@@ -1,4 +1,41 @@
-Spring Hadoop is a framework extension for writing Hadoop jobs that benefit from the features of Spring, Spring Batch and Spring Integration.  There is no code yet, but watch this space...
+Spring Hadoop is a framework extension for writing Hadoop jobs that
+benefit from the features of Spring, Spring Batch and Spring
+Integration.  The feature set is limited right now to support for
+dependency injection in simple Hadoop jobs.  If you have ideas about
+how to improve or extend the scope, please feel free to contribute
+(see below for instructions).
+
+# Getting Started
+
+Clone the source code and run `mvn install` (we use 2.1.x) from the
+command line, or import as a Maven project into SpringSource Tool
+Suite (STS).  There are some integration tests that show you what you
+can do.  For example (from `WordCountIntegrationTests`):
+
+    JobTemplate jobTemplate = new JobTemplate();
+    jobTemplate.setVerbose(true);
+    assertTrue(jobTemplate.run("/spring/autowired-job-context.xml"));
+
+This runs a simple word count job (per the online tutorial on the
+[Hadoop home
+page](http://hadoop.apache.org/common/docs/r0.20.2/mapred_tutorial.html)).
+Such a simple job doesn't benefit much from dependency injection, but
+it shows the basic principles, and will feel very comfortable to
+existing Spring users.  More complex jobs, especially with externalise
+parameterisation of the components, will benefit greatly from having a
+container to manage the dependencies.
+
+The test code above runs the job locally by default.  To run it in a
+Hadoop cluster you need to run the cluster (of course) and provide
+configuration for a jar file containing the job and for the job
+tracker and distributed file system.  You can generate a jar file by
+running `mvn assembly:single` and then using the settings already in
+the test.  The test case also sets up the job tracker host for the job
+configuration (the default settings will work for a local job tracker
+with the settings from the [Hadoop getting started
+guide](http://hadoop.apache.org/common/docs/r0.20.2/quickstart.html)).
+The `HadoopSetUp` test utility is used in the test to sets up the
+cluster properties if it detects the local job tracker.
 
 # Contributing to Spring Hadoop
 

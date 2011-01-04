@@ -11,6 +11,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<!-- versions for commonly-used dependencies -->
+		<hadoop.version>0.20.2</hadoop.version>
 		<cglib.version>2.2</cglib.version>
 		<commons-io.version>1.4</commons-io.version>
 		<junit.version>4.8.2</junit.version>
@@ -80,6 +81,11 @@
 	</distributionManagement>
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>org.apache.hadoop</groupId>
+				<artifactId>hadoop-core</artifactId>
+				<version>${hadoop.version}</version>
+			</dependency>
 			<!-- Spring -->
 			<dependency>
 				<groupId>org.springframework</groupId>
@@ -202,7 +208,6 @@
 				<scope>test</scope>
 			</dependency>
 
-
 			<dependency>
 				<groupId>org.codehaus.jackson</groupId>
 				<artifactId>jackson-core-asl</artifactId>
@@ -213,13 +218,6 @@
 				<artifactId>jackson-mapper-asl</artifactId>
 				<version>${org.codehaus.jackson.version}</version>
 			</dependency>
-
-            <dependency>
-              <groupId>log4j</groupId>
-              <artifactId>log4j</artifactId>
-              <version>${log4j.version}</version>
-              <scope>test</scope>
-            </dependency>
 
 		</dependencies>
 	</dependencyManagement>
@@ -281,14 +279,11 @@
 		<pluginManagement>
 			<plugins>
 				<plugin>
-					<!-- configures the springsource bundlor plugin, which generates OSGI-compatible 
-						MANIFEST.MF files during the 'compile' phase of the maven build. this plugin 
-						is declared within the pluginManagement section because not every module 
-						that inherits from this pom needs bundlor's services, e.g.: spring-integration-samples 
-						and all its children. for this reason, all modules that wish to use bundlor 
-						must declare it explicitly. it is not necessary to specify the <version> 
-						or <configuration> sections, but groupId and artifactId are required. see 
-						http://static.springsource.org/s2-bundlor/1.0.x/user-guide/html/ch04s03.html 
+					<!-- configures the springsource bundlor plugin, which generates OSGI-compatible MANIFEST.MF files during the 'compile' 
+						phase of the maven build. this plugin is declared within the pluginManagement section because not every module that inherits 
+						from this pom needs bundlor's services, e.g.: spring-integration-samples and all its children. for this reason, all modules 
+						that wish to use bundlor must declare it explicitly. it is not necessary to specify the <version> or <configuration> sections, 
+						but groupId and artifactId are required. see http://static.springsource.org/s2-bundlor/1.0.x/user-guide/html/ch04s03.html 
 						for more info -->
 					<groupId>com.springsource.bundlor</groupId>
 					<artifactId>com.springsource.bundlor.maven</artifactId>
@@ -332,8 +327,7 @@
 	<reporting>
 		<plugins>
 			<plugin>
-				<!-- significantly speeds up the 'Dependencies' report during site creation 
-					see http://old.nabble.com/Skipping-dependency-report-during-Maven2-site-generation-td20116761.html -->
+				<!-- significantly speeds up the 'Dependencies' report during site creation see http://old.nabble.com/Skipping-dependency-report-during-Maven2-site-generation-td20116761.html -->
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-project-info-reports-plugin</artifactId>
 				<version>2.1</version>
