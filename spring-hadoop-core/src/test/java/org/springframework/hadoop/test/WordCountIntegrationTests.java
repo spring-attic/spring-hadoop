@@ -15,6 +15,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.hadoop.JobTemplate;
+import org.springframework.util.ClassUtils;
 
 public class WordCountIntegrationTests {
 
@@ -59,12 +60,27 @@ public class WordCountIntegrationTests {
 	}
 
 	@Test
-	public void testAutowiredJob() throws Exception {
-		assertTrue(jobTemplate.run("/spring/autowired-job-context.xml"));
+	public void testXmlConfiguredJob() throws Exception {
+		assertTrue(jobTemplate.run("classpath:/spring/autowired-job-context.xml"));
+	}
+	
+	@Test
+	public void testClassConfiguredJob() throws Exception {
+		assertTrue(jobTemplate.run(JobConfiguration.class));
+	}
+	
+	@Test
+	public void testLiteConfiguredJob() throws Exception {
+		assertTrue(jobTemplate.run(LiteConfiguration.class));
+	}
+	
+	@Test
+	public void testPackageConfiguredJob() throws Exception {
+		assertTrue(jobTemplate.run(ClassUtils.getPackageName(getClass())+".config"));
 	}
 	
 	public static void main(String[] args) throws Exception {
-		new WordCountIntegrationTests().testAutowiredJob();
+		new WordCountIntegrationTests().testXmlConfiguredJob();
 	}
 
 }

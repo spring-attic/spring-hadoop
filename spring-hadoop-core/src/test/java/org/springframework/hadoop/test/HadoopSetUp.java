@@ -8,8 +8,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -26,6 +26,45 @@ import org.junit.rules.TestWatchman;
 import org.junit.runners.model.FrameworkMethod;
 import org.springframework.hadoop.JobTemplate;
 
+/**
+ * <p>
+ * A JUnit &#64;Rule that can be used to detect and configure a remote Hadoop
+ * cluster, or fall back to running locally for a simple functional test.
+ * </p>
+ * 
+ * <p>
+ * Example usage
+ * 
+ * <pre>
+ * &#064;Rule
+ * public HadoopSetUp setUp = HadoopSetUp.preferClusterRunning(&quot;localhost&quot;, 9001);
+ * 
+ * private JobTemplate jobTemplate;
+ * 
+ * &#064;Before
+ * public void init() throws Exception {
+ * 	jobTemplate = new JobTemplate();
+ * 	if (setUp.isClusterOnline()) {
+ * 		setUp.setJarFile(&quot;target/my-test.jar&quot;);
+ * 		jobTemplate.setExtraConfiguration(setUp.getExtraConfiguration());
+ * 		setUp.copy(&quot;src/test/resources/input&quot;);
+ * 	}
+ * 	jobTemplate.setVerbose(true);
+ * 	setUp.delete(&quot;target/output&quot;);
+ * }
+ * 
+ * &#064;Test
+ * public void testJob() throws Exception {
+ * 	assertTrue(jobTemplate.run(JobConfiguration.class));
+ * }
+ * 
+ * </pre>
+ * 
+ * </p>
+ * 
+ * @author Dave Syer
+ * 
+ */
 public class HadoopSetUp extends TestWatchman {
 
 	private static Log logger = LogFactory.getLog(HadoopSetUp.class);
@@ -47,6 +86,9 @@ public class HadoopSetUp extends TestWatchman {
 	private String jarFile;
 
 	/**
+	 * Use this factory to run the job only on a remote cluster, and skip all
+	 * tests if the cluster is not detected.
+	 * 
 	 * @return a new rule that assumes an existing running cluster
 	 */
 	public static HadoopSetUp ensureClusterRunning(String hostname, int port) {
@@ -54,6 +96,10 @@ public class HadoopSetUp extends TestWatchman {
 	}
 
 	/**
+	 * Detect a cluster with default parameters (job tracker at
+	 * <code>locahost:9001</code>). Use this factory to run the job only on a
+	 * remote cluster, and skip all tests if the cluster is not detected.
+	 * 
 	 * @return a new rule that assumes an existing running cluster
 	 */
 	public static HadoopSetUp ensureClusterRunning() {
@@ -61,6 +107,9 @@ public class HadoopSetUp extends TestWatchman {
 	}
 
 	/**
+	 * Use this factory method to prefer a cluster deployment, but fall back to
+	 * local if the cluster is not running.
+	 * 
 	 * @return a new rule that prefers an existing running cluster
 	 */
 	public static HadoopSetUp preferClusterRunning(String hostname, int port) {
@@ -68,6 +117,10 @@ public class HadoopSetUp extends TestWatchman {
 	}
 
 	/**
+	 * Detect a cluster with default parameters (job tracker at
+	 * <code>locahost:9001</code>). Use this factory method to prefer a cluster
+	 * deployment, but fall back to local if the cluster is not running.
+	 * 
 	 * @return a new rule that prefers an existing running cluster
 	 */
 	public static HadoopSetUp preferClusterRunning() {
@@ -184,7 +237,7 @@ public class HadoopSetUp extends TestWatchman {
 	/**
 	 * @return the configuration
 	 */
-	public Map<String, String> getExtraConfiguration() {
+	public Properties getExtraConfiguration() {
 		return jobTemplate.getExtraConfiguration();
 	}
 
@@ -211,8 +264,8 @@ public class HadoopSetUp extends TestWatchman {
 
 	public Configuration getConfiguration() {
 		Configuration configuration = new Configuration();
-		for (Entry<String, String> entry : getExtraConfiguration().entrySet()) {
-			configuration.set(entry.getKey(), entry.getValue());
+		for (Entry<Object, Object> entry : getExtraConfiguration().entrySet()) {
+			configuration.set((String) entry.getKey(), (String) entry.getValue());
 		}
 		return configuration;
 	}

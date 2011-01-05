@@ -19,6 +19,9 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.Job;
 
 /**
+ * A set of utilities for creating Spring application contexts and pulling out
+ * Hadoop components by name or type.
+ * 
  * @author Dave Syer
  * 
  */
@@ -29,9 +32,13 @@ public interface ContextLoader {
 	<T> T getBean(Configuration configuration, Class<T> type, String property);
 
 	Job getJob(String configLocation, String name);
-	
+
 	Job getJob(String configLocation);
 
 	void releaseJob(Job job);
+
+	Job getJob(Class<?> configLocation);
+
+	Job getJob(Class<?> configLocation, String jobName);
 
 }

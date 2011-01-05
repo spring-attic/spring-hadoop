@@ -19,11 +19,14 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.Job;
 
 /**
+ * Static wrapper for a {@link ContextLoader} to enable Spring components to
+ * share an application context in a Hadoop environment.
+ * 
  * @author Dave Syer
  * 
  */
 public class HadoopApplicationContextUtils {
-	
+
 	private static ContextLoader loader = new DefaultContextLoader();
 
 	public static <T> T getBean(Configuration configuration, Class<T> type, String property) {
@@ -46,12 +49,20 @@ public class HadoopApplicationContextUtils {
 		return loader.getJob(configLocation);
 	}
 
-	public static Job getJob(String configLocation, String name) {
-		return loader.getJob(configLocation, name);
+	public static Job getJob(String configLocation, String jobName) {
+		return loader.getJob(configLocation, jobName);
 	}
 
 	public static void releaseJob(Job job) {
 		loader.releaseJob(job);
+	}
+
+	public static Job getJob(Class<?> configLocation) {
+		return loader.getJob(configLocation);
+	}
+
+	public static Job getJob(Class<?> configLocation, String jobName) {
+		return loader.getJob(configLocation, jobName);
 	}
 
 }

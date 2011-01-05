@@ -1,8 +1,8 @@
 package org.springframework.hadoop;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.IOException;
 import java.util.Map.Entry;
+import java.util.Properties;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
@@ -17,7 +17,7 @@ public class JobTemplate {
 	/**
 	 * The default location for a job configuration.
 	 */
-	public static final String DEFAULT_CONFIG_LOCATION = "/META-INF/spring/hadoop/job-context.xml";
+	public static final String DEFAULT_CONFIG_LOCATION = "classpath*:/META-INF/spring/hadoop/job-context.xml";
 
 	public static final String SPRING_INPUT_PATHS = "spring.input.paths";
 
@@ -31,7 +31,7 @@ public class JobTemplate {
 
 	private int port = 9001;
 
-	private Map<String,String> extraConfiguration = new HashMap<String, String>();
+	private Properties extraConfiguration = new Properties();
 
 	/**
 	 * @param verbose the verbose flag to set
@@ -43,7 +43,7 @@ public class JobTemplate {
 	/**
 	 * @param configuration extra configuration to apply
 	 */
-	public void setExtraConfiguration(Map<String,String> configuration) {
+	public void setExtraConfiguration(Properties configuration) {
 		this.extraConfiguration = configuration;
 	}
 
@@ -65,16 +65,34 @@ public class JobTemplate {
 
 	// TODO: add callback to enhance context?
 	public boolean run(String configLocation) throws Exception {
+		Job template = HadoopApplicationContextUtils.getJob(configLocation);
+		return runFromTemplate(template);
+	}
 
-		Job bean = HadoopApplicationContextUtils.getJob(configLocation);
+	public boolean run(String configLocation, String jobName) throws Exception {
+		Job template = HadoopApplicationContextUtils.getJob(configLocation, jobName);
+		return runFromTemplate(template);
+	}
+
+	public boolean run(Class<?> configLocation) throws Exception {
+		Job template = HadoopApplicationContextUtils.getJob(configLocation);
+		return runFromTemplate(template);		
+	}
+	
+	public boolean run(Class<?> configLocation, String jobName) throws Exception {
+		Job template = HadoopApplicationContextUtils.getJob(configLocation, jobName);
+		return runFromTemplate(template);		
+	}
+	
+	private boolean runFromTemplate(Job template) throws IOException, InterruptedException, ClassNotFoundException {
 
 		try {
 
 			// Construct the new complete configuration *before* the Job is initialized...
-			Configuration configuration = bean.getConfiguration();
+			Configuration configuration = template.getConfiguration();
 			mergeExtraConfiguration(configuration);
 			// Leave the original Job intact (so it can be a singleton).
-			Job job = new Job(configuration, bean.getJobName());
+			Job job = new Job(configuration, template.getJobName());
 
 			if (configuration.get(SPRING_INPUT_PATHS) != null) {
 				for (String path : StringUtils.commaDelimitedListToStringArray(configuration.get(SPRING_INPUT_PATHS))) {
@@ -90,25 +108,26 @@ public class JobTemplate {
 
 		}
 		finally {
-			HadoopApplicationContextUtils.releaseJob(bean);
+			HadoopApplicationContextUtils.releaseJob(template);
 		}
+
 	}
 
 	private void mergeExtraConfiguration(Configuration configuration) {
-		for (Entry<String, String> entry : getExtraConfiguration().entrySet()) {
-			configuration.set(entry.getKey(), entry.getValue());
+		for (Entry<Object, Object> entry : getExtraConfiguration().entrySet()) {
+			configuration.set((String)entry.getKey(), (String)entry.getValue());
 		}
 	}
 
-	public Map<String,String> getExtraConfiguration() {
-		Map<String, String> map = new HashMap<String, String>(extraConfiguration);
+	public Properties getExtraConfiguration() {
+		Properties map = new Properties(extraConfiguration);
 		if (jarFile != null) {
-			map.put("mapred.jar", jarFile);
+			map.setProperty("mapred.jar", jarFile);
 		}
 		if (hostname != null) {
-			map.put("mapred.job.tracker", String.format("%s:%d", hostname, port));
+			map.setProperty("mapred.job.tracker", String.format("%s:%d", hostname, port));
 			// TODO: make fs port configurable
-			map.put("fs.default.name", String.format("hdfs://%s:%d/", hostname, port - 1));
+			map.setProperty("fs.default.name", String.format("hdfs://%s:%d/", hostname, port - 1));
 		}
 		return map;
 	}

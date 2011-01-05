@@ -15,6 +15,8 @@
  */
 package org.springframework.hadoop.mapreduce;
 
+import java.io.IOException;
+
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
@@ -24,6 +26,15 @@ import org.springframework.hadoop.JobTemplate;
 import org.springframework.util.StringUtils;
 
 /**
+ * A factory bean for a {@link Job} to be configured with Spring and used as a
+ * template to launch Hadoop processes. Instead of configuring like a native job
+ * with class names for the mapper, reducer etc, this factory allows you to
+ * inject concrete instances of the dependencies. Those instances will be used
+ * as is for a local job or re-created from a separate application context
+ * remotely for a clustered job.
+ * 
+ * @see JobTemplate for template usage patterns
+ * 
  * @author Dave Syer
  * 
  */
@@ -47,26 +58,62 @@ public class JobFactoryBean implements FactoryBean<Job>, BeanNameAware {
 
 	private Mapper<?, ?, ?, ?> mapper;
 
+	/**
+	 * The {@link Reducer} that will be used in this job.
+	 * 
+	 * @return the reducer to use
+	 */
 	public void setReducer(Reducer<?, ?, ?, ?> reducer) {
 		this.reducer = reducer;
 	}
 
+	/**
+	 * The {@link Reducer combiner} that will be used in this job.
+	 * 
+	 * @return the combiner to use
+	 */
 	public void setCombiner(Reducer<?, ?, ?, ?> combiner) {
 		this.combiner = combiner;
 	}
 
+	/**
+	 * The {@link Mapper} that will be used in this job.
+	 * 
+	 * @return the mapper to use
+	 */
 	public void setMapper(Mapper<?, ?, ?, ?> mapper) {
 		this.mapper = mapper;
 	}
 
+	/**
+	 * The {@link Reducer} that will be used in this job. This public getter is
+	 * provided so it can be called by a remote process to extract a mapper at
+	 * run time.
+	 * 
+	 * @return the reducer to use
+	 */
 	public Reducer<?, ?, ?, ?> getReducer() {
 		return reducer;
 	}
 
+	/**
+	 * The {@link Reducer combiner} that will be used in this job. This public
+	 * getter is provided so it can be called by a remote process to extract a
+	 * mapper at run time.
+	 * 
+	 * @return the combiner to use
+	 */
 	public Reducer<?, ?, ?, ?> getCombiner() {
 		return combiner;
 	}
 
+	/**
+	 * The {@link Mapper} that will be used in this job. This public getter is
+	 * provided so it can be called by a remote process to extract a mapper at
+	 * run time.
+	 * 
+	 * @return the mapper to use
+	 */
 	public Mapper<?, ?, ?, ?> getMapper() {
 		return mapper;
 	}
@@ -103,11 +150,11 @@ public class JobFactoryBean implements FactoryBean<Job>, BeanNameAware {
 	}
 
 	/**
-	 * @return
-	 * @throws Exception
+	 * @return a {@link Job} instance
+	 * @throws IOException if there is a problem creating the job
 	 * @see FactoryBean#getObject()
 	 */
-	public Job getObject() throws Exception {
+	public Job getObject() throws IOException {
 		if (job == null) {
 			job = new Job();
 		}
@@ -140,7 +187,7 @@ public class JobFactoryBean implements FactoryBean<Job>, BeanNameAware {
 	}
 
 	/**
-	 * @return
+	 * @return {@link Job}
 	 * @see FactoryBean#getObjectType()
 	 */
 	public Class<?> getObjectType() {
@@ -148,7 +195,7 @@ public class JobFactoryBean implements FactoryBean<Job>, BeanNameAware {
 	}
 
 	/**
-	 * @return
+	 * @return true
 	 * @see FactoryBean#isSingleton()
 	 */
 	public boolean isSingleton() {

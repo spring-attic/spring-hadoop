@@ -28,6 +28,7 @@ import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.support.AbstractBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -63,14 +64,27 @@ public class DefaultContextLoader implements ContextLoader {
 		}
 	}
 
-	public Job getJob(String configLocation) {
+	public Job getJob(Class<?> configLocation, String jobName) {
+		Assert.notNull(configLocation, "A config location must be provided");
+		ApplicationContextReference reference = findApplicationContext(configLocation);
+		return getJobInternal(reference, jobName);
+	}
+
+	public Job getJob(Class<?> configLocation) {
 		return getJob(configLocation, null);
 	}
 
 	public Job getJob(String configLocation, String jobName) {
-
 		Assert.notNull(configLocation, "A config location must be provided");
 		ApplicationContextReference reference = findApplicationContext(configLocation);
+		return getJobInternal(reference, jobName);
+	}
+
+	public Job getJob(String configLocation) {
+		return getJob(configLocation, null);
+	}
+
+	private Job getJobInternal(ApplicationContextReference reference, String jobName) {
 
 		Job job = null;
 		if (jobName == null) {
@@ -82,7 +96,7 @@ public class DefaultContextLoader implements ContextLoader {
 
 		if (job != null) {
 			Configuration configuration = job.getConfiguration();
-			configuration.set(SPRING_CONFIG_LOCATION, configLocation);
+			configuration.set(SPRING_CONFIG_LOCATION, reference.getConfigLocation());
 			reference.increment();
 			if (job.getJobName() != null) {
 				jobName = job.getJobName();
@@ -143,12 +157,28 @@ public class DefaultContextLoader implements ContextLoader {
 		return configuration.get(SPRING_CONFIG_LOCATION, "/META-INF/spring/hadoop/" + jobName + "-context.xml");
 	}
 
+	private ApplicationContextReference findApplicationContext(Class<?> location) {
+		String path = location.getName();
+		if (contexts.containsKey(path)) {
+			return contexts.get(path);
+		}
+		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(location);
+		contexts.putIfAbsent(path, new ApplicationContextReference(context, path));
+		return contexts.get(path);
+	}
+
 	private ApplicationContextReference findApplicationContext(String path) {
 		if (contexts.containsKey(path)) {
 			return contexts.get(path);
 		}
-		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(path);
-		contexts.putIfAbsent(path, new ApplicationContextReference(context));
+		ApplicationContext context;
+		if (path.endsWith(".xml")) {
+			context = new ClassPathXmlApplicationContext(path);
+		}
+		else {
+			context = new AnnotationConfigApplicationContext(path);
+		}
+		contexts.putIfAbsent(path, new ApplicationContextReference(context, path));
 		return contexts.get(path);
 	}
 
@@ -201,8 +231,16 @@ public class DefaultContextLoader implements ContextLoader {
 
 		private final AtomicInteger references = new AtomicInteger();
 
-		public ApplicationContextReference(ApplicationContext context) {
+		private final String configLocation;
+
+		public ApplicationContextReference(ApplicationContext context, Object configLocation) {
 			this.context = context;
+			this.configLocation = configLocation instanceof Class ? ((Class<?>) configLocation).getName()
+					: configLocation.toString();
+		}
+
+		public String getConfigLocation() {
+			return configLocation;
 		}
 
 		public int decrement() {
