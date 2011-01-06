@@ -17,8 +17,13 @@ package org.springframework.hadoop.mapreduce;
 
 import java.io.IOException;
 
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.RawComparator;
+import org.apache.hadoop.mapreduce.InputFormat;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.OutputFormat;
+import org.apache.hadoop.mapreduce.Partitioner;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
@@ -57,6 +62,20 @@ public class JobFactoryBean implements FactoryBean<Job>, BeanNameAware {
 	private Reducer<?, ?, ?, ?> combiner;
 
 	private Mapper<?, ?, ?, ?> mapper;
+
+	private String workingDirectory;
+
+	private InputFormat<?, ?> inputFormat;
+
+	private OutputFormat<?, ?> outputFormat;
+
+	private Partitioner<?, ?> partitioner;
+
+	private RawComparator<?> sortComparator;
+
+	private RawComparator<?> groupingComparator;
+
+	private Integer numReduceTasks;
 
 	/**
 	 * The {@link Reducer} that will be used in this job.
@@ -118,6 +137,29 @@ public class JobFactoryBean implements FactoryBean<Job>, BeanNameAware {
 		return mapper;
 	}
 
+	public InputFormat<?, ?> getInputFormat() {
+		return inputFormat;
+	}
+
+	public OutputFormat<?, ?> getOutputFormat() {
+		return outputFormat;
+	}
+
+	public Partitioner<?, ?> getPartitioner() {
+		return partitioner;
+	}
+
+	public RawComparator<?> getSortComparator() {
+		return sortComparator;
+	}
+
+	/**
+	 * @return the groupingComparator
+	 */
+	public RawComparator<?> getGroupingComparator() {
+		return groupingComparator;
+	}
+
 	/**
 	 * @param name
 	 * @see BeanNameAware#setBeanName(java.lang.String)
@@ -131,6 +173,34 @@ public class JobFactoryBean implements FactoryBean<Job>, BeanNameAware {
 	 */
 	public void setJob(Job job) {
 		this.job = job;
+	}
+
+	public void setNumReduceTasks(int numReduceTasks) throws IllegalStateException {
+		this.numReduceTasks = numReduceTasks;
+	}
+
+	public void setWorkingDirectory(String workingDirectory) throws IOException {
+		this.workingDirectory = workingDirectory;
+	}
+
+	public void setInputFormat(InputFormat<?, ?> inputFormat) throws IllegalStateException {
+		this.inputFormat = inputFormat;
+	}
+
+	public void setOutputFormat(OutputFormat<?, ?> outputFormat) throws IllegalStateException {
+		this.outputFormat = outputFormat;
+	}
+
+	public void setPartitioner(Partitioner<?, ?> partitioner) throws IllegalStateException {
+		this.partitioner = partitioner;
+	}
+
+	public void setSortComparator(RawComparator<?> sortComparator) throws IllegalStateException {
+		this.sortComparator = sortComparator;
+	}
+
+	public void setGroupingComparator(RawComparator<?> groupingComparator) throws IllegalStateException {
+		this.groupingComparator = groupingComparator;
 	}
 
 	public void setInputPaths(String... inputPaths) {
@@ -168,6 +238,12 @@ public class JobFactoryBean implements FactoryBean<Job>, BeanNameAware {
 		if (name != null) {
 			job.setJobName(name);
 		}
+		if (workingDirectory != null) {
+			job.setWorkingDirectory(new Path(workingDirectory));
+		}
+		if (numReduceTasks != null) {
+			job.setNumReduceTasks(numReduceTasks);
+		}
 		if (mapper != null) {
 			job.setMapperClass(AutowiringMapper.class);
 		}
@@ -176,6 +252,21 @@ public class JobFactoryBean implements FactoryBean<Job>, BeanNameAware {
 		}
 		if (reducer != null) {
 			job.setReducerClass(AutowiringReducer.class);
+		}
+		if (inputFormat != null) {
+			job.setInputFormatClass(AutowiringInputFormat.class);
+		}
+		if (outputFormat != null) {
+			job.setOutputFormatClass(AutowiringOutputFormat.class);
+		}
+		if (sortComparator != null) {
+			job.setSortComparatorClass(AutowiringSortComparator.class);
+		}
+		if (groupingComparator != null) {
+			job.setGroupingComparatorClass(AutowiringGroupingComparator.class);
+		}
+		if (partitioner != null) {
+			job.setPartitionerClass(AutowiringPartitioner.class);
 		}
 		if (valueClass != null) {
 			job.setOutputValueClass(valueClass);

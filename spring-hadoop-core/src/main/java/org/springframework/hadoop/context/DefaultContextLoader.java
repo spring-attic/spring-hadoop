@@ -31,6 +31,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -39,24 +40,34 @@ import org.springframework.util.StringUtils;
  */
 public class DefaultContextLoader implements ContextLoader {
 
-	private static final String SPRING_CONFIG_LOCATION = "spring.config.location";
+	/**
+	 * Configuration key for Spring config location.
+	 */
+	public static final String SPRING_CONFIG_LOCATION = "spring.config.location";
 
-	private static final String SPRING_JOB_NAME = "spring.job.name";
+	/**
+	 * Configuration key for job name (in case distinct from normal job name).
+	 */
+	public static final String SPRING_JOB_NAME = "spring.job.name";
 
 	private ConcurrentMap<String, ApplicationContextReference> contexts = new ConcurrentHashMap<String, ApplicationContextReference>();
 
-	public <T> T getBean(Configuration configuration, Class<T> type, String property) {
-		ApplicationContextReference reference = findApplicationContext(configuration);
+	public <T> T getBean(Configuration configuration, Class<T> type, boolean createContext) {
+		return getBean(configuration, type, createContext, null);
+	}
+	
+	public <T> T getBean(Configuration configuration, Class<T> type, boolean createContext, String property) {
+		ApplicationContextReference reference = findApplicationContext(configuration, createContext);
 		T bean = getBean(reference.getContext(), configuration, type, property);
-		if (bean != null) {
+		if (bean != null && createContext) {
 			reference.increment();
 		}
 		return bean;
 	}
 
-	public void releaseBean(Configuration configuration, Class<?> type, String property) {
+	public void releaseContext(Configuration configuration) {
 		ApplicationContextReference reference = getApplicationContext(configuration);
-		if (reference == null || getBean(reference.getContext(), configuration, type, property) == null) {
+		if (reference == null) {
 			return;
 		}
 		if (reference.decrement() == 0) {
@@ -66,7 +77,7 @@ public class DefaultContextLoader implements ContextLoader {
 
 	public Job getJob(Class<?> configLocation, String jobName) {
 		Assert.notNull(configLocation, "A config location must be provided");
-		ApplicationContextReference reference = findApplicationContext(configLocation);
+		ApplicationContextReference reference = findApplicationContext(configLocation.getName(), true);
 		return getJobInternal(reference, jobName);
 	}
 
@@ -76,12 +87,33 @@ public class DefaultContextLoader implements ContextLoader {
 
 	public Job getJob(String configLocation, String jobName) {
 		Assert.notNull(configLocation, "A config location must be provided");
-		ApplicationContextReference reference = findApplicationContext(configLocation);
+		ApplicationContextReference reference = findApplicationContext(configLocation, true);
 		return getJobInternal(reference, jobName);
 	}
 
 	public Job getJob(String configLocation) {
 		return getJob(configLocation, null);
+	}
+
+	public void releaseJob(Job job) {
+		if (job == null) {
+			return;
+		}
+		Configuration configuration = job.getConfiguration();
+		releaseContext(configuration);
+	}
+
+	private void remove(Configuration configuration) {
+		ApplicationContextReference reference = getApplicationContext(configuration);
+		if (reference == null) {
+			return;
+		}
+		// TODO: use a cache with expiry instead of always removing immediately
+		ApplicationContext context = reference.getContext();
+		if (context instanceof ConfigurableApplicationContext) {
+			((ConfigurableApplicationContext) context).close();
+		}
+		contexts.remove(getJobName(configuration));
 	}
 
 	private Job getJobInternal(ApplicationContextReference reference, String jobName) {
@@ -106,27 +138,6 @@ public class DefaultContextLoader implements ContextLoader {
 
 		return job;
 
-	}
-
-	public void releaseJob(Job job) {
-		if (job == null) {
-			return;
-		}
-		Configuration configuration = job.getConfiguration();
-		releaseBean(configuration, Job.class, null);
-	}
-
-	private void remove(Configuration configuration) {
-		ApplicationContextReference reference = getApplicationContext(configuration);
-		if (reference == null) {
-			return;
-		}
-		// TODO: use a cache with expiry instead of always removing immediately
-		ApplicationContext context = reference.getContext();
-		if (context instanceof ConfigurableApplicationContext) {
-			((ConfigurableApplicationContext) context).close();
-		}
-		contexts.remove(getJobName(configuration));
 	}
 
 	private <T> T getBeanFromFactoryBean(ApplicationContext context, Configuration configuration, Class<T> type,
@@ -154,36 +165,43 @@ public class DefaultContextLoader implements ContextLoader {
 
 	private String getConfigLocation(Configuration configuration) {
 		String jobName = getJobName(configuration);
-		return configuration.get(SPRING_CONFIG_LOCATION, "/META-INF/spring/hadoop/" + jobName + "-context.xml");
+		String defaultValue = configuration.get(SPRING_CONFIG_LOCATION, "/META-INF/spring/hadoop/" + jobName
+				+ "-context.xml");
+		return configuration.get(SPRING_CONFIG_LOCATION, defaultValue);
 	}
 
-	private ApplicationContextReference findApplicationContext(Class<?> location) {
-		String path = location.getName();
+	private ApplicationContextReference findApplicationContext(String path, boolean createContext) {
 		if (contexts.containsKey(path)) {
 			return contexts.get(path);
 		}
-		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(location);
-		contexts.putIfAbsent(path, new ApplicationContextReference(context, path));
-		return contexts.get(path);
-	}
-
-	private ApplicationContextReference findApplicationContext(String path) {
-		if (contexts.containsKey(path)) {
-			return contexts.get(path);
+		if (!createContext) {
+			throw new IllegalStateException("Could not find existing ApplicationContext at [" + path + "]");
+		}
+		Class<?> configClass = null;
+		try {
+			configClass = ClassUtils.forName(path, ClassUtils.getDefaultClassLoader());
+		}
+		catch (ClassNotFoundException e) {
+			// ignore
 		}
 		ApplicationContext context;
-		if (path.endsWith(".xml")) {
-			context = new ClassPathXmlApplicationContext(path);
+		if (configClass != null) {
+			context = new AnnotationConfigApplicationContext((Class<?>) configClass);
 		}
 		else {
-			context = new AnnotationConfigApplicationContext(path);
+			if (path.endsWith(".xml")) {
+				context = new ClassPathXmlApplicationContext(path);
+			}
+			else {
+				context = new AnnotationConfigApplicationContext(path);
+			}
 		}
 		contexts.putIfAbsent(path, new ApplicationContextReference(context, path));
 		return contexts.get(path);
 	}
 
-	private ApplicationContextReference findApplicationContext(Configuration configuration) {
-		return findApplicationContext(getConfigLocation(configuration));
+	private ApplicationContextReference findApplicationContext(Configuration configuration, boolean createContext) {
+		return findApplicationContext(getConfigLocation(configuration), createContext);
 	}
 
 	private ApplicationContextReference getApplicationContext(Configuration configuration) {
@@ -194,12 +212,12 @@ public class DefaultContextLoader implements ContextLoader {
 	private <T> T getBean(ApplicationContext context, Configuration configuration, Class<T> type, String property) {
 		T bean = getBeanFromFactoryBean(context, configuration, type, property);
 		if (bean == null) {
-			bean = getRawBean(context, configuration, type, property);
+			bean = getBeanByName(context, configuration, type, property);
 		}
 		return bean;
 	}
 
-	private <T> T getRawBean(ApplicationContext context, Configuration configuration, Class<T> type, String property) {
+	private <T> T getBeanByName(ApplicationContext context, Configuration configuration, Class<T> type, String property) {
 		T bean = null;
 		List<String> candidates = Arrays.asList(StringUtils.uncapitalize(type.getSimpleName()),
 				StringUtils.uncapitalize(getJobName(configuration)) + type.getSimpleName());

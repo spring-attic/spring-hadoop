@@ -75,6 +75,11 @@ public class WordCountIntegrationTests {
 	}
 	
 	@Test
+	public void tesKitchenSinkJob() throws Exception {
+		assertTrue(jobTemplate.run(KitchenSinkConfiguration.class));
+	}
+	
+	@Test
 	public void testPackageConfiguredJob() throws Exception {
 		assertTrue(jobTemplate.run(ClassUtils.getPackageName(getClass())+".config"));
 	}

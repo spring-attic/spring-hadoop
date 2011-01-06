@@ -27,18 +27,20 @@ import org.apache.hadoop.mapreduce.Job;
  */
 public interface ContextLoader {
 
-	void releaseBean(Configuration configuration, Class<?> type, String property);
+	<T> T getBean(Configuration configuration, Class<T> type, boolean createContext, String property);
 
-	<T> T getBean(Configuration configuration, Class<T> type, String property);
+	<T> T getBean(Configuration configuration, Class<T> type, boolean createContext);
 
-	Job getJob(String configLocation, String name);
+	void releaseContext(Configuration configuration);
+	
+	Job getJob(String configLocation, String jobName);
 
 	Job getJob(String configLocation);
-
-	void releaseJob(Job job);
 
 	Job getJob(Class<?> configLocation);
 
 	Job getJob(Class<?> configLocation, String jobName);
 
+	void releaseJob(Job job);
+	
 }

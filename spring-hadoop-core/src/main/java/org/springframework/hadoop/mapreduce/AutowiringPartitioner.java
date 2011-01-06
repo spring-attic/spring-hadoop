@@ -15,33 +15,35 @@
  */
 package org.springframework.hadoop.mapreduce;
 
-import java.io.IOException;
-
-import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.conf.Configurable;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.mapreduce.Partitioner;
 import org.springframework.hadoop.context.HadoopApplicationContextUtils;
 
 /**
  * @author Dave Syer
  * 
  */
-public class AutowiringMapper<KI, VI, KO, VO> extends Mapper<KI, VI, KO, VO> {
+public class AutowiringPartitioner<K, V> extends Partitioner<K, V> implements Configurable {
 
-	private Mapper<KI, VI, KO, VO> delegate;
+	private Configuration configuration;
 
-	protected void setup(Context context) throws IOException, InterruptedException {
+	private Partitioner<K, V> delegate;
+
+	public void setConf(Configuration configuration) {
+		this.configuration = configuration;
 		@SuppressWarnings("unchecked")
-		Mapper<KI, VI, KO, VO> delegate = HadoopApplicationContextUtils.getBean(context.getConfiguration(), Mapper.class);
-		this.delegate = delegate;
+		Partitioner<K, V> bean = HadoopApplicationContextUtils.getExistingBean(configuration, Partitioner.class);
+		delegate = bean;
 	}
 
-	public void run(Context context) throws IOException, InterruptedException {
-		setup(context);
-		delegate.run(context);
-		cleanup(context);
+	public Configuration getConf() {
+		return configuration;
 	}
 
-	protected void cleanup(Context context) throws IOException ,InterruptedException {
-		HadoopApplicationContextUtils.releaseContext(context.getConfiguration());
+	@Override
+	public int getPartition(K key, V value, int numPartitions) {
+		return delegate.getPartition(key, value, numPartitions);
 	}
 
 }

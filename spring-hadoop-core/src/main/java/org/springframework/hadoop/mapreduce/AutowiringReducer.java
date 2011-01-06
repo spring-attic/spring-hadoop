@@ -41,7 +41,7 @@ public class AutowiringReducer<KI, VI, KO, VO> extends Reducer<KI, VI, KO, VO> {
 	}
 
 	protected void cleanup(Context context) throws IOException ,InterruptedException {
-		HadoopApplicationContextUtils.releaseBean(context.getConfiguration(), Reducer.class);
+		HadoopApplicationContextUtils.releaseContext(context.getConfiguration());
 	}
 
 }

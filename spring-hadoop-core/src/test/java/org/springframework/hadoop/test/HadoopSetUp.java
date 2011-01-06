@@ -170,6 +170,12 @@ public class HadoopSetUp extends TestWatchman {
 	}
 
 	public void init() {
+
+		if ((clusterOnline && !clusterOffline) || (clusterOffline && !clusterOnline)) {
+			// We already tested and it's not there
+			return;
+		}
+		
 		if (hostname == null) {
 			// nothing to do
 			return;
@@ -179,7 +185,7 @@ public class HadoopSetUp extends TestWatchman {
 		if (assumeOnline) {
 			Assume.assumeTrue(clusterOnline);
 		}
-
+		
 		JobClient client = null;
 
 		try {
