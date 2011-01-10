@@ -18,6 +18,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapred.ClusterStatus;
 import org.apache.hadoop.mapred.JobClient;
@@ -269,6 +270,18 @@ public class HadoopSetUp extends TestWatchman {
 			delete(destination);
 		}
 		FileSystem.get(getConfiguration()).copyFromLocalFile(false, true, new Path(directory), new Path(destination));
+	}
+
+	/**
+	 * @param zipFile
+	 * @param destination
+	 */
+	public void unzip(String zipFile, String destination) throws IOException {
+		File file = new File(destination);
+		if (file.exists()) {
+			FileUtil.fullyDelete(file);
+		}
+		FileUtil.unZip(new File(zipFile), file);
 	}
 
 	public Configuration getConfiguration() {

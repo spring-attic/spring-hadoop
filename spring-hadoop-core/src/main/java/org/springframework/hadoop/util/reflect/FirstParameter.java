@@ -13,25 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.hadoop.test;
+package org.springframework.hadoop.util.reflect;
 
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.Reducer;
+import org.springframework.core.MethodParameter;
 
-public class IntSumReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
-	
-	private IntWritable result = new IntWritable();
+/**
+ * @author Dave Syer
+ * 
+ */
+public class FirstParameter implements ParameterMatcher {
 
-	public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException,
-			InterruptedException {
-		int sum = 0;
-		for (IntWritable val : values) {
-			sum += val.get();
+	public List<MethodParameter> match(List<MethodParameter> parameters) {
+		if (parameters.isEmpty()) {
+			return new ArrayList<MethodParameter>();
 		}
-		result.set(sum);
-		context.write(key, result);
+		return Arrays.asList(parameters.get(0));
 	}
+
 }

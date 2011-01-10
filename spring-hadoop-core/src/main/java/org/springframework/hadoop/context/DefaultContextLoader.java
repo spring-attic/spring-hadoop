@@ -32,7 +32,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.GenericXmlApplicationContext;
-import org.springframework.hadoop.util.PropertiesConverter;
+import org.springframework.hadoop.util.PropertiesUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
@@ -133,7 +133,7 @@ public class DefaultContextLoader implements ContextLoader {
 		if (job != null) {
 			Configuration configuration = job.getConfiguration();
 			configuration
-					.set(SPRING_CONFIG_BOOTSTRAP, PropertiesConverter.propertiesToString(reference.getBootstrap()));
+					.set(SPRING_CONFIG_BOOTSTRAP, PropertiesUtils.propertiesToString(reference.getBootstrap()));
 			configuration.set(SPRING_CONFIG_LOCATION, reference.getConfigLocation());
 			reference.increment();
 			if (job.getJobName() != null) {
@@ -234,7 +234,7 @@ public class DefaultContextLoader implements ContextLoader {
 	}
 
 	private Properties getBootstrapProperties(Configuration configuration) {
-		return PropertiesConverter.stringToProperties(configuration.get(SPRING_CONFIG_BOOTSTRAP, ""));
+		return PropertiesUtils.stringToProperties(configuration.get(SPRING_CONFIG_BOOTSTRAP, ""));
 	}
 
 	private ApplicationContextReference getApplicationContext(Configuration configuration) {

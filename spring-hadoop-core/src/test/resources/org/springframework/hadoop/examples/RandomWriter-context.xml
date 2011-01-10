@@ -5,7 +5,7 @@
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
-	<bean id="randomWriterJob" class="org.springframework.hadoop.mapreduce.JobFactoryBean">
+	<bean id="randomWriterJob" class="org.springframework.hadoop.configuration.JobFactoryBean">
 		<property name="outputPath" value="${output.path:target/binary}" />
 		<property name="outputKeyClass" value="org.apache.hadoop.io.BytesWritable" />
 		<property name="outputValueClass" value="org.apache.hadoop.io.BytesWritable" />

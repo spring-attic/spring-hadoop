@@ -43,7 +43,7 @@ import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.hadoop.mapreduce.JobFactoryBean;
+import org.springframework.hadoop.configuration.JobFactoryBean;
 
 /**
  * @author Dave Syer
@@ -55,11 +55,11 @@ public class KitchenSinkConfiguration {
 	private static Log logger = LogFactory.getLog(KitchenSinkConfiguration.class);
 
 	@Bean
-	public FactoryBean<Job> getClassConfiguredJob() throws Exception {
+	public FactoryBean<Job> kitchenSinkJob() throws Exception {
 		JobFactoryBean factory = new JobFactoryBean();
-		factory.setMapper(getMapper());
-		factory.setReducer(getReducer());
-		factory.setCombiner(getReducer());
+		factory.setMapper(mapper());
+		factory.setReducer(reducer());
+		factory.setCombiner(reducer());
 		factory.setGroupingComparator(new TextComparator());
 		factory.setSortComparator(new TextComparator());
 		factory.setInputFormat(inputFormat());
@@ -87,12 +87,12 @@ public class KitchenSinkConfiguration {
 	}
 
 	@Bean
-	public Mapper<Object, Text, Text, IntWritable> getMapper() {
+	public Mapper<Object, Text, Text, IntWritable> mapper() {
 		return new TokenizerMapper();
 	}
 
 	@Bean
-	public Reducer<Text, IntWritable, Text, IntWritable> getReducer() {
+	public Reducer<Text, IntWritable, Text, IntWritable> reducer() {
 		return new IntSumReducer();
 	}
 

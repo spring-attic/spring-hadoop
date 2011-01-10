@@ -23,7 +23,7 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.hadoop.mapreduce.JobFactoryBean;
+import org.springframework.hadoop.configuration.JobFactoryBean;
 import org.springframework.hadoop.test.IntSumReducer;
 import org.springframework.hadoop.test.TokenizerMapper;
 
@@ -35,11 +35,11 @@ import org.springframework.hadoop.test.TokenizerMapper;
 public class JobConfiguration {
 
 	@Bean
-	public FactoryBean<Job> getClassConfiguredJob() throws Exception {
+	public FactoryBean<Job> wordCountJob() throws Exception {
 		JobFactoryBean factory = new JobFactoryBean();
-		factory.setMapper(getMapper());
-		factory.setReducer(getReducer());
-		factory.setCombiner(getReducer());
+		factory.setMapper(mapper());
+		factory.setReducer(reducer());
+		factory.setCombiner(reducer());
 		factory.setOutputKeyClass(Text.class);
 		factory.setOutputValueClass(IntWritable.class);
 		factory.setInputPaths("target/input");
@@ -48,12 +48,12 @@ public class JobConfiguration {
 	}
 
 	@Bean
-	public Mapper<Object, Text, Text, IntWritable> getMapper() {
+	public Mapper<Object, Text, Text, IntWritable> mapper() {
 		return new TokenizerMapper();
 	}
 
 	@Bean
-	public Reducer<Text, IntWritable, Text, IntWritable> getReducer() {
+	public Reducer<Text, IntWritable, Text, IntWritable> reducer() {
 		return new IntSumReducer();
 	}
 

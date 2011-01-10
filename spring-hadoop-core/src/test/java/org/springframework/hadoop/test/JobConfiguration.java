@@ -21,9 +21,11 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.hadoop.mapreduce.JobFactoryBean;
+import org.springframework.hadoop.configuration.JobFactoryBean;
 
 /**
  * @author Dave Syer
@@ -33,26 +35,42 @@ import org.springframework.hadoop.mapreduce.JobFactoryBean;
 public class JobConfiguration {
 
 	@Bean
-	public FactoryBean<Job> getClassConfiguredJob() throws Exception {
+	public FactoryBean<Job> classConfiguredJob(@Value("${input.path:src/test/resources/input}") String inputPath,
+			@Value("${output.path:target/output}") String outputPath) throws Exception {
 		JobFactoryBean factory = new JobFactoryBean();
-		factory.setMapper(getMapper());
-		factory.setReducer(getReducer());
-		factory.setCombiner(getReducer());
-		factory.setOutputKeyClass(Text.class);
-		factory.setOutputValueClass(IntWritable.class);
-		factory.setInputPaths("target/input");
-		factory.setOutputPath("target/output");
+		factory.setMapper(mapper());
+		factory.setReducer(reducer());
+		factory.setCombiner(reducer());
+		factory.setOutputKeyClass(outputKeyType());
+		factory.setOutputValueClass(outputValueType());
+		factory.setInputPaths(inputPath);
+		factory.setOutputPath(outputPath);
 		return factory;
 	}
 
+	protected Class<IntWritable> outputValueType() {
+		return IntWritable.class;
+	}
+
+	protected Class<Text> outputKeyType() {
+		return Text.class;
+	}
+
 	@Bean
-	public Mapper<Object, Text, Text, IntWritable> getMapper() {
+	public Mapper<?, ?, ?, ?> mapper() throws Exception {
 		return new TokenizerMapper();
 	}
 
 	@Bean
-	public Reducer<Text, IntWritable, Text, IntWritable> getReducer() {
+	public Reducer<?, ?, ?, ?> reducer() throws Exception {
 		return new IntSumReducer();
+	}
+
+	@Bean
+	protected PropertyPlaceholderConfigurer externalizedConfiguration() {
+		PropertyPlaceholderConfigurer configurer = new PropertyPlaceholderConfigurer();
+		configurer.setSystemPropertiesMode(PropertyPlaceholderConfigurer.SYSTEM_PROPERTIES_MODE_OVERRIDE);
+		return configurer;
 	}
 
 }

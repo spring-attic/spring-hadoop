@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.hadoop.mapreduce;
+package org.springframework.hadoop.configuration;
 
 import java.io.IOException;
 
@@ -28,6 +28,14 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.hadoop.JobTemplate;
+import org.springframework.hadoop.mapreduce.AutowiringCombiner;
+import org.springframework.hadoop.mapreduce.AutowiringGroupingComparator;
+import org.springframework.hadoop.mapreduce.AutowiringInputFormat;
+import org.springframework.hadoop.mapreduce.AutowiringMapper;
+import org.springframework.hadoop.mapreduce.AutowiringOutputFormat;
+import org.springframework.hadoop.mapreduce.AutowiringPartitioner;
+import org.springframework.hadoop.mapreduce.AutowiringReducer;
+import org.springframework.hadoop.mapreduce.AutowiringSortComparator;
 import org.springframework.util.StringUtils;
 
 /**

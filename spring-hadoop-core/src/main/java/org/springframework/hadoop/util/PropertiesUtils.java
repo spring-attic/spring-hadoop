@@ -31,14 +31,14 @@ import org.springframework.util.StringUtils;
  * @author Dave Syer
  *
  */
-public final class PropertiesConverter {
+public final class PropertiesUtils {
 
 	private static final PropertiesPersister propertiesPersister = new DefaultPropertiesPersister();
 
 	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
 	// prevents the class from being instantiated
-	private PropertiesConverter() {
+	private PropertiesUtils() {
 	};
 
 	/**

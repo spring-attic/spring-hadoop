@@ -28,7 +28,7 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.springframework.hadoop.context.DefaultContextLoader;
 import org.springframework.hadoop.context.HadoopApplicationContextUtils;
-import org.springframework.hadoop.util.PropertiesConverter;
+import org.springframework.hadoop.util.PropertiesUtils;
 import org.springframework.util.StringUtils;
 
 public class JobTemplate {
@@ -135,7 +135,7 @@ public class JobTemplate {
 
 	private Configuration getBootstrapConfiguration() {
 		mergeExtraConfiguration(configuration);
-		configuration.set(DefaultContextLoader.SPRING_CONFIG_BOOTSTRAP, PropertiesConverter.propertiesToString(bootstrapProperties));
+		configuration.set(DefaultContextLoader.SPRING_CONFIG_BOOTSTRAP, PropertiesUtils.propertiesToString(bootstrapProperties));
 		return configuration;
 	}
 
@@ -197,6 +197,10 @@ public class JobTemplate {
 			map.setProperty("fs.default.name", String.format("hdfs://%s:%d/", hostname, port - 1));
 		}
 		return map;
+	}
+
+	public void addExtraConfiguration(String key, String value) {
+		extraConfiguration.put(key, value);
 	}
 
 }

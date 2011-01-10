@@ -15,7 +15,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.hadoop.JobTemplate;
-import org.springframework.hadoop.util.PropertiesConverter;
+import org.springframework.hadoop.util.PropertiesUtils;
 import org.springframework.util.ClassUtils;
 
 public class WordCountIntegrationTests {
@@ -76,6 +76,11 @@ public class WordCountIntegrationTests {
 	}
 	
 	@Test
+	public void testPojoConfiguredJob() throws Exception {
+		assertTrue(jobTemplate.run(PojoConfiguration.class));
+	}
+	
+	@Test
 	public void tesKitchenSinkJob() throws Exception {
 		assertTrue(jobTemplate.run(KitchenSinkConfiguration.class));
 	}
@@ -87,7 +92,7 @@ public class WordCountIntegrationTests {
 	
 	@Test
 	public void testBootstrapJob() throws Exception {
-		jobTemplate.setBootstrapProperties(PropertiesConverter.stringToProperties("tokenizer.ref=wordTokenizer"));
+		jobTemplate.setBootstrapProperties(PropertiesUtils.stringToProperties("tokenizer.ref=wordTokenizer"));
 		assertTrue(jobTemplate.run("classpath:/jobs/bootstrap-job-context.xml"));
 	}
 	
