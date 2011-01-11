@@ -15,8 +15,6 @@
  */
 package org.springframework.hadoop.context;
 
-import java.util.Properties;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.Job;
 
@@ -35,7 +33,7 @@ public interface ContextLoader {
 
 	void releaseContext(Configuration configuration);
 	
-	Job getJob(Object configLocation, Properties bootstrap, String jobName);
+	Job getJob(Object configLocation, Configuration configuration, String jobName);
 
 	void releaseJob(Job job);
 	

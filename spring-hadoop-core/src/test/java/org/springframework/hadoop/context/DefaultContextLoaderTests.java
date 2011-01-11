@@ -52,7 +52,8 @@ public class DefaultContextLoaderTests {
 	public void testGetBeanFromNewContext() {
 		TestContextHolder holder = loader.getBean(configuration, TestContextHolder.class, true);
 		assertTrue(holder.getApplicationContext().containsBean(DefaultContextLoader.SPRING_CONFIG_BOOTSTRAP));
-		Properties properties = holder.getApplicationContext().getBean(DefaultContextLoader.SPRING_CONFIG_BOOTSTRAP, Properties.class);
+		Properties properties = holder.getApplicationContext().getBean(DefaultContextLoader.SPRING_CONFIG_BOOTSTRAP,
+				Properties.class);
 		assertEquals("{}", properties.toString());
 	}
 
@@ -61,7 +62,8 @@ public class DefaultContextLoaderTests {
 		configuration.set(DefaultContextLoader.SPRING_CONFIG_BOOTSTRAP, "foo=bar");
 		TestContextHolder holder = loader.getBean(configuration, TestContextHolder.class, true);
 		assertTrue(holder.getApplicationContext().containsBean(DefaultContextLoader.SPRING_CONFIG_BOOTSTRAP));
-		Properties properties = holder.getApplicationContext().getBean(DefaultContextLoader.SPRING_CONFIG_BOOTSTRAP, Properties.class);
+		Properties properties = holder.getApplicationContext().getBean(DefaultContextLoader.SPRING_CONFIG_BOOTSTRAP,
+				Properties.class);
 		assertEquals("{foo=bar}", properties.toString());
 	}
 
@@ -87,7 +89,8 @@ public class DefaultContextLoaderTests {
 	public void testGetJob() {
 		Job job = loader.getJob(JobConfiguration.class, null, null);
 		assertNotNull(job);
-		assertEquals(JobConfiguration.class, job.getConfiguration().getClass(DefaultContextLoader.SPRING_CONFIG_LOCATION, Object.class));
+		assertEquals(JobConfiguration.class,
+				job.getConfiguration().getClass(DefaultContextLoader.SPRING_CONFIG_LOCATION, Object.class));
 	}
 
 	@Test

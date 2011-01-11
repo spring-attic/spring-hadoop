@@ -7,9 +7,11 @@
 	</configSuffixes>
 	<enableImports><![CDATA[false]]></enableImports>
 	<configs>
-		<config>src/test/resources/spring/autowired-job-context.xml</config>
-		<config>src/test/resources/spring/bootstrap-job-context.xml</config>
 		<config>src/test/resources/org/springframework/hadoop/context/job-context.xml</config>
+		<config>src/test/resources/jobs/autowired-job-context.xml</config>
+		<config>src/test/resources/jobs/bootstrap-job-context.xml</config>
+		<config>src/test/resources/org/springframework/hadoop/examples/Sort-context.xml</config>
+		<config>src/test/resources/org/springframework/hadoop/examples/RandomWriter-context.xml</config>
 	</configs>
 	<configSets>
 	</configSets>

@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package org.springframework.hadoop.mapreduce;
+package org.springframework.hadoop.context;
 
-import java.util.Map;
 import java.util.Properties;
 
 import org.springframework.beans.BeansException;
@@ -30,12 +29,6 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
  */
 public class BootstrapPropertiesFactoryBean implements FactoryBean<Properties>, BeanFactoryPostProcessor {
 
-	/**
-	 * Configuration key for this factory to signal that it has been applied
-	 * (value will be true if so and null otherwise).
-	 */
-	private static final String SPRING_CONFIG_BOOTSTRAP = "spring.config.bootstrap";
-
 	private Properties instance = new Properties();
 
 	public Properties getObject() throws Exception {
@@ -43,7 +36,7 @@ public class BootstrapPropertiesFactoryBean implements FactoryBean<Properties>, 
 	}
 
 	public Class<?> getObjectType() {
-		return Map.class;
+		return Properties.class;
 	}
 
 	public boolean isSingleton() {
@@ -51,11 +44,11 @@ public class BootstrapPropertiesFactoryBean implements FactoryBean<Properties>, 
 	}
 
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-		if (beanFactory.containsSingleton(SPRING_CONFIG_BOOTSTRAP)) {
-			Properties bean = beanFactory.getBean(SPRING_CONFIG_BOOTSTRAP, Properties.class);
+		if (beanFactory.containsSingleton(DefaultContextLoader.SPRING_CONFIG_BOOTSTRAP)) {
+			Properties bean = beanFactory.getBean(DefaultContextLoader.SPRING_CONFIG_BOOTSTRAP, Properties.class);
 			instance = bean;
 		}
-		instance.setProperty(SPRING_CONFIG_BOOTSTRAP, "true");
+		instance.setProperty(DefaultContextLoader.SPRING_CONFIG_BOOTSTRAP, "true");
 	}
 
 }

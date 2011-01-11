@@ -54,9 +54,16 @@ public class DefaultContextLoader implements ContextLoader {
 	public static final String SPRING_JOB_NAME = "mapred.job.name";
 
 	/**
-	 * Configuration key for bootstrap properties.
+	 * Configuration key for this factory to signal that it has been applied
+	 * (value will be true if so and null otherwise).
 	 */
 	public static final String SPRING_CONFIG_BOOTSTRAP = "spring.config.bootstrap";
+
+	/**
+	 * Configuration key for this factory to signal that it has been applied
+	 * (value will be true if so and null otherwise).
+	 */
+	public static final String SPRING_CONFIG_EXTRA = "spring.config.extra";
 
 	private ConcurrentMap<String, ApplicationContextReference> contexts = new ConcurrentHashMap<String, ApplicationContextReference>();
 
@@ -83,12 +90,12 @@ public class DefaultContextLoader implements ContextLoader {
 		}
 	}
 
-	public Job getJob(Object configLocation, Properties bootstrap, String jobName) {
+	public Job getJob(Object configLocation, Configuration configuration, String jobName) {
 		Assert.notNull(configLocation, "A config location must be provided.");
-		if (bootstrap == null) {
-			bootstrap = new Properties();
+		if (configuration == null) {
+			configuration = new Configuration();
 		}
-		ApplicationContextReference reference = findApplicationContext(bootstrap, configLocation, true);
+		ApplicationContextReference reference = findApplicationContext(configuration, configLocation, true);
 		return getJobInternal(reference, jobName);
 	}
 
@@ -166,7 +173,8 @@ public class DefaultContextLoader implements ContextLoader {
 		return configuration.get(SPRING_CONFIG_LOCATION);
 	}
 
-	private ApplicationContextReference findApplicationContext(Properties bootstrap, Object path, boolean createContext) {
+	private ApplicationContextReference findApplicationContext(Configuration configuration, Object path,
+			boolean createContext) {
 		String configLocation = null;
 		if (path instanceof String) {
 			configLocation = (String) path;
@@ -177,10 +185,11 @@ public class DefaultContextLoader implements ContextLoader {
 		if (configLocation == null) {
 			throw new IllegalArgumentException("The config path must be a String or a Class");
 		}
-		return findApplicationContext(bootstrap, configLocation, createContext);
+		return findApplicationContext(configuration, configLocation, createContext);
 	}
 
-	private ApplicationContextReference findApplicationContext(Properties bootstrap, String path, boolean createContext) {
+	private ApplicationContextReference findApplicationContext(Configuration configuration, String path,
+			boolean createContext) {
 		if (contexts.containsKey(path)) {
 			return contexts.get(path);
 		}
@@ -212,18 +221,19 @@ public class DefaultContextLoader implements ContextLoader {
 				context = annotationContext;
 			}
 		}
+		Properties bootstrap = getBootstrapProperties(configuration);
 		context.getBeanFactory().registerSingleton(SPRING_CONFIG_BOOTSTRAP, bootstrap);
+		context.getBeanFactory().registerSingleton(SPRING_CONFIG_EXTRA, configuration);
 		context.refresh();
 		contexts.putIfAbsent(path, new ApplicationContextReference(context, path, bootstrap));
 		return contexts.get(path);
 	}
 
 	private ApplicationContextReference findApplicationContext(Configuration configuration, boolean createContext) {
-		Properties bootstrap = getBootstrap(configuration);
-		return findApplicationContext(bootstrap, getConfigLocation(configuration), createContext);
+		return findApplicationContext(configuration, getConfigLocation(configuration), createContext);
 	}
 
-	private Properties getBootstrap(Configuration configuration) {
+	private Properties getBootstrapProperties(Configuration configuration) {
 		return PropertiesConverter.stringToProperties(configuration.get(SPRING_CONFIG_BOOTSTRAP, ""));
 	}
 

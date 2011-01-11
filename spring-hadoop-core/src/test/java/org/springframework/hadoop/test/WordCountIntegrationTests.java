@@ -62,7 +62,7 @@ public class WordCountIntegrationTests {
 
 	@Test
 	public void testXmlConfiguredJob() throws Exception {
-		assertTrue(jobTemplate.run("classpath:/spring/autowired-job-context.xml"));
+		assertTrue(jobTemplate.run("classpath:/jobs/autowired-job-context.xml"));
 	}
 	
 	@Test
@@ -88,7 +88,7 @@ public class WordCountIntegrationTests {
 	@Test
 	public void testBootstrapJob() throws Exception {
 		jobTemplate.setBootstrapProperties(PropertiesConverter.stringToProperties("tokenizer.ref=wordTokenizer"));
-		assertTrue(jobTemplate.run("classpath:/spring/bootstrap-job-context.xml"));
+		assertTrue(jobTemplate.run("classpath:/jobs/bootstrap-job-context.xml"));
 	}
 	
 	public static void main(String[] args) throws Exception {

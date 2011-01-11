@@ -1,3 +1,18 @@
+/*
+ * Copyright 2006-2010 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.springframework.hadoop;
 
 import java.io.IOException;
@@ -6,10 +21,14 @@ import java.util.Properties;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.mapred.ClusterStatus;
+import org.apache.hadoop.mapred.JobClient;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.springframework.hadoop.context.DefaultContextLoader;
 import org.springframework.hadoop.context.HadoopApplicationContextUtils;
+import org.springframework.hadoop.util.PropertiesConverter;
 import org.springframework.util.StringUtils;
 
 public class JobTemplate {
@@ -30,10 +49,12 @@ public class JobTemplate {
 	private String hostname;
 
 	private int port = 9001;
-	
+
 	private Properties bootstrapProperties = new Properties();
 
 	private Properties extraConfiguration = new Properties();
+
+	private Configuration configuration = new Configuration();
 
 	/**
 	 * @param verbose the verbose flag to set
@@ -48,7 +69,14 @@ public class JobTemplate {
 	public void setExtraConfiguration(Properties configuration) {
 		this.extraConfiguration = configuration;
 	}
-	
+
+	/**
+	 * @param configuration configuration to apply
+	 */
+	public void setConfiguration(Configuration configuration) {
+		this.configuration = configuration;
+	}
+
 	/**
 	 * @param bootstrapProperties the bootstrap properties to set
 	 */
@@ -68,41 +96,54 @@ public class JobTemplate {
 		this.port = port;
 	}
 
-	public boolean run() throws Exception {
+	public boolean run() {
 		return run(DEFAULT_CONFIG_LOCATION);
 	}
 
 	// TODO: add callback to enhance context?
-	public boolean run(String configLocation) throws Exception {
-		Job template = HadoopApplicationContextUtils.getJob(configLocation, getBootstrapProperties());
+	public boolean run(String configLocation) {
+		Job template = HadoopApplicationContextUtils.getJob(configLocation, getBootstrapConfiguration());
 		return runFromTemplate(template);
 	}
 
-	public boolean run(String configLocation, String jobName) throws Exception {
-		Job template = HadoopApplicationContextUtils.getJob(configLocation, getBootstrapProperties(), jobName);
+	public boolean run(String configLocation, String jobName) {
+		Job template = HadoopApplicationContextUtils.getJob(configLocation, getBootstrapConfiguration(), jobName);
 		return runFromTemplate(template);
 	}
 
-	public boolean run(Class<?> configLocation) throws Exception {
+	public boolean run(Class<?> configLocation) {
 		Job template = HadoopApplicationContextUtils.getJob(configLocation);
 		return runFromTemplate(template);
 	}
 
-	public boolean run(Class<?> configLocation, String jobName) throws Exception {
-		Job template = HadoopApplicationContextUtils.getJob(configLocation, getBootstrapProperties(), jobName);
+	public boolean run(Class<?> configLocation, String jobName) {
+		Job template = HadoopApplicationContextUtils.getJob(configLocation, getBootstrapConfiguration(), jobName);
 		return runFromTemplate(template);
 	}
 
-	private Properties getBootstrapProperties() {
-		return bootstrapProperties;
+	public ClusterStatus getClusterStatus() {
+		try {
+			// TODO: is there a non-deprecated way to do this?
+			@SuppressWarnings("deprecation")
+			JobClient client = new JobClient(new org.apache.hadoop.mapred.JobConf(getBootstrapConfiguration()));
+			return client.getClusterStatus();
+		}
+		catch (IOException e) {
+			throw new HadoopException("Cannot get cluster status", e);
+		}
 	}
 
-	private boolean runFromTemplate(Job template) throws IOException,
-			InterruptedException, ClassNotFoundException {
+	private Configuration getBootstrapConfiguration() {
+		mergeExtraConfiguration(configuration);
+		configuration.set(DefaultContextLoader.SPRING_CONFIG_BOOTSTRAP, PropertiesConverter.propertiesToString(bootstrapProperties));
+		return configuration;
+	}
+
+	private boolean runFromTemplate(Job template) {
 		return runFromTemplate(template, null);
 	}
 
-	private boolean runFromTemplate(Job template, Properties bootstrap) throws IOException, InterruptedException, ClassNotFoundException {
+	private boolean runFromTemplate(Job template, Properties bootstrap) {
 
 		try {
 
@@ -125,6 +166,12 @@ public class JobTemplate {
 
 			return job.waitForCompletion(verbose);
 
+		}
+		catch (RuntimeException e) {
+			throw e;
+		}
+		catch (Exception e) {
+			throw new HadoopException("Cannot execute Job", e);
 		}
 		finally {
 			HadoopApplicationContextUtils.releaseJob(template);

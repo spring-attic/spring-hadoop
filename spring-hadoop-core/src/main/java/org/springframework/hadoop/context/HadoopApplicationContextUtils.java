@@ -15,8 +15,6 @@
  */
 package org.springframework.hadoop.context;
 
-import java.util.Properties;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.Job;
 import org.springframework.context.ApplicationContext;
@@ -167,13 +165,13 @@ public class HadoopApplicationContextUtils {
 		return getJob(configLocation, null, jobName);
 	}
 
-	public static Job getJob(Object configLocation, Properties configuration) {
+	public static Job getJob(Object configLocation, Configuration configuration) {
 		return getJob(configLocation, configuration, null);
 	}
 
-	public static Job getJob(Object configLocation, Properties configuration, String jobName) {
+	public static Job getJob(Object configLocation, Configuration configuration, String jobName) {
 		if (configuration==null) {
-			configuration = new Properties();
+			configuration = new Configuration();
 		}
 		Job job = loader.getJob(configLocation, configuration, jobName);
 		assertNotNull(job, Job.class, jobName);
