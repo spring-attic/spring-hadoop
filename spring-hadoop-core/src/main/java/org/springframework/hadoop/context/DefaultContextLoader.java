@@ -29,6 +29,7 @@ import org.springframework.beans.factory.support.AbstractBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
@@ -184,18 +185,24 @@ public class DefaultContextLoader implements ContextLoader {
 		catch (ClassNotFoundException e) {
 			// ignore
 		}
-		ApplicationContext context;
+		AbstractApplicationContext context;
 		if (configClass != null) {
-			context = new AnnotationConfigApplicationContext((Class<?>) configClass);
+			AnnotationConfigApplicationContext annotationContext =  new AnnotationConfigApplicationContext();
+			annotationContext.register(configClass);
+			context = annotationContext;
 		}
 		else {
 			if (path.endsWith(".xml")) {
-				context = new ClassPathXmlApplicationContext(path);
+				context = new ClassPathXmlApplicationContext(new String[] {path}, false);
 			}
 			else {
-				context = new AnnotationConfigApplicationContext(path);
+				AnnotationConfigApplicationContext annotationContext = new AnnotationConfigApplicationContext();
+				annotationContext.scan(path);
+				context = annotationContext;
 			}
 		}
+		// context.getBeanFactory().registerSingleton(CONFIGURATION_BEAN_NAME, configuration);
+		context.refresh();
 		contexts.putIfAbsent(path, new ApplicationContextReference(context, path));
 		return contexts.get(path);
 	}
