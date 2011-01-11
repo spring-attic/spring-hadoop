@@ -9,6 +9,7 @@
 	<packaging>pom</packaging>
 	<modules> 
 		<module>spring-hadoop-parent</module>
+		<module>spring-hadoop-core</module>
 	</modules>
 	<profiles>
 		<profile>
