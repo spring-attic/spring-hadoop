@@ -42,7 +42,7 @@ public class JobConfiguration {
 		factory.setCombiner(getReducer());
 		factory.setOutputKeyClass(Text.class);
 		factory.setOutputValueClass(IntWritable.class);
-		factory.setInputPaths("src/test/resources/input");
+		factory.setInputPaths("target/input");
 		factory.setOutputPath("target/output");
 		return factory;
 	}

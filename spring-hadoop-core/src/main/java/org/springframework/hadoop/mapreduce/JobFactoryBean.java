@@ -79,8 +79,6 @@ public class JobFactoryBean implements FactoryBean<Job>, BeanNameAware {
 
 	/**
 	 * The {@link Reducer} that will be used in this job.
-	 * 
-	 * @return the reducer to use
 	 */
 	public void setReducer(Reducer<?, ?, ?, ?> reducer) {
 		this.reducer = reducer;
@@ -88,8 +86,6 @@ public class JobFactoryBean implements FactoryBean<Job>, BeanNameAware {
 
 	/**
 	 * The {@link Reducer combiner} that will be used in this job.
-	 * 
-	 * @return the combiner to use
 	 */
 	public void setCombiner(Reducer<?, ?, ?, ?> combiner) {
 		this.combiner = combiner;
@@ -97,8 +93,6 @@ public class JobFactoryBean implements FactoryBean<Job>, BeanNameAware {
 
 	/**
 	 * The {@link Mapper} that will be used in this job.
-	 * 
-	 * @return the mapper to use
 	 */
 	public void setMapper(Mapper<?, ?, ?, ?> mapper) {
 		this.mapper = mapper;

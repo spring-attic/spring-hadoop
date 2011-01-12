@@ -15,6 +15,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.hadoop.JobTemplate;
+import org.springframework.hadoop.util.PropertiesConverter;
 import org.springframework.util.ClassUtils;
 
 public class WordCountIntegrationTests {
@@ -32,9 +33,9 @@ public class WordCountIntegrationTests {
 		if (setUp.isClusterOnline()) {
 			setUp.setJarFile("target/spring-hadoop-core-1.0.0.BUILD-SNAPSHOT-test.jar");
 			jobTemplate.setExtraConfiguration(setUp.getExtraConfiguration());
-			setUp.copy("src/test/resources/input");
 		}
 		jobTemplate.setVerbose(true);
+		setUp.copy("src/test/resources/input", "target/input");
 		setUp.delete("target/output");
 	}
 
@@ -54,7 +55,7 @@ public class WordCountIntegrationTests {
 		job.setReducerClass(IntSumReducer.class);
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(IntWritable.class);
-		FileInputFormat.addInputPath(job, new Path("src/test/resources/input"));
+		FileInputFormat.addInputPath(job, new Path("target/input"));
 		FileOutputFormat.setOutputPath(job, new Path("target/output"));
 		assertTrue(job.waitForCompletion(true));
 	}
@@ -82,6 +83,12 @@ public class WordCountIntegrationTests {
 	@Test
 	public void testPackageConfiguredJob() throws Exception {
 		assertTrue(jobTemplate.run(ClassUtils.getPackageName(getClass())+".config"));
+	}
+	
+	@Test
+	public void testBootstrapJob() throws Exception {
+		jobTemplate.setBootstrapProperties(PropertiesConverter.stringToProperties("tokenizer.ref=wordTokenizer"));
+		assertTrue(jobTemplate.run("classpath:/spring/bootstrap-job-context.xml"));
 	}
 	
 	public static void main(String[] args) throws Exception {

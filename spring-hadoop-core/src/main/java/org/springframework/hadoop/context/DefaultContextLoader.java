@@ -18,6 +18,7 @@ package org.springframework.hadoop.context;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -30,7 +31,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.support.GenericXmlApplicationContext;
+import org.springframework.hadoop.util.PropertiesConverter;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
@@ -47,16 +49,21 @@ public class DefaultContextLoader implements ContextLoader {
 	public static final String SPRING_CONFIG_LOCATION = "spring.config.location";
 
 	/**
-	 * Configuration key for job name (in case distinct from normal job name).
+	 * Configuration key for job name (should be same as hadoop thinks it is).
 	 */
-	public static final String SPRING_JOB_NAME = "spring.job.name";
+	public static final String SPRING_JOB_NAME = "mapred.job.name";
+
+	/**
+	 * Configuration key for bootstrap properties.
+	 */
+	public static final String SPRING_CONFIG_BOOTSTRAP = "spring.config.bootstrap";
 
 	private ConcurrentMap<String, ApplicationContextReference> contexts = new ConcurrentHashMap<String, ApplicationContextReference>();
 
 	public <T> T getBean(Configuration configuration, Class<T> type, boolean createContext) {
 		return getBean(configuration, type, createContext, null);
 	}
-	
+
 	public <T> T getBean(Configuration configuration, Class<T> type, boolean createContext, String property) {
 		ApplicationContextReference reference = findApplicationContext(configuration, createContext);
 		T bean = getBean(reference.getContext(), configuration, type, property);
@@ -76,24 +83,13 @@ public class DefaultContextLoader implements ContextLoader {
 		}
 	}
 
-	public Job getJob(Class<?> configLocation, String jobName) {
-		Assert.notNull(configLocation, "A config location must be provided");
-		ApplicationContextReference reference = findApplicationContext(configLocation.getName(), true);
+	public Job getJob(Object configLocation, Properties bootstrap, String jobName) {
+		Assert.notNull(configLocation, "A config location must be provided.");
+		if (bootstrap == null) {
+			bootstrap = new Properties();
+		}
+		ApplicationContextReference reference = findApplicationContext(bootstrap, configLocation, true);
 		return getJobInternal(reference, jobName);
-	}
-
-	public Job getJob(Class<?> configLocation) {
-		return getJob(configLocation, null);
-	}
-
-	public Job getJob(String configLocation, String jobName) {
-		Assert.notNull(configLocation, "A config location must be provided");
-		ApplicationContextReference reference = findApplicationContext(configLocation, true);
-		return getJobInternal(reference, jobName);
-	}
-
-	public Job getJob(String configLocation) {
-		return getJob(configLocation, null);
 	}
 
 	public void releaseJob(Job job) {
@@ -114,7 +110,7 @@ public class DefaultContextLoader implements ContextLoader {
 		if (context instanceof ConfigurableApplicationContext) {
 			((ConfigurableApplicationContext) context).close();
 		}
-		contexts.remove(getJobName(configuration));
+		contexts.remove(getConfigLocation(configuration));
 	}
 
 	private Job getJobInternal(ApplicationContextReference reference, String jobName) {
@@ -129,6 +125,8 @@ public class DefaultContextLoader implements ContextLoader {
 
 		if (job != null) {
 			Configuration configuration = job.getConfiguration();
+			configuration
+					.set(SPRING_CONFIG_BOOTSTRAP, PropertiesConverter.propertiesToString(reference.getBootstrap()));
 			configuration.set(SPRING_CONFIG_LOCATION, reference.getConfigLocation());
 			reference.increment();
 			if (job.getJobName() != null) {
@@ -165,13 +163,24 @@ public class DefaultContextLoader implements ContextLoader {
 	}
 
 	private String getConfigLocation(Configuration configuration) {
-		String jobName = getJobName(configuration);
-		String defaultValue = configuration.get(SPRING_CONFIG_LOCATION, "/META-INF/spring/hadoop/" + jobName
-				+ "-context.xml");
-		return configuration.get(SPRING_CONFIG_LOCATION, defaultValue);
+		return configuration.get(SPRING_CONFIG_LOCATION);
 	}
 
-	private ApplicationContextReference findApplicationContext(String path, boolean createContext) {
+	private ApplicationContextReference findApplicationContext(Properties bootstrap, Object path, boolean createContext) {
+		String configLocation = null;
+		if (path instanceof String) {
+			configLocation = (String) path;
+		}
+		else if (path instanceof Class<?>) {
+			configLocation = ((Class<?>) path).getName();
+		}
+		if (configLocation == null) {
+			throw new IllegalArgumentException("The config path must be a String or a Class");
+		}
+		return findApplicationContext(bootstrap, configLocation, createContext);
+	}
+
+	private ApplicationContextReference findApplicationContext(Properties bootstrap, String path, boolean createContext) {
 		if (contexts.containsKey(path)) {
 			return contexts.get(path);
 		}
@@ -187,13 +196,15 @@ public class DefaultContextLoader implements ContextLoader {
 		}
 		AbstractApplicationContext context;
 		if (configClass != null) {
-			AnnotationConfigApplicationContext annotationContext =  new AnnotationConfigApplicationContext();
+			AnnotationConfigApplicationContext annotationContext = new AnnotationConfigApplicationContext();
 			annotationContext.register(configClass);
 			context = annotationContext;
 		}
 		else {
 			if (path.endsWith(".xml")) {
-				context = new ClassPathXmlApplicationContext(new String[] {path}, false);
+				GenericXmlApplicationContext xmlContext = new GenericXmlApplicationContext();
+				xmlContext.load(path);
+				context = xmlContext;
 			}
 			else {
 				AnnotationConfigApplicationContext annotationContext = new AnnotationConfigApplicationContext();
@@ -201,19 +212,23 @@ public class DefaultContextLoader implements ContextLoader {
 				context = annotationContext;
 			}
 		}
-		// context.getBeanFactory().registerSingleton(CONFIGURATION_BEAN_NAME, configuration);
+		context.getBeanFactory().registerSingleton(SPRING_CONFIG_BOOTSTRAP, bootstrap);
 		context.refresh();
-		contexts.putIfAbsent(path, new ApplicationContextReference(context, path));
+		contexts.putIfAbsent(path, new ApplicationContextReference(context, path, bootstrap));
 		return contexts.get(path);
 	}
 
 	private ApplicationContextReference findApplicationContext(Configuration configuration, boolean createContext) {
-		return findApplicationContext(getConfigLocation(configuration), createContext);
+		Properties bootstrap = getBootstrap(configuration);
+		return findApplicationContext(bootstrap, getConfigLocation(configuration), createContext);
+	}
+
+	private Properties getBootstrap(Configuration configuration) {
+		return PropertiesConverter.stringToProperties(configuration.get(SPRING_CONFIG_BOOTSTRAP, ""));
 	}
 
 	private ApplicationContextReference getApplicationContext(Configuration configuration) {
-		String jobName = getJobName(configuration);
-		return contexts.get(jobName);
+		return contexts.get(getConfigLocation(configuration));
 	}
 
 	private <T> T getBean(ApplicationContext context, Configuration configuration, Class<T> type, String property) {
@@ -256,12 +271,18 @@ public class DefaultContextLoader implements ContextLoader {
 
 		private final AtomicInteger references = new AtomicInteger();
 
+		private final Properties bootstrap;
+
 		private final String configLocation;
 
-		public ApplicationContextReference(ApplicationContext context, Object configLocation) {
+		public ApplicationContextReference(ApplicationContext context, String configLocation, Properties bootstrap) {
 			this.context = context;
-			this.configLocation = configLocation instanceof Class ? ((Class<?>) configLocation).getName()
-					: configLocation.toString();
+			this.configLocation = configLocation;
+			this.bootstrap = bootstrap;
+		}
+
+		public Properties getBootstrap() {
+			return bootstrap;
 		}
 
 		public String getConfigLocation() {

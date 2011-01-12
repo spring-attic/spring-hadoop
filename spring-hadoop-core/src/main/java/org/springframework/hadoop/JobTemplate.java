@@ -30,6 +30,8 @@ public class JobTemplate {
 	private String hostname;
 
 	private int port = 9001;
+	
+	private Properties bootstrapProperties = new Properties();
 
 	private Properties extraConfiguration = new Properties();
 
@@ -45,6 +47,13 @@ public class JobTemplate {
 	 */
 	public void setExtraConfiguration(Properties configuration) {
 		this.extraConfiguration = configuration;
+	}
+	
+	/**
+	 * @param bootstrapProperties the bootstrap properties to set
+	 */
+	public void setBootstrapProperties(Properties bootstrapProperties) {
+		this.bootstrapProperties = bootstrapProperties;
 	}
 
 	public void setJarFile(String jarFile) {
@@ -65,30 +74,40 @@ public class JobTemplate {
 
 	// TODO: add callback to enhance context?
 	public boolean run(String configLocation) throws Exception {
-		Job template = HadoopApplicationContextUtils.getJob(configLocation);
+		Job template = HadoopApplicationContextUtils.getJob(configLocation, getBootstrapProperties());
 		return runFromTemplate(template);
 	}
 
 	public boolean run(String configLocation, String jobName) throws Exception {
-		Job template = HadoopApplicationContextUtils.getJob(configLocation, jobName);
+		Job template = HadoopApplicationContextUtils.getJob(configLocation, getBootstrapProperties(), jobName);
 		return runFromTemplate(template);
 	}
 
 	public boolean run(Class<?> configLocation) throws Exception {
 		Job template = HadoopApplicationContextUtils.getJob(configLocation);
-		return runFromTemplate(template);		
+		return runFromTemplate(template);
 	}
-	
+
 	public boolean run(Class<?> configLocation, String jobName) throws Exception {
-		Job template = HadoopApplicationContextUtils.getJob(configLocation, jobName);
-		return runFromTemplate(template);		
+		Job template = HadoopApplicationContextUtils.getJob(configLocation, getBootstrapProperties(), jobName);
+		return runFromTemplate(template);
 	}
-	
-	private boolean runFromTemplate(Job template) throws IOException, InterruptedException, ClassNotFoundException {
+
+	private Properties getBootstrapProperties() {
+		return bootstrapProperties;
+	}
+
+	private boolean runFromTemplate(Job template) throws IOException,
+			InterruptedException, ClassNotFoundException {
+		return runFromTemplate(template, null);
+	}
+
+	private boolean runFromTemplate(Job template, Properties bootstrap) throws IOException, InterruptedException, ClassNotFoundException {
 
 		try {
 
-			// Construct the new complete configuration *before* the Job is initialized...
+			// Construct the new complete configuration *before* the Job is
+			// initialized...
 			Configuration configuration = template.getConfiguration();
 			mergeExtraConfiguration(configuration);
 			// Leave the original Job intact (so it can be a singleton).
@@ -115,12 +134,13 @@ public class JobTemplate {
 
 	private void mergeExtraConfiguration(Configuration configuration) {
 		for (Entry<Object, Object> entry : getExtraConfiguration().entrySet()) {
-			configuration.set((String)entry.getKey(), (String)entry.getValue());
+			configuration.set((String) entry.getKey(), (String) entry.getValue());
 		}
 	}
 
 	public Properties getExtraConfiguration() {
-		Properties map = new Properties(extraConfiguration);
+		Properties map = new Properties();
+		map.putAll(extraConfiguration);
 		if (jarFile != null) {
 			map.setProperty("mapred.jar", jarFile);
 		}

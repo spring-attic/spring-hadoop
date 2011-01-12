@@ -6,13 +6,22 @@
 		<property name="mapper" ref="mapper" />
 		<property name="combiner" ref="reducer" />
 		<property name="reducer" ref="reducer" />
-		<property name="inputPaths" value="target/input" />
-		<property name="outputPath" value="target/output" />
+		<property name="inputPaths" value="#{bootstrap['input.path']?:'target/input'}" />
+		<property name="outputPath" value="#{bootstrap['output.path']?:'target/output'}" />
 		<property name="outputKeyClass" value="org.apache.hadoop.io.Text" />
 		<property name="outputValueClass" value="org.apache.hadoop.io.IntWritable" />
 	</bean>
 
-	<bean id="mapper" class="org.springframework.hadoop.test.TokenizerMapper" />
+	<bean id="mapper" class="org.springframework.hadoop.test.CustomTokenizerMapper">
+		<property name="tokenizer" ref="#{bootstrap['tokenizer.ref']?:'simpleTokenizer'}"/>
+	</bean>
+
+	<bean id="simpleTokenizer" class="org.springframework.hadoop.test.CustomTokenizerMapper$SimpleTokenizer"/>
+
+	<bean id="wordTokenizer" class="org.springframework.hadoop.test.WordTokenizer"/>
+
 	<bean id="reducer" name="combiner" class="org.springframework.hadoop.test.IntSumReducer" />
+	
+	<bean id="bootstrap" class="org.springframework.hadoop.mapreduce.BootstrapPropertiesFactoryBean"/>
 
 </beans>

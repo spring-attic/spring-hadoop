@@ -16,25 +16,43 @@
 package org.springframework.hadoop.test;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
-public class TokenizerMapper extends Mapper<Object, Text, Text, IntWritable> {
+public class CustomTokenizerMapper extends Mapper<Object, Text, Text, IntWritable> {
 
 	private final static IntWritable one = new IntWritable(1);
 
+	private CustomTokenizer tokenizer = new SimpleTokenizer();
+
 	private Text word = new Text();
 
+	public void setTokenizer(CustomTokenizer tokenizer) {
+		this.tokenizer = tokenizer;
+	}
+
 	public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
-		StringTokenizer outer = new StringTokenizer(value.toString());
-		while (outer.hasMoreTokens()) {
-			String token = outer.nextToken();
+		for (String token : tokenizer.tokenize(value.toString())) {
 			word.set(token);
 			context.write(word, one);
 		}
 	}
 
+	public static class SimpleTokenizer implements CustomTokenizer {
+
+		public Iterable<String> tokenize(String input) {
+			List<String> list = new ArrayList<String>();
+			StringTokenizer outer = new StringTokenizer(input);
+			while (outer.hasMoreTokens()) {
+				list.add(outer.nextToken());
+			}
+			return list;
+		}
+
+	}
 }

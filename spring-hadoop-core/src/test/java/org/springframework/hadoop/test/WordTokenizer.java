@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2011 the original author or authors.
+ * Copyright 2006-2010 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,28 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.hadoop.test;
 
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 
-import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.Mapper;
+/**
+ * @author Dave Syer
+ * 
+ */
+public class WordTokenizer implements CustomTokenizer {
 
-public class TokenizerMapper extends Mapper<Object, Text, Text, IntWritable> {
-
-	private final static IntWritable one = new IntWritable(1);
-
-	private Text word = new Text();
-
-	public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
-		StringTokenizer outer = new StringTokenizer(value.toString());
+	public Iterable<String> tokenize(String input) {
+		List<String> list = new ArrayList<String>();
+		StringTokenizer outer = new StringTokenizer(input);
 		while (outer.hasMoreTokens()) {
 			String token = outer.nextToken();
-			word.set(token);
-			context.write(word, one);
+			token = token.toLowerCase().replaceAll("[^a-z]", " ");
+			StringTokenizer inner = new StringTokenizer(token.trim());
+			while (inner.hasMoreTokens()) {
+				list.add(inner.nextToken());
+			}
 		}
+		return list;
 	}
 
 }

@@ -47,7 +47,7 @@ import org.springframework.hadoop.JobTemplate;
  * 	if (setUp.isClusterOnline()) {
  * 		setUp.setJarFile(&quot;target/my-test.jar&quot;);
  * 		jobTemplate.setExtraConfiguration(setUp.getExtraConfiguration());
- * 		setUp.copy(&quot;src/test/resources/input&quot;);
+ * 		setUp.copy(&quot;src/test/resources/input&quot;, &quot;target/input&quot;);
  * 	}
  * 	jobTemplate.setVerbose(true);
  * 	setUp.delete(&quot;target/output&quot;);
@@ -265,6 +265,9 @@ public class HadoopSetUp extends TestWatchman {
 	 * @param directory
 	 */
 	public void copy(String directory, String destination) throws Exception {
+		if (!directory.equals(destination)) {
+			delete(destination);
+		}
 		FileSystem.get(getConfiguration()).copyFromLocalFile(false, true, new Path(directory), new Path(destination));
 	}
 
