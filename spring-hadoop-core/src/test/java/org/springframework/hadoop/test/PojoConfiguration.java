@@ -15,11 +15,10 @@
  */
 package org.springframework.hadoop.test;
 
-import java.io.IOException;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.mapreduce.RecordWriter;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
@@ -75,15 +74,15 @@ public class PojoConfiguration extends JobConfiguration implements BeanFactoryAw
 	public class PojoMapReducer {
 
 		@org.springframework.hadoop.annotation.Mapper
-		public void map(String value, RecordWriter<String, Integer> writer) throws InterruptedException, IOException {
+		public void map(String value, Map<String, Integer> writer) {
 			StringTokenizer itr = new StringTokenizer(value);
 			while (itr.hasMoreTokens()) {
-				writer.write(itr.nextToken(), 1);
+				writer.put(itr.nextToken(), 1);
 			}
 		}
 
 		@org.springframework.hadoop.annotation.Reducer
-		public int reduce(Iterable<Integer> values) throws InterruptedException, IOException {
+		public int reduce(Iterable<Integer> values) {
 			int sum = 0;
 			for (Integer val : values) {
 				sum += val;

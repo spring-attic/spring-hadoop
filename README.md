@@ -56,15 +56,15 @@ API.  For example:
     public class PojoMapReducer {
 
         @Mapper
-        public void map(String value, RecordWriter<String, Integer> writer) throws InterruptedException, IOException {
+        public void map(String value, Map<String, Integer> writer) {
             StringTokenizer itr = new StringTokenizer(value);
             while (itr.hasMoreTokens()) {
-                writer.write(itr.nextToken(), 1);
+                writer.put(itr.nextToken(), 1);
             }
         }
 
         @Reducer
-        public int reduce(Iterable<Integer> values) throws InterruptedException, IOException {
+        public int reduce(Iterable<Integer> values) {
             int sum = 0;
             for (Integer val : values) {
                 sum += val;

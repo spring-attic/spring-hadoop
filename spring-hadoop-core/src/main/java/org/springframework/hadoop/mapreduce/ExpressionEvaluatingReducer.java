@@ -97,6 +97,8 @@ public class ExpressionEvaluatingReducer<I> extends Reducer<Writable, Writable, 
 
 		private Iterable<?> values;
 
+		private Map<Object,Object> map;
+
 		public ParametersWrapper(Writable key, Iterable<Writable> values, Class<?> targetValueType,
 				Reducer<Writable, Writable, Writable, Writable>.Context context, ConversionService conversionService,
 				Class<? extends Writable> outputKeyType, Class<? extends Writable> outputValueType) {
@@ -105,6 +107,7 @@ public class ExpressionEvaluatingReducer<I> extends Reducer<Writable, Writable, 
 			this.values = new ConversionServiceIterableAdapter<Writable, Object>(values, targetValueType,
 					conversionService);
 			this.writer = new ConversionServiceRecordWriter(context, conversionService, outputKeyType, outputValueType);
+			this.map = new RecordWriterMap(writer);
 		}
 
 		public Writable getKey() {
@@ -117,6 +120,10 @@ public class ExpressionEvaluatingReducer<I> extends Reducer<Writable, Writable, 
 
 		public RecordWriter<Object, Object> getWriter() {
 			return writer;
+		}
+		
+		public Map<Object, Object> getMap() {
+			return map;
 		}
 
 		public Iterable<?> getValues() {

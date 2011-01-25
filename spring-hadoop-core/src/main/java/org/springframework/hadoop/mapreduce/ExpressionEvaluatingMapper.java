@@ -88,12 +88,15 @@ public class ExpressionEvaluatingMapper extends Mapper<Writable, Writable, Writa
 
 		private Writable value;
 
+		private Map<Object, Object> map;
+
 		public ParametersWrapper(Writable key, Writable value,
 				Mapper<Writable, Writable, Writable, Writable>.Context context, ConversionService conversionService, Class<? extends Writable> outputKeyType, Class<? extends Writable> outputValueType) {
 			this.key = key;
 			this.context = context;
 			this.value = value;
 			this.writer = new ConversionServiceRecordWriter(context, conversionService, outputKeyType, outputValueType);
+			this.map = new RecordWriterMap(writer);
 		}
 
 		public Writable getKey() {
@@ -106,6 +109,10 @@ public class ExpressionEvaluatingMapper extends Mapper<Writable, Writable, Writa
 
 		public RecordWriter<Object, Object> getWriter() {
 			return writer;
+		}
+
+		public Map<Object, Object> getMap() {
+			return map;
 		}
 
 		public Writable getValue() {
