@@ -1,0 +1,2 @@
+http\://www.springframework.org/schema/hadoop/spring-hadoop.xsd=/org/springframework/hadoop/configuration/xml/spring-hadoop-1.0.xsd
+http\://www.springframework.org/schema/hadoop/spring-hadoop-1.0.xsd=/org/springframework/hadoop/configuration/xml/spring-hadoop-1.0.xsd

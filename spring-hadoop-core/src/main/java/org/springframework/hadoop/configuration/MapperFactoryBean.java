@@ -26,8 +26,7 @@ import org.springframework.hadoop.mapreduce.ExpressionEvaluatingMapper;
  */
 public class MapperFactoryBean extends AbstractExpressionEvaluatorFactoryBean<Mapper<?, ?, ?, ?>> {
 
-	protected Mapper<?, ?, ?, ?> doGetObject(Object target, ConversionService conversionService,
-			Class<? extends Writable> outputKeyType, Class<? extends Writable> outputValueType) {
+	protected Mapper<?, ?, ?, ?> doGetObject(Object target, ConversionService conversionService, Class<? extends Writable> outputKeyType, Class<? extends Writable> outputValueType) {
 		ExpressionFactory factory = new ExpressionFactory();
 		String expression = factory.getMapperExpression(target);
 		return new ExpressionEvaluatingMapper(target, expression, conversionService, outputKeyType, outputValueType);
