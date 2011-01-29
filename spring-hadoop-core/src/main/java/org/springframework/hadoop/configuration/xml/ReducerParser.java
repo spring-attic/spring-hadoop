@@ -12,12 +12,5 @@ import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
  */
 public class ReducerParser extends AbstractSingleBeanDefinitionParser {
 
-  /**
-   * example use case:
-   *
-   * <CODE>
-   *   <reducer
-   *
-   * </CODE>
-   */
+
 }

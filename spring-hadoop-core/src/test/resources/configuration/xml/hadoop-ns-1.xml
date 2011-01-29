@@ -11,10 +11,11 @@
     <context:component-scan base-package="org.springframework.hadoop.test.config.xml"/>
 
     <hadoop:mapper
-            id="x"
-            output-key-class="org.apache.hadoop.io.IntWritable"
-            output-value-class="org.apache.hadoop.io.Text"
+            id="nsMapper"
+            output-key-type="org.apache.hadoop.io.IntWritable"
+            output-value-type="org.apache.hadoop.io.Text"
             ref= "pojoMapper"
+            method="map"
             />
 
 

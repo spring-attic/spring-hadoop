@@ -17,11 +17,14 @@ package org.springframework.hadoop.configuration.xml;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
+import org.springframework.hadoop.configuration.MapperFactoryBean;
+import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
 
 /**
  *
  * Parser for {@link org.springframework.hadoop.configuration.MapperFactoryBean} instances
+ * as defined in a &lt;mapper&gt; element.
  *
  * @author Josh Long
  * @since 1.0
@@ -30,8 +33,41 @@ import org.w3c.dom.Element;
  *
  */
 public class MapperParser extends AbstractSingleBeanDefinitionParser {
-  @Override
-  protected void doParse(Element element, BeanDefinitionBuilder builder) {
+	/**
+	 * the attribute for the 'target' bean to be used by the {@link MapperFactoryBean factory bean}
+	 */
+	public static final String REF_ATTR = "ref" ;
 
+	/**
+	 * attribute specifying method that is optionally used (on the bean {@link MapperParser#REF_ATTR references}) in lieu of a method with an annotation
+	 *
+	 */
+	public static final String METHOD_ATTR = "method" ;
+
+	/**
+	 * the attribute for the class of the key that's "emitted"
+	 */
+	public static final String OUTPUT_KEY_TYPE_ATTR = "output-key-type";
+
+	/**
+	 * the attribute for the class of the value that's "emitted"
+	 */
+	public static final String OUTPUT_VALUE_TYPE_ATTR = "output-value-type";
+
+	@Override
+	protected Class getBeanClass(Element element) {
+	 return MapperFactoryBean.class ;
+	}
+
+
+	@Override
+  protected void doParse(Element element, BeanDefinitionBuilder builder) {
+		builder.addPropertyValue( "outputValueType"  , element.getAttribute(OUTPUT_VALUE_TYPE_ATTR) );
+		builder.addPropertyValue( "outputKeyType"  , element.getAttribute(OUTPUT_KEY_TYPE_ATTR) );
+		builder.addPropertyReference( "target", element.getAttribute(REF_ATTR));
+		String method = element.getAttribute( METHOD_ATTR) ;
+		if(StringUtils.hasText( method )){
+			builder.addPropertyValue( "method" , method) ;
+		}
   }
 }

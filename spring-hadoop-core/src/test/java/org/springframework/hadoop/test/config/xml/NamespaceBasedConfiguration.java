@@ -20,12 +20,16 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.hadoop.configuration.JobFactoryBean;
+import org.springframework.hadoop.configuration.ReducerFactoryBean;
 
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -37,22 +41,32 @@ import java.util.StringTokenizer;
  * @author 1.0
  */
 @Configuration
-public class NamespaceBasedConfiguration {
+public class NamespaceBasedConfiguration implements BeanFactoryAware {
 
   @Bean
   public FactoryBean<Job> classConfiguredJob(@Value("${input.path:src/test/resources/input}") String inputPath,
                                              @Value("${output.path:target/output}") String outputPath) throws Exception {
     JobFactoryBean factory = new JobFactoryBean();
     factory.setMapper(this.mapper);
-    factory.setReducer(this.reducer);
-    factory.setCombiner(this.reducer);
+    factory.setReducer(this.reducer());
+    factory.setCombiner(this.reducer());
     factory.setOutputKeyClass(outputKeyType());
     factory.setOutputValueClass(outputValueType());
     factory.setInputPaths(inputPath);
     factory.setOutputPath(outputPath);
     return factory;
   }
-
+	@Bean
+	public Reducer<?, ?, ?, ?> reducer() throws Exception {
+		ReducerFactoryBean factory = new ReducerFactoryBean();
+		factory.setTarget(pojoReducer());
+		factory.setOutputKeyType(outputKeyType());
+		factory.setOutputValueType(outputValueType());
+		factory.setInputValueType(Integer.class);
+		factory.setBeanFactory(beanFactory);
+		factory.afterPropertiesSet();
+		return factory.getObject();
+	}
   protected Class<IntWritable> outputValueType() {
     return IntWritable.class;
   }
@@ -65,7 +79,6 @@ public class NamespaceBasedConfiguration {
   public Object pojoReducer() {
     return new Object() {
       @org.springframework.hadoop.annotation.Reducer
-
       public int reduce(Iterable<Integer> values) {
         int sum = 0;
         for (Integer val : values) {
@@ -79,8 +92,13 @@ public class NamespaceBasedConfiguration {
   @Bean
   public Object pojoMapper() {
     return new Object() {
+			/**
+			 * another public method to throw the {@link org.springframework.hadoop.configuration.MapperFactoryBean} off. Must be specified in the XML
+			 *
+			 */
+			public void doIt(){}
 
-      @org.springframework.hadoop.annotation.Mapper
+//      @org.springframework.hadoop.annotation.Mapper
       public void map(String value, Map<String, Integer> writer) {
         StringTokenizer itr = new StringTokenizer(value);
         while (itr.hasMoreTokens()) {
@@ -96,6 +114,9 @@ public class NamespaceBasedConfiguration {
   @Autowired
   private Mapper<?, ?, ?, ?> mapper;
 
-  @Autowired
-  private Reducer<?, ?, ?, ?> reducer;
+	private BeanFactory beanFactory ;
+
+	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+	 this.beanFactory = beanFactory ;
+	}
 }

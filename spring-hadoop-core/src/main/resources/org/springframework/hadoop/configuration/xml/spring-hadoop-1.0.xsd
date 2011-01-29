@@ -37,9 +37,9 @@
         <xsd:complexType>
 
 
-            <xsd:attributeGroup ref="outputKeyClassType"/>
+            <xsd:attributeGroup ref="outputKeyType"/>
 
-            <xsd:attributeGroup ref="outputValueClassType"/>
+            <xsd:attributeGroup ref="outputValueType"/>
 
             <!--
                 for now, u *need* to provide a bean for us to use as your implementation
@@ -57,6 +57,8 @@
                 </xsd:annotation>
             </xsd:attribute>
 
+            <xsd:attribute name="method" type="xsd:string" use="optional"/>
+
             <xsd:attribute name="id" type="xsd:ID" use="required"/>
 
         </xsd:complexType>
@@ -64,8 +66,8 @@
 
 
     <!-- todo this should be adjustable; a) use conversion service b) reflectively figure it out -->
-    <xsd:attributeGroup name="outputKeyClassType">
-        <xsd:attribute name="output-key-class" type="xsd:string" use="required">
+    <xsd:attributeGroup name="outputKeyType">
+        <xsd:attribute name="output-key-type" type="xsd:string" use="required">
             <xsd:annotation>
                 <xsd:documentation>
                     the output key class
@@ -82,8 +84,8 @@
     </xsd:attributeGroup>
 
     <!-- todo this should be adjustable; a) use conversion service b) reflectively figure it out -->
-    <xsd:attributeGroup name="outputValueClassType">
-        <xsd:attribute name="output-value-class" type="xsd:string" use="required">
+    <xsd:attributeGroup name="outputValueType">
+        <xsd:attribute name="output-value-type" type="xsd:string" use="required">
             <xsd:annotation>
                 <xsd:documentation>
                     the output value class
