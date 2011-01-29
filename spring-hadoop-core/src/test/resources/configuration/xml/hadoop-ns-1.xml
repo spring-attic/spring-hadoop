@@ -4,9 +4,9 @@
 	    xmlns:context="http://www.springframework.org/schema/context"
          xmlns:hadoop="http://www.springframework.org/schema/hadoop"
         xsi:schemaLocation="
-        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-        http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop-1.0.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop-1.0.xsd
+http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
     <context:component-scan base-package="org.springframework.hadoop.test.config.xml"/>
 
@@ -17,6 +17,14 @@
             ref= "pojoMapper"
             method="map"
             />
+
+    <hadoop:reducer
+            output-key-type="org.apache.hadoop.io.Text"
+            output-value-type="org.apache.hadoop.io.IntWritable"
+            input-value-type="org.apache.hadoop.io.IntWritable" 
+            ref ="pojoReducer" method="reduce"
+            id="nsReducer"
+    />
 
 
 

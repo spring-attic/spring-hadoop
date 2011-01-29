@@ -1,6 +1,7 @@
 package org.springframework.hadoop.configuration.xml;
 
 import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,7 +11,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
- * Live-fire test of the Spring namespace
+ * Live-fire test of the Spring Hadoop namespace
  *
  * @author Josh Long
  */
@@ -18,10 +19,21 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 public class NamespaceParsingTests {
 
-	@Autowired @Qualifier("nsMapper") private Mapper mapper ;
+	@Autowired
+	@Qualifier("nsMapper")
+	private Mapper mapper;
+
+	@Autowired
+	@Qualifier("nsReducer")
+	private Reducer reducer;
+
+	@Test
+	public void testParserCorrectlyInstantiatedReducer() throws Exception {
+		Assert.assertNotNull("the mapper should not be null", this.reducer);
+	}
 
 	@Test
 	public void testParserCorrectlyInstantiatedMapper() throws Exception {
-		Assert.assertNotNull( "the mapper should not be null" , this.mapper) ;
+		Assert.assertNotNull("the mapper should not be null", this.mapper);
 	}
 }

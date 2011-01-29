@@ -48,25 +48,15 @@ public class NamespaceBasedConfiguration implements BeanFactoryAware {
                                              @Value("${output.path:target/output}") String outputPath) throws Exception {
     JobFactoryBean factory = new JobFactoryBean();
     factory.setMapper(this.mapper);
-    factory.setReducer(this.reducer());
-    factory.setCombiner(this.reducer());
+    factory.setReducer(this.reducer );
+    factory.setCombiner(this.reducer );
     factory.setOutputKeyClass(outputKeyType());
     factory.setOutputValueClass(outputValueType());
     factory.setInputPaths(inputPath);
     factory.setOutputPath(outputPath);
     return factory;
   }
-	@Bean
-	public Reducer<?, ?, ?, ?> reducer() throws Exception {
-		ReducerFactoryBean factory = new ReducerFactoryBean();
-		factory.setTarget(pojoReducer());
-		factory.setOutputKeyType(outputKeyType());
-		factory.setOutputValueType(outputValueType());
-		factory.setInputValueType(Integer.class);
-		factory.setBeanFactory(beanFactory);
-		factory.afterPropertiesSet();
-		return factory.getObject();
-	}
+
   protected Class<IntWritable> outputValueType() {
     return IntWritable.class;
   }
@@ -77,8 +67,16 @@ public class NamespaceBasedConfiguration implements BeanFactoryAware {
 
   @Bean
   public Object pojoReducer() {
+
+
     return new Object() {
-      @org.springframework.hadoop.annotation.Reducer
+			/**
+			 * another public method to throw the {@link org.springframework.hadoop.configuration.ReducerFactoryBean} off. Must be specified in the XML
+			 *
+			 */
+			public void doIt(){}
+
+//      @org.springframework.hadoop.annotation.Reducer
       public int reduce(Iterable<Integer> values) {
         int sum = 0;
         for (Integer val : values) {
@@ -111,8 +109,12 @@ public class NamespaceBasedConfiguration implements BeanFactoryAware {
   /**
    * these are provided by the namespace
    */
-  @Autowired
-  private Mapper<?, ?, ?, ?> mapper;
+  @Autowired private Mapper<?, ?, ?, ?> mapper;
+
+	/**
+	 * these are provided by the namespace
+	 */
+	@Autowired private Reducer<?,?,?,?> reducer ;
 
 	private BeanFactory beanFactory ;
 
