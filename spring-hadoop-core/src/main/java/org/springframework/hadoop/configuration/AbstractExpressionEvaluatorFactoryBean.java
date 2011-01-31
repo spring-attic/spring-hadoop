@@ -87,7 +87,7 @@ public abstract class AbstractExpressionEvaluatorFactoryBean<T> implements Facto
 	}
 
 	public T getObject() throws Exception {
-		if (getObjectType().isAssignableFrom(MethodUtils.getTargetClass(target))) {
+		if (getObjectType().isInstance(target)) {
 			@SuppressWarnings("unchecked")
 			T result = (T) target;
 			return result;
