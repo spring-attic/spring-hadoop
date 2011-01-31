@@ -12,7 +12,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * Live-fire test of the Spring Hadoop namespace
- *
+ * 
  * @author Josh Long
  */
 @ContextConfiguration("/configuration/xml/hadoop-ns-1.xml")
@@ -20,12 +20,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class NamespaceParsingTests {
 
 	@Autowired
-	@Qualifier("nsMapper")
-	private Mapper mapper;
+	@Qualifier("mapper")
+	private Mapper<?, ?, ?, ?> mapper;
 
 	@Autowired
-	@Qualifier("nsReducer")
-	private Reducer reducer;
+	@Qualifier("reducer")
+	private Reducer<?, ?, ?, ?> reducer;
 
 	@Test
 	public void testParserCorrectlyInstantiatedReducer() throws Exception {

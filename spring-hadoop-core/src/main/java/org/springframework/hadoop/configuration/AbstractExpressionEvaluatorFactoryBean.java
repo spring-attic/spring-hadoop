@@ -33,7 +33,6 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.convert.converter.ConverterRegistry;
 import org.springframework.core.convert.support.ConversionServiceFactory;
 import org.springframework.hadoop.util.BeanFactoryConversionService;
-import org.springframework.hadoop.util.reflect.MethodUtils;
 import org.springframework.util.Assert;
 
 /**
