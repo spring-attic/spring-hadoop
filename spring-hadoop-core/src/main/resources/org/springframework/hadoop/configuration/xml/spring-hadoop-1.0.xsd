@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.springframework.org/schema/hadoop"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:beans="http://www.springframework.org/schema/beans"
+            xmlns:tool="http://www.springframework.org/schema/tool"
+            targetNamespace="http://www.springframework.org/schema/hadoop"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified"
+            xsi:schemaLocation="
+            http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+            http://www.springframework.org/schema/tool http://www.springframework.org/schema/tool/spring-tool-3.0.xsd
+            "
+            version="1.0">
+
+    <xsd:import namespace="http://www.springframework.org/schema/beans"/>
+    <xsd:import namespace="http://www.springframework.org/schema/tool"/>
+
+    <xsd:annotation>
+        <xsd:documentation><![CDATA[
+	 Defines the configuration for Spring Hadoop Core
+		]]></xsd:documentation>
+    </xsd:annotation>
+
+
+    <!-- Mappers-->
+    <xsd:element name="mapper">
+        <xsd:annotation>
+            <xsd:documentation>
+
+
+                Defines a Hadoop Map Reduce job Mapper (org.apache.hadoop.mapreduce.Mapper)
+                that's built using org.springframework.hadoop.configuration.MapperFactoryBean
+
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+
+
+            <xsd:attributeGroup ref="outputKeyType"/>
+
+            <xsd:attributeGroup ref="outputValueType"/>
+
+            <!--
+                for now, u *need* to provide a bean for us to use as your implementation
+            -->
+            <xsd:attribute name="ref">
+                <xsd:annotation>
+                    <xsd:documentation source="org.springframework.hadoop.configuration.MapperFactoryBean"><![CDATA[
+							 Hadoop Mapper impl
+							]]></xsd:documentation>
+                    <xsd:appinfo>
+                        <tool:annotation kind="ref">
+                            <tool:expected-type type="java.lang.Object"/>
+                        </tool:annotation>
+                    </xsd:appinfo>
+                </xsd:annotation>
+            </xsd:attribute>
+
+            <xsd:attribute name="method" type="xsd:string" use="optional"/>
+
+            <xsd:attribute name="id" type="xsd:ID" use="required"/>
+
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="reducer">
+        <xsd:annotation>
+            <xsd:documentation>
+
+
+                Defines a Hadoop Map Reduce job Reducer (org.apache.hadoop.mapreduce.Reducer)
+                that's built using org.springframework.hadoop.configuration.ReducerFactoryBean
+
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+
+
+            <xsd:attributeGroup ref="outputKeyType"/>
+            <xsd:attributeGroup ref="outputValueType"/>
+            <xsd:attributeGroup ref="inputValueType"/>
+
+            <!--
+                for now, u *need* to provide a bean for us to use as your implementation
+            -->
+            <xsd:attribute name="ref">
+                <xsd:annotation>
+                    <xsd:documentation source="org.springframework.hadoop.configuration.ReducerFactoryBean"><![CDATA[
+						Hadoop Reducer implementation
+							]]></xsd:documentation>
+                    <xsd:appinfo>
+                        <tool:annotation kind="ref">
+                            <tool:expected-type type="java.lang.Object"/>
+                        </tool:annotation>
+                    </xsd:appinfo>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="method" type="xsd:string" use="optional"/>
+            <xsd:attribute name="id" type="xsd:ID" use="required"/>
+
+        </xsd:complexType>
+    </xsd:element>
+
+
+    <!-- todo this should be adjustable; a) use conversion service b) reflectively figure it out -->
+
+    <xsd:attributeGroup name="inputValueType">
+        <xsd:attribute name="input-value-type" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation>
+                    the input value class
+                </xsd:documentation>
+                <xsd:appinfo>
+                    <tool:annotation kind="direct">
+                        <tool:expected-type type="java.lang.Class"/>
+                        <tool:assignable-to type="org.apache.hadoop.io.Writable"/>
+                    </tool:annotation>
+                </xsd:appinfo>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:attributeGroup>
+
+    <xsd:attributeGroup name="outputKeyType">
+        <xsd:attribute name="output-key-type" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation>
+                    the output key class
+                </xsd:documentation>
+                <xsd:appinfo>
+                    <tool:annotation kind="direct">
+                        <tool:expected-type type="java.lang.Class"/>
+
+                        <tool:assignable-to type="org.apache.hadoop.io.Writable"/>
+                    </tool:annotation>
+                </xsd:appinfo>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:attributeGroup>
+
+    <!-- todo this should be adjustable; a) use conversion service b) reflectively figure it out -->
+    <xsd:attributeGroup name="outputValueType">
+        <xsd:attribute name="output-value-type" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation>
+                    the output value class
+                </xsd:documentation>
+                <xsd:appinfo>
+                    <tool:annotation kind="direct">
+                        <tool:expected-type type="java.lang.Class"/>
+                        <tool:assignable-to type="org.apache.hadoop.io.Writable"/>
+                    </tool:annotation>
+                </xsd:appinfo>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:attributeGroup>
+
+
+    <xsd:simpleType name="description">
+        <xsd:annotation>
+            <xsd:documentation><![CDATA[
+	Contains informative text describing the purpose of the enclosing element.
+	Used primarily for user documentation of XML bean definition documents.
+			]]></xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="xsd:string"/>
+    </xsd:simpleType>
+
+
+</xsd:schema>

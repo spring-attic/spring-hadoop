@@ -3,3 +3,7 @@ bin
 .settings
 .classpath
 .project
+*.iml
+*.ipr
+*.iws
+
