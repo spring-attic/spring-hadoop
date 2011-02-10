@@ -46,9 +46,13 @@ public class JobTemplate {
 
 	private String jarFile;
 
-	private String hostname;
+	private String jobTrackerHostname;
 
-	private int port = 9001;
+	private int jobTrackerPort = 9001;
+
+	private String hdfsHostname;
+
+	private Integer hdfsPort;
 
 	private Properties bootstrapProperties = new Properties();
 
@@ -88,12 +92,20 @@ public class JobTemplate {
 		this.jarFile = jarFile;
 	}
 
-	public void setHostname(String hostname) {
-		this.hostname = hostname;
+	public void setJobTrackerHostname(String hostname) {
+		this.jobTrackerHostname = hostname;
 	}
 
-	public void setPort(int port) {
-		this.port = port;
+	public void setJobTrackerPort(int port) {
+		this.jobTrackerPort = port;
+	}
+
+	public void setHdfsHostname(String hdfsHostname) {
+		this.hdfsHostname = hdfsHostname;
+	}
+
+	public void setHdfsPort(int hdfsPort) {
+		this.hdfsPort = hdfsPort;
 	}
 
 	public boolean run() {
@@ -135,7 +147,8 @@ public class JobTemplate {
 
 	private Configuration getBootstrapConfiguration() {
 		mergeExtraConfiguration(configuration);
-		configuration.set(DefaultContextLoader.SPRING_CONFIG_BOOTSTRAP, PropertiesUtils.propertiesToString(bootstrapProperties));
+		configuration.set(DefaultContextLoader.SPRING_CONFIG_BOOTSTRAP,
+				PropertiesUtils.propertiesToString(bootstrapProperties));
 		return configuration;
 	}
 
@@ -191,10 +204,15 @@ public class JobTemplate {
 		if (jarFile != null) {
 			map.setProperty("mapred.jar", jarFile);
 		}
-		if (hostname != null) {
-			map.setProperty("mapred.job.tracker", String.format("%s:%d", hostname, port));
-			// TODO: make fs port configurable
-			map.setProperty("fs.default.name", String.format("hdfs://%s:%d/", hostname, port - 1));
+		if (jobTrackerHostname != null) {
+			map.setProperty("mapred.job.tracker", String.format("%s:%d", jobTrackerHostname, jobTrackerPort));
+		}
+		int port = hdfsPort==null ? jobTrackerPort - 1 : hdfsPort;
+		if (hdfsHostname != null) {
+			map.setProperty("fs.default.name", String.format("hdfs://%s:%d/", hdfsHostname, port));
+		}
+		else if (jobTrackerHostname != null) {
+			map.setProperty("fs.default.name", String.format("hdfs://%s:%d/", jobTrackerHostname, port));
 		}
 		return map;
 	}

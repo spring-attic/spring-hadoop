@@ -199,8 +199,8 @@ public class HadoopSetUp extends TestWatchman {
 				clusterOffline = false;
 				jarFile = buildJarFile();
 				jobTemplate.setJarFile(jarFile);
-				jobTemplate.setHostname(hostname);
-				jobTemplate.setPort(port);
+				jobTemplate.setJobTrackerHostname(hostname);
+				jobTemplate.setJobTrackerPort(port);
 			}
 
 		}

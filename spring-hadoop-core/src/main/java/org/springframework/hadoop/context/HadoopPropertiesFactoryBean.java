@@ -60,7 +60,6 @@ public class HadoopPropertiesFactoryBean implements FactoryBean<Properties>, Ini
 
 	public void afterPropertiesSet() throws Exception {
 		configuration.get("dummy"); // force load resources
-		// TODO: could use a JobClient here if it adds anything?
 		for (Entry<String, String> entry : configuration) {
 			instance.setProperty(entry.getKey(), entry.getValue());
 		}

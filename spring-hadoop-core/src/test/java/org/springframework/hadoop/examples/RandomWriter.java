@@ -243,7 +243,6 @@ public class RandomWriter extends Configured implements Tool, InitializingBean {
 	}
 
 	public int run(String[] args) throws Exception {
-		// TODO: conf.setInt(NUM_MAPS, getNumMaps());
 		Configuration configuration = getConf();
 		JobTemplate jobTemplate = new JobTemplate();
 		jobTemplate.setConfiguration(configuration);
