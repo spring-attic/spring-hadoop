@@ -68,7 +68,7 @@ public class KitchenSinkConfiguration {
 		factory.setOutputKeyClass(Text.class);
 		factory.setOutputValueClass(IntWritable.class);
 		factory.setInputPaths("foo");
-		factory.setOutputPath("bar");
+		factory.setOutputPath("target/bar");
 		return factory;
 	}
 
