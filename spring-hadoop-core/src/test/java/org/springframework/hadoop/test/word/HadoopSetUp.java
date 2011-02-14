@@ -1,4 +1,4 @@
-package org.springframework.hadoop.test;
+package org.springframework.hadoop.test.word;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;

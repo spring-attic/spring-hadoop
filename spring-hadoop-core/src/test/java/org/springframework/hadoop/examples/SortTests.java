@@ -24,7 +24,7 @@ import org.apache.hadoop.mapred.JobClient;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.springframework.hadoop.test.HadoopSetUp;
+import org.springframework.hadoop.test.word.HadoopSetUp;
 
 /**
  * @author Dave Syer

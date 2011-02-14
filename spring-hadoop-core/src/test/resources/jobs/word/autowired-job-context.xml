@@ -6,13 +6,13 @@
 		<property name="mapper" ref="mapper" />
 		<property name="combiner" ref="reducer" />
 		<property name="reducer" ref="reducer" />
-		<property name="inputPaths" value="target/input" />
-		<property name="outputPath" value="target/output" />
+		<property name="inputPaths" value="target/input/word" />
+		<property name="outputPath" value="target/output/word" />
 		<property name="outputKeyClass" value="org.apache.hadoop.io.Text" />
 		<property name="outputValueClass" value="org.apache.hadoop.io.IntWritable" />
 	</bean>
 
-	<bean id="mapper" class="org.springframework.hadoop.test.TokenizerMapper" />
-	<bean id="reducer" name="combiner" class="org.springframework.hadoop.test.IntSumReducer" />
+	<bean id="mapper" class="org.springframework.hadoop.test.word.TokenizerMapper" />
+	<bean id="reducer" name="combiner" class="org.springframework.hadoop.test.word.IntSumReducer" />
 
 </beans>

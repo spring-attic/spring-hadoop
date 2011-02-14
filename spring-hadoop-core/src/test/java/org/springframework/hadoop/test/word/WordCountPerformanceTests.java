@@ -1,4 +1,4 @@
-package org.springframework.hadoop.test;
+package org.springframework.hadoop.test.word;
 
 import static org.junit.Assert.assertTrue;
 
@@ -25,9 +25,9 @@ public class WordCountPerformanceTests {
 	public RepeatProcessor repeats = new RepeatProcessor(0, !System.getProperty("performance.test", "false").equals(
 			"false"));
 
-	private String input = "target/book/input";
+	private String input = "target/book/input/word";
 
-	private String output = "target/output";
+	private String output = "target/output/word";
 
 	private String zipFile = "src/test/resources/book.zip";
 

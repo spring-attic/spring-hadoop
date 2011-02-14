@@ -15,13 +15,6 @@
  */
 package org.springframework.hadoop.configuration;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
-import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
@@ -29,9 +22,7 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.convert.ConversionService;
-import org.springframework.core.convert.converter.Converter;
-import org.springframework.core.convert.converter.ConverterRegistry;
-import org.springframework.core.convert.support.ConversionServiceFactory;
+import org.springframework.hadoop.convert.HadoopConversionServiceFactory;
 import org.springframework.hadoop.util.BeanFactoryConversionService;
 import org.springframework.util.Assert;
 
@@ -46,7 +37,7 @@ public abstract class AbstractExpressionEvaluatorFactoryBean<T> implements Facto
 
 	private String method;
 
-	private ConversionService conversionService = ConversionServiceFactory.createDefaultConversionService();
+	private ConversionService conversionService = HadoopConversionServiceFactory.createDefaultConversionService();
 
 	private Class<? extends Writable> outputKeyType;
 
@@ -82,7 +73,6 @@ public abstract class AbstractExpressionEvaluatorFactoryBean<T> implements Facto
 		Assert.state(target != null, "Target must be provided");
 		Assert.state(outputValueType != null, "Ouput value type must be provided");
 		Assert.state(outputKeyType != null, "Ouput key type must be provided");
-		addDefaultConverters();
 	}
 
 	public T getObject() throws Exception {
@@ -107,44 +97,6 @@ public abstract class AbstractExpressionEvaluatorFactoryBean<T> implements Facto
 
 	public boolean isSingleton() {
 		return true;
-	}
-
-	private void addDefaultConverters() {
-		if (!(conversionService instanceof ConverterRegistry)) {
-			return;
-		}
-		ConverterRegistry registry = (ConverterRegistry) conversionService;
-		Set<Converter<?, ?>> converters = new HashSet<Converter<?, ?>>();
-		converters.add(new Converter<Iterable<?>, Collection<?>>() {
-			public Collection<?> convert(Iterable<?> source) {
-				ArrayList<Object> result = new ArrayList<Object>();
-				for (Object item : source) {
-					result.add(item);
-				}
-				return result;
-			}
-		});
-		converters.add(new Converter<IntWritable, Integer>() {
-			public Integer convert(IntWritable source) {
-				return source.get();
-			}
-		});
-		converters.add(new Converter<Integer, IntWritable>() {
-			public IntWritable convert(Integer source) {
-				return new IntWritable(source);
-			}
-		});
-		converters.add(new Converter<Text, String>() {
-			public String convert(Text source) {
-				return source.toString();
-			}
-		});
-		converters.add(new Converter<String, Text>() {
-			public Text convert(String source) {
-				return new Text(source);
-			}
-		});
-		ConversionServiceFactory.registerConverters(converters, registry);
 	}
 
 }

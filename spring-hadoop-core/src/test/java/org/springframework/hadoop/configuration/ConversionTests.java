@@ -43,9 +43,9 @@ import org.springframework.expression.spel.SpelEvaluationException;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.expression.spel.support.StandardTypeConverter;
+import org.springframework.hadoop.convert.IterableToIterableConverter;
 import org.springframework.hadoop.mapreduce.ConversionServiceRecordWriter;
 import org.springframework.hadoop.util.ConversionServiceIterableAdapter;
-import org.springframework.hadoop.util.IterableToIterableConverter;
 
 /**
  * @author Dave Syer

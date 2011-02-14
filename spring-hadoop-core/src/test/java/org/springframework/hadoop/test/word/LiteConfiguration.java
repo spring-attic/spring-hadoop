@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.hadoop.test;
+package org.springframework.hadoop.test.word;
 
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
@@ -40,8 +40,8 @@ public class LiteConfiguration {
 		factory.setCombiner(reducer());
 		factory.setOutputKeyClass(Text.class);
 		factory.setOutputValueClass(IntWritable.class);
-		factory.setInputPaths("target/input");
-		factory.setOutputPath("target/output");
+		factory.setInputPaths("target/input/word");
+		factory.setOutputPath("target/output/word");
 		return factory;
 	}
 

@@ -3,7 +3,6 @@ package org.springframework.hadoop.configuration.xml;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.springframework.hadoop.configuration.ReducerFactoryBean;
-import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
 
 /**
@@ -57,9 +56,6 @@ public class ReducerParser extends AbstractSingleBeanDefinitionParser {
 		builder.addPropertyValue("outputValueType", element.getAttribute(OUTPUT_VALUE_TYPE_ATTR));
 		builder.addPropertyValue("outputKeyType", element.getAttribute(OUTPUT_KEY_TYPE_ATTR));
 		builder.addPropertyReference("target", element.getAttribute(REF_ATTR));
-		String method = element.getAttribute(METHOD_ATTR);
-		if (StringUtils.hasText(method)) {
-			builder.addPropertyValue("method", method);
-		}
+		NamespaceUtils.setValueIfAttributeDefined(builder, element, METHOD_ATTR);
 	}
 }

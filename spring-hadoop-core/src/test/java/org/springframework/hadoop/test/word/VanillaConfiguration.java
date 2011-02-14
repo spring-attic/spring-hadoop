@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.hadoop.test;
+package org.springframework.hadoop.test.word;
 
 import java.io.IOException;
 import java.util.StringTokenizer;
 
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.springframework.context.annotation.Bean;
@@ -31,17 +30,17 @@ import org.springframework.context.annotation.Configuration;
  * 
  */
 @Configuration
-public class GenericConfiguration extends JobConfiguration {
+public class VanillaConfiguration extends JobConfiguration {
 
 	@Bean
 	@Override
 	public Mapper<?, ?, ?, ?> mapper() {
-		return new Mapper<Writable, Writable, Writable, Writable>() {
+		return new Mapper<Object, Text, Text, IntWritable>() {
 			private Text word = new Text();
 
 			private IntWritable one = new IntWritable(1);
 
-			protected void map(Writable key, Writable value, Context context) throws IOException, InterruptedException {
+			protected void map(Object key, Text value, Context context) throws IOException, InterruptedException {
 				StringTokenizer itr = new StringTokenizer(value.toString());
 				while (itr.hasMoreTokens()) {
 					word.set(itr.nextToken());
@@ -54,10 +53,9 @@ public class GenericConfiguration extends JobConfiguration {
 	@Bean
 	@Override
 	public Reducer<?, ?, ?, ?> reducer() {
-		return new Reducer<Writable, IntWritable, Writable, Writable>() {
+		return new Reducer<Text, IntWritable, Text, IntWritable>() {
 			private IntWritable result = new IntWritable();
-
-			public void reduce(Writable key, Iterable<IntWritable> values, Context context) throws IOException,
+			public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException,
 					InterruptedException {
 				int sum = 0;
 				for (IntWritable val : values) {

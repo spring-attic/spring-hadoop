@@ -86,6 +86,9 @@ public class RecordWriterMap implements Map<Object, Object> {
 	}
 
 	public void clear() {
+		this.key = null;
+		this.value = null;
+		this.size = 0;
 	}
 
 	public Set<Object> keySet() {

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.hadoop.test;
+package org.springframework.hadoop.test.word.config;
 
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
@@ -21,11 +21,11 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.springframework.beans.factory.FactoryBean;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.hadoop.configuration.JobFactoryBean;
+import org.springframework.hadoop.test.word.IntSumReducer;
+import org.springframework.hadoop.test.word.TokenizerMapper;
 
 /**
  * @author Dave Syer
@@ -35,42 +35,26 @@ import org.springframework.hadoop.configuration.JobFactoryBean;
 public class JobConfiguration {
 
 	@Bean
-	public FactoryBean<Job> classConfiguredJob(@Value("${input.path:src/test/resources/input}") String inputPath,
-			@Value("${output.path:target/output}") String outputPath) throws Exception {
+	public FactoryBean<Job> wordCountJob() throws Exception {
 		JobFactoryBean factory = new JobFactoryBean();
 		factory.setMapper(mapper());
 		factory.setReducer(reducer());
 		factory.setCombiner(reducer());
-		factory.setOutputKeyClass(outputKeyType());
-		factory.setOutputValueClass(outputValueType());
-		factory.setInputPaths(inputPath);
-		factory.setOutputPath(outputPath);
+		factory.setOutputKeyClass(Text.class);
+		factory.setOutputValueClass(IntWritable.class);
+		factory.setInputPaths("target/input/word");
+		factory.setOutputPath("target/output/word");
 		return factory;
 	}
 
-	protected Class<IntWritable> outputValueType() {
-		return IntWritable.class;
-	}
-
-	protected Class<Text> outputKeyType() {
-		return Text.class;
-	}
-
 	@Bean
-	public Mapper<?, ?, ?, ?> mapper() throws Exception {
+	public Mapper<Object, Text, Text, IntWritable> mapper() {
 		return new TokenizerMapper();
 	}
 
 	@Bean
-	public Reducer<?, ?, ?, ?> reducer() throws Exception {
+	public Reducer<Text, IntWritable, Text, IntWritable> reducer() {
 		return new IntSumReducer();
-	}
-
-	@Bean
-	protected PropertyPlaceholderConfigurer externalizedConfiguration() {
-		PropertyPlaceholderConfigurer configurer = new PropertyPlaceholderConfigurer();
-		configurer.setSystemPropertiesMode(PropertyPlaceholderConfigurer.SYSTEM_PROPERTIES_MODE_OVERRIDE);
-		return configurer;
 	}
 
 }

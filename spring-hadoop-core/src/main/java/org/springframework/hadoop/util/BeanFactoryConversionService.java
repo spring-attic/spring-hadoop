@@ -30,7 +30,7 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.convert.converter.ConverterFactory;
 import org.springframework.core.convert.converter.ConverterRegistry;
 import org.springframework.core.convert.converter.GenericConverter;
-import org.springframework.core.convert.support.ConversionServiceFactory;
+import org.springframework.hadoop.convert.HadoopConversionServiceFactory;
 import org.springframework.util.CollectionUtils;
 
 /**
@@ -50,7 +50,7 @@ public class BeanFactoryConversionService implements ConversionService, Converte
 	public BeanFactoryConversionService() {
 		synchronized (BeanFactoryConversionService.class) {
 			if (defaultConversionService == null) {
-				defaultConversionService = ConversionServiceFactory.createDefaultConversionService();
+				defaultConversionService = HadoopConversionServiceFactory.createDefaultConversionService();
 			}
 		}
 		this.conversionService = defaultConversionService;

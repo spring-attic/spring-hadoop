@@ -29,8 +29,8 @@ import org.apache.hadoop.mapreduce.TaskAttemptID;
 import org.junit.Test;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.core.convert.support.ConversionServiceFactory;
 import org.springframework.core.convert.support.GenericConversionService;
+import org.springframework.hadoop.convert.HadoopConversionServiceFactory;
 
 /**
  * @author Dave Syer
@@ -90,30 +90,10 @@ public class ExpressionEvaluatingMapperTests {
 	}
 
 	public ConversionService conversionService() {
-		GenericConversionService service = ConversionServiceFactory.createDefaultConversionService();
+		GenericConversionService service = HadoopConversionServiceFactory.createDefaultConversionService();
 		service.addConverter(new Converter<String, Date>() {
 			public Date convert(String source) {
 				return new Date(100L);
-			}
-		});
-		service.addConverter(new Converter<IntWritable, Integer>() {
-			public Integer convert(IntWritable source) {
-				return source.get();
-			}
-		});
-		service.addConverter(new Converter<Integer, IntWritable>() {
-			public IntWritable convert(Integer source) {
-				return new IntWritable(source);
-			}
-		});
-		service.addConverter(new Converter<Text, String>() {
-			public String convert(Text source) {
-				return source.toString();
-			}
-		});
-		service.addConverter(new Converter<String, Text>() {
-			public Text convert(String source) {
-				return new Text(source);
 			}
 		});
 		return service;

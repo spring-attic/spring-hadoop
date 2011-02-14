@@ -8,21 +8,21 @@
 		<property name="mapper" ref="mapper" />
 		<property name="combiner" ref="reducer" />
 		<property name="reducer" ref="reducer" />
-		<property name="inputPaths" value="${input.path:target/input}" />
-		<property name="outputPath" value="${output.path:target/output}" />
+		<property name="inputPaths" value="${input.path:target/input/word}" />
+		<property name="outputPath" value="${output.path:target/output/word}" />
 		<property name="outputKeyClass" value="org.apache.hadoop.io.Text" />
 		<property name="outputValueClass" value="org.apache.hadoop.io.IntWritable" />
 	</bean>
 
-	<bean id="mapper" class="org.springframework.hadoop.test.CustomTokenizerMapper">
+	<bean id="mapper" class="org.springframework.hadoop.test.word.CustomTokenizerMapper">
 		<property name="tokenizer" ref="${tokenizer.ref:simpleTokenizer}" />
 	</bean>
 
-	<bean id="simpleTokenizer" class="org.springframework.hadoop.test.CustomTokenizerMapper$SimpleTokenizer" />
+	<bean id="simpleTokenizer" class="org.springframework.hadoop.test.word.CustomTokenizerMapper$SimpleTokenizer" />
 
-	<bean id="wordTokenizer" class="org.springframework.hadoop.test.WordTokenizer" />
+	<bean id="wordTokenizer" class="org.springframework.hadoop.test.word.WordTokenizer" />
 
-	<bean id="reducer" name="combiner" class="org.springframework.hadoop.test.IntSumReducer" />
+	<bean id="reducer" name="combiner" class="org.springframework.hadoop.test.word.IntSumReducer" />
 
 	<context:property-placeholder properties-ref="bootstrap" system-properties-mode="OVERRIDE" />
 

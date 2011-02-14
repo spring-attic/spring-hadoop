@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.hadoop.test;
+package org.springframework.hadoop.test.word;
 
 import java.util.ArrayList;
 import java.util.List;
