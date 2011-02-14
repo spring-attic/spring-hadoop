@@ -39,7 +39,7 @@ public class KeyValueIntegrationTests {
 	}
 
 	@Test
-	public void testXmlConfiguredJob() throws Exception {
+	public void testKeyValueInputFromFile() throws Exception {
 		assertTrue(jobTemplate.run("classpath:/jobs/kv/job-context.xml"));
 	}
 

@@ -213,10 +213,20 @@ public class JobFactoryBean implements FactoryBean<Job>, BeanNameAware {
 		this.outputPath = outputPath;
 	}
 
+	/**
+	 * The type of key emitted by the Mapper.
+	 * 
+	 * @param keyClass the key class
+	 */
 	public void setOutputKeyClass(Class<?> keyClass) {
 		this.keyClass = keyClass;
 	}
 
+	/**
+	 * The type of value emitted by the Mapper.
+	 * 
+	 * @param keyClass the key class
+	 */
 	public void setOutputValueClass(Class<?> valueClass) {
 		this.valueClass = valueClass;
 	}
