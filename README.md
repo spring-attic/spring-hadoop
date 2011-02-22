@@ -35,6 +35,9 @@ the tests use local file paths relative to the project directory.
 Make sure you run the tests in an IDE launching from the project
 directory (not the parent directory).
 
+Windows users need to have [Cygwin|http://www.cygwin.com/] or [MinGW|http://www.mingw.org/] 
+available in the classpath as Hadoop relies on various *nix utilities.
+
 The test code above runs the job locally by default.  To run it in a
 Hadoop cluster you need to run the cluster (of course) and provide
 configuration for a jar file containing the job and for the job
