@@ -21,6 +21,20 @@ import java.util.Set;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.convert.converter.ConverterRegistry;
 import org.springframework.core.convert.support.GenericConversionService;
+import org.springframework.hadoop.convert.basics.BooleanBooleanWritableConverter;
+import org.springframework.hadoop.convert.basics.BooleanWritableBooleanConverter;
+import org.springframework.hadoop.convert.basics.ByteByteWritableConverter;
+import org.springframework.hadoop.convert.basics.ByteWritableByteConverter;
+import org.springframework.hadoop.convert.basics.DoubleDoubleWritableConverter;
+import org.springframework.hadoop.convert.basics.DoubleWritableDoubleConverter;
+import org.springframework.hadoop.convert.basics.FloatFloatWritableConverter;
+import org.springframework.hadoop.convert.basics.FloatWritableFloatConverter;
+import org.springframework.hadoop.convert.basics.IntWritableIntegerConverter;
+import org.springframework.hadoop.convert.basics.IntegerIntWritableConverter;
+import org.springframework.hadoop.convert.basics.LongLongWritableConverter;
+import org.springframework.hadoop.convert.basics.LongWritableLongConverter;
+import org.springframework.hadoop.convert.basics.StringTextConverter;
+import org.springframework.hadoop.convert.basics.TextStringConverter;
 
 /**
  * @author Dave Syer
@@ -30,10 +44,22 @@ public class HadoopConversionServiceFactory {
 
 	public static GenericConversionService createDefaultConversionService() {
 		GenericConversionService service = org.springframework.core.convert.support.ConversionServiceFactory.createDefaultConversionService();
+        // basics converters
+		service.addConverter(new BooleanWritableBooleanConverter());
+        service.addConverter(new BooleanBooleanWritableConverter());
+		service.addConverter(new ByteWritableByteConverter());
+        service.addConverter(new ByteByteWritableConverter());
 		service.addConverter(new IntWritableIntegerConverter());
 		service.addConverter(new IntegerIntWritableConverter());
+	    service.addConverter(new LongWritableLongConverter());
+	    service.addConverter(new LongLongWritableConverter());
+        service.addConverter(new FloatWritableFloatConverter());
+        service.addConverter(new FloatFloatWritableConverter());
+        service.addConverter(new DoubleWritableDoubleConverter());
+        service.addConverter(new DoubleDoubleWritableConverter());
 		service.addConverter(new TextStringConverter());
 		service.addConverter(new StringTextConverter());
+		// other converters
 		service.addConverter(new IterableCollectionConverter());
 		service.removeConvertible(Map.class, Map.class);
 		service.addConverter(new StreamingMapToMapConverter(service));
