@@ -21,20 +21,20 @@ import java.util.Set;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.convert.converter.ConverterRegistry;
 import org.springframework.core.convert.support.GenericConversionService;
-import org.springframework.hadoop.convert.basics.BooleanBooleanWritableConverter;
-import org.springframework.hadoop.convert.basics.BooleanWritableBooleanConverter;
-import org.springframework.hadoop.convert.basics.ByteByteWritableConverter;
-import org.springframework.hadoop.convert.basics.ByteWritableByteConverter;
-import org.springframework.hadoop.convert.basics.DoubleDoubleWritableConverter;
-import org.springframework.hadoop.convert.basics.DoubleWritableDoubleConverter;
-import org.springframework.hadoop.convert.basics.FloatFloatWritableConverter;
-import org.springframework.hadoop.convert.basics.FloatWritableFloatConverter;
-import org.springframework.hadoop.convert.basics.IntWritableIntegerConverter;
-import org.springframework.hadoop.convert.basics.IntegerIntWritableConverter;
-import org.springframework.hadoop.convert.basics.LongLongWritableConverter;
-import org.springframework.hadoop.convert.basics.LongWritableLongConverter;
-import org.springframework.hadoop.convert.basics.StringTextConverter;
-import org.springframework.hadoop.convert.basics.TextStringConverter;
+import org.springframework.hadoop.convert.support.BooleanBooleanWritableConverter;
+import org.springframework.hadoop.convert.support.BooleanWritableBooleanConverter;
+import org.springframework.hadoop.convert.support.ByteByteWritableConverter;
+import org.springframework.hadoop.convert.support.ByteWritableByteConverter;
+import org.springframework.hadoop.convert.support.DoubleDoubleWritableConverter;
+import org.springframework.hadoop.convert.support.DoubleWritableDoubleConverter;
+import org.springframework.hadoop.convert.support.FloatFloatWritableConverter;
+import org.springframework.hadoop.convert.support.FloatWritableFloatConverter;
+import org.springframework.hadoop.convert.support.IntWritableIntegerConverter;
+import org.springframework.hadoop.convert.support.IntegerIntWritableConverter;
+import org.springframework.hadoop.convert.support.LongLongWritableConverter;
+import org.springframework.hadoop.convert.support.LongWritableLongConverter;
+import org.springframework.hadoop.convert.support.StringTextConverter;
+import org.springframework.hadoop.convert.support.TextStringConverter;
 
 /**
  * @author Dave Syer

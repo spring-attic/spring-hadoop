@@ -1,4 +1,4 @@
-package org.springframework.hadoop.convert.basics;
+package org.springframework.hadoop.convert.support;
 
 import org.apache.hadoop.io.LongWritable;
 import org.springframework.core.convert.converter.Converter;

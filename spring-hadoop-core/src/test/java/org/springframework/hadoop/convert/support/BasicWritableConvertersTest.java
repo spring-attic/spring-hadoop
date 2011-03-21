@@ -1,4 +1,4 @@
-package org.springframework.hadoop.convert.basics;
+package org.springframework.hadoop.convert.support;
 
 import junit.framework.Assert;
 
@@ -11,6 +11,20 @@ import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.junit.Test;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.hadoop.convert.support.BooleanBooleanWritableConverter;
+import org.springframework.hadoop.convert.support.BooleanWritableBooleanConverter;
+import org.springframework.hadoop.convert.support.ByteByteWritableConverter;
+import org.springframework.hadoop.convert.support.ByteWritableByteConverter;
+import org.springframework.hadoop.convert.support.DoubleDoubleWritableConverter;
+import org.springframework.hadoop.convert.support.DoubleWritableDoubleConverter;
+import org.springframework.hadoop.convert.support.FloatFloatWritableConverter;
+import org.springframework.hadoop.convert.support.FloatWritableFloatConverter;
+import org.springframework.hadoop.convert.support.IntWritableIntegerConverter;
+import org.springframework.hadoop.convert.support.IntegerIntWritableConverter;
+import org.springframework.hadoop.convert.support.LongLongWritableConverter;
+import org.springframework.hadoop.convert.support.LongWritableLongConverter;
+import org.springframework.hadoop.convert.support.StringTextConverter;
+import org.springframework.hadoop.convert.support.TextStringConverter;
 
 
 /**
