@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<preface xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="preface">
+	<title>Preface</title>
+	<para>
+    Spring Hadoop is a framework extension for writing Hadoop jobs that benefit from the features of Spring, Spring Batch and 
+    Spring Integration.  The feature set is limited right now to support for dependency injection in simple Hadoop jobs.  If you have ideas about
+    how to improve or extend the scope, please feel free to contribute (see below for instructions).
+	</para>
+	
+</preface>

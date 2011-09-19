@@ -25,9 +25,9 @@
   </bookinfo>
 
   <toc />
-  <!--
   <xi:include href="preface.xml"/>
-  
+
+  <!--
   <part id="introduction">
       <title>Introduction</title>
 
