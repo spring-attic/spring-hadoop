@@ -22,8 +22,8 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.data.hadoop.convert.BeanFactoryConversionService;
 import org.springframework.data.hadoop.convert.HadoopConversionServiceFactory;
-import org.springframework.data.hadoop.util.BeanFactoryConversionService;
 import org.springframework.util.Assert;
 
 /**

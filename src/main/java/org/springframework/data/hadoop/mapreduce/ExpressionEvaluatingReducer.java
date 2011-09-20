@@ -20,7 +20,7 @@ import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.RecordWriter;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.springframework.core.convert.ConversionService;
-import org.springframework.data.hadoop.util.ConversionServiceIterableAdapter;
+import org.springframework.data.hadoop.convert.ConversionServiceIterableAdapter;
 import org.springframework.expression.Expression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;

@@ -66,9 +66,7 @@ public class HadoopConversionServiceFactory {
 		return service;
 	}
 
-
 	public static void registerConverters(Set<Converter<?, ?>> converters, ConverterRegistry registry) {
 		org.springframework.core.convert.support.ConversionServiceFactory.registerConverters(converters, registry);
 	}
-
 }

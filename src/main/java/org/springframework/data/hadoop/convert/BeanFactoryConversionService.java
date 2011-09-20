@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.data.hadoop.util;
+package org.springframework.data.hadoop.convert;
 
 import java.beans.PropertyEditor;
 import java.util.Collection;
@@ -30,7 +30,6 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.convert.converter.ConverterFactory;
 import org.springframework.core.convert.converter.ConverterRegistry;
 import org.springframework.core.convert.converter.GenericConverter;
-import org.springframework.data.hadoop.convert.HadoopConversionServiceFactory;
 import org.springframework.util.CollectionUtils;
 
 /**
