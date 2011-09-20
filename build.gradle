@@ -1,6 +1,6 @@
 // used for artifact names, building doc upload urls, etc.
 description = 'Spring Hadoop'
-abbreviation = 'SHDP'
+abbreviation = 'DATAHADOOP'
 
 apply plugin: 'base'
 
@@ -24,7 +24,7 @@ buildscript {
 }
 
 allprojects {
-    group = 'org.springframework.hadoop'
+    group = 'org.springframework.data.hadoop'
     version = "$springHadoopVersion"
     
     releaseBuild = version.endsWith('RELEASE')
@@ -110,7 +110,7 @@ javadoc {
       breakIterator = true
       showFromProtected()
       groups = [
-        'Spring Hadoop' : ['org.springframework.hadoop*'],
+        'Spring Data Hadoop' : ['org.springframework.data.hadoop*'],
       ]
   
      links = [
@@ -121,7 +121,7 @@ javadoc {
         "http://jakarta.apache.org/commons/logging/apidocs/"
      ]
      
-     exclude "org/springframework/hadoop/config/**"
+     exclude "org/springframework/data/hadoop/config/**"
   }
     
   title = "${rootProject.description} ${version} API"

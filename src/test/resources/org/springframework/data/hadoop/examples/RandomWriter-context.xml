@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="randomWriterJob" class="org.springframework.data.hadoop.configuration.JobFactoryBean">
+		<property name="outputPath" value="${output.path:target/binary}" />
+		<property name="outputKeyClass" value="org.apache.hadoop.io.BytesWritable" />
+		<property name="outputValueClass" value="org.apache.hadoop.io.BytesWritable" />
+		<property name="mapper" value="#{randomWriter.mapper}"/>
+		<property name="inputFormat" value="#{randomWriter.inputFormat}"/>
+		<property name="outputFormat">
+			<bean class="org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat" />
+		</property>
+	</bean>
+
+	<bean id="randomWriter" class="org.springframework.data.hadoop.examples.RandomWriter">
+		<property name="conf" ref="configuration" />
+		<property name="numBytesToWrite" value="${mapreduce.randomwriter.bytes_per_map:4096}"/>
+		<property name="mapsPerHost" value="${mapreduce.randomwriter.mapsperhost:1}"/>
+		<property name="minKeySize" value="${mapreduce.randomwriter.minkey:10}"/>
+		<property name="maxKeySize" value="${mapreduce.randomwriter.maxkey:1000}"/>
+		<property name="minValueSize" value="${mapreduce.randomwriter.minvalue:0}"/>
+		<property name="maxValueSize" value="${mapreduce.randomwriter.maxvalue:20000}"/>
+	</bean>
+
+	<context:property-placeholder properties-ref="bootstrap" system-properties-mode="OVERRIDE" />
+
+	<bean id="bootstrap" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="propertiesArray">
+			<list>
+				<bean class="org.springframework.data.hadoop.context.HadoopPropertiesFactoryBean">
+					<property name="configuration" ref="configuration" />
+				</bean>
+				<bean class="org.springframework.data.hadoop.context.BootstrapPropertiesFactoryBean" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="configuration" class="org.springframework.data.hadoop.context.HadoopConfigurationFactoryBean" />
+
+</beans>

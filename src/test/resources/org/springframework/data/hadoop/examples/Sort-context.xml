@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="sortJob" class="org.springframework.data.hadoop.configuration.JobFactoryBean">
+		<property name="inputPaths" value="${input.path:target/input}" />
+		<property name="outputPath" value="${output.path:target/output}" />
+		<property name="outputKeyClass" value="${output.key.class:org.apache.hadoop.io.BytesWritable}" />
+		<property name="outputValueClass" value="${output.value.class:org.apache.hadoop.io.BytesWritable}" />
+		<property name="numReduceTasks" value="${mapred.reduce.tasks:#{sortSample.numReduceTasks}}" />
+		<property name="inputFormat">
+			<bean class="${input.format:org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat}" />
+		</property>
+		<property name="outputFormat">
+			<bean class="${output.format:org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat}" />
+		</property>
+	</bean>
+
+	<bean id="sort" class="org.springframework.data.hadoop.examples.Sort">
+		<property name="conf" ref="configuration" />
+		<property name="options">
+			<map>
+				<entry key="-m" value="mapred.map.tasks" />
+				<entry key="-r" value="mapred.reduce.tasks" />
+				<entry key="-inFormat" value="input.format" />
+				<entry key="-outFormat" value="output.format" />
+				<entry key="-outKey" value="out.key.class" />
+				<entry key="-outValue" value="out.value.class" />
+			</map>
+		</property>
+		<property name="usage">
+			<map>
+				<entry key="-m" value="maps" />
+				<entry key="-r" value="reduces" />
+				<entry key="-inFormat" value="input format class" />
+				<entry key="-outFormat" value="output format class" />
+				<entry key="-outKey" value="output key class" />
+				<entry key="-outValue" value="output value class" />
+				<entry key="" value="input"/>
+				<entry key="" value="output"/>
+			</map>
+		</property>
+	</bean>
+
+	<context:property-placeholder properties-ref="bootstrap" system-properties-mode="OVERRIDE" />
+
+	<bean id="bootstrap" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="propertiesArray">
+			<list>
+				<bean class="org.springframework.data.hadoop.context.HadoopPropertiesFactoryBean">
+					<property name="configuration" ref="configuration" />
+				</bean>
+				<bean class="org.springframework.data.hadoop.context.BootstrapPropertiesFactoryBean" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="configuration" class="org.springframework.data.hadoop.context.HadoopConfigurationFactoryBean" />
+
+</beans>

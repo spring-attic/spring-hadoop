@@ -6,15 +6,15 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
 http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop-1.0.xsd
 http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
-	<bean id="autowiredWordCount" class="org.springframework.hadoop.configuration.JobFactoryBean">
+	<bean id="autowiredWordCount" class="org.springframework.data.hadoop.configuration.JobFactoryBean">
 		<property name="mapper" ref="mapper" />
 		<property name="reducer" ref="reducer" />
 		<property name="inputPaths" value="target/input/kv" />
 		<property name="outputPath" value="target/output/kv" />
 		<property name="inputFormat">
-			<bean class="org.springframework.hadoop.io.TextInputFormat">
+			<bean class="org.springframework.data.hadoop.io.TextInputFormat">
 				<constructor-arg>
-					<bean class="org.springframework.hadoop.io.SeparatorLineMapper">
+					<bean class="org.springframework.data.hadoop.io.SeparatorLineMapper">
 						<property name="delimiter" value="=" />
 					</bean>
 				</constructor-arg>
@@ -30,8 +30,8 @@ http://www.springframework.org/schema/context http://www.springframework.org/sch
 	<hadoop:reducer id="reducer" output-key-type="org.apache.hadoop.io.Text" output-value-type="org.apache.hadoop.io.IntWritable"
 		input-value-type="org.apache.hadoop.io.Text" ref="mapperReducer" />
 
-	<bean id="mapperReducer" class="org.springframework.hadoop.test.kv.MapperReducer" />
+	<bean id="mapperReducer" class="org.springframework.data.hadoop.test.kv.MapperReducer" />
 	
-	<bean id="conversionService" class="org.springframework.hadoop.convert.HadoopConversionServiceFactoryBean"/>
+	<bean id="conversionService" class="org.springframework.data.hadoop.convert.HadoopConversionServiceFactoryBean"/>
 
 </beans>
