@@ -25,6 +25,56 @@ dependencies {
     deployerJars "org.springframework.build.aws:org.springframework.build.aws.maven:3.0.0.RELEASE"
 }
 
+task generatePom {
+    group = 'Build'
+    description = 'Generates a Maven POM file suitable for use in building the project'
+
+    generatedPomFileName = "pom.xml"
+
+    // ensure changes in the classpath trigger regeneration of poms
+    inputs.files(project.sourceSets.main.compileClasspath)
+
+    // ensure version changes in gradle.properties trigger regeneration of poms
+    inputs.files(new File(project.rootProject.rootDir, Project.GRADLE_PROPERTIES))
+
+    // enable partial cleaning with `gradle cleanGeneratePom`
+    outputs.files(generatedPomFileName)
+
+    doLast() {
+        // customize the pom creation process
+        p = pom {
+            project {
+                name = project.description
+                properties {
+                    setProperty('project.build.sourceEncoding', 'UTF8')
+                }
+                build {
+                    plugins {
+                        plugin {
+                            groupId = 'org.apache.maven.plugins'
+                            artifactId = 'maven-compiler-plugin'
+                            configuration {
+                                source = '1.5'
+                                target = '1.5'
+                            }
+                        }
+                    }
+               }
+           }
+        }
+
+        // customizing the artifact id is a special case that must be configured
+        // after the pom is fully configured, otherwise it'll be overwritten
+        p.whenConfigured { pom -> pom.artifactId = project.name }
+
+        customizePom(p)
+
+        // write the pom.xml file out to the filesystem
+        p.writeTo(generatedPomFileName)
+    }
+}
+
+
 // Remove the archive configuration from the runtime configuration, so that anything added to archives
 // (such as the source jar) is no longer included in the runtime classpath
 configurations.default.extendsFrom = [configurations.runtime] as Set
@@ -86,7 +136,7 @@ def customizePom(pom) {
     //pom.scopeMappings.addMapping(10, configurations.provided, 'provided')
     pom.whenConfigured { p ->
         // Remove test scope dependencies from published poms
-        p.dependencies = p.dependencies.findAll {it.scope != 'test'}
+        //p.dependencies = p.dependencies.findAll {it.scope != 'test'}
 
         // Flag optional deps
         def opDeps = configurations.testRuntime.allDependencies.findAll { gradleDep ->
