@@ -18,6 +18,7 @@ package org.springframework.data.hadoop.io;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
 
@@ -26,7 +27,9 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.LocalFileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.RawLocalFileSystem;
+import org.springframework.core.io.ContextResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.WritableResource;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -35,7 +38,7 @@ import org.springframework.util.StringUtils;
  *  
  * @author Costin Leau
  */
-class HdfsResource implements Resource {
+class HdfsResource implements WritableResource, ContextResource {
 
 	private final String location;
 	private final Path path;
@@ -106,11 +109,11 @@ class HdfsResource implements Resource {
 			return ((LocalFileSystem) fs).pathToFile(path);
 		}
 
-		throw new UnsupportedOperationException("Cannot create File over " + getDescription());
+		throw new UnsupportedOperationException("Cannot resolve File object for " + getDescription());
 	}
 
 	public String getFilename() {
-		throw new IllegalStateException(getDescription() + " does not have a filename");
+		return path.getName();
 	}
 
 	public URI getURI() throws IOException {
@@ -122,7 +125,7 @@ class HdfsResource implements Resource {
 	}
 
 	public boolean isOpen() {
-		return false;
+		return true;
 	}
 
 	public boolean isReadable() {
@@ -167,5 +170,21 @@ class HdfsResource implements Resource {
 	@Override
 	public int hashCode() {
 		return path.hashCode();
+	}
+
+	public String getPathWithinContext() {
+		return path.getName();
+	}
+
+	public OutputStream getOutputStream() throws IOException {
+		return fs.create(path, false);
+	}
+
+	public boolean isWritable() {
+		try {
+			return (fs.exists(path) && fs.isFile(path));
+		} catch (IOException ex) {
+			return false;
+		}
 	}
 }

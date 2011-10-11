@@ -76,6 +76,8 @@ dependencies {
     compile "org.springframework:spring-tx:$springVersion"
     compile "org.springframework:spring-aop:$springVersion"
     compile "org.springframework:spring-oxm:$springVersion"
+    compile "org.springframework.batch:spring-batch-core:$springBatchVersion"
+    compile "org.springframework.integration:spring-integration-core:$springIntVersion"
 
     // Hadoop
     compile "org.apache.hadoop:hadoop-core:$hadoopVersion"

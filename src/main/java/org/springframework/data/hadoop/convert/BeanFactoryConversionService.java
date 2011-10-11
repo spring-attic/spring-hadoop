@@ -168,4 +168,7 @@ public class BeanFactoryConversionService implements ConversionService, Converte
 		}
 	}
 
+	public void addConverter(Class<?> sourceType, Class<?> targetType, Converter<?, ?> converter) {
+		throw new UnsupportedOperationException();
+	}
 }

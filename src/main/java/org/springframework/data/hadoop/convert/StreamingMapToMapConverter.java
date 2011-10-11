@@ -96,22 +96,18 @@ public class StreamingMapToMapConverter implements ConditionalGenericConverter {
 		}
 
 		public Object put(Object key, Object value) {
-			Object targetKey = conversionService.convert(key,
-					sourceType.getMapKeyTypeDescriptor(key),
+			Object targetKey = conversionService.convert(key, sourceType.getMapKeyTypeDescriptor(key),
 					targetType.getMapKeyTypeDescriptor(key));
-			Object targetValue = conversionService.convert(value,
-					sourceType.getMapValueTypeDescriptor(value),
+			Object targetValue = conversionService.convert(value, sourceType.getMapValueTypeDescriptor(value),
 					targetType.getMapValueTypeDescriptor(value));
 			this.key = key;
 			this.value = value;
 			this.size++;
 			try {
 				return sourceMap.put(targetKey, targetValue);
-			}
-			catch (RuntimeException e) {
+			} catch (RuntimeException e) {
 				throw e;
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				throw new HadoopException("Could not write to record writer", e);
 			}
 		}
