@@ -23,7 +23,7 @@ public class KeyValueIntegrationTests {
 	public void init() throws Exception {
 		jobTemplate = new JobTemplate();
 		if (setUp.isClusterOnline()) {
-			setUp.setJarFile("target/spring-hadoop-core-1.0.0.BUILD-SNAPSHOT-test.jar");
+			setUp.setJarFile("target/spring-hadoop-1.0.0.BUILD-SNAPSHOT-test.jar");
 			jobTemplate.setExtraConfiguration(setUp.getExtraConfiguration());
 		}
 		jobTemplate.setVerbose(true);

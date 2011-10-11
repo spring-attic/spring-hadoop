@@ -37,7 +37,7 @@ public class SortTests {
 
 	@Before
 	public void init() throws Exception {
-		setUp.delete("target/output");
+		setUp.delete("bin/output");
 	}
 
 	@Test
@@ -59,14 +59,14 @@ public class SortTests {
 
 	@Test
 	public void testRandomWriter() throws Exception {
-		setUp.delete("target/binary");
+		setUp.delete("bin/binary");
 		// Always local because the configuration hasn't been set up for the cluster
 		new RandomWriter().run(new String[0]);
 	}
 
 	@Test
 	public void testSort() throws Exception {
-		setUp.copy("target/binary", "target/input");
+		setUp.copy("bin/binary", "bin/input");
 		// Always local because the configuration hasn't been set up for the cluster
 		new Sort().run(new String[0]);
 	}

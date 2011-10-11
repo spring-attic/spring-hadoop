@@ -6,8 +6,8 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
 	<bean id="sortJob" class="org.springframework.data.hadoop.configuration.JobFactoryBean">
-		<property name="inputPaths" value="${input.path:target/input}" />
-		<property name="outputPath" value="${output.path:target/output}" />
+		<property name="inputPaths" value="${input.path:bin/input}" />
+		<property name="outputPath" value="${output.path:bin/output}" />
 		<property name="outputKeyClass" value="${output.key.class:org.apache.hadoop.io.BytesWritable}" />
 		<property name="outputValueClass" value="${output.value.class:org.apache.hadoop.io.BytesWritable}" />
 		<property name="numReduceTasks" value="${mapred.reduce.tasks:#{sortSample.numReduceTasks}}" />

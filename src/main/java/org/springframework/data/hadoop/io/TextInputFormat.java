@@ -90,7 +90,5 @@ public class TextInputFormat<K extends Writable, V extends Writable> extends Fil
 		public void close() throws IOException {
 			lineRecordReader.close();
 		}
-
 	}
-
 }
