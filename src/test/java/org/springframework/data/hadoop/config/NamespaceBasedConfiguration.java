@@ -40,9 +40,13 @@ import org.springframework.data.hadoop.configuration.JobFactoryBean;
 @Configuration
 public class NamespaceBasedConfiguration {
 
+	@Value("${input.path:src/test/resources/input}")
+	private String inputPath;
+	@Value("${output.path:target/output}")
+	private String outputPath;
+
 	@Bean
-	public FactoryBean<Job> classConfiguredJob(@Value("${input.path:src/test/resources/input}") String inputPath,
-			@Value("${output.path:target/output}") String outputPath) throws Exception {
+	public FactoryBean<Job> classConfiguredJob() throws Exception {
 		JobFactoryBean factory = new JobFactoryBean();
 		factory.setMapper(this.mapper);
 		factory.setReducer(this.reducer);
