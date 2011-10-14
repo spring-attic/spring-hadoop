@@ -43,7 +43,7 @@ class HdfsResource implements WritableResource, ContextResource {
 	private final String location;
 	private final Path path;
 	private final FileSystem fs;
-	private final boolean exists;
+	private boolean exists;
 	private final FileStatus status;
 
 	HdfsResource(String location, FileSystem fs) {
@@ -51,16 +51,15 @@ class HdfsResource implements WritableResource, ContextResource {
 	}
 
 	HdfsResource(String parent, String child, FileSystem fs) {
-		Assert.hasText(parent, "parent location required");
-		if (StringUtils.hasText(child)) {
-			this.path = new Path(parent, child);
-			this.location = path.toString();
-		}
-		else {
-			this.path = new Path(parent);
-			this.location = parent;
-		}
+		this(StringUtils.hasText(child) ? new Path(parent, child) : new Path(parent), fs);
+	}
 
+	HdfsResource(Path path, FileSystem fs) {
+		Assert.notNull(path, "a valid path is required");
+		Assert.notNull(fs, "non null file system required");
+
+		this.path = path;
+		this.location = path.toString();
 		this.fs = fs;
 		boolean exists = false;
 
@@ -77,6 +76,7 @@ class HdfsResource implements WritableResource, ContextResource {
 		}
 		this.status = status;
 	}
+
 
 	public long contentLength() throws IOException {
 		if (exists) {
@@ -177,14 +177,27 @@ class HdfsResource implements WritableResource, ContextResource {
 	}
 
 	public OutputStream getOutputStream() throws IOException {
-		return fs.create(path, false);
+		try {
+			return fs.create(path, false);
+		} finally {
+			exists = true;
+		}
 	}
 
 	public boolean isWritable() {
 		try {
-			return (fs.exists(path) && fs.isFile(path));
+			return ((exists && fs.isFile(path)) || (!exists));
 		} catch (IOException ex) {
 			return false;
 		}
+	}
+
+	/**
+	 * Returns the path.
+	 *
+	 * @return Returns the path
+	 */
+	Path getPath() {
+		return path;
 	}
 }

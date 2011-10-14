@@ -62,4 +62,11 @@ public class HadoopTasklet implements InitializingBean, Tasklet {
 		String message = "Job [" + job.getJobID() + "|" + job.getJobName() + " ] failed";
 		throw (exc != null ? new HadoopException(message, exc) : new HadoopException(message));
 	}
+
+	/**
+	 * @param job The job to set.
+	 */
+	public void setJob(Job job) {
+		this.job = job;
+	}
 }

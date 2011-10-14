@@ -19,6 +19,7 @@ import java.net.URI;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 
@@ -29,7 +30,7 @@ import org.springframework.beans.factory.InitializingBean;
  * 
  * @author Costin Leau
  */
-public class FileSystemFactoryBean implements InitializingBean, FactoryBean<FileSystem> {
+public class FileSystemFactoryBean implements InitializingBean, DisposableBean, FactoryBean<FileSystem> {
 
 	private FileSystem fs;
 	private Configuration configuration;
@@ -39,6 +40,14 @@ public class FileSystemFactoryBean implements InitializingBean, FactoryBean<File
 		Configuration cfg = (configuration != null ? configuration : new Configuration(true));
 		fs = (uri != null ? FileSystem.get(uri, cfg) : FileSystem.get(cfg));
 	}
+
+	public void destroy() throws Exception {
+		if (fs != null) {
+			fs.close();
+		}
+		fs = null;
+	}
+
 
 	public FileSystem getObject() throws Exception {
 		return fs;

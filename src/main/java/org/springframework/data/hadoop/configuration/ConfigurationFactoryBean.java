@@ -37,7 +37,7 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 	private Set<Resource> resources;
 	private Map<String, Object> properties;
 
-	private ClassLoader beanClassLoader;
+	private ClassLoader beanClassLoader = getClass().getClassLoader();
 	private boolean initialize = true;
 
 	public void afterPropertiesSet() throws Exception {
