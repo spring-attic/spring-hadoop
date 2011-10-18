@@ -27,17 +27,6 @@
 		p:generator-ref="name-generator"
 		p:overwrite="true"/>
 
-	<!-- map the reading resource (file://) to the writing environment (hdfs://) -->
-	<!-- we'll move to an Ant-like model -->	
-	<bean id="name-generator" class="org.springframework.data.hadoop.batch.ChainedNameGenerator">
-		<property name="generators">
-			<list>
-				<bean class="org.springframework.data.hadoop.batch.BasePathNameGenerator" p:path="." p:remove="true"/>
-				<bean class="org.springframework.data.hadoop.batch.PrefixNameGenerator" p:prefix="/ide-test/"/>
-			</list> 
-		</property>
-	</bean>
-	
 	<bean id="hadoop-tasklet" class="org.springframework.data.hadoop.batch.HadoopTasklet" p:job-ref="mr-job" p:waitForJob="true"/>
 	
 	<bean id="mr-job" class="org.springframework.data.hadoop.configuration.JobFactoryBean"

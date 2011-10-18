@@ -13,4 +13,15 @@
 	    </map>
 	  </property>
 	</bean>
+	
+	<!-- map the reading resource (file://) to the writing environment (hdfs://) -->
+	<!-- we'll move to an Ant-like model -->	
+	<bean id="name-generator" class="org.springframework.data.hadoop.batch.ChainedNameGenerator">
+		<property name="generators">
+			<list>
+				<bean class="org.springframework.data.hadoop.batch.BasePathNameGenerator" p:path="." p:remove="true"/>
+				<bean class="org.springframework.data.hadoop.batch.PrefixNameGenerator" p:prefix="/ide-test/"/>
+			</list> 
+		</property>
+	</bean>
 </beans>
