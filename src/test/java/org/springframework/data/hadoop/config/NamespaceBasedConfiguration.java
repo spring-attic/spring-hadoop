@@ -28,7 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.hadoop.configuration.JobFactoryBean;
+import org.springframework.data.hadoop.configuration.AutowiredJobFactoryBean;
 
 /**
  * Simple POJO configuration for the things that we can't (yet) configure using
@@ -47,13 +47,13 @@ public class NamespaceBasedConfiguration {
 
 	@Bean
 	public FactoryBean<Job> classConfiguredJob() throws Exception {
-		JobFactoryBean factory = new JobFactoryBean();
-		factory.setMapper(this.mapper);
-		factory.setReducer(this.reducer);
-		factory.setCombiner(this.reducer);
-		factory.setOutputKeyClass(outputKeyType());
-		factory.setOutputValueClass(outputValueType());
-		factory.setInputPaths(inputPath);
+		AutowiredJobFactoryBean factory = new AutowiredJobFactoryBean();
+		factory.setMapper(this.mapper.getClass());
+		factory.setReducer(this.reducer.getClass());
+		factory.setCombiner(this.reducer.getClass());
+		factory.setKey(outputKeyType());
+		factory.setValue(outputValueType());
+		factory.setInputPath(inputPath);
 		factory.setOutputPath(outputPath);
 		return factory;
 	}

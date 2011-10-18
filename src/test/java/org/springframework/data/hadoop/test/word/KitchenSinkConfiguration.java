@@ -43,7 +43,7 @@ import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.hadoop.configuration.JobFactoryBean;
+import org.springframework.data.hadoop.configuration.AutowiredJobFactoryBean;
 
 /**
  * @author Dave Syer
@@ -56,18 +56,18 @@ public class KitchenSinkConfiguration {
 
 	@Bean
 	public FactoryBean<Job> kitchenSinkJob() throws Exception {
-		JobFactoryBean factory = new JobFactoryBean();
-		factory.setMapper(mapper());
-		factory.setReducer(reducer());
-		factory.setCombiner(reducer());
-		factory.setGroupingComparator(new TextComparator());
-		factory.setSortComparator(new TextComparator());
-		factory.setInputFormat(inputFormat());
-		factory.setOutputFormat(outputFormat());
-		factory.setPartitioner(partitioner());
-		factory.setOutputKeyClass(Text.class);
-		factory.setOutputValueClass(IntWritable.class);
-		factory.setInputPaths("foo");
+		AutowiredJobFactoryBean factory = new AutowiredJobFactoryBean();
+		factory.setMapper(mapper().getClass());
+		factory.setReducer(reducer().getClass());
+		factory.setCombiner(reducer().getClass());
+		factory.setGroupingComparator(new TextComparator().getClass());
+		factory.setSortComparator(new TextComparator().getClass());
+		factory.setInputFormat(inputFormat().getClass());
+		factory.setOutputFormat(outputFormat().getClass());
+		factory.setPartitioner(partitioner().getClass());
+		factory.setKey(Text.class);
+		factory.setValue(IntWritable.class);
+		factory.setInputPath("foo");
 		factory.setOutputPath("target/bar");
 		return factory;
 	}

@@ -11,7 +11,7 @@ import org.w3c.dom.Element;
  * 
  * @author Josh Long
  * @see org.springframework.data.hadoop.configuration.ReducerFactoryBean
- * @see org.springframework.data.hadoop.configuration.JobFactoryBean
+ * @see org.springframework.data.hadoop.configuration.AutowiredJobFactoryBean
  * @since 1.0
  */
 class ReducerParser extends AbstractSingleBeanDefinitionParser {

@@ -17,9 +17,13 @@ package org.springframework.data.hadoop.batch;
 
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.context.ResourceLoaderAware;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.WritableResource;
@@ -35,36 +39,65 @@ import org.springframework.util.FileCopyUtils;
  * 
  * @author Costin Leau
  */
-public class ResourcesItemWriter implements InitializingBean, ItemWriter<Resource>, ResourceLoaderAware {
+public class ResourcesItemWriter implements InitializingBean, ItemWriter<Resource>, ApplicationContextAware {
+
+	private static final Log log = LogFactory.getLog(ResourcesItemWriter.class);
 
 	private ResourceLoader resourceLoader;
 
 	private NameGenerator generator;
 
+	private boolean overwrite = false;
+
+	private ApplicationContext ctx;
+
 	public void afterPropertiesSet() {
-		Assert.notNull(resourceLoader, "a resource loader is required");
+		Assert.isTrue(resourceLoader != null || ctx != null, "a resource loader is required");
+		if (resourceLoader == null) {
+			resourceLoader = ctx;
+		}
 	}
 
 	public void setResourceLoader(ResourceLoader resourceLoader) {
 		this.resourceLoader = resourceLoader;
 	}
 
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		this.ctx = applicationContext;
+	}
+
 	public void setGenerator(NameGenerator generator) {
 		this.generator = generator;
 	}
 
+
+	public void setOverwrite(boolean overwrite) {
+		this.overwrite = overwrite;
+	}
+
 	public void write(List<? extends Resource> items) throws Exception {
+		boolean trace = log.isTraceEnabled();
+
 		for (Resource resource : items) {
 			String uri = resource.getURI().toString();
 			String newUri = (generator != null ? generator.generate(uri) : uri);
 
 			Resource out = resourceLoader.getResource(newUri);
-			Assert.isTrue(out instanceof WritableResource, "Cannot resolve a writable resource for " + newUri);
-			WritableResource wOut = (WritableResource) out;
-			Assert.isTrue(wOut.isWritable(), "Writable resources [" + wOut + "] is read-only");
-			if (!out.equals(resource)) {
-				FileCopyUtils.copy(resource.getInputStream(), wOut.getOutputStream());
+			if (!out.exists() || overwrite) {
+				Assert.isTrue(out instanceof WritableResource, "Cannot resolve a writable resource for " + newUri);
+				WritableResource wOut = (WritableResource) out;
+				Assert.isTrue(wOut.isWritable(), "Writable resources [" + wOut + "] is read-only");
+				if (!out.equals(resource)) {
+					FileCopyUtils.copy(resource.getInputStream(), wOut.getOutputStream());
+				}
+			}
+			else {
+				if (trace) {
+					log.trace("Skipping writing resource [" + out.getDescription()
+							+ "] since it already exists and overwriting not allowed");
+				}
 			}
 		}
 	}
+
 }

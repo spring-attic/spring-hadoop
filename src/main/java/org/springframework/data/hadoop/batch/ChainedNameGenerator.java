@@ -15,25 +15,29 @@
  */
 package org.springframework.data.hadoop.batch;
 
-import org.springframework.util.StringUtils;
+import java.util.List;
 
 /**
- * Simple name generator that appends a prefix to the given name. 
+ * Chained name generator.
  * 
  * @author Costin Leau
  */
-public class PrefixNameGenerator implements NameGenerator {
+public class ChainedNameGenerator implements NameGenerator {
 
-	private String prefix = "";
-
-	public void setPrefix(String prefix) {
-		this.prefix = (StringUtils.hasText(prefix) ? prefix : "");
-	}
+	private List<NameGenerator> generators;
 
 	public String generate(String original) {
-		if (prefix.endsWith("/") && original.startsWith("/")) {
-			return prefix.substring(0, prefix.length() - 1).concat(original);
+		String process = original;
+		for (NameGenerator generator : generators) {
+			process = generator.generate(process);
 		}
-		return prefix.concat(original);
+		return process;
+	}
+
+	/**
+	 * @param generators The generators to set.
+	 */
+	public void setGenerators(List<NameGenerator> generators) {
+		this.generators = generators;
 	}
 }

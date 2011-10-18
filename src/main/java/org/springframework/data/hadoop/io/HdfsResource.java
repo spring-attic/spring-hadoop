@@ -58,9 +58,10 @@ class HdfsResource implements WritableResource, ContextResource {
 		Assert.notNull(path, "a valid path is required");
 		Assert.notNull(fs, "non null file system required");
 
-		this.path = path;
 		this.location = path.toString();
 		this.fs = fs;
+		this.path = path.makeQualified(fs);
+
 		boolean exists = false;
 
 		try {
@@ -125,7 +126,7 @@ class HdfsResource implements WritableResource, ContextResource {
 	}
 
 	public boolean isOpen() {
-		return true;
+		return (exists ? true : false);
 	}
 
 	public boolean isReadable() {
@@ -178,7 +179,7 @@ class HdfsResource implements WritableResource, ContextResource {
 
 	public OutputStream getOutputStream() throws IOException {
 		try {
-			return fs.create(path, false);
+			return fs.create(path, true);
 		} finally {
 			exists = true;
 		}

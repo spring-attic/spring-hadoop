@@ -23,7 +23,7 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.hadoop.configuration.JobFactoryBean;
+import org.springframework.data.hadoop.configuration.AutowiredJobFactoryBean;
 import org.springframework.data.hadoop.test.word.IntSumReducer;
 import org.springframework.data.hadoop.test.word.TokenizerMapper;
 
@@ -36,13 +36,13 @@ public class JobConfiguration {
 
 	@Bean
 	public FactoryBean<Job> wordCountJob() throws Exception {
-		JobFactoryBean factory = new JobFactoryBean();
-		factory.setMapper(mapper());
-		factory.setReducer(reducer());
-		factory.setCombiner(reducer());
-		factory.setOutputKeyClass(Text.class);
-		factory.setOutputValueClass(IntWritable.class);
-		factory.setInputPaths("target/input/word");
+		AutowiredJobFactoryBean factory = new AutowiredJobFactoryBean();
+		factory.setMapper(mapper().getClass());
+		factory.setReducer(reducer().getClass());
+		factory.setCombiner(reducer().getClass());
+		factory.setKey(Text.class);
+		factory.setValue(IntWritable.class);
+		factory.setInputPath("target/input/word");
 		factory.setOutputPath("target/output/word");
 		return factory;
 	}

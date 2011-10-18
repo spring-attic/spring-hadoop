@@ -28,7 +28,7 @@ import org.w3c.dom.Element;
  * @author Josh Long
  * @since 1.0
  * @see org.springframework.data.hadoop.configuration.MapperFactoryBean
- * @see org.springframework.data.hadoop.configuration.JobFactoryBean
+ * @see org.springframework.data.hadoop.configuration.AutowiredJobFactoryBean
  * 
  */
 class MapperParser extends AbstractSingleBeanDefinitionParser {

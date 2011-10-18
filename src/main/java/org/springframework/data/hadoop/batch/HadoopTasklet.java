@@ -46,16 +46,16 @@ public class HadoopTasklet implements InitializingBean, Tasklet {
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		Exception exc = null;
 
+		System.out.println("About to kick-start job...");
 		try {
-			if (waitForJob) {
+			if (!waitForJob) {
 				job.submit();
-				return RepeatStatus.CONTINUABLE;
 			}
 			else {
-				if (job.waitForCompletion(false)) {
-					return RepeatStatus.FINISHED;
-				}
+				job.waitForCompletion(false);
 			}
+			System.out.println("Finished job execution...");
+			return RepeatStatus.FINISHED;
 		} catch (Exception ex) {
 			exc = ex;
 		}

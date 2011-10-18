@@ -73,6 +73,10 @@ public class DefaultContextLoader implements ContextLoader {
 
 	public <T> T getBean(Configuration configuration, Class<T> type, boolean createContext, String property) {
 		ApplicationContextReference reference = findApplicationContext(configuration, createContext);
+		if (reference == null) {
+			return null;
+		}
+
 		T bean = getBean(reference.getContext(), configuration, type, property);
 		if (bean != null && createContext) {
 			reference.increment();
@@ -132,8 +136,7 @@ public class DefaultContextLoader implements ContextLoader {
 
 		if (job != null) {
 			Configuration configuration = job.getConfiguration();
-			configuration
-					.set(SPRING_CONFIG_BOOTSTRAP, PropertiesUtils.propertiesToString(reference.getBootstrap()));
+			configuration.set(SPRING_CONFIG_BOOTSTRAP, PropertiesUtils.propertiesToString(reference.getBootstrap()));
 			configuration.set(SPRING_CONFIG_LOCATION, reference.getConfigLocation());
 			reference.increment();
 			if (job.getJobName() != null) {
@@ -146,8 +149,7 @@ public class DefaultContextLoader implements ContextLoader {
 
 	}
 
-	private <T> T getBeanFromFactoryBean(ApplicationContext context, Configuration configuration, Class<T> type,
-			String property) {
+	private <T> T getBeanFromFactoryBean(ApplicationContext context, Configuration configuration, Class<T> type, String property) {
 
 		String factory = AbstractBeanFactory.FACTORY_BEAN_PREFIX + getJobName(configuration);
 
@@ -173,8 +175,7 @@ public class DefaultContextLoader implements ContextLoader {
 		return configuration.get(SPRING_CONFIG_LOCATION);
 	}
 
-	private ApplicationContextReference findApplicationContext(Configuration configuration, Object path,
-			boolean createContext) {
+	private ApplicationContextReference findApplicationContext(Configuration configuration, Object path, boolean createContext) {
 		String configLocation = null;
 		if (path instanceof String) {
 			configLocation = (String) path;
@@ -188,8 +189,12 @@ public class DefaultContextLoader implements ContextLoader {
 		return findApplicationContext(configuration, configLocation, createContext);
 	}
 
-	private ApplicationContextReference findApplicationContext(Configuration configuration, String path,
-			boolean createContext) {
+	private ApplicationContextReference findApplicationContext(Configuration configuration, String path, boolean createContext) {
+
+		if (!StringUtils.hasText(path)) {
+			return null;
+		}
+
 		if (contexts.containsKey(path)) {
 			return contexts.get(path);
 		}
@@ -199,8 +204,7 @@ public class DefaultContextLoader implements ContextLoader {
 		Class<?> configClass = null;
 		try {
 			configClass = ClassUtils.forName(path, ClassUtils.getDefaultClassLoader());
-		}
-		catch (ClassNotFoundException e) {
+		} catch (ClassNotFoundException e) {
 			// ignore
 		}
 		AbstractApplicationContext context;
@@ -255,10 +259,8 @@ public class DefaultContextLoader implements ContextLoader {
 				StringUtils.uncapitalize(getJobName(configuration)) + type.getSimpleName());
 		if (property != null) {
 			candidates = new ArrayList<String>(candidates);
-			candidates.addAll(
-					0,
-					Arrays.asList(StringUtils.uncapitalize(property),
-							StringUtils.uncapitalize(getJobName(configuration)) + StringUtils.capitalize(property)));
+			candidates.addAll(0, Arrays.asList(StringUtils.uncapitalize(property),
+					StringUtils.uncapitalize(getJobName(configuration)) + StringUtils.capitalize(property)));
 		}
 
 		List<String> names = Arrays.asList(context.getBeanNamesForType(type));

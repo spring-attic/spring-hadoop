@@ -1,0 +1,64 @@
+<beans
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:c="http://www.springframework.org/schema/c"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+      	http://www.springframework.org/schema/batch	http://www.springframework.org/schema/batch/spring-batch-2.1.xsd">
+ 		
+	<job id="mainJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="import" next="do">
+			<tasklet>
+				<chunk reader="reader" writer="writer" commit-interval="10"/>
+			</tasklet>
+		</step>
+		<step id="do">
+			<tasklet ref="hadoop-tasklet"/>
+		</step>
+	</job>
+	
+	<bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean"/>
+	<bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager"/>
+	
+	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher" p:jobRepository-ref="jobRepository"/>
+	
+	<bean id="reader" class="org.springframework.batch.item.file.ResourcesItemReader" p:resources="classpath:input/word/*.txt"/>
+	<bean id="writer" class="org.springframework.data.hadoop.batch.ResourcesItemWriter" 
+		p:resource-loader-ref="hdfsResourceLoader"
+		p:generator-ref="name-generator"
+		p:overwrite="true"/>
+	
+	<bean id="hdfsResourceLoader" class="org.springframework.data.hadoop.io.HdfsResourceLoader" c:fs-ref="fs"/>
+	<bean id="fs" class="org.springframework.data.hadoop.io.FileSystemFactoryBean" p:configuration-ref="fs-config"/>
+	<bean id="fs-config" class="org.springframework.data.hadoop.configuration.ConfigurationFactoryBean">
+		<property name="properties">
+			<map>
+			  <entry key="fs.default.name" value="hdfs://localhost"/>
+			</map>
+		</property>
+	</bean>
+		
+	<bean id="name-generator" class="org.springframework.data.hadoop.batch.ChainedNameGenerator">
+		<property name="generators">
+			<list>
+				<bean class="org.springframework.data.hadoop.batch.BasePathNameGenerator" p:path="." p:remove="true"/>
+				<bean class="org.springframework.data.hadoop.batch.PrefixNameGenerator" p:prefix="/ide-test/"/>
+			</list> 
+		</property>
+	</bean>
+	
+	<bean id="hadoop-tasklet" class="org.springframework.data.hadoop.batch.HadoopTasklet" p:job-ref="mr-job" p:waitForJob="true"/>
+	
+	<bean id="mr-job" class="org.springframework.data.hadoop.configuration.JobFactoryBean"
+		p:resource-loader-ref="hdfsResourceLoader"
+		p:input-paths="/ide-test/input/word/"
+		p:output-path="/ide-test/output/word/"
+		p:mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
+		p:reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"
+		p:key="org.apache.hadoop.io.Text"
+		p:value="org.apache.hadoop.io.IntWritable"/>
+	  
+	<bean id="start-job" class="org.springframework.data.hadoop.batch.TriggerJobs"/>
+	
+</beans>

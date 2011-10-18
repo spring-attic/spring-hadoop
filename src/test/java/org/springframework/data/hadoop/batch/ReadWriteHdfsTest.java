@@ -15,25 +15,29 @@
  */
 package org.springframework.data.hadoop.batch;
 
-import org.springframework.util.StringUtils;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.junit.Test;
+import org.springframework.context.support.GenericXmlApplicationContext;
+
 
 /**
- * Simple name generator that appends a prefix to the given name. 
+ * Basic data workflow test writing data into HDFS, executing a basic job and then reading data out of HDFS.
  * 
  * @author Costin Leau
  */
-public class PrefixNameGenerator implements NameGenerator {
+public class ReadWriteHdfsTest {
 
-	private String prefix = "";
+	@Test
+	public void testWorkflow() throws Exception {
+		GenericXmlApplicationContext ctx = new GenericXmlApplicationContext(
+				"/org/springframework/data/hadoop/batch/in-do-out.xml");
 
-	public void setPrefix(String prefix) {
-		this.prefix = (StringUtils.hasText(prefix) ? prefix : "");
-	}
+		ctx.registerShutdownHook();
 
-	public String generate(String original) {
-		if (prefix.endsWith("/") && original.startsWith("/")) {
-			return prefix.substring(0, prefix.length() - 1).concat(original);
-		}
-		return prefix.concat(original);
+		FileSystem fs = ctx.getBean(FileSystem.class);
+		fs.delete(new Path("/ide-test/output/word/"), true);
+
+		ctx.getBean(TriggerJobs.class).startJobs(ctx);
 	}
 }
