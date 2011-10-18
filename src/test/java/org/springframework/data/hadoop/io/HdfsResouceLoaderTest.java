@@ -144,7 +144,5 @@ public class HdfsResouceLoaderTest {
 		resource = loader.getResource("test");
 		System.out.println(resource.getURI());
 		System.out.println(resource.getURL());
-
-
 	}
 }

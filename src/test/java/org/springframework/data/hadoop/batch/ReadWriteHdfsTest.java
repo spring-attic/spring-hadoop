@@ -38,6 +38,7 @@ public class ReadWriteHdfsTest {
 		FileSystem fs = ctx.getBean(FileSystem.class);
 		fs.delete(new Path("/ide-test/output/word/"), true);
 
-		ctx.getBean(TriggerJobs.class).startJobs(ctx);
+		TriggerJobs tj = new TriggerJobs();
+		tj.startJobs(ctx);
 	}
 }
