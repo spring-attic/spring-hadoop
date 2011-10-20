@@ -15,6 +15,9 @@
  */
 package org.springframework.data.hadoop.batch;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -41,6 +44,14 @@ import org.springframework.util.FileCopyUtils;
  */
 public class ResourcesItemWriter implements InitializingBean, ItemWriter<Resource>, ApplicationContextAware {
 
+	public interface OutputStreamDecorator {
+		OutputStream decorate(OutputStream out) throws IOException;
+	}
+
+	public interface InputStreamDecorator {
+		InputStream decorate(InputStream in) throws IOException;
+	}
+
 	private static final Log log = LogFactory.getLog(ResourcesItemWriter.class);
 
 	private ResourceLoader resourceLoader;
@@ -50,6 +61,9 @@ public class ResourcesItemWriter implements InitializingBean, ItemWriter<Resourc
 	private boolean overwrite = false;
 
 	private ApplicationContext ctx;
+
+	private InputStreamDecorator inDecorator;
+	private OutputStreamDecorator outDecorator;
 
 	public void afterPropertiesSet() {
 		Assert.isTrue(resourceLoader != null || ctx != null, "a resource loader is required");
@@ -88,7 +102,18 @@ public class ResourcesItemWriter implements InitializingBean, ItemWriter<Resourc
 				WritableResource wOut = (WritableResource) out;
 				Assert.isTrue(wOut.isWritable(), "Writable resources [" + wOut + "] is read-only");
 				if (!out.equals(resource)) {
-					FileCopyUtils.copy(resource.getInputStream(), wOut.getOutputStream());
+					InputStream inStream = resource.getInputStream();
+					OutputStream outStream = wOut.getOutputStream();
+
+					if (inDecorator != null) {
+						inStream = inDecorator.decorate(inStream);
+					}
+
+					if (outDecorator != null) {
+						outStream = outDecorator.decorate(outStream);
+					}
+
+					FileCopyUtils.copy(inStream, outStream);
 				}
 			}
 			else {
@@ -100,4 +125,11 @@ public class ResourcesItemWriter implements InitializingBean, ItemWriter<Resourc
 		}
 	}
 
+	public void setInputStreamDecorator(InputStreamDecorator inDecorator) {
+		this.inDecorator = inDecorator;
+	}
+
+	public void setOutputStreamDecorator(OutputStreamDecorator outDecorator) {
+		this.outDecorator = outDecorator;
+	}
 }
