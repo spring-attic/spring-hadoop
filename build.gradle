@@ -76,6 +76,7 @@ dependencies {
     compile "org.springframework:spring-tx:$springVersion"
     compile "org.springframework:spring-aop:$springVersion"
     compile "org.springframework:spring-oxm:$springVersion"
+    compile "org.springframework:spring-jdbc:$springVersion"
     compile "org.springframework.batch:spring-batch-core:$springBatchVersion"
     compile "org.springframework.integration:spring-integration-core:$springIntVersion"
 
@@ -86,6 +87,17 @@ dependencies {
     compile "org.codehaus.jackson:jackson-core-asl:$jacksonVersion"
     compile "org.codehaus.jackson:jackson-mapper-asl:$jacksonVersion"
     compile "cglib:cglib:$cglibVersion"
+    
+    // Hive
+    compile "org.apache.hive:hive-common:$hiveVersion"
+    compile "org.apache.hive:hive-jdbc:$hiveVersion"
+    compile "org.apache.hive:hive-service:$hiveVersion"
+    compile "org.apache.hive:hive-metastore:$hiveVersion"
+    compile "org.apache.hive:hive-shims:$hiveVersion"
+    compile "org.apache.hive:hive-serde:$hiveVersion"
+    compile "org.apache.thrift:libthrift:$thriftVersion"
+    compile "org.apache.thrift:libfb303:$thriftVersion"
+
 
     // Testing
     testCompile "junit:junit:$junitVersion"

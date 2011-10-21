@@ -7,25 +7,43 @@
       	http://www.springframework.org/schema/batch	http://www.springframework.org/schema/batch/spring-batch-2.1.xsd">
 
 	<import resource="batch-common.xml"/>
-	<import resource="hadoop-ctx.xml"/>
+	<import resource="../hadoop-ctx.xml"/>
 	
 	<job id="mainJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="import" next="do">
 			<tasklet>
-				<chunk reader="reader" writer="writer" commit-interval="10"/>
+				<chunk reader="file-reader" writer="hdfs-writer" commit-interval="10"/>
 			</tasklet>
 		</step>
-		<step id="do">
+		<step id="do" next="export">
 			<tasklet ref="hadoop-tasklet"/>
 		</step>
+		<!-- 
+		<step id="export">
+			<tasklet>
+				<chunk reader="hdfs-reader" writer="file-writer" commit-interval="10"/>
+			</tasklet>
+		</step>
+		 -->
 	</job>
 	
 	
-	<bean id="reader" class="org.springframework.batch.item.file.ResourcesItemReader" p:resources="classpath:input/word/*.txt"/>
-	<bean id="writer" class="org.springframework.data.hadoop.batch.ResourcesItemWriter" 
+	<bean id="file-reader" class="org.springframework.batch.item.file.ResourcesItemReader" p:resources="classpath:input/word/*.txt"/>
+
+	<bean id="hdfs-writer" class="org.springframework.data.hadoop.batch.ResourcesItemWriter" 
 		p:resource-loader-ref="hdfsResourceLoader"
 		p:generator-ref="name-generator"
-		p:overwrite="true"/>
+		p:overwrite="true">
+			<!--
+			<property name="outputStreamDecorator">
+				<bean class="org.springframework.data.hadoop.batch.CompressStreamDecorator">
+					<constructor-arg>
+						<bean class="org.apache.hadoop.io.compress.GzipCodec"/>
+					</constructor-arg>
+				</bean>
+			</property>
+			  -->
+	</bean>
 
 	<bean id="hadoop-tasklet" class="org.springframework.data.hadoop.batch.HadoopTasklet" p:job-ref="mr-job" p:waitForJob="true"/>
 	
