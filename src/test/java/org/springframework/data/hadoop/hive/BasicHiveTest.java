@@ -19,10 +19,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.apache.hadoop.hive.service.HiveClient;
-import org.apache.thrift.protocol.TBinaryProtocol;
-import org.apache.thrift.protocol.TProtocol;
-import org.apache.thrift.transport.TSocket;
-import org.apache.thrift.transport.TTransport;
 import org.junit.Test;
 import org.springframework.context.support.GenericXmlApplicationContext;
 import org.springframework.dao.DataAccessException;
@@ -63,13 +59,8 @@ public class BasicHiveTest {
 			}
 		});
 
-		TTransport transport = new TSocket("localhost", 10000);
-		TProtocol protocol = new TBinaryProtocol(transport);
-		HiveClient client = new HiveClient(protocol);
-		transport.open();
-
+		HiveClient client = ctx.getBean(HiveClient.class);
 		client.execute("select count(1) as cnt from " + tableName);
 		System.out.println(client.fetchOne());
-		transport.close();
 	}
 }

@@ -14,13 +14,5 @@
 	 
 	<context:property-placeholder location="test.properties"/>
 	
-	<bean id="hive-driver" class="org.apache.hadoop.hive.jdbc.HiveDriver"/>
-	
-	<bean id="hive-ds" class="org.springframework.jdbc.datasource.SimpleDriverDataSource"
-		c:driver-ref="hive-driver"
-		c:url="${hive.url}"/>
-	
-	<bean id="hive-client" class="org.springframework.data.hadoop.hive.HiveClientFactoryBean"/>
-	
-	<bean id="template" class="org.springframework.jdbc.core.JdbcTemplate" c:data-source-ref="hive-ds"/>
+	<bean id="pig" class="org.springframework.data.hadoop.pig.PigServerFactoryBean" />
 </beans>

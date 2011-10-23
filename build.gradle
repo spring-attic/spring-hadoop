@@ -98,6 +98,9 @@ dependencies {
     compile "org.apache.thrift:libthrift:$thriftVersion"
     compile "org.apache.thrift:libfb303:$thriftVersion"
 
+    // Pig
+    compile "org.apache.pig:pig:$pigVersion"
+    compile "org.antlr:antlr-runtime:$antlrVersion"
 
     // Testing
     testCompile "junit:junit:$junitVersion"
