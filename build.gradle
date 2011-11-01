@@ -101,6 +101,9 @@ dependencies {
     // Pig
     compile "org.apache.pig:pig:$pigVersion"
     compile "org.antlr:antlr-runtime:$antlrVersion"
+    
+    // HBase
+    compile "org.apache.hbase:hbase:$hbaseVersion"
 
     // Testing
     testCompile "junit:junit:$junitVersion"

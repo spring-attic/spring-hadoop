@@ -41,7 +41,7 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 	private boolean initialize = true;
 
 	public void afterPropertiesSet() throws Exception {
-		config = (configuration != null ? new Configuration(configuration) : new Configuration(loadDefaults));
+		config = createConfiguration(configuration);
 
 		config.setClassLoader(beanClassLoader);
 		if (resources != null) {
@@ -80,9 +80,27 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 		if (initialize) {
 			config.size();
 		}
+
+		postProcessConfiguration(config);
 	}
 
-	public Configuration getObject() throws Exception {
+	/**
+	 * Creates a configuration instance potentially using the existing one (passed as an argument - which can be null). 
+	 * 
+	 * @param existing
+	 * @return
+	 */
+	protected Configuration createConfiguration(Configuration existing) {
+		return (existing != null ? new Configuration(existing) : new Configuration(loadDefaults));
+	}
+
+
+	protected void postProcessConfiguration(Configuration configuration) {
+		// no-op
+	}
+
+
+	public Configuration getObject() {
 		return config;
 	}
 
