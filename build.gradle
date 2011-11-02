@@ -82,6 +82,7 @@ dependencies {
 
     // Hadoop
     compile "org.apache.hadoop:hadoop-core:$hadoopVersion"
+    compile "org.apache.hadoop:hadoop-streaming:$hadoopVersion"
     
     compile "commons-io:commons-io:$commonsioVersion"
     compile "org.codehaus.jackson:jackson-core-asl:$jacksonVersion"
