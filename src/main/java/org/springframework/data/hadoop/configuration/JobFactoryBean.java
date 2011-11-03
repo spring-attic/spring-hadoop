@@ -16,6 +16,8 @@
 package org.springframework.data.hadoop.configuration;
 
 import java.io.IOException;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -112,6 +114,19 @@ public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanN
 
 		job = (configuration != null ? new Job(configuration) : new Job());
 
+
+		// set first to enable auto-detection of K/V to skip the key/value types to be specified
+		if (mapper != null) {
+			job.setMapperClass(mapper);
+			configureMapperTypesIfPossible(job, mapper);
+		}
+
+		if (reducer != null) {
+			job.setReducerClass(reducer);
+			configureReducerTypesIfPossible(job, reducer);
+		}
+
+
 		if (StringUtils.hasText(name)) {
 			job.setJobName(name);
 		}
@@ -130,9 +145,6 @@ public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanN
 		if (mapValueClass != null) {
 			job.setMapOutputValueClass(mapValueClass);
 		}
-		if (mapper != null) {
-			job.setMapperClass(mapper);
-		}
 		if (numReduceTasks != null) {
 			job.setNumReduceTasks(numReduceTasks);
 		}
@@ -147,9 +159,6 @@ public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanN
 		}
 		if (partitioner != null) {
 			job.setPartitionerClass(partitioner);
-		}
-		if (reducer != null) {
-			job.setReducerClass(reducer);
 		}
 		if (sortComparator != null) {
 			job.setSortComparatorClass(sortComparator);
@@ -187,6 +196,37 @@ public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanN
 		}
 
 		processJob(job);
+	}
+
+	private void configureMapperTypesIfPossible(Job j, Class<? extends Mapper> mapper) {
+		// Find mapper
+		Class<?> targetClass = mapper;
+		Type targetType = mapper;
+
+		do {
+			targetType = targetClass.getGenericSuperclass();
+			targetClass = targetClass.getSuperclass();
+		} while (targetClass != null && targetClass != Object.class && Mapper.class.equals(targetType));
+
+
+		if (targetType instanceof ParameterizedType) {
+			Type[] params = ((ParameterizedType) targetType).getActualTypeArguments();
+			if (params.length == 4) {
+				// set each param (if possible);
+				if (params[2] instanceof Class) {
+					j.setMapOutputKeyClass((Class) params[2]);
+				}
+
+				// set each param (if possible);
+				if (params[3] instanceof Class) {
+					j.setMapOutputValueClass((Class) params[3]);
+				}
+			}
+		}
+	}
+
+	private void configureReducerTypesIfPossible(Job j, Class<? extends Reducer> reducer) {
+		// don't do anything yet
 	}
 
 	private Path resolveResource(String path) throws IOException {

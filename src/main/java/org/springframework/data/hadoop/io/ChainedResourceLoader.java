@@ -16,16 +16,22 @@
 package org.springframework.data.hadoop.io;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.core.Ordered;
+import org.springframework.core.PriorityOrdered;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.util.Assert;
 
@@ -36,15 +42,17 @@ import org.springframework.util.Assert;
  * 
  * @author Costin Leau
  */
-public class ChainedResourceLoader implements ApplicationContextAware, InitializingBean, ResourcePatternResolver {
+public class ChainedResourceLoader implements ApplicationContextAware, InitializingBean, ResourcePatternResolver,
+		BeanFactoryPostProcessor, Ordered {
 
 	private ResourcePatternResolver fallback;
 	private Map<String, ResourceLoader> resourceLoaders = new ConcurrentHashMap<String, ResourceLoader>(4);
 	private Map<String, ResourcePatternResolver> patternLoaders = new ConcurrentHashMap<String, ResourcePatternResolver>(
 			4);
-	private Map<String, ? extends ResourceLoader> loaders;
+	private Map<String, ? extends ResourceLoader> loaders = Collections.emptyMap();
 
 	public void setLoaders(Map<String, ? extends ResourceLoader> loaders) {
+		Assert.notNull(loaders, "a valid map of loaders required");
 		this.loaders = loaders;
 	}
 
@@ -75,7 +83,7 @@ public class ChainedResourceLoader implements ApplicationContextAware, Initializ
 	}
 
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-		fallback = applicationContext;
+		fallback = new PathMatchingResourcePatternResolver(applicationContext.getClassLoader());
 
 		if (applicationContext instanceof GenericApplicationContext) {
 			((GenericApplicationContext) applicationContext).setResourceLoader(this);
@@ -83,7 +91,7 @@ public class ChainedResourceLoader implements ApplicationContextAware, Initializ
 	}
 
 	private String getPrefix(String location) {
-		int indexOf = location.indexOf(":");
+		int indexOf = location.indexOf("://");
 		return (indexOf > 0 ? location.substring(indexOf) : null);
 	}
 
@@ -94,6 +102,16 @@ public class ChainedResourceLoader implements ApplicationContextAware, Initializ
 
 	private ResourceLoader resolveResourceLoader(String location) {
 		String prefix = getPrefix(location);
-		return (prefix != null ? resourceLoaders.get(prefix) : fallback);
+		ResourceLoader rl = (prefix != null ? resourceLoaders.get(prefix) : fallback);
+		return (rl == null ? fallback : rl);
+	}
+
+	public int getOrder() {
+		return PriorityOrdered.LOWEST_PRECEDENCE;
+	}
+
+	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
+		Assert.notNull(fallback);
+		// no-op - simply added to be sure we're triggered early on
 	}
 }
