@@ -9,7 +9,15 @@
 
 	<context:property-placeholder location="test.properties"/>
 
-	<bean id="hdfsResourceLoader" class="org.springframework.data.hadoop.io.HdfsResourceLoader" c:fs-ref="fs"/>
+	<bean id="chainedResourceLoader" class="org.springframework.data.hadoop.io.ChainedResourceLoader">
+		<property name="loaders">
+			<map>
+				<entry key="hdfs" value-ref="hdfsResourceLoader"/>
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="hdfsResourceLoader" class="org.springframework.data.hadoop.io.HdfsResourceLoader" c:fs-ref="fs" p:register-jvm-url="true"/>
 	<bean id="fs" class="org.springframework.data.hadoop.io.FileSystemFactoryBean" p:configuration-ref="fs-config"/>
 	<bean id="fs-config" class="org.springframework.data.hadoop.configuration.ConfigurationFactoryBean">
 	 <property name="properties">

@@ -1,10 +1,12 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:hdp="http://www.springframework.org/schema/hadoop"
 	xmlns:c="http://www.springframework.org/schema/c"
 	xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-      	http://www.springframework.org/schema/batch	http://www.springframework.org/schema/batch/spring-batch-2.1.xsd">
+      	http://www.springframework.org/schema/batch	http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
+      	http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop-1.0.xsd">
 
 	<import resource="batch-common.xml"/>
 	<import resource="../hadoop-ctx.xml"/>
@@ -34,26 +36,16 @@
 		p:resource-loader-ref="hdfsResourceLoader"
 		p:generator-ref="name-generator"
 		p:overwrite="true">
-			<!--
-			<property name="outputStreamDecorator">
-				<bean class="org.springframework.data.hadoop.batch.CompressStreamDecorator">
-					<constructor-arg>
-						<bean class="org.apache.hadoop.io.compress.GzipCodec"/>
-					</constructor-arg>
-				</bean>
-			</property>
-			  -->
 	</bean>
 
-	<bean id="hadoop-tasklet" class="org.springframework.data.hadoop.batch.HadoopTasklet" p:job-ref="mr-job" p:wait-for-job="true"/>
+	<hdp:tasklet id="hadoop-tasklet" job-ref="mr-job" wait-for-job="true"/>
 	
-	<bean id="mr-job" class="org.springframework.data.hadoop.configuration.JobFactoryBean"
-		p:resource-loader-ref="hdfsResourceLoader"
-		p:input-paths="/ide-test/input/word/"
-		p:output-path="/ide-test/output/word/"
-		p:mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
-		p:reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"
-		p:key="org.apache.hadoop.io.Text"
-		p:value="org.apache.hadoop.io.IntWritable"/>
+	<hdp:job id="mr-job" 
+	    input-path="hdfs://localhost/ide-test/input/word/" output-path="hdfs://localhost/ide-test/output/word/"
+		mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
+		reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"
+	/>
 	  
+	  <!-- key="org.apache.hadoop.io.Text" 
+	  		value="org.apache.hadoop.io.IntWritable"-->
 </beans>

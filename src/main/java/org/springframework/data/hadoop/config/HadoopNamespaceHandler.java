@@ -22,7 +22,7 @@ import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
  *
  *
  * @author Josh Long
- * @since 1.0
+ * @author Costin Leau
  * @see MapperParser
  * @see ReducerParser
  */
@@ -34,6 +34,9 @@ class HadoopNamespaceHandler extends NamespaceHandlerSupport {
 	public void init() {
 		this.registerBeanDefinitionParser("mapper", new MapperParser());
 		this.registerBeanDefinitionParser("reducer", new ReducerParser());
+
+		registerBeanDefinitionParser("tasklet", new HadoopTaskletParser());
+		registerBeanDefinitionParser("job", new HadoopJobParser());
 
 	}
 }

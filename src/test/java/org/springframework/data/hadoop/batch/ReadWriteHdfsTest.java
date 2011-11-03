@@ -15,7 +15,10 @@
  */
 package org.springframework.data.hadoop.batch;
 
+import java.net.URL;
+
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.FsUrlStreamHandlerFactory;
 import org.apache.hadoop.fs.Path;
 import org.junit.Test;
 import org.springframework.context.support.GenericXmlApplicationContext;
@@ -28,7 +31,11 @@ import org.springframework.context.support.GenericXmlApplicationContext;
  */
 public class ReadWriteHdfsTest {
 
-	@Test
+	public void setup() {
+		URL.setURLStreamHandlerFactory(new FsUrlStreamHandlerFactory());
+	}
+
+	//@Test
 	public void testWorkflow() throws Exception {
 		GenericXmlApplicationContext ctx = new GenericXmlApplicationContext(
 				"/org/springframework/data/hadoop/batch/in-do-out.xml");
@@ -41,4 +48,19 @@ public class ReadWriteHdfsTest {
 		TriggerJobs tj = new TriggerJobs();
 		tj.startJobs(ctx);
 	}
+
+	@Test
+	public void testWorkflowNS() throws Exception {
+		GenericXmlApplicationContext ctx = new GenericXmlApplicationContext(
+				"/org/springframework/data/hadoop/batch/in-do-out-ns.xml");
+
+		ctx.registerShutdownHook();
+
+		FileSystem fs = ctx.getBean(FileSystem.class);
+		fs.delete(new Path("/ide-test/output/word/"), true);
+
+		TriggerJobs tj = new TriggerJobs();
+		tj.startJobs(ctx);
+	}
+
 }
