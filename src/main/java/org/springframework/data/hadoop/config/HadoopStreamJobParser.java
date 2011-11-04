@@ -18,7 +18,7 @@ package org.springframework.data.hadoop.config;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractSimpleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.data.hadoop.configuration.JobFactoryBean;
+import org.springframework.data.hadoop.configuration.StreamJobFactoryBean;
 import org.w3c.dom.Element;
 
 /**
@@ -26,11 +26,11 @@ import org.w3c.dom.Element;
  * 
  * @author Costin Leau
  */
-class HadoopJobParser extends AbstractSimpleBeanDefinitionParser {
+class HadoopStreamJobParser extends AbstractSimpleBeanDefinitionParser {
 
 	@Override
 	protected Class<?> getBeanClass(Element element) {
-		return JobFactoryBean.class;
+		return StreamJobFactoryBean.class;
 	}
 
 	@Override

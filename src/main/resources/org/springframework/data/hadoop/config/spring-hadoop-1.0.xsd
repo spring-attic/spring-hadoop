@@ -208,13 +208,13 @@ Defines a Hadoop Job.
           </xsd:documentation>
 	      <xsd:appinfo>
 	        <tool:annotation>
-	          <tool:exports type="org.springframework.data.hadoop.batch.HadoopTasklet"/>
+	          <tool:exports type="org.apache.hadoop.mapreduce.Job"/>
 	        </tool:annotation>
 	      </xsd:appinfo>
 		</xsd:annotation>
 		<xsd:complexType>
 		<xsd:attribute name="id" type="xsd:ID" use="required" />
-		<xsd:attribute name="mapper">
+		<xsd:attribute name="mapper" use="required">
 		<xsd:annotation>
 			<xsd:appinfo>
 				<tool:annotation kind="direct">
@@ -224,7 +224,7 @@ Defines a Hadoop Job.
 			</xsd:appinfo>
 	 	</xsd:annotation>			
 		</xsd:attribute>
-		<xsd:attribute name="reducer">
+		<xsd:attribute name="reducer" use="required">
 		<xsd:annotation>
 			<xsd:appinfo>
 				<tool:annotation kind="direct">
@@ -330,7 +330,7 @@ Defines a Hadoop Job.
 			</xsd:appinfo>
 	 	</xsd:annotation>			
 		</xsd:attribute>
-		<xsd:attribute name="input-path">
+		<xsd:attribute name="input-path" use="required">
 		<xsd:annotation>
 			<xsd:appinfo>
 				<tool:annotation kind="direct">
@@ -339,7 +339,7 @@ Defines a Hadoop Job.
 			</xsd:appinfo>
 	 	</xsd:annotation>			
 		</xsd:attribute>
-		<xsd:attribute name="output-path">
+		<xsd:attribute name="output-path" use="required">
 		<xsd:annotation>
 			<xsd:appinfo>
 				<tool:annotation kind="direct">
@@ -361,4 +361,145 @@ Hadoop Configuration]]></xsd:documentation>
 		</xsd:attribute>
 		</xsd:complexType>
 	</xsd:element>
+	
+	<xsd:element name="stream-job">
+		<xsd:annotation>
+		   <xsd:documentation><![CDATA[
+Defines a Hadoop Streaming Job.
+				]]>
+          </xsd:documentation>
+	      <xsd:appinfo>
+	        <tool:annotation>
+	          <tool:exports type="org.apache.hadoop.mapreduce.Job"/>
+	        </tool:annotation>
+	      </xsd:appinfo>
+		</xsd:annotation>
+		<xsd:complexType>
+		<xsd:attribute name="id" type="xsd:ID" use="required" />
+		<xsd:attribute name="mapper" use="required">
+		<xsd:annotation>
+			<xsd:documentation><![CDATA[
+The streaming mapper command to run.
+			]]></xsd:documentation>
+		</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="reducer" use="required">
+		<xsd:annotation>
+			<xsd:documentation><![CDATA[
+The streaming reducer command to run.
+			]]></xsd:documentation>
+	 	</xsd:annotation>			
+		</xsd:attribute>
+		<xsd:attribute name="combiner">
+		<xsd:annotation>
+			<xsd:documentation><![CDATA[
+The combiner class name.
+			]]></xsd:documentation>
+			<xsd:appinfo>
+				<tool:annotation kind="direct">
+					<tool:expected-type type="java.lang.Class" />
+					<tool:assignable-to type="org.apache.hadoop.mapreduce.Reducer" />
+				</tool:annotation>
+			</xsd:appinfo>
+	 	</xsd:annotation>			
+		</xsd:attribute>
+		<xsd:attribute name="input-format">
+		<xsd:annotation>
+			<xsd:appinfo>
+				<tool:annotation kind="direct">
+					<tool:expected-type type="java.lang.Class" />
+					<tool:assignable-to type="org.apache.hadoop.mapreduce.InputFormat" />
+				</tool:annotation>
+			</xsd:appinfo>
+	 	</xsd:annotation>			
+		</xsd:attribute>
+		<xsd:attribute name="output-format">
+		<xsd:annotation>
+			<xsd:appinfo>
+				<tool:annotation kind="direct">
+					<tool:expected-type type="java.lang.Class" />
+					<tool:assignable-to type="org.apache.hadoop.mapreduce.OutputFormat" />
+				</tool:annotation>
+			</xsd:appinfo>
+	 	</xsd:annotation>			
+		</xsd:attribute>
+		<xsd:attribute name="partitioner">
+		<xsd:annotation>
+			<xsd:appinfo>
+				<tool:annotation kind="direct">
+					<tool:expected-type type="java.lang.Class" />
+					<tool:assignable-to type="org.apache.hadoop.mapreduce.Partitioner" />
+				</tool:annotation>
+			</xsd:appinfo>
+	 	</xsd:annotation>			
+		</xsd:attribute>
+		<xsd:attribute name="input-path" use="required">
+		<xsd:annotation>
+			<xsd:appinfo>
+				<tool:annotation kind="direct">
+					<tool:expected-type type="java.lang.String[]" />
+				</tool:annotation>
+			</xsd:appinfo>
+	 	</xsd:annotation>			
+		</xsd:attribute>
+		<xsd:attribute name="output-path" use="required">
+		<xsd:annotation>
+			<xsd:appinfo>
+				<tool:annotation kind="direct">
+					<tool:expected-type type="java.lang.String" />
+				</tool:annotation>
+			</xsd:appinfo>
+	 	</xsd:annotation>			
+		</xsd:attribute>
+		<xsd:attribute name="configuration-ref">
+		<xsd:annotation>
+				<xsd:documentation source="org.apache.hadoop.conf.Configuration"><![CDATA[
+Optional Hadoop configuration]]></xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref">
+						<tool:expected-type type="org.apache.hadoop.conf.Configuration" />
+					</tool:annotation>
+				</xsd:appinfo>
+	 	</xsd:annotation>			
+		</xsd:attribute>
+		<xsd:attribute name="number-reducers">
+		<xsd:annotation>
+			<xsd:appinfo>
+				<tool:annotation kind="direct">
+					<tool:expected-type type="java.lang.Integer" />
+				</tool:annotation>
+			</xsd:appinfo>
+	 	</xsd:annotation>			
+		</xsd:attribute>
+		<xsd:attribute name="file">
+		<xsd:annotation>
+			<xsd:appinfo>
+				<tool:annotation kind="direct">
+					<tool:expected-type type="java.lang.String[]" />
+				</tool:annotation>
+			</xsd:appinfo>
+	 	</xsd:annotation>			
+		</xsd:attribute>
+		<xsd:attribute name="archive">
+		<xsd:annotation>
+			<xsd:appinfo>
+				<tool:annotation kind="direct">
+					<tool:expected-type type="java.lang.String[]" />
+				</tool:annotation>
+			</xsd:appinfo>
+	 	</xsd:annotation>			
+		</xsd:attribute>
+		<xsd:attribute name="lib">
+		<xsd:annotation>
+			<xsd:appinfo>
+				<tool:annotation kind="direct">
+					<tool:expected-type type="java.lang.String[]" />
+				</tool:annotation>
+			</xsd:appinfo>
+	 	</xsd:annotation>			
+		</xsd:attribute>
+		
+		</xsd:complexType>
+	</xsd:element>
+	
 </xsd:schema>

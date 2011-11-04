@@ -15,20 +15,27 @@
  */
 package org.springframework.data.hadoop.configuration;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.streaming.StreamJob;
+import org.apache.hadoop.util.GenericOptionsParser;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.util.Assert;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -40,16 +47,18 @@ import org.springframework.util.StringUtils;
  * 
  * @author Costin Leau
  */
+// TODO: allow additional arguments to be specified command-line style
 public class StreamJobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanNameAware, ApplicationContextAware {
 
 	private Job job;
 	private String name;
 	private ApplicationContext context;
-	private String input, output, mapper, reducer, combiner, inputFormat, outputFormat, partitioner, cacheFile,
-			cacheArchive;
+	private String output, mapper, reducer, combiner, inputFormat, outputFormat, partitioner;
+	private Integer numReduceTasks;
+	private String[] input, file, libJar, archive;
+
 	private Configuration configuration;
 	private Map<String, String> env;
-	private Map<String, String> arg;
 
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.context = applicationContext;
@@ -72,43 +81,65 @@ public class StreamJobFactoryBean implements InitializingBean, FactoryBean<Job>,
 	}
 
 	public void afterPropertiesSet() throws Exception {
+		Assert.isTrue(!ObjectUtils.isEmpty(input), "at least one input required");
+		Assert.hasText(output, "the output is required");
+
 		Configuration cfg = (configuration != null ? new Configuration(configuration) : new Configuration());
+
+		buildGenericOptions(cfg);
 
 		Map<String, String> args = new LinkedHashMap<String, String>();
 
-		// add arguments
-		addArgument(input, "-input", args);
+		// add unique arguments
 		addArgument(output, "-output", args);
 		addArgument(mapper, "-mapper", args);
 		addArgument(reducer, "-reducer", args);
 		addArgument(combiner, "-combiner", args);
+		addArgument(partitioner, "-partitioner", args);
 		addArgument(inputFormat, "-inputformat", args);
 		addArgument(outputFormat, "-outputformat", args);
-		addArgument(cacheFile, "-cacheFile", args);
-		addArgument(cacheArchive, "-cacheArchive", args);
+
+		if (numReduceTasks != null)
+			addArgument(numReduceTasks.toString(), "-numReduceTasks", args);
+
+		// translate map to list
+		List<String> argsList = new ArrayList<String>(args.size() * 2 + 16);
+
+		for (Map.Entry<String, String> entry : args.entrySet()) {
+			argsList.add(entry.getKey());
+			argsList.add(entry.getValue());
+		}
+
+		// add recurring arguments
+		addArgument(input, "-input", argsList);
+
+		job = new Job(createStreamJob(cfg, argsList.toArray(new String[argsList.size()])));
+	}
+
+	private void buildGenericOptions(Configuration cfg) {
+
+		List<String> args = new ArrayList<String>();
+
+		// add known arguments first
+		addArgument(file, "-files", args);
+		addArgument(libJar, "-libjars", args);
+		addArgument(archive, "-archives", args);
+
 
 		// add cmd env
 		if (env != null) {
 			for (Entry<String, String> entry : env.entrySet()) {
-				args.put("-cmdenv", entry.getKey() + "=" + entry.getValue());
+				args.add("-D");
+				args.add(entry.getKey() + "=" + entry.getValue());
 			}
 		}
 
-		// add arg env
-		if (arg != null) {
-			args.putAll(arg);
+		// populate config object
+		try {
+			new GenericOptionsParser(cfg, args.toArray(new String[args.size()]));
+		} catch (IOException ex) {
+			throw new IllegalStateException(ex);
 		}
-
-		// translate map to array
-		String[] argsArray = new String[args.size() * 2];
-
-		int i = -1;
-		for (Map.Entry<String, String> entry : args.entrySet()) {
-			argsArray[++i] = entry.getKey();
-			argsArray[++i] = entry.getValue();
-		}
-
-		job = new Job(createStreamJob(cfg, argsArray));
 	}
 
 	private Configuration createStreamJob(Configuration cfg, String[] args) {
@@ -117,20 +148,29 @@ public class StreamJobFactoryBean implements InitializingBean, FactoryBean<Job>,
 		job.setConf(cfg);
 		Field argv = ReflectionUtils.findField(job.getClass(), "argv_");
 		// job.argv_ = args
+		ReflectionUtils.makeAccessible(argv);
 		ReflectionUtils.setField(argv, job, args);
 
 		// job.init();
-		ReflectionUtils.invokeMethod(ReflectionUtils.findMethod(job.getClass(), "init"), job);
+		invokeMethod(job, "init");
 		// job.preProcessArgs();
-		ReflectionUtils.invokeMethod(ReflectionUtils.findMethod(job.getClass(), "preProcessArgs"), job);
+		invokeMethod(job, "preProcessArgs");
 		// job.parseArgv();
-		ReflectionUtils.invokeMethod(ReflectionUtils.findMethod(job.getClass(), "parseArgv"), job);
+		invokeMethod(job, "parseArgv");
 		// job.postProcessArgs();
-		ReflectionUtils.invokeMethod(ReflectionUtils.findMethod(job.getClass(), "postProcessArgs"), job);
+		invokeMethod(job, "postProcessArgs");
 		// job.setJobConf();
-		ReflectionUtils.invokeMethod(ReflectionUtils.findMethod(job.getClass(), "setJobConf"), job);
+		invokeMethod(job, "setJobConf");
 		// return job.jobConf_;
-		return (Configuration) ReflectionUtils.getField(ReflectionUtils.findField(job.getClass(), "jobConf_"), job);
+		Field jobConf = ReflectionUtils.findField(job.getClass(), "jobConf_");
+		ReflectionUtils.makeAccessible(jobConf);
+		return (Configuration) ReflectionUtils.getField(jobConf, job);
+	}
+
+	private static void invokeMethod(Object target, String methodName) {
+		Method m = ReflectionUtils.findMethod(target.getClass(), methodName);
+		ReflectionUtils.makeAccessible(m);
+		ReflectionUtils.invokeMethod(m, target);
 	}
 
 	private static void addArgument(String arg, String name, Map<String, String> args) {
@@ -139,17 +179,26 @@ public class StreamJobFactoryBean implements InitializingBean, FactoryBean<Job>,
 		}
 	}
 
+	private static void addArgument(String[] args, String name, List<String> list) {
+		if (!ObjectUtils.isEmpty(args)) {
+			for (String string : args) {
+				list.add(name);
+				list.add(string.trim());
+			}
+		}
+	}
+
 	/**
 	 * @param input The input to set.
 	 */
-	public void setInput(String input) {
+	public void setInputPath(String[] input) {
 		this.input = input;
 	}
 
 	/**
 	 * @param output The output to set.
 	 */
-	public void setOutput(String output) {
+	public void setOutputPath(String output) {
 		this.output = output;
 	}
 
@@ -196,17 +245,17 @@ public class StreamJobFactoryBean implements InitializingBean, FactoryBean<Job>,
 	}
 
 	/**
-	 * @param cacheFile The cacheFile to set.
+	 * @param files The cacheFile to set.
 	 */
-	public void setCacheFile(String cacheFile) {
-		this.cacheFile = cacheFile;
+	public void setFile(String[] files) {
+		this.file = files;
 	}
 
 	/**
-	 * @param cacheArchive The cacheArchive to set.
+	 * @param archives The cacheArchive to set.
 	 */
-	public void setCacheArchive(String cacheArchive) {
-		this.cacheArchive = cacheArchive;
+	public void setArchive(String[] archives) {
+		this.archive = archives;
 	}
 
 	/**
@@ -226,10 +275,16 @@ public class StreamJobFactoryBean implements InitializingBean, FactoryBean<Job>,
 	}
 
 	/**
-	 * Sets additional arguments to be used for the streaming job.
-	 * @param arg The arg to set.
+	 * @param numReduceTasks The numReduceTasks to set.
 	 */
-	public void setArg(Map<String, String> arg) {
-		this.arg = arg;
+	public void setNumReduceTasks(Integer numReduceTasks) {
+		this.numReduceTasks = numReduceTasks;
+	}
+
+	/**
+	 * @param libJars The libJars to set.
+	 */
+	public void setLibJar(String[] libJars) {
+		this.libJar = libJars;
 	}
 }

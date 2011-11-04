@@ -15,11 +15,11 @@
  */
 package org.springframework.data.hadoop.batch;
 
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.streaming.StreamJob;
+import org.apache.hadoop.mapreduce.Job;
 import org.junit.Test;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericXmlApplicationContext;
 
 /**
@@ -44,19 +44,36 @@ public class StreamingTest {
 
 		ctx.registerShutdownHook();
 
+		cleanOutput(ctx);
 
+		Job job = ctx.getBean("vanilla-stream-job", Job.class);
+		job.waitForCompletion(true);
+
+		// equivalent
+		// 	Configuration cfg = ctx.getBean(Configuration.class);
+		//	StreamJob stream = new StreamJob();
+		//	stream.setConf(cfg);
+		//	String[] args = new String[] { "-verbose", "-input", "test", "-output", "output", "-mapper",
+		//				"E:\\tools\\nix\\unxutils\\cat", "-reducer", "E:\\tools\\nix\\unxutils\\wc" };
+//	stream.run(args);
+
+	}
+
+	@Test
+	public void testStreamingNS() throws Exception {
+		GenericXmlApplicationContext ctx = new GenericXmlApplicationContext(
+				"/org/springframework/data/hadoop/streaming/basic.xml");
+
+		ctx.registerShutdownHook();
+
+		cleanOutput(ctx);
+		Job job = ctx.getBean("ns-stream-job", Job.class);
+		job.waitForCompletion(true);
+	}
+
+	private void cleanOutput(ApplicationContext ctx) throws Exception {
 		FileSystem fs = ctx.getBean(FileSystem.class);
 		fs.copyFromLocalFile(new Path("./build.gradle"), new Path("test/"));
 		fs.delete(new Path("output"), true);
-
-		Configuration cfg = ctx.getBean(Configuration.class);
-		StreamJob stream = new StreamJob();
-		stream.setConf(cfg);
-
-
-		String[] args = new String[] { "-verbose", "-input", "test", "-output", "output", "-mapper",
-				"E:\\tools\\nix\\unxutils\\cat", "-reducer", "E:\\tools\\nix\\unxutils\\wc" };
-		stream.run(args);
-
 	}
 }
