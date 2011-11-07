@@ -17,18 +17,18 @@ package org.springframework.data.hadoop.config;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
-import org.springframework.data.hadoop.configuration.MapperFactoryBean;
+import org.springframework.data.hadoop.mapreduce.MapperFactoryBean;
 import org.w3c.dom.Element;
 
 /**
  * 
- * Parser for {@link org.springframework.data.hadoop.configuration.MapperFactoryBean}
+ * Parser for {@link org.springframework.data.hadoop.mapreduce.MapperFactoryBean}
  * instances as defined in a &lt;mapper&gt; element.
  * 
  * @author Josh Long
  * @since 1.0
- * @see org.springframework.data.hadoop.configuration.MapperFactoryBean
- * @see org.springframework.data.hadoop.configuration.AutowiredJobFactoryBean
+ * @see org.springframework.data.hadoop.mapreduce.MapperFactoryBean
+ * @see org.springframework.data.hadoop.mapreduce.AutowiredJobFactoryBean
  * 
  */
 class MapperParser extends AbstractSingleBeanDefinitionParser {

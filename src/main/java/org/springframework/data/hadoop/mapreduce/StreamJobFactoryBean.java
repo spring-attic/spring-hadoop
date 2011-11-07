@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.hadoop.configuration;
+package org.springframework.data.hadoop.mapreduce;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -114,6 +114,7 @@ public class StreamJobFactoryBean implements InitializingBean, FactoryBean<Job>,
 		addArgument(input, "-input", argsList);
 
 		job = new Job(createStreamJob(cfg, argsList.toArray(new String[argsList.size()])));
+		job.setJobName(name);
 	}
 
 	private void buildGenericOptions(Configuration cfg) {

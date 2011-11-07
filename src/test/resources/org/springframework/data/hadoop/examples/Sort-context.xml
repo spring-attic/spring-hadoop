@@ -3,20 +3,16 @@
 	xmlns:context="http://www.springframework.org/schema/context" xmlns:util="http://www.springframework.org/schema/util"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
-	<bean id="sortJob" class="org.springframework.data.hadoop.configuration.JobFactoryBean">
-		<property name="inputPaths" value="${input.path:bin/input}" />
-		<property name="outputPath" value="${output.path:bin/output}" />
-		<property name="outputKeyClass" value="${output.key.class:org.apache.hadoop.io.BytesWritable}" />
-		<property name="outputValueClass" value="${output.value.class:org.apache.hadoop.io.BytesWritable}" />
+	<bean id="sortJob" class="org.springframework.data.hadoop.mapreduce.JobFactoryBean">
+		<property name="inputPaths" value="${input.path:input}" />
+		<property name="outputPath" value="${output.path:output}" />
+		<property name="key" value="${output.key.class:org.apache.hadoop.io.BytesWritable}" />
+		<property name="value" value="${output.value.class:org.apache.hadoop.io.BytesWritable}" />
 		<property name="numReduceTasks" value="${mapred.reduce.tasks:#{sortSample.numReduceTasks}}" />
-		<property name="inputFormat">
-			<bean class="${input.format:org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat}" />
-		</property>
-		<property name="outputFormat">
-			<bean class="${output.format:org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat}" />
-		</property>
+		<property name="inputFormat" value="${input.format:org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat}"/>
+		<property name="outputFormat" value="${output.format:org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat}"/>
 	</bean>
 
 	<bean id="sort" class="org.springframework.data.hadoop.examples.Sort">

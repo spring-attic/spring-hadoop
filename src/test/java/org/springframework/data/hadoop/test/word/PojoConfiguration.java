@@ -25,8 +25,8 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.hadoop.configuration.MapperFactoryBean;
-import org.springframework.data.hadoop.configuration.ReducerFactoryBean;
+import org.springframework.data.hadoop.mapreduce.MapperFactoryBean;
+import org.springframework.data.hadoop.mapreduce.ReducerFactoryBean;
 
 /**
  * @author Dave Syer

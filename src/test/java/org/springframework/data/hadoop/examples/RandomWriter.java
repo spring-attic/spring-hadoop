@@ -43,7 +43,7 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.data.hadoop.JobTemplate;
+import org.springframework.data.hadoop.mapreduce.JobTemplate;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
@@ -225,12 +225,12 @@ public class RandomWriter extends Configured implements Tool, InitializingBean {
 		}
 	}
 
-	public RandomMapper getMapper() {
-		return new RandomMapper();
+	public Class<?> getMapper() {
+		return RandomMapper.class;
 	}
 
-	public RandomInputFormat getInputFormat() {
-		return new RandomInputFormat();
+	public Class<?> getInputFormat() {
+		return RandomInputFormat.class;
 	}
 
 	@Override

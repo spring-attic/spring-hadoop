@@ -1,7 +1,5 @@
 package org.springframework.data.hadoop.test.word;
 
-import static org.junit.Assert.assertTrue;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.After;
@@ -9,9 +7,12 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.data.hadoop.JobTemplate;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.data.hadoop.mapreduce.JobTemplate;
 import org.springframework.test.annotation.Repeat;
 import org.springframework.util.StopWatch;
+
+import static org.junit.Assert.*;
 
 public class WordCountPerformanceTests {
 
@@ -25,9 +26,9 @@ public class WordCountPerformanceTests {
 	public RepeatProcessor repeats = new RepeatProcessor(0, !System.getProperty("performance.test", "false").equals(
 			"false"));
 
-	private String input = "target/book/input/word";
+	private String input = "book/input/word";
 
-	private String output = "target/output/word";
+	private String output = "output/word";
 
 	private String zipFile = "src/test/resources/book.zip";
 
@@ -40,6 +41,14 @@ public class WordCountPerformanceTests {
 	@Before
 	public void init() throws Exception {
 
+		DefaultResourceLoader loader = new DefaultResourceLoader();
+		String base = loader.getResource(".").getURL().toString();
+		String baseFolder = base.substring(base.substring(0, base.length() - 1).lastIndexOf("/") + 1);
+
+		// path for hadoop which seems to be using the base folder instead of the classpath
+		String inputHD = baseFolder + input;
+		String outputHD = baseFolder + output;
+
 		System.setProperty("input.path", input);
 
 		jobTemplate = new JobTemplate();
@@ -51,13 +60,13 @@ public class WordCountPerformanceTests {
 		}
 
 		setUp.unzip(zipFile, input);
-		setUp.delete(output);
+		setUp.delete(outputHD);
 
-		if (setUp.isClusterOnline()) {
-			setUp.setJarFile("target/spring-hadoop-core-1.0.0.BUILD-SNAPSHOT-test.jar");
-			jobTemplate.setExtraConfiguration(setUp.getExtraConfiguration());
-			setUp.copy(input);
-		}
+		//		if (setUp.isClusterOnline()) {
+		//			setUp.setJarFile("target/spring-hadoop-core-1.0.0.BUILD-SNAPSHOT-test.jar");
+		//			jobTemplate.setExtraConfiguration(setUp.getExtraConfiguration());
+		//			setUp.copy(input);
+		//		}
 
 	}
 

@@ -6,7 +6,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
       	http://www.springframework.org/schema/batch	http://www.springframework.org/schema/batch/spring-batch-2.1.xsd">
 
-	<import resource="batch-common.xml"/>
+	<import resource="../batch-common.xml"/>
 	<import resource="../hadoop-ctx.xml"/>
 	
 	<job id="mainJob" xmlns="http://www.springframework.org/schema/batch">
@@ -47,13 +47,12 @@
 
 	<bean id="hadoop-tasklet" class="org.springframework.data.hadoop.batch.HadoopTasklet" p:job-ref="mr-job" p:wait-for-job="true"/>
 	
-	<bean id="mr-job" class="org.springframework.data.hadoop.configuration.JobFactoryBean"
-		p:resource-loader-ref="hdfsResourceLoader"
+	<bean id="mr-job" class="org.springframework.data.hadoop.mapreduce.JobFactoryBean"
+		p:configuration-ref="fs-config"
 		p:input-paths="/ide-test/input/word/"
 		p:output-path="/ide-test/output/word/"
 		p:mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
 		p:reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"
-		p:key="org.apache.hadoop.io.Text"
-		p:value="org.apache.hadoop.io.IntWritable"/>
+	/>
 	  
 </beans>

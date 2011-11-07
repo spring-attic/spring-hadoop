@@ -17,11 +17,15 @@ package org.springframework.data.hadoop.batch;
 
 import java.net.URL;
 
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FsUrlStreamHandlerFactory;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.mapreduce.Job;
 import org.junit.Test;
 import org.springframework.context.support.GenericXmlApplicationContext;
+import org.springframework.core.io.Resource;
+import org.springframework.data.hadoop.io.HdfsResourceLoader;
 
 
 /**
@@ -35,7 +39,7 @@ public class ReadWriteHdfsTest {
 		URL.setURLStreamHandlerFactory(new FsUrlStreamHandlerFactory());
 	}
 
-	//@Test
+	@Test
 	public void testWorkflow() throws Exception {
 		GenericXmlApplicationContext ctx = new GenericXmlApplicationContext(
 				"/org/springframework/data/hadoop/batch/in-do-out.xml");
@@ -43,10 +47,22 @@ public class ReadWriteHdfsTest {
 		ctx.registerShutdownHook();
 
 		FileSystem fs = ctx.getBean(FileSystem.class);
-		fs.delete(new Path("/ide-test/output/word/"), true);
+		System.out.println("FS is " + fs.getClass().getName());
+		HdfsResourceLoader hrl = ctx.getBean(HdfsResourceLoader.class);
+		Resource resource = hrl.getResource("/ide-test/output/word/");
+
+		fs.delete(new Path(resource.getURI().toString()), true);
 
 		TriggerJobs tj = new TriggerJobs();
 		tj.startJobs(ctx);
+
+		Path p = new Path("/ide-test/output/word/");
+		Job job = (Job) ctx.getBean("mr-job");
+		Configuration c = job.getConfiguration();
+		FileSystem fs2 = p.getFileSystem(c);
+		System.out.println("FS is " + fs2.getClass().getName());
+
+		fs2.exists(p);
 	}
 
 	@Test

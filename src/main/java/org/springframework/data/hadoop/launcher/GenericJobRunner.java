@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.hadoop;
+package org.springframework.data.hadoop.launcher;
 
+import org.springframework.data.hadoop.mapreduce.JobTemplate;
 import org.springframework.util.ClassUtils;
 
 /**

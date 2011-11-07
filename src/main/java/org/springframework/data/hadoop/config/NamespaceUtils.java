@@ -13,20 +13,9 @@
 
 package org.springframework.data.hadoop.config;
 
-import java.util.List;
-
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.BeanDefinitionHolder;
-import org.springframework.beans.factory.config.TypedStringValue;
-import org.springframework.beans.factory.parsing.BeanComponentDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
-import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
-import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.core.Conventions;
-import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
-import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
 
 /**
@@ -36,6 +25,19 @@ import org.w3c.dom.Element;
 abstract class NamespaceUtils {
 
 	static final String REF_ATTRIBUTE = "ref";
+
+	static boolean isReference(String attributeName) {
+		return attributeName.endsWith("-ref");
+	}
+
+	static boolean addReference(Element element, String attributeName, String propertyName, BeanDefinitionBuilder builder) {
+		String beanRef = element.getAttribute(attributeName);
+		if (StringUtils.hasText(beanRef)) {
+			builder.addPropertyReference(propertyName, beanRef);
+			return true;
+		}
+		return false;
+	}
 
 	/**
 	 * Populates the specified bean definition property with the value of the attribute whose name is provided if that
@@ -73,37 +75,6 @@ abstract class NamespaceUtils {
 				Conventions.attributeNameToPropertyName(attributeName));
 	}
 
-	/**
-	 * Populates the bean definition constructor argument with the value of that attribute if it is defined in the given
-	 * element.
-	 * 
-	 * @param builder the bean definition builder to be configured
-	 * @param element the XML element where the attribute should be defined
-	 * @param attributeName the name of the attribute whose value will be used as a constructor argument
-	 */
-	public static void addConstructorArgValueIfAttributeDefined(BeanDefinitionBuilder builder, Element element,
-			String attributeName) {
-		String value = element.getAttribute(attributeName);
-		if (StringUtils.hasText(value)) {
-			builder.addConstructorArgValue(new TypedStringValue(value));
-		}
-	}
-
-	/**
-	 * Populates the bean definition constructor argument with a reference to a bean with id equal to the attribute if
-	 * it is defined in the given element.
-	 * 
-	 * @param builder the bean definition builder to be configured
-	 * @param element the XML element where the attribute should be defined
-	 * @param attributeName the name of the attribute whose value will be used to set the reference
-	 */
-	public static void addConstructorArgRefIfAttributeDefined(BeanDefinitionBuilder builder, Element element,
-			String attributeName) {
-		String value = element.getAttribute(attributeName);
-		if (StringUtils.hasText(value)) {
-			builder.addConstructorArgReference(value);
-		}
-	}
 
 	/**
 	 * Populates the specified bean definition property with the reference to a bean. The bean reference is identified
@@ -144,42 +115,5 @@ abstract class NamespaceUtils {
 			String attributeName) {
 		setReferenceIfAttributeDefined(builder, element, attributeName,
 				Conventions.attributeNameToPropertyName(attributeName));
-	}
-
-	/**
-	 * Provides a user friendly description of an element based on its node name and, if available, its "id" attribute
-	 * value. This is useful for creating error messages from within bean definition parsers.
-	 */
-	public static String createElementDescription(Element element) {
-		String elementId = "'" + element.getNodeName() + "'";
-		String id = element.getAttribute("id");
-		if (StringUtils.hasText(id)) {
-			elementId += " with id='" + id + "'";
-		}
-		return elementId;
-	}
-
-	public static BeanComponentDefinition parseInnerBeanDefinition(Element element, ParserContext parserContext) {
-		// parses out inner bean definition for concrete implementation if defined
-		List<Element> childElements = DomUtils.getChildElementsByTagName(element, "bean");
-		BeanComponentDefinition innerComponentDefinition = null;
-		if (childElements != null && childElements.size() == 1) {
-			Element beanElement = childElements.get(0);
-			BeanDefinitionParserDelegate delegate = parserContext.getDelegate();
-			BeanDefinitionHolder bdHolder = delegate.parseBeanDefinitionElement(beanElement);
-			bdHolder = delegate.decorateBeanDefinitionIfRequired(beanElement, bdHolder);
-			BeanDefinition inDef = bdHolder.getBeanDefinition();
-			String beanName = BeanDefinitionReaderUtils.generateBeanName(inDef, parserContext.getRegistry());
-			innerComponentDefinition = new BeanComponentDefinition(inDef, beanName);
-			parserContext.registerBeanComponent(innerComponentDefinition);
-		}
-
-		String ref = element.getAttribute(REF_ATTRIBUTE);
-		Assert.isTrue(!(StringUtils.hasText(ref) && innerComponentDefinition != null),
-				"Ambiguous definition. Inner bean "
-						+ (innerComponentDefinition == null ? innerComponentDefinition : innerComponentDefinition
-								.getBeanDefinition().getBeanClassName()) + " declaration and \"ref\" " + ref
-						+ " are not allowed together.");
-		return innerComponentDefinition;
 	}
 }

@@ -23,7 +23,7 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.hadoop.configuration.AutowiredJobFactoryBean;
+import org.springframework.data.hadoop.mapreduce.AutowiredJobFactoryBean;
 import org.springframework.data.hadoop.test.word.IntSumReducer;
 import org.springframework.data.hadoop.test.word.TokenizerMapper;
 

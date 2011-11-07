@@ -112,6 +112,8 @@ dependencies {
     testCompile "org.springframework:spring-test:$springVersion"
     testCompile("javax.annotation:jsr250-api:1.0") { optional = true }
     testCompile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
+    testCompile "org.springframework.integration:spring-integration-event:$springIntVersion"
+    testCompile "org.springframework.integration:spring-integration-file:$springIntVersion"
 }
 
 javaprojects = rootProject

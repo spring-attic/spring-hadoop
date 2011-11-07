@@ -50,11 +50,13 @@ public class PigContextFactoryBean implements InitializingBean, FactoryBean<PigC
 	}
 
 	public void afterPropertiesSet() throws Exception {
+		if (StringUtils.hasText(jobTracker)) {
+			properties.setProperty("mapred.job.tracker", jobTracker);
+			// invoking setter below causes NPE since PIG expects the engine to be started already ...
+			// context.setJobtrackerLocation(jobTracker);
+		}
 		context = new PigContext(execType, properties);
 
-		if (StringUtils.hasText(jobTracker)) {
-			context.setJobtrackerLocation(jobTracker);
-		}
 		if (StringUtils.hasText(lastAlias)) {
 			context.setLastAlias(lastAlias);
 		}

@@ -38,19 +38,15 @@ class HadoopTaskletParser extends AbstractSimpleBeanDefinitionParser {
 		boolean eligible = super.isEligibleAttribute(attributeName);
 
 		if (eligible) {
-			return !"job-ref".equals(attributeName);
+			return !NamespaceUtils.isReference(attributeName);
 		}
 
 		return false;
-
 	}
 
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 		super.doParse(element, parserContext, builder);
-
-		String jobRef = element.getAttribute("job-ref");
-
-		builder.addPropertyReference("job", jobRef);
+		NamespaceUtils.addReference(element, "job-ref", "job", builder);
 	}
 }

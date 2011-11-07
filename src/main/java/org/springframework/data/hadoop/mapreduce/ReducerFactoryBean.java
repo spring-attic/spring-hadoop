@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.hadoop.configuration;
+package org.springframework.data.hadoop.mapreduce;
 
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.springframework.core.convert.ConversionService;
-import org.springframework.data.hadoop.mapreduce.ExpressionEvaluatingReducer;
 
 /**
  * @author Dave Syer

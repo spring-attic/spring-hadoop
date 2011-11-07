@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.hadoop;
+package org.springframework.data.hadoop.mapreduce;
 
 import java.io.IOException;
 import java.util.Properties;
@@ -26,6 +26,7 @@ import org.apache.hadoop.mapred.JobClient;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.springframework.data.hadoop.HadoopException;
 import org.springframework.data.hadoop.context.DefaultContextLoader;
 import org.springframework.data.hadoop.context.HadoopApplicationContextUtils;
 import org.springframework.data.hadoop.util.PropertiesUtils;

@@ -17,6 +17,7 @@ package org.springframework.data.hadoop.batch;
 
 import java.util.Map;
 
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.launch.JobLauncher;
@@ -43,7 +44,9 @@ public class TriggerJobs //implements ApplicationListener<ContextRefreshedEvent>
 		for (Map.Entry<String, Job> entry : jobs.entrySet()) {
 			System.out.println("Executing job " + entry.getKey());
 			try {
-				launcher.run(entry.getValue(), new JobParameters());
+				if (launcher.run(entry.getValue(), new JobParameters()).getStatus().equals(BatchStatus.FAILED)){
+					throw new BeanInitializationException("Failed executing job " + entry.getKey());
+				}
 			} catch (Exception ex) {
 				throw new BeanInitializationException("Cannot execute job " + entry.getKey(), ex);
 			}

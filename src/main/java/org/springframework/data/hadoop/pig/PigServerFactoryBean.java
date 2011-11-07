@@ -15,11 +15,13 @@
  */
 package org.springframework.data.hadoop.pig;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.pig.PigServer;
-import org.apache.pig.backend.executionengine.ExecException;
 import org.apache.pig.impl.PigContext;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.DisposableBean;
@@ -37,6 +39,8 @@ import org.springframework.util.StringUtils;
  */
 public class PigServerFactoryBean implements SmartLifecycle, InitializingBean, DisposableBean, FactoryBean<PigServer>,
 		BeanNameAware {
+
+	private static final Log log = LogFactory.getLog(PigServerFactoryBean.class);
 
 	private PigServer pigServer;
 	private volatile boolean running = false;
@@ -66,17 +70,11 @@ public class PigServerFactoryBean implements SmartLifecycle, InitializingBean, D
 
 	public void afterPropertiesSet() throws Exception {
 		PigContext ctx = (pigContext != null ? pigContext : new PigContext());
-		pigServer = new PigServer(ctx);
+		pigServer = new PigServer(ctx, false);
 
 		if (!CollectionUtils.isEmpty(pathToSkip)) {
 			for (String path : pathToSkip) {
 				pigServer.addPathToSkip(path);
-			}
-		}
-
-		if (!CollectionUtils.isEmpty(scripts)) {
-			for (Resource resource : scripts) {
-				pigServer.registerScript(resource.getInputStream());
 			}
 		}
 
@@ -120,8 +118,17 @@ public class PigServerFactoryBean implements SmartLifecycle, InitializingBean, D
 			running = true;
 			try {
 				pigServer.getPigContext().connect();
-			} catch (ExecException ex) {
+				registerScripts();
+			} catch (Exception ex) {
 				throw new IllegalStateException("Cannot start PigServer", ex);
+			}
+		}
+	}
+
+	private void registerScripts() throws IOException {
+		if (!CollectionUtils.isEmpty(scripts)) {
+			for (Resource resource : scripts) {
+				pigServer.registerScript(resource.getInputStream());
 			}
 		}
 	}

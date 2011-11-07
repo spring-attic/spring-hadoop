@@ -154,8 +154,8 @@ public class HdfsResourceLoader implements ResourcePatternResolver, PriorityOrde
 			try {
 				URL.setURLStreamHandlerFactory(new FsUrlStreamHandlerFactory(fs.getConf()));
 				log.info("Registered HDFS URL stream handler");
-			} catch (Throwable ex) {
-				log.warn("Cannot register Hadoop URL stream handler - one is already registered?", ex);
+			} catch (Error err) {
+				log.warn("Cannot register Hadoop URL stream handler - one is already registered");
 			}
 		}
 	}

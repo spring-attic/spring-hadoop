@@ -330,6 +330,15 @@ Defines a Hadoop Job.
 			</xsd:appinfo>
 	 	</xsd:annotation>			
 		</xsd:attribute>
+		<xsd:attribute name="codec">
+		<xsd:annotation>
+			<xsd:appinfo>
+				<tool:annotation kind="direct">
+					<tool:expected-type type="java.lang.Class" />
+				</tool:annotation>
+			</xsd:appinfo>
+	 	</xsd:annotation>			
+		</xsd:attribute>
 		<xsd:attribute name="input-path" use="required">
 		<xsd:annotation>
 			<xsd:appinfo>
@@ -347,6 +356,8 @@ Defines a Hadoop Job.
 				</tool:annotation>
 			</xsd:appinfo>
 	 	</xsd:annotation>			
+		</xsd:attribute>
+		<xsd:attribute name="validate-paths" default="true">
 		</xsd:attribute>
 		<xsd:attribute name="configuration-ref">
 		<xsd:annotation>

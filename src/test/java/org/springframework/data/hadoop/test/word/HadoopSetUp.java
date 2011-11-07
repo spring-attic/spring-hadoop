@@ -25,7 +25,7 @@ import org.apache.hadoop.mapred.JobClient;
 import org.junit.Assume;
 import org.junit.rules.TestWatchman;
 import org.junit.runners.model.FrameworkMethod;
-import org.springframework.data.hadoop.JobTemplate;
+import org.springframework.data.hadoop.mapreduce.JobTemplate;
 
 /**
  * <p>

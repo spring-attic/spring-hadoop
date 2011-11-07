@@ -1,14 +1,15 @@
 package org.springframework.data.hadoop.test.kv;
 
-import static org.junit.Assert.assertTrue;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.data.hadoop.JobTemplate;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.data.hadoop.mapreduce.JobTemplate;
 import org.springframework.data.hadoop.test.word.HadoopSetUp;
+
+import static org.junit.Assert.*;
 
 public class KeyValueIntegrationTests {
 
@@ -22,13 +23,19 @@ public class KeyValueIntegrationTests {
 	@Before
 	public void init() throws Exception {
 		jobTemplate = new JobTemplate();
-		if (setUp.isClusterOnline()) {
-			setUp.setJarFile("target/spring-hadoop-1.0.0.BUILD-SNAPSHOT-test.jar");
-			jobTemplate.setExtraConfiguration(setUp.getExtraConfiguration());
-		}
+		//		if (setUp.isClusterOnline()) {
+		//			setUp.setJarFile("target/spring-hadoop-1.0.0.BUILD-SNAPSHOT-test.jar");
+		//			jobTemplate.setExtraConfiguration(setUp.getExtraConfiguration());
+		//		}
 		jobTemplate.setVerbose(true);
-		setUp.copy("src/test/resources/input/kv", "target/input/kv");
-		setUp.delete("target/output/kv");
+		DefaultResourceLoader loader = new DefaultResourceLoader();
+		String dest = loader.getResource(".").getURL().toString() + "/input/kv";
+
+		setUp.copy("src/test/resources/input/kv", dest);
+		try {
+			setUp.delete(context.getResource("output/kv").getURL().toString());
+		} catch (Exception ex) {
+		}
 	}
 
 	@After

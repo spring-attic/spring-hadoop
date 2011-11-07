@@ -25,7 +25,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.hadoop.configuration.AutowiredJobFactoryBean;
+import org.springframework.data.hadoop.mapreduce.AutowiredJobFactoryBean;
 
 /**
  * @author Dave Syer
@@ -36,7 +36,8 @@ public class JobConfiguration {
 
 	@Bean
 	public FactoryBean<Job> classConfiguredJob(@Value("${input.path:src/test/resources/input/word}") String inputPath,
-			@Value("${output.path:target/output/word}") String outputPath) throws Exception {
+			@Value("${output.path:bin/output/word}") String outputPath)
+			throws Exception {
 		AutowiredJobFactoryBean factory = new AutowiredJobFactoryBean();
 		factory.setMapper(mapper().getClass());
 		factory.setReducer(reducer().getClass());

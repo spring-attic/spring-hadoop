@@ -22,7 +22,7 @@ import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.data.hadoop.configuration.AutowiredJobFactoryBean;
+import org.springframework.data.hadoop.mapreduce.AutowiredJobFactoryBean;
 import org.springframework.stereotype.Component;
 
 /**

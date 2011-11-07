@@ -14,7 +14,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.data.hadoop.JobTemplate;
+import org.springframework.data.hadoop.mapreduce.JobTemplate;
 import org.springframework.data.hadoop.util.PropertiesUtils;
 import org.springframework.util.ClassUtils;
 

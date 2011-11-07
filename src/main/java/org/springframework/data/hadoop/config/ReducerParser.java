@@ -2,23 +2,23 @@ package org.springframework.data.hadoop.config;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
-import org.springframework.data.hadoop.configuration.ReducerFactoryBean;
+import org.springframework.data.hadoop.mapreduce.ReducerFactoryBean;
 import org.w3c.dom.Element;
 
 /**
  * Simple parser for
- * {@link org.springframework.data.hadoop.configuration.ReducerFactoryBean} instances
+ * {@link org.springframework.data.hadoop.mapreduce.ReducerFactoryBean} instances
  * 
  * @author Josh Long
- * @see org.springframework.data.hadoop.configuration.ReducerFactoryBean
- * @see org.springframework.data.hadoop.configuration.AutowiredJobFactoryBean
+ * @see org.springframework.data.hadoop.mapreduce.ReducerFactoryBean
+ * @see org.springframework.data.hadoop.mapreduce.AutowiredJobFactoryBean
  * @since 1.0
  */
 class ReducerParser extends AbstractSingleBeanDefinitionParser {
 
 	/**
 	 * the attribute for the 'target' bean to be used by the
-	 * {@link org.springframework.data.hadoop.configuration.MapperFactoryBean factory
+	 * {@link org.springframework.data.hadoop.mapreduce.MapperFactoryBean factory
 	 * bean}
 	 */
 	public static final String REF_ATTR = "ref";

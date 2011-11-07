@@ -1,0 +1,87 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:hdp="http://www.springframework.org/schema/hadoop"
+	xmlns:c="http://www.springframework.org/schema/c"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+      	http://www.springframework.org/schema/batch	http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
+      	http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop-1.0.xsd">
+
+	<import resource="../batch-common.xml"/>
+	<import resource="../hadoop-ctx.xml"/>
+	<import resource="int-trigger.xml"/>
+	
+	<job id="batch" xmlns="http://www.springframework.org/schema/batch">
+		<step id="import" next="execute-mr">
+			<tasklet>
+				<chunk reader="file-reader" writer="hdfs-writer" commit-interval="10"/>
+			</tasklet>
+		</step>
+		<step id="execute-mr" next="execute-streaming">
+			<tasklet ref="hadoop-mr"/>
+		</step>
+		<step id="execute-streaming" next="execute-pig">
+			<tasklet ref="hadoop-streaming"/>
+		</step>
+		<step id="execute-pig">
+			<tasklet ref="hadoop-pig-tasklet"/>
+		</step>
+	</job>
+	
+	<hdp:tasklet id="hadoop-mr" job-ref="mr-job" wait-for-job="true"/>
+	<hdp:tasklet id="hadoop-streaming" job-ref="stream-job" wait-for-job="true"/>
+	
+	<hdp:job id="mr-job" 
+	    input-path="${log.input}/logs" output-path="${log.output}"
+		mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
+		reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"
+		configuration-ref="fs-config"
+		codec="org.apache.hadoop.io.compress.GzipCodec"
+		validate-paths="false"
+	/>
+
+	<hdp:stream-job id="stream-job" 
+	    input-path="${log.input}/logs" output-path="${log.output}/stream"
+		mapper="${path.cat}"
+		reducer="${path.wc}"
+		configuration-ref="fs-config"
+	/>
+
+	<bean id="pig" class="org.springframework.data.hadoop.pig.PigServerFactoryBean"
+		p:scripts="classpath:org/springframework/data/hadoop/pig/script.pig" p:auto-startup="false">
+		<property name="pigContext">
+			<bean id="pig-ctx" class="org.springframework.data.hadoop.pig.PigContextFactoryBean" p:exec-type="LOCAL"/>
+		</property>
+	</bean>
+		
+	<bean id="hadoop-pig-tasklet" class="org.springframework.batch.core.step.tasklet.MethodInvokingTaskletAdapter">
+	    <property name="targetObject" ref="&amp;pig"/>
+	    <property name="targetMethod" value="start" />
+	</bean>
+	
+	<bean id="file-reader" class="org.springframework.batch.item.file.ResourcesItemReader" p:resources="classpath:${input.directory}/*.log"/>
+
+	<bean id="hdfs-writer" class="org.springframework.data.hadoop.batch.ResourcesItemWriter" 
+		p:resource-loader-ref="hdfsResourceLoader"
+		p:generator-ref="name-generator"
+		p:overwrite="true">
+		
+		<property name="outputStreamDecorator">
+			<bean class="org.springframework.data.hadoop.batch.CompressStreamDecorator">
+				<constructor-arg>
+					<bean class="org.apache.hadoop.io.compress.GzipCodec"/>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="name-generator" class="org.springframework.data.hadoop.batch.ChainedNameGenerator">
+		<property name="generators">
+			<list>
+				<bean class="org.springframework.data.hadoop.batch.BasePathNameGenerator" p:path="." p:remove="true"/>
+				<bean class="org.springframework.data.hadoop.batch.PrefixNameGenerator" p:prefix="${log.input}"/>
+			</list> 
+		</property>
+	</bean>
+</beans>

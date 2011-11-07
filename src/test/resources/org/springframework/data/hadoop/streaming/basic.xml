@@ -14,7 +14,7 @@
 	 
 	<context:property-placeholder location="test.properties"/>
 	
-	<bean id="vanilla-stream-job" class="org.springframework.data.hadoop.configuration.StreamJobFactoryBean"
+	<bean id="vanilla-stream-job" class="org.springframework.data.hadoop.mapreduce.StreamJobFactoryBean"
 		p:configuration-ref="fs-config"
 		p:input-path="test"
 		p:output-path="output"

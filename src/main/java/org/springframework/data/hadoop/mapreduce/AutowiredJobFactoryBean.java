@@ -13,21 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.hadoop.configuration;
+package org.springframework.data.hadoop.mapreduce;
 
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.springframework.data.hadoop.JobTemplate;
-import org.springframework.data.hadoop.mapreduce.AutowiringCombiner;
-import org.springframework.data.hadoop.mapreduce.AutowiringGroupingComparator;
-import org.springframework.data.hadoop.mapreduce.AutowiringInputFormat;
-import org.springframework.data.hadoop.mapreduce.AutowiringMapper;
-import org.springframework.data.hadoop.mapreduce.AutowiringOutputFormat;
-import org.springframework.data.hadoop.mapreduce.AutowiringPartitioner;
-import org.springframework.data.hadoop.mapreduce.AutowiringReducer;
-import org.springframework.data.hadoop.mapreduce.AutowiringSortComparator;
 import org.springframework.util.ObjectUtils;
 
 /**
@@ -64,28 +55,28 @@ public class AutowiredJobFactoryBean extends JobFactoryBean {
 			job.getConfiguration().set(JobTemplate.SPRING_OUTPUT_PATH, oPath.toString());
 		}
 
-		if (job.getMapperClass() != null) {
+		if (job.getMapperClass() == null) {
 			job.setMapperClass(AutowiringMapper.class);
 		}
-		if (job.getCombinerClass() != null) {
+		if (job.getCombinerClass() == null) {
 			job.setCombinerClass(AutowiringCombiner.class);
 		}
-		if (job.getReducerClass() != null) {
+		if (job.getReducerClass() == null) {
 			job.setReducerClass(AutowiringReducer.class);
 		}
-		if (job.getInputFormatClass() != null) {
+		if (job.getInputFormatClass() == null) {
 			job.setInputFormatClass(AutowiringInputFormat.class);
 		}
-		if (job.getOutputFormatClass() != null) {
+		if (job.getOutputFormatClass() == null) {
 			job.setOutputFormatClass(AutowiringOutputFormat.class);
 		}
-		if (job.getSortComparator() != null) {
+		if (job.getSortComparator() == null) {
 			job.setSortComparatorClass(AutowiringSortComparator.class);
 		}
-		if (job.getGroupingComparator() != null) {
+		if (job.getGroupingComparator() == null) {
 			job.setGroupingComparatorClass(AutowiringGroupingComparator.class);
 		}
-		if (job.getPartitionerClass() != null) {
+		if (job.getPartitionerClass() == null) {
 			job.setPartitionerClass(AutowiringPartitioner.class);
 		}
 	}

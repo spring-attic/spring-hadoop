@@ -27,7 +27,7 @@ import org.springframework.data.hadoop.annotation.Key;
 import org.springframework.data.hadoop.annotation.Mapper;
 import org.springframework.data.hadoop.annotation.Reducer;
 import org.springframework.data.hadoop.annotation.Value;
-import org.springframework.data.hadoop.configuration.ExpressionFactory;
+import org.springframework.data.hadoop.mapreduce.ExpressionFactory;
 
 /**
  * @author Dave Syer

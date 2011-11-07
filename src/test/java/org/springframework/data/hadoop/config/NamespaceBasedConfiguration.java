@@ -28,7 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.hadoop.configuration.AutowiredJobFactoryBean;
+import org.springframework.data.hadoop.mapreduce.AutowiredJobFactoryBean;
 
 /**
  * Simple POJO configuration for the things that we can't (yet) configure using
@@ -40,9 +40,9 @@ import org.springframework.data.hadoop.configuration.AutowiredJobFactoryBean;
 @Configuration
 public class NamespaceBasedConfiguration {
 
-	@Value("${input.path:src/test/resources/input}")
+	@Value("${input.path:input}")
 	private String inputPath;
-	@Value("${output.path:target/output}")
+	@Value("${output.path:output}")
 	private String outputPath;
 
 	@Bean
@@ -73,7 +73,7 @@ public class NamespaceBasedConfiguration {
 		return new Object() {
 			/**
 			 * another public method to throw the
-			 * {@link org.springframework.data.hadoop.configuration.ReducerFactoryBean}
+			 * {@link org.springframework.data.hadoop.mapreduce.ReducerFactoryBean}
 			 * off. Must be specified in the XML
 			 * 
 			 */
@@ -96,7 +96,7 @@ public class NamespaceBasedConfiguration {
 		return new Object() {
 			/**
 			 * another public method to throw the
-			 * {@link org.springframework.data.hadoop.configuration.MapperFactoryBean}
+			 * {@link org.springframework.data.hadoop.mapreduce.MapperFactoryBean}
 			 * off. Must be specified in the XML
 			 * 
 			 */

@@ -4,9 +4,11 @@
 	xsi:schemaLocation="
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd
-http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
 	<context:component-scan base-package="org.springframework.data.hadoop.config" />
+	
+	<context:property-placeholder/>
 
 	<hadoop:mapper id="mapper" output-key-type="org.apache.hadoop.io.IntWritable" output-value-type="org.apache.hadoop.io.Text"
 		ref="pojoMapper" method="map" />

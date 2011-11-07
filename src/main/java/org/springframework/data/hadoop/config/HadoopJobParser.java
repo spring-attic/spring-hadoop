@@ -18,7 +18,7 @@ package org.springframework.data.hadoop.config;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractSimpleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.data.hadoop.configuration.JobFactoryBean;
+import org.springframework.data.hadoop.mapreduce.JobFactoryBean;
 import org.w3c.dom.Element;
 
 /**
@@ -38,18 +38,15 @@ class HadoopJobParser extends AbstractSimpleBeanDefinitionParser {
 		boolean eligible = super.isEligibleAttribute(attributeName);
 
 		if (eligible) {
-			return !"configuration-ref".equals(attributeName);
+			return !NamespaceUtils.isReference(attributeName);
 		}
 
 		return false;
-
 	}
 
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 		super.doParse(element, parserContext, builder);
-
-		String configRef = element.getAttribute("configuration-ref");
-		builder.addPropertyReference("configuration", configRef);
+		NamespaceUtils.addReference(element, "configuration-ref", "configuration", builder);
 	}
 }

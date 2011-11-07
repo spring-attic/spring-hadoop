@@ -28,7 +28,7 @@ import org.apache.hadoop.mapred.ClusterStatus;
 import org.apache.hadoop.mapred.JobClient;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
-import org.springframework.data.hadoop.JobTemplate;
+import org.springframework.data.hadoop.mapreduce.JobTemplate;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
@@ -125,5 +125,4 @@ public class Sort extends Configured implements Tool {
 		int res = ToolRunner.run(new Configuration(), new Sort(), args);
 		System.exit(res);
 	}
-
 }

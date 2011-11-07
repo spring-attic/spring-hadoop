@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.hadoop.configuration;
+package org.springframework.data.hadoop.mapreduce;
 
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.RawComparator;
 import org.apache.hadoop.io.compress.CompressionCodec;
@@ -34,14 +35,12 @@ import org.apache.hadoop.mapreduce.Partitioner;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
+import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.data.hadoop.io.HdfsResourceLoader;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -52,10 +51,7 @@ import org.springframework.util.StringUtils;
  * @author Costin Leau
  */
 // TODO: extract input/output format configs
-public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanNameAware, ApplicationContextAware {
-
-	private ResourceLoader resourceLoader;
-	private ApplicationContext context;
+public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanNameAware {
 
 	private Job job;
 	private Configuration configuration;
@@ -88,6 +84,7 @@ public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanN
 	private String outputPath;
 	private Boolean compressOutput;
 	private Class<? extends CompressionCodec> codecClass;
+	private Boolean validatePaths = Boolean.TRUE;
 
 	public void setBeanName(String name) {
 		this.name = name;
@@ -106,12 +103,6 @@ public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanN
 	}
 
 	public void afterPropertiesSet() throws Exception {
-		Assert.isTrue(resourceLoader != null || context != null, "a resource loader is required");
-
-		if (resourceLoader == null) {
-			resourceLoader = context;
-		}
-
 		job = (configuration != null ? new Job(configuration) : new Job());
 
 
@@ -177,14 +168,16 @@ public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanN
 			conf.setJar(jar.getURI().toString());
 		}
 
+		ResourcePatternResolver rl = new HdfsResourceLoader(FileSystem.get(job.getConfiguration()));
+
 		if (!CollectionUtils.isEmpty(inputPaths)) {
 			for (String path : inputPaths) {
-				FileInputFormat.addInputPath(job, resolveResource(path));
+				FileInputFormat.addInputPath(job, validatePaths(path, rl, true));
 			}
 		}
 
 		if (StringUtils.hasText(outputPath)) {
-			FileOutputFormat.setOutputPath(job, resolveResource(outputPath));
+			FileOutputFormat.setOutputPath(job, validatePaths(outputPath, rl, false));
 		}
 
 		if (compressOutput != null) {
@@ -214,12 +207,17 @@ public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanN
 			if (params.length == 4) {
 				// set each param (if possible);
 				if (params[2] instanceof Class) {
-					j.setMapOutputKeyClass((Class) params[2]);
+					Class clz = (Class) params[2];
+					if (!clz.isInterface())
+						j.setMapOutputKeyClass(clz);
 				}
 
 				// set each param (if possible);
 				if (params[3] instanceof Class) {
-					j.setMapOutputValueClass((Class) params[3]);
+					Class clz = (Class) params[3];
+					if (!clz.isInterface()) {
+						j.setMapOutputValueClass(clz);
+					}
 				}
 			}
 		}
@@ -229,27 +227,24 @@ public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanN
 		// don't do anything yet
 	}
 
-	private Path resolveResource(String path) throws IOException {
-		return new Path(resourceLoader != null ? resourceLoader.getResource(path).getURI().toString() : path);
+	private Path validatePaths(String path, ResourcePatternResolver resourceLoader, boolean shouldExist)
+			throws IOException {
+		if (Boolean.TRUE.equals(validatePaths)) {
+			Resource res = resourceLoader.getResource(path);
+
+			if (shouldExist) {
+				Assert.isTrue(res.exists(), "The input path [" + path + "] does not exist");
+			}
+			else {
+				Assert.isTrue(!res.exists(), "The output path [" + path + "] already exists");
+			}
+		}
+
+		return new Path(path);
 	}
 
 	protected void processJob(Job job) throws Exception {
 		// no-op
-	}
-
-	public void setResourceLoader(ResourceLoader loader) {
-		this.resourceLoader = loader;
-	}
-
-	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-		this.context = applicationContext;
-	}
-
-	/**
-	 * @param context The context to set.
-	 */
-	public void setContext(ApplicationContext context) {
-		this.context = context;
 	}
 
 	/**
@@ -418,7 +413,14 @@ public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanN
 	/**
 	 * @param codecClass The codecClass to set.
 	 */
-	public void setCodecClass(Class<? extends CompressionCodec> codecClass) {
+	public void setCodec(Class<? extends CompressionCodec> codecClass) {
 		this.codecClass = codecClass;
+	}
+
+	/**
+	 * @param validatePaths The validatePaths to set.
+	 */
+	public void setValidatePaths(Boolean validatePaths) {
+		this.validatePaths = validatePaths;
 	}
 }

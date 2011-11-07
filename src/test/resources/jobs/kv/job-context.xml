@@ -6,7 +6,7 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
 http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop-1.0.xsd
 http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
-	<bean id="autowiredWordCount" class="org.springframework.data.hadoop.configuration.JobFactoryBean">
+	<bean id="autowiredWordCount" class="org.springframework.data.hadoop.mapreduce.JobFactoryBean">
 		<property name="mapper" ref="mapper" />
 		<property name="reducer" ref="reducer" />
 		<property name="inputPaths" value="target/input/kv" />
