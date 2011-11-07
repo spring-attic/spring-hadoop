@@ -16,8 +16,6 @@
 
 package org.springframework.data.hadoop.examples;
 
-import static org.junit.Assert.assertEquals;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapred.ClusterStatus;
 import org.apache.hadoop.mapred.JobClient;
@@ -25,6 +23,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.data.hadoop.test.word.HadoopSetUp;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Dave Syer
@@ -37,7 +37,7 @@ public class SortTests {
 
 	@Before
 	public void init() throws Exception {
-		setUp.delete("bin/output");
+		//setUp.delete("bin/output");
 	}
 
 	@Test
@@ -66,7 +66,8 @@ public class SortTests {
 
 	@Test
 	public void testSort() throws Exception {
-		setUp.copy("bin/binary", "bin/input");
+		//setUp.copy("bin/binary", "bin/input");
+		//setUp.copy("bin/binary", "bin/input");
 		// Always local because the configuration hasn't been set up for the cluster
 		new Sort().run(new String[0]);
 	}

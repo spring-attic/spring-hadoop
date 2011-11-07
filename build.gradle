@@ -56,9 +56,11 @@ apply plugin: 'bundlor'  // all core projects should be OSGi-compliant
 bundlor.useProjectProps = true
 [compileJava, compileTestJava]*.options*.compilerArgs = ["-Xlint:-serial"]
 
-//test {
-//    forkEvery = 1
-//}
+test {
+    //forkEvery = 1
+    systemProperties['input.path'] = 'build/classes/test/input'
+    systemProperties['output.path'] = 'build/classes/test/output'
+}
 
 // Common dependencies
 dependencies {

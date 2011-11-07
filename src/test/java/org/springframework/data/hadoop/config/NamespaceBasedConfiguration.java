@@ -40,9 +40,9 @@ import org.springframework.data.hadoop.mapreduce.AutowiredJobFactoryBean;
 @Configuration
 public class NamespaceBasedConfiguration {
 
-	@Value("${input.path:input}")
+	@Value("${input.path:bin/input}")
 	private String inputPath;
-	@Value("${output.path:output}")
+	@Value("${output.path:bin/output}")
 	private String outputPath;
 
 	@Bean

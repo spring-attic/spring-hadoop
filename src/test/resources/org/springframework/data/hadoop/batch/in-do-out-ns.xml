@@ -32,12 +32,6 @@
 	
 	<bean id="file-reader" class="org.springframework.batch.item.file.ResourcesItemReader" p:resources="classpath:input/word/*.txt"/>
 
-	<bean id="hdfs-writer" class="org.springframework.data.hadoop.batch.ResourcesItemWriter" 
-		p:resource-loader-ref="hdfsResourceLoader"
-		p:generator-ref="name-generator"
-		p:overwrite="true">
-	</bean>
-
 	<hdp:tasklet id="hadoop-tasklet" job-ref="mr-job" wait-for-job="true"/>
 	
 	<hdp:job id="mr-job" 
@@ -45,5 +39,6 @@
 		mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
 		reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"
 		configuration-ref="fs-config"
+		validate-paths="false"
 	/>
 </beans>

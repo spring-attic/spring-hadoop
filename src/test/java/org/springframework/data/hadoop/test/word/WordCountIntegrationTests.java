@@ -1,7 +1,5 @@
 package org.springframework.data.hadoop.test.word;
 
-import static org.junit.Assert.assertTrue;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
@@ -18,7 +16,9 @@ import org.springframework.data.hadoop.mapreduce.JobTemplate;
 import org.springframework.data.hadoop.util.PropertiesUtils;
 import org.springframework.util.ClassUtils;
 
-public class WordCountIntegrationTests {
+import static org.junit.Assert.*;
+
+public abstract class WordCountIntegrationTests {
 
 	@Rule
 	public HadoopSetUp setUp = HadoopSetUp.preferClusterRunning("localhost", 9001);
@@ -97,7 +97,6 @@ public class WordCountIntegrationTests {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		new WordCountIntegrationTests().testXmlConfiguredJob();
+		//		new WordCountIntegrationTests().testXmlConfiguredJob();
 	}
-
 }

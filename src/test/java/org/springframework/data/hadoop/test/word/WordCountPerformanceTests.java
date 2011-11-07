@@ -14,7 +14,7 @@ import org.springframework.util.StopWatch;
 
 import static org.junit.Assert.*;
 
-public class WordCountPerformanceTests {
+public abstract class WordCountPerformanceTests {
 
 	private static Log logger = LogFactory.getLog(WordCountPerformanceTests.class);
 

@@ -3,7 +3,6 @@ package org.springframework.data.hadoop.test.kv;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.data.hadoop.mapreduce.JobTemplate;
@@ -11,7 +10,7 @@ import org.springframework.data.hadoop.test.word.HadoopSetUp;
 
 import static org.junit.Assert.*;
 
-public class KeyValueIntegrationTests {
+public abstract class KeyValueIntegrationTests {
 
 	@Rule
 	public HadoopSetUp setUp = HadoopSetUp.preferClusterRunning("localhost", 9001);
@@ -45,7 +44,7 @@ public class KeyValueIntegrationTests {
 		}
 	}
 
-	@Test
+	//@Test
 	public void testKeyValueInputFromFile() throws Exception {
 		assertTrue(jobTemplate.run("classpath:/jobs/kv/job-context.xml"));
 	}

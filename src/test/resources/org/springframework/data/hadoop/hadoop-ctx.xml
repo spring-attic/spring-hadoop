@@ -27,12 +27,19 @@
 	  </property>
 	</bean>
 	
+	<bean id="hdfs-writer" class="org.springframework.data.hadoop.batch.ResourcesItemWriter" 
+		p:resource-loader-ref="hdfsResourceLoader"
+		p:generator-ref="name-generator"
+		p:overwrite="true">
+	</bean>
+	
+	
 	<!-- map the reading resource (file://) to the writing environment (hdfs://) -->
 	<!-- we'll move to an Ant-like model -->	
 	<bean id="name-generator" class="org.springframework.data.hadoop.batch.ChainedNameGenerator">
 		<property name="generators">
 			<list>
-				<bean class="org.springframework.data.hadoop.batch.BasePathNameGenerator" p:path="." p:remove="true"/>
+				<bean class="org.springframework.data.hadoop.batch.BasePathNameGenerator" p:path="classpath:test.properties" p:remove="true"/>
 				<bean class="org.springframework.data.hadoop.batch.PrefixNameGenerator" p:prefix="/ide-test/"/>
 			</list> 
 		</property>

@@ -18,32 +18,10 @@
 		<step id="do">
 			<tasklet ref="hadoop-tasklet"/>
 		</step>
-		<!-- 
-		<step id="export">
-			<tasklet>
-				<chunk reader="hdfs-reader" writer="file-writer" commit-interval="10"/>
-			</tasklet>
-		</step>
-		 -->
 	</job>
 	
 	
-	<bean id="file-reader" class="org.springframework.batch.item.file.ResourcesItemReader" p:resources="classpath:input/word/*.txt"/>
-
-	<bean id="hdfs-writer" class="org.springframework.data.hadoop.batch.ResourcesItemWriter" 
-		p:resource-loader-ref="hdfsResourceLoader"
-		p:generator-ref="name-generator"
-		p:overwrite="true">
-			<!--
-			<property name="outputStreamDecorator">
-				<bean class="org.springframework.data.hadoop.batch.CompressStreamDecorator">
-					<constructor-arg>
-						<bean class="org.apache.hadoop.io.compress.GzipCodec"/>
-					</constructor-arg>
-				</bean>
-			</property>
-			  -->
-	</bean>
+	<bean id="file-reader" class="org.springframework.batch.item.file.ResourcesItemReader" p:resources="classpath:/input/word/*.txt"/>
 
 	<bean id="hadoop-tasklet" class="org.springframework.data.hadoop.batch.HadoopTasklet" p:job-ref="mr-job" p:wait-for-job="true"/>
 	
@@ -53,6 +31,7 @@
 		p:output-path="/ide-test/output/word/"
 		p:mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
 		p:reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"
+		p:validate-paths="false"
 	/>
 	  
 </beans>
