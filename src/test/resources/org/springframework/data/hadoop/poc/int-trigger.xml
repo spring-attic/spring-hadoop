@@ -2,6 +2,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:int="http://www.springframework.org/schema/integration"
 	xmlns:file="http://www.springframework.org/schema/integration/file"
+	xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
       	http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
       	http://www.springframework.org/schema/integration/file http://www.springframework.org/schema/integration/file/spring-integration-file.xsd">
@@ -18,4 +19,13 @@
 	<int:service-activator input-channel="in" output-channel="done" expression="@jobLauncher.run(@batch, new org.springframework.batch.core.JobParameters())"/>
 
 	<int:logging-channel-adapter id="done"/>
+	
+	<int:inbound-channel-adapter channel="logger" ref="resourceLoaderAdapter" method="getResources">
+		<int:poller fixed-rate="2000"/>
+	</int:inbound-channel-adapter>
+	
+	
+	<bean id="resourceLoaderAdapter" class="org.springframework.data.hadoop.integration.ResourcePatternResolverAdapter" p:resource-loader-ref="hdfsResourceLoader" p:location-pattern="/**/*"/>
+
+	<int:logging-channel-adapter id="logger" expression="payload" level="WARN"/>	
 </beans>

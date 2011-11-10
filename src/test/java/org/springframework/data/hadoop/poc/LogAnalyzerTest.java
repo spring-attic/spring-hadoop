@@ -38,6 +38,7 @@ public class LogAnalyzerTest {
 		fs.delete(new Path("/logs/output/"), true);
 		fs.delete(new Path("/logs/output/stream"), true);
 
+
 		Thread.sleep(1000 * 15);
 	}
 }
