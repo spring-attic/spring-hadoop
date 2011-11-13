@@ -226,7 +226,7 @@ task uploadDist(type: org.springframework.gradle.tasks.S3DistroUpload, dependsOn
     group = "Distribution"
     archiveFile = dist.archivePath
     projectKey = 'SGF'
-    projectName = 'Spring GemFire'
+    projectName = 'Spring Hadoop'
 }
 
 defaultTasks 'clean', 'build'
