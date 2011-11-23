@@ -1,84 +1,12 @@
-Spring Hadoop is a framework extension for writing Hadoop jobs that
-benefit from the features of Spring, Spring Batch and Spring
-Integration.  The feature set is limited right now to support for
-dependency injection in simple Hadoop jobs.  If you have ideas about
-how to improve or extend the scope, please feel free to contribute
-(see below for instructions).
+The Spring Hadoop provides extensions to [Spring](http://www.springsource.org/spring-core), [Spring Batch](http://www.springsource.org/spring-batch), and [Spring Integration](http://www.springsource.org/spring-integration) to build manageable and robust pipeline solutions around Hadoop.  
 
-# Getting Started
+Spring Hadoop extends Spring Batch by providing support for reading from and writing to HDFS, running various types of Hadoop jobs (Java MapReduce, Hive, Pig, Streaming), and HBase interactions. An important goal is to provide excellent support for non-Java based developers to be productive using Spring Hadoop and not have to write any Java code to use the core feature set.
 
-Clone the source code and run `mvn install` (we use 2.1.x) from the
-command line, or import as a Maven project into SpringSource Tool
-Suite (STS).  There are some integration tests that show you what you
-can do.  For example (from `WordCountIntegrationTests`):
+Spring Hadoop also applies the familiar Spring programming model to Java MapReduce jobs by providing support for dependency injection of simple jobs as well as a POJO based MapReduce programming model that decouples your MapReduce classes from Hadoop specific details such as base classes and data types.
 
-    JobTemplate jobTemplate = new JobTemplate();
-    jobTemplate.setVerbose(true);
-    assertTrue(jobTemplate.run("/spring/autowired-job-context.xml"));
+You can find out more details on the [wiki](https://github.com/SpringSource/spring-hadoop/wiki).   If you have ideas about how to improve or extend the scope, please feel free to contribute
 
-This runs a simple word count job (per the online tutorial on the
-[Hadoop home
-page](http://hadoop.apache.org/common/docs/r0.20.2/mapred_tutorial.html)).
-Such a simple job doesn't benefit much from dependency injection, but
-it shows the basic principles, and will feel very comfortable to
-existing Spring users.  More complex jobs, especially with externalise
-parameterisation of the components, will benefit greatly from having a
-container to manage the dependencies.
 
-The tests run out of the box in STS (or Eclipse with Maven support),
-or from the command line, e.g:
-
-    $ mvn test -Dtest=WordCountIntegrationTests
-
-You might need to tweak your setup if you use a different IDE because
-the tests use local file paths relative to the project directory.
-Make sure you run the tests in an IDE launching from the project
-directory (not the parent directory).
-
-Windows users need to have [Cygwin](http://www.cygwin.com/) or [MSYS](http://www.mingw.org/)
-available in the classpath as Hadoop relies on various *nix utilities.
-
-The test code above runs the job locally by default.  To run it in a
-Hadoop cluster you need to run the cluster (of course) and provide
-configuration for a jar file containing the job and for the job
-tracker and distributed file system.  You can generate a jar file by
-running `mvn assembly:single` and then using the settings already in
-the test.  The test case also sets up the job tracker host for the job
-configuration (the default settings will work for a local job tracker
-with the settings from the [Hadoop getting started
-guide](http://hadoop.apache.org/common/docs/r0.20.2/quickstart.html)).
-The `HadoopSetUp` test utility is used in the test to sets up the
-cluster properties if it detects the local job tracker.
-
-# POJO Programming
-
-With Spring Hadoop you can write business logic in Plain Old Java
-Objects (POJOs), and have the framework adapt them to the underlying
-API.  For example:
-
-    public class PojoMapReducer {
-
-        @Mapper
-        public void map(String value, Map<String, Integer> writer) {
-            StringTokenizer itr = new StringTokenizer(value);
-            while (itr.hasMoreTokens()) {
-                writer.put(itr.nextToken(), 1);
-            }
-        }
-
-        @Reducer
-        public int reduce(Iterable<Integer> values) {
-            int sum = 0;
-            for (Integer val : values) {
-                sum += val;
-            }
-            return sum;
-        }
-
-    }
-
-See the `PojoConfiguration` in the core tests for an example of how to
-configure the POJO to run as a Hadoop `Mapper` and `Reducer`.
 
 # Contributing to Spring Hadoop
 
