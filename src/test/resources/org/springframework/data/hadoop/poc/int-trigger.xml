@@ -21,7 +21,7 @@
 	<int:logging-channel-adapter id="done"/>
 	
 	<int:resource-inbound-channel-adapter id="hdfs-trigger" channel="logger" pattern-resolver="hdfsResourceLoader" pattern="**/*">
-		<int:poller fixed-rate="2000"/>
+		<int:poller fixed-rate="200"/>
 	</int:resource-inbound-channel-adapter>
 
 	<int:logging-channel-adapter id="logger" expression="T(java.util.Arrays).toString(payload)" level="WARN"/>	
