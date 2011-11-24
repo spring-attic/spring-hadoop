@@ -15,6 +15,7 @@
  */
 package org.springframework.data.hadoop.poc;
 
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.junit.Test;
@@ -34,7 +35,7 @@ public class LogAnalyzerTest {
 
 		ctx.registerShutdownHook();
 
-		FileSystem fs = ctx.getBean(FileSystem.class);
+		FileSystem fs = FileSystem.get(ctx.getBean(Configuration.class));
 		fs.delete(new Path("/logs/output/"), true);
 		fs.delete(new Path("/logs/output/stream"), true);
 

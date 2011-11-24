@@ -15,10 +15,14 @@
  */
 package org.springframework.data.hadoop.configuration;
 
+import java.net.URL;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FsUrlStreamHandlerFactory;
 import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -31,6 +35,8 @@ import org.springframework.core.io.Resource;
  */
 public class ConfigurationFactoryBean implements BeanClassLoaderAware, InitializingBean, FactoryBean<Configuration> {
 
+	private static final Log log = LogFactory.getLog(ConfigurationFactoryBean.class);
+
 	private Configuration config;
 	private Configuration configuration;
 	private boolean loadDefaults = true;
@@ -39,6 +45,7 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 
 	private ClassLoader beanClassLoader = getClass().getClassLoader();
 	private boolean initialize = true;
+	private boolean registerJvmUrl = false;
 
 	public void afterPropertiesSet() throws Exception {
 		config = createConfiguration(configuration);
@@ -82,6 +89,15 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 		}
 
 		postProcessConfiguration(config);
+
+		if (registerJvmUrl) {
+			try {
+				URL.setURLStreamHandlerFactory(new FsUrlStreamHandlerFactory(getObject()));
+				log.info("Registered HDFS URL stream handler");
+			} catch (Error err) {
+				log.warn("Cannot register Hadoop URL stream handler - one is already registered");
+			}
+		}
 	}
 
 	/**
@@ -150,5 +166,9 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 	 */
 	public void setInitialize(boolean initialize) {
 		this.initialize = initialize;
+	}
+
+	public void setRegisterUrlHandler(boolean register) {
+		this.registerJvmUrl = register;
 	}
 }

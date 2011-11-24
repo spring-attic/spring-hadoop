@@ -35,7 +35,7 @@ public class HadoopCfgNsTest {
 	@Resource(name = "hadoop-config")
 	private Configuration simple;
 
-	@Resource(name = "complex")
+	@Resource
 	private Configuration complex;
 
 	@Test

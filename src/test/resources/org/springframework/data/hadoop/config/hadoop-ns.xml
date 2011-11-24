@@ -5,7 +5,7 @@
 	xmlns:hdp="http://www.springframework.org/schema/hadoop"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd" default-lazy-init="true">
 
 
 	<!-- default -->
@@ -17,4 +17,7 @@
 		<entry key="test.name.2" value="complex"/>
 	</hdp:config>
 	
+	<!-- default hdfs resource loader 
+	<hdp:resource-loader />
+	-->
 </beans>

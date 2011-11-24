@@ -36,7 +36,6 @@
 	    input-path="${log.input}/logs" output-path="${log.output}"
 		mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
 		reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"
-		configuration-ref="fs-config"
 		codec="org.apache.hadoop.io.compress.GzipCodec"
 		validate-paths="false"
 	/>
@@ -45,7 +44,6 @@
 	    input-path="${log.input}/logs" output-path="${log.output}/stream"
 		mapper="${path.cat}"
 		reducer="${path.wc}"
-		configuration-ref="fs-config"
 	/>
 
 	<bean id="pig" class="org.springframework.data.hadoop.pig.PigServerFactoryBean"
@@ -63,7 +61,7 @@
 	<bean id="file-reader" class="org.springframework.batch.item.file.ResourcesItemReader" p:resources="classpath:${input.directory}/*.log"/>
 
 	<bean id="hdfs-writer" class="org.springframework.data.hadoop.batch.ResourcesItemWriter" 
-		p:resource-loader-ref="hdfsResourceLoader"
+		p:resource-loader-ref="hadoop-resource-loader"
 		p:generator-ref="name-generator"
 		p:overwrite="true">
 		

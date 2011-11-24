@@ -14,15 +14,21 @@
 	<bean id="chainedResourceLoader" class="org.springframework.data.hadoop.io.ChainedResourceLoader">
 		<property name="loaders">
 			<map>
-				<entry key="hdfs" value-ref="hdfsResourceLoader"/>
+				<entry key="hdfs" value-ref="hadoop-resource-loader"/>
 			</map>
 		</property>
 	</bean>
-	
-	<bean id="hdfsResourceLoader" class="org.springframework.data.hadoop.io.HdfsResourceLoader" c:fs-ref="fs" p:register-jvm-url="true"/>
+
+	<!--  automatically picks the hadoop-config reference -->
+	<hdp:resource-loader />	
+	<!-- 
+	<bean id="hdfsResourceLoader" class="org.springframework.data.hadoop.io.HdfsResourceLoader" c:fs-ref="fs"/>
 	<bean id="fs" class="org.springframework.data.hadoop.io.FileSystemFactoryBean" p:configuration-ref="fs-config"/>
+	 -->
+	 
 	
-	<hdp:config id="fs-config">
+	<!--  default id is 'hadoop-config' -->
+	<hdp:config register-url-handler="false">
 		<entry key="fs.default.name" value="${hd.fs}"/>
 	</hdp:config>
 
@@ -37,7 +43,7 @@
 	 -->
 	 
 	<bean id="hdfs-writer" class="org.springframework.data.hadoop.batch.ResourcesItemWriter" 
-		p:resource-loader-ref="hdfsResourceLoader"
+		p:resource-loader-ref="hadoop-resource-loader"
 		p:generator-ref="name-generator"
 		p:overwrite="true">
 	</bean>

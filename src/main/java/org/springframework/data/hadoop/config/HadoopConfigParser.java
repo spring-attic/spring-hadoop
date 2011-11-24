@@ -64,6 +64,6 @@ public class HadoopConfigParser extends AbstractImprovedSimpleBeanDefinitionPars
 
 	@Override
 	protected String defaultId() {
-		return "hadoop-config";
+		return "hadoop-configuration";
 	}
 }

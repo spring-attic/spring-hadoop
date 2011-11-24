@@ -17,6 +17,7 @@ package org.springframework.data.hadoop.io;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -24,6 +25,7 @@ import java.util.UUID;
 
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.FsUrlStreamHandlerFactory;
 import org.apache.hadoop.fs.Path;
 import org.junit.After;
 import org.junit.Before;
@@ -136,7 +138,7 @@ public class HdfsResouceLoaderTest {
 	@Test
 	public void testResolve() throws Exception {
 		Resource resource = loader.getResource("/test");
-		loader.setRegisterJvmUrl(true);
+		URL.setURLStreamHandlerFactory(new FsUrlStreamHandlerFactory(fs.getConf()));
 
 		System.out.println(((HdfsResource) resource).getPath().makeQualified(fs));
 

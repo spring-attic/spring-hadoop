@@ -203,7 +203,7 @@ Whether to synchronously wait for the job to finish (the default) or not.
 	<xsd:element name="config">
 		<xsd:annotation>
 		   <xsd:documentation><![CDATA[
-Defines a Hadoop Job.
+Defines a Hadoop Configuration.
 				]]>
           </xsd:documentation>
 	      <xsd:appinfo>
@@ -215,7 +215,14 @@ Defines a Hadoop Job.
 		<xsd:complexType>
 		  <xsd:complexContent>
 		    <xsd:extension base="beans:mapType">
-				<xsd:attribute name="id" type="xsd:ID" use="optional"/>
+				<xsd:attribute name="id" type="xsd:ID" use="optional">
+				<xsd:annotation>
+				<xsd:documentation><![CDATA[
+Bean id (default is "hadoop-config").
+				]]>
+          		</xsd:documentation>
+				</xsd:annotation>
+				</xsd:attribute>
 				<xsd:attribute name="configuration-ref">
 				<xsd:annotation>
 						<xsd:documentation source="org.apache.hadoop.conf.Configuration"><![CDATA[
@@ -238,8 +245,53 @@ Hadoop Configuration resources. Multiple resources can be specified, using comma
 						</xsd:appinfo>
 			 	</xsd:annotation>			
 				</xsd:attribute>
+				<xsd:attribute name="register-url-handler" use="optional" default="false">
+				<xsd:annotation>
+				<xsd:documentation><![CDATA[
+Registers an HDFS url handler in the running VM. Note that this operation can be executed at most once
+in a given JVM hence the default is false.
+				]]>
+		   		</xsd:documentation>
+				</xsd:annotation>
+				</xsd:attribute>
 			</xsd:extension>
 		</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="resource-loader">
+			<xsd:annotation>
+		   <xsd:documentation><![CDATA[
+Defines a HDFS-aware resource loader.
+				]]>
+          </xsd:documentation>
+	      <xsd:appinfo>
+	        <tool:annotation>
+	          <tool:exports type="org.springframework.data.hadoop.io.HdfsResourceLoader"/>
+	        </tool:annotation>
+	      </xsd:appinfo>
+		</xsd:annotation>
+		<xsd:complexType>
+		<xsd:attribute name="id" type="xsd:ID" use="optional">
+		<xsd:annotation>
+		<xsd:documentation><![CDATA[
+Bean id (default is "hadoop-resource-loader").
+		]]>
+   		</xsd:documentation>
+		</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="configuration-ref" use="optional" default="hadoop-configuration">
+		<xsd:annotation>
+				<xsd:documentation source="org.apache.hadoop.conf.Configuration"><![CDATA[
+Reference to the Hadoop Configuration. Defaults to 'hadoop-configuration'.]]></xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref">
+						<tool:expected-type type="org.apache.hadoop.conf.Configuration" />
+					</tool:annotation>
+				</xsd:appinfo>
+	 	</xsd:annotation>			
+		</xsd:attribute>
+		<xsd:attribute name="uri" use="optional"/>
 		</xsd:complexType>
 	</xsd:element>
 	
@@ -402,10 +454,10 @@ Defines a Hadoop Job.
 		</xsd:attribute>
 		<xsd:attribute name="validate-paths" default="true">
 		</xsd:attribute>
-		<xsd:attribute name="configuration-ref">
+		<xsd:attribute name="configuration-ref" use="optional" default="hadoop-configuration">
 		<xsd:annotation>
 				<xsd:documentation source="org.apache.hadoop.conf.Configuration"><![CDATA[
-Hadoop Configuration]]></xsd:documentation>
+Reference to the Hadoop Configuration. Defaults to 'hadoop-configuration'.]]></xsd:documentation>
 				<xsd:appinfo>
 					<tool:annotation kind="ref">
 						<tool:expected-type type="org.apache.hadoop.conf.Configuration" />
@@ -505,10 +557,10 @@ The combiner class name.
 			</xsd:appinfo>
 	 	</xsd:annotation>			
 		</xsd:attribute>
-		<xsd:attribute name="configuration-ref">
+		<xsd:attribute name="configuration-ref" default="hadoop-configuration">
 		<xsd:annotation>
 				<xsd:documentation source="org.apache.hadoop.conf.Configuration"><![CDATA[
-Optional Hadoop configuration]]></xsd:documentation>
+Reference to the Hadoop Configuration. Defaults to 'hadoop-configuration'.]]></xsd:documentation>
 				<xsd:appinfo>
 					<tool:annotation kind="ref">
 						<tool:expected-type type="org.apache.hadoop.conf.Configuration" />

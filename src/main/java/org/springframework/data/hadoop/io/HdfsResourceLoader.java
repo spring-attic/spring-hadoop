@@ -18,16 +18,12 @@ package org.springframework.data.hadoop.io;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URL;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.FsUrlStreamHandlerFactory;
 import org.apache.hadoop.fs.Path;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.core.PriorityOrdered;
@@ -42,8 +38,6 @@ import org.springframework.util.PathMatcher;
  * @author Costin Leau
  */
 public class HdfsResourceLoader implements ResourcePatternResolver, PriorityOrdered, DisposableBean {
-
-	private static final Log log = LogFactory.getLog(HdfsResourceLoader.class);
 
 	private static final String PREFIX_DELIMITER = ":";
 
@@ -169,20 +163,6 @@ public class HdfsResourceLoader implements ResourcePatternResolver, PriorityOrde
 		// strip prefix
 		int index = path.indexOf(PREFIX_DELIMITER);
 		return (index > -1 ? path.substring(index + 1) : path);
-	}
-
-	/**
-	 * @param registerJvmUrl The registerJvmUrl to set.
-	 */
-	public void setRegisterJvmUrl(boolean registerJvmUrl) {
-		if (registerJvmUrl) {
-			try {
-				URL.setURLStreamHandlerFactory(new FsUrlStreamHandlerFactory(fs.getConf()));
-				log.info("Registered HDFS URL stream handler");
-			} catch (Error err) {
-				log.warn("Cannot register Hadoop URL stream handler - one is already registered");
-			}
-		}
 	}
 
 	public int getOrder() {
