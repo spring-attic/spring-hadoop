@@ -17,16 +17,19 @@
 package org.springframework.data.hadoop.io;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FsUrlStreamHandlerFactory;
 import org.apache.hadoop.fs.Path;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.core.PriorityOrdered;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
@@ -38,7 +41,7 @@ import org.springframework.util.PathMatcher;
  * 
  * @author Costin Leau
  */
-public class HdfsResourceLoader implements ResourcePatternResolver, PriorityOrdered {
+public class HdfsResourceLoader implements ResourcePatternResolver, PriorityOrdered, DisposableBean {
 
 	private static final Log log = LogFactory.getLog(HdfsResourceLoader.class);
 
@@ -46,9 +49,28 @@ public class HdfsResourceLoader implements ResourcePatternResolver, PriorityOrde
 
 	private final FileSystem fs;
 	private final PathMatcher pathMatcher = new AntPathMatcher();
+	private final boolean internalFS;
+
+	public HdfsResourceLoader(Configuration config) {
+		this(config, null);
+	}
+
+	public HdfsResourceLoader(Configuration config, URI uri) {
+		internalFS = true;
+		FileSystem tempFS = null;
+		try {
+			tempFS = (uri != null ? FileSystem.get(uri, config) : FileSystem.get(config));
+		} catch (IOException ex) {
+			tempFS = null;
+			throw new IllegalStateException("Cannot create filesystem", ex);
+		} finally {
+			fs = tempFS;
+		}
+	}
 
 	public HdfsResourceLoader(FileSystem fs) {
 		this.fs = fs;
+		internalFS = false;
 	}
 
 	public ClassLoader getClassLoader() {
@@ -75,6 +97,9 @@ public class HdfsResourceLoader implements ResourcePatternResolver, PriorityOrde
 	protected Resource[] findPathMatchingResources(String locationPattern) throws IOException {
 		String rootDirPath = determineRootDir(locationPattern);
 		String subPattern = locationPattern.substring(rootDirPath.length());
+		if (rootDirPath.isEmpty()) {
+			rootDirPath = ".";
+		}
 		Resource rootDirResource = getResource(rootDirPath);
 
 		Set<Resource> result = new LinkedHashSet<Resource>(16);
@@ -162,5 +187,11 @@ public class HdfsResourceLoader implements ResourcePatternResolver, PriorityOrde
 
 	public int getOrder() {
 		return PriorityOrdered.HIGHEST_PRECEDENCE;
+	}
+
+	public void destroy() throws IOException {
+		if (fs != null & internalFS) {
+			fs.close();
+		}
 	}
 }

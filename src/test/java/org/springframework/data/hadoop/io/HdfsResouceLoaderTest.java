@@ -70,7 +70,7 @@ public class HdfsResouceLoaderTest {
 
 	@Test
 	public void testPatternResolver() throws Exception {
-		Resource[] resources = loader.getResources("/**/*");
+		Resource[] resources = loader.getResources("**/*");
 		System.out.println(resources.length);
 		System.out.println(Arrays.toString(resources));
 
@@ -136,6 +136,7 @@ public class HdfsResouceLoaderTest {
 	@Test
 	public void testResolve() throws Exception {
 		Resource resource = loader.getResource("/test");
+		loader.setRegisterJvmUrl(true);
 
 		System.out.println(((HdfsResource) resource).getPath().makeQualified(fs));
 

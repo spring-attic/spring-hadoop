@@ -20,12 +20,9 @@
 
 	<int:logging-channel-adapter id="done"/>
 	
-	<int:inbound-channel-adapter channel="logger" ref="resourceLoaderAdapter" method="getResources">
+	<int:resource-inbound-channel-adapter id="hdfs-trigger" channel="logger" pattern-resolver="hdfsResourceLoader" pattern="**/*">
 		<int:poller fixed-rate="2000"/>
-	</int:inbound-channel-adapter>
-	
-	
-	<bean id="resourceLoaderAdapter" class="org.springframework.data.hadoop.integration.ResourcePatternResolverAdapter" p:resource-loader-ref="hdfsResourceLoader" p:location-pattern="/**/*"/>
+	</int:resource-inbound-channel-adapter>
 
-	<int:logging-channel-adapter id="logger" expression="payload" level="WARN"/>	
+	<int:logging-channel-adapter id="logger" expression="T(java.util.Arrays).toString(payload)" level="WARN"/>	
 </beans>
