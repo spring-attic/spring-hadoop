@@ -66,6 +66,6 @@ class MapperParser extends AbstractSingleBeanDefinitionParser {
 		builder.addPropertyValue("outputValueType", element.getAttribute(OUTPUT_VALUE_TYPE_ATTR));
 		builder.addPropertyValue("outputKeyType", element.getAttribute(OUTPUT_KEY_TYPE_ATTR));
 		builder.addPropertyReference("target", element.getAttribute(REF_ATTR));
-		NamespaceUtils.setValueIfAttributeDefined(builder, element, METHOD_ATTR);
+		NamespaceUtils.setPropertyValue(element, builder, METHOD_ATTR);
 	}
 }

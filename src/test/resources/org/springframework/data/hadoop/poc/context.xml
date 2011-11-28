@@ -46,17 +46,20 @@
 		reducer="${path.wc}"
 	/>
 
+	<!-- 
 	<bean id="pig" class="org.springframework.data.hadoop.pig.PigServerFactoryBean"
 		p:scripts="classpath:org/springframework/data/hadoop/pig/script.pig" p:auto-startup="false">
 		<property name="pigContext">
 			<bean id="pig-ctx" class="org.springframework.data.hadoop.pig.PigContextFactoryBean" p:exec-type="LOCAL"/>
 		</property>
 	</bean>
-		
+	-->
+	<hdp:pig scripts="classpath:org/springframework/data/hadoop/pig/script.pig" auto-startup="false" exec-type="LOCAL" />
+	
 	<bean id="hadoop-pig-tasklet" class="org.springframework.batch.core.step.tasklet.MethodInvokingTaskletAdapter">
-	    <property name="targetObject" ref="&amp;pig"/>
+	    <property name="targetObject" ref="&amp;hadoop-pig"/>
 	    <property name="targetMethod" value="start" />
-	</bean>
+	</bean> 
 	
 	<bean id="file-reader" class="org.springframework.batch.item.file.ResourcesItemReader" p:resources="classpath:${input.directory}/*.log"/>
 

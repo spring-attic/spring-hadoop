@@ -21,6 +21,7 @@ import org.w3c.dom.Element;
 /**
  * Namespace utilities.
  * 
+ * @author Costin Leau
  */
 abstract class NamespaceUtils {
 
@@ -37,6 +38,10 @@ abstract class NamespaceUtils {
 		}
 	}
 
+	static void setPropertyValue(Element element, BeanDefinitionBuilder builder, String attrName) {
+		setPropertyValue(element, builder, attrName, Conventions.attributeNameToPropertyName(attrName));
+	}
+
 	static boolean setPropertyReference(Element element, BeanDefinitionBuilder builder, String attrName, String propertyName) {
 		String attr = element.getAttribute(attrName);
 		if (StringUtils.hasText(attr)) {
@@ -46,22 +51,8 @@ abstract class NamespaceUtils {
 		return false;
 	}
 
-
-	/**
-	 * Populates the bean definition property corresponding to the specified attributeName with the value of that
-	 * attribute if it is defined in the given element.
-	 * 
-	 * <p>
-	 * The property name will be the camel-case equivalent of the lower case hyphen separated attribute (e.g. the
-	 * "foo-bar" attribute would match the "fooBar" property).
-	 * 
-	 * @see Conventions#attributeNameToPropertyName(String)
-	 * 
-	 * @param builder the bean definition builder to be configured
-	 * @param element the XML element where the attribute should be defined
-	 * @param attributeName the name of the attribute whose value will be set on the property
-	 */
-	static void setValueIfAttributeDefined(BeanDefinitionBuilder builder, Element element, String attributeName) {
-		setPropertyValue(element, builder, attributeName, Conventions.attributeNameToPropertyName(attributeName));
+	static boolean setPropertyReference(Element element, BeanDefinitionBuilder builder, String attrName) {
+		return setPropertyReference(element, builder, attrName, 
+				Conventions.attributeNameToPropertyName(isReference(attrName)? attrName.substring(0, attrName.length() - 4) : attrName));
 	}
 }

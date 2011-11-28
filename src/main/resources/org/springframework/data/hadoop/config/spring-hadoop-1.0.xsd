@@ -604,8 +604,77 @@ Reference to the Hadoop Configuration. Defaults to 'hadoop-configuration'.]]></x
 			</xsd:appinfo>
 	 	</xsd:annotation>			
 		</xsd:attribute>
-		
 		</xsd:complexType>
 	</xsd:element>
-	
+
+	<xsd:element name="pig">
+		<xsd:annotation>
+		   <xsd:documentation><![CDATA[
+Defines a Pig server.
+				]]>
+          </xsd:documentation>
+	      <xsd:appinfo>
+	        <tool:annotation>
+	          <tool:exports type="org.apache.pig.PigServer"/>
+	        </tool:annotation>
+	      </xsd:appinfo>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+			 <xsd:extension base="beans:propsType">
+				<xsd:attribute name="id" type="xsd:ID" use="optional">
+				<xsd:annotation>
+				<xsd:documentation><![CDATA[
+Bean id (default is "hadoop-pig").
+				]]>
+          		</xsd:documentation>
+				</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="scripts">
+				<xsd:annotation>
+						<xsd:documentation source="org.springframework.core.io.Resource"><![CDATA[
+Pig scripts to be registered. Multiple resources can be specified, using comma (,) as a separator.]]></xsd:documentation>
+						<xsd:appinfo>
+							<tool:annotation kind="direct">
+								<tool:expected-type type="org.springframework.core.io.Resource[]" />
+							</tool:annotation>
+						</xsd:appinfo>
+			 	</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="paths-to-skip">
+				<xsd:annotation>
+						<xsd:documentation><![CDATA[
+The path to be skipped while automatically shipping binaries for streaming. Multiple resources can be specified, using comma (,) as a separator.
+						]]></xsd:documentation>
+			 	</xsd:annotation>			
+				</xsd:attribute>
+				<xsd:attribute name="parallelism" type="xsd:integer"/>
+				<xsd:attribute name="validate-each-statement" type="xsd:boolean"/>
+				<xsd:attribute name="job-priority" type="xsd:string"/>
+				<xsd:attribute name="job-name" type="xsd:string"/>
+				<xsd:attribute name="job-tracker" type="xsd:string"/>
+				<xsd:attribute name="auto-startup" type="xsd:boolean"/>
+				<xsd:attribute name="configuration-ref">
+				<xsd:annotation>
+						<xsd:documentation source="org.apache.hadoop.conf.Configuration"><![CDATA[
+Reference to the Hadoop Configuration. Can be tweaked through the nested properties or the other properties.]]></xsd:documentation>
+						<xsd:appinfo>
+							<tool:annotation kind="ref">
+								<tool:expected-type type="org.apache.hadoop.conf.Configuration" />
+							</tool:annotation>
+						</xsd:appinfo>
+			 	</xsd:annotation>
+			 	</xsd:attribute>			
+				<xsd:attribute name="exec-type" default="MAPREDUCE">
+					<xsd:simpleType>
+					  <xsd:restriction base="xsd:string">
+					  	<xsd:enumeration value="MAPREDUCE"/>
+					  	<xsd:enumeration value="LOCAL"/>
+					  </xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+			</xsd:extension>
+		   </xsd:complexContent>				
+		</xsd:complexType>
+	</xsd:element>
 </xsd:schema>

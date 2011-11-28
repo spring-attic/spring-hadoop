@@ -15,8 +15,13 @@
  */
 package org.springframework.data.hadoop.pig;
 
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 
+import org.apache.hadoop.conf.Configuration;
 import org.apache.pig.ExecType;
 import org.apache.pig.impl.PigContext;
 import org.springframework.beans.factory.FactoryBean;
@@ -35,7 +40,8 @@ public class PigContextFactoryBean implements InitializingBean, FactoryBean<PigC
 	private String lastAlias;
 	private String jobTracker;
 	private ExecType execType = ExecType.MAPREDUCE;
-	private Properties properties = new Properties();
+	private Properties properties;
+	private Configuration configuration;
 
 	public PigContext getObject() throws Exception {
 		return context;
@@ -50,12 +56,32 @@ public class PigContextFactoryBean implements InitializingBean, FactoryBean<PigC
 	}
 
 	public void afterPropertiesSet() throws Exception {
+		Properties prop = new Properties();
+
+		// first add the hadoop config
+		if (configuration != null) {
+			Iterator<Entry<String, String>> iterator = configuration.iterator();
+			while (iterator.hasNext()) {
+				Map.Entry<java.lang.String, java.lang.String> entry = iterator.next();
+				prop.setProperty(entry.getKey(), entry.getValue());
+			}
+		}
+
+		// add properties
+		if (properties != null) {
+			Enumeration<?> names = properties.propertyNames();
+			while (names.hasMoreElements()) {
+				String name = (String) names.nextElement();
+				prop.setProperty(name, properties.getProperty(name));
+			}
+		}
+
 		if (StringUtils.hasText(jobTracker)) {
-			properties.setProperty("mapred.job.tracker", jobTracker);
+			prop.setProperty("mapred.job.tracker", jobTracker);
 			// invoking setter below causes NPE since PIG expects the engine to be started already ...
 			// context.setJobtrackerLocation(jobTracker);
 		}
-		context = new PigContext(execType, properties);
+		context = new PigContext(execType, prop);
 
 		if (StringUtils.hasText(lastAlias)) {
 			context.setLastAlias(lastAlias);
@@ -88,5 +114,12 @@ public class PigContextFactoryBean implements InitializingBean, FactoryBean<PigC
 	 */
 	public void setProperties(Properties properties) {
 		this.properties = properties;
+	}
+
+	/**
+	 * @param configuration The configuration to set.
+	 */
+	public void setConfiguration(Configuration configuration) {
+		this.configuration = configuration;
 	}
 }

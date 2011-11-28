@@ -16,8 +16,7 @@
 package org.springframework.data.hadoop.pig;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
+import java.util.Collection;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,7 +32,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Factory for creating a {@link PigServerFactoryBean} instance.
+ * Factory for creating a {@link PigServer} instance.
  * 
  * @author Costin Leau
  */
@@ -48,8 +47,8 @@ public class PigServerFactoryBean implements SmartLifecycle, InitializingBean, D
 	private boolean autoStartup = true;
 
 	private PigContext pigContext;
-	private List<String> pathToSkip;
-	private List<Resource> scripts;
+	private Collection<String> pathToSkip;
+	private Collection<Resource> scripts;
 	private Integer parallelism;
 	private String jobName;
 	private String jobPriority;
@@ -167,16 +166,14 @@ public class PigServerFactoryBean implements SmartLifecycle, InitializingBean, D
 	/**
 	 * @param pathToSkip The pathToSkip to set.
 	 */
-	public void setPathToSkip(String pathToSkip) {
-		if (StringUtils.hasText(pathToSkip)) {
-			this.pathToSkip = Arrays.asList(StringUtils.commaDelimitedListToStringArray(pathToSkip));
-		}
+	public void setPathsToSkip(Collection<String> pathToSkip) {
+		this.pathToSkip = pathToSkip;
 	}
 
 	/**
 	 * @param scripts The scripts to set.
 	 */
-	public void setScripts(List<Resource> scripts) {
+	public void setScripts(Collection<Resource> scripts) {
 		this.scripts = scripts;
 	}
 
