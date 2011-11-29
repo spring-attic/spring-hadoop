@@ -15,14 +15,14 @@
 	<context:property-placeholder location="test.properties"/>
 	
 	<bean id="vanilla-stream-job" class="org.springframework.data.hadoop.mapreduce.StreamJobFactoryBean"
-		p:configuration-ref="fs-config"
+		p:configuration-ref="hadoop-configuration"
 		p:input-path="test"
 		p:output-path="output"
 		p:mapper="${path.cat}"
 		p:reducer="${path.wc}"/>
 		
 	<hdp:stream-job id="ns-stream-job"
-		configuration-ref="fs-config"
+		configuration-ref="hadoop-configuration"
 		input-path="test"
 		output-path="output"
 		mapper="${path.cat}"

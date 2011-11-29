@@ -9,13 +9,13 @@
 
 
 	<!-- default -->
-	<hdp:config value-type="java.lang.String">
+	<hdp:configuration value-type="java.lang.String">
 		<entry key="test.name"><value>default</value></entry>
-	</hdp:config>
+	</hdp:configuration>
 
-	<hdp:config id="complex" resources="classpath:/test-site.xml, classpath:/test-site-2.xml" configuration-ref="hadoop-config">
+	<hdp:configuration id="complex" resources="classpath:/test-site.xml, classpath:/test-site-2.xml" configuration-ref="hadoop-configuration">
 		<entry key="test.name.2" value="complex"/>
-	</hdp:config>
+	</hdp:configuration>
 	
 	<!-- default hdfs resource loader 
 	<hdp:resource-loader />

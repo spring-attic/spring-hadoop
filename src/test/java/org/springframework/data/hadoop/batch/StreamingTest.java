@@ -15,6 +15,7 @@
  */
 package org.springframework.data.hadoop.batch;
 
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.Job;
@@ -72,7 +73,7 @@ public class StreamingTest {
 	}
 
 	private void cleanOutput(ApplicationContext ctx) throws Exception {
-		FileSystem fs = ctx.getBean(FileSystem.class);
+		FileSystem fs = FileSystem.get(ctx.getBean(Configuration.class));
 		fs.copyFromLocalFile(new Path("./build.gradle"), new Path("test/"));
 		fs.delete(new Path("output"), true);
 	}

@@ -200,7 +200,7 @@ Whether to synchronously wait for the job to finish (the default) or not.
 	</xsd:complexType>
 	</xsd:element>
 	
-	<xsd:element name="config">
+	<xsd:element name="configuration">
 		<xsd:annotation>
 		   <xsd:documentation><![CDATA[
 Defines a Hadoop Configuration.
@@ -218,7 +218,7 @@ Defines a Hadoop Configuration.
 				<xsd:attribute name="id" type="xsd:ID" use="optional">
 				<xsd:annotation>
 				<xsd:documentation><![CDATA[
-Bean id (default is "hadoop-config").
+Bean id (default is "hadoop-configuration").
 				]]>
           		</xsd:documentation>
 				</xsd:annotation>
@@ -675,6 +675,44 @@ Reference to the Hadoop Configuration. Can be tweaked through the nested propert
 				</xsd:attribute>
 			</xsd:extension>
 		   </xsd:complexContent>				
+		</xsd:complexType>
+	</xsd:element>
+	
+	<!-- HBase -->
+	<xsd:element name="hbase-configuration">
+		<xsd:complexType>
+			<xsd:annotation>
+			   <xsd:documentation><![CDATA[
+Defines an HBase configuration.
+					]]>
+	          </xsd:documentation>
+		      <xsd:appinfo>
+		        <tool:annotation>
+		          <tool:exports type="org.apache.hadoop.conf.Configuration"/>
+		        </tool:annotation>
+		      </xsd:appinfo>
+			</xsd:annotation>
+			<xsd:attribute name="id" type="xsd:ID" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+Bean id (default is "hbase-configuration").
+				]]>
+         		</xsd:documentation>
+			</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="stop-proxy" type="xsd:boolean" default="true"/>
+			<xsd:attribute name="delete-connection" type="xsd:boolean" default="true"/>
+			<xsd:attribute name="configuration-ref">
+			<xsd:annotation>
+					<xsd:documentation source="org.apache.hadoop.conf.Configuration"><![CDATA[
+Reference to the Hadoop configuration.]]></xsd:documentation>
+					<xsd:appinfo>
+						<tool:annotation kind="ref">
+							<tool:expected-type type="org.apache.hadoop.conf.Configuration" />
+						</tool:annotation>
+					</xsd:appinfo>
+		 	</xsd:annotation>
+		 	</xsd:attribute>		
 		</xsd:complexType>
 	</xsd:element>
 </xsd:schema>

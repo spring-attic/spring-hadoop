@@ -45,7 +45,7 @@ public class BasicHBaseTest {
 
 		ctx.registerShutdownHook();
 
-		Configuration config = ctx.getBean("hbase-config", Configuration.class);
+		Configuration config = ctx.getBean("hbase-configuration", Configuration.class);
 		HBaseAdmin admin = new HBaseAdmin(config);
 		String tableName = "myTable";
 		String columnName = "myColumnFamily";

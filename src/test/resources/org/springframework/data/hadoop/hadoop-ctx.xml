@@ -28,9 +28,9 @@
 	 
 	
 	<!--  default id is 'hadoop-config' -->
-	<hdp:config register-url-handler="false">
+	<hdp:configuration register-url-handler="false">
 		<entry key="fs.default.name" value="${hd.fs}"/>
-	</hdp:config>
+	</hdp:configuration>
 
 	<!-- 
 	<bean id="fs-config" class="org.springframework.data.hadoop.configuration.ConfigurationFactoryBean">

@@ -56,10 +56,49 @@ apply plugin: 'bundlor'  // all core projects should be OSGi-compliant
 bundlor.useProjectProps = true
 [compileJava, compileTestJava]*.options*.compilerArgs = ["-Xlint:-serial"]
 
+skipPig = true
+skipHive = true
+skipHBase = true
+
+task enablePigTests {
+    description = "Enable Pig tests"
+    group = "Verification"
+    skipPig = false
+}
+
+task enableHiveTests {
+    description = "Enable Hive tests"
+    group = "Verification"
+    skipHive = false
+}
+
+task enableHBaseTests {
+    description = "Enable HBase tests"
+    group = "Verification"
+    skipHBase = false
+}
+
+task enableAllTest() {
+    description = "Enable all (incl. Pig, Hive, HBase) tests"
+    group = "Verification"
+    skipPig = false
+    skipHBase = false
+    skipHive = false
+}
+
 test {
     //forkEvery = 1
     systemProperties['input.path'] = 'build/classes/test/input'
     systemProperties['output.path'] = 'build/classes/test/output'
+    includes = ["**/*.class"]
+        
+    if (skipPig) 
+    {
+        println "Excluding Pig"
+        excludes.add("**/pig/**")
+    }
+    if (skipHBase) excludes.add("**/hbase/**")
+    if (skipHive) excludes.add("**/hive/**")
 }
 
 // Common dependencies
@@ -120,8 +159,8 @@ dependencies {
 
 javaprojects = rootProject
 
-sourceCompatibility = 1.5
-targetCompatibility = 1.5 
+sourceCompatibility = 1.6
+targetCompatibility = 1.6 
 
 javadoc {
   srcDir = file("${projectDir}/docs/src/api")
@@ -225,8 +264,8 @@ task uploadDist(type: org.springframework.gradle.tasks.S3DistroUpload, dependsOn
     description = "Upload the ZIP Distribution"
     group = "Distribution"
     archiveFile = dist.archivePath
-    projectKey = 'SGF'
-    projectName = 'Spring Hadoop'
+    projectKey = 'SHDP'
+    projectName = 'Spring Data Hadoop'
 }
 
 defaultTasks 'clean', 'build'

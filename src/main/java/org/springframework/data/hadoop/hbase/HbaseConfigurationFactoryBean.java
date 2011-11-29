@@ -19,7 +19,8 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.client.HConnectionManager;
 import org.springframework.beans.factory.DisposableBean;
-import org.springframework.data.hadoop.configuration.ConfigurationFactoryBean;
+import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.InitializingBean;
 
 /**
  * Factory for creating HBase specific configuration. By default also cleans up any connection associated with the current configuration.
@@ -28,15 +29,12 @@ import org.springframework.data.hadoop.configuration.ConfigurationFactoryBean;
  * @see HConnectionManager
  * @author Costin Leau
  */
-public class HbaseConfigurationFactoryBean extends ConfigurationFactoryBean implements DisposableBean {
+public class HbaseConfigurationFactoryBean implements InitializingBean, DisposableBean, FactoryBean<Configuration> {
 
 	private boolean deleteConnection = true;
 	private boolean stopProxy = true;
-
-	@Override
-	protected void postProcessConfiguration(Configuration configuration) {
-		HBaseConfiguration.addHbaseResources(configuration);
-	}
+	private Configuration config;
+	private Configuration configuration;
 
 	/**
 	 * Indicates whether the potential connection created by this config is destroyed at shutdown (default).
@@ -47,7 +45,6 @@ public class HbaseConfigurationFactoryBean extends ConfigurationFactoryBean impl
 		this.deleteConnection = deleteConnection;
 	}
 
-
 	/**
 	 * Indicates whether, when/if the associated connection is destroyed, whether the proxy is stopped or not. 
 	 * 
@@ -57,9 +54,34 @@ public class HbaseConfigurationFactoryBean extends ConfigurationFactoryBean impl
 		this.stopProxy = stopProxy;
 	}
 
+	/**
+	 * Sets the Hadoop configuration to use.
+	 * 
+	 * @param configuration The configuration to set.
+	 */
+	public void setConfiguration(Configuration configuration) {
+		this.configuration = configuration;
+	}
+
 	public void destroy() {
 		if (deleteConnection) {
 			HConnectionManager.deleteConnection(getObject(), stopProxy);
 		}
+	}
+
+	public void afterPropertiesSet() {
+		config = (configuration != null ? HBaseConfiguration.create(configuration) : configuration);
+	}
+
+	public Configuration getObject() {
+		return config;
+	}
+
+	public Class<? extends Configuration> getObjectType() {
+		return (config != null ? config.getClass() : Configuration.class);
+	}
+
+	public boolean isSingleton() {
+		return true;
 	}
 }

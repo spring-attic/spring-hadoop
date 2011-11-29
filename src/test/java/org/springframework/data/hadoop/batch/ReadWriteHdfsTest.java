@@ -46,7 +46,7 @@ public class ReadWriteHdfsTest {
 
 		ctx.registerShutdownHook();
 
-		FileSystem fs = ctx.getBean(FileSystem.class);
+		FileSystem fs = FileSystem.get(ctx.getBean(Configuration.class));
 		System.out.println("FS is " + fs.getClass().getName());
 		HdfsResourceLoader hrl = ctx.getBean(HdfsResourceLoader.class);
 		Resource resource = hrl.getResource("/ide-test/output/word/");
@@ -72,7 +72,7 @@ public class ReadWriteHdfsTest {
 
 		ctx.registerShutdownHook();
 
-		FileSystem fs = ctx.getBean(FileSystem.class);
+		FileSystem fs = FileSystem.get(ctx.getBean(Configuration.class));
 		fs.delete(new Path("/ide-test/output/word/"), true);
 
 		TriggerJobs tj = new TriggerJobs();

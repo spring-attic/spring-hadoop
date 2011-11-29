@@ -38,7 +38,7 @@
 	    input-path="/ide-test/input/word/" output-path="/ide-test/output/word/"
 		mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
 		reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"
-		configuration-ref="fs-config"
+		configuration-ref="hadoop-configuration"
 		validate-paths="false"
 	/>
 </beans>
