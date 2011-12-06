@@ -715,4 +715,33 @@ Reference to the Hadoop configuration.]]></xsd:documentation>
 		 	</xsd:attribute>		
 		</xsd:complexType>
 	</xsd:element>
+	
+	<!-- Hive -->
+	<xsd:element name="hive-client">
+		<xsd:complexType>
+			<xsd:annotation>
+			   <xsd:documentation><![CDATA[
+Defines a Hive client for connecting to a Hive server through the Thrift protocol.
+					]]>
+	          </xsd:documentation>
+		      <xsd:appinfo>
+		        <tool:annotation>
+		          <tool:exports type="org.apache.hadoop.hive.service.HiveClient"/>
+		        </tool:annotation>
+		      </xsd:appinfo>
+			</xsd:annotation>
+			<xsd:attribute name="id" type="xsd:ID" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+Bean id (default is "hive-client").
+				]]>
+         		</xsd:documentation>
+			</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="host" type="xsd:string" default="localhost"/>
+			<xsd:attribute name="port" type="xsd:string" default="10000"/>
+			<xsd:attribute name="auto-startup" type="xsd:boolean"/>
+		</xsd:complexType>
+	</xsd:element>
+	
 </xsd:schema>

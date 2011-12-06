@@ -28,9 +28,6 @@ import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
  */
 class HadoopNamespaceHandler extends NamespaceHandlerSupport {
 
-	/**
-	 * @see org.springframework.beans.factory.xml.NamespaceHandler#init()
-	 */
 	public void init() {
 		this.registerBeanDefinitionParser("mapper", new MapperParser());
 		this.registerBeanDefinitionParser("reducer", new ReducerParser());
@@ -42,6 +39,7 @@ class HadoopNamespaceHandler extends NamespaceHandlerSupport {
 		registerBeanDefinitionParser("resource-loader", new HadoopResourceLoaderParser());
 		registerBeanDefinitionParser("pig", new PigParser());
 		registerBeanDefinitionParser("hbase-configuration", new HbaseConfigurationParser());
+		registerBeanDefinitionParser("hive-client", new HiveClientParser());
 	}
 }
 
