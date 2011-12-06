@@ -63,27 +63,37 @@ skipHBase = true
 task enablePigTests {
     description = "Enable Pig tests"
     group = "Verification"
-    skipPig = false
+    
+    doLast() {
+        project.skipPig = false
+   }
 }
 
 task enableHiveTests {
     description = "Enable Hive tests"
     group = "Verification"
-    skipHive = false
+    doLast() {
+        project.skipHive = false
+   }
 }
 
 task enableHBaseTests {
     description = "Enable HBase tests"
     group = "Verification"
-    skipHBase = false
+    doLast() {
+        project.skipHBase = false
+    }
 }
 
-task enableAllTest() {
+task enableAllTests() {
     description = "Enable all (incl. Pig, Hive, HBase) tests"
     group = "Verification"
-    skipPig = false
-    skipHBase = false
-    skipHive = false
+    doFirst() {
+      println "Enable all tests"
+      project.skipPig = false
+      project.skipHBase = false
+      project.skipHive = false
+    }
 }
 
 test {
@@ -91,14 +101,30 @@ test {
     systemProperties['input.path'] = 'build/classes/test/input'
     systemProperties['output.path'] = 'build/classes/test/output'
     includes = ["**/*.class"]
+
+    doFirst() {
+        msg = ""
         
-    if (skipPig) 
-    {
-        println "Excluding Pig"
-        excludes.add("**/pig/**")
+        if (skipPig) 
+        {
+            msg += "Pig "
+            excludes.add("**/pig/**")
+        }
+        if (skipHBase)
+        {
+            msg += "HBase "
+            excludes.add("**/hbase/**")
+        }
+        
+        if (skipHive) 
+        {
+            msg += "Hive"
+            excludes.add("**/hive/**")
+        }
+        
+        if (!msg.isEmpty())
+            println "Skipping [$msg] Tests";
     }
-    if (skipHBase) excludes.add("**/hbase/**")
-    if (skipHive) excludes.add("**/hive/**")
 }
 
 // Common dependencies
@@ -228,8 +254,6 @@ task wrapper(type: Wrapper) {
 
 apply from: "$rootDir/maven.gradle"
 
-assemble.dependsOn = ['jar', 'sourceJar', 'javadocJar']
-
 // Distribution tasks
 task dist(type: Zip) {
     description = "Generate the ZIP Distribution"
@@ -268,4 +292,5 @@ task uploadDist(type: org.springframework.gradle.tasks.S3DistroUpload, dependsOn
     projectName = 'Spring Data Hadoop'
 }
 
+assemble.dependsOn = ['jar', 'sourceJar', 'javadocJar']
 defaultTasks 'clean', 'build'
