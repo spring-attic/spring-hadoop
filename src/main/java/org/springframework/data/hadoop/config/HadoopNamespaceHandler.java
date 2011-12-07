@@ -20,18 +20,11 @@ import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 /**
  * Core Spring Hadoop namespace handler
  *
- *
- * @author Josh Long
  * @author Costin Leau
- * @see MapperParser
- * @see ReducerParser
  */
 class HadoopNamespaceHandler extends NamespaceHandlerSupport {
 
 	public void init() {
-		this.registerBeanDefinitionParser("mapper", new MapperParser());
-		this.registerBeanDefinitionParser("reducer", new ReducerParser());
-
 		registerBeanDefinitionParser("tasklet", new HadoopTaskletParser());
 		registerBeanDefinitionParser("job", new HadoopJobParser());
 		registerBeanDefinitionParser("stream-job", new HadoopStreamJobParser());
