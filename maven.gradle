@@ -151,7 +151,7 @@ def customizePom(pom) {
             }
         }*.optional = true
         
-        p.groupId = "org.springframework.data.hadoop"
+        p.groupId = "org.springframework.data"
     }
 
     pom.project {

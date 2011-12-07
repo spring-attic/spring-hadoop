@@ -157,9 +157,6 @@ public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanN
 		if (StringUtils.hasText(workingDir)) {
 			job.setWorkingDirectory(new Path(workingDir));
 		}
-		if (userClassPrecendence != null) {
-			job.setUserClassesTakesPrecedence(userClassPrecendence);
-		}
 		if (jarClass != null) {
 			job.setJarByClass(jarClass);
 		}
@@ -357,13 +354,6 @@ public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanN
 	 */
 	public void setNumReduceTasks(Integer numReduceTasks) {
 		this.numReduceTasks = numReduceTasks;
-	}
-
-	/**
-	 * @param userClassPrecendence The userClassPrecendence to set.
-	 */
-	public void setUserClassPrecendence(Boolean userClassPrecendence) {
-		this.userClassPrecendence = userClassPrecendence;
 	}
 
 	/**

@@ -120,8 +120,8 @@ public class HdfsResourceLoader implements ResourcePatternResolver, PriorityOrde
 
 		Path rootDir;
 
-		rootDir = (rootDirResource instanceof HdfsResource ? ((HdfsResource) rootDirResource).getPath() : new Path(
-				rootDirResource.getURI()));
+		rootDir = (rootDirResource instanceof HdfsResource ? ((HdfsResource) rootDirResource).getPath() : 
+				new Path(rootDirResource.getURI().toString()));
 
 		Set<Resource> results = new LinkedHashSet<Resource>();
 		String pattern = subPattern;

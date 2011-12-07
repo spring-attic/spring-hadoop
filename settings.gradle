@@ -1,4 +1,4 @@
-rootProject.name = 'spring-hadoop'
+rootProject.name = 'spring-data-hadoop'
 
 include 'docs'
        
