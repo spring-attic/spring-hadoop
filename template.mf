@@ -1,26 +1,27 @@
-Bundle-SymbolicName: org.springframework.hadoop.core
-Bundle-Name: Spring Hadoop Core
+Bundle-SymbolicName: org.springframework.data.hadoop
+Bundle-Name: Spring Data Hadoop
 Bundle-Vendor: SpringSource
 Bundle-ManifestVersion: 2
+Export-Template: org.springframework.data.hadoop.*;version=${version}
 Import-Template: 
- org.springframework.beans.*;version="[3.0.0, 4.0.0)",
- org.springframework.context.*;version="[3.0.0, 4.0.0)",
- org.springframework.jdbc.*;version="[3.0.0, 4.0.0)",
- org.springframework.aop.*;version="[3.0.0, 4.0.0)",
- org.springframework.expression.*;version="[3.0.0, 4.0.0)",
- org.springframework.util.*;version="[3.0.0, 4.0.0)",
- org.springframework.core.*;version="[3.0.0, 4.0.0)",
- org.springframework.stereotype.*;version="[3.0.0, 4.0.0)",
- org.springframework.scheduling.*;version="[3.0.0, 4.0.0)",
- org.springframework.ui.*;version="[3.0.0, 4.0.0)",
- org.springframework.transaction.*;version="[3.0.0, 4.0.0)",
- org.springframework.web.*;version="[3.0.0, 4.0.0)",
- org.springframework.validation.*;version="[3.0.0, 4.0.0)",
- org.apache.hadoop.*;version="[0.20.0, 0.21.0)",
+ org.springframework.beans.*;version=${spring.range},
+ org.springframework.context.*;version=${spring.range},
+ org.springframework.jdbc.*;version=${spring.range},
+ org.springframework.aop.*;version=${spring.range},
+ org.springframework.expression.*;version=${spring.range},
+ org.springframework.util.*;version=${spring.range},
+ org.springframework.core.*;version=${spring.range},
+ org.springframework.stereotype.*;version=${spring.range},
+ org.springframework.scheduling.*;version=${spring.range},
+ org.springframework.ui.*;version=${spring.range},
+ org.springframework.transaction.*;version=${spring.range},
+ org.springframework.web.*;version=${spring.range},
+ org.springframework.validation.*;version=${spring.range},
+ org.springframework.batch.*;version=${batch.range},
+ org.apache.hadoop.hbase.*;version=${hbase.range},
+ org.apache.hadoop.hive.*;version=${hive.range},
+ org.apache.hadoop.*;version=${hadoop.range},
+ org.apache.pig.*;version=${pig.range},
+ org.apache.thrift.*;version=${thrift.range},
  org.apache.commons.logging;version="[1.1.1, 2.0.0)",
- org.apache.commons.dbcp.*;version="[1.2.2, 2.0.0)";resolution:=optional,
- org.apache.commons.io.*;version="[1.4.0, 2.0.0)";resolution:=optional,
- org.aspectj.*;version="0",
- javax.sql;version="0",
- javax.servlet.*;version="0";resolution:=optional,
  org.w3c.dom.*;version="0"
