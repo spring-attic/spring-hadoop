@@ -200,15 +200,21 @@ javadoc {
       outputLevel = org.gradle.external.javadoc.JavadocOutputLevel.QUIET
       breakIterator = true
       showFromProtected()
-      groups = [
-        'Spring Data Hadoop' : ['org.springframework.data.hadoop*'],
-      ]
+      
+//      groups = [
+//        'Spring Data Hadoop' : ['org.springframework.data.hadoop*'],
+//      ]
   
      links = [
         "http://static.springframework.org/spring/docs/3.1.x/javadoc-api",
         "http://download.oracle.com/javase/6/docs/api",
         "http://logging.apache.org/log4j/docs/api/",
-        "http://atinject.googlecode.com/svn/trunk/javadoc/",
+        "http://hadoop.apache.org/common/docs/current/api/",
+        "http://hbase.apache.org/apidocs/",
+        "http://pig.apache.org/docs/r0.9.1/api/",
+        "http://hive.apache.org/docs/r0.7.1/api/",
+        "http://static.springsource.org/spring-batch/apidocs/",
+        "http://static.springsource.org/spring-integration/api/",
         "http://jakarta.apache.org/commons/logging/apidocs/"
      ]
      

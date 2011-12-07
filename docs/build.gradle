@@ -25,7 +25,10 @@ def imagesDir = new File(projectDir, 'src/reference/resources/images');
 imgSpec = copySpec {
     into ('reference') {
         from("$projectDir/src/reference/resources") {
-            include "css/**/*"
+            include 'css/**/*'
+        }
+        from("$buildDir/docs") {
+            include '*.pdf'
         }
     }
     
@@ -39,6 +42,7 @@ refSpec = copySpec {
     into ('reference') {
         from("$buildDir/docs") {
            exclude '*.fo'
+           exclude '*.pdf'
         }
     }
     

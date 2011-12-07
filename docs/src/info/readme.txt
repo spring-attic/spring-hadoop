@@ -1,5 +1,5 @@
-SPRING HADOOP
--------------
+SPRING DATA HADOOP
+------------------
 http://www.springsource.org/spring-data/hadoop
 
 1. INTRODUCTION

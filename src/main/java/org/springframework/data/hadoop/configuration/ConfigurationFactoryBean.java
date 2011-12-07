@@ -104,7 +104,7 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 	 * Creates a configuration instance potentially using the existing one (passed as an argument - which can be null). 
 	 * 
 	 * @param existing
-	 * @return
+	 * @return configuration instance
 	 */
 	protected Configuration createConfiguration(Configuration existing) {
 		return (existing != null ? new Configuration(existing) : new Configuration(loadDefaults));

@@ -1,8 +1,8 @@
-SPRING HADOOP CHANGELOG
-=======================
-http://www.springsource.org/spring-hadoop
+SPRING DATA HADOOP CHANGELOG
+============================
+http://www.springsource.org/spring-data/hadoop
 
-Changes in version 1.1.0.M1 (2011-mm-dd)
+Changes in version 1.1.0.M1 (201y-mm-dd)
 ----------------------------------------
 
 General

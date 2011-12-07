@@ -14,25 +14,30 @@
 package org.springframework.data.hadoop;
 
 /**
- * @author Dave Syer
+ * Core Hadoop Exception.
  * 
+ * @author Dave Syer
  */
 @SuppressWarnings("serial")
 public class HadoopException extends RuntimeException {
 
 	/**
-	 * @param message the message for this exception
-	 * @param e the cause of this exception
+	 * Constructs a new <code>HadoopException</code> instance.
+	 *
+	 * @param message message
+	 * @param ex exception
 	 */
-	public HadoopException(String message, Throwable e) {
-		super(message, e);
+	public HadoopException(String message, Throwable ex) {
+		super(message, ex);
 	}
 
 	/**
-	 * @param message the message for this exception
+	 * 
+	 * Constructs a new <code>HadoopException</code> instance.
+	 *
+	 * @param message message
 	 */
 	public HadoopException(String message) {
 		super(message);
 	}
-
 }

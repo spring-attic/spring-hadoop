@@ -46,7 +46,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Factory bean for creating Hadoop jobs. For Spring-aware jobs, see {@link AutowiredJobFactoryBean}.
+ * Factory bean for creating Hadoop jobs.
  * 
  * @author Costin Leau
  */
