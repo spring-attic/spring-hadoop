@@ -27,14 +27,13 @@
   <toc />
   <xi:include href="preface.xml"/>
 
-  <!--
   <part id="introduction">
       <title>Introduction</title>
-
-	    <xi:include href="introduction/introduction.xml"/>
- 
+      <xi:include href="introduction/introduction.xml"/>
+      <xi:include href="introduction/requirements.xml"/>      
   </part>
-
+  
+  <!--
   <part id="reference">
       <title>Reference Documentation</title>
 
@@ -44,18 +43,19 @@
       <xi:include href="reference/serialization.xml"/>
       <xi:include href="reference/samples.xml"/>
   </part>
-
+   -->
   <part id="resources">
       <title>Other Resources</title>
       <partintro>
           <para>
               In addition to this reference documentation, there are a number of
-              other resources that may help you learn how to use GemFire and Spring framework. 
+              other resources that may help you learn how to use Hadoop and Spring framework. 
               These additional, third-party resources are enumerated in this section.
           </para>
       </partintro>
       <xi:include href="links.xml"/>
   </part>
+  <!--
   <part id="appendices">
       <title>Appendices</title>
       <xi:include href="appendix/appendix-schema.xml"/>

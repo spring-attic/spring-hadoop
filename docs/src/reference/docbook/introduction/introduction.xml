@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<partintro xmlns="http://docbook.org/ns/docbook" version="5.0">
+    <para>
+      <para>This document is the reference guide for Spring Hadoop project (SHDP). It explains the relationship
+      between Spring framework and Hadoop (and the various related projects) 0.2X, defines the basic concepts and semantics of the integration
+      and how these can be used effectively.
+      </para>
+    </para>
+</partintro>
