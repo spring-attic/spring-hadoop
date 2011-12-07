@@ -1,0 +1,20 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:c="http://www.springframework.org/schema/c"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+      	http://www.springframework.org/schema/batch	http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
+      	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!-- 
+	<import resource="../hadoop-ctx.xml"/>
+	 -->
+	 
+	<context:property-placeholder location="test.properties"/>
+	
+	<bean id="pig-ctx" class="org.springframework.data.hadoop.pig.PigContextFactoryBean" p:exec-type="LOCAL"/>
+	<bean id="pig" class="org.springframework.data.hadoop.pig.PigServerFactoryBean" p:pig-context-ref="pig-ctx" p:scripts="classpath:org/springframework/data/hadoop/pig/script.pig"/>
+	
+</beans>

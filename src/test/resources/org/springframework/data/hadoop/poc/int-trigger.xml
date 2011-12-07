@@ -1,0 +1,28 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:file="http://www.springframework.org/schema/integration/file"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+      	http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+      	http://www.springframework.org/schema/integration/file http://www.springframework.org/schema/integration/file/spring-integration-file.xsd">
+
+	<!--  watch for input files to act as a trigger -->
+	
+	<file:inbound-channel-adapter id="input-logs" directory="file:bin/${input.directory}" filename-pattern="*ready" channel="in">
+		<int:poller fixed-delay="1000"/>
+	</file:inbound-channel-adapter>
+	
+	<int:channel id="in"/>
+	
+	<!-- once detected, trigger  -->
+	<int:service-activator input-channel="in" output-channel="done" expression="@jobLauncher.run(@batch, new org.springframework.batch.core.JobParameters())"/>
+
+	<int:logging-channel-adapter id="done"/>
+	
+	<int:resource-inbound-channel-adapter id="hdfs-trigger" channel="logger" pattern-resolver="hadoop-resource-loader" pattern="**/*">
+		<int:poller fixed-rate="200"/>
+	</int:resource-inbound-channel-adapter>
+
+	<int:logging-channel-adapter id="logger" expression="T(java.util.Arrays).toString(payload)" level="WARN"/>	
+</beans>

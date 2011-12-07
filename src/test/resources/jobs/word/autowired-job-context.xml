@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+	<bean id="autowiredWordCount" class="org.springframework.data.hadoop.mapreduce.JobFactoryBean">
+		<property name="mapper" ref="mapper" />
+		<property name="combiner" ref="reducer" />
+		<property name="reducer" ref="reducer" />
+		<property name="inputPaths" value="target/input/word" />
+		<property name="outputPath" value="target/output/word" />
+		<property name="outputKeyClass" value="org.apache.hadoop.io.Text" />
+		<property name="outputValueClass" value="org.apache.hadoop.io.IntWritable" />
+	</bean>
+
+	<bean id="mapper" class="org.springframework.data.hadoop.test.word.TokenizerMapper" />
+	<bean id="reducer" name="combiner" class="org.springframework.data.hadoop.test.word.IntSumReducer" />
+
+</beans>

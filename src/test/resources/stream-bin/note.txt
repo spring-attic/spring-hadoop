@@ -1,0 +1,2 @@
+The executables here are used for running the streaming tests with minimal changes/configurations for each host.
+The Windows executables present here are part of the MSYS project - see http://www.mingw.org/wiki/MSYS for more information.

@@ -1,0 +1,27 @@
+Bundle-SymbolicName: org.springframework.data.hadoop
+Bundle-Name: Spring Data Hadoop
+Bundle-Vendor: SpringSource
+Bundle-ManifestVersion: 2
+Export-Template: org.springframework.data.hadoop.*;version=${version}
+Import-Template: 
+ org.springframework.beans.*;version=${spring.range},
+ org.springframework.context.*;version=${spring.range},
+ org.springframework.jdbc.*;version=${spring.range},
+ org.springframework.aop.*;version=${spring.range},
+ org.springframework.expression.*;version=${spring.range},
+ org.springframework.util.*;version=${spring.range},
+ org.springframework.core.*;version=${spring.range},
+ org.springframework.stereotype.*;version=${spring.range},
+ org.springframework.scheduling.*;version=${spring.range},
+ org.springframework.ui.*;version=${spring.range},
+ org.springframework.transaction.*;version=${spring.range},
+ org.springframework.web.*;version=${spring.range},
+ org.springframework.validation.*;version=${spring.range},
+ org.springframework.batch.*;version=${batch.range},
+ org.apache.hadoop.hbase.*;version=${hbase.range},
+ org.apache.hadoop.hive.*;version=${hive.range},
+ org.apache.hadoop.*;version=${hadoop.range},
+ org.apache.pig.*;version=${pig.range},
+ org.apache.thrift.*;version=${thrift.range},
+ org.apache.commons.logging;version="[1.1.1, 2.0.0)",
+ org.w3c.dom.*;version="0"
