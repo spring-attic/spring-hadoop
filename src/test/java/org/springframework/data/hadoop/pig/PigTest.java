@@ -18,6 +18,7 @@ package org.springframework.data.hadoop.pig;
 import org.apache.pig.PigServer;
 import org.junit.Test;
 import org.springframework.context.support.GenericXmlApplicationContext;
+import org.springframework.data.hadoop.TestUtils;
 
 import static org.junit.Assert.*;
 
@@ -26,9 +27,12 @@ import static org.junit.Assert.*;
  */
 public class PigTest {
 
+	{
+		TestUtils.hackHadoopStagingOnWin();
+	}
+
 	@Test
 	public void testPig() throws Exception {
-
 		GenericXmlApplicationContext ctx = new GenericXmlApplicationContext(
 				"/org/springframework/data/hadoop/pig/basic.xml");
 
