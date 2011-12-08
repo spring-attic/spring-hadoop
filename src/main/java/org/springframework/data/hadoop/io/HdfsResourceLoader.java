@@ -30,6 +30,7 @@ import org.springframework.core.PriorityOrdered;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.util.AntPathMatcher;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.PathMatcher;
 
 /**
@@ -138,16 +139,18 @@ public class HdfsResourceLoader implements ResourcePatternResolver, PriorityOrde
 	private void doRetrieveMatchingResources(Path rootDir, String subPattern, Set<Resource> results) throws IOException {
 		if (!fs.isFile(rootDir)) {
 			FileStatus[] statuses = fs.listStatus(rootDir);
+			
+			if (!ObjectUtils.isEmpty(statuses)) {
+				for (FileStatus fileStatus : statuses) {
+					Path p = fileStatus.getPath();
+					String location = stripPrefix(p.toUri().getPath());
+					if (fileStatus.isDir() && pathMatcher.matchStart(subPattern, location)) {
+						doRetrieveMatchingResources(p, subPattern, results);
+					}
 
-			for (FileStatus fileStatus : statuses) {
-				Path p = fileStatus.getPath();
-				String location = stripPrefix(p.toUri().getPath());
-				if (fileStatus.isDir() && pathMatcher.matchStart(subPattern, location)) {
-					doRetrieveMatchingResources(p, subPattern, results);
-				}
-
-				else if (pathMatcher.match(subPattern, location)) {
-					results.add(new HdfsResource(p, fs));
+					else if (pathMatcher.match(subPattern, location)) {
+						results.add(new HdfsResource(p, fs));
+					}
 				}
 			}
 		}
