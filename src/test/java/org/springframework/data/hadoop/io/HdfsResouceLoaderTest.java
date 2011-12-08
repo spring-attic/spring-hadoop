@@ -21,6 +21,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.UUID;
 
 import org.apache.hadoop.fs.FileStatus;
@@ -32,6 +33,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.WritableResource;
+import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.data.hadoop.configuration.ConfigurationFactoryBean;
 
 import static org.junit.Assert.*;
@@ -48,8 +50,11 @@ public class HdfsResouceLoaderTest {
 
 	@Before
 	public void before() throws Exception {
+
+		Properties prop = PropertiesLoaderUtils.loadAllProperties("test.properties");
+
 		Map<String, Object> props = new LinkedHashMap<String, Object>();
-		props.put("fs.default.name", "hdfs://localhost");
+		props.put("fs.default.name", prop.get("hd.fs"));
 
 		ConfigurationFactoryBean cfb = new ConfigurationFactoryBean();
 		cfb.setBeanClassLoader(getClass().getClassLoader());
