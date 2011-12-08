@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.hadoop.poc;
+package org.springframework.data.hadoop.pig.poc;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.junit.Test;
 import org.springframework.context.support.GenericXmlApplicationContext;
+import org.springframework.data.hadoop.TestUtils;
 
 /**
  * This test acts as a tiny sample that builds a small data pipeline for doing log analysis.
@@ -27,6 +28,11 @@ import org.springframework.context.support.GenericXmlApplicationContext;
  * @author Costin Leau
  */
 public class LogAnalyzerTest {
+
+	{
+		TestUtils.hackHadoopStagingOnWin();
+	}
+
 
 	@Test
 	public void executePOC() throws Exception {

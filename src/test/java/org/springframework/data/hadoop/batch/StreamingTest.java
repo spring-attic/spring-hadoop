@@ -22,6 +22,7 @@ import org.apache.hadoop.mapreduce.Job;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericXmlApplicationContext;
+import org.springframework.data.hadoop.TestUtils;
 
 /**
  * Test running a basic streaming example
@@ -37,6 +38,10 @@ import org.springframework.context.support.GenericXmlApplicationContext;
  * @author Costin Leau
  */
 public class StreamingTest {
+
+	{
+		TestUtils.hackHadoopStagingOnWin();
+	}
 
 	@Test
 	public void testStreaming() throws Exception {
