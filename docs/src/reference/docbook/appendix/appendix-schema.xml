@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<appendix xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="appendix-schema" xmlns:xi="http://www.w3.org/2001/XInclude">
+    <title>Spring Data Hadoop Schema</title>
+
+	<para>Spring Hadoop Schema</para>	
+    <programlisting language="xml"><xi:include href="../../../../../src/main/resources/org/springframework/data/hadoop/config/spring-hadoop-1.0.xsd" parse="text" xmlns:xi="http://www.w3.org/2001/XInclude">
+       <xi:fallback>
+    	<para><emphasis>FIXME: SHDP SCHEMA LOCATION/NAME CHANGED</emphasis></para>
+  	   </xi:fallback>
+  	 </xi:include>
+    </programlisting>
+
+</appendix>

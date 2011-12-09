@@ -33,17 +33,17 @@
       <xi:include href="introduction/requirements.xml"/>      
   </part>
   
-  <!--
   <part id="reference">
       <title>Reference Documentation</title>
-
+       <!--
       <xi:include href="reference/introduction.xml"/>
+      -->
       <xi:include href="reference/bootstrap.xml"/>
       <xi:include href="reference/data.xml"/>
       <xi:include href="reference/serialization.xml"/>
       <xi:include href="reference/samples.xml"/>
   </part>
-   -->
+
   <part id="resources">
       <title>Other Resources</title>
       <partintro>
@@ -55,10 +55,8 @@
       </partintro>
       <xi:include href="links.xml"/>
   </part>
-  <!--
   <part id="appendices">
       <title>Appendices</title>
       <xi:include href="appendix/appendix-schema.xml"/>
   </part>
-  -->
 </book>
