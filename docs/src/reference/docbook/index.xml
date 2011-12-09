@@ -35,13 +35,13 @@
   
   <part id="reference">
       <title>Reference Documentation</title>
-       <!--
       <xi:include href="reference/introduction.xml"/>
+      <xi:include href="reference/hadoop.xml"/>
+      <!--
+      <xi:include href="reference/hbase.xml"/>
+      <xi:include href="reference/hive.xml"/>
+      <xi:include href="reference/pig.xml"/>
       -->
-      <xi:include href="reference/bootstrap.xml"/>
-      <xi:include href="reference/data.xml"/>
-      <xi:include href="reference/serialization.xml"/>
-      <xi:include href="reference/samples.xml"/>
   </part>
 
   <part id="resources">
@@ -53,6 +53,9 @@
               These additional, third-party resources are enumerated in this section.
           </para>
       </partintro>
+      <!--
+      <xi:include href="dev.xml"/>
+      -->
       <xi:include href="links.xml"/>
   </part>
   <part id="appendices">

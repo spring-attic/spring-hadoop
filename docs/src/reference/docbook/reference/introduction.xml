@@ -1,0 +1,28 @@
+<partintro>
+   <title>Document structure</title>
+
+   <para>This part of the reference documentation explains the core functionality
+   offered by Spring Hadoop (SHDP) integration.</para>
+
+   <para><xref linkend="hadoop"/> describes the configuration support provided for
+   bootstrapping, initializing and working with core Hadoop.</para>
+
+    <!--
+   <para><xref linkend="hbase"/> explains the integration between HBase and Spring Hadoop.
+   </para>
+
+   <para><xref linkend="hive"/> describes the Spring support for Hive.
+   </para>
+
+   <para><xref linkend="pig"/> provides an tour of the Pig integration.
+   </para>
+    -->
+   <!-- 
+   <para><xref linkend="samples"/> describes the samples provided with the distribution
+   for showcasing the various features available in Spring GemFire.
+   </para>
+
+   <para><xref linkend="testing"/> showcases various ways of testing GemFire inside
+   Spring framework.</para>
+ 	-->
+</partintro>
