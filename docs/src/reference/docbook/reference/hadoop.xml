@@ -62,7 +62,7 @@
  			<area id="hdp#default-ns#prefix" coords="2 64"/>
  			<area id="hdp#default-ns#beans-prefix" coords="3 64"/>
  			<area id="hdp#default-ns#beans-example" coords="9 64"/>
- 			<area id="hdp#default-ns#gfe-example" coords="11 64"/>
+ 			<area id="hdp#default-ns#hdp-example" coords="11 64"/>
  		</areaspec>
  		<programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <beans:beans xmlns="http://www.springframework.org/schema/hadoop"
@@ -87,7 +87,7 @@
  			<callout arearefs="hdp#default-ns#beans-example">
  				<para>Bean declaration using the <literal>&lt;beans&gt;</literal> namespace. Notice the prefix.</para>
  			</callout>
- 			<callout arearefs="hdp#default-ns#gfe-example">
+ 			<callout arearefs="hdp#default-ns#hdp-example">
  				<para>Bean declaration using the <literal>&lt;hdp&gt;</literal> namespace. Notice the <emphasis>lack</emphasis> of prefix (as <literal>hdp</literal> is the default namespace).</para>
  			</callout>
  		</calloutlist>
@@ -110,5 +110,67 @@
    	 <para>The declaration above defines a <classname>Configuration</classname> bean (to be precise a factory bean of type <classname>ConfigurationFactoryBean</classname>) named, by default, 
    	 <literal>hadoop-configuration</literal>. The default name is used, by conventions, by the other elements that require a configuration - this leads to simple and very concise configurations as the 
    	 main components can automatically wire themselves up without requiring any specific configuration.</para>
+   	 
+   	 <para>For scenarios where the defaults need to be tweaked, one can pass in additional configuration files:</para>
+   	 
+   	 <programlisting language="xml"><![CDATA[<hdp:configuration resources="classpath:/custom-site.xml, classpath:/hq-site.xml"]]></programlisting>
+   	 
+   	 <para>In this example, two additional Hadoop configuration resources are added to the configuration.</para>
+   	 
+    <note>
+        <para>Note that the configuration makes use of Spring's <ulink
+        url="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/resources.html"><interfacename>Resource</interfacename></ulink>
+        abstraction to locate the file. This allows various search patterns to be used, depending on the running environment or the prefix specified
+        (if any) by the value - in this example the classpath is used.</para>
+    </note>
+
+    <para>In addition to referencing configuration resources, one can tweak Hadoop settings directly through Java <classname>Properties</classname>. 
+    This can be quite handy when just a few options need to be changed:</para>
+    
+    <programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:hdp="http://www.springframework.org/schema/hadoop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
+        
+     <hdp:configuration>
+        <entry key="fs.default.name" value="hdfs://localhost:9000"/>
+        <entry key="hadoop.tmp.dir" value="/tmp/hadoop"/>
+     </hdp:configuration>
+</beans>]]></programlisting>
+
+     <para>One can further customize the settings by avoiding the so called <emphasis>hard-coded</emphasis> values by externalizing them so they can be replaced at runtime, based on the existing
+     environment without touching the configuration:</para>
+     
+    <programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:hdp="http://www.springframework.org/schema/hadoop"
+    xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
+        
+     <hdp:configuration>
+        <entry key="fs.default.name" value="${hd.fs}"/>
+        <entry key="hadoop.tmp.dir" value="file://${java.io.tmpdir}"/>
+     </hdp:configuration>
+     
+     <context:property-placeholder location="classpath:hadoop.properties" />     
+</beans>]]></programlisting>
+     
+     <para>
+     Through Spring's property placeholder <ulink url="http://static.springsource.org/spring/docs/3.0.x/reference/beans.html#beans-factory-placeholderconfigurer">support</ulink>, <ulink url="http://static.springsource.org/spring/docs/3.0.x/reference/expressions.html">SpEL</ulink> and the <ulink url="http://blog.springsource.com/2011/06/09/spring-framework-3-1-m2-released/">environment 
+     abstraction</ulink> one can externalize environment specific properties from the main code base easing the deployment across multiple machines. In the example above, the default file system is
+     replaced based on the properties available in <literal>hadoop.properties</literal> while the temp dir is determined dynamically through <literal>SpEL</literal>. Both approaches offer a lot
+     of flexbility in adapting to the running environment - in fact we use this approach extensivly in the Spring Hadoop test suite to cope with the differences between the different development boxes
+     and the CI server.</para>
+     
+     <para>Another option worth mentioning is <literal>register-url-handler</literal> which, as the name implies, automatically registers an URL handler in the running VM. This allows urls referrencing 
+     <emphasis>hdfs</emphasis> resource (by using the <literal>hdfs</literal> prefix) to be properly resolved - if the handler is not registered, such an URL would through an exception since the VM does not know what 
+     <literal>hdfs</literal> mean.</para>
+     <note><para>Since only one URL handler can be registered per VM, at most once, this option is turned off by default. Due to the reasons mentioned before, once enabled if it fails, it will log the error but will not
+     throw an exception. If your <literal>hdfs</literal> URLs stop working, make sure to investigate this aspect.</para></note>
    </section>
 </chapter>
