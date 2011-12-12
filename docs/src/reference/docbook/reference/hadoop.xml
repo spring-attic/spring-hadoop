@@ -178,7 +178,7 @@
 </hdp:configuration>
      
 <hdp:configuration id="custom" configuration-ref="hadoop-configuration">
-	<entry key="fs.default.name" value="${custom.hd.fs}"/>
+    <entry key="fs.default.name" value="${custom.hd.fs}"/>
 </hdp:configuration>     
 
 ...
@@ -199,11 +199,10 @@
    	 <para>Once the Hadoop configuration is taken care of, one needs to actually submit some work to it. SHDP makes it easy to configure and run Hadoop jobs whether they are vanilla map-reduce type or streaming.
    	 Let us start with an example:</para>
    	 
-   	 <programlisting> language="xml"><![CDATA[<hdp:job id="mr-job" 
-	    input-path="/input/" output-path="/ouput/"
-		mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
-		reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"/>]]>
-   	 </programlisting>
+   	 <programlisting language="xml"><![CDATA[<hdp:job id="mr-job" 
+   	 input-path="/input/" output-path="/ouput/"
+   	 mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
+   	 reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"/>]]></programlisting>
    	 
    	 <para>The declaration above creates a typical Hadoop <literal>Job</literal>: specifies its input and output, the mapper and the reducer classes. Notice that there is no reference to the Hadoop configuration above - that's
    	 because, if not specified, the default naming convention (<literal>hadoop-configuration</literal>) will be used instead. Neither are the key or value types - these two are automatically determined through a best-effort attempt
@@ -222,18 +221,17 @@
 	 	<title>Creating a Hadoop Streaming Job</title>
 	 	
 	 	<para>Hadoop <ulink url="http://hadoop.apache.org/common/docs/current/streaming.html">Streaming</ulink> jobs (or in short streaming), are a popular feature of Hadoop as they allow the creation of Map/Reduce jobs
-	 	with any executable or script (the equivalent of using the previous counting words example is to use <ulink url="http://en.wikipedia.org/wiki/Cat_%28Unix%29"/> and <ulink url="http://en.wikipedia.org/wiki/Wc_%28Unix%29"/>).
+	 	with any executable or script (the equivalent of using the previous counting words example is to use <ulink url="http://en.wikipedia.org/wiki/Cat_%28Unix%29"><literal>cat</literal></ulink> and 
+	 	<ulink url="http://en.wikipedia.org/wiki/Wc_%28Unix%29"><literal>wc</literal></ulink> commands).
 	 	While it is rather easy to start up Streaming from the command line, doing so programatically, such as from a Java environment, can be challenging due to the various number of parameters (and their ordering) 
 	 	that need to be parsed. SHDP simplifies such as tasks - it's as easy and straight-forward as declaring a <literal>job</literal> from the previous section; in fact most of the attributes will be the same:</para>
 	 	
-   	 <programlisting> language="xml"><![CDATA[<hdp:stream-job id="stream-job" 
-	    input-path="/input/" output-path="/ouput/"
-		mapper="${path.cat}"
-		reducer="${path.wc}"/>]]>
-   	 </programlisting>
+   	 <programlisting language="xml"><![CDATA[<hdp:stream-job id="stream-job" 
+   	 input-path="/input/" output-path="/ouput/"
+   	 mapper="${path.cat}" reducer="${path.wc}"/>]]></programlisting>
 	 	
 	 	<para>If certain properties need to be specified (typically the <literal>-D</literal> or <literal>-cmdenv</literal> arguments), consider creating a dedicated configuration object as documented 
-	 	<ulink url="hadoop:config:inherit">above</ulink></para>
+	 	<link linkend="hadoop:config:inherit">above</link></para>
 	 </section>   	 
    </section>
 </chapter>

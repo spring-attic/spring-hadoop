@@ -84,7 +84,7 @@ public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanN
 	private String outputPath;
 	private Boolean compressOutput;
 	private Class<? extends CompressionCodec> codecClass;
-	private Boolean validatePaths = Boolean.TRUE;
+	private Boolean validatePaths = Boolean.FALSE;
 
 	public void setBeanName(String name) {
 		this.name = name;
