@@ -1,5 +1,4 @@
 .gradle
-target
 bin
 build
 .settings
