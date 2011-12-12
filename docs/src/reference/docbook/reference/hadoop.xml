@@ -1,7 +1,114 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter xmlns="http://docbook.org/ns/docbook" version="5.0"  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" xml:id="hadoop">
   
-  <title>Spring and Hadoop integration</title>
+  <title>Spring and Hadoop</title>
 
-  <para></para>
+  <para>One of the common tasks when using Hadoop is interacting with its <emphasis>runtime</emphasis> - whether it is a local setup or a remote cluster, one needs to properly configure and bootstrap Hadoop
+  in order to submit the required jobs. This chapter will focus on how Spring Hadoop (SHDP) leverages Spring's lightweight IoC container to simplify the interaction with Hadoop and make deployment, testing and provisioning
+  easier and more manageable.</para>
+  
+  <section id="hadoop:ns">
+  	<title>Using the Spring Hadoop Namespace</title>
+  	
+  	<para>To simplify configuration, SHDP provides a dedicated namespace for most of its components. However, one can opt to configure the beans
+  	directly through the usual <literal>&lt;bean&gt;</literal> definition. For more information about XML Schema-based configuration in Spring, see 
+  	<ulink url="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/xsd-config.html">this</ulink> appendix in the
+  	Spring Framework reference documentation.</para>
+  	
+  	<para>To use the SHDP namespace, one just needs to import it inside the configuration:</para>
+
+ 	<programlistingco>
+ 		<areaspec>
+ 			<area id="hdp#ns#prefix" coords="4 11"/>
+ 			<area id="hdp#ns#uri" coords="4 58"/>
+ 			<area id="hdp#ns#uri#loc" coords="7 119"/>
+ 			<area id="hdp#ns#example" coords="10 9"/>
+ 		</areaspec>
+ 		<programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:hdp="http://www.springframework.org/schema/hadoop"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
+	<bean id ... >
+	
+    <hdp:configuration ...>
+		
+</beans>]]></programlisting>
+ 		<calloutlist>
+ 			<callout arearefs="hdp#ns#prefix">
+ 				<para>Spring Hadoop namespace prefix. Any name can do but through out the reference documentation, the <literal>hdp</literal> will be used.</para>
+ 			</callout>
+ 			<callout arearefs="hdp#ns#uri">
+ 				<para>The namespace URI.</para>
+ 			</callout>
+ 			<callout arearefs="hdp#ns#uri#loc">
+ 				<para>The namespace URI location. Note that even though the location points to an external address (which exists and is valid), Spring will resolve
+ 				the schema locally as it is included in the Spring Hadoop library.</para>
+ 			</callout>
+ 			<callout arearefs="hdp#ns#example">
+ 				<para>Declaration example for the Hadoop namespace. Notice the prefix usage.</para>
+ 			</callout>
+ 		</calloutlist>
+ 	</programlistingco>
+ 	
+ 	<para>Once declared, the namespace elements can be declared simply by appending the aforementioned prefix. Note that is possible to change the default namespace,
+ 	for example from <literal>&lt;beans&gt;</literal> to <literal>&lt;hdp&gt;</literal>. This is useful for configuration composed mainly of Hadoop components as
+ 	it avoids declaring the prefix. To achieve this, simply swap the namespace prefix declaration above:</para>
+
+ 	<programlistingco>
+ 		<areaspec>
+ 			<area id="hdp#default-ns#prefix" coords="2 64"/>
+ 			<area id="hdp#default-ns#beans-prefix" coords="3 64"/>
+ 			<area id="hdp#default-ns#beans-example" coords="9 64"/>
+ 			<area id="hdp#default-ns#gfe-example" coords="11 64"/>
+ 		</areaspec>
+ 		<programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/hadoop"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xsi:schemaLocation="
+	    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	    http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/gemfire/spring-hadoop.xsd">
+	    
+    <beans:bean id ... >
+	
+    <configuration ...>
+	
+</beans:beans>]]></programlisting>
+ 		<calloutlist>
+ 			<callout arearefs="hdp#default-ns#prefix">
+ 				<para>The default namespace declaration for this XML file points to the Spring Hadoop namespace.</para>
+ 			</callout>
+ 			<callout arearefs="hdp#default-ns#beans-prefix">
+ 				<para>The beans namespace prefix declaration.</para>
+ 			</callout>
+ 			<callout arearefs="hdp#default-ns#beans-example">
+ 				<para>Bean declaration using the <literal>&lt;beans&gt;</literal> namespace. Notice the prefix.</para>
+ 			</callout>
+ 			<callout arearefs="hdp#default-ns#gfe-example">
+ 				<para>Bean declaration using the <literal>&lt;hdp&gt;</literal> namespace. Notice the <emphasis>lack</emphasis> of prefix (as <literal>hdp</literal> is the default namespace).</para>
+ 			</callout>
+ 		</calloutlist>
+ 	</programlistingco>
+ 	
+ 	<para>For the remainder of this doc, to improve readability, the XML examples will simply refer to the <literal>&lt;hdp&gt;</literal> namespace
+ 	without the namespace declaration, where possible.</para>
+  </section>
+  
+   <section id="hadoop:config">
+   	 <title>Configuring Hadoop</title>
+   	 
+   	 <para>In order to use Hadoop, one needs to first configure it namely by creating a <literal>Configuration</literal> object. The configuration holds information about the job tracker, the input, output format and the various
+   	 other parameters of the map reduce job.</para>
+   	 
+   	 <para>In its simplest form, the configuration definition is a one liner:</para>
+   	 
+   	 <programlisting language="xml"><![CDATA[<hdp:configuration />]]></programlisting>
+   	 
+   	 <para>The declaration above defines a <classname>Configuration</classname> bean (to be precise a factory bean of type <classname>ConfigurationFactoryBean</classname>) named, by default, 
+   	 <literal>hadoop-configuration</literal>. The default name is used, by conventions, by the other elements that require a configuration - this leads to simple and very concise configurations as the 
+   	 main components can automatically wire themselves up without requiring any specific configuration.</para>
+   </section>
 </chapter>

@@ -10,4 +10,9 @@
     that decouples your MapReduce classes from Hadoop specific details such as base classes and data types.
 	</para>
 	
+	<para>This document assumes the reader already has a basic familiarity with the Spring Framework and Hadoop concepts and APIs.</para>
+	<para>While every effort has been made to ensure that this documentation is comprehensive and there are no errors, nevertheless some topics might require more explanation and some typos might have 
+	crept in. If you do spot any mistakes or even more serious errors and you can spare a few cycles during lunch, please do bring the error to the attention of the Spring Hadoop team by raising an issue. 
+	Thank you.</para>
+	
 </preface>
