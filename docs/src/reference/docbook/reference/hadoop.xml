@@ -167,6 +167,25 @@
      of flexbility in adapting to the running environment - in fact we use this approach extensivly in the Spring Hadoop test suite to cope with the differences between the different development boxes
      and the CI server.</para>
      
+     <para><anchor id="hadoop:config:inherit"/>It is possible to create configuration based on existing ones - this allows one to create dedicated configurations, slightly different from the main ones, usable for certain jobs 
+     (such as streaming - more about that below). Simply use the <literal>configuration-ref</literal> attribute to refer to the <emphasis>parent</emphasis> configuration - all its properties will be inherited and
+     overridden as specified by the child:</para>
+
+    <programlisting language="xml"><![CDATA[<!-- default name is 'hadoop-configuration' -->
+<hdp:configuration>
+    <entry key="fs.default.name" value="${hd.fs}"/>
+    <entry key="hadoop.tmp.dir" value="file://${java.io.tmpdir}"/>
+</hdp:configuration>
+     
+<hdp:configuration id="custom" configuration-ref="hadoop-configuration">
+	<entry key="fs.default.name" value="${custom.hd.fs}"/>
+</hdp:configuration>     
+
+...
+]]></programlisting>     
+     <para>Make sure though you specify a different name since otherwise, since both definitions will have the same name, the Spring container will interpret this as being the same
+     definition (and will usually consider the last one found).</para>
+     
      <para>Another option worth mentioning is <literal>register-url-handler</literal> which, as the name implies, automatically registers an URL handler in the running VM. This allows urls referrencing 
      <emphasis>hdfs</emphasis> resource (by using the <literal>hdfs</literal> prefix) to be properly resolved - if the handler is not registered, such an URL would through an exception since the VM does not know what 
      <literal>hdfs</literal> mean.</para>
@@ -205,7 +224,16 @@
 	 	<para>Hadoop <ulink url="http://hadoop.apache.org/common/docs/current/streaming.html">Streaming</ulink> jobs (or in short streaming), are a popular feature of Hadoop as they allow the creation of Map/Reduce jobs
 	 	with any executable or script (the equivalent of using the previous counting words example is to use <ulink url="http://en.wikipedia.org/wiki/Cat_%28Unix%29"/> and <ulink url="http://en.wikipedia.org/wiki/Wc_%28Unix%29"/>).
 	 	While it is rather easy to start up Streaming from the command line, doing so programatically, such as from a Java environment, can be challenging due to the various number of parameters (and their ordering) 
-	 	that need to be parsed. SHDP simplifies such as tasks - it's as easy and straight-forward as declaring a <literal>job</literal> from the previous section; in fact most of the attributes will be the same.</para>
+	 	that need to be parsed. SHDP simplifies such as tasks - it's as easy and straight-forward as declaring a <literal>job</literal> from the previous section; in fact most of the attributes will be the same:</para>
+	 	
+   	 <programlisting> language="xml"><![CDATA[<hdp:stream-job id="stream-job" 
+	    input-path="/input/" output-path="/ouput/"
+		mapper="${path.cat}"
+		reducer="${path.wc}"/>]]>
+   	 </programlisting>
+	 	
+	 	<para>If certain properties need to be specified (typically the <literal>-D</literal> or <literal>-cmdenv</literal> arguments), consider creating a dedicated configuration object as documented 
+	 	<ulink url="hadoop:config:inherit">above</ulink></para>
 	 </section>   	 
    </section>
 </chapter>
