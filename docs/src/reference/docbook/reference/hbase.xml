@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0"  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" xml:id="hbase">
+
+	<title>Working with HBase</title>
+	
+	<para>SHDP provides basic configuration for <ulink url="http://hbase.apache.org">HBase</ulink> through the <literal>hbase-configuration</literal> namespace element (or its backing 
+	<classname>HbaseConfigurationFactoryBean</classname>).</para>
+	
+	<programlisting language="xml"><![CDATA[<!-- default bean id is 'hbase-configuration' that uses the existing 'hadoop-configuration' object -->
+<hdp:hbase-configuration configuration-ref="hadoop-configuration" />]]></programlisting>
+	
+	<para>The above declaration does more then easily create an HBase configuration object; it will also manage the backing HBase connections: when the application
+	context shuts down, so will any HBase connections opened - this behavior can be adjusted through the <literal>stop-proxy</literal> and <literal>delete-connection</literal> attributes:</para>
+	
+	<programlisting language="xml"><![CDATA[<!-- delete associated connections but do not stop the proxies -->
+<hdp:hbase-configuration stop-proxy="false" delete-connection="true" />]]></programlisting>
+	
+</chapter>

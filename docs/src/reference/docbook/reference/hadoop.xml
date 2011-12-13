@@ -200,9 +200,9 @@
    	 Let us start with an example:</para>
    	 
    	 <programlisting language="xml"><![CDATA[<hdp:job id="mr-job" 
-   	 input-path="/input/" output-path="/ouput/"
-   	 mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
-   	 reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"/>]]></programlisting>
+  input-path="/input/" output-path="/ouput/"
+  mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
+  reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"/>]]></programlisting>
    	 
    	 <para>The declaration above creates a typical Hadoop <literal>Job</literal>: specifies its input and output, the mapper and the reducer classes. Notice that there is no reference to the Hadoop configuration above - that's
    	 because, if not specified, the default naming convention (<literal>hadoop-configuration</literal>) will be used instead. Neither are the key or value types - these two are automatically determined through a best-effort attempt
@@ -227,11 +227,11 @@
 	 	that need to be parsed. SHDP simplifies such as tasks - it's as easy and straight-forward as declaring a <literal>job</literal> from the previous section; in fact most of the attributes will be the same:</para>
 	 	
    	 <programlisting language="xml"><![CDATA[<hdp:stream-job id="stream-job" 
-   	 input-path="/input/" output-path="/ouput/"
-   	 mapper="${path.cat}" reducer="${path.wc}"/>]]></programlisting>
+  input-path="/input/" output-path="/ouput/"
+  mapper="${path.cat}" reducer="${path.wc}"/>]]></programlisting>
 	 	
 	 	<para>If certain properties need to be specified (typically the <literal>-D</literal> or <literal>-cmdenv</literal> arguments), consider creating a dedicated configuration object as documented 
-	 	<link linkend="hadoop:config:inherit">above</link></para>
+	 	<link linkend="hadoop:config:inherit">above</link> and using that for the streaming job.</para>
 	 </section>   	 
    </section>
 </chapter>

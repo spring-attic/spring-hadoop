@@ -7,13 +7,13 @@
    <para><xref linkend="hadoop"/> describes the configuration support provided for
    bootstrapping, initializing and working with core Hadoop.</para>
 
-    <!--
    <para><xref linkend="hbase"/> explains the integration between HBase and Spring Hadoop.
    </para>
 
    <para><xref linkend="hive"/> describes the Spring support for Hive.
    </para>
-
+   
+   <!--
    <para><xref linkend="pig"/> provides an tour of the Pig integration.
    </para>
     -->
