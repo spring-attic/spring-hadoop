@@ -10,6 +10,8 @@ You can find out more details from the [user documentation](http://static.spring
 
 # Artifacts
 
+Maven:
+
     <dependency>
       <groupId>org.springframework.data</groupId>
       <artifactId>spring-data-hadoop</artifactId>
@@ -22,6 +24,8 @@ You can find out more details from the [user documentation](http://static.spring
       <name>Springframework Maven SNAPSHOT Repository</name>
       <url>http://maven.springframework.org/snapshot</url>
     </repository> 
+
+Gradle: 
 
     repositories {
        mavenRepo name: "spring-snapshot", urls: "http://maven.springframework.org/snapshot"
