@@ -4,7 +4,7 @@ Spring Hadoop extends Spring Batch by providing support for reading from and wri
 
 Spring Hadoop also applies the familiar Spring programming model to Java MapReduce jobs by providing support for dependency injection of simple jobs as well as a POJO based MapReduce programming model that decouples your MapReduce classes from Hadoop specific details such as base classes and data types.
 
-You can find out more details from the [reference documentation](http://static.springsource.org/spring-hadoop/docs/current/reference/) or by browsing the [javadocs](http://static.springsource.org/spring-hadoop/docs/current/api/). If you have ideas about how to improve or extend the scope, please feel free to contribute.
+You can find out more details from the [reference documentation](http://static.springsource.org/spring-data/hadoop/docs/current/reference/) or by browsing the [javadocs](http://static.springsource.org/spring-data/hadoop/docs/current/api/). If you have ideas about how to improve or extend the scope, please feel free to contribute.
 
 
 # Contributing to Spring Hadoop
