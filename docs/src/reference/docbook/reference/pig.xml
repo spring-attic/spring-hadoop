@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0"  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" xml:id="pig">
+
+	<title>Pig support</title>
+	
+	<para>For <ulink url="http://pig.apache.org">Pig</ulink> users, SHDP provides easy creation and configuration of <interfacename>PigServer</interfacename> instances for registering and executing scripts either locally
+	or remotely. In its simplest form, the declaration looks as follows:</para>
+	
+	<programlisting language="xml"><![CDATA[<hdp:pig />]]></programlisting>
+	
+	<para>This will create a <interfacename>PigServer</interfacename> instance, named <literal>hadoop-pig</literal>, configured with a default <interfacename>PigContext</interfacename>, 
+	executing scripts in <literal>MapReduce</literal> mode. In typical scenarios however, one might want to connect to a remote Hadoop tracker and register some scripts automatically so let us take a look of how the
+	configuration might look like:</para>
+	
+	<programlisting language="xml"><![CDATA[<hdp:pig scripts="classpath:/scripts/pig/script.pig" configuration-ref="hadoop-configuration" job-name="pig-job" />]]></programlisting>
+	
+	<para>As you can tell, the <literal>pig</literal> namespace offers several options pertaining to Pig configuration. 
+	And, as with the other Hadoop-related integration, the underlying <interfacename>PigServer</interfacename> is bound to the enclosing application context life-cycle; that is, it will automatically start and stop along-side
+	the application so one does not have to worry about its management.</para>
+	
+</chapter>

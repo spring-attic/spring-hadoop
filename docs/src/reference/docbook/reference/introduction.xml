@@ -13,10 +13,8 @@
    <para><xref linkend="hive"/> describes the Spring support for Hive.
    </para>
    
-   <!--
    <para><xref linkend="pig"/> provides an tour of the Pig integration.
    </para>
-    -->
    <!-- 
    <para><xref linkend="samples"/> describes the samples provided with the distribution
    for showcasing the various features available in Spring GemFire.

@@ -39,9 +39,7 @@
       <xi:include href="reference/hadoop.xml"/>
       <xi:include href="reference/hbase.xml"/>
       <xi:include href="reference/hive.xml"/>
-      <!--
       <xi:include href="reference/pig.xml"/>
-      -->
   </part>
 
   <part id="resources">
