@@ -10,7 +10,7 @@ You can find out more details from the [user documentation](http://static.spring
 
 # Artifacts
 
-Maven:
+* Maven:
 
 ~~~~~ xml
 <dependency>
@@ -27,7 +27,7 @@ Maven:
 </repository> 
 ~~~~~
 
-Gradle: 
+* Gradle: 
 
 ~~~~~ groovy
 repositories {
