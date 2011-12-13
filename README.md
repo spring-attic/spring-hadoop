@@ -16,14 +16,22 @@ You can find out more details from the [user documentation](http://static.spring
 <dependency>
   <groupId>org.springframework.data</groupId>
   <artifactId>spring-data-hadoop</artifactId>
-  <version>1.0.0.BUILD-SNAPSHOT</version>
+  <version>${version}</version>
 </dependency> 
 
+<!-- used for nightly builds -->
 <repository>
   <id>spring-maven-snapshot</id>
   <snapshots><enabled>true</enabled></snapshots>
   <name>Springframework Maven SNAPSHOT Repository</name>
   <url>http://maven.springframework.org/snapshot</url>
+</repository> 
+
+<!-- used for milestone/rc releases -->
+<repository>
+  <id>spring-maven-milestone</id>
+  <name>Springframework Maven Milestone Repository</name>
+  <url>http://maven.springframework.org/milestone</url>
 </repository> 
 ~~~~~
 
@@ -32,12 +40,15 @@ You can find out more details from the [user documentation](http://static.spring
 ~~~~~ groovy
 repositories {
    mavenRepo name: "spring-snapshot", urls: "http://maven.springframework.org/snapshot"
+   mavenRepo name: "spring-milestone", urls: "http://maven.springframework.org/milestone"
 }
 
 dependencies {
-   compile "org.springframework.data:spring-data-hadoop:1.0.0.BUILD-SNAPSHOT"
+   compile "org.springframework.data:spring-data-hadoop:${version}"
 }
 ~~~~~
+
+The latest nightly is _1.0.0.BUILD-SNAPSHOT_
 
 # Building
 
