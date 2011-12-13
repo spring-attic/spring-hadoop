@@ -40,18 +40,19 @@
       	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 	
     <!-- basic Hive driver bean -->
-	<bean id="hive-driver" class="org.apache.hadoop.hive.jdbc.HiveDriver"/>
+    <bean id="hive-driver" class="org.apache.hadoop.hive.jdbc.HiveDriver"/>
 
-	<!-- wrapping a basic datasource around the driver -->
-	<!-- notice the 'c:' namespace for inlining constructor arguments 
-		 in this case the url (default is 'jdbc:hive://localhost:10000/default') -->
-	<bean id="hive-ds" class="org.springframework.jdbc.datasource.SimpleDriverDataSource"
-		c:driver-ref="hive-driver" c:url="${hive.url}"/>
+    <!-- wrapping a basic datasource around the driver -->
+    <!-- notice the 'c:' namespace for inlining constructor arguments, 
+         in this case the url (default is 'jdbc:hive://localhost:10000/default') -->
+    <bean id="hive-ds" class="org.springframework.jdbc.datasource.SimpleDriverDataSource"
+       c:driver-ref="hive-driver" c:url="${hive.url}"/>
 
 	<!-- standard JdbcTemplate declaration -->
-	<bean id="template" class="org.springframework.jdbc.core.JdbcTemplate" c:data-source-ref="hive-ds"/>
+    <bean id="template" class="org.springframework.jdbc.core.JdbcTemplate" c:data-source-ref="hive-ds"/>
 	
-	<context:property-placeholder location="hive.properties"/>]]></programlisting>
+    <context:property-placeholder location="hive.properties"/>
+</beans>]]></programlisting>
 	
 		<para>And that is it! Following the example above, one can use the <literal>hive-ds</literal> <interfacename>DataSource</interfacename> bean to manually get a hold of <interfacename>Connection</interfacename>s 
 		or better yet, use Spring's <classname>JdbcTemplate</classname> as in the example above.</para>
