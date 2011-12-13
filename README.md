@@ -13,31 +13,31 @@ You can find out more details from the [user documentation](http://static.spring
 Maven:
 
 ~~~~~ xml
-    <dependency>
-      <groupId>org.springframework.data</groupId>
-      <artifactId>spring-data-hadoop</artifactId>
-      <version>1.0.0.BUILD-SNAPSHOT</version>
-    </dependency> 
+<dependency>
+  <groupId>org.springframework.data</groupId>
+  <artifactId>spring-data-hadoop</artifactId>
+  <version>1.0.0.BUILD-SNAPSHOT</version>
+</dependency> 
 
-    <repository>
-      <id>spring-maven-snapshot</id>
-      <snapshots><enabled>true</enabled></snapshots>
-      <name>Springframework Maven SNAPSHOT Repository</name>
-      <url>http://maven.springframework.org/snapshot</url>
-    </repository> 
+<repository>
+  <id>spring-maven-snapshot</id>
+  <snapshots><enabled>true</enabled></snapshots>
+  <name>Springframework Maven SNAPSHOT Repository</name>
+  <url>http://maven.springframework.org/snapshot</url>
+</repository> 
 ~~~~~
 
 Gradle: 
 
-```xml
-    repositories {
-       mavenRepo name: "spring-snapshot", urls: "http://maven.springframework.org/snapshot"
-    }
-    
-    dependencies {
-       compile "org.springframework.data:spring-data-hadoop:1.0.0.BUILD-SNAPSHOT
-    }
-```
+~~~~~ groovy
+repositories {
+   mavenRepo name: "spring-snapshot", urls: "http://maven.springframework.org/snapshot"
+}
+
+dependencies {
+   compile "org.springframework.data:spring-data-hadoop:1.0.0.BUILD-SNAPSHOT
+}
+~~~~~
 
 # Contributing to Spring Hadoop
 
