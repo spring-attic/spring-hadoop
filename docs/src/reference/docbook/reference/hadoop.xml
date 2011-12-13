@@ -226,7 +226,7 @@
 	 	While it is rather easy to start up Streaming from the command line, doing so programatically, such as from a Java environment, can be challenging due to the various number of parameters (and their ordering) 
 	 	that need to be parsed. SHDP simplifies such as tasks - it's as easy and straight-forward as declaring a <literal>job</literal> from the previous section; in fact most of the attributes will be the same:</para>
 	 	
-   	 <programlisting language="xml"><![CDATA[<hdp:stream-job id="stream-job" 
+   	 <programlisting language="xml"><![CDATA[<hdp:streaming id="streaming" 
   input-path="/input/" output-path="/ouput/"
   mapper="${path.cat}" reducer="${path.wc}"/>]]></programlisting>
 	 	

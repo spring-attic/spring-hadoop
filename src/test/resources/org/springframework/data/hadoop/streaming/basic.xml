@@ -21,7 +21,7 @@
 		p:mapper="${path.cat}"
 		p:reducer="${path.wc}"/>
 		
-	<hdp:stream-job id="ns-stream-job"
+	<hdp:streaming id="ns-stream-job"
 		configuration-ref="hadoop-configuration"
 		input-path="test"
 		output-path="output"

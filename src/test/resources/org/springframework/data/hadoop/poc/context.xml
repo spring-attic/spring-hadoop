@@ -40,7 +40,7 @@
 		validate-paths="false"
 	/>
 
-	<hdp:stream-job id="stream-job" 
+	<hdp:streaming id="stream-job" 
 	    input-path="${log.input}/logs" output-path="${log.output}/stream"
 		mapper="${path.cat}"
 		reducer="${path.wc}"

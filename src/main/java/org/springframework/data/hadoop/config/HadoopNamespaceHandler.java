@@ -27,7 +27,7 @@ class HadoopNamespaceHandler extends NamespaceHandlerSupport {
 	public void init() {
 		registerBeanDefinitionParser("tasklet", new HadoopTaskletParser());
 		registerBeanDefinitionParser("job", new HadoopJobParser());
-		registerBeanDefinitionParser("stream-job", new HadoopStreamJobParser());
+		registerBeanDefinitionParser("streaming", new HadoopStreamJobParser());
 		registerBeanDefinitionParser("configuration", new HadoopConfigParser());
 		registerBeanDefinitionParser("resource-loader", new HadoopResourceLoaderParser());
 		registerBeanDefinitionParser("pig", new PigParser());
