@@ -1,18 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter xmlns="http://docbook.org/ns/docbook" version="5.0"  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" xml:id="hive">
 
-	<title>Working with Hive</title>
+	<title>Hive integration</title>
 	
-	<para>SHDP provides basic configuration for <ulink url="http://hbase.apache.org">HBase</ulink> through the <literal>hbase-configuration</literal> namespace element (or its backing 
-	<classname>HbaseConfigurationFactoryBean</classname>).</para>
+	<para>When working with <ulink url="http://hive.apache.org"/> from a Java environment, one can choose between the <ulink url="http://thrift.apache.org/">Thrift</ulink> client or using the Hive JDBC-like
+	<ulink url="http://hive.apache.org/docs/r0.7.1/api/org/apache/hadoop/hive/jdbc/package-summary.html">driver</ulink>. Both have their pros and cons but no matter the choice, Spring and SHDP supports both of them.</para>
 	
-	<programlisting language="xml"><![CDATA[<!-- default bean id is 'hbase-configuration' that uses the existing 'hadoop-configuration' object -->
-<hdp:hbase-configuration configuration-ref="hadoop-configuration" />]]></programlisting>
+	<section id="hive:thrift">
+	    <title>Using Hive Thrift Client</title>
+	    
+	    <para>SHDP provides a dedicated namespace element for configuring a Hive client (that is Hive accessing a server node through the Thrift). Simply specify the host, the port 
+	    (the defaults are <literal>localhost</literal> and <literal>10000</literal> respectively) and you're good to go:</para>
+	    
+	    <programlisting language="xml"><![CDATA[<!-- by default, the definition name is 'hive-client' -->
+<hdp:hive-client host="some-other-host" port="10001" />]]></programlisting>
+		
+		<para>The Hive client is bound to the enclosing application context life-cycle, that is it will automatically startup and shutdown along-side the application context.</para>
+	</section>
 	
-	<para>The above declaration does more then easily create an HBase configuration object; it will also manage the backing HBase connections: when the application
-	context shuts down, so will any HBase connections opened - this behavior can be adjusted through the <literal>stop-proxy</literal> and <literal>delete-connection</literal> attributes:</para>
+	<section id="hive:jdbc">
+	    <title>Using Hive JDBC</title>
+	    
+	    <para>Another attractive option for accessing Hive is through its JDBC driver. This exposes Hive through the <ulink url="http://docs.oracle.com/javase/6/docs/technotes/guides/jdbc/">JDBC API</ulink> meaning 
+	    one can use the standard API or its derived utilities to interact with Hive, such as the rich 
+	    <ulink url="http://static.springsource.org/spring/docs/current/spring-framework-reference/html/jdbc.html">JDBC support</ulink> in Spring Framework.</para>
+	    
+	    <warning>
+	    	<para>Note that the JDBC driver is a work-in-progress and not all the JDBC features are available (and probably never will since Hive cannot support all of them as it is not the typical relational database).
+	    	Do read the official documentation and examples.</para>
+	    </warning>
+	    
+	    <para>SHDP does not offer any dedicated support for the JDBC integration - Spring Framework itself provides the needed tools; simply configure Hive as you would with any other JDBC <interfacename>Driver</interfacename>:</para>
+	    
+	    <programlisting language="xml"><![CDATA[<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:c="http://www.springframework.org/schema/c"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+      	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 	
-	<programlisting language="xml"><![CDATA[<!-- delete associated connections but do not stop the proxies -->
-<hdp:hbase-configuration stop-proxy="false" delete-connection="true" />]]></programlisting>
+    <!-- basic Hive driver bean -->
+	<bean id="hive-driver" class="org.apache.hadoop.hive.jdbc.HiveDriver"/>
+
+	<!-- wrapping a basic datasource around the driver -->
+	<!-- notice the 'c:' namespace for inlining constructor arguments 
+		 in this case the url (default is 'jdbc:hive://localhost:10000/default') -->
+	<bean id="hive-ds" class="org.springframework.jdbc.datasource.SimpleDriverDataSource"
+		c:driver-ref="hive-driver" c:url="${hive.url}"/>
+
+	<!-- standard JdbcTemplate declaration -->
+	<bean id="template" class="org.springframework.jdbc.core.JdbcTemplate" c:data-source-ref="hive-ds"/>
 	
+	<context:property-placeholder location="hive.properties"/>]]></programlisting>
+	
+		<para>And that is it! Following the example above, one can use the <literal>hive-ds</literal> <interfacename>DataSource</interfacename> bean to manually get a hold of <interfacename>Connection</interfacename>s 
+		or better yet, use Spring's <classname>JdbcTemplate</classname> as in the example above.</para>
+	</section>
+
 </chapter>
