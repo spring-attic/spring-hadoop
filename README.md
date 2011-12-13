@@ -4,8 +4,37 @@ Spring Hadoop extends Spring Batch by providing support for reading from and wri
 
 Spring Hadoop also applies the familiar Spring programming model to Java MapReduce jobs by providing support for dependency injection of simple jobs as well as a POJO based MapReduce programming model that decouples your MapReduce classes from Hadoop specific details such as base classes and data types.
 
-You can find out more details from the [reference documentation](http://static.springsource.org/spring-data/hadoop/docs/current/reference/) or by browsing the [javadocs](http://static.springsource.org/spring-data/hadoop/docs/current/api/). If you have ideas about how to improve or extend the scope, please feel free to contribute.
+# Docs
 
+You can find out more details from the [user documentation](http://static.springsource.org/spring-data/hadoop/docs/current/reference/) or by browsing the [javadocs](http://static.springsource.org/spring-data/hadoop/docs/current/api/). If you have ideas about how to improve or extend the scope, please feel free to contribute.
+
+# Artifacts
+
+* Maven:
+
+      <dependency>
+        <groupId>org.springframework.data</groupId>
+        <artifactId>spring-data-hadoop</artifactId>
+        <version>1.0.0.BUILD-SNAPSHOT</version>
+      </dependency> 
+
+
+      <repository>
+        <id>spring-maven-snapshot</id>
+        <snapshots><enabled>true</enabled></snapshots>
+        <name>Springframework Maven SNAPSHOT Repository</name>
+        <url>http://maven.springframework.org/snapshot</url>
+      </repository> 
+
+* Gradle
+
+    repositories {
+       mavenRepo name: "spring-snapshot", urls: "http://maven.springframework.org/snapshot"
+    }
+    
+    dependencies {
+       compile "org.springframework.data:spring-data-hadoop:1.0.0.BUILD-SNAPSHOT
+    }
 
 # Contributing to Spring Hadoop
 
