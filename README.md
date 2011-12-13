@@ -35,7 +35,7 @@ repositories {
 }
 
 dependencies {
-   compile "org.springframework.data:spring-data-hadoop:1.0.0.BUILD-SNAPSHOT
+   compile "org.springframework.data:spring-data-hadoop:1.0.0.BUILD-SNAPSHOT"
 }
 ~~~~~
 
