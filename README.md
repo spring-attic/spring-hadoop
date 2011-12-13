@@ -12,6 +12,7 @@ You can find out more details from the [user documentation](http://static.spring
 
 Maven:
 
+~~~~~ xml
     <dependency>
       <groupId>org.springframework.data</groupId>
       <artifactId>spring-data-hadoop</artifactId>
@@ -24,9 +25,11 @@ Maven:
       <name>Springframework Maven SNAPSHOT Repository</name>
       <url>http://maven.springframework.org/snapshot</url>
     </repository> 
+~~~~~
 
 Gradle: 
 
+```xml
     repositories {
        mavenRepo name: "spring-snapshot", urls: "http://maven.springframework.org/snapshot"
     }
@@ -34,6 +37,7 @@ Gradle:
     dependencies {
        compile "org.springframework.data:spring-data-hadoop:1.0.0.BUILD-SNAPSHOT
     }
+```
 
 # Contributing to Spring Hadoop
 
