@@ -18,9 +18,6 @@ package org.springframework.data.hadoop.io;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -28,9 +25,6 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.fs.permission.FsAction;
-import org.apache.hadoop.fs.permission.FsPermission;
-import org.apache.hadoop.security.UserGroupInformation;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.core.PriorityOrdered;
 import org.springframework.core.io.Resource;
@@ -39,7 +33,6 @@ import org.springframework.util.AntPathMatcher;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.PathMatcher;
-import org.springframework.util.StringUtils;
 
 /**
  * Spring ResourceLoader over Hadoop FileSystem.
@@ -53,7 +46,6 @@ public class HdfsResourceLoader implements ResourcePatternResolver, PriorityOrde
 	private final FileSystem fs;
 	private final PathMatcher pathMatcher = new AntPathMatcher();
 	private final boolean internalFS;
-	private final String ugi;
 
 	public HdfsResourceLoader(Configuration config) {
 		this(config, null);
@@ -74,8 +66,6 @@ public class HdfsResourceLoader implements ResourcePatternResolver, PriorityOrde
 		} finally {
 			fs = tempFS;
 		}
-
-		ugi = (user == null ? currentUser(fs) : user);
 	}
 
 	public HdfsResourceLoader(Configuration config, URI uri) {
@@ -86,7 +76,6 @@ public class HdfsResourceLoader implements ResourcePatternResolver, PriorityOrde
 		Assert.notNull(fs, "a non-null file-system required");
 		this.fs = fs;
 		internalFS = false;
-		ugi = currentUser(fs);
 	}
 
 	public ClassLoader getClassLoader() {
@@ -161,8 +150,13 @@ public class HdfsResourceLoader implements ResourcePatternResolver, PriorityOrde
 	}
 
 	private void doRetrieveMatchingResources(Path rootDir, String subPattern, Set<Resource> results) throws IOException {
-		if (isDirAndAccessible(rootDir)) {
-			FileStatus[] statuses = fs.listStatus(rootDir);
+		if (!fs.isFile(rootDir)) {
+			FileStatus[] statuses = null;
+			try {
+				statuses = fs.listStatus(rootDir);
+			} catch (IOException ex) {
+				// ignore (likely security exception)
+			}
 
 			if (!ObjectUtils.isEmpty(statuses)) {
 				for (FileStatus fileStatus : statuses) {
@@ -185,51 +179,10 @@ public class HdfsResourceLoader implements ResourcePatternResolver, PriorityOrde
 		}
 	}
 
-	// check whether the given path is a folder and if so, if it's accessible
-	// this method acts as an optimization to minimize the number of operations per entry
-	private boolean isDirAndAccessible(Path rootDir) throws IOException {
-		FileStatus status = fs.getFileStatus(rootDir);
-		if (status.isDir()){
-			FsPermission perm = status.getPermission();
-			// start with other
-			return (perm.getOtherAction().implies(FsAction.READ) ||
-				   (currentGroups().contains(status.getGroup()) && perm.getGroupAction().implies(FsAction.READ)) ||
-				   (ugi.equals(status.getOwner()) && perm.getUserAction().implies(FsAction.READ)));		
-		}
-
-		return false;
-	}
-
 	private static String stripPrefix(String path) {
 		// strip prefix
 		int index = path.indexOf(PREFIX_DELIMITER);
 		return (index > -1 ? path.substring(index + 1) : path);
-	}
-
-	private static String currentUser(FileSystem fs) {
-		String name = null;
-
-		try {
-			name = UserGroupInformation.getCurrentUser().getUserName();
-		} catch (Exception ex) {
-			// ignore
-		}
-		if (!StringUtils.hasText(name)) {
-			String homeDir = fs.getHomeDirectory().getName();
-			name = homeDir.substring(homeDir.lastIndexOf("/"));
-		}
-		if (!StringUtils.hasText(name)) {
-			name = System.getProperty("user.name");
-		}
-		return name;
-	}
-
-	private static Collection<String> currentGroups() {
-		try {
-			return Arrays.asList(UserGroupInformation.getCurrentUser().getGroupNames());
-		} catch (IOException ex) {
-			return Collections.emptyList();
-		}
 	}
 
 	public int getOrder() {
