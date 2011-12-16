@@ -28,6 +28,7 @@ import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FsUrlStreamHandlerFactory;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.security.UserGroupInformation;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -67,7 +68,10 @@ public class HdfsResouceLoaderTest {
 
 		fs = fsf.getObject();
 
-		loader = new HdfsResourceLoader(fs);
+		System.out.println("Current user is " + UserGroupInformation.getCurrentUser());
+		System.out.println("Home dir is " + fs.getHomeDirectory().toString());
+
+		loader = new HdfsResourceLoader(cfb.getObject(), null);
 	}
 
 	@After
@@ -80,6 +84,11 @@ public class HdfsResouceLoaderTest {
 		Resource[] resources = loader.getResources("**/*");
 		System.out.println(resources.length);
 		System.out.println(Arrays.toString(resources));
+
+		Resource[] homeResources = loader.getResources("~/**/*");
+		System.out.println(homeResources.length);
+		System.out.println(Arrays.toString(resources));
+		assertArrayEquals(resources, homeResources);
 
 		Resource[] res = loader.getResources("/**/user/**/*");
 		System.out.println(Arrays.toString(res));
@@ -146,7 +155,6 @@ public class HdfsResouceLoaderTest {
 		URL.setURLStreamHandlerFactory(new FsUrlStreamHandlerFactory(fs.getConf()));
 
 		System.out.println(((HdfsResource) resource).getPath().makeQualified(fs));
-
 		System.out.println(resource.getURI());
 
 		resource = loader.getResource("test");
