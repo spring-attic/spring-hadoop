@@ -9,7 +9,7 @@
 	<programlisting language="xml"><![CDATA[<!-- default bean id is 'hbase-configuration' that uses the existing 'hadoop-configuration' object -->
 <hdp:hbase-configuration configuration-ref="hadoop-configuration" />]]></programlisting>
 	
-	<para>The above declaration does more then easily create an HBase configuration object; it will also manage the backing HBase connections: when the application
+	<para>The above declaration does more than easily create an HBase configuration object; it will also manage the backing HBase connections: when the application
 	context shuts down, so will any HBase connections opened - this behavior can be adjusted through the <literal>stop-proxy</literal> and <literal>delete-connection</literal> attributes:</para>
 	
 	<programlisting language="xml"><![CDATA[<!-- delete associated connections but do not stop the proxies -->
