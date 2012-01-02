@@ -50,7 +50,9 @@ public class SimplerFileSystem extends FileSystem {
 	}
 
 	public void setConf(Configuration conf) {
-		fs.setConf(conf);
+		if (fs != null) {
+			fs.setConf(conf);
+		}
 	}
 
 	public Configuration getConf() {
@@ -283,6 +285,10 @@ public class SimplerFileSystem extends FileSystem {
 
 	public boolean exists(Path f) throws IOException {
 		return fs.exists(f);
+	}
+
+	public boolean exists(String f) throws IOException {
+		return fs.exists(path(f));
 	}
 
 	public boolean isDirectory(Path f) throws IOException {
