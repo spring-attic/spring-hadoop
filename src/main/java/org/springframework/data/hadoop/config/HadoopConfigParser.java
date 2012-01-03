@@ -28,7 +28,7 @@ import org.w3c.dom.Element;
  * 
  * @author Costin Leau
  */
-public class HadoopConfigParser extends AbstractImprovedSimpleBeanDefinitionParser {
+class HadoopConfigParser extends AbstractImprovedSimpleBeanDefinitionParser {
 
 	private static final String PROPERTIES_PROP = "properties";
 

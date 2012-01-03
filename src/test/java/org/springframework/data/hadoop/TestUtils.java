@@ -15,7 +15,15 @@
  */
 package org.springframework.data.hadoop;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.JobSubmissionFiles;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.WritableResource;
+import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.data.hadoop.io.HdfsResourceLoader;
 
 /**
  * @author Costin Leau
@@ -30,4 +38,25 @@ public class TestUtils {
 			JobSubmissionFiles.JOB_FILE_PERMISSION.fromShort((short) 0655);
 		}
 	}
+
+	public static Resource writeToFS(Configuration cfg, String filename) {
+		return writeToFS(new HdfsResourceLoader(cfg), filename);
+	}
+
+	public static Resource writeToFS(ResourcePatternResolver loader, String filename) {
+		try {
+			Resource resource = loader.getResource(filename);
+			WritableResource wr = (WritableResource) resource;
+
+			byte[] bytes = filename.getBytes();
+			OutputStream out = wr.getOutputStream();
+			out.write(bytes);
+			out.close();
+
+			return resource;
+		} catch (IOException ex) {
+			throw new IllegalArgumentException(ex);
+		}
+	}
+
 }

@@ -33,7 +33,6 @@ public class BasePathNameGenerator implements InitializingBean, ResourceLoaderAw
 	private String basePath;
 
 	public String generate(String original) {
-		System.out.println("Received path " + original);
 		if (original.startsWith(basePath)) {
 			if (remove) {
 				return original.substring(basePath.length());
@@ -57,7 +56,6 @@ public class BasePathNameGenerator implements InitializingBean, ResourceLoaderAw
 		if (!path.endsWith("/")) {
 			basePath = basePath.substring(0, basePath.lastIndexOf("/"));
 		}
-		System.out.println("Base path is " + basePath);
 	}
 
 	/**

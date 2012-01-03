@@ -10,8 +10,6 @@
 
 	<import resource="../hadoop-ctx.xml"/>
 	 
-	<context:property-placeholder location="test.properties"/>
-	
 	<bean id="pig-ctx" class="org.springframework.data.hadoop.pig.PigContextFactoryBean" p:exec-type="LOCAL" p:configuration-ref="hadoop-configuration"/>
 	<bean id="pig" class="org.springframework.data.hadoop.pig.PigServerFactoryBean" p:pig-context-ref="pig-ctx" p:scripts="classpath:org/springframework/data/hadoop/pig/script.pig"/>
 	

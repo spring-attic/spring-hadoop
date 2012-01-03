@@ -24,7 +24,7 @@ import org.w3c.dom.Element;
 /**
  * @author Costin Leau
  */
-public class HadoopResourceLoaderParser extends AbstractImprovedSimpleBeanDefinitionParser {
+class HadoopResourceLoaderParser extends AbstractImprovedSimpleBeanDefinitionParser {
 
 	@Override
 	protected Class<?> getBeanClass(Element element) {
