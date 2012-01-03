@@ -461,6 +461,66 @@ Reference to the Hadoop Configuration. Defaults to 'hadoop-configuration'.]]></x
 		</xsd:complexType>
 	</xsd:element>
 
+	<xsd:complexType name="entryType">
+		<xsd:attribute name="value" type="xsd:string" use="required"/>
+	</xsd:complexType> 
+	
+	
+	<xsd:element name="cache">
+			<xsd:annotation>
+			   <xsd:documentation><![CDATA[
+Configures Hadoop Distributed Cache.
+					]]>
+	          </xsd:documentation>
+		      <xsd:appinfo>
+		        <tool:annotation>
+		          <tool:exports type="org.apache.hadoop.io.DistributedCacheFactoryBean"/>
+		        </tool:annotation>
+		      </xsd:appinfo>
+			</xsd:annotation>
+		<xsd:complexType>
+			<xsd:sequence minOccurs="1" maxOccurs="unbounded">
+				<xsd:choice>
+					<xsd:element name="classpath" type="entryType"/>
+					<xsd:element name="cache" type="entryType"/>
+					<xsd:element name="local" type="entryType"/>
+				</xsd:choice>
+			</xsd:sequence>
+			<xsd:attribute name="id" type="xsd:ID" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+Bean id (default is "hadoop-cache").
+				]]>
+         		</xsd:documentation>
+			</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="create-symlink" type="xsd:boolean"/>
+			<xsd:attribute name="configuration-ref" default="hadoop-configuration">
+			<xsd:annotation>
+					<xsd:documentation source="org.apache.hadoop.conf.Configuration"><![CDATA[
+Reference to the Hadoop Configuration. Defaults to 'hadoop-configuration'.]]></xsd:documentation>
+					<xsd:appinfo>
+						<tool:annotation kind="ref">
+							<tool:expected-type type="org.apache.hadoop.conf.Configuration" />
+						</tool:annotation>
+					</xsd:appinfo>
+		 	</xsd:annotation>
+		 	</xsd:attribute>			
+			<xsd:attribute name="file-system-ref">
+			<xsd:annotation>
+					<xsd:documentation source="org.apache.hadoop.fs.FileSystem"><![CDATA[
+Reference to the Hadoop FileSystem.]]></xsd:documentation>
+					<xsd:appinfo>
+						<tool:annotation kind="ref">
+							<tool:expected-type type="org.apache.hadoop.fs.FileSystem" />
+						</tool:annotation>
+					</xsd:appinfo>
+		 	</xsd:annotation>
+		 	</xsd:attribute>			
+		</xsd:complexType>
+	</xsd:element>
+
+	
 	<xsd:element name="pig">
 		<xsd:annotation>
 		   <xsd:documentation><![CDATA[

@@ -33,6 +33,7 @@ class HadoopNamespaceHandler extends NamespaceHandlerSupport {
 		registerBeanDefinitionParser("pig", new PigParser());
 		registerBeanDefinitionParser("hbase-configuration", new HbaseConfigurationParser());
 		registerBeanDefinitionParser("hive-client", new HiveClientParser());
+		registerBeanDefinitionParser("cache", new DistributedCacheParser());
 	}
 }
 

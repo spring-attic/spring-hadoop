@@ -1,0 +1,20 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:hdp="http://www.springframework.org/schema/hadoop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+      	http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd" default-lazy-init="true">
+
+
+	<import resource="../hadoop-ctx.xml"/>
+	
+	<hdp:cache create-symlink="true">
+		<hdp:classpath value="/cp/some-library.jar#library.jar" />
+		<hdp:classpath value="/cp/some-zip.zip" />
+		<hdp:cache value="/cache/some-archive.tgz#main-archive" />
+		<hdp:cache value="/cache/some-resource.res" />
+		<hdp:local value="some-file.txt" />
+		<hdp:local value="some-tar.tar" />
+		<hdp:local value="~/local/*.txt" />
+	</hdp:cache>
+	
+</beans>
