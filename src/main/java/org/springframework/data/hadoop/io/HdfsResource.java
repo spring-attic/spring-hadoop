@@ -51,7 +51,7 @@ class HdfsResource implements WritableResource, ContextResource {
 	}
 
 	HdfsResource(String parent, String child, FileSystem fs) {
-		this(StringUtils.hasText(child) ? new Path(parent, child) : new Path(parent), fs);
+		this(StringUtils.hasText(child) ? new Path(new Path(URI.create(parent)), new Path(URI.create(child))) : new Path(URI.create(parent)), fs);
 	}
 
 	HdfsResource(Path path, FileSystem fs) {

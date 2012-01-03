@@ -17,6 +17,7 @@ package org.springframework.data.hadoop.io;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -35,6 +36,7 @@ import org.junit.Test;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.WritableResource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
+import org.springframework.data.hadoop.TestUtils;
 import org.springframework.data.hadoop.configuration.ConfigurationFactoryBean;
 
 import static org.junit.Assert.*;
@@ -125,25 +127,17 @@ public class HdfsResouceLoaderTest {
 			assertFalse(resource.isReadable());
 			assertFalse(resource.isOpen());
 
-			assertTrue(resource instanceof WritableResource);
-			WritableResource wr = (WritableResource) resource;
-			assertTrue(wr.isWritable());
-
-			byte[] bytes = name.getBytes();
-			OutputStream out = wr.getOutputStream();
-
-			out.write(bytes);
-			out.close();
-
+			resource = TestUtils.writeToFS(loader, name);
 			assertTrue(resource.exists());
 			assertTrue(resource.isReadable());
 			assertTrue(resource.isOpen());
 
 			InputStream in = resource.getInputStream();
-			byte[] copy = new byte[bytes.length];
+
+			byte[] copy = new byte[name.length()];
 			in.read(copy);
 			in.close();
-			assertArrayEquals(bytes, copy);
+			assertArrayEquals(name.getBytes(), copy);
 		} finally {
 			fs.delete(path, true);
 		}
@@ -160,5 +154,83 @@ public class HdfsResouceLoaderTest {
 		resource = loader.getResource("test");
 		System.out.println(resource.getURI());
 		System.out.println(resource.getURL());
+	}
+
+	@Test
+	public void testPathWithFragment() throws Exception {
+		String name = "test-" + UUID.randomUUID() + ".file#fragment";
+
+		Path path = new Path(name);
+		HdfsResource resource = (HdfsResource) loader.getResource(name);
+
+		try {
+			System.out.println(resource.toString());
+			assertFalse(resource.exists());
+			assertFalse(resource.isReadable());
+			assertFalse(resource.isOpen());
+
+			assertTrue(resource instanceof WritableResource);
+			WritableResource wr = (WritableResource) resource;
+			assertTrue(wr.isWritable());
+
+			byte[] bytes = name.getBytes();
+			OutputStream out = wr.getOutputStream();
+
+			out.write(bytes);
+			out.close();
+
+			assertTrue(resource.exists());
+			assertTrue(resource.isReadable());
+			assertTrue(resource.isOpen());
+
+			URI uri = resource.getURI();
+			assertEquals("fragment", uri.getFragment());
+
+		} finally {
+			fs.delete(path, true);
+		}
+
+	}
+
+	@Test
+	public void testFilesMatch() throws Exception {
+		try {
+			TestUtils.writeToFS(loader, "local/" + UUID.randomUUID() + ".txt");
+			TestUtils.writeToFS(loader, "local/" + UUID.randomUUID() + ".txt");
+			TestUtils.writeToFS(loader, "local/" + UUID.randomUUID() + ".txt");
+
+			Resource[] resources = loader.getResources("local/*.txt");
+			assertTrue(resources.length >= 3);
+		} finally {
+			fs.delete(new Path("local/"), true);
+		}
+	}
+
+	@Test
+	public void testFilesMatchWithHomePrefix() throws Exception {
+		try {
+			TestUtils.writeToFS(loader, "local/" + UUID.randomUUID() + ".txt");
+			TestUtils.writeToFS(loader, "local/" + UUID.randomUUID() + ".txt");
+			TestUtils.writeToFS(loader, "local/" + UUID.randomUUID() + ".txt");
+
+			Resource[] resources = loader.getResources("~/local/*.txt");
+			assertTrue(resources.length >= 3);
+		} finally {
+			fs.delete(new Path("local/"), true);
+		}
+	}
+
+	@Test
+	public void testFilesMatchWithPrefix() throws Exception {
+		try {
+			TestUtils.writeToFS(loader, "local/" + UUID.randomUUID() + ".txt");
+			TestUtils.writeToFS(loader, "local/" + UUID.randomUUID() + ".txt");
+			TestUtils.writeToFS(loader, "local/" + UUID.randomUUID() + ".txt");
+
+			Resource[] resources = loader.getResources("./local/../local/*.txt");
+			assertTrue(resources.length >= 3);
+		} finally {
+			fs.delete(new Path("local/"), true);
+		}
 	}
 }

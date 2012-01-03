@@ -100,9 +100,14 @@ public class HdfsResourceLoader implements ResourcePatternResolver, PriorityOrde
 	}
 
 	protected Resource[] findPathMatchingResources(String locationPattern) throws IOException {
+		// replace ~/ shortcut
+		if (locationPattern.startsWith("~/")) {
+			locationPattern = locationPattern.substring(2);
+		}
+
 		String rootDirPath = determineRootDir(locationPattern);
 		String subPattern = locationPattern.substring(rootDirPath.length());
-		if (rootDirPath.isEmpty() || "~/".equals(rootDirPath)) {
+		if (rootDirPath.isEmpty()) {
 			rootDirPath = ".";
 		}
 		Resource rootDirResource = getResource(rootDirPath);
@@ -114,9 +119,6 @@ public class HdfsResourceLoader implements ResourcePatternResolver, PriorityOrde
 	}
 
 	protected String determineRootDir(String location) {
-		// ~/ shortcut
-		if (location.startsWith("~/"))
-			return "~/";
 		int prefixEnd = location.indexOf(PREFIX_DELIMITER) + 1;
 		int rootDirEnd = location.length();
 
@@ -159,9 +161,13 @@ public class HdfsResourceLoader implements ResourcePatternResolver, PriorityOrde
 			}
 
 			if (!ObjectUtils.isEmpty(statuses)) {
+				String root = rootDir.toUri().getPath();
 				for (FileStatus fileStatus : statuses) {
 					Path p = fileStatus.getPath();
-					String location = stripPrefix(p.toUri().getPath());
+					String location = p.toUri().getPath();
+					if (location.startsWith(root)) {
+						location = location.substring(root.length());
+					}
 					if (fileStatus.isDir() && pathMatcher.matchStart(subPattern, location)) {
 						doRetrieveMatchingResources(p, subPattern, results);
 					}
