@@ -19,7 +19,7 @@
 		</property>
 	</bean>
 
-	<!--  automatically picks the hadoop-config reference -->
+	<!--  automatically picks the hadoop-configuration reference -->
 	<hdp:resource-loader />	
 	<!-- 
 	<bean id="hdfsResourceLoader" class="org.springframework.data.hadoop.io.HdfsResourceLoader" c:fs-ref="fs"/>
@@ -27,7 +27,7 @@
 	 -->
 	 
 	
-	<!--  default id is 'hadoop-config' -->
+	<!--  default id is 'hadoop-configuration' -->
 	<hdp:configuration register-url-handler="false">
 		<entry key="fs.default.name" value="${hd.fs}"/>
 	</hdp:configuration>

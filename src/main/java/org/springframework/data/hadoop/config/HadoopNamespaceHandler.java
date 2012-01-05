@@ -23,7 +23,6 @@ import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
  * @author Costin Leau
  */
 class HadoopNamespaceHandler extends NamespaceHandlerSupport {
-
 	public void init() {
 		registerBeanDefinitionParser("tasklet", new HadoopTaskletParser());
 		registerBeanDefinitionParser("job", new HadoopJobParser());
@@ -34,6 +33,7 @@ class HadoopNamespaceHandler extends NamespaceHandlerSupport {
 		registerBeanDefinitionParser("hbase-configuration", new HbaseConfigurationParser());
 		registerBeanDefinitionParser("hive-client", new HiveClientParser());
 		registerBeanDefinitionParser("cache", new DistributedCacheParser());
+		registerBeanDefinitionParser("script", new ScriptParser());
 	}
 }
 

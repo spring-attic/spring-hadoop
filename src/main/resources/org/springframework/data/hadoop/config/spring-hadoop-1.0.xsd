@@ -658,4 +658,92 @@ Bean id (default is "hive-client").
 		</xsd:complexType>
 	</xsd:element>
 	
+	<!-- Script -->
+	
+	<xsd:element name="script">
+		<xsd:complexType>
+			<xsd:annotation>
+			   <xsd:documentation><![CDATA[
+Dedicated scripting facility for interacting with Hadoop. Allows Groovy, JavaScript (Rhino), Ruby (JRuby), Python (Jython)
+or any JSR-223 scripting language to be used for executing commands against Hadoop, in particular its file system.  
+					]]>
+	          </xsd:documentation>
+		      <xsd:appinfo>
+		        <tool:annotation>
+		          <tool:exports type="java.lang.Object"/>
+		        </tool:annotation>
+		      </xsd:appinfo>
+			</xsd:annotation>
+			<xsd:choice>
+			<xsd:sequence minOccurs="0" maxOccurs="unbounded">
+					<xsd:element name="argument" type="beans:propertyType">
+						<xsd:annotation>
+							<xsd:documentation><![CDATA[
+Argument (or property) to pass to the script. Can be used to enhance or override the default properties.
+							]]></xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+			</xsd:sequence>
+			<xsd:sequence minOccurs="0" maxOccurs="1">
+					<xsd:element name="inline-script" minOccurs="0" maxOccurs="1">
+						<xsd:annotation>
+							<xsd:documentation><![CDATA[
+The source code for the dynamic language-backed bean.
+							]]></xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+			</xsd:sequence>			
+			</xsd:choice>
+			<xsd:attribute name="id" type="xsd:ID" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+Bean id (populated by default with the script filename if no value is given).
+				]]>
+         		</xsd:documentation>
+			</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="source" type="xsd:string">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+The script source. Can be any resource on the local filesystem, web or even hdfs.
+				]]>
+         		</xsd:documentation>
+			</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="language" type="xsd:string">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+The language used for executing the script. If no value is given, the script source extension
+is used to determine the scripting engine.
+				]]>
+         		</xsd:documentation>
+         	</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="evaluate" default="ALWAYS">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+When to evaluate the script. 'ALWAYS' (default) evaluates the script on all invocations,
+'IF_MODIFIED' if the script source has been modified since the last invocation and 'ONCE'
+only once for the duration of the application. 
+				]]>
+         		</xsd:documentation>
+         	</xsd:annotation>
+         	<xsd:simpleType>
+         		<xsd:restriction base="xsd:string">
+         			<xsd:enumeration value="ONCE"/>
+         			<xsd:enumeration value="IF_MODIFIED"/>
+         			<xsd:enumeration value="ALWAYS"/>
+         		</xsd:restriction>
+         	</xsd:simpleType>
+			</xsd:attribute>
+			<xsd:attribute name="run-at-startup" type="xsd:boolean" default="true">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+Whether the script is evaluated automatically once the application context initializes (default) or only when in use.
+				]]>
+         		</xsd:documentation>
+         	</xsd:annotation>
+         	</xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>
 </xsd:schema>

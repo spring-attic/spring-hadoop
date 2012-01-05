@@ -28,8 +28,6 @@ import javax.script.SimpleBindings;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.BeanClassLoaderAware;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.scripting.ScriptCompilationException;
 import org.springframework.scripting.ScriptSource;
 import org.springframework.util.Assert;
@@ -41,34 +39,28 @@ import org.springframework.util.StringUtils;
  * 
  * @author Costin Leau
  */
-public class Jsr223ScriptEvaluator implements ScriptEvaluator, InitializingBean, BeanClassLoaderAware {
+class Jsr223ScriptEvaluator implements ScriptEvaluator {
 
 	private final Log log = LogFactory.getLog(getClass());
 
 	private String language;
 	private String extension;
-	private ScriptEngine engine;
 	private ClassLoader classLoader;
-	
-	@Override
-	public void afterPropertiesSet() {
-		Assert.isTrue(StringUtils.hasText(language) || StringUtils.hasText(extension), "the language or extension needs to be specified");
-		
-		ScriptEngineManager engineManager = new ScriptEngineManager(classLoader);
-		engine = (StringUtils.hasText(language) ? engineManager.getEngineByName(language)
-				: engineManager.getEngineByExtension(extension));
-		
-		Assert.notNull("No suitable engine found for " + (StringUtils.hasText(language) ? "language " + language : "extension " + extension));  
-		
-		if (log.isDebugEnabled()){
-			ScriptEngineFactory factory = engine.getFactory();
-			log.debug(String.format("Using ScriptEngine %s (%s), language %s (%s)", 
-					factory.getEngineName(), factory.getEngineVersion(), factory.getLanguageName(), factory.getLanguageVersion()));
-		}
-	}
 
-	@Override
-	public void setBeanClassLoader(ClassLoader classLoader) {
+
+	/**
+	 * Constructs a new <code>Jsr223ScriptEvaluator</code> instance.
+	 */
+	public Jsr223ScriptEvaluator() {
+		this(null);
+	};
+
+	/**
+	 * Constructs a new <code>Jsr223ScriptEvaluator</code> instance.
+	 *
+	 * @param classLoader class loader to use
+	 */
+	public Jsr223ScriptEvaluator(ClassLoader classLoader) {
 		this.classLoader = classLoader;
 	}
 
@@ -79,11 +71,13 @@ public class Jsr223ScriptEvaluator implements ScriptEvaluator, InitializingBean,
 
 	@Override
 	public Object evaluate(ScriptSource script, Map<String, Object> arguments) {
+		ScriptEngine engine = discoverEngine(script, arguments);
+
 		Bindings bindings = (!CollectionUtils.isEmpty(arguments) ? new SimpleBindings(arguments) : null);
 
 		try {
-			return (bindings == null ? 
-					engine.eval(script.getScriptAsString()) : engine.eval(script.getScriptAsString(), bindings));
+			return (bindings == null ? engine.eval(script.getScriptAsString()) : engine.eval(
+					script.getScriptAsString(), bindings));
 		} catch (IOException ex) {
 			throw new ScriptCompilationException(script, "Cannot access script", ex);
 		} catch (ScriptException ex) {
@@ -91,7 +85,34 @@ public class Jsr223ScriptEvaluator implements ScriptEvaluator, InitializingBean,
 		}
 	}
 
+	protected ScriptEngine discoverEngine(ScriptSource script, Map<String, Object> arguments) {
+		ScriptEngineManager engineManager = new ScriptEngineManager(classLoader);
+		ScriptEngine engine = null;
+
+		if (StringUtils.hasText(language)) {
+			engine = engineManager.getEngineByName(language);
+		}
+		else {
+			// make use the extension (enhanced ScriptSource interface)
+			Assert.hasText(extension, "no language or extension specified");
+			engine = engineManager.getEngineByExtension(extension);
+		}
+
+		Assert.notNull(engine, "No suitable engine found for "
+				+ (StringUtils.hasText(language) ? "language " + language : "extension " + extension));
+
+		if (log.isDebugEnabled()) {
+			ScriptEngineFactory factory = engine.getFactory();
+			log.debug(String.format("Using ScriptEngine %s (%s), language %s (%s)", factory.getEngineName(),
+					factory.getEngineVersion(), factory.getLanguageName(), factory.getLanguageVersion()));
+		}
+
+		return engine;
+	}
+
 	/**
+	 * Sets the extension of the language meant for evaluation the scripts.. 
+	 * 
 	 * @param extension The extension to set.
 	 */
 	public void setExtension(String extension) {
@@ -99,6 +120,8 @@ public class Jsr223ScriptEvaluator implements ScriptEvaluator, InitializingBean,
 	}
 
 	/**
+	 * Sets the name of language meant for evaluation the scripts.
+	 * 
 	 * @param language The language to set.
 	 */
 	public void setLanguage(String language) {

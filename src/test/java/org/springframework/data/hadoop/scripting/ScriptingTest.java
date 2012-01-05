@@ -19,20 +19,33 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.annotation.Resource;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.UrlResource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.data.hadoop.io.SimplerFileSystem;
 import org.springframework.scripting.ScriptSource;
 import org.springframework.scripting.support.ResourceScriptSource;
 import org.springframework.scripting.support.StaticScriptSource;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Costin Leau
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration
 public class ScriptingTest {
+
+	@Resource
+	private ApplicationContext ctx;
 
 	@Test
 	public void testRhinoScript() throws Exception {
@@ -40,7 +53,6 @@ public class ScriptingTest {
 
 		Jsr223ScriptEvaluator eval = new Jsr223ScriptEvaluator();
 		eval.setLanguage("javascript");
-		eval.afterPropertiesSet();
 
 		System.out.println(eval.evaluate(script));
 	}
@@ -51,7 +63,6 @@ public class ScriptingTest {
 
 		Jsr223ScriptEvaluator eval = new Jsr223ScriptEvaluator();
 		eval.setLanguage("javascript");
-		eval.afterPropertiesSet();
 
 		Properties prop = PropertiesLoaderUtils.loadAllProperties("test.properties");
 
@@ -67,5 +78,12 @@ public class ScriptingTest {
 		args.put("fs", sfs);
 
 		eval.evaluate(script, args);
+	}
+
+	@Test
+	public void testScriptNS() throws Exception {
+		assertNotNull(ctx);
+		assertTrue(ctx.containsBean("script-js"));
+		System.out.println("Script result is " + ctx.getBean("script-js"));
 	}
 }
