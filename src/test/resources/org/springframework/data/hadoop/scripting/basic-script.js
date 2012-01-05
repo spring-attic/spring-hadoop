@@ -9,4 +9,5 @@ name = UUID.randomUUID().toString()
 scriptName = "src/test/resources/test.properties"
 fs.copyFromLocalFile(scriptName, name)
 println(new Path(name).makeQualified(fs))
-println(fs.getLength(name))
+// return the file length 
+fs.getLength(name)

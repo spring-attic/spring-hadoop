@@ -81,9 +81,26 @@ public class ScriptingTest {
 	}
 
 	@Test
-	public void testScriptNS() throws Exception {
-		assertNotNull(ctx);
+	public void testScriptNSJavaScript() throws Exception {
 		assertTrue(ctx.containsBean("script-js"));
-		System.out.println("Script result is " + ctx.getBean("script-js"));
+		assertNotNull(ctx.getBean("script-js"));
+	}
+
+	@Test
+	public void testScriptNSJython() throws Exception {
+		assertTrue(ctx.containsBean("script-py"));
+		ctx.getBean("script-py");
+	}
+
+	@Test
+	public void testScriptNSJRuby() throws Exception {
+		assertTrue(ctx.containsBean("script-rb"));
+		assertNotNull(ctx.getBean("script-rb"));
+	}
+
+	@Test
+	public void testScriptNSJGroovy() throws Exception {
+		assertTrue(ctx.containsBean("script-groovy"));
+		assertNotNull(ctx.getBean("script-groovy"));
 	}
 }

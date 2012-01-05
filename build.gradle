@@ -181,6 +181,9 @@ dependencies {
     testCompile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
     testCompile "org.springframework.integration:spring-integration-event:$springIntVersion"
     testCompile "org.springframework.integration:spring-integration-file:$springIntVersion"
+    testCompile "org.codehaus.groovy:groovy:$groovyVersion"
+    testCompile "org.jruby:jruby:$jrubyVersion"
+    testCompile "org.python:jython-standalone:$jythonVersion"
 }
 
 javaprojects = rootProject
