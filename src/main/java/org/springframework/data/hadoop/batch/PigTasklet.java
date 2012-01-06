@@ -32,6 +32,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**
+ * Pig tasklet. Usually used as a prototype as a new {@link PigServer} instance is required every time (to prevent concurrency issues).
+ * 
  * @author Costin Leau
  */
 public class PigTasklet implements InitializingBean, Tasklet {
@@ -56,7 +58,10 @@ public class PigTasklet implements InitializingBean, Tasklet {
 			return RepeatStatus.FINISHED;
 		} catch (Exception ex) {
 			exc = ex;
+		} finally {
+			pig.shutdown();
 		}
+
 
 		throw new HadoopException("Cannot execute Pig script(s)", exc);
 	}
