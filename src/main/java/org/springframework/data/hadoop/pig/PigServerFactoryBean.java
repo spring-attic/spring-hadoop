@@ -16,6 +16,7 @@
 package org.springframework.data.hadoop.pig;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collection;
 
 import org.apache.commons.logging.Log;
@@ -23,28 +24,21 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.pig.PigServer;
 import org.apache.pig.impl.PigContext;
 import org.springframework.beans.factory.BeanNameAware;
-import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.context.SmartLifecycle;
 import org.springframework.core.io.Resource;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Factory for creating a {@link PigServer} instance.
+ * Factory for creating a {@link PigServer} instance. Note that since PigServer is not thread-safe, this factory will
+ * create a new instance for every {@link #getObject()} invocation. The caller needs to handle the object clean-up, 
+ * specifically calling {@link PigServer#shutdown()}.
  * 
  * @author Costin Leau
  */
-public class PigServerFactoryBean implements SmartLifecycle, InitializingBean, DisposableBean, FactoryBean<PigServer>,
-		BeanNameAware {
+public class PigServerFactoryBean implements FactoryBean<PigServer>, BeanNameAware {
 
 	private static final Log log = LogFactory.getLog(PigServerFactoryBean.class);
-
-	private PigServer pigServer;
-	private volatile boolean running = false;
-
-	private boolean autoStartup = true;
 
 	private PigContext pigContext;
 	private Collection<String> pathToSkip;
@@ -56,20 +50,22 @@ public class PigServerFactoryBean implements SmartLifecycle, InitializingBean, D
 	private String beanName;
 
 	public PigServer getObject() throws Exception {
-		return pigServer;
+		return createPigInstance();
 	}
 
 	public Class<?> getObjectType() {
-		return (pigServer != null ? pigServer.getClass() : PigServer.class);
+		return PigServer.class;
 	}
 
 	public boolean isSingleton() {
-		return true;
+		return false;
 	}
 
-	public void afterPropertiesSet() throws Exception {
+	protected PigServer createPigInstance() throws IOException {
 		PigContext ctx = (pigContext != null ? pigContext : new PigContext());
-		pigServer = new PigServer(ctx, false);
+
+		// apparently if not connected, pig can cause all kind of errors
+		PigServer pigServer = new PigServer(ctx, true);
 
 		if (!CollectionUtils.isEmpty(pathToSkip)) {
 			for (String path : pathToSkip) {
@@ -97,59 +93,28 @@ public class PigServerFactoryBean implements SmartLifecycle, InitializingBean, D
 		if (validateEachStatement != null) {
 			pigServer.setValidateEachStatement(validateEachStatement);
 		}
-	}
-
-	public void destroy() throws Exception {
-		stop();
-	}
 
 
-	public void setAutoStartup(boolean autoStart) {
-		this.autoStartup = autoStart;
-	}
-
-	public boolean isRunning() {
-		return running;
-	}
-
-	public void start() {
-		if (!isRunning()) {
-			running = true;
-			try {
-				pigServer.getPigContext().connect();
-				registerScripts();
-			} catch (Exception ex) {
-				throw new IllegalStateException("Cannot start PigServer", ex);
-			}
-		}
-	}
-
-	private void registerScripts() throws IOException {
 		if (!CollectionUtils.isEmpty(scripts)) {
+
 			for (Resource resource : scripts) {
-				pigServer.registerScript(resource.getInputStream());
+				InputStream in = null;
+				try {
+					in = resource.getInputStream();
+					pigServer.registerScript(in);
+
+				} finally {
+					if (in != null) {
+						try {
+							in.close();
+						} catch (IOException ex) {
+						}
+					}
+				}
 			}
 		}
-	}
 
-	public void stop() {
-		if (isRunning()) {
-			running = false;
-			pigServer.shutdown();
-		}
-	}
-
-	public boolean isAutoStartup() {
-		return autoStartup;
-	}
-
-	public void stop(Runnable callback) {
-		stop();
-		callback.run();
-	}
-
-	public int getPhase() {
-		return Integer.MIN_VALUE;
+		return pigServer;
 	}
 
 	public void setBeanName(String name) {

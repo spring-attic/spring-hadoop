@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 the original author or authors.
+ * Copyright 2011-2012 the original author or authors.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,56 +15,84 @@
  */
 package org.springframework.data.hadoop.batch;
 
-import org.apache.hadoop.mapreduce.Job;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+
+import org.apache.pig.PigServer;
+import org.apache.pig.backend.executionengine.ExecJob;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.core.io.Resource;
 import org.springframework.data.hadoop.HadoopException;
 import org.springframework.util.Assert;
+import org.springframework.util.ObjectUtils;
 
 /**
- * Batch tasklet for executing one or more Hadoop jobs.
- * Can be configured to wait for the job to finish - by default, the job is submited and the tasklet returns.
- * 
  * @author Costin Leau
  */
-public class HadoopTasklet implements InitializingBean, Tasklet {
+public class PigTasklet implements InitializingBean, Tasklet {
 
-	private Job job;
-	private boolean waitForJob = true;
+	private PigServer pig;
+	private Resource[] scripts;
 
+	@Override
 	public void afterPropertiesSet() {
-		Assert.notNull(job, "A Hadoop job is required");
+		Assert.notNull(pig, "A PigServer instance is required");
+		Assert.isTrue(!ObjectUtils.isEmpty(scripts), "At least one script needs to be specified");
 	}
 
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		Exception exc = null;
 
+		pig.setBatchOn();
+		pig.getPigContext().connect();
+
 		try {
-			if (!waitForJob) {
-				job.submit();
-			}
-			else {
-				job.waitForCompletion(false);
-			}
+			execute();
 			return RepeatStatus.FINISHED;
 		} catch (Exception ex) {
 			exc = ex;
 		}
-		String message = "Job [" + job.getJobID() + "|" + job.getJobName() + " ] failed";
-		throw (exc != null ? new HadoopException(message, exc) : new HadoopException(message));
+
+		throw new HadoopException("Cannot execute Pig script(s)", exc);
+	}
+
+	private List<ExecJob> execute() throws IOException {
+
+		// register scripts
+		for (Resource script : scripts) {
+			InputStream in = null;
+			try {
+				in = script.getInputStream();
+				pig.registerScript(in);
+			} finally {
+				if (in != null) {
+					try {
+						in.close();
+					} catch (IOException ex) {
+					}
+				}
+			}
+		}
+
+		return pig.executeBatch();
 	}
 
 	/**
-	 * @param job The job to set.
+	 * @param scripts The scripts to set.
 	 */
-	public void setJob(Job job) {
-		this.job = job;
+	public void setScripts(Resource[] scripts) {
+		this.scripts = scripts;
 	}
 
-	public void setWaitForJob(boolean waitForJob) {
-		this.waitForJob = waitForJob;
+	/**
+	 * @param pig The pig to set.
+	 */
+	public void setPig(PigServer pig) {
+		this.pig = pig;
 	}
 }

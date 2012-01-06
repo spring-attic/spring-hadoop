@@ -16,31 +16,48 @@
 package org.springframework.data.hadoop.pig;
 
 import org.apache.pig.PigServer;
+import org.junit.After;
 import org.junit.Test;
-import org.springframework.context.support.GenericXmlApplicationContext;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.hadoop.TestUtils;
+import org.springframework.data.hadoop.batch.PigTasklet;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.junit.Assert.*;
 
 /**
  * @author Costin Leau
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration("/org/springframework/data/hadoop/pig/basic.xml")
 public class PigTest {
+
+	@Autowired
+	private PigServer pig;
+	@Autowired
+	private ApplicationContext ctx;
 
 	{
 		TestUtils.hackHadoopStagingOnWin();
 	}
 
+	@After
+	public void cleanup() throws Exception {
+		pig.shutdown();
+	}
+
 	@Test
 	public void testPig() throws Exception {
-		GenericXmlApplicationContext ctx = new GenericXmlApplicationContext(
-				"/org/springframework/data/hadoop/pig/basic.xml");
-
-		ctx.registerShutdownHook();
-
-		PigServer pig = ctx.getBean(PigServer.class);
-
 		pig.registerQuery("A = LOAD 'foo.txt' AS (key, value);");
 		assertFalse(pig.isBatchOn());
+	}
+
+	@Test
+	public void testTasklet() throws Exception {
+		PigTasklet pt = ctx.getBean("tasklet", PigTasklet.class);
+		pt.execute(null, null);
 	}
 }
