@@ -57,8 +57,12 @@ abstract class AbstractImprovedSimpleBeanDefinitionParser extends AbstractSimple
 		postProcess(builder, element);
 	}
 
-	protected String defaultId() {
-		throw new IllegalStateException("No default name was specified");
+	protected String defaultId(ParserContext context, Element element) {
+		context.getReaderContext().error(
+				"Id is required for element '" + context.getDelegate().getLocalName(element)
+						+ "' when used as a top-level tag", element);
+
+		return null;
 	}
 
 	@Override
@@ -66,7 +70,7 @@ abstract class AbstractImprovedSimpleBeanDefinitionParser extends AbstractSimple
 			throws BeanDefinitionStoreException {
 		String name = super.resolveId(element, definition, parserContext);
 		if (!StringUtils.hasText(name)) {
-			name = defaultId();
+			name = defaultId(parserContext, element);
 		}
 		return name;
 	}

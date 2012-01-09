@@ -15,6 +15,7 @@
  */
 package org.springframework.data.hadoop.config;
 
+import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.data.hadoop.hbase.HbaseConfigurationFactoryBean;
 import org.w3c.dom.Element;
 
@@ -31,7 +32,7 @@ class HbaseConfigurationParser extends AbstractImprovedSimpleBeanDefinitionParse
 	}
 
 	@Override
-	protected String defaultId() {
+	protected String defaultId(ParserContext context, Element element) {
 		return "hbase-configuration";
 	}
 }

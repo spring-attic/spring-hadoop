@@ -1,0 +1,26 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:hdp="http://www.springframework.org/schema/hadoop"
+	xmlns:c="http://www.springframework.org/schema/c"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+      	http://www.springframework.org/schema/batch	http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
+      	http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
+
+	<import resource="../batch-common.xml"/>
+	<import resource="../hadoop-ctx.xml"/>
+	
+	<job id="mainJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="do">
+			<tasklet ref="pig-script"/>
+		</step>
+	</job>
+
+	<hdp:pig-server configuration-ref="hadoop-configuration" exec-type="LOCAL" job-name="pig-script"/> 
+	
+	<hdp:pig-tasklet id="pig-script" pig-server-ref="hadoop-pig-server">
+		<hdp:script location="org/springframework/data/hadoop/pig/script.pig" />
+	</hdp:pig-tasklet> 
+	
+</beans>

@@ -34,7 +34,7 @@ Defines a Spring Batch tasklet for Hadoop Jobs.
 		<!-- the job reference -->
 		<xsd:attribute name="job-ref">
 			<xsd:annotation>
-				<xsd:documentation source="org.apache.hadoop.mapreduce.Job"><![CDATA[
+				<xsd:documentation source="java:org.apache.hadoop.mapreduce.Job"><![CDATA[
 Hadoop Job]]></xsd:documentation>
 				<xsd:appinfo>
 					<tool:annotation kind="ref">
@@ -79,7 +79,7 @@ Bean id (default is "hadoop-configuration").
 				</xsd:attribute>
 				<xsd:attribute name="configuration-ref">
 				<xsd:annotation>
-						<xsd:documentation source="org.apache.hadoop.conf.Configuration"><![CDATA[
+						<xsd:documentation source="java:org.apache.hadoop.conf.Configuration"><![CDATA[
 Reference to another Hadoop configuration (useful for chaining)]]></xsd:documentation>
 						<xsd:appinfo>
 							<tool:annotation kind="ref">
@@ -90,7 +90,7 @@ Reference to another Hadoop configuration (useful for chaining)]]></xsd:document
 				</xsd:attribute>
 				<xsd:attribute name="resources">
 				<xsd:annotation>
-						<xsd:documentation source="org.springframework.core.io.Resource"><![CDATA[
+						<xsd:documentation source="java:org.springframework.core.io.Resource"><![CDATA[
 Hadoop Configuration resources. Multiple resources can be specified, using comma (,) as a separator]]></xsd:documentation>
 						<xsd:appinfo>
 							<tool:annotation kind="direct">
@@ -136,7 +136,7 @@ Bean id (default is "hadoop-resource-loader").
 		</xsd:attribute>
 		<xsd:attribute name="configuration-ref" use="optional" default="hadoop-configuration">
 		<xsd:annotation>
-				<xsd:documentation source="org.apache.hadoop.conf.Configuration"><![CDATA[
+				<xsd:documentation source="java:org.apache.hadoop.conf.Configuration"><![CDATA[
 Reference to the Hadoop Configuration. Defaults to 'hadoop-configuration'.]]></xsd:documentation>
 				<xsd:appinfo>
 					<tool:annotation kind="ref">
@@ -310,7 +310,7 @@ Defines a Hadoop Job.
 		</xsd:attribute>
 		<xsd:attribute name="configuration-ref" use="optional" default="hadoop-configuration">
 		<xsd:annotation>
-				<xsd:documentation source="org.apache.hadoop.conf.Configuration"><![CDATA[
+				<xsd:documentation source="java:org.apache.hadoop.conf.Configuration"><![CDATA[
 Reference to the Hadoop Configuration. Defaults to 'hadoop-configuration'.]]></xsd:documentation>
 				<xsd:appinfo>
 					<tool:annotation kind="ref">
@@ -413,7 +413,7 @@ The combiner class name.
 		</xsd:attribute>
 		<xsd:attribute name="configuration-ref" default="hadoop-configuration">
 		<xsd:annotation>
-				<xsd:documentation source="org.apache.hadoop.conf.Configuration"><![CDATA[
+				<xsd:documentation source="java:org.apache.hadoop.conf.Configuration"><![CDATA[
 Reference to the Hadoop Configuration. Defaults to 'hadoop-configuration'.]]></xsd:documentation>
 				<xsd:appinfo>
 					<tool:annotation kind="ref">
@@ -497,7 +497,7 @@ Bean id (default is "hadoop-cache").
 			<xsd:attribute name="create-symlink" type="xsd:boolean"/>
 			<xsd:attribute name="configuration-ref" default="hadoop-configuration">
 			<xsd:annotation>
-					<xsd:documentation source="org.apache.hadoop.conf.Configuration"><![CDATA[
+					<xsd:documentation source="java:org.apache.hadoop.conf.Configuration"><![CDATA[
 Reference to the Hadoop Configuration. Defaults to 'hadoop-configuration'.]]></xsd:documentation>
 					<xsd:appinfo>
 						<tool:annotation kind="ref">
@@ -508,7 +508,7 @@ Reference to the Hadoop Configuration. Defaults to 'hadoop-configuration'.]]></x
 		 	</xsd:attribute>			
 			<xsd:attribute name="file-system-ref">
 			<xsd:annotation>
-					<xsd:documentation source="org.apache.hadoop.fs.FileSystem"><![CDATA[
+					<xsd:documentation source="java:org.apache.hadoop.fs.FileSystem"><![CDATA[
 Reference to the Hadoop FileSystem.]]></xsd:documentation>
 					<xsd:appinfo>
 						<tool:annotation kind="ref">
@@ -520,8 +520,23 @@ Reference to the Hadoop FileSystem.]]></xsd:documentation>
 		</xsd:complexType>
 	</xsd:element>
 
+	<xsd:complexType name="pigScriptType">
+		<xsd:complexContent>
+			<xsd:extension base="beans:propsType">
+				<xsd:attribute name="location" type="xsd:string">
+					<xsd:annotation>
+						<xsd:appinfo>
+							<tool:annotation>
+								<tool:expected-type type="org.springframework.core.io.Resource"/>
+							</tool:annotation>
+						</xsd:appinfo>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
 	
-	<xsd:element name="pig">
+	<xsd:element name="pig-server">
 		<xsd:annotation>
 		   <xsd:documentation><![CDATA[
 Defines a PigServer 'template' (note that since PigServer is not thread-safe, each bean invocation will create a new PigServer instance).
@@ -534,43 +549,46 @@ Defines a PigServer 'template' (note that since PigServer is not thread-safe, ea
 	      </xsd:appinfo>
 		</xsd:annotation>
 		<xsd:complexType>
-			<xsd:complexContent>
-			 <xsd:extension base="beans:propsType">
-				<xsd:attribute name="id" type="xsd:ID" use="optional">
+			<xsd:sequence>
+					<xsd:element name="script" type="pigScriptType" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+						<xsd:documentation><![CDATA[
+Pig script.]]></xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="properties" type="beans:propsType" minOccurs="0" maxOccurs="1">
+						<xsd:annotation>
+						<xsd:documentation><![CDATA[
+Configuration properties specific to this PigServer instance. Usually added to customize the configuration specified through 'configuration-ref'.
+						]]>
+		          		</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+			</xsd:sequence>
+			<xsd:attribute name="id" type="xsd:ID" use="optional">
 				<xsd:annotation>
 				<xsd:documentation><![CDATA[
-Bean id (default is "hadoop-pig").
+Bean id (default is "hadoop-pig-server").
 				]]>
           		</xsd:documentation>
 				</xsd:annotation>
-				</xsd:attribute>
-				<xsd:attribute name="scripts">
-				<xsd:annotation>
-						<xsd:documentation source="org.springframework.core.io.Resource"><![CDATA[
-Pig scripts to be registered. Multiple resources can be specified, using comma (,) as a separator.]]></xsd:documentation>
-						<xsd:appinfo>
-							<tool:annotation kind="direct">
-								<tool:expected-type type="org.springframework.core.io.Resource[]" />
-							</tool:annotation>
-						</xsd:appinfo>
-			 	</xsd:annotation>
-				</xsd:attribute>
-				<xsd:attribute name="paths-to-skip">
+			</xsd:attribute>
+			<xsd:attribute name="paths-to-skip">
 				<xsd:annotation>
 						<xsd:documentation><![CDATA[
 The path to be skipped while automatically shipping binaries for streaming. Multiple resources can be specified, using comma (,) as a separator.
 						]]></xsd:documentation>
 			 	</xsd:annotation>			
-				</xsd:attribute>
-				<xsd:attribute name="parallelism" type="xsd:integer"/>
-				<xsd:attribute name="validate-each-statement" type="xsd:boolean"/>
-				<xsd:attribute name="job-priority" type="xsd:string"/>
-				<xsd:attribute name="job-name" type="xsd:string"/>
-				<xsd:attribute name="job-tracker" type="xsd:string"/>
-				<xsd:attribute name="configuration-ref">
+			</xsd:attribute>
+			<xsd:attribute name="parallelism" type="xsd:integer"/>
+			<xsd:attribute name="validate-each-statement" type="xsd:boolean"/>
+			<xsd:attribute name="job-priority" type="xsd:string"/>
+			<xsd:attribute name="job-name" type="xsd:string"/>
+			<xsd:attribute name="job-tracker" type="xsd:string"/>
+			<xsd:attribute name="configuration-ref">
 				<xsd:annotation>
-						<xsd:documentation source="org.apache.hadoop.conf.Configuration"><![CDATA[
-Reference to the Hadoop Configuration. Can be tweaked through the nested properties or the other properties.]]></xsd:documentation>
+						<xsd:documentation source="java:org.apache.hadoop.conf.Configuration"><![CDATA[
+Reference to the Hadoop Configuration. Can be tweaked through the 'configuration' element or the other attributes.]]></xsd:documentation>
 						<xsd:appinfo>
 							<tool:annotation kind="ref">
 								<tool:expected-type type="org.apache.hadoop.conf.Configuration" />
@@ -586,8 +604,50 @@ Reference to the Hadoop Configuration. Can be tweaked through the nested propert
 					  </xsd:restriction>
 					</xsd:simpleType>
 				</xsd:attribute>
-			</xsd:extension>
-		   </xsd:complexContent>				
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="pig-tasklet">
+		<xsd:annotation>
+		   <xsd:documentation><![CDATA[
+Defines a PigTasklet.
+				]]>
+          </xsd:documentation>
+	      <xsd:appinfo>
+	        <tool:annotation>
+	          <tool:exports type="org.springframework.data.hadoop.batch.PigTasket"/>
+	        </tool:annotation>
+	      </xsd:appinfo>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="script" type="pigScriptType" minOccurs="1" maxOccurs="unbounded">
+					<xsd:annotation>
+					<xsd:documentation><![CDATA[
+Pig script.]]></xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+			</xsd:sequence>
+			<xsd:attribute name="id" type="xsd:ID" use="required">
+				<xsd:annotation>
+				<xsd:documentation><![CDATA[
+Bean id.
+				]]>
+          		</xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="pig-server-ref" type="xsd:string" use="required">
+				<xsd:annotation>
+				<xsd:documentation source="java:org.apache.pig.PigServer"><![CDATA[
+Reference to a PigServer instance.
+				]]></xsd:documentation>
+					<xsd:appinfo>
+						<tool:annotation kind="ref">
+							<tool:expected-type type="org.apache.pig.PigServer" />
+						</tool:annotation>
+					</xsd:appinfo>
+				</xsd:annotation>
+			</xsd:attribute>
 		</xsd:complexType>
 	</xsd:element>
 	
@@ -617,7 +677,7 @@ Bean id (default is "hbase-configuration").
 			<xsd:attribute name="delete-connection" type="xsd:boolean" default="true"/>
 			<xsd:attribute name="configuration-ref">
 			<xsd:annotation>
-					<xsd:documentation source="org.apache.hadoop.conf.Configuration"><![CDATA[
+					<xsd:documentation source="java:org.apache.hadoop.conf.Configuration"><![CDATA[
 Reference to the Hadoop configuration.]]></xsd:documentation>
 					<xsd:appinfo>
 						<tool:annotation kind="ref">

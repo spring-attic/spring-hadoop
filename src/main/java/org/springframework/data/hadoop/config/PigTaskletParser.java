@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 the original author or authors.
+ * Copyright 2011-2012 the original author or authors.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,39 +15,36 @@
  */
 package org.springframework.data.hadoop.config;
 
+import java.util.Collection;
+
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.data.hadoop.io.HdfsResourceLoader;
-import org.springframework.util.StringUtils;
+import org.springframework.data.hadoop.batch.PigTasklet;
+import org.springframework.util.CollectionUtils;
 import org.w3c.dom.Element;
 
 /**
+ * Parser for 'pig-tasklet' element.
+ * 
  * @author Costin Leau
  */
-class HadoopResourceLoaderParser extends AbstractImprovedSimpleBeanDefinitionParser {
+public class PigTaskletParser extends AbstractImprovedSimpleBeanDefinitionParser {
 
 	@Override
 	protected Class<?> getBeanClass(Element element) {
-		return HdfsResourceLoader.class;
-	}
-
-	@Override
-	protected String defaultId(ParserContext context, Element element) {
-		return "hadoop-resource-loader";
+		return PigTasklet.class;
 	}
 
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
-		// get configuration
-		String config = element.getAttribute("configuration-ref");
-		builder.addConstructorArgReference(config.trim());
+		// parse attributes using conventions
+		super.doParse(element, parserContext, builder);
 
-		// get uri (if available)
-		String uri = element.getAttribute("uri");
-		if (StringUtils.hasText(uri)) {
-			builder.addConstructorArgValue(uri);
+		// parse scripts
+		Collection<BeanDefinition> scripts = PigServerParser.parseScripts(parserContext, element);
+		if (!CollectionUtils.isEmpty(scripts)) {
+			builder.addPropertyValue("scripts", scripts);
 		}
-
-		postProcess(builder, element);
 	}
 }

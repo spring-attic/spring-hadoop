@@ -25,7 +25,6 @@ import org.apache.pig.PigServer;
 import org.apache.pig.impl.PigContext;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
-import org.springframework.core.io.Resource;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -42,7 +41,7 @@ public class PigServerFactoryBean implements FactoryBean<PigServer>, BeanNameAwa
 
 	private PigContext pigContext;
 	private Collection<String> pathToSkip;
-	private Collection<Resource> scripts;
+	private Collection<PigScript> scripts;
 	private Integer parallelism;
 	private String jobName;
 	private String jobPriority;
@@ -96,12 +95,11 @@ public class PigServerFactoryBean implements FactoryBean<PigServer>, BeanNameAwa
 
 
 		if (!CollectionUtils.isEmpty(scripts)) {
-
-			for (Resource resource : scripts) {
+			for (PigScript script : scripts) {
 				InputStream in = null;
 				try {
-					in = resource.getInputStream();
-					pigServer.registerScript(in);
+					in = script.getResource().getInputStream();
+					pigServer.registerScript(in, script.getParams());
 
 				} finally {
 					if (in != null) {
@@ -138,7 +136,7 @@ public class PigServerFactoryBean implements FactoryBean<PigServer>, BeanNameAwa
 	/**
 	 * @param scripts The scripts to set.
 	 */
-	public void setScripts(Collection<Resource> scripts) {
+	public void setScripts(Collection<PigScript> scripts) {
 		this.scripts = scripts;
 	}
 

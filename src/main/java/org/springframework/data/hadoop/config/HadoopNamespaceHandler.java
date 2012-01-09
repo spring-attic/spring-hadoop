@@ -29,7 +29,8 @@ class HadoopNamespaceHandler extends NamespaceHandlerSupport {
 		registerBeanDefinitionParser("streaming", new HadoopStreamJobParser());
 		registerBeanDefinitionParser("configuration", new HadoopConfigParser());
 		registerBeanDefinitionParser("resource-loader", new HadoopResourceLoaderParser());
-		registerBeanDefinitionParser("pig", new PigParser());
+		registerBeanDefinitionParser("pig-server", new PigServerParser());
+		registerBeanDefinitionParser("pig-tasklet", new PigTaskletParser());
 		registerBeanDefinitionParser("hbase-configuration", new HbaseConfigurationParser());
 		registerBeanDefinitionParser("hive-client", new HiveClientParser());
 		registerBeanDefinitionParser("cache", new DistributedCacheParser());
