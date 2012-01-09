@@ -46,5 +46,4 @@ public class PigBatchTest {
 		TriggerJobs tj = new TriggerJobs();
 		tj.startJobs(ctx);
 	}
-
 }

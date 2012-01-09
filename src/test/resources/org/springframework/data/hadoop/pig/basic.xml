@@ -9,18 +9,8 @@
 
 	<import resource="../hadoop-ctx.xml"/>
 
-	<!-- 
 	<bean id="pig-ctx" class="org.springframework.data.hadoop.pig.PigContextFactoryBean" p:exec-type="LOCAL" p:configuration-ref="hadoop-configuration"/>
 	<bean id="pig" class="org.springframework.data.hadoop.pig.PigServerFactoryBean" p:pig-context-ref="pig-ctx"/>
-	<bean id="tasklet" class="org.springframework.data.hadoop.batch.PigTasklet" p:pig-ref="pig">
-		<property name="scripts">
-			<list>
-				<bean class="org.springframework.data.hadoop.pig.PigScript" c:resource="org/springframework/data/hadoop/pig/script.pig"/>
-			</list>
-		</property>
-	</bean>
-
-	 -->
 	
 	<hdp:pig-server configuration-ref="hadoop-configuration" exec-type="LOCAL" job-name="pig-script">
 		<hdp:script location="org/springframework/data/hadoop/pig/script.pig" >

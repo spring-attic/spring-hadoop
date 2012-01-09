@@ -636,10 +636,10 @@ Bean id.
           		</xsd:documentation>
 				</xsd:annotation>
 			</xsd:attribute>
-			<xsd:attribute name="pig-server-ref" type="xsd:string" use="required">
+			<xsd:attribute name="pig-server-ref" type="xsd:string" use="optional" default="hadoop-pig-server">
 				<xsd:annotation>
 				<xsd:documentation source="java:org.apache.pig.PigServer"><![CDATA[
-Reference to a PigServer instance.
+Reference to a PigServer instance. Defaults to 'hadoop-pig-server'.
 				]]></xsd:documentation>
 					<xsd:appinfo>
 						<tool:annotation kind="ref">

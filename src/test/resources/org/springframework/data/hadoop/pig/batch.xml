@@ -12,14 +12,25 @@
 	<import resource="../hadoop-ctx.xml"/>
 	
 	<job id="mainJob" xmlns="http://www.springframework.org/schema/batch">
-		<step id="do">
+		<step id="bean" next="ns">
+			<tasklet ref="tasklet"/>
+		</step>
+		<step id="ns">
 			<tasklet ref="pig-script"/>
 		</step>
 	</job>
 
+	<bean id="tasklet" class="org.springframework.data.hadoop.batch.PigTasklet" p:pig-server-ref="hadoop-pig-server">
+		<property name="scripts">
+			<list>
+				<bean class="org.springframework.data.hadoop.pig.PigScript" c:resource="org/springframework/data/hadoop/pig/script.pig"/>
+			</list>
+		</property>
+	</bean>
+
 	<hdp:pig-server configuration-ref="hadoop-configuration" exec-type="LOCAL" job-name="pig-script"/> 
 	
-	<hdp:pig-tasklet id="pig-script" pig-server-ref="hadoop-pig-server">
+	<hdp:pig-tasklet id="pig-script">
 		<hdp:script location="org/springframework/data/hadoop/pig/script.pig" />
 	</hdp:pig-tasklet> 
 	
