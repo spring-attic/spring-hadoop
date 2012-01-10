@@ -21,6 +21,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.hadoop.TestUtils;
+import org.springframework.data.hadoop.batch.PigTasklet;
 import org.springframework.data.hadoop.batch.TriggerJobs;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -45,5 +46,11 @@ public class PigBatchTest {
 	public void testServerNamespace() throws Exception {
 		TriggerJobs tj = new TriggerJobs();
 		tj.startJobs(ctx);
+	}
+
+	@Test
+	public void testTasklet() throws Exception {
+		PigTasklet pt = ctx.getBean("tasklet", PigTasklet.class);
+		pt.execute(null, null);
 	}
 }

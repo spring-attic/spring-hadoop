@@ -25,7 +25,7 @@
 			<tasklet ref="hadoop-streaming"/>
 		</step>
 		<step id="execute-pig">
-			<tasklet ref="hadoop-pig-tasklet"/>
+			<tasklet ref="pig-script"/>
 		</step>
 	</job>
 	
@@ -54,13 +54,12 @@
 		</property>
 	</bean>
 	-->
-	<hdp:pig scripts="classpath:org/springframework/data/hadoop/pig/script.pig" auto-startup="false" exec-type="LOCAL" />
+	<hdp:pig-server exec-type="LOCAL" />
 	
-	<bean id="hadoop-pig-tasklet" class="org.springframework.batch.core.step.tasklet.MethodInvokingTaskletAdapter">
-	    <property name="targetObject" ref="&amp;hadoop-pig"/>
-	    <property name="targetMethod" value="start" />
-	</bean> 
-	
+	<hdp:pig-tasklet id="pig-script">
+		<hdp:script location="org/springframework/data/hadoop/pig/script.pig" />
+	</hdp:pig-tasklet> 
+ 
 	<bean id="file-reader" class="org.springframework.batch.item.file.ResourcesItemReader" p:resources="classpath:${input.directory}/*.log"/>
 
 	<bean id="hdfs-writer" class="org.springframework.data.hadoop.batch.ResourcesItemWriter" 
