@@ -20,8 +20,6 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 
@@ -56,8 +54,8 @@ public class HdfsResouceLoaderTest {
 
 		Properties prop = PropertiesLoaderUtils.loadAllProperties("test.properties");
 
-		Map<String, Object> props = new LinkedHashMap<String, Object>();
-		props.put("fs.default.name", prop.get("hd.fs"));
+		Properties props = new Properties();
+		props.setProperty("fs.default.name", prop.getProperty("hd.fs"));
 
 		ConfigurationFactoryBean cfb = new ConfigurationFactoryBean();
 		cfb.setBeanClassLoader(getClass().getClassLoader());

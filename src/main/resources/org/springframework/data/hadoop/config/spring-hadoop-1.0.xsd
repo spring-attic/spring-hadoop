@@ -66,9 +66,7 @@ Defines a Hadoop Configuration.
 	        </tool:annotation>
 	      </xsd:appinfo>
 		</xsd:annotation>
-		<xsd:complexType>
-		  <xsd:complexContent>
-		    <xsd:extension base="beans:mapType">
+		<xsd:complexType mixed="true">
 				<xsd:attribute name="id" type="xsd:ID" use="optional">
 				<xsd:annotation>
 				<xsd:documentation><![CDATA[
@@ -108,8 +106,6 @@ in a given JVM hence the default is false.
 		   		</xsd:documentation>
 				</xsd:annotation>
 				</xsd:attribute>
-			</xsd:extension>
-		</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
 	
@@ -713,10 +709,50 @@ Bean id (default is "hive-client").
 			</xsd:attribute>
 			<xsd:attribute name="host" type="xsd:string" default="localhost"/>
 			<xsd:attribute name="port" type="xsd:string" default="10000"/>
-			<xsd:attribute name="auto-startup" type="xsd:boolean"/>
+			<xsd:attribute name="auto-startup" type="xsd:boolean" default="true"/>
 		</xsd:complexType>
 	</xsd:element>
 	
+	<xsd:element name="hive-server">
+		<xsd:complexType>
+			<xsd:annotation>
+			   <xsd:documentation><![CDATA[
+Defines an embedded Hive Server instance opened for access through the Thrift protocol.
+					]]>
+	          </xsd:documentation>
+		      <xsd:appinfo>
+		        <tool:annotation>
+		          <tool:exports type="org.apache.thrift.server.TServer"/>
+		        </tool:annotation>
+		      </xsd:appinfo>
+			</xsd:annotation>
+			<xsd:attribute name="id" type="xsd:ID" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+Bean id (default is "hive-server").
+				]]>
+         		</xsd:documentation>
+			</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="port" type="xsd:string" default="10000"/>
+			<xsd:attribute name="min-threads" type="xsd:string" default="5"/>
+			<xsd:attribute name="max-threads" type="xsd:string" default="100"/>
+			<xsd:attribute name="auto-startup" type="xsd:boolean" default="true"/>
+			<xsd:attribute name="configuration-ref">
+			<xsd:annotation>
+					<xsd:documentation source="java:org.apache.hadoop.conf.Configuration"><![CDATA[
+Reference to the Hadoop configuration.]]></xsd:documentation>
+					<xsd:appinfo>
+						<tool:annotation kind="ref">
+							<tool:expected-type type="org.apache.hadoop.conf.Configuration" />
+						</tool:annotation>
+					</xsd:appinfo>
+		 	</xsd:annotation>
+		 	</xsd:attribute>		
+			
+		</xsd:complexType>
+	</xsd:element>
+
 	<!-- Script -->
 	
 	<xsd:element name="script">

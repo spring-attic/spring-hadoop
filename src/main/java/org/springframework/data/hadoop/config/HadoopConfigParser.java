@@ -15,12 +15,11 @@
  */
 package org.springframework.data.hadoop.config;
 
-import java.util.Map;
-
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.data.hadoop.configuration.ConfigurationFactoryBean;
 import org.springframework.util.StringUtils;
+import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
 
 /**
@@ -30,8 +29,6 @@ import org.w3c.dom.Element;
  */
 class HadoopConfigParser extends AbstractImprovedSimpleBeanDefinitionParser {
 
-	private static final String PROPERTIES_PROP = "properties";
-
 	@Override
 	protected Class<?> getBeanClass(Element element) {
 		return ConfigurationFactoryBean.class;
@@ -39,8 +36,7 @@ class HadoopConfigParser extends AbstractImprovedSimpleBeanDefinitionParser {
 
 	@Override
 	protected boolean isEligibleAttribute(String attributeName) {
-		return !("resources".equals(attributeName) || "value-type".equals(attributeName) || "key-type".equals(attributeName))
-				&& super.isEligibleAttribute(attributeName);
+		return (!"resources".equals(attributeName)) && super.isEligibleAttribute(attributeName);
 	}
 
 	@Override
@@ -55,10 +51,10 @@ class HadoopConfigParser extends AbstractImprovedSimpleBeanDefinitionParser {
 			builder.addPropertyValue("resources", StringUtils.commaDelimitedListToStringArray(attr));
 		}
 
-		// parse nested element (if any)
-		Map parsedProps = parserContext.getDelegate().parseMapElement(element, builder.getRawBeanDefinition());
-		if (!parsedProps.isEmpty()) {
-			builder.addPropertyValue(PROPERTIES_PROP, parsedProps);
+		String props = DomUtils.getTextValue(element);
+
+		if (StringUtils.hasText(props)) {
+			builder.addPropertyValue("properties", props);
 		}
 	}
 

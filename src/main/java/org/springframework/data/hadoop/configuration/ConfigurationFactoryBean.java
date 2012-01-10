@@ -16,7 +16,7 @@
 package org.springframework.data.hadoop.configuration;
 
 import java.net.URL;
-import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -41,7 +41,7 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 	private Configuration configuration;
 	private boolean loadDefaults = true;
 	private Set<Resource> resources;
-	private Map<String, Object> properties;
+	private Properties properties;
 
 	private ClassLoader beanClassLoader = getClass().getClassLoader();
 	private boolean initialize = true;
@@ -57,32 +57,7 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 			}
 		}
 
-		if (properties != null) {
-			for (Map.Entry<String, Object> entry : properties.entrySet()) {
-				String key = entry.getKey();
-				Object value = entry.getValue();
-
-				// so much for method overloading
-				if (value instanceof Float) {
-					config.setFloat(key, (Float) value);
-				}
-				if (value instanceof Long) {
-					config.setLong(key, (Long) value);
-				}
-				if (value instanceof Integer) {
-					config.setInt(key, (Integer) value);
-				}
-				if (value instanceof Boolean) {
-					config.setBoolean(key, (Boolean) value);
-				}
-				if (value instanceof String[]) {
-					config.setStrings(key, (String[]) value);
-				}
-
-				// fall back to toString
-				config.set(key, value.toString());
-			}
-		}
+		ConfigurationUtils.addProperties(config, properties);
 
 		if (initialize) {
 			config.size();
@@ -157,7 +132,7 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 	/**
 	 * @param properties The properties to set.
 	 */
-	public void setProperties(Map<String, Object> properties) {
+	public void setProperties(Properties properties) {
 		this.properties = properties;
 	}
 
