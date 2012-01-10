@@ -107,7 +107,7 @@ class Jsr223ScriptEvaluatorFactoryBean implements InitializingBean, BeanClassLoa
 	}
 
 	/**
-	 * @param resource The resource to set.
+	 * @param script The resource to set.
 	 */
 	public void setScriptSource(ScriptSource script) {
 		this.script = script;
@@ -130,7 +130,7 @@ class Jsr223ScriptEvaluatorFactoryBean implements InitializingBean, BeanClassLoa
 	/**
 	 * Sets the way the script is modified.
 	 * 
-	 * @param singleton
+	 * @param evaluation
 	 */
 	public void setEvaluate(EvaluationType evaluation) {
 		this.evaluation = evaluation;
