@@ -7,18 +7,12 @@
       	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
       	http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
 
- 	<!-- 
-
 	<import resource="../hadoop-ctx.xml"/>
  	
- 	 p:configuration-ref="hadoop-configuration"
- 	 
- 	 configuration-ref="hadoop-configuration"
- 	 -->
-	<bean id="pig-ctx" class="org.springframework.data.hadoop.pig.PigContextFactoryBean" p:exec-type="LOCAL"/>
+	<bean id="pig-ctx" class="org.springframework.data.hadoop.pig.PigContextFactoryBean" p:exec-type="LOCAL" p:configuration-ref="hadoop-configuration"/>
 	<bean id="pig" class="org.springframework.data.hadoop.pig.PigServerFactoryBean" p:pig-context-ref="pig-ctx"/>
 	
-	<pig-server  exec-type="LOCAL" job-name="pig-script" xmlns="http://www.springframework.org/schema/hadoop">
+	<pig-server  exec-type="LOCAL" job-name="pig-script" configuration-ref="hadoop-configuration" xmlns="http://www.springframework.org/schema/hadoop">
 		<properties>
 			ivy=blue
 		</properties>
