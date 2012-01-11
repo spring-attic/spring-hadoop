@@ -4,6 +4,7 @@ Bundle-Vendor: SpringSource
 Bundle-ManifestVersion: 2
 Export-Template: org.springframework.data.hadoop.*;version=${version}
 Import-Template: 
+ javax.script.*;version="0",
  org.springframework.beans.*;version=${spring.range},
  org.springframework.context.*;version=${spring.range},
  org.springframework.jdbc.*;version=${spring.range},
@@ -11,8 +12,9 @@ Import-Template:
  org.springframework.expression.*;version=${spring.range},
  org.springframework.util.*;version=${spring.range},
  org.springframework.core.*;version=${spring.range},
- org.springframework.stereotype.*;version=${spring.range},
  org.springframework.scheduling.*;version=${spring.range},
+ org.springframework.scripting.*;version=${spring.range},
+ org.springframework.stereotype.*;version=${spring.range},
  org.springframework.ui.*;version=${spring.range},
  org.springframework.transaction.*;version=${spring.range},
  org.springframework.web.*;version=${spring.range},
