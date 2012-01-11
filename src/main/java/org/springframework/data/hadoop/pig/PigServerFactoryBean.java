@@ -23,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.pig.PigServer;
 import org.apache.pig.impl.PigContext;
+import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.util.CollectionUtils;
@@ -99,8 +100,9 @@ public class PigServerFactoryBean implements FactoryBean<PigServer>, BeanNameAwa
 				InputStream in = null;
 				try {
 					in = script.getResource().getInputStream();
-					pigServer.registerScript(in, script.getParams());
-
+					pigServer.registerScript(in, script.getArguments());
+				} catch (IOException ex) {
+					throw new BeanInitializationException("Cannot register script " + script, ex);
 				} finally {
 					if (in != null) {
 						try {

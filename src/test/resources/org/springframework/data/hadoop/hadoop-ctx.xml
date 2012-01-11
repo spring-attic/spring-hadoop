@@ -29,7 +29,7 @@
 	
 	<!--  default id is 'hadoop-configuration' -->
 	<hdp:configuration register-url-handler="false">
-		<entry key="fs.default.name" value="${hd.fs}"/>
+		fs.default.name=${hd.fs}
 	</hdp:configuration>
 
 	<!-- 

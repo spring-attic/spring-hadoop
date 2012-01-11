@@ -516,18 +516,32 @@ Reference to the Hadoop FileSystem.]]></xsd:documentation>
 		</xsd:complexType>
 	</xsd:element>
 
-	<xsd:complexType name="pigScriptType">
+	<xsd:complexType name="scriptType" mixed="true">
+			<xsd:attribute name="location" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+Location of the script. As an alternative one can inline the script by using a nested, text declaration.]]></xsd:documentation>
+					<xsd:appinfo>
+						<tool:annotation>
+							<tool:expected-type type="org.springframework.core.io.Resource"/>
+						</tool:annotation>
+					</xsd:appinfo>
+				</xsd:annotation>
+			</xsd:attribute>
+	</xsd:complexType>
+	
+	<xsd:complexType name="scriptWithArgumentsType" mixed="true">
 		<xsd:complexContent>
-			<xsd:extension base="beans:propsType">
-				<xsd:attribute name="location" type="xsd:string">
+			<xsd:extension base="scriptType">
+			<xsd:sequence>
+				<xsd:element name="arguments" minOccurs="0" maxOccurs="1">
 					<xsd:annotation>
-						<xsd:appinfo>
-							<tool:annotation>
-								<tool:expected-type type="org.springframework.core.io.Resource"/>
-							</tool:annotation>
-						</xsd:appinfo>
-					</xsd:annotation>
-				</xsd:attribute>
+		   			<xsd:documentation><![CDATA[
+Argument(s) to pass to this script. Defined in Properties format (key=value).
+				]]></xsd:documentation>
+				    </xsd:annotation>
+				</xsd:element>
+			</xsd:sequence>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
@@ -546,18 +560,18 @@ Defines a PigServer 'template' (note that since PigServer is not thread-safe, ea
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:sequence>
-					<xsd:element name="script" type="pigScriptType" minOccurs="0" maxOccurs="unbounded">
-						<xsd:annotation>
-						<xsd:documentation><![CDATA[
-Pig script.]]></xsd:documentation>
-						</xsd:annotation>
-					</xsd:element>
-					<xsd:element name="properties" type="beans:propsType" minOccurs="0" maxOccurs="1">
+					<xsd:element name="properties" minOccurs="0" maxOccurs="1">
 						<xsd:annotation>
 						<xsd:documentation><![CDATA[
 Configuration properties specific to this PigServer instance. Usually added to customize the configuration specified through 'configuration-ref'.
 						]]>
 		          		</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="script" type="scriptWithArgumentsType" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+						<xsd:documentation><![CDATA[
+Pig script.]]></xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 			</xsd:sequence>
@@ -617,7 +631,7 @@ Defines a PigTasklet.
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:sequence>
-				<xsd:element name="script" type="pigScriptType" minOccurs="1" maxOccurs="unbounded">
+				<xsd:element name="script" type="scriptWithArgumentsType" minOccurs="1" maxOccurs="unbounded">
 					<xsd:annotation>
 					<xsd:documentation><![CDATA[
 Pig script.]]></xsd:documentation>
@@ -627,9 +641,7 @@ Pig script.]]></xsd:documentation>
 			<xsd:attribute name="id" type="xsd:ID" use="required">
 				<xsd:annotation>
 				<xsd:documentation><![CDATA[
-Bean id.
-				]]>
-          		</xsd:documentation>
+Bean id.]]></xsd:documentation>
 				</xsd:annotation>
 			</xsd:attribute>
 			<xsd:attribute name="pig-server-ref" type="xsd:string" use="optional" default="hadoop-pig-server">
@@ -726,6 +738,16 @@ Defines an embedded Hive Server instance opened for access through the Thrift pr
 		        </tool:annotation>
 		      </xsd:appinfo>
 			</xsd:annotation>
+			<xsd:sequence>
+				<xsd:element name="properties" minOccurs="0" maxOccurs="1">
+						<xsd:annotation>
+						<xsd:documentation><![CDATA[
+Configuration properties specific to this PigServer instance. Usually added to customize the configuration specified through 'configuration-ref'.
+						]]>
+		          		</xsd:documentation>
+						</xsd:annotation>
+				</xsd:element>
+			</xsd:sequence>
 			<xsd:attribute name="id" type="xsd:ID" use="optional">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[
@@ -754,9 +776,8 @@ Reference to the Hadoop configuration.]]></xsd:documentation>
 	</xsd:element>
 
 	<!-- Script -->
-	
 	<xsd:element name="script">
-		<xsd:complexType>
+		<xsd:complexType mixed="true">
 			<xsd:annotation>
 			   <xsd:documentation><![CDATA[
 Dedicated scripting facility for interacting with Hadoop. Allows Groovy, JavaScript (Rhino), Ruby (JRuby), Python (Jython)
@@ -769,26 +790,15 @@ or any JSR-223 scripting language to be used for executing commands against Hado
 		        </tool:annotation>
 		      </xsd:appinfo>
 			</xsd:annotation>
-			<xsd:choice>
-			<xsd:sequence minOccurs="0" maxOccurs="unbounded">
-					<xsd:element name="argument" type="beans:propertyType">
-						<xsd:annotation>
-							<xsd:documentation><![CDATA[
-Argument (or property) to pass to the script. Can be used to enhance or override the default properties.
-							]]></xsd:documentation>
-						</xsd:annotation>
-					</xsd:element>
-			</xsd:sequence>
-			<xsd:sequence minOccurs="0" maxOccurs="1">
-					<xsd:element name="inline-script" minOccurs="0" maxOccurs="1">
-						<xsd:annotation>
-							<xsd:documentation><![CDATA[
-The source code for the dynamic language-backed bean.
-							]]></xsd:documentation>
-						</xsd:annotation>
-					</xsd:element>
+			<xsd:sequence>
+				<xsd:element name="property" type="beans:propertyType"  minOccurs="0" maxOccurs="unbounded">
+					<xsd:annotation>
+						<xsd:documentation><![CDATA[
+Property to pass to the script. Can be used to enhance or override the default properties.
+						]]></xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
 			</xsd:sequence>			
-			</xsd:choice>
 			<xsd:attribute name="id" type="xsd:ID" use="optional">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[
@@ -797,10 +807,10 @@ Bean id (populated by default with the script filename if no value is given).
          		</xsd:documentation>
 			</xsd:annotation>
 			</xsd:attribute>
-			<xsd:attribute name="source" type="xsd:string">
+			<xsd:attribute name="location" type="xsd:string">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[
-The script source. Can be any resource on the local filesystem, web or even hdfs.
+The location of the script. Can be any resource on the local filesystem, web or even hdfs.
 				]]>
          		</xsd:documentation>
 			</xsd:annotation>

@@ -103,4 +103,10 @@ public class ScriptingTest {
 		assertTrue(ctx.containsBean("script-groovy"));
 		assertNotNull(ctx.getBean("script-groovy"));
 	}
+
+	@Test
+	public void testInlinedScriptNSJavaScript() throws Exception {
+		assertTrue(ctx.containsBean("inlined-js"));
+		assertNotNull(ctx.getBean("inlined-js"));
+	}
 }

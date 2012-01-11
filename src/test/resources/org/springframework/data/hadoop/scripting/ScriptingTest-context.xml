@@ -8,8 +8,19 @@
 
 	<import resource="../hadoop-ctx.xml"/>
 
-	<hdp:script id="script-js" source="org/springframework/data/hadoop/scripting/basic-script.js"/> 
-	<hdp:script id="script-py" source="org/springframework/data/hadoop/scripting/basic-script.py"/>
-	<hdp:script id="script-rb" source="org/springframework/data/hadoop/scripting/basic-script.rb"/>
-	<hdp:script id="script-groovy" source="org/springframework/data/hadoop/scripting/basic-script.groovy"/>
+	<hdp:script id="script-js" location="org/springframework/data/hadoop/scripting/basic-script.js"/> 
+	<hdp:script id="script-py" location="org/springframework/data/hadoop/scripting/basic-script.py"/>
+	<hdp:script id="script-rb" location="org/springframework/data/hadoop/scripting/basic-script.rb"/>
+	<hdp:script id="script-groovy" location="org/springframework/data/hadoop/scripting/basic-script.groovy"/>
+	
+	<hdp:script id="inlined-js" language="javascript">
+importPackage(java.util);
+importPackage(org.apache.hadoop.fs);
+
+name = UUID.randomUUID().toString()
+scriptName = "src/test/resources/test.properties"
+fs.copyFromLocalFile(scriptName, name)
+// return the file length 
+fs.getLength(name)
+	</hdp:script> 
 </beans>

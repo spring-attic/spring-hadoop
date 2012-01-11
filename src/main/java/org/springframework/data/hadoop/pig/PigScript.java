@@ -15,7 +15,10 @@
  */
 package org.springframework.data.hadoop.pig;
 
+import java.util.Enumeration;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
@@ -28,16 +31,24 @@ import org.springframework.util.Assert;
 public class PigScript {
 
 	private Resource resource;
-	private Map<String, String> params;
+	private Map<String, String> arguments;
 
 	public PigScript(Resource resource) {
 		this(resource, null);
 	}
 
-	public PigScript(Resource resource, Map<String, String> params) {
+	public PigScript(Resource resource, Properties args) {
 		Assert.notNull(resource, "a valid resource is required");
 		this.resource = resource;
-		this.params = params;
+		this.arguments = new LinkedHashMap<String, String>();
+
+		if (args != null) {
+			Enumeration<?> prop = args.propertyNames();
+			while (prop.hasMoreElements()) {
+				String key = prop.nextElement().toString();
+				arguments.put(key, args.getProperty(key));
+			}
+		}
 	}
 
 	/**
@@ -50,11 +61,16 @@ public class PigScript {
 	}
 
 	/**
-	 * Returns the params.
+	 * Returns the arguments associated with this script.
 	 *
-	 * @return Returns the params
+	 * @return Returns the arguments for this script.
 	 */
-	public Map<String, String> getParams() {
-		return params;
+	public Map<String, String> getArguments() {
+		return arguments;
+	}
+
+	@Override
+	public String toString() {
+		return resource.getDescription();
 	}
 }

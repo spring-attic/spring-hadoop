@@ -7,18 +7,34 @@
       	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
       	http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
 
-	<import resource="../hadoop-ctx.xml"/>
+ 	<!-- 
 
-	<bean id="pig-ctx" class="org.springframework.data.hadoop.pig.PigContextFactoryBean" p:exec-type="LOCAL" p:configuration-ref="hadoop-configuration"/>
+	<import resource="../hadoop-ctx.xml"/>
+ 	
+ 	 p:configuration-ref="hadoop-configuration"
+ 	 
+ 	 configuration-ref="hadoop-configuration"
+ 	 -->
+	<bean id="pig-ctx" class="org.springframework.data.hadoop.pig.PigContextFactoryBean" p:exec-type="LOCAL"/>
 	<bean id="pig" class="org.springframework.data.hadoop.pig.PigServerFactoryBean" p:pig-context-ref="pig-ctx"/>
 	
-	<hdp:pig-server configuration-ref="hadoop-configuration" exec-type="LOCAL" job-name="pig-script">
-		<hdp:script location="org/springframework/data/hadoop/pig/script.pig" >
-			<prop key="war">web</prop>
-		</hdp:script>
-		<hdp:script location="org/springframework/data/hadoop/pig/script.pig" />
-		<hdp:properties>
-			<prop key="ivy">blue</prop>
-		</hdp:properties>
-	</hdp:pig-server>
+	<pig-server  exec-type="LOCAL" job-name="pig-script" xmlns="http://www.springframework.org/schema/hadoop">
+		<properties>
+			ivy=blue
+		</properties>
+		<script location="org/springframework/data/hadoop/pig/script.pig">
+			<arguments>
+				war=web
+			</arguments>
+		</script>
+		<script location="org/springframework/data/hadoop/pig/script.pig" />
+		<script>
+			<arguments>
+				war=web
+			</arguments>
+			A = LOAD 'src/test/resources/logs/apache_access.log' USING PigStorage() AS (name:chararray, age:int);
+			B = FOREACH A GENERATE name;
+			DUMP B;
+		</script>
+	</pig-server>
 </beans>

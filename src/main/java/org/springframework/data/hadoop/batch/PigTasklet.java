@@ -73,7 +73,7 @@ public class PigTasklet implements InitializingBean, Tasklet {
 			InputStream in = null;
 			try {
 				in = script.getResource().getInputStream();
-				pig.registerScript(in, script.getParams());
+				pig.registerScript(in, script.getArguments());
 			} finally {
 				if (in != null) {
 					try {

@@ -41,6 +41,7 @@ allprojects {
         mavenRepo name: "spring-snapshot", urls: "http://maven.springframework.org/snapshot"
         mavenRepo name: "sonatype-snapshot", urls: "http://oss.sonatype.org/content/repositories/snapshots"
         mavenRepo name: "ext-snapshots", urls: "http://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo-ext/"
+        mavenRepo name: "data-nucleus", urls: "http://www.datanucleus.org/downloads/maven2/"
 	}
 
 }
@@ -157,6 +158,7 @@ dependencies {
     compile "cglib:cglib:$cglibVersion"
     
     // Hive
+    compile "org.apache.hive:hive-cli:$hiveVersion"
     compile "org.apache.hive:hive-common:$hiveVersion"
     compile "org.apache.hive:hive-jdbc:$hiveVersion"
     compile "org.apache.hive:hive-service:$hiveVersion"
@@ -171,7 +173,9 @@ dependencies {
     compile "org.antlr:antlr-runtime:$antlrVersion"
     
     // HBase
-    compile "org.apache.hbase:hbase:$hbaseVersion"
+    compile("org.apache.hbase:hbase:$hbaseVersion") {
+        exclude module: "thrift"
+    }
 
     // Testing
     testCompile "junit:junit:$junitVersion"
@@ -184,6 +188,9 @@ dependencies {
     testCompile "org.codehaus.groovy:groovy:$groovyVersion"
     testCompile "org.jruby:jruby:$jrubyVersion"
     testCompile "org.python:jython-standalone:$jythonVersion"
+    testCompile "org.apache.hive:hive-builtins:$hiveVersion"
+    // specify a version of antlr that works with both hive and pig
+    testCompile "org.antlr:antlr-runtime:$antlrVersion"
 }
 
 javaprojects = rootProject

@@ -17,12 +17,14 @@ package org.springframework.data.hadoop.config;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Properties;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.data.hadoop.pig.PigContextFactoryBean;
 import org.springframework.data.hadoop.pig.PigScript;
 import org.springframework.data.hadoop.pig.PigServerFactoryBean;
@@ -46,7 +48,7 @@ class PigServerParser extends AbstractImprovedSimpleBeanDefinitionParser {
 
 	@Override
 	protected boolean isEligibleAttribute(String attributeName) {
-		return !("scripts".equals(attributeName) || "paths-to-skip".equals(attributeName)
+		return !("paths-to-skip".equals(attributeName)
 				|| "job-tracker".equals(attributeName) || "configuration-ref".equals(attributeName) || "exec-type".equals(attributeName))
 				&& super.isEligibleAttribute(attributeName);
 	}
@@ -71,11 +73,10 @@ class PigServerParser extends AbstractImprovedSimpleBeanDefinitionParser {
 		// parse nested PigContext definition
 		BeanDefinitionBuilder contextBuilder = BeanDefinitionBuilder.genericBeanDefinition(PigContextFactoryBean.class);
 
-		Element props = DomUtils.getChildElementByTagName(element, "properties");
+		String props = DomUtils.getChildElementValueByTagName(element, "properties");
 
-		if (props != null) {
-			Properties parsedProps = parserContext.getDelegate().parsePropsElement(props);
-			contextBuilder.addPropertyValue("properties", parsedProps);
+		if (StringUtils.hasText(props)) {
+			contextBuilder.addPropertyValue("properties", props);
 		}
 
 		NamespaceUtils.setPropertyValue(element, contextBuilder, "job-tracker");
@@ -97,17 +98,41 @@ class PigServerParser extends AbstractImprovedSimpleBeanDefinitionParser {
 			Collection<BeanDefinition> defs = new ManagedList<BeanDefinition>(children.size());
 
 			for (Element child : children) {
-				BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(PigScript.class);
-				builder.addConstructorArgValue(child.getAttribute("location"));
+				// parse source
+				String location = child.getAttribute("location");
+				String inline = DomUtils.getTextValue(child);
+				boolean hasScriptInlined = StringUtils.hasText(inline);
 
-				Properties props = context.getDelegate().parsePropsElement(child);
-				if (props != null) {
-					Properties parsedProps = context.getDelegate().parsePropsElement(element);
-					if (parsedProps.propertyNames().hasMoreElements()) {
-						builder.addPropertyValue("properties", parsedProps);
+
+				GenericBeanDefinition def = new GenericBeanDefinition();
+				def.setSource(child);
+				def.setBeanClass(PigScript.class);
+
+				Object resource = null;
+
+				if (StringUtils.hasText(location)) {
+					if (hasScriptInlined) {
+						context.getReaderContext().error(
+								"cannot specify both 'location' and a nested script; use only one", element);
 					}
+					resource = location;
 				}
-				defs.add(builder.getBeanDefinition());
+				else {
+					if (!hasScriptInlined) {
+						context.getReaderContext().error("no 'location' or nested script specified", element);
+					}
+
+					resource = new ByteArrayResource(inline.getBytes(), "resource for inlined script");
+				}
+
+				def.getConstructorArgumentValues().addIndexedArgumentValue(0, resource, Resource.class.getName());
+
+				String args = DomUtils.getChildElementValueByTagName(child, "arguments");
+
+				if (args != null) {
+					def.getConstructorArgumentValues().addIndexedArgumentValue(1, args);
+				}
+				defs.add(def);
 			}
 
 			return defs;

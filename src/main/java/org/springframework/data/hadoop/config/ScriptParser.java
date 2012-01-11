@@ -39,10 +39,9 @@ import org.w3c.dom.Element;
 class ScriptParser extends AbstractSimpleBeanDefinitionParser {
 
 
-
 	@Override
 	protected boolean isEligibleAttribute(String attributeName) {
-		return !("source".equals(attributeName)) && super.isEligibleAttribute(attributeName);
+		return !("location".equals(attributeName)) && super.isEligibleAttribute(attributeName);
 	}
 
 	@Override
@@ -51,38 +50,38 @@ class ScriptParser extends AbstractSimpleBeanDefinitionParser {
 		super.doParse(element, parserContext, builder);
 
 		// parse source
-		String source = element.getAttribute("source");
-		Element inline = DomUtils.getChildElementByTagName(element, "inline-script");
+		String location = element.getAttribute("location");
+		String inline = DomUtils.getTextValue(element);
+		boolean hasScriptInlined = StringUtils.hasText(inline);
 
 		Object scriptSource = null;
 
-		if (StringUtils.hasText(source)) {
-			if (inline != null) {
-				parserContext.getReaderContext().error(
-						"cannot specify both 'source' and 'inline-script'; use only one", element);
+		if (StringUtils.hasText(location)) {
+			if (hasScriptInlined) {
+				parserContext.getReaderContext().error("cannot specify both 'location' and a nested script; use only one", element);
 			}
 
 			BeanDefinitionBuilder b = BeanDefinitionBuilder.genericBeanDefinition(ResourceScriptSource.class);
-			b.addConstructorArgValue(source);
+			b.addConstructorArgValue(location);
 			scriptSource = b.getBeanDefinition();
 		}
 		else {
-			if (inline == null) {
-				parserContext.getReaderContext().error("no 'source' or 'inline-script' specified", element);
+			if (!hasScriptInlined) {
+				parserContext.getReaderContext().error("no 'location' or nested script specified", element);
 			}
 
-			scriptSource = new StaticScriptSource(DomUtils.getTextValue(inline), element.getAttribute("id"));
+			scriptSource = new StaticScriptSource(inline, element.getAttribute("id"));
 		}
 
 		builder.addPropertyValue("scriptSource", scriptSource);
 
 		// no language specified, figure out from the source
 		if (!element.hasAttribute("language")) {
-			if (inline != null) {
-				parserContext.getReaderContext().error("the language needs to be specified when using 'inline-script'", element);
+			if (hasScriptInlined) {
+				parserContext.getReaderContext().error("the language needs to be specified when using an inlined script", element);
 			}
 
-			builder.addPropertyValue("extension", StringUtils.getFilenameExtension(source));
+			builder.addPropertyValue("extension", StringUtils.getFilenameExtension(location));
 		}
 
 		// parse properties
