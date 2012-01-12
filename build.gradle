@@ -158,7 +158,6 @@ dependencies {
     compile "cglib:cglib:$cglibVersion"
     
     // Hive
-    compile "org.apache.hive:hive-cli:$hiveVersion"
     compile "org.apache.hive:hive-common:$hiveVersion"
     compile "org.apache.hive:hive-jdbc:$hiveVersion"
     compile "org.apache.hive:hive-service:$hiveVersion"
@@ -191,6 +190,12 @@ dependencies {
     testCompile "org.apache.hive:hive-builtins:$hiveVersion"
     // specify a version of antlr that works with both hive and pig
     testCompile "org.antlr:antlr-runtime:$antlrVersion"
+    // hive optional dependencies
+    //testCompile "org.datanucleus:datanucleus-connectionpool:$dataNucleusVersion"
+    //testCompile "org.datanucleus:datanucleus-core:$dataNucleusVersion"
+    //testCompile "org.datanucleus:datanucleus-enhancer:$dataNucleusVersion"
+    //testCompile "org.datanucleus:datanucleus-rdbms:$dataNucleusVersion"
+    //testCompile "javax.jdo:jdo2-api:$jdoVersion"
 }
 
 javaprojects = rootProject

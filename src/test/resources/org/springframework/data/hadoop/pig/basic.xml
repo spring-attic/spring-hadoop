@@ -12,7 +12,7 @@
 	<bean id="pig-ctx" class="org.springframework.data.hadoop.pig.PigContextFactoryBean" p:exec-type="LOCAL" p:configuration-ref="hadoop-configuration"/>
 	<bean id="pig" class="org.springframework.data.hadoop.pig.PigServerFactoryBean" p:pig-context-ref="pig-ctx"/>
 	
-	<pig-server  exec-type="LOCAL" job-name="pig-script" configuration-ref="hadoop-configuration" xmlns="http://www.springframework.org/schema/hadoop">
+	<pig exec-type="LOCAL" job-name="pig-script" configuration-ref="hadoop-configuration" xmlns="http://www.springframework.org/schema/hadoop">
 		<properties>
 			ivy=blue
 		</properties>
@@ -30,5 +30,5 @@
 			B = FOREACH A GENERATE name;
 			DUMP B;
 		</script>
-	</pig-server>
+	</pig>
 </beans>

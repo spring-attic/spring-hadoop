@@ -15,85 +15,59 @@
  */
 package org.springframework.data.hadoop.batch;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Collection;
-import java.util.List;
 
-import org.apache.hadoop.io.IOUtils;
-import org.apache.pig.PigServer;
-import org.apache.pig.backend.executionengine.ExecJob;
+import org.apache.hadoop.hive.service.HiveClient;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.core.io.Resource;
 import org.springframework.data.hadoop.HadoopException;
-import org.springframework.data.hadoop.pig.PigScript;
+import org.springframework.data.hadoop.hive.HiveScriptRunner;
 import org.springframework.util.Assert;
 
 /**
- * Pig tasklet. Usually used as a prototype as a new {@link PigServer} instance is required every time (to prevent concurrency issues).
+ * Hive tasklet running Hive scripts on demand, against a {@link HiveClient}.
  * 
  * @author Costin Leau
  */
-public class PigTasklet implements InitializingBean, Tasklet {
+public class HiveTasklet implements InitializingBean, Tasklet {
 
-	private PigServer pig;
-	private Collection<PigScript> scripts;
+	private HiveClient hive;
+	private Collection<Resource> scripts;
 
 	@Override
 	public void afterPropertiesSet() {
-		Assert.notNull(pig, "A PigServer instance is required");
+		Assert.notNull(hive, "A HiveClient instance is required");
 		Assert.notEmpty(scripts, "At least one script needs to be specified");
 	}
 
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		Exception exc = null;
 
-		pig.setBatchOn();
-		pig.getPigContext().connect();
-
 		try {
-			execute();
+			HiveScriptRunner.run(hive, scripts);
 			return RepeatStatus.FINISHED;
 		} catch (Exception ex) {
 			exc = ex;
-		} finally {
-			pig.shutdown();
 		}
 
-
-		throw new HadoopException("Cannot execute Pig script(s)", exc);
-	}
-
-	private List<ExecJob> execute() throws IOException {
-
-		// register scripts
-		for (PigScript script : scripts) {
-			InputStream in = null;
-			try {
-				in = script.getResource().getInputStream();
-				pig.registerScript(in, script.getArguments());
-			} finally {
-				IOUtils.closeStream(in);
-			}
-		}
-
-		return pig.executeBatch();
+		throw new HadoopException("Cannot execute Hive script(s)", exc);
 	}
 
 	/**
 	 * @param scripts The scripts to set.
 	 */
-	public void setScripts(Collection<PigScript> scripts) {
+	public void setScripts(Collection<Resource> scripts) {
 		this.scripts = scripts;
 	}
 
 	/**
-	 * @param pig The pig to set.
+	 * @param hive HiveClient to set
 	 */
-	public void setPigServer(PigServer pig) {
-		this.pig = pig;
+	public void setHiveClient(HiveClient hive) {
+		this.hive = hive;
 	}
 }

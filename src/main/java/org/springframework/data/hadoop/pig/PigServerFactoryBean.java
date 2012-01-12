@@ -21,6 +21,7 @@ import java.util.Collection;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.hadoop.io.IOUtils;
 import org.apache.pig.PigServer;
 import org.apache.pig.impl.PigContext;
 import org.springframework.beans.factory.BeanInitializationException;
@@ -104,12 +105,7 @@ public class PigServerFactoryBean implements FactoryBean<PigServer>, BeanNameAwa
 				} catch (IOException ex) {
 					throw new BeanInitializationException("Cannot register script " + script, ex);
 				} finally {
-					if (in != null) {
-						try {
-							in.close();
-						} catch (IOException ex) {
-						}
-					}
+					IOUtils.closeStream(in);
 				}
 			}
 		}

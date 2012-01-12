@@ -15,6 +15,7 @@
  */
 package org.springframework.data.hadoop.config;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -53,6 +54,10 @@ class PigServerParser extends AbstractImprovedSimpleBeanDefinitionParser {
 				&& super.isEligibleAttribute(attributeName);
 	}
 
+	@Override
+	protected String defaultId(ParserContext context, Element element) {
+		return "pig";
+	}
 
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
@@ -74,7 +79,6 @@ class PigServerParser extends AbstractImprovedSimpleBeanDefinitionParser {
 		BeanDefinitionBuilder contextBuilder = BeanDefinitionBuilder.genericBeanDefinition(PigContextFactoryBean.class);
 
 		String props = DomUtils.getChildElementValueByTagName(element, "properties");
-
 		if (StringUtils.hasText(props)) {
 			contextBuilder.addPropertyValue("properties", props);
 		}
@@ -84,11 +88,6 @@ class PigServerParser extends AbstractImprovedSimpleBeanDefinitionParser {
 		NamespaceUtils.setPropertyReference(element, contextBuilder, "configuration-ref");
 
 		builder.addPropertyValue("pigContext", contextBuilder.getBeanDefinition());
-	}
-
-	@Override
-	protected String defaultId(ParserContext context, Element element) {
-		return "hadoop-pig-server";
 	}
 
 	static Collection<BeanDefinition> parseScripts(ParserContext context, Element element) {
@@ -112,8 +111,7 @@ class PigServerParser extends AbstractImprovedSimpleBeanDefinitionParser {
 
 				if (StringUtils.hasText(location)) {
 					if (hasScriptInlined) {
-						context.getReaderContext().error(
-								"cannot specify both 'location' and a nested script; use only one", element);
+						context.getReaderContext().error("cannot specify both 'location' and a nested script; use only one", element);
 					}
 					resource = location;
 				}
@@ -122,7 +120,16 @@ class PigServerParser extends AbstractImprovedSimpleBeanDefinitionParser {
 						context.getReaderContext().error("no 'location' or nested script specified", element);
 					}
 
-					resource = new ByteArrayResource(inline.getBytes(), "resource for inlined script");
+					byte[] bytes = null;
+					try{
+						bytes = inline.getBytes("UTF-8");	
+					} catch (IOException ex){
+						context.getReaderContext().warning("cannot convert inlined script using 'utf-8', falling back to platform default", element);
+						bytes = inline.getBytes();
+					}
+					
+					
+					resource = new ByteArrayResource(bytes, "resource for inlined script");
 				}
 
 				def.getConstructorArgumentValues().addIndexedArgumentValue(0, resource, Resource.class.getName());

@@ -546,7 +546,7 @@ Argument(s) to pass to this script. Defined in Properties format (key=value).
 		</xsd:complexContent>
 	</xsd:complexType>
 	
-	<xsd:element name="pig-server">
+	<xsd:element name="pig">
 		<xsd:annotation>
 		   <xsd:documentation><![CDATA[
 Defines a PigServer 'template' (note that since PigServer is not thread-safe, each bean invocation will create a new PigServer instance).
@@ -644,7 +644,7 @@ Pig script.]]></xsd:documentation>
 Bean id.]]></xsd:documentation>
 				</xsd:annotation>
 			</xsd:attribute>
-			<xsd:attribute name="pig-server-ref" type="xsd:string" use="optional" default="hadoop-pig-server">
+			<xsd:attribute name="pig-server-ref" type="xsd:string" use="optional" default="pig">
 				<xsd:annotation>
 				<xsd:documentation source="java:org.apache.pig.PigServer"><![CDATA[
 Reference to a PigServer instance. Defaults to 'hadoop-pig-server'.
@@ -739,13 +739,13 @@ Defines an embedded Hive Server instance opened for access through the Thrift pr
 		      </xsd:appinfo>
 			</xsd:annotation>
 			<xsd:sequence>
-				<xsd:element name="properties" minOccurs="0" maxOccurs="1">
-						<xsd:annotation>
+				<xsd:element name="properties" minOccurs="0" maxOccurs="1" >
+					<xsd:annotation>
 						<xsd:documentation><![CDATA[
-Configuration properties specific to this PigServer instance. Usually added to customize the configuration specified through 'configuration-ref'.
+Configuration properties specific to this Hive server instance. Usually added to customize the configuration specified through 'configuration-ref'.
 						]]>
 		          		</xsd:documentation>
-						</xsd:annotation>
+					</xsd:annotation>
 				</xsd:element>
 			</xsd:sequence>
 			<xsd:attribute name="id" type="xsd:ID" use="optional">
@@ -772,6 +772,48 @@ Reference to the Hadoop configuration.]]></xsd:documentation>
 		 	</xsd:annotation>
 		 	</xsd:attribute>		
 			
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="hive-tasklet">
+		<xsd:annotation>
+		   <xsd:documentation><![CDATA[
+Defines a HiveTasklet.
+				]]>
+          </xsd:documentation>
+	      <xsd:appinfo>
+	        <tool:annotation>
+	          <tool:exports type="org.springframework.data.hadoop.batch.HiveTasket"/>
+	        </tool:annotation>
+	      </xsd:appinfo>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="script" type="scriptType" minOccurs="1" maxOccurs="unbounded">
+					<xsd:annotation>
+					<xsd:documentation><![CDATA[
+Hive script.]]></xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+			</xsd:sequence>
+			<xsd:attribute name="id" type="xsd:ID" use="required">
+				<xsd:annotation>
+				<xsd:documentation><![CDATA[
+Bean id.]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="hive-client-ref" type="xsd:string" use="optional" default="hive-client">
+				<xsd:annotation>
+				<xsd:documentation source="java:org.apache.hadoop.hive.service.HiveClient"><![CDATA[
+Reference to a HiveClient instance. Defaults to 'hive-client'.
+				]]></xsd:documentation>
+					<xsd:appinfo>
+						<tool:annotation kind="ref">
+							<tool:expected-type type="org.apache.hadoop.hive.service.HiveClient" />
+						</tool:annotation>
+					</xsd:appinfo>
+				</xsd:annotation>
+			</xsd:attribute>
 		</xsd:complexType>
 	</xsd:element>
 

@@ -2,36 +2,44 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:batch="http://www.springframework.org/schema/batch"
 	xmlns:hdp="http://www.springframework.org/schema/hadoop"
+	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:c="http://www.springframework.org/schema/c"
 	xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
       	http://www.springframework.org/schema/batch	http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
+      	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
       	http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
 
 	<import resource="../batch-common.xml"/>
 	<import resource="../hadoop-ctx.xml"/>
+	
+	<context:property-placeholder location="test.properties"/>
 	
 	<job id="mainJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="bean" next="ns">
 			<tasklet ref="tasklet"/>
 		</step>
 		<step id="ns">
-			<tasklet ref="pig-script"/>
+			<tasklet ref="hive-script"/>
 		</step>
 	</job>
 
-	<bean id="tasklet" class="org.springframework.data.hadoop.batch.PigTasklet" p:pig-server-ref="pig">
+	<bean id="tasklet" class="org.springframework.data.hadoop.batch.HiveTasklet" p:hive-client-ref="hive-client">
 		<property name="scripts">
 			<list>
-				<bean class="org.springframework.data.hadoop.pig.PigScript" c:resource="org/springframework/data/hadoop/pig/script.pig"/>
+				<value>org/springframework/data/hadoop/hive/script.q</value>
 			</list>
 		</property>
 	</bean>
 
-	<hdp:pig configuration-ref="hadoop-configuration" exec-type="LOCAL" job-name="pig-script"/> 
+	<hdp:hive-client host="${hive.host}" port="${hive.port}"/> 
 	
-	<hdp:pig-tasklet id="pig-script">
-		<hdp:script location="org/springframework/data/hadoop/pig/script.pig" />
-	</hdp:pig-tasklet> 
-	
+	<hdp:hive-tasklet id="hive-script">
+		<hdp:script>
+			DROP TABLE IF EXITS testHiveBatchTable; 
+			CREATE TABLE testHiveBatchTable (key int, value string);
+			DESCRIBE testHiveBatchTable;
+		</hdp:script>
+		<hdp:script location="org/springframework/data/hadoop/hive/script.q" />
+	</hdp:hive-tasklet> 
 </beans>

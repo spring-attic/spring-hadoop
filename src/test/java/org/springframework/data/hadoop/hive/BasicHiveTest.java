@@ -20,10 +20,17 @@ import java.sql.SQLException;
 
 import org.apache.hadoop.hive.service.HiveClient;
 import org.junit.Test;
-import org.springframework.context.support.GenericXmlApplicationContext;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.hadoop.TestUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import static org.junit.Assert.*;
 
 /**
  * Test for basic JDBC connectivity to Hive following 
@@ -31,15 +38,22 @@ import org.springframework.jdbc.core.ResultSetExtractor;
  * 
  * @author Costin Leau
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration("/org/springframework/data/hadoop/hive/basic.xml")
 public class BasicHiveTest {
+
+	@Autowired
+	private ApplicationContext ctx;
+	@Autowired
+	private HiveClient client;
+
+	{
+		System.setProperty("java.io.tmpdir", "");
+		TestUtils.hackHadoopStagingOnWin();
+	}
 
 	@Test
 	public void testHiveConnection() throws Exception {
-		GenericXmlApplicationContext ctx = new GenericXmlApplicationContext(
-				"/org/springframework/data/hadoop/hive/basic.xml");
-
-		ctx.registerShutdownHook();
-
 		JdbcTemplate jdbc = ctx.getBean("template", JdbcTemplate.class);
 		String tableName = "testHiveDriverTable";
 
@@ -47,20 +61,23 @@ public class BasicHiveTest {
 		jdbc.execute("create table " + tableName + " (key int, value string)");
 		jdbc.query("show tables", new ResultSetExtractor<String>() {
 			public String extractData(ResultSet rs) throws SQLException, DataAccessException {
-				System.out.println(rs.getObject(1));
 				return "";
 			}
 		});
 
 		jdbc.query("select count(1) from " + tableName, new ResultSetExtractor<String>() {
 			public String extractData(ResultSet rs) throws SQLException, DataAccessException {
-				System.out.println(rs.getObject(1));
 				return "";
 			}
 		});
-
-		HiveClient client = ctx.getBean(HiveClient.class);
-		client.execute("select count(1) as cnt from " + tableName);
-		System.out.println(client.fetchOne());
 	}
+
+	@Test
+	public void testHiveClient() throws Exception {
+		String tableName = "testHiveDriverTable";
+		client.execute("select count(1) as cnt from " + tableName);
+		assertNotNull(client.fetchOne());
+
+	}
+
 }

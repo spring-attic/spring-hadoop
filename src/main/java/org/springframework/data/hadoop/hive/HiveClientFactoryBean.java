@@ -15,6 +15,7 @@
  */
 package org.springframework.data.hadoop.hive;
 
+
 import org.apache.hadoop.hive.service.HiveClient;
 import org.apache.hadoop.hive.service.ThriftHive;
 import org.apache.thrift.protocol.TBinaryProtocol;
@@ -42,18 +43,18 @@ public class HiveClientFactoryBean implements SmartLifecycle, FactoryBean<HiveCl
 
 	private TTransport transport;
 
-	public void afterPropertiesSet() throws Exception {
+	public void afterPropertiesSet() {
 		transport = new TSocket(host, port, timeout);
 		hive = new HiveClient(new TBinaryProtocol(transport));
 	}
 
-	public void destroy() throws Exception {
+	public void destroy() {
 		stop();
 		hive = null;
 		transport = null;
 	}
 
-	public HiveClient getObject() throws Exception {
+	public HiveClient getObject() {
 		return hive;
 	}
 
