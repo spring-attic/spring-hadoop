@@ -152,44 +152,48 @@ dependencies {
     compile "org.apache.hadoop:hadoop-core:$hadoopVersion"
     compile "org.apache.hadoop:hadoop-streaming:$hadoopVersion"
     
-    compile "commons-io:commons-io:$commonsioVersion"
-    compile "org.codehaus.jackson:jackson-core-asl:$jacksonVersion"
-    compile "org.codehaus.jackson:jackson-mapper-asl:$jacksonVersion"
-    compile "cglib:cglib:$cglibVersion"
-    
+    testRuntime "commons-io:commons-io:$commonsioVersion"
+    testRuntime "org.codehaus.jackson:jackson-core-asl:$jacksonVersion"
+    testRuntime "org.codehaus.jackson:jackson-mapper-asl:$jacksonVersion"
+    testRuntime "cglib:cglib:$cglibVersion"
+
     // Hive
-    compile "org.apache.hive:hive-common:$hiveVersion"
+    testRuntime "org.apache.hive:hive-common:$hiveVersion"
     compile "org.apache.hive:hive-jdbc:$hiveVersion"
     compile "org.apache.hive:hive-service:$hiveVersion"
-    compile "org.apache.hive:hive-metastore:$hiveVersion"
-    compile "org.apache.hive:hive-shims:$hiveVersion"
-    compile "org.apache.hive:hive-serde:$hiveVersion"
-    compile "org.apache.thrift:libthrift:$thriftVersion"
-    compile "org.apache.thrift:libfb303:$thriftVersion"
+    testRuntime "org.apache.hive:hive-metastore:$hiveVersion"
+    testRuntime "org.apache.hive:hive-shims:$hiveVersion"
+    testRuntime "org.apache.hive:hive-serde:$hiveVersion"
+    testRuntime "org.apache.thrift:libthrift:$thriftVersion"
+    testRuntime "org.apache.thrift:libfb303:$thriftVersion"
 
     // Pig
     compile "org.apache.pig:pig:$pigVersion"
-    compile "org.antlr:antlr-runtime:$antlrVersion"
     
     // HBase
     compile("org.apache.hbase:hbase:$hbaseVersion") {
         exclude module: "thrift"
     }
 
+    // Libs dependencies (specified to cope with incompatibilities between them)
+    testRuntime "org.antlr:antlr:$antlrVersion"
+    testRuntime "org.antlr:antlr-runtime:$antlrVersion"
+
+    
     // Testing
     testCompile "junit:junit:$junitVersion"
     testCompile "org.mockito:mockito-core:$mockitoVersion"
     testCompile "org.springframework:spring-test:$springVersion"
     testCompile("javax.annotation:jsr250-api:1.0") { optional = true }
     testCompile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
-    testCompile "org.springframework.integration:spring-integration-event:$springIntVersion"
-    testCompile "org.springframework.integration:spring-integration-file:$springIntVersion"
-    testCompile "org.codehaus.groovy:groovy:$groovyVersion"
-    testCompile "org.jruby:jruby:$jrubyVersion"
-    testCompile "org.python:jython-standalone:$jythonVersion"
-    testCompile "org.apache.hive:hive-builtins:$hiveVersion"
+    testRuntime "org.springframework.integration:spring-integration-event:$springIntVersion"
+    testRuntime "org.springframework.integration:spring-integration-file:$springIntVersion"
+    testRuntime "org.codehaus.groovy:groovy:$groovyVersion"
+    testRuntime "org.jruby:jruby:$jrubyVersion"
+    testRuntime "org.python:jython-standalone:$jythonVersion"
+    testRuntime "org.apache.hive:hive-builtins:$hiveVersion"
     // specify a version of antlr that works with both hive and pig
-    testCompile "org.antlr:antlr-runtime:$antlrVersion"
+    testRuntime "org.antlr:antlr-runtime:$antlrVersion"
     // hive optional dependencies
     //testCompile "org.datanucleus:datanucleus-connectionpool:$dataNucleusVersion"
     //testCompile "org.datanucleus:datanucleus-core:$dataNucleusVersion"

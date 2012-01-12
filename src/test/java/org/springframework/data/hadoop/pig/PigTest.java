@@ -59,7 +59,7 @@ public class PigTest {
 
 	@Test
 	public void testServerNamespace() throws Exception {
-		String defaultName = "hadoop-pig-server";
+		String defaultName = "pig";
 		assertTrue(ctx.containsBean(defaultName));
 		PigServer server = ctx.getBean(defaultName, PigServer.class);
 		Properties props = server.getPigContext().getProperties();
