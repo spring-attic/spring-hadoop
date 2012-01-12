@@ -54,7 +54,7 @@
 		</property>
 	</bean>
 	-->
-	<hdp:pig-server exec-type="LOCAL" />
+	<hdp:pig exec-type="LOCAL" />
 	
 	<hdp:pig-tasklet id="pig-script">
 		<hdp:script location="org/springframework/data/hadoop/pig/script.pig" />
