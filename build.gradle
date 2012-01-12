@@ -151,6 +151,7 @@ dependencies {
     // Hadoop
     compile "org.apache.hadoop:hadoop-core:$hadoopVersion"
     compile "org.apache.hadoop:hadoop-streaming:$hadoopVersion"
+    compile "org.apache.hadoop:hadoop-tools:$hadoopVersion"
     
     testRuntime "commons-io:commons-io:$commonsioVersion"
     testRuntime "org.codehaus.jackson:jackson-core-asl:$jacksonVersion"

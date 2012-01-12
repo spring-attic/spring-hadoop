@@ -23,7 +23,7 @@
 	<hdp:resource-loader />	
 	<!-- 
 	<bean id="hdfsResourceLoader" class="org.springframework.data.hadoop.io.HdfsResourceLoader" c:fs-ref="fs"/>
-	<bean id="fs" class="org.springframework.data.hadoop.io.FileSystemFactoryBean" p:configuration-ref="fs-config"/>
+	<bean id="fs" class="org.springframework.data.hadoop.fs.FileSystemFactoryBean" p:configuration-ref="fs-config"/>
 	 -->
 	 
 	

@@ -36,6 +36,7 @@ import org.springframework.core.io.WritableResource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.data.hadoop.TestUtils;
 import org.springframework.data.hadoop.configuration.ConfigurationFactoryBean;
+import org.springframework.data.hadoop.fs.FileSystemFactoryBean;
 
 import static org.junit.Assert.*;
 

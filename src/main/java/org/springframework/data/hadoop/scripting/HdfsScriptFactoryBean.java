@@ -26,8 +26,8 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.data.hadoop.fs.SimplerFileSystem;
 import org.springframework.data.hadoop.io.HdfsResourceLoader;
-import org.springframework.data.hadoop.io.SimplerFileSystem;
 import org.springframework.util.Assert;
 
 /**
