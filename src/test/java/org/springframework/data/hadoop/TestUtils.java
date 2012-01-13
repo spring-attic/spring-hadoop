@@ -46,6 +46,7 @@ public class TestUtils {
 	public static Resource writeToFS(ResourcePatternResolver loader, String filename) {
 		try {
 			Resource resource = loader.getResource(filename);
+			System.out.println("Writing resource " + resource.getURI());
 			WritableResource wr = (WritableResource) resource;
 
 			byte[] bytes = filename.getBytes();

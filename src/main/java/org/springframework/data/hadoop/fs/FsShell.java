@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -28,12 +29,18 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
+import org.springframework.data.hadoop.fs.PrettyPrintList.Printer;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.util.ObjectUtils;
 
 /**
  * HDFS FileSystem Shell supporting the 'hadoop fs/dfs [x]' commands as methods. 
  * See the <a href="http://hadoop.apache.org/common/docs/stable/file_system_shell.html">official guide</a> for more information.
+ * <p/>
+ * This class mimics as much as possible the shell behavior yet it is meant to be used in a programmatic way, 
+ * that is rather then printing out information, they return object or collections that one can iterate through. If the message is
+ * all that's needed then simply call the returned object {@link #toString()} explicitly or implicitly (by printing out or doing string
+ * concatenation). 
  * 
  * @author Costin Leau
  */
@@ -78,22 +85,31 @@ public class FsShell {
 		return writer.toString();
 	}
 
-	public Collection<String> cat(String... uris) {
+	public Collection<Path> cat(String... uris) {
 		if (ObjectUtils.isEmpty(uris)) {
 			return Collections.emptyList();
 		}
 
-		final Collection<String> results = new ArrayList<String>(uris.length);
 
-		for (String uri : uris) {
-			Path src = new Path(uri);
-			new FileBatch() {
-				@Override
-				void process(Path p, FileSystem srcFs) throws IOException {
-					results.add(getContent(srcFs.open(p)));
-				}
-			}.run(src);
+		final Collection<Path> results = new PrettyPrintList<Path>(new ArrayList<Path>(uris.length),
+				new Printer<Path>() {
+
+					@Override
+					public String toString(Path e) throws IOException {
+						return getContent(fs.open(e));
+					}
+				});
+
+		try {
+
+			for (String uri : uris) {
+				Path src = new Path(uri);
+				results.addAll(Arrays.asList(FileUtil.stat2Paths(fs.globStatus(src), src)));
+			}
+		} catch (IOException ex) {
+			throw new IllegalArgumentException("Cannot execute command", ex);
 		}
+
 		return results;
 	}
 
@@ -101,16 +117,36 @@ public class FsShell {
 		chgrp(false, group, uris);
 	}
 
+	public void chgrpr(String group, String... uris) {
+		chgrp(true, group, uris);
+	}
+
 	public void chgrp(boolean recursive, String group, String... uris) {
-		throw new UnsupportedOperationException();
+		FsShellPermissions.changePermissions(fs, configuration, FsShellPermissions.Op.CHGRP, recursive, group, uris);
+	}
+
+	public void chmod(String mode, String... uris) {
+		chmod(false, mode, uris);
+	}
+
+	public void chmodr(String mode, String... uris) {
+		chmod(true, mode, uris);
 	}
 
 	public void chmod(boolean recursive, String mode, String... uris) {
-		throw new UnsupportedOperationException();
+		FsShellPermissions.changePermissions(fs, configuration, FsShellPermissions.Op.CHMOD, recursive, mode, uris);
+	}
+
+	public void chown(String mode, String... uris) {
+		chown(false, mode, uris);
+	}
+
+	public void chownr(String mode, String... uris) {
+		chown(true, mode, uris);
 	}
 
 	public void chown(boolean recursive, String owner, String... uris) {
-		throw new UnsupportedOperationException();
+		FsShellPermissions.changePermissions(fs, configuration, FsShellPermissions.Op.CHOWN, recursive, owner, uris);
 	}
 
 	public void copyFromLocal(String src, String dst) {
@@ -251,5 +287,19 @@ public class FsShell {
 
 	public void touchz(String... uris) {
 		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * @param fs The fs to set.
+	 */
+	public void setFs(FileSystem fs) {
+		this.fs = fs;
+	}
+
+	/**
+	 * @param configuration The configuration to set.
+	 */
+	public void setConfiguration(Configuration configuration) {
+		this.configuration = configuration;
 	}
 }

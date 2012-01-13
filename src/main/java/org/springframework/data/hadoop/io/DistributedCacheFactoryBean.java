@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.hadoop.fs;
+package org.springframework.data.hadoop.io;
 
 import java.net.URI;
 import java.util.Collection;
@@ -25,8 +25,6 @@ import org.apache.hadoop.fs.Path;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
-import org.springframework.data.hadoop.io.HdfsResource;
-import org.springframework.data.hadoop.io.HdfsResourceLoader;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
