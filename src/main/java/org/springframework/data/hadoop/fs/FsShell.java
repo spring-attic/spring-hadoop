@@ -15,6 +15,7 @@
  */
 package org.springframework.data.hadoop.fs;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -24,14 +25,23 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.ChecksumFileSystem;
+import org.apache.hadoop.fs.ContentSummary;
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
-import org.springframework.data.hadoop.fs.PrettyPrintList.Printer;
+import org.apache.hadoop.fs.Trash;
+import org.springframework.data.hadoop.HadoopException;
+import org.springframework.data.hadoop.fs.PrettyPrintList.ListPrinter;
+import org.springframework.data.hadoop.fs.PrettyPrintMap.MapPrinter;
+import org.springframework.util.Assert;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * HDFS FileSystem Shell supporting the 'hadoop fs/dfs [x]' commands as methods. 
@@ -48,32 +58,20 @@ public class FsShell {
 
 	private FileSystem fs;
 	private Configuration configuration;
+	private Trash trash;
 
-	private abstract class FileBatch {
-		abstract void process(Path p, FileSystem fs) throws IOException;
 
-		final void run(Path src) {
-			List<IOException> exceptions = new ArrayList<IOException>();
+	public FsShell(Configuration configuration) {
+		this(configuration, null);
+	}
 
-			try {
-				// get filesystem
-				FileSystem srcFs = src.getFileSystem(configuration);
-
-				for (Path p : FileUtil.stat2Paths(fs.globStatus(src), src))
-					try {
-						process(p, srcFs);
-					} catch (IOException ioe) {
-						exceptions.add(ioe);
-					}
-			} catch (IOException ex) {
-				throw new IllegalArgumentException("Cannot get fs", ex);
-			}
-
-			if (!exceptions.isEmpty())
-				if (exceptions.size() == 1)
-					throw new RuntimeException("Exception occurred", exceptions.get(0));
-				else
-					throw new RuntimeException("Multiple exceptions occurred: " + exceptions);
+	public FsShell(Configuration configuration, FileSystem fs) {
+		this.configuration = configuration;
+		try {
+			this.fs = (fs != null ? fs : FileSystem.get(configuration));
+			this.trash = new Trash(configuration);
+		} catch (IOException ex) {
+			throw new HadoopException("Cannot create shell", ex);
 		}
 	}
 
@@ -91,14 +89,12 @@ public class FsShell {
 		}
 
 
-		final Collection<Path> results = new PrettyPrintList<Path>(new ArrayList<Path>(uris.length),
-				new Printer<Path>() {
-
-					@Override
-					public String toString(Path e) throws IOException {
-						return getContent(fs.open(e));
-					}
-				});
+		final Collection<Path> results = new PrettyPrintList<Path>(uris.length, new ListPrinter<Path>() {
+			@Override
+			public String toString(Path e) throws IOException {
+				return getContent(fs.open(e));
+			}
+		});
 
 		try {
 
@@ -107,10 +103,10 @@ public class FsShell {
 				results.addAll(Arrays.asList(FileUtil.stat2Paths(fs.globStatus(src), src)));
 			}
 		} catch (IOException ex) {
-			throw new IllegalArgumentException("Cannot execute command", ex);
+			throw new HadoopException("Cannot execute command", ex);
 		}
 
-		return results;
+		return Collections.unmodifiableCollection(results);
 	}
 
 	public void chgrp(String group, String... uris) {
@@ -150,47 +146,258 @@ public class FsShell {
 	}
 
 	public void copyFromLocal(String src, String dst) {
-		throw new UnsupportedOperationException();
+		copyFromLocal(src, dst, (String[]) null);
 	}
 
-	public void copyToLocal(String dst, String src) {
-		throw new UnsupportedOperationException();
+	public void copyFromLocal(String src, String src2, String dst) {
+		copyFromLocal(src, src2, new String[] { dst });
 	}
 
-	public void copyToLocal(boolean ignorecrc, boolean crc, String dst, String src) {
-		throw new UnsupportedOperationException();
+	public void copyFromLocal(String src, String src2, String... dst) {
+		Assert.hasText(src, "at least one valid source path needs to be specified");
+
+		Path dstPath = null;
+		// create src path
+		List<Path> srcs = new ArrayList<Path>();
+		srcs.add(new Path(src));
+
+		if (!ObjectUtils.isEmpty(dst)) {
+			srcs.add(new Path(src2));
+			for (int i = 0; i < dst.length - 1; i++) {
+				srcs.add(new Path(dst[i]));
+			}
+			dstPath = new Path(dst[dst.length - 1]);
+		}
+		else {
+			dstPath = new Path(src2);
+		}
+
+		try {
+			FileSystem dstFs = dstPath.getFileSystem(configuration);
+			dstFs.copyFromLocalFile(false, false, srcs.toArray(new Path[srcs.size()]), dstPath);
+		} catch (IOException ex) {
+			throw new HadoopException("Cannot copy resources", ex);
+		}
 	}
 
-	public String count(String... uris) {
-		throw new UnsupportedOperationException();
+	public void copyToLocal(String src, String localdst) {
 	}
 
-	public String count(boolean quota, String... uris) {
-		throw new UnsupportedOperationException();
+	public void copyToLocal(boolean ignorecrc, boolean crc, String src, String localdst) {
+		File dst = new File(localdst);
+		Path srcpath = new Path(src);
+
+		try {
+			FileSystem srcFs = srcpath.getFileSystem(configuration);
+			srcFs.setVerifyChecksum(ignorecrc);
+			if (crc && !(srcFs instanceof ChecksumFileSystem)) {
+				crc = false;
+			}
+			FileStatus[] srcs = srcFs.globStatus(srcpath);
+			boolean dstIsDir = dst.isDirectory();
+			if (srcs.length > 1 && !dstIsDir) {
+				throw new IllegalArgumentException("When copying multiple files, "
+						+ "destination should be a directory.");
+			}
+			for (FileStatus status : srcs) {
+				Path p = status.getPath();
+				File f = dstIsDir ? new File(dst, p.getName()) : dst;
+				copyToLocal(srcFs, p, f, crc);
+			}
+		} catch (IOException ex) {
+			throw new HadoopException("Cannot copy resources", ex);
+		}
+
+	}
+
+	// copied from FsShell
+	private void copyToLocal(final FileSystem srcFS, final Path src, final File dst, final boolean copyCrc)
+			throws IOException {
+
+		final String COPYTOLOCAL_PREFIX = "_copyToLocal_";
+
+		/* Keep the structure similar to ChecksumFileSystem.copyToLocal(). 
+		* Ideal these two should just invoke FileUtil.copy() and not repeat
+		* recursion here. Of course, copy() should support two more options :
+		* copyCrc and useTmpFile (may be useTmpFile need not be an option).
+		*/
+		if (!srcFS.getFileStatus(src).isDir()) {
+			if (dst.exists()) {
+				// match the error message in FileUtil.checkDest():
+				throw new IOException("Target " + dst + " already exists");
+			}
+
+			// use absolute name so that tmp file is always created under dest dir
+			File tmp = FileUtil.createLocalTempFile(dst.getAbsoluteFile(), COPYTOLOCAL_PREFIX, true);
+			if (!FileUtil.copy(srcFS, src, tmp, false, srcFS.getConf())) {
+				throw new IOException("Failed to copy " + src + " to " + dst);
+			}
+
+			if (!tmp.renameTo(dst)) {
+				throw new IOException("Failed to rename tmp file " + tmp + " to local destination \"" + dst + "\".");
+			}
+
+			if (copyCrc) {
+				if (!(srcFS instanceof ChecksumFileSystem)) {
+					throw new IOException("Source file system does not have crc files");
+				}
+
+				ChecksumFileSystem csfs = (ChecksumFileSystem) srcFS;
+				File dstcs = FileSystem.getLocal(srcFS.getConf()).pathToFile(
+						csfs.getChecksumFile(new Path(dst.getCanonicalPath())));
+				copyToLocal(csfs.getRawFileSystem(), csfs.getChecksumFile(src), dstcs, false);
+			}
+		}
+		else {
+			// once FileUtil.copy() supports tmp file, we don't need to mkdirs().
+			dst.mkdirs();
+			for (FileStatus path : srcFS.listStatus(src)) {
+				copyToLocal(srcFS, path.getPath(), new File(dst, path.getPath().getName()), copyCrc);
+			}
+		}
+	}
+
+	public Map<Path, ContentSummary> count(String... uris) {
+		return count(false, uris);
+	}
+
+	public Map<Path, ContentSummary> count(final boolean quota, String... uris) {
+
+		final Map<Path, ContentSummary> results = new PrettyPrintMap<Path, ContentSummary>(uris.length,
+				new MapPrinter<Path, ContentSummary>() {
+					@Override
+					public String toString(Path p, ContentSummary c) throws IOException {
+						return c.toString(quota) + p;
+					}
+				});
+
+		for (String src : uris) {
+			try {
+				Path srcPath = new Path(src);
+				final FileSystem fs = srcPath.getFileSystem(configuration);
+				FileStatus[] statuses = fs.globStatus(srcPath);
+				Assert.notEmpty(statuses, "Can not find listing for " + src);
+				for (FileStatus s : statuses) {
+					Path p = s.getPath();
+					results.put(p, fs.getContentSummary(p));
+				}
+			} catch (IOException ex) {
+				throw new HadoopException("Cannot find listing", ex);
+			}
+		}
+
+		return Collections.unmodifiableMap(results);
 	}
 
 	public void cp(String src, String dst) {
-		throw new UnsupportedOperationException();
+		cp(src, dst, (String[]) null);
 	}
 
-	public void cp(String src1, String src2, String... uris) {
-		throw new UnsupportedOperationException();
+	public void cp(String src, String src2, String... dst) {
+		Assert.hasText(src, "at least one valid source path needs to be specified");
+
+		Path dstPath = null;
+		// create src path
+		List<Path> srcs = new ArrayList<Path>();
+		srcs.add(new Path(src));
+
+
+		if (!ObjectUtils.isEmpty(dst)) {
+			srcs.add(new Path(src2));
+			for (int i = 0; i < dst.length - 1; i++) {
+				srcs.add(new Path(dst[i]));
+			}
+			dstPath = new Path(dst[dst.length - 1]);
+		}
+		else {
+			dstPath = new Path(src2);
+		}
+
+		try {
+
+			FileSystem dstFs = dstPath.getFileSystem(configuration);
+			boolean isDestDir = dstFs.isDirectory(dstPath);
+
+			if (StringUtils.hasText(src2) || (ObjectUtils.isEmpty(dst) && dst.length > 2)) {
+				if (!isDestDir) {
+					throw new IllegalArgumentException("When copying multiple files, destination " + dstPath.toUri()
+							+ " should be a directory.");
+				}
+			}
+
+			for (Path path : srcs) {
+				FileSystem srcFs = path.getFileSystem(configuration);
+				Path[] from = FileUtil.stat2Paths(srcFs.globStatus(path), path);
+				if (!ObjectUtils.isEmpty(from) && from.length > 1 && !isDestDir) {
+					throw new IllegalArgumentException(
+							"When copying multiple files, destination should be a directory.");
+				}
+				for (Path fromPath : from) {
+					FileUtil.copy(srcFs, fromPath, dstFs, dstPath, false, configuration);
+				}
+			}
+		} catch (IOException ex) {
+			throw new HadoopException("Cannot copy resources", ex);
+		}
 	}
 
-	public long du(String... uris) {
-		throw new UnsupportedOperationException();
+	public Map<Path, Long> du(String... uris) {
+		return du(false, false, uris);
 	}
 
-	public Object du(boolean summary, boolean humanReadable, String... strings) {
-		throw new UnsupportedOperationException();
+	public Map<Path, Long> du(boolean summary, boolean humanReadable, String... strings) {
+		Assert.notEmpty(strings, "at least one valid path is required");
+
+		final int BORDER = 2;
+
+		Map<Path, Long> results = new PrettyPrintMap<Path, Long>(strings.length, new MapPrinter<Path, Long>() {
+
+			@Override
+			public String toString(Path path, Long size) throws Exception {
+				return String.format("%-" + (10 + BORDER) + "d", size) + "\n" + path;
+			}
+		});
+
+		try {
+			for (String src : strings) {
+				Path srcPath = new Path(src);
+				FileSystem srcFs = srcPath.getFileSystem(configuration);
+				Path[] pathItems = FileUtil.stat2Paths(srcFs.globStatus(srcPath), srcPath);
+				FileStatus items[] = srcFs.listStatus(pathItems);
+				if (ObjectUtils.isEmpty(items) && (!srcFs.exists(srcPath))) {
+					throw new HadoopException("Cannot access " + src + ": No such file or directory.");
+				}
+				else {
+					int maxLength = 10;
+
+					long length[] = new long[items.length];
+					for (int i = 0; i < items.length; i++) {
+						Long size = (items[i].isDir() ? srcFs.getContentSummary(items[i].getPath()).getLength() : items[i].getLen());
+						results.put(items[i].getPath(), size);
+						int len = String.valueOf(length[i]).length();
+						if (len > maxLength)
+							maxLength = len;
+					}
+				}
+			}
+		} catch (IOException ex) {
+			throw new HadoopException("Cannot copy resources", ex);
+		}
+
+		return results;
 	}
 
-	public String dus(String... strings) {
-		return (String) du(true, true, strings);
+	public Map<Path, Long> dus(String... strings) {
+		return du(true, false, strings);
 	}
 
 	public void expunge() {
-		throw new UnsupportedOperationException();
+		try {
+			trash.expunge();
+			trash.checkpoint();
+		} catch (IOException ex) {
+			throw new HadoopException("Cannot expunge trash");
+		}
 	}
 
 	public void get(String dst, String src) {
@@ -287,19 +494,5 @@ public class FsShell {
 
 	public void touchz(String... uris) {
 		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @param fs The fs to set.
-	 */
-	public void setFs(FileSystem fs) {
-		this.fs = fs;
-	}
-
-	/**
-	 * @param configuration The configuration to set.
-	 */
-	public void setConfiguration(Configuration configuration) {
-		this.configuration = configuration;
 	}
 }

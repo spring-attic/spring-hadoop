@@ -15,40 +15,42 @@
  */
 package org.springframework.data.hadoop.fs;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
- * Dedicated {@link List} with a custom {@link #toString()} to be specified in a template-like fashion. 
+ * Dedicated {@link Map} with a custom {@link #toString()} to be specified in a template-like fashion.
  * 
  * @author Costin Leau
  */
 @SuppressWarnings("serial")
-class PrettyPrintList<E> extends ArrayList<E> {
+class PrettyPrintMap<K, V> extends LinkedHashMap<K, V> {
 
-	interface ListPrinter<E> {
-		String toString(E e) throws Exception;
+	interface MapPrinter<K, V> {
+		String toString(K k, V v) throws Exception;
 	}
 
-	final ListPrinter<E> printer;
+	final MapPrinter<K, V> printer;
 
-	PrettyPrintList(int size, ListPrinter<E> printer) {
+	PrettyPrintMap(int size, MapPrinter<K, V> printer) {
 		super(size);
 		this.printer = printer;
 	}
 
 	@Override
 	public String toString() {
-		Iterator<E> i = iterator();
+
+		Iterator<Entry<K, V>> i = entrySet().iterator();
 		if (!i.hasNext())
 			return "";
 
 		StringBuilder sb = new StringBuilder();
 		try {
 			for (;;) {
-				E e = i.next();
-				printer.toString(e);
+				Entry<K, V> e = i.next();
+				sb.append(printer.toString(e.getKey(), e.getValue()));
 				if (!i.hasNext())
 					return sb.toString();
 				sb.append("\n");
