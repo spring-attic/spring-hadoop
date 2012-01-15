@@ -112,12 +112,7 @@ public class FsShell implements Closeable, DisposableBean {
 	}
 
 	public Collection<Path> cat(String... uris) {
-		if (ObjectUtils.isEmpty(uris)) {
-			return Collections.emptyList();
-		}
-
-
-		final Collection<Path> results = new PrettyPrintList<Path>(uris.length, new ListPrinter<Path>() {
+		final Collection<Path> results = new PrettyPrintList<Path>(new ListPrinter<Path>() {
 			@Override
 			public String toString(Path e) throws IOException {
 				try {
@@ -129,10 +124,11 @@ public class FsShell implements Closeable, DisposableBean {
 		});
 
 		try {
-
-			for (String uri : uris) {
-				Path src = new Path(uri);
-				results.addAll(Arrays.asList(FileUtil.stat2Paths(fs.globStatus(src), src)));
+			if (!ObjectUtils.isEmpty(uris)) {
+				for (String uri : uris) {
+					Path src = new Path(uri);
+					results.addAll(Arrays.asList(FileUtil.stat2Paths(fs.globStatus(src), src)));
+				}
 			}
 		} catch (IOException ex) {
 			throw new HadoopException("Cannot execute command", ex);

@@ -52,7 +52,7 @@ class PrettyPrintList<E> extends ArrayList<E> {
 		try {
 			for (;;) {
 				E e = i.next();
-				printer.toString(e);
+				sb.append(printer.toString(e));
 				if (!i.hasNext())
 					return sb.toString();
 				sb.append("\n");
