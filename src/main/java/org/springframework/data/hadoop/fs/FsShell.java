@@ -30,8 +30,10 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.BlockLocation;
 import org.apache.hadoop.fs.ChecksumFileSystem;
 import org.apache.hadoop.fs.ContentSummary;
 import org.apache.hadoop.fs.FileStatus;
@@ -618,7 +620,6 @@ public class FsShell {
 					}
 					srcFs.delete(p, recursive);
 				}
-
 			} catch (IOException ex) {
 				throw new HadoopException("Cannot delete (all) resources", ex);
 			}
@@ -633,12 +634,91 @@ public class FsShell {
 		rm(true, skipTrash, uris);
 	}
 
-	public int setrep(String uri) {
-		return setrep(false, uri).iterator().next();
+	public void setrep(short replication, String... uris) {
+		setrep(false, replication, uris);
 	}
 
-	public Collection<Integer> setrep(boolean recursive, String uri) {
-		throw new UnsupportedOperationException();
+	public void setrep(boolean recursive, short replication, String... uris) {
+		setrep(-1, recursive, replication, uris);
+	}
+
+	public void setrepr(short replication, String... uris) {
+		setrep(-1, true, replication, uris);
+	}
+
+	public void setrepr(long secondsToWait, short replication, String... uris) {
+		setrep(secondsToWait, true, replication, uris);
+	}
+
+	public void setrep(long secondsToWait, boolean recursive, short replication, String... uris) {
+		Assert.isTrue(replication >= 1, "Replication must be >=1");
+
+		List<Path> waitList = (secondsToWait >= 0 ? new ArrayList<Path>() : null);
+
+		try {
+			for (String uri : uris) {
+				Path srcPath = new Path(uri);
+				FileSystem srcFs = srcPath.getFileSystem(configuration);
+				Path[] srcs = FileUtil.stat2Paths(srcFs.globStatus(srcPath), srcPath);
+				for (Path src : srcs) {
+					setrep(replication, recursive, srcFs, src, waitList);
+				}
+			}
+
+			if (waitList != null) {
+				boolean waitUntilDone = (secondsToWait == 0);
+				long timeLeft = TimeUnit.SECONDS.toMillis(secondsToWait);
+
+				for (Path path : waitList) {
+					FileStatus status = fs.getFileStatus(path);
+					long len = status.getLen();
+
+					boolean done = false;
+
+					while (!done) {
+						BlockLocation[] locations = fs.getFileBlockLocations(status, 0, len);
+						int i = 0;
+						for (; i < locations.length && locations[i].getHosts().length == replication; i++) {
+						}
+						done = (i == locations.length);
+
+						if (!done && (waitUntilDone || timeLeft > 5000)) {
+							try {
+								// sleep for 10s
+								Thread.sleep(10000);
+							} catch (InterruptedException e) {
+								return;
+							}
+							timeLeft = -1000;
+						}
+					}
+				}
+			}
+		} catch (IOException ex) {
+			throw new HadoopException("Cannot set replication", ex);
+		}
+	}
+
+	private void setrep(short replication, boolean recursive, FileSystem srcFs, Path src, List<Path> waitList)
+			throws IOException {
+		if (srcFs.isFile(src)) {
+			if (srcFs.setReplication(src, replication)) {
+				if (waitList != null) {
+					waitList.add(src);
+				}
+				throw new HadoopException("Cannot set replication for " + src);
+			}
+		}
+		else {
+			if (recursive) {
+				FileStatus items[] = srcFs.listStatus(src);
+				if (!ObjectUtils.isEmpty(items)) {
+					for (FileStatus status : items) {
+						setrep(replication, recursive, srcFs, status.getPath(), waitList);
+					}
+				}
+			}
+		}
 	}
 
 	public Boolean test(String uri) {
