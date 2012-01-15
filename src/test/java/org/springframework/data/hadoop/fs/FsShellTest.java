@@ -15,6 +15,8 @@
  */
 package org.springframework.data.hadoop.fs;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.UUID;
@@ -33,10 +35,13 @@ import org.springframework.core.io.Resource;
 import org.springframework.data.hadoop.TestUtils;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.util.FileCopyUtils;
 
 import static org.junit.Assert.*;
 
 /**
+ * Integration test for FsShell. Note that this test uses FsShell itself inside testing to increase the coverage and reduce the test size.
+ * 
  * @author Costin Leau
  */
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -91,7 +96,7 @@ public class FsShellTest {
 	}
 
 	@Test
-	public void testMultiCat() throws Exception {
+	public void testCatMulti() throws Exception {
 		String name1 = "local/" + UUID.randomUUID() + ".txt";
 		String name2 = "local/" + UUID.randomUUID() + ".txt";
 		Resource res1 = TestUtils.writeToFS(cfg, name1);
@@ -103,4 +108,45 @@ public class FsShellTest {
 		assertEquals(res2.getURI(), it.next().toUri());
 	}
 
+	@Test
+	public void testCopyFromLocal() throws Exception {
+		String name1 = UUID.randomUUID() + ".txt";
+		String dst = "local/" + name1;
+		File f = new File(name1);
+		f.deleteOnExit();
+		FileCopyUtils.copy(name1, new FileWriter(f));
+
+		try {
+			shell.copyFromLocal(name1, dst);
+			assertTrue(shell.test(dst));
+			assertEquals(name1, shell.cat(dst).toString());
+		} finally {
+			f.delete();
+		}
+	}
+
+	@Test
+	public void testCopyFromLocalMultiAndDir() throws Exception {
+		String name1 = UUID.randomUUID() + "-1.txt";
+		String name2 = UUID.randomUUID() + "-2.txt";
+		String dst = "local/";
+		File f1 = new File(name1);
+		File f2 = new File(name2);
+		f1.deleteOnExit();
+		f2.deleteOnExit();
+		FileCopyUtils.copy(name1, new FileWriter(f1));
+		FileCopyUtils.copy(name2, new FileWriter(f2));
+
+		try {
+			shell.copyFromLocal(name1, dst);
+			shell.copyFromLocal(name2, dst);
+			assertTrue(shell.test(dst + name1));
+			assertTrue(shell.test(dst + name2));
+			assertEquals(name1, shell.cat(dst + name1).toString());
+			assertEquals(name2, shell.cat(dst + name2).toString());
+		} finally {
+			f1.delete();
+			f2.delete();
+		}
+	}
 }
