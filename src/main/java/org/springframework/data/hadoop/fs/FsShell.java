@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
+import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -150,10 +151,6 @@ public class FsShell {
 
 	public void copyFromLocal(String src, String dst) {
 		copyFromLocal(src, dst, (String[]) null);
-	}
-
-	public void copyFromLocal(String src, String src2, String dst) {
-		copyFromLocal(src, src2, new String[] { dst });
 	}
 
 	public void copyFromLocal(String src, String src2, String... dst) {
@@ -502,10 +499,6 @@ public class FsShell {
 		moveFromLocal(localsrc, dst, (String[]) null);
 	}
 
-	public void moveFromLocal(String localsrc, String localsrc2, String dst) {
-		moveFromLocal(localsrc, localsrc2, new String[] { dst });
-	}
-
 	public void moveFromLocal(String localsrc, String localsrc2, String... dst) {
 		Object[] va = parseVarargs(localsrc, localsrc2, dst);
 		List<Path> srcs = (List<Path>) va[0];
@@ -528,11 +521,59 @@ public class FsShell {
 	}
 
 	public void mv(String src, String dst) {
-		mv(src, null, dst);
+		mv(src, dst, (String[]) null);
 	}
 
 	public void mv(String src, String src2, String... dst) {
-		throw new UnsupportedOperationException();
+		Object[] va = parseVarargs(src, src2, dst);
+		List<Path> sources = (List<Path>) va[0];
+		Path dstPath = (Path) va[1];
+
+		try {
+			FileSystem dstFs = dstPath.getFileSystem(configuration);
+			boolean isDstDir = dstFs.isDirectory(dstPath);
+
+			if (sources.size() > 1 && !isDstDir) {
+				throw new IllegalArgumentException("Destination must be a dir when moving multiple files");
+			}
+
+			for (Path srcPath : sources) {
+				FileSystem srcFs = srcPath.getFileSystem(configuration);
+				URI srcURI = srcFs.getUri();
+				URI dstURI = dstFs.getUri();
+				if (srcURI.compareTo(dstURI) != 0) {
+					throw new IllegalArgumentException("src and destination filesystems do not match.");
+				}
+				Path[] srcs = FileUtil.stat2Paths(srcFs.globStatus(srcPath), srcPath);
+				if (srcs.length > 1 && !isDstDir) {
+					throw new IllegalArgumentException("When moving multiple files, destination should be a directory.");
+				}
+				for (Path s : srcs) {
+					if (!srcFs.rename(s, dstPath)) {
+						FileStatus srcFstatus = null;
+						FileStatus dstFstatus = null;
+						try {
+							srcFstatus = srcFs.getFileStatus(s);
+						} catch (FileNotFoundException e) {
+							// ignore
+						}
+						try {
+							dstFstatus = dstFs.getFileStatus(dstPath);
+						} catch (IOException e) {
+						}
+						if ((srcFstatus != null) && (dstFstatus != null)) {
+							if (srcFstatus.isDir() && !dstFstatus.isDir()) {
+								throw new IllegalArgumentException("cannot overwrite non directory " + dst
+										+ " with directory " + s);
+							}
+						}
+						throw new HadoopException("Failed to rename " + s + " to " + dst);
+					}
+				}
+			}
+		} catch (IOException ex) {
+			throw new HadoopException("Cannot rename resources", ex);
+		}
 	}
 
 	public void put(String localsrc, String dst) {
