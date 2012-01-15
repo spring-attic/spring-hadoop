@@ -96,7 +96,11 @@ public class FsShell {
 		final Collection<Path> results = new PrettyPrintList<Path>(uris.length, new ListPrinter<Path>() {
 			@Override
 			public String toString(Path e) throws IOException {
-				return getContent(fs.open(e));
+				try {
+					return getContent(fs.open(e));
+				} catch (IOException ex) {
+					return "No such file or directory " + e.toUri();
+				}
 			}
 		});
 
@@ -585,19 +589,48 @@ public class FsShell {
 	}
 
 	public void rm(String... uris) {
-		rm(false, uris);
+		rm(false, false, uris);
 	}
 
-	public void rm(boolean skipTrash, String... uris) {
-		throw new UnsupportedOperationException();
+	public void rm(boolean recursive, String... uris) {
+		rm(recursive, false, uris);
+	}
+
+	public void rm(boolean recursive, boolean skipTrash, String... uris) {
+		for (String uri : uris) {
+			try {
+				Path src = new Path(uri);
+				FileSystem srcFs = src.getFileSystem(configuration);
+
+				for (Path p : FileUtil.stat2Paths(fs.globStatus(src), src)) {
+					FileStatus status = srcFs.getFileStatus(p);
+					if (status.isDir() && !recursive) {
+						throw new IllegalStateException("Cannot remove directory \"" + src
+								+ "\", if recursive deletion was not specified");
+					}
+					if (!skipTrash) {
+						try {
+							Trash trashTmp = new Trash(srcFs, configuration);
+							trashTmp.moveToTrash(src);
+						} catch (IOException ex) {
+							throw new HadoopException("Cannot move to Trash resource " + src, ex);
+						}
+					}
+					srcFs.delete(p, recursive);
+				}
+
+			} catch (IOException ex) {
+				throw new HadoopException("Cannot delete (all) resources", ex);
+			}
+		}
 	}
 
 	public void rmr(String... uris) {
-		rm(false, uris);
+		rm(true, false, uris);
 	}
 
 	public void rmr(boolean skipTrash, String... uris) {
-		throw new UnsupportedOperationException();
+		rm(true, skipTrash, uris);
 	}
 
 	public int setrep(String uri) {
