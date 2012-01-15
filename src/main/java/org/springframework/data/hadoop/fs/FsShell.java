@@ -16,6 +16,7 @@
 package org.springframework.data.hadoop.fs;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -436,47 +437,45 @@ public class FsShell {
 		}
 	}
 
-	public Collection<FileStatus> ls(String match) {
+	public Collection<FileStatus> ls(String... match) {
 		return ls(false, match);
 	}
 
-	public Collection<FileStatus> ls(boolean recursive, String match) {
+	public Collection<FileStatus> ls(boolean recursive, String... match) {
 
-		Path srcPath = new Path(match);
+		Collection<FileStatus> results = new PrettyPrintList<FileStatus>(new ListPrinter<FileStatus>() {
+			@Override
+			public String toString(FileStatus stat) throws Exception {
+				final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+				int maxReplication = 3, maxLen = 10, maxOwner = 10, maxGroup = 10;
+
+				StringBuilder sb = new StringBuilder();
+				sb.append((stat.isDir() ? "d" : "-") + stat.getPermission() + " ").append("\n");
+				sb.append(String.format("%" + maxReplication + "s ", (!stat.isDir() ? stat.getReplication() : "-")));
+				sb.append("\n");
+				sb.append(String.format("%-" + maxOwner + "s ", stat.getOwner())).append("\n");
+				sb.append(String.format("%-" + maxGroup + "s ", stat.getGroup())).append("\n");
+				sb.append(String.format("%" + maxLen + "d ", stat.getLen())).append("\n");
+				sb.append(df.format(new Date(stat.getModificationTime())) + " ").append("\n");
+				sb.append(stat.getPath().toUri().getPath()).append("\n");
+				return sb.toString();
+			}
+		});
 
 		try {
-			FileSystem srcFs = srcPath.getFileSystem(configuration);
-			FileStatus[] srcs = srcFs.globStatus(srcPath);
-			if (ObjectUtils.isEmpty(srcs)) {
-				return Collections.emptyList();
-			}
+			for (String src : match) {
+				Path srcPath = new Path(src);
 
-			Collection<FileStatus> results = new PrettyPrintList<FileStatus>(new ListPrinter<FileStatus>() {
-				@Override
-				public String toString(FileStatus stat) throws Exception {
-					final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-					int maxReplication = 3, maxLen = 10, maxOwner = 10, maxGroup = 10;
-
-					StringBuilder sb = new StringBuilder();
-					sb.append((stat.isDir() ? "d" : "-") + stat.getPermission() + " ").append("\n");
-					sb.append(String.format("%" + maxReplication + "s ", (!stat.isDir() ? stat.getReplication() : "-")));
-					sb.append("\n");
-					sb.append(String.format("%-" + maxOwner + "s ", stat.getOwner())).append("\n");
-					sb.append(String.format("%-" + maxGroup + "s ", stat.getGroup())).append("\n");
-					sb.append(String.format("%" + maxLen + "d ", stat.getLen())).append("\n");
-					sb.append(df.format(new Date(stat.getModificationTime())) + " ").append("\n");
-					sb.append(stat.getPath().toUri().getPath()).append("\n");
-					return sb.toString();
+				FileSystem srcFs = srcPath.getFileSystem(configuration);
+				FileStatus[] srcs = srcFs.globStatus(srcPath);
+				if (!ObjectUtils.isEmpty(srcs)) {
+					for (FileStatus status : srcs) {
+						ls(status, srcFs, recursive, results);
+					}
 				}
-			});
-
-
-
-			for (FileStatus status : srcs) {
-				ls(status, srcFs, recursive, results);
 			}
 
-			return results;
+			return Collections.unmodifiableCollection(results);
 
 		} catch (IOException ex) {
 			throw new HadoopException("Cannot list resources", ex);
@@ -504,7 +503,28 @@ public class FsShell {
 	}
 
 	public void mkdir(String... uris) {
-		throw new UnsupportedOperationException();
+		for (String src : uris) {
+			try {
+				Path p = new Path(src);
+				FileSystem srcFs = p.getFileSystem(configuration);
+				FileStatus fstatus = null;
+				try {
+					fstatus = srcFs.getFileStatus(p);
+					if (fstatus.isDir()) {
+						throw new IllegalStateException("Cannot create directory " + src + ": File exists");
+					}
+					else {
+						throw new IllegalStateException(src + " exists but is not a directory");
+					}
+				} catch (FileNotFoundException e) {
+					if (!srcFs.mkdirs(p)) {
+						throw new HadoopException("Failed to create " + src);
+					}
+				}
+			} catch (IOException ex) {
+				throw new HadoopException("Cannot create directory", ex);
+			}
+		}
 	}
 
 	public void moveFromLocal(String localsrc, String dst) {
