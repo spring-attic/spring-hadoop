@@ -19,9 +19,11 @@ import java.io.File;
 import java.io.FileWriter;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.UUID;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.ContentSummary;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsAction;
@@ -190,5 +192,39 @@ public class FsShellTest {
 		} finally {
 			FileSystemUtils.deleteRecursively(dir);
 		}
+	}
+
+	@Test
+	public void testCount() throws Exception {
+		String name1 = "local/" + UUID.randomUUID() + ".txt";
+		String name2 = "local/" + UUID.randomUUID() + ".txt";
+		Resource res1 = TestUtils.writeToFS(cfg, name1);
+		Resource res2 = TestUtils.writeToFS(cfg, name2);
+
+		Map<Path, ContentSummary> count = shell.count(name1, name2);
+		assertTrue(count.size() >= 2);
+		for (ContentSummary summary : count.values()) {
+			assertEquals(name2.length(), summary.getLength());
+		}
+
+		assertTrue(count.toString().contains(name1));
+		assertTrue(count.toString().contains(name2));
+	}
+
+	@Test
+	public void testCountWithQuota() throws Exception {
+		String name1 = "local/" + UUID.randomUUID() + ".txt";
+		String name2 = "local/" + UUID.randomUUID() + ".txt";
+		Resource res1 = TestUtils.writeToFS(cfg, name1);
+		Resource res2 = TestUtils.writeToFS(cfg, name2);
+
+		Map<Path, ContentSummary> count = shell.count(true, name1, name2);
+		assertTrue(count.size() >= 2);
+		for (ContentSummary summary : count.values()) {
+			assertEquals(name2.length(), summary.getLength());
+		}
+
+		assertTrue(count.toString().contains(name1));
+		assertTrue(count.toString().contains(name2));
 	}
 }
