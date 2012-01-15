@@ -11,6 +11,7 @@
 
 	<context:property-placeholder location="test.properties"/>
 
+	<!-- 
 	<bean id="chainedResourceLoader" class="org.springframework.data.hadoop.io.ChainedResourceLoader">
 		<property name="loaders">
 			<map>
@@ -18,7 +19,8 @@
 			</map>
 		</property>
 	</bean>
-
+ 	-->
+ 
 	<!--  automatically picks the hadoop-configuration reference -->
 	<hdp:resource-loader />	
 	<!-- 

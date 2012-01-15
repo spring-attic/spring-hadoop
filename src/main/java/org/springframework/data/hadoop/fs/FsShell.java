@@ -15,6 +15,7 @@
  */
 package org.springframework.data.hadoop.fs;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -44,6 +45,7 @@ import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.Trash;
 import org.apache.hadoop.io.IOUtils;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.data.hadoop.HadoopException;
 import org.springframework.data.hadoop.fs.PrettyPrintList.ListPrinter;
 import org.springframework.data.hadoop.fs.PrettyPrintMap.MapPrinter;
@@ -64,8 +66,9 @@ import org.springframework.util.StringUtils;
  * @author Hadoop's FsShell authors 
  * @author Costin Leau
  */
-public class FsShell {
+public class FsShell implements Closeable, DisposableBean {
 
+	private boolean internalFs = false;
 	private FileSystem fs;
 	private Configuration configuration;
 	private Trash trash;
@@ -79,9 +82,24 @@ public class FsShell {
 		this.configuration = configuration;
 		try {
 			this.fs = (fs != null ? fs : FileSystem.get(configuration));
+			this.internalFs = (fs == null);
 			this.trash = new Trash(configuration);
 		} catch (IOException ex) {
 			throw new HadoopException("Cannot create shell", ex);
+		}
+	}
+
+
+	@Override
+	public void destroy() throws Exception {
+		close();
+	}
+
+	@Override
+	public void close() throws IOException {
+		if (internalFs && fs != null) {
+			fs.close();
+			fs = null;
 		}
 	}
 

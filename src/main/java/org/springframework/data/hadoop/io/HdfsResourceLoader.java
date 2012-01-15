@@ -16,6 +16,7 @@
 
 package org.springframework.data.hadoop.io;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.net.URI;
 import java.util.LinkedHashSet;
@@ -39,7 +40,7 @@ import org.springframework.util.PathMatcher;
  * 
  * @author Costin Leau
  */
-public class HdfsResourceLoader implements ResourcePatternResolver, PriorityOrdered, DisposableBean {
+public class HdfsResourceLoader implements ResourcePatternResolver, PriorityOrdered, Closeable, DisposableBean {
 
 	private static final String PREFIX_DELIMITER = ":";
 
@@ -196,6 +197,11 @@ public class HdfsResourceLoader implements ResourcePatternResolver, PriorityOrde
 	}
 
 	public void destroy() throws IOException {
+		close();
+	}
+
+	@Override
+	public void close() throws IOException {
 		if (fs != null & internalFS) {
 			fs.close();
 		}

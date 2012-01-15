@@ -8,10 +8,8 @@
 
 	<import resource="../hadoop-ctx.xml"/>
 
-	<bean id="fsShell" class="org.springframework.data.hadoop.fs.FsShell" p:configuration-ref="hadoop-configuration">
-		<property name="fs">
-			<bean id="fs" class="org.springframework.data.hadoop.fs.FileSystemFactoryBean" p:configuration-ref="hadoop-configuration"/>
-		</property>
-	</bean>
+	<bean id="fsShell" class="org.springframework.data.hadoop.fs.FsShell" c:configuration-ref="hadoop-configuration" c:fs-ref="fs"/>
+	
+	<bean id="fs" class="org.springframework.data.hadoop.fs.FileSystemFactoryBean" p:configuration-ref="hadoop-configuration"/>
 	
 </beans>
