@@ -577,11 +577,11 @@ public class FsShell {
 	}
 
 	public void put(String localsrc, String dst) {
-		throw new UnsupportedOperationException();
+		put(localsrc, dst, null);
 	}
 
 	public void put(String localsrc, String localsrc2, String... dst) {
-		throw new UnsupportedOperationException();
+		copyFromLocal(localsrc, localsrc2, dst);
 	}
 
 	public void rm(String... uris) {
