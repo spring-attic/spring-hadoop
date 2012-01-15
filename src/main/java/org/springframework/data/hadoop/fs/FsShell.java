@@ -722,11 +722,31 @@ public class FsShell {
 	}
 
 	public Boolean test(String uri) {
-		return test(false, false, false, uri);
+		return test(true, false, false, uri);
 	}
 
 	public Boolean test(boolean exists, boolean zero, boolean directory, String uri) {
-		throw new UnsupportedOperationException();
+		Path f = new Path(uri);
+
+		boolean result = true;
+		try {
+			FileSystem srcFs = f.getFileSystem(configuration);
+
+			if (exists) {
+				result &= srcFs.exists(f);
+			}
+
+			if (zero) {
+				result &= (srcFs.getFileStatus(f).getLen() == 0);
+			}
+			if (directory) {
+				result &= (srcFs.getFileStatus(f).isDir());
+			}
+
+			return result;
+		} catch (IOException ex) {
+			throw new HadoopException("Cannot test resource " + uri, ex);
+		}
 	}
 
 	public String text(String uri) {
