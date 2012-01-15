@@ -31,16 +31,19 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.zip.GZIPInputStream;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.BlockLocation;
 import org.apache.hadoop.fs.ChecksumFileSystem;
 import org.apache.hadoop.fs.ContentSummary;
+import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.Trash;
+import org.apache.hadoop.io.IOUtils;
 import org.springframework.data.hadoop.HadoopException;
 import org.springframework.data.hadoop.fs.PrettyPrintList.ListPrinter;
 import org.springframework.data.hadoop.fs.PrettyPrintMap.MapPrinter;
@@ -58,6 +61,7 @@ import org.springframework.util.StringUtils;
  * all that's needed then simply call the returned object {@link #toString()} explicitly or implicitly (by printing out or doing string
  * concatenation). 
  * 
+ * @author Hadoop's FsShell authors 
  * @author Costin Leau
  */
 public class FsShell {
@@ -722,19 +726,101 @@ public class FsShell {
 	}
 
 	public Boolean test(String uri) {
-		return test(false, false, false, uri);
+		return test(true, false, false, uri);
 	}
 
 	public Boolean test(boolean exists, boolean zero, boolean directory, String uri) {
-		throw new UnsupportedOperationException();
+		Path f = new Path(uri);
+
+		boolean result = true;
+		try {
+			FileSystem srcFs = f.getFileSystem(configuration);
+
+			if (exists) {
+				result &= srcFs.exists(f);
+			}
+
+			if (zero) {
+				result &= (srcFs.getFileStatus(f).getLen() == 0);
+			}
+			if (directory) {
+				result &= (srcFs.getFileStatus(f).isDir());
+			}
+
+			return result;
+		} catch (IOException ex) {
+			throw new HadoopException("Cannot test resource " + uri, ex);
+		}
 	}
 
-	public String text(String uri) {
-		throw new UnsupportedOperationException();
+	public Collection<String> text(String... uris) {
+		Collection<String> texts = new PrettyPrintList<String>(new ListPrinter<String>() {
+
+			@Override
+			public String toString(String e) throws Exception {
+				return e + "\n";
+			}
+		});
+
+		for (String uri : uris) {
+
+			InputStream in = null;
+			FSDataInputStream i = null;
+
+			try {
+				Path srcPat = new Path(uri);
+				FileSystem srcFs = srcPat.getFileSystem(configuration);
+
+				for (Path src : FileUtil.stat2Paths(srcFs.globStatus(srcPat), srcPat)) {
+					Assert.isTrue(srcFs.isDirectory(src), "Source must be a file");
+					i = srcFs.open(src);
+					switch (i.readShort()) {
+					case 0x1f8b: // RFC 1952
+						i.seek(0);
+						in = new GZIPInputStream(i);
+						break;
+					case 0x5345: // 'S' 'E'
+						if (i.readByte() == 'Q') {
+							i.close();
+							in = new TextRecordInputStream(src, srcFs, configuration);
+						}
+						break;
+					}
+					i.seek(0);
+					texts.add(getContent(in));
+				}
+			} catch (IOException ex) {
+				throw new HadoopException("Cannot read " + uri, ex);
+			} finally {
+				IOUtils.closeStream(in);
+				IOUtils.closeStream(i);
+			}
+		}
+		return texts;
 	}
 
 	public void touchz(String... uris) {
-		throw new UnsupportedOperationException();
+		for (String uri : uris) {
+			try {
+				Path src = new Path(uri);
+				FileSystem srcFs = src.getFileSystem(configuration);
+				FileStatus st;
+				if (srcFs.exists(src)) {
+					st = srcFs.getFileStatus(src);
+					if (st.isDir()) {
+						// TODO: handle this
+						throw new IllegalArgumentException(src + " is a directory");
+					}
+					else if (st.getLen() != 0)
+						throw new IllegalArgumentException(src + " must be a zero-length file");
+				}
+				else {
+					IOUtils.closeStream(srcFs.create(src));
+				}
+			} catch (IOException ex) {
+				throw new HadoopException("Cannot touchz " + uri, ex);
+			}
+		}
 	}
 
 	private static Object[] parseVarargs(String src1, String src2, String... dst) {
