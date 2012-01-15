@@ -605,7 +605,7 @@ public class FsShell implements Closeable, DisposableBean {
 	}
 
 	public void put(String localsrc, String dst) {
-		put(localsrc, dst, null);
+		put(localsrc, dst, (String[]) null);
 	}
 
 	public void put(String localsrc, String localsrc2, String... dst) {
