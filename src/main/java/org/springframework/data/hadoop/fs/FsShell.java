@@ -157,23 +157,9 @@ public class FsShell {
 	}
 
 	public void copyFromLocal(String src, String src2, String... dst) {
-		Assert.hasText(src, "at least one valid source path needs to be specified");
-
-		Path dstPath = null;
-		// create src path
-		List<Path> srcs = new ArrayList<Path>();
-		srcs.add(new Path(src));
-
-		if (!ObjectUtils.isEmpty(dst)) {
-			srcs.add(new Path(src2));
-			for (int i = 0; i < dst.length - 1; i++) {
-				srcs.add(new Path(dst[i]));
-			}
-			dstPath = new Path(dst[dst.length - 1]);
-		}
-		else {
-			dstPath = new Path(src2);
-		}
+		Object[] va = parseVarargs(src, src2, dst);
+		List<Path> srcs = (List<Path>) va[0];
+		Path dstPath = (Path) va[1];
 
 		try {
 			FileSystem dstFs = dstPath.getFileSystem(configuration);
@@ -298,24 +284,9 @@ public class FsShell {
 	}
 
 	public void cp(String src, String src2, String... dst) {
-		Assert.hasText(src, "at least one valid source path needs to be specified");
-
-		Path dstPath = null;
-		// create src path
-		List<Path> srcs = new ArrayList<Path>();
-		srcs.add(new Path(src));
-
-
-		if (!ObjectUtils.isEmpty(dst)) {
-			srcs.add(new Path(src2));
-			for (int i = 0; i < dst.length - 1; i++) {
-				srcs.add(new Path(dst[i]));
-			}
-			dstPath = new Path(dst[dst.length - 1]);
-		}
-		else {
-			dstPath = new Path(src2);
-		}
+		Object[] va = parseVarargs(src, src2, dst);
+		List<Path> srcs = (List<Path>) va[0];
+		Path dstPath = (Path) va[1];
 
 		try {
 
@@ -528,7 +499,24 @@ public class FsShell {
 	}
 
 	public void moveFromLocal(String localsrc, String dst) {
-		throw new UnsupportedOperationException();
+		moveFromLocal(localsrc, dst, (String[]) null);
+	}
+
+	public void moveFromLocal(String localsrc, String localsrc2, String dst) {
+		moveFromLocal(localsrc, localsrc2, new String[] { dst });
+	}
+
+	public void moveFromLocal(String localsrc, String localsrc2, String... dst) {
+		Object[] va = parseVarargs(localsrc, localsrc2, dst);
+		List<Path> srcs = (List<Path>) va[0];
+		Path dstPath = (Path) va[1];
+
+		try {
+			FileSystem dstFs = dstPath.getFileSystem(configuration);
+			dstFs.moveFromLocalFile(srcs.toArray(new Path[srcs.size()]), dstPath);
+		} catch (IOException ex) {
+			throw new HadoopException("Cannot move resources", ex);
+		}
 	}
 
 	public void moveToLocal(String src, String dst) {
@@ -536,7 +524,7 @@ public class FsShell {
 	}
 
 	public void moveToLocal(boolean crc, String src, String dst) {
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException("Option 'moveToLocal' is not implemented yet.");
 	}
 
 	public void mv(String src, String dst) {
@@ -593,5 +581,28 @@ public class FsShell {
 
 	public void touchz(String... uris) {
 		throw new UnsupportedOperationException();
+	}
+
+	private static Object[] parseVarargs(String src1, String src2, String... dst) {
+		Assert.hasText(src1, "at least one valid source path needs to be specified");
+
+		Path dstPath = null;
+		// create src path
+		List<Path> srcs = new ArrayList<Path>();
+		srcs.add(new Path(src1));
+
+
+		if (!ObjectUtils.isEmpty(dst)) {
+			srcs.add(new Path(src2));
+			for (int i = 0; i < dst.length - 1; i++) {
+				srcs.add(new Path(dst[i]));
+			}
+			dstPath = new Path(dst[dst.length - 1]);
+		}
+		else {
+			dstPath = new Path(src2);
+		}
+
+		return new Object[] { srcs, dstPath };
 	}
 }
