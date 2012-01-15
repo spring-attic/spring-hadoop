@@ -36,6 +36,7 @@ import org.springframework.data.hadoop.TestUtils;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.FileCopyUtils;
+import org.springframework.util.FileSystemUtils;
 
 import static org.junit.Assert.*;
 
@@ -147,6 +148,47 @@ public class FsShellTest {
 		} finally {
 			f1.delete();
 			f2.delete();
+		}
+	}
+
+	@Test
+	public void testCopyToLocal() throws Exception {
+		String fName = UUID.randomUUID() + ".txt";
+		String name = "local/" + fName;
+		Resource res = TestUtils.writeToFS(cfg, name);
+		shell.copyToLocal(name, ".");
+		File fl = new File(fName);
+		try {
+			assertTrue(fl.exists());
+			assertArrayEquals(FileCopyUtils.copyToByteArray(res.getInputStream()), FileCopyUtils.copyToByteArray(fl));
+		} finally {
+			fl.delete();
+		}
+	}
+
+	@Test
+	public void testCopyToLocalMulti() throws Exception {
+		String fName1 = UUID.randomUUID() + ".txt";
+		String name1 = "local/" + fName1;
+		String fName2 = UUID.randomUUID() + ".txt";
+		String name2 = "local/" + fName2;
+
+		File dir = new File("local");
+		dir.mkdir();
+
+		Resource res1 = TestUtils.writeToFS(cfg, name1);
+		Resource res2 = TestUtils.writeToFS(cfg, name2);
+		shell.copyToLocal(name1, "local");
+		shell.copyToLocal(false, true, name2, "local");
+		File fl1 = new File(name1);
+		File fl2 = new File(name2);
+		try {
+			assertTrue(fl1.exists());
+			assertTrue(fl2.exists());
+			assertArrayEquals(FileCopyUtils.copyToByteArray(res1.getInputStream()), FileCopyUtils.copyToByteArray(fl1));
+			assertArrayEquals(FileCopyUtils.copyToByteArray(res2.getInputStream()), FileCopyUtils.copyToByteArray(fl2));
+		} finally {
+			FileSystemUtils.deleteRecursively(dir);
 		}
 	}
 }
