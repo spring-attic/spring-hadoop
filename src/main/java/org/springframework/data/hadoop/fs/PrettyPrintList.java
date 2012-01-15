@@ -33,6 +33,10 @@ class PrettyPrintList<E> extends ArrayList<E> {
 
 	final ListPrinter<E> printer;
 
+	PrettyPrintList(ListPrinter<E> printer) {
+		this.printer = printer;
+	}
+
 	PrettyPrintList(int size, ListPrinter<E> printer) {
 		super(size);
 		this.printer = printer;

@@ -20,10 +20,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -181,6 +183,7 @@ public class FsShell {
 	}
 
 	public void copyToLocal(String src, String localdst) {
+		copyToLocal(true, false, src, localdst);
 	}
 
 	public void copyToLocal(boolean ignorecrc, boolean crc, String src, String localdst) {
@@ -400,12 +403,12 @@ public class FsShell {
 		}
 	}
 
-	public void get(String dst, String src) {
-		throw new UnsupportedOperationException();
+	public void get(String src, String dst) {
+		copyToLocal(src, dst);
 	}
 
-	public void get(boolean ignorecrc, boolean crc, String dst, String src) {
-		throw new UnsupportedOperationException();
+	public void get(boolean ignorecrc, boolean crc, String src, String dst) {
+		copyToLocal(ignorecrc, crc, src, dst);
 	}
 
 	public void getmerge(String src, String localdst) {
@@ -413,15 +416,91 @@ public class FsShell {
 	}
 
 	public void getmerge(String src, String localdst, boolean addnl) {
-		throw new UnsupportedOperationException();
+		Path srcPath = new Path(src);
+		Path dst = new Path(localdst);
+		try {
+			FileSystem srcFs = srcPath.getFileSystem(configuration);
+			Path[] srcs = FileUtil.stat2Paths(srcFs.globStatus(srcPath), srcPath);
+			for (int i = 0; i < srcs.length; i++) {
+				if (addnl) {
+					FileUtil.copyMerge(srcFs, srcs[i], FileSystem.getLocal(configuration), dst, false, configuration,
+							"\n");
+				}
+				else {
+					FileUtil.copyMerge(srcFs, srcs[i], FileSystem.getLocal(configuration), dst, false, configuration,
+							null);
+				}
+			}
+		} catch (IOException ex) {
+			throw new HadoopException("Cannot getmerge", ex);
+		}
 	}
 
-	public String ls(String... args) {
-		throw new UnsupportedOperationException();
+	public Collection<FileStatus> ls(String match) {
+		return ls(false, match);
 	}
 
-	public String lsr(String... args) {
-		throw new UnsupportedOperationException();
+	public Collection<FileStatus> ls(boolean recursive, String match) {
+
+		Path srcPath = new Path(match);
+
+		try {
+			FileSystem srcFs = srcPath.getFileSystem(configuration);
+			FileStatus[] srcs = srcFs.globStatus(srcPath);
+			if (ObjectUtils.isEmpty(srcs)) {
+				return Collections.emptyList();
+			}
+
+			Collection<FileStatus> results = new PrettyPrintList<FileStatus>(new ListPrinter<FileStatus>() {
+				@Override
+				public String toString(FileStatus stat) throws Exception {
+					final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+					int maxReplication = 3, maxLen = 10, maxOwner = 10, maxGroup = 10;
+
+					StringBuilder sb = new StringBuilder();
+					sb.append((stat.isDir() ? "d" : "-") + stat.getPermission() + " ").append("\n");
+					sb.append(String.format("%" + maxReplication + "s ", (!stat.isDir() ? stat.getReplication() : "-")));
+					sb.append("\n");
+					sb.append(String.format("%-" + maxOwner + "s ", stat.getOwner())).append("\n");
+					sb.append(String.format("%-" + maxGroup + "s ", stat.getGroup())).append("\n");
+					sb.append(String.format("%" + maxLen + "d ", stat.getLen())).append("\n");
+					sb.append(df.format(new Date(stat.getModificationTime())) + " ").append("\n");
+					sb.append(stat.getPath().toUri().getPath()).append("\n");
+					return sb.toString();
+				}
+			});
+
+
+
+			for (FileStatus status : srcs) {
+				ls(status, srcFs, recursive, results);
+			}
+
+			return results;
+
+		} catch (IOException ex) {
+			throw new HadoopException("Cannot list resources", ex);
+		}
+	}
+
+	private void ls(FileStatus src, FileSystem srcFs, boolean recursive, Collection<FileStatus> results)
+			throws IOException {
+
+		results.add(src);
+		final FileStatus[] items = (src.isDir() ? srcFs.listStatus(src.getPath()) : new FileStatus[] { src });
+
+		if (!ObjectUtils.isEmpty(items)) {
+			for (FileStatus stat : items) {
+				if (recursive && stat.isDir()) {
+					ls(stat, srcFs, recursive, results);
+				}
+			}
+		}
+	}
+
+
+	public Collection<FileStatus> lsr(String match) {
+		return ls(true, match);
 	}
 
 	public void mkdir(String... uris) {
