@@ -602,11 +602,11 @@ public class FsShell implements Closeable, DisposableBean {
 						}
 						if ((srcFstatus != null) && (dstFstatus != null)) {
 							if (srcFstatus.isDir() && !dstFstatus.isDir()) {
-								throw new IllegalArgumentException("cannot overwrite non directory " + dst
+								throw new IllegalArgumentException("cannot overwrite non directory " + dstPath
 										+ " with directory " + s);
 							}
 						}
-						throw new HadoopException("Failed to rename " + s + " to " + dst);
+						throw new HadoopException("Failed to rename " + s + " to " + dstPath);
 					}
 				}
 			}

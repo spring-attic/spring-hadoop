@@ -439,4 +439,44 @@ public class FsShellTest {
 			f2.delete();
 		}
 	}
+
+	@Test
+	public void testMvMulti() throws Exception {
+		String name1 = UUID.randomUUID() + "-1.txt";
+		String name2 = UUID.randomUUID() + "-2.txt";
+		String dst = "local/";
+		String mv = "local/mv/";
+
+		Resource res1 = TestUtils.writeToFS(cfg, dst + name1);
+		Resource res2 = TestUtils.writeToFS(cfg, dst + name2);
+
+		assertTrue(res1.exists());
+		assertTrue(res2.exists());
+
+		shell.mkdir(mv);
+
+		shell.mv(dst + name1, mv);
+		shell.mv(dst + name2, mv);
+
+		assertTrue(shell.test(mv + name1));
+		assertTrue(shell.test(mv + name2));
+		assertFalse(shell.test(dst + name1));
+		assertFalse(shell.test(dst + name2));
+	}
+
+	@Test
+	public void testMvSingle() throws Exception {
+		String name1 = UUID.randomUUID() + "-1.txt";
+		String dst = "local/";
+		String mv = "local/mv" + name1;
+
+		Resource res1 = TestUtils.writeToFS(cfg, dst + name1);
+
+		assertTrue(res1.exists());
+
+		shell.mv(dst + name1, mv);
+
+		assertTrue(shell.test(mv));
+		assertFalse(shell.test(dst + name1));
+	}
 }
