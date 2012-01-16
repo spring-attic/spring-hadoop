@@ -553,15 +553,46 @@ public class FsShellTest {
 	public void testMultiSetrep() throws Exception {
 		String name1 = "local/setrep/" + UUID.randomUUID() + ".txt";
 		String name2 = "local/setrep/" + UUID.randomUUID() + ".txt";
-		
+
 		TestUtils.writeToFS(cfg, name1);
 		TestUtils.writeToFS(cfg, name2);
-		
-		Path p1 = new Path(name1); Path p2 = new Path(name2);
-		
+
+		Path p1 = new Path(name1);
+		Path p2 = new Path(name2);
+
 		short replication = fs.getReplication(p1);
 		shell.setrep(true, (short) (replication + 1), "local/setrep/");
 		assertEquals(replication + 1, fs.getReplication(p1));
 		assertEquals(replication + 1, fs.getReplication(p2));
+	}
+
+	@Test
+	public void testTest() throws Exception {
+		String name1 = "local/" + UUID.randomUUID() + ".txt";
+		assertFalse(shell.test(name1));
+		TestUtils.writeToFS(cfg, name1);
+		assertTrue(shell.test(name1));
+		assertFalse(shell.test(false, true, false, name1));
+		assertFalse(shell.test(false, false, true, name1));
+	}
+
+	@Test
+	public void testTestDir() throws Exception {
+		String name1 = "local/" + UUID.randomUUID();
+		assertFalse(shell.test(name1));
+		shell.mkdir(name1);
+		assertTrue(shell.test(name1));
+		assertTrue(shell.test(false, true, false, name1));
+		assertTrue(shell.test(false, false, true, name1));
+	}
+
+	@Test
+	public void testTestFile() throws Exception {
+		String name1 = "local/" + UUID.randomUUID();
+		assertFalse(shell.test(name1));
+		shell.touchz(name1);
+		assertTrue(shell.test(name1));
+		assertTrue(shell.test(false, true, false, name1));
+		assertFalse(shell.test(false, false, true, name1));
 	}
 }
