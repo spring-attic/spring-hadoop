@@ -489,4 +489,44 @@ public class FsShellTest {
 	public void testPutMultiAndDir() throws Exception {
 		testCopyFromLocalMultiAndDir();
 	}
+
+	@Test
+	public void testRM() throws Exception {
+		String name1 = "local/" + UUID.randomUUID() + ".txt";
+		String name2 = "local/" + UUID.randomUUID() + ".txt";
+
+		TestUtils.writeToFS(cfg, name1);
+		TestUtils.writeToFS(cfg, name2);
+
+		assertTrue(shell.test(name1));
+		assertTrue(shell.test(name2));
+		shell.rm(name1, name2);
+		assertFalse(shell.test(name1));
+		assertFalse(shell.test(name2));
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void testRMDirectoryNonRecursive() throws Exception {
+		String name1 = "local/rmr/" + UUID.randomUUID() + ".txt";
+
+		TestUtils.writeToFS(cfg, name1);
+
+		assertTrue(shell.test(name1));
+		shell.rm("local/rmr/");
+	}
+
+	@Test
+	public void testRMR() throws Exception {
+		String name1 = "local/rmr/" + UUID.randomUUID() + ".txt";
+		String name2 = "local/rmr/" + UUID.randomUUID() + ".txt";
+
+		TestUtils.writeToFS(cfg, name1);
+		TestUtils.writeToFS(cfg, name2);
+
+		assertTrue(shell.test(name1));
+		assertTrue(shell.test(name2));
+		shell.rmr("local/rmr/");
+		assertFalse(shell.test(name1));
+		assertFalse(shell.test(name2));
+	}
 }
