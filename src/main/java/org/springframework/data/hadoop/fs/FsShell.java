@@ -446,14 +446,13 @@ public class FsShell implements Closeable, DisposableBean {
 				int maxReplication = 3, maxLen = 10, maxOwner = 10, maxGroup = 10;
 
 				StringBuilder sb = new StringBuilder();
-				sb.append((stat.isDir() ? "d" : "-") + stat.getPermission() + " ").append("\n");
+				sb.append((stat.isDir() ? "d" : "-") + stat.getPermission() + " ");
 				sb.append(String.format("%" + maxReplication + "s ", (!stat.isDir() ? stat.getReplication() : "-")));
-				sb.append("\n");
-				sb.append(String.format("%-" + maxOwner + "s ", stat.getOwner())).append("\n");
-				sb.append(String.format("%-" + maxGroup + "s ", stat.getGroup())).append("\n");
-				sb.append(String.format("%" + maxLen + "d ", stat.getLen())).append("\n");
-				sb.append(df.format(new Date(stat.getModificationTime())) + " ").append("\n");
-				sb.append(stat.getPath().toUri().getPath()).append("\n");
+				sb.append(String.format("%-" + maxOwner + "s ", stat.getOwner()));
+				sb.append(String.format("%-" + maxGroup + "s ", stat.getGroup()));
+				sb.append(String.format("%" + maxLen + "d ", stat.getLen()));
+				sb.append(df.format(new Date(stat.getModificationTime())) + " ");
+				sb.append(stat.getPath().toUri().getPath());
 				return sb.toString();
 			}
 		});
@@ -468,6 +467,9 @@ public class FsShell implements Closeable, DisposableBean {
 					for (FileStatus status : srcs) {
 						ls(status, srcFs, recursive, results);
 					}
+				}
+				else {
+					throw new IllegalArgumentException("Cannot access " + srcPath + ": No such file or directory.");
 				}
 			}
 
@@ -488,6 +490,9 @@ public class FsShell implements Closeable, DisposableBean {
 			for (FileStatus stat : items) {
 				if (recursive && stat.isDir()) {
 					ls(stat, srcFs, recursive, results);
+				}
+				else {
+					results.add(stat);
 				}
 			}
 		}

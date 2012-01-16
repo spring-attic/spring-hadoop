@@ -25,6 +25,7 @@ import java.util.UUID;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.ContentSummary;
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsAction;
@@ -356,5 +357,30 @@ public class FsShellTest {
 		} finally {
 			FileSystemUtils.deleteRecursively(dir);
 		}
+	}
+
+	@Test
+	public void testLSR() throws Exception {
+		String fName1 = UUID.randomUUID() + ".txt";
+		String name1 = "local/merge/" + fName1;
+		TestUtils.writeToFS(cfg, name1);
+
+		Collection<FileStatus> lsr = shell.lsr(".");
+		assertTrue(lsr.size() > 1);
+		String output = lsr.toString();
+		assertTrue(output.contains(name1));
+	}
+
+	@Test
+	public void testLS() throws Exception {
+		String fName1 = UUID.randomUUID() + ".txt";
+		String name1 = "local/merge/" + fName1;
+		TestUtils.writeToFS(cfg, name1);
+
+		Collection<FileStatus> ls = shell.ls(".");
+		assertTrue(ls.size() >= 1);
+		assertTrue(ls.toString().contains("drwx"));
+		assertFalse(ls.toString().contains(name1));
+		assertTrue(shell.ls(name1).contains(name1));
 	}
 }
