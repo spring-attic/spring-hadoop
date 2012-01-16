@@ -16,6 +16,7 @@
 package org.springframework.data.hadoop.fs;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.Collection;
 import java.util.Iterator;
@@ -289,5 +290,71 @@ public class FsShellTest {
 		String s = shell.du("local/").toString();
 		assertTrue(s.contains(res1.getURI().toString()));
 		assertTrue(s.contains(res2.getURI().toString()));
+	}
+
+	@Test
+	public void testGet() throws Exception {
+		testCopyToLocal();
+	}
+
+	@Test
+	public void testGetMulti() throws Exception {
+		testCopyToLocalMulti();
+	}
+
+	@Test
+	public void testGetMerge() throws Exception {
+		String fName1 = UUID.randomUUID() + ".txt";
+		String name1 = "local/merge/" + fName1;
+		TestUtils.writeToFS(cfg, name1);
+
+		String fName2 = UUID.randomUUID() + ".txt";
+		String name2 = "local/merge/" + fName2;
+		TestUtils.writeToFS(cfg, name2);
+
+		File dir = new File("local");
+		dir.mkdir();
+
+		String localName = "local/merge.txt";
+		File fl1 = new File(localName);
+
+		try {
+			shell.getmerge("local/merge/", localName);
+			assertTrue(fl1.exists());
+			String content = FileCopyUtils.copyToString(new FileReader(fl1));
+			assertTrue(content.contains(name1));
+			assertTrue(content.contains(name2));
+			assertEquals(content.length(), name1.length() + name2.length());
+		} finally {
+			FileSystemUtils.deleteRecursively(dir);
+		}
+	}
+
+	@Test
+	public void testGetMergeWithNewLine() throws Exception {
+		String fName1 = UUID.randomUUID() + ".txt";
+		String name1 = "local/merge/" + fName1;
+		TestUtils.writeToFS(cfg, name1);
+
+		String fName2 = UUID.randomUUID() + ".txt";
+		String name2 = "local/merge/" + fName2;
+		TestUtils.writeToFS(cfg, name2);
+
+		File dir = new File("local");
+		dir.mkdir();
+
+		String localName = "local/merge.txt";
+		File fl1 = new File(localName);
+
+		try {
+			shell.getmerge("local/merge/", localName, true);
+			assertTrue(fl1.exists());
+			String content = FileCopyUtils.copyToString(new FileReader(fl1));
+			assertTrue(content.contains(name1 + "\n"));
+			assertTrue(content.contains(name2));
+			assertEquals(content.length(), name1.length() + name2.length() + 2);
+		} finally {
+			FileSystemUtils.deleteRecursively(dir);
+		}
 	}
 }
