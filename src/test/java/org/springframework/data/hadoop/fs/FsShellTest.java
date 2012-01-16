@@ -231,7 +231,7 @@ public class FsShellTest {
 	@Test
 	public void testCp() throws Exception {
 		String fName = UUID.randomUUID() + ".txt";
-		String name1 = "local/"+fName;
+		String name1 = "local/" + fName;
 		TestUtils.writeToFS(cfg, name1);
 
 		String dst = "local/cp/";
@@ -260,5 +260,34 @@ public class FsShellTest {
 		assertTrue(shell.test(dst + fName2));
 		assertEquals(shell.cat(name1).toString(), shell.cat(dst + fName1).toString());
 		assertEquals(shell.cat(name2).toString(), shell.cat(dst + fName2).toString());
+	}
+
+	@Test
+	public void testDUS() throws Exception {
+		String fName1 = UUID.randomUUID() + ".txt";
+		String name1 = "local/" + fName1;
+		Resource res1 = TestUtils.writeToFS(cfg, name1);
+
+		String fName2 = UUID.randomUUID() + ".txt";
+		String name2 = "local/" + fName2;
+		Resource res2 = TestUtils.writeToFS(cfg, name2);
+
+		assertEquals(shell.dus(name1).toString(), res1.getURI() + "\t" + name1.length());
+		assertEquals(shell.dus(name2).toString(), res2.getURI() + "\t" + name2.length());
+	}
+
+	@Test
+	public void testDU() throws Exception {
+		String fName1 = UUID.randomUUID() + ".txt";
+		String name1 = "local/" + fName1;
+		Resource res1 = TestUtils.writeToFS(cfg, name1);
+
+		String fName2 = UUID.randomUUID() + ".txt";
+		String name2 = "local/" + fName2;
+		Resource res2 = TestUtils.writeToFS(cfg, name2);
+
+		String s = shell.du("local/").toString();
+		assertTrue(s.contains(res1.getURI().toString()));
+		assertTrue(s.contains(res2.getURI().toString()));
 	}
 }

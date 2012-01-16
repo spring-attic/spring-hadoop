@@ -338,11 +338,13 @@ public class FsShell implements Closeable, DisposableBean {
 	}
 
 	public Map<Path, Long> du(String... uris) {
-		return du(false, false, uris);
+		return du(false, uris);
 	}
 
-	public Map<Path, Long> du(boolean summary, boolean humanReadable, String... strings) {
-		Assert.notEmpty(strings, "at least one valid path is required");
+	public Map<Path, Long> du(final boolean summary, String... strings) {
+		if (ObjectUtils.isEmpty(strings)) {
+			strings = new String[] { "." };
+		}
 
 		final int BORDER = 2;
 
@@ -350,7 +352,10 @@ public class FsShell implements Closeable, DisposableBean {
 
 			@Override
 			public String toString(Path path, Long size) throws Exception {
-				return String.format("%-" + (10 + BORDER) + "d", size) + "\n" + path;
+				if (summary) {
+					return ("".equals(path) ? "." : path) + "\t" + size;
+				}
+				return String.format("%-" + (10 + BORDER) + "d", size) + path;
 			}
 		});
 
@@ -358,21 +363,20 @@ public class FsShell implements Closeable, DisposableBean {
 			for (String src : strings) {
 				Path srcPath = new Path(src);
 				FileSystem srcFs = srcPath.getFileSystem(configuration);
-				Path[] pathItems = FileUtil.stat2Paths(srcFs.globStatus(srcPath), srcPath);
-				FileStatus items[] = srcFs.listStatus(pathItems);
-				if (ObjectUtils.isEmpty(items) && (!srcFs.exists(srcPath))) {
-					throw new HadoopException("Cannot access " + src + ": No such file or directory.");
+				FileStatus[] fileStatus = srcFs.globStatus(srcPath);
+				if (summary) {
+					for (FileStatus status : fileStatus) {
+						results.put(status.getPath(), srcFs.getContentSummary(status.getPath()).getLength());
+					}
 				}
 				else {
-					int maxLength = 10;
-
-					long length[] = new long[items.length];
-					for (int i = 0; i < items.length; i++) {
-						Long size = (items[i].isDir() ? srcFs.getContentSummary(items[i].getPath()).getLength() : items[i].getLen());
-						results.put(items[i].getPath(), size);
-						int len = String.valueOf(length[i]).length();
-						if (len > maxLength)
-							maxLength = len;
+					FileStatus items[] = srcFs.listStatus(FileUtil.stat2Paths(fileStatus, srcPath));
+					if (ObjectUtils.isEmpty(items) && (!srcFs.exists(srcPath))) {
+						throw new HadoopException("Cannot access " + src + ": No such file or directory.");
+					}
+					for (FileStatus status : items) {
+						Long size = (status.isDir() ? srcFs.getContentSummary(status.getPath()).getLength() : status.getLen());
+						results.put(status.getPath(), size);
 					}
 				}
 			}
@@ -380,11 +384,11 @@ public class FsShell implements Closeable, DisposableBean {
 			throw new HadoopException("Cannot copy resources", ex);
 		}
 
-		return results;
+		return Collections.unmodifiableMap(results);
 	}
 
 	public Map<Path, Long> dus(String... strings) {
-		return du(true, false, strings);
+		return du(true, strings);
 	}
 
 	public void expunge() {
