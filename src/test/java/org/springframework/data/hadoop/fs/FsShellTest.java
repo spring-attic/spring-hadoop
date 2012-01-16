@@ -227,4 +227,38 @@ public class FsShellTest {
 		assertTrue(count.toString().contains(name1));
 		assertTrue(count.toString().contains(name2));
 	}
+
+	@Test
+	public void testCp() throws Exception {
+		String fName = UUID.randomUUID() + ".txt";
+		String name1 = "local/"+fName;
+		TestUtils.writeToFS(cfg, name1);
+
+		String dst = "local/cp/";
+		shell.mkdir(dst);
+		shell.cp(name1, dst);
+
+		assertTrue(shell.test(dst + fName));
+		assertEquals(shell.cat(name1).toString(), shell.cat(dst + fName).toString());
+	}
+
+	@Test
+	public void testCpMulti() throws Exception {
+		String fName1 = UUID.randomUUID() + ".txt";
+		String name1 = "local/" + fName1;
+		TestUtils.writeToFS(cfg, name1);
+
+		String fName2 = UUID.randomUUID() + ".txt";
+		String name2 = "local/" + fName2;
+		TestUtils.writeToFS(cfg, name2);
+
+		String dst = "local/cp/";
+		shell.mkdir(dst);
+		shell.cp(name1, name2, dst);
+
+		assertTrue(shell.test(dst + fName1));
+		assertTrue(shell.test(dst + fName2));
+		assertEquals(shell.cat(name1).toString(), shell.cat(dst + fName1).toString());
+		assertEquals(shell.cat(name2).toString(), shell.cat(dst + fName2).toString());
+	}
 }
