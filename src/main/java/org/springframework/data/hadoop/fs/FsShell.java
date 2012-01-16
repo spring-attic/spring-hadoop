@@ -646,9 +646,9 @@ public class FsShell implements Closeable, DisposableBean {
 					if (!skipTrash) {
 						try {
 							Trash trashTmp = new Trash(srcFs, configuration);
-							trashTmp.moveToTrash(src);
+							trashTmp.moveToTrash(p);
 						} catch (IOException ex) {
-							throw new HadoopException("Cannot move to Trash resource " + src, ex);
+							throw new HadoopException("Cannot move to Trash resource " + p, ex);
 						}
 					}
 					srcFs.delete(p, recursive);
@@ -739,6 +739,8 @@ public class FsShell implements Closeable, DisposableBean {
 				if (waitList != null) {
 					waitList.add(src);
 				}
+			}
+			else {
 				throw new HadoopException("Cannot set replication for " + src);
 			}
 		}

@@ -529,4 +529,39 @@ public class FsShellTest {
 		assertFalse(shell.test(name1));
 		assertFalse(shell.test(name2));
 	}
+
+	//@Test - disabled for now as Trash is disabled by default as well
+	public void testTrash() throws Exception {
+		String name1 = "local/rmr/" + UUID.randomUUID() + ".txt";
+		TestUtils.writeToFS(cfg, name1);
+		shell.rmr("local/rmr/");
+		assertTrue(shell.test(".Trash"));
+		System.out.println(shell.ls(".Trash"));
+	}
+
+	@Test
+	public void testSetrep() throws Exception {
+		String name1 = "local/setrep/" + UUID.randomUUID() + ".txt";
+		TestUtils.writeToFS(cfg, name1);
+		Path p = new Path(name1);
+		short replication = fs.getReplication(p);
+		shell.setrep((short) (replication + 1), name1);
+		assertEquals(replication + 1, fs.getReplication(p));
+	}
+
+	@Test
+	public void testMultiSetrep() throws Exception {
+		String name1 = "local/setrep/" + UUID.randomUUID() + ".txt";
+		String name2 = "local/setrep/" + UUID.randomUUID() + ".txt";
+		
+		TestUtils.writeToFS(cfg, name1);
+		TestUtils.writeToFS(cfg, name2);
+		
+		Path p1 = new Path(name1); Path p2 = new Path(name2);
+		
+		short replication = fs.getReplication(p1);
+		shell.setrep(true, (short) (replication + 1), "local/setrep/");
+		assertEquals(replication + 1, fs.getReplication(p1));
+		assertEquals(replication + 1, fs.getReplication(p2));
+	}
 }
