@@ -479,4 +479,14 @@ public class FsShellTest {
 		assertTrue(shell.test(mv));
 		assertFalse(shell.test(dst + name1));
 	}
+
+	@Test
+	public void testPut() throws Exception {
+		testCopyFromLocal();
+	}
+
+	@Test
+	public void testPutMultiAndDir() throws Exception {
+		testCopyFromLocalMultiAndDir();
+	}
 }
