@@ -394,4 +394,49 @@ public class FsShellTest {
 		shell.mkdir(dir);
 		assertTrue(shell.test(true, false, true, dir));
 	}
+
+	@Test
+	public void testMoveFromLocal() throws Exception {
+		String name1 = UUID.randomUUID() + ".txt";
+		String dst = "local/" + name1;
+		File f = new File(name1);
+		f.deleteOnExit();
+		FileCopyUtils.copy(name1, new FileWriter(f));
+
+		try {
+			shell.moveFromLocal(name1, dst);
+			assertTrue(shell.test(dst));
+			assertEquals(name1, shell.cat(dst).toString());
+			assertFalse(f.exists());
+		} finally {
+			f.delete();
+		}
+	}
+
+	@Test
+	public void testMoveFromLocalMultiAndDir() throws Exception {
+		String name1 = UUID.randomUUID() + "-1.txt";
+		String name2 = UUID.randomUUID() + "-2.txt";
+		String dst = "local/";
+		File f1 = new File(name1);
+		File f2 = new File(name2);
+		f1.deleteOnExit();
+		f2.deleteOnExit();
+		FileCopyUtils.copy(name1, new FileWriter(f1));
+		FileCopyUtils.copy(name2, new FileWriter(f2));
+
+		try {
+			shell.moveFromLocal(name1, dst);
+			shell.moveFromLocal(name2, dst);
+			assertTrue(shell.test(dst + name1));
+			assertTrue(shell.test(dst + name2));
+			assertEquals(name1, shell.cat(dst + name1).toString());
+			assertEquals(name2, shell.cat(dst + name2).toString());
+			assertFalse(f1.exists());
+			assertFalse(f2.exists());
+		} finally {
+			f1.delete();
+			f2.delete();
+		}
+	}
 }
