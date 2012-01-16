@@ -595,4 +595,13 @@ public class FsShellTest {
 		assertTrue(shell.test(false, true, false, name1));
 		assertFalse(shell.test(false, false, true, name1));
 	}
+
+	@Test
+	public void testTouchz() throws Exception {
+		String name1 = "local/" + UUID.randomUUID() + ".txt";
+		assertFalse(shell.test(name1));
+		shell.touchz(name1);
+		assertTrue(shell.test(true, true, false, name1));
+		assertEquals(0, fs.getLength(new Path(name1)));
+	}
 }
