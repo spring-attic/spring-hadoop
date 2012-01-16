@@ -179,6 +179,7 @@ public class FsShell implements Closeable, DisposableBean {
 
 	public void copyFromLocal(String src, String src2, String... dst) {
 		Object[] va = parseVarargs(src, src2, dst);
+		@SuppressWarnings("unchecked")
 		List<Path> srcs = (List<Path>) va[0];
 		Path dstPath = (Path) va[1];
 
@@ -306,13 +307,14 @@ public class FsShell implements Closeable, DisposableBean {
 
 	public void cp(String src, String src2, String... dst) {
 		Object[] va = parseVarargs(src, src2, dst);
+		@SuppressWarnings("unchecked")
 		List<Path> srcs = (List<Path>) va[0];
 		Path dstPath = (Path) va[1];
 
 		try {
 
 			FileSystem dstFs = dstPath.getFileSystem(configuration);
-			boolean isDestDir = dstFs.isDirectory(dstPath);
+			boolean isDestDir = !dstFs.isFile(dstPath);
 
 			if (StringUtils.hasText(src2) || (ObjectUtils.isEmpty(dst) && dst.length > 2)) {
 				if (!isDestDir) {
@@ -484,15 +486,17 @@ public class FsShell implements Closeable, DisposableBean {
 			throws IOException {
 
 		results.add(src);
-		final FileStatus[] items = (src.isDir() ? srcFs.listStatus(src.getPath()) : new FileStatus[] { src });
 
-		if (!ObjectUtils.isEmpty(items)) {
-			for (FileStatus stat : items) {
-				if (recursive && stat.isDir()) {
-					ls(stat, srcFs, recursive, results);
-				}
-				else {
-					results.add(stat);
+		if (src.isDir()) {
+			final FileStatus[] items = srcFs.listStatus(src.getPath());
+			if (!ObjectUtils.isEmpty(items)) {
+				for (FileStatus stat : items) {
+					if (recursive && stat.isDir()) {
+						ls(stat, srcFs, recursive, results);
+					}
+					else {
+						results.add(stat);
+					}
 				}
 			}
 		}
@@ -534,6 +538,7 @@ public class FsShell implements Closeable, DisposableBean {
 
 	public void moveFromLocal(String localsrc, String localsrc2, String... dst) {
 		Object[] va = parseVarargs(localsrc, localsrc2, dst);
+		@SuppressWarnings("unchecked")
 		List<Path> srcs = (List<Path>) va[0];
 		Path dstPath = (Path) va[1];
 
@@ -559,12 +564,13 @@ public class FsShell implements Closeable, DisposableBean {
 
 	public void mv(String src, String src2, String... dst) {
 		Object[] va = parseVarargs(src, src2, dst);
+		@SuppressWarnings({ "unchecked" })
 		List<Path> sources = (List<Path>) va[0];
 		Path dstPath = (Path) va[1];
 
 		try {
 			FileSystem dstFs = dstPath.getFileSystem(configuration);
-			boolean isDstDir = dstFs.isDirectory(dstPath);
+			boolean isDstDir = !dstFs.isFile(dstPath);
 
 			if (sources.size() > 1 && !isDstDir) {
 				throw new IllegalArgumentException("Destination must be a dir when moving multiple files");
@@ -758,16 +764,14 @@ public class FsShell implements Closeable, DisposableBean {
 		boolean result = true;
 		try {
 			FileSystem srcFs = f.getFileSystem(configuration);
+			// mandatory check - if this fails, so will the others (with a NPE)
+			result = srcFs.exists(f);
 
-			if (exists) {
-				result &= srcFs.exists(f);
+			if (result && zero) {
+				result &= srcFs.getFileStatus(f).getLen() == 0;
 			}
-
-			if (zero) {
-				result &= (srcFs.getFileStatus(f).getLen() == 0);
-			}
-			if (directory) {
-				result &= (srcFs.getFileStatus(f).isDir());
+			if (result && directory) {
+				result &= srcFs.getFileStatus(f).isDir();
 			}
 
 			return result;
@@ -795,7 +799,7 @@ public class FsShell implements Closeable, DisposableBean {
 				FileSystem srcFs = srcPat.getFileSystem(configuration);
 
 				for (Path src : FileUtil.stat2Paths(srcFs.globStatus(srcPat), srcPat)) {
-					Assert.isTrue(srcFs.isDirectory(src), "Source must be a file");
+					Assert.isTrue(!srcFs.isFile(src), "Source must be a file");
 					i = srcFs.open(src);
 					switch (i.readShort()) {
 					case 0x1f8b: // RFC 1952

@@ -374,13 +374,24 @@ public class FsShellTest {
 	@Test
 	public void testLS() throws Exception {
 		String fName1 = UUID.randomUUID() + ".txt";
-		String name1 = "local/merge/" + fName1;
+		String name1 = "local/ls/" + fName1;
 		TestUtils.writeToFS(cfg, name1);
 
 		Collection<FileStatus> ls = shell.ls(".");
 		assertTrue(ls.size() >= 1);
 		assertTrue(ls.toString().contains("drwx"));
 		assertFalse(ls.toString().contains(name1));
-		assertTrue(shell.ls(name1).contains(name1));
+		ls = shell.ls("local/ls/");
+		assertEquals(2, ls.size());
+		assertTrue(shell.ls(name1).toString().contains(name1));
+	}
+
+	@Test
+	public void testMkDir() throws Exception {
+		String fname1 = UUID.randomUUID().toString();
+		String dir = "local/mkdir-test/" + fname1;
+		assertFalse(shell.test(true, false, true, dir));
+		shell.mkdir(dir);
+		assertTrue(shell.test(true, false, true, dir));
 	}
 }
