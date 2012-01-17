@@ -22,7 +22,6 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.context.support.GenericXmlApplicationContext;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.data.hadoop.fs.ChainedResourceLoader;
 
 import static org.junit.Assert.*;
 
@@ -47,7 +46,7 @@ public class ChainedResourceLoaderTest {
 	@Test
 	public void testChainedRLWithGenericCtx() throws Exception {
 		GenericXmlApplicationContext ctx = new GenericXmlApplicationContext(
-				"/org/springframework/data/hadoop/io/rl.xml");
+				"/org/springframework/data/hadoop/fs/rl.xml");
 
 		ctx.registerShutdownHook();
 
