@@ -14,6 +14,7 @@ if (!fsh.test(dir)) {
    println "File content is " + fsh.cat(dir + name)
 }
 
-println "ls:\n" + fsh.ls(dir).toString()
+println fsh.ls(dir).toString()
 fsh.rmr(dir)
+
 fs.getLength(name)
