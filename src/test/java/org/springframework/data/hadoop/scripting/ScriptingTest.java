@@ -28,6 +28,7 @@ import org.junit.runner.RunWith;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.UrlResource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
+import org.springframework.data.hadoop.fs.FsShell;
 import org.springframework.data.hadoop.fs.SimplerFileSystem;
 import org.springframework.scripting.ScriptSource;
 import org.springframework.scripting.support.ResourceScriptSource;
@@ -59,7 +60,9 @@ public class ScriptingTest {
 
 	@Test
 	public void testRhinoHadoopScript() throws Exception {
-		ScriptSource script = new ResourceScriptSource(new UrlResource(getClass().getResource("basic-script.js")));
+		UrlResource urlResource = new UrlResource(getClass().getResource("basic-script.js"));
+		System.out.println("Using resource " + urlResource);
+		ScriptSource script = new ResourceScriptSource(urlResource);
 
 		Jsr223ScriptEvaluator eval = new Jsr223ScriptEvaluator();
 		eval.setLanguage("javascript");
@@ -74,6 +77,7 @@ public class ScriptingTest {
 		SimplerFileSystem sfs = new SimplerFileSystem(fs);
 		
 		args.put("fs", sfs);
+		args.put("fsh", new FsShell(config, sfs));
 
 		eval.evaluate(script, args);
 	}

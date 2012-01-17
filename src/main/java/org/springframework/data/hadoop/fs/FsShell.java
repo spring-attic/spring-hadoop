@@ -111,6 +111,10 @@ public class FsShell implements Closeable, DisposableBean {
 		return writer.toString();
 	}
 
+	public Collection<Path> cat(String uri) {
+		return cat(new String[] { uri });
+	}
+
 	public Collection<Path> cat(String... uris) {
 		final Collection<Path> results = new PrettyPrintList<Path>(new ListPrinter<Path>() {
 			@Override
@@ -137,48 +141,96 @@ public class FsShell implements Closeable, DisposableBean {
 		return Collections.unmodifiableCollection(results);
 	}
 
+	public void chgrp(String group, String uri) {
+		chgrp(group, uri);
+	}
+
 	public void chgrp(String group, String... uris) {
 		chgrp(false, group, uris);
+	}
+
+	public void chgrpr(String group, String uri) {
+		chgrp(group, new String[] { uri });
 	}
 
 	public void chgrpr(String group, String... uris) {
 		chgrp(true, group, uris);
 	}
 
+	public void chgrp(boolean recursive, String group, String uri) {
+		chgrp(recursive, group, new String[] { uri });
+	}
+
 	public void chgrp(boolean recursive, String group, String... uris) {
 		FsShellPermissions.changePermissions(fs, configuration, FsShellPermissions.Op.CHGRP, recursive, group, uris);
+	}
+
+	public void chmod(String mode, String uri) {
+		chmod(mode, new String[] { uri });
 	}
 
 	public void chmod(String mode, String... uris) {
 		chmod(false, mode, uris);
 	}
 
+	public void chmodr(String mode, String uri) {
+		chmodr(mode, new String[] { uri });
+	}
+
 	public void chmodr(String mode, String... uris) {
 		chmod(true, mode, uris);
+	}
+
+	public void chmodr(Integer mode, String uri) {
+		chmodr(mode, new String[] { uri });
 	}
 
 	public void chmodr(Integer mode, String... uris) {
 		chmod(true, String.valueOf(mode), uris);
 	}
 
+	public void chmod(Integer mode, String uri) {
+		chmod(mode, new String[] { uri });
+	}
+
 	public void chmod(Integer mode, String... uris) {
 		chmod(false, String.valueOf(mode), uris);
+	}
+
+	public void chmod(boolean recursive, Integer mode, String uri) {
+		chmod(recursive, mode, new String[] { uri });
 	}
 
 	public void chmod(boolean recursive, Integer mode, String... uris) {
 		chmod(recursive, String.valueOf(mode), uris);
 	}
 
+	public void chmod(boolean recursive, String mode, String uri) {
+		chmod(recursive, mode, new String[] { uri });
+	}
+
 	public void chmod(boolean recursive, String mode, String... uris) {
 		FsShellPermissions.changePermissions(fs, configuration, FsShellPermissions.Op.CHMOD, recursive, mode, uris);
+	}
+
+	public void chown(String mode, String uri) {
+		chown(mode, new String[] { uri });
 	}
 
 	public void chown(String mode, String... uris) {
 		chown(false, mode, uris);
 	}
 
+	public void chownr(String mode, String uri) {
+		chownr(mode, new String[] { uri });
+	}
+
 	public void chownr(String mode, String... uris) {
 		chown(true, mode, uris);
+	}
+
+	public void chown(boolean recursive, String owner, String uri) {
+		chown(recursive, owner, new String[] { uri });
 	}
 
 	public void chown(boolean recursive, String owner, String... uris) {
@@ -281,8 +333,16 @@ public class FsShell implements Closeable, DisposableBean {
 		}
 	}
 
+	public Map<Path, ContentSummary> count(String uri) {
+		return count(new String[] { uri });
+	}
+
 	public Map<Path, ContentSummary> count(String... uris) {
 		return count(false, uris);
+	}
+
+	public Map<Path, ContentSummary> count(final boolean quota, String uri) {
+		return count(quota, new String[] { uri });
 	}
 
 	public Map<Path, ContentSummary> count(final boolean quota, String... uris) {
@@ -351,8 +411,16 @@ public class FsShell implements Closeable, DisposableBean {
 		}
 	}
 
+	public Map<Path, Long> du(String uri) {
+		return du(new String[] { uri });
+	}
+
 	public Map<Path, Long> du(String... uris) {
 		return du(false, uris);
+	}
+
+	public Map<Path, Long> du(final boolean summary, String string) {
+		return du(summary, new String[] { string });
 	}
 
 	public Map<Path, Long> du(final boolean summary, String... strings) {
@@ -399,6 +467,10 @@ public class FsShell implements Closeable, DisposableBean {
 		}
 
 		return Collections.unmodifiableMap(results);
+	}
+
+	public Map<Path, Long> dus(String string) {
+		return dus(new String[] { string });
 	}
 
 	public Map<Path, Long> dus(String... strings) {
@@ -453,6 +525,10 @@ public class FsShell implements Closeable, DisposableBean {
 
 	public Collection<FileStatus> ls(String... match) {
 		return ls(false, match);
+	}
+
+	public Collection<FileStatus> ls(boolean recursive, String match) {
+		return ls(recursive, new String[] { match });
 	}
 
 	public Collection<FileStatus> ls(boolean recursive, String... match) {
@@ -521,6 +597,14 @@ public class FsShell implements Closeable, DisposableBean {
 
 	public Collection<FileStatus> lsr(String match) {
 		return ls(true, match);
+	}
+
+	public Collection<FileStatus> lsr(String... match) {
+		return ls(true, match);
+	}
+
+	public void mkdir(String uri) {
+		mkdir(new String[] { uri });
 	}
 
 	public void mkdir(String... uris) {
@@ -639,8 +723,16 @@ public class FsShell implements Closeable, DisposableBean {
 		copyFromLocal(localsrc, localsrc2, dst);
 	}
 
+	public void rm(String uri) {
+		rm(new String[] { uri });
+	}
+
 	public void rm(String... uris) {
 		rm(false, false, uris);
+	}
+
+	public void rm(boolean recursive, String uri) {
+		rm(recursive, new String[] { uri });
 	}
 
 	public void rm(boolean recursive, String... uris) {
@@ -675,16 +767,32 @@ public class FsShell implements Closeable, DisposableBean {
 		}
 	}
 
+	public void rmr(String uri) {
+		rmr(new String[] { uri });
+	}
+
 	public void rmr(String... uris) {
 		rm(true, false, uris);
+	}
+
+	public void rmr(boolean skipTrash, String uri) {
+		rmr(skipTrash, new String[] { uri });
 	}
 
 	public void rmr(boolean skipTrash, String... uris) {
 		rm(true, skipTrash, uris);
 	}
 
+	public void setrep(short replication, String uri) {
+		setrep(replication, new String[] { uri });
+	}
+
 	public void setrep(short replication, String... uris) {
 		setrep(false, replication, uris);
+	}
+
+	public void setrep(boolean recursive, short replication, String uri) {
+		setrep(recursive, replication, new String[] { uri });
 	}
 
 	public void setrep(boolean recursive, short replication, String... uris) {
@@ -695,8 +803,20 @@ public class FsShell implements Closeable, DisposableBean {
 		setrep(-1, true, replication, uris);
 	}
 
+	public void setrepr(short replication, String uri) {
+		setrepr(replication, new String[] { uri });
+	}
+
+	public void setrepr(long secondsToWait, short replication, String uri) {
+		setrepr(secondsToWait, replication, new String[] { uri });
+	}
+
 	public void setrepr(long secondsToWait, short replication, String... uris) {
 		setrep(secondsToWait, true, replication, uris);
+	}
+
+	public void setrep(long secondsToWait, boolean recursive, short replication, String uri) {
+		setrep(secondsToWait, recursive, replication, new String[] { uri });
 	}
 
 	public void setrep(long secondsToWait, boolean recursive, short replication, String... uris) {
@@ -772,11 +892,11 @@ public class FsShell implements Closeable, DisposableBean {
 		}
 	}
 
-	public Boolean test(String uri) {
+	public boolean test(String uri) {
 		return test(true, false, false, uri);
 	}
 
-	public Boolean test(boolean exists, boolean zero, boolean directory, String uri) {
+	public boolean test(boolean exists, boolean zero, boolean directory, String uri) {
 		Path f = new Path(uri);
 
 		boolean result = true;
@@ -796,6 +916,10 @@ public class FsShell implements Closeable, DisposableBean {
 		} catch (IOException ex) {
 			throw new HadoopException("Cannot test resource " + uri, ex);
 		}
+	}
+
+	public Collection<String> text(String uri) {
+		return text(new String[] { uri });
 	}
 
 	public Collection<String> text(String... uris) {
@@ -842,6 +966,10 @@ public class FsShell implements Closeable, DisposableBean {
 			}
 		}
 		return texts;
+	}
+
+	public void touchz(String uri) {
+		touchz(new String[] { uri });
 	}
 
 	public void touchz(String... uris) {
