@@ -41,7 +41,19 @@ import org.springframework.util.StringUtils;
  * 
  * @author Costin Leau
  */
-public abstract class DistributedCopyUtil {
+public class DistributedCopyUtil {
+
+	private DistributedCopyUtil() {
+	};
+
+	/**
+	 * Returns an instance to this class (used mainly for accessibility from a scripting environment).
+	 * 
+	 * @return an instance to this class.
+	 */
+	public static DistributedCopyUtil getInstance() {
+		return new DistributedCopyUtil();
+	}
 
 	public enum Preserve {
 		REPLICATION, BLOCKSIZE, USER, GROUP, PERMISSION;
@@ -55,12 +67,8 @@ public abstract class DistributedCopyUtil {
 					preserve.contains(GROUP), preserve.contains(PERMISSION));
 		}
 
-		static String toString(Boolean preserveReplication, 
-				Boolean preserveBlockSize, 
-				Boolean preserveUser, 
-				Boolean preserveGroup, 
-				Boolean preservePermission) {
-			
+		static String toString(Boolean preserveReplication, Boolean preserveBlockSize, Boolean preserveUser, Boolean preserveGroup, Boolean preservePermission) {
+
 			StringBuilder sb = new StringBuilder();
 
 			if (Boolean.TRUE.equals(preserveReplication)) {
@@ -86,55 +94,31 @@ public abstract class DistributedCopyUtil {
 			return sb.toString();
 		}
 	}
-	
-	public static void copy(Configuration configuration, EnumSet<Preserve> preserve,
-			Boolean ignoreFailures,
-			Boolean overwrite, 
-			Boolean update, 
-			Boolean delete,
-			String... uris) {
 
-		copy(configuration, preserve, ignoreFailures, Boolean.FALSE, null, null, overwrite, update, delete, null, null, null, uris);
+	public static void copy(Configuration configuration, EnumSet<Preserve> preserve, Boolean ignoreFailures, Boolean overwrite, Boolean update, Boolean delete, String... uris) {
+
+		copy(configuration, preserve, ignoreFailures, Boolean.FALSE, null, null, overwrite, update, delete, null, null,
+				null, uris);
 	}
-	
-	public static void copy(Configuration configuration, EnumSet<Preserve> preserve, 
-			Boolean ignoreFailures, 
-			Boolean skipCrc, 
-			String logDir, 
-			Integer mappers, 
-			Boolean overwrite, 
-			Boolean update,
-			Boolean delete, 
-			Long fileLimit, Long sizeLimit, 
-			String fileList,
-			String... uris) {
-		
+
+	public static void copy(Configuration configuration, EnumSet<Preserve> preserve, Boolean ignoreFailures, Boolean skipCrc, String logDir, Integer mappers, Boolean overwrite, Boolean update, Boolean delete, Long fileLimit, Long sizeLimit, String fileList, String... uris) {
+
 		Boolean r = (preserve != null && preserve.contains(Preserve.REPLICATION));
 		Boolean b = (preserve != null && preserve.contains(Preserve.BLOCKSIZE));
 		Boolean u = (preserve != null && preserve.contains(Preserve.USER));
 		Boolean g = (preserve != null && preserve.contains(Preserve.GROUP));
 		Boolean p = (preserve != null && preserve.contains(Preserve.PERMISSION));
-		
-		copy(configuration, r, b, u, g, p, ignoreFailures, skipCrc, logDir, mappers, overwrite, update, delete, fileLimit, sizeLimit, fileList, uris);
+
+		copy(configuration, r, b, u, g, p, ignoreFailures, skipCrc, logDir, mappers, overwrite, update, delete,
+				fileLimit, sizeLimit, fileList, uris);
 	}
 
-	public static void copy(Configuration configuration, 
-			Boolean preserveReplication, Boolean preserveBlockSize, Boolean preserveUser, Boolean preserveGroup, Boolean preservePermission, 
-			Boolean ignoreFailures, 
-			Boolean skipCrc, 
-			String logDir, 
-			Integer mappers, 
-			Boolean overwrite, 
-			Boolean update, 
-			Boolean delete, 
-			Long fileLimit, Long sizeLimit, 
-			String fileList,
-			String... uris) {
+	public static void copy(Configuration configuration, Boolean preserveReplication, Boolean preserveBlockSize, Boolean preserveUser, Boolean preserveGroup, Boolean preservePermission, Boolean ignoreFailures, Boolean skipCrc, String logDir, Integer mappers, Boolean overwrite, Boolean update, Boolean delete, Long fileLimit, Long sizeLimit, String fileList, String... uris) {
 
 		List<String> args = new ArrayList<String>();
 
-		args.add(Preserve.toString(
-				preserveReplication, preserveBlockSize, preserveUser, preserveGroup, preservePermission));
+		args.add(Preserve.toString(preserveReplication, preserveBlockSize, preserveUser, preserveGroup,
+				preservePermission));
 
 		if (Boolean.TRUE.equals(ignoreFailures)) {
 			args.add("-i");

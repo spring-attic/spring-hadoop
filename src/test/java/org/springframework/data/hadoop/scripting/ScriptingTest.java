@@ -49,12 +49,12 @@ public class ScriptingTest {
 
 	@Test
 	public void testRhinoScript() throws Exception {
-		ScriptSource script = new StaticScriptSource("print('Hello, world!')");
+		ScriptSource script = new StaticScriptSource("msg = 'Hello, world!'");
 
 		Jsr223ScriptEvaluator eval = new Jsr223ScriptEvaluator();
 		eval.setLanguage("javascript");
 
-		System.out.println(eval.evaluate(script));
+		assertEquals("Hello, world!", eval.evaluate(script));
 	}
 
 	@Test
@@ -71,9 +71,7 @@ public class ScriptingTest {
 
 		Map<String, Object> args = new LinkedHashMap<String, Object>();
 		FileSystem fs = FileSystem.get(config);
-		System.out.println("Fs is " + fs);
 		SimplerFileSystem sfs = new SimplerFileSystem(fs);
-		System.out.println("Fs is " + sfs);
 		
 		args.put("fs", sfs);
 

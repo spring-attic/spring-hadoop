@@ -157,6 +157,18 @@ public class FsShell implements Closeable, DisposableBean {
 		chmod(true, mode, uris);
 	}
 
+	public void chmodr(Integer mode, String... uris) {
+		chmod(true, String.valueOf(mode), uris);
+	}
+
+	public void chmod(Integer mode, String... uris) {
+		chmod(false, String.valueOf(mode), uris);
+	}
+
+	public void chmod(boolean recursive, Integer mode, String... uris) {
+		chmod(recursive, String.valueOf(mode), uris);
+	}
+
 	public void chmod(boolean recursive, String mode, String... uris) {
 		FsShellPermissions.changePermissions(fs, configuration, FsShellPermissions.Op.CHMOD, recursive, mode, uris);
 	}

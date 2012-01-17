@@ -26,6 +26,8 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.data.hadoop.fs.DistributedCopyUtil;
+import org.springframework.data.hadoop.fs.FsShell;
 import org.springframework.data.hadoop.fs.HdfsResourceLoader;
 import org.springframework.data.hadoop.fs.SimplerFileSystem;
 import org.springframework.util.Assert;
@@ -45,6 +47,8 @@ import org.springframework.util.Assert;
  *  </th>
  *  <tr><td>cfg</td><td> org.apache.hadoop.conf.Configuration</td><td>Hadoop Configuration (relies on 'hadoop-configuration' bean or singleton type match)</td></tr>
  * 	<tr><td>fs</td><td>org.apache.hadoop.fs.FileSystem</td><td>Hadoop File System (relies on 'hadoop-fs' bean or singleton type match, falls back to creating one based on 'cfg')</td></tr>
+ *  <tr><td>fsh</td><td>org.springframework.data.hadoop.fs.FsShell</td><td>File System shell, exposing hadoop 'fs' commands as an API</td></tr>
+ *  <tr><td>distcp</td><td>org.springframework.data.hadoop.fs.DistributedCopyUtil</td><td>programmatic access to DistCp</td></tr>
  *  <tr><td>hdfsRL</td><td>org.springframework.data.hadoop.io.HdfsResourceLoader</td><td>HdfsResourceLoader (relies on 'hadoop-resource-loader' or singleton type match, falls back to creating one automatically based on 'cfg')</td></tr>
  *  <tr><td>ctx</td><td>org.springframework.context.ApplicationContext</td><td>Enclosing application context</td></tr>
  *  <tr><td>ctxRL</td><td>org.springframework.io.support.ResourcePatternResolver</td><td>Enclosing application context ResourceLoader (same as ctx)</td></tr>
@@ -54,6 +58,9 @@ import org.springframework.util.Assert;
  * <p/>
  * Note that the above variables are added only if found (have a non-null value) and the keys are not bound already.
  * 
+ * @see HdfsResourceLoader
+ * @see FsShell
+ * @see ApplicationContext
  * @author Costin Leau
  */
 public class HdfsScriptFactoryBean extends Jsr223ScriptEvaluatorFactoryBean implements ApplicationContextAware {
@@ -86,6 +93,20 @@ public class HdfsScriptFactoryBean extends Jsr223ScriptEvaluatorFactoryBean impl
 
 		if (!hasBinding(args, name, FileSystem.class)) {
 			putIfAbsent(args, name, detectFS(name, cfg));
+		}
+
+		FileSystem fs = (FileSystem) args.get(name);
+
+		name = "distcp";
+
+		if (!hasBinding(args, name, DistributedCopyUtil.class)) {
+			putIfAbsent(args, name, DistributedCopyUtil.getInstance());
+		}
+
+		name = "fsh";
+
+		if (!hasBinding(args, name, FsShell.class)) {
+			putIfAbsent(args, name, new FsShell(cfg, fs));
 		}
 
 		putIfAbsent(args, "cl", ctx.getClassLoader());
