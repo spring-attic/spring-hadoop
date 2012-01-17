@@ -184,7 +184,9 @@ public abstract class DistributedCopyUtil {
 			Class<?> argClass = ClassUtils.resolveClassName("org.apache.hadoop.tools.DistCp$Arguments",
 					cl.getClassLoader());
 			Method m = ReflectionUtils.findMethod(DistCp.class, "copy", Configuration.class, argClass);
+			ReflectionUtils.makeAccessible(m);
 			Method v = ReflectionUtils.findMethod(argClass, "valueOf", String[].class, Configuration.class);
+			ReflectionUtils.makeAccessible(v);
 
 			// Arguments.valueOf()
 			Object args = ReflectionUtils.invokeMethod(v, null, parsedArgs, config);
