@@ -24,7 +24,7 @@
 		<property name="scripts">
 			<list>
 				<bean class="org.springframework.data.hadoop.pig.PigScript">
-					<constructor-arg name="resource" value=""org/springframework/data/hadoop/pig/script.pig"/>
+					<constructor-arg name="resource" value="org/springframework/data/hadoop/pig/script.pig"/>
 				</bean>
 			</list>
 		</property>
