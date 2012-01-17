@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.hadoop.io;
+package org.springframework.data.hadoop.fs;
 
 import org.junit.Test;
 import org.springframework.beans.BeansException;
@@ -22,6 +22,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.context.support.GenericXmlApplicationContext;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.data.hadoop.fs.ChainedResourceLoader;
 
 import static org.junit.Assert.*;
 

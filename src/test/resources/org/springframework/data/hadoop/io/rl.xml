@@ -7,7 +7,7 @@
 
 
 
-	<bean id="chainedResourceLoader" class="org.springframework.data.hadoop.io.ChainedResourceLoader">
+	<bean id="chainedResourceLoader" class="org.springframework.data.hadoop.fs.ChainedResourceLoader">
 	</bean>
 	
 	<bean id="testBean" class="org.springframework.data.hadoop.io.ChainedResourceLoaderTest$ResourceLoaderTestBean"/>

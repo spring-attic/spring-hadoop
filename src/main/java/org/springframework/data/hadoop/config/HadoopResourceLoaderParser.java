@@ -17,7 +17,7 @@ package org.springframework.data.hadoop.config;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.data.hadoop.io.HdfsResourceLoader;
+import org.springframework.data.hadoop.fs.HdfsResourceLoader;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
 

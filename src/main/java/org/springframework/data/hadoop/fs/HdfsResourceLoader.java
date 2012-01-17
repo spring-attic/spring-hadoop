@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.data.hadoop.io;
+package org.springframework.data.hadoop.fs;
 
 import java.io.Closeable;
 import java.io.IOException;

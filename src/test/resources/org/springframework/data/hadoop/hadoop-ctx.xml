@@ -12,7 +12,7 @@
 	<context:property-placeholder location="test.properties"/>
 
 	<!-- 
-	<bean id="chainedResourceLoader" class="org.springframework.data.hadoop.io.ChainedResourceLoader">
+	<bean id="chainedResourceLoader" class="org.springframework.data.hadoop.fs.ChainedResourceLoader">
 		<property name="loaders">
 			<map>
 				<entry key="hdfs" value-ref="hadoop-resource-loader"/>
@@ -24,7 +24,7 @@
 	<!--  automatically picks the hadoop-configuration reference -->
 	<hdp:resource-loader />	
 	<!-- 
-	<bean id="hdfsResourceLoader" class="org.springframework.data.hadoop.io.HdfsResourceLoader" c:fs-ref="fs"/>
+	<bean id="hdfsResourceLoader" class="org.springframework.data.hadoop.fs.HdfsResourceLoader" c:fs-ref="fs"/>
 	<bean id="fs" class="org.springframework.data.hadoop.fs.FileSystemFactoryBean" p:configuration-ref="fs-config"/>
 	 -->
 	 

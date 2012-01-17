@@ -23,7 +23,7 @@ import org.junit.Test;
 import org.springframework.context.support.GenericXmlApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.data.hadoop.TestUtils;
-import org.springframework.data.hadoop.io.HdfsResourceLoader;
+import org.springframework.data.hadoop.fs.HdfsResourceLoader;
 
 
 /**

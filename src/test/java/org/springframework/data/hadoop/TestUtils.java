@@ -23,7 +23,7 @@ import org.apache.hadoop.mapreduce.JobSubmissionFiles;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.WritableResource;
 import org.springframework.core.io.support.ResourcePatternResolver;
-import org.springframework.data.hadoop.io.HdfsResourceLoader;
+import org.springframework.data.hadoop.fs.HdfsResourceLoader;
 
 /**
  * @author Costin Leau

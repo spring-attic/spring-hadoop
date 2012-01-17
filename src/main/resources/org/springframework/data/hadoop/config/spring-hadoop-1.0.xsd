@@ -117,7 +117,7 @@ Defines a HDFS-aware resource loader.
           </xsd:documentation>
 	      <xsd:appinfo>
 	        <tool:annotation>
-	          <tool:exports type="org.springframework.data.hadoop.io.HdfsResourceLoader"/>
+	          <tool:exports type="org.springframework.data.hadoop.fs.HdfsResourceLoader"/>
 	        </tool:annotation>
 	      </xsd:appinfo>
 		</xsd:annotation>

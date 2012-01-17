@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.hadoop.io;
+package org.springframework.data.hadoop.fs;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -37,6 +37,8 @@ import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.data.hadoop.TestUtils;
 import org.springframework.data.hadoop.configuration.ConfigurationFactoryBean;
 import org.springframework.data.hadoop.fs.FileSystemFactoryBean;
+import org.springframework.data.hadoop.fs.HdfsResource;
+import org.springframework.data.hadoop.fs.HdfsResourceLoader;
 
 import static org.junit.Assert.*;
 
