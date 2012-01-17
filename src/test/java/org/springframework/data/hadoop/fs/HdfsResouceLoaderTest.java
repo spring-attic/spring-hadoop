@@ -16,7 +16,6 @@
 package org.springframework.data.hadoop.fs;
 
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
 import java.util.Arrays;
@@ -32,13 +31,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.WritableResource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.data.hadoop.TestUtils;
 import org.springframework.data.hadoop.configuration.ConfigurationFactoryBean;
-import org.springframework.data.hadoop.fs.FileSystemFactoryBean;
-import org.springframework.data.hadoop.fs.HdfsResource;
-import org.springframework.data.hadoop.fs.HdfsResourceLoader;
 
 import static org.junit.Assert.*;
 
@@ -162,7 +157,7 @@ public class HdfsResouceLoaderTest {
 		String name = "test-" + UUID.randomUUID() + ".file#fragment";
 
 		Path path = new Path(name);
-		HdfsResource resource = (HdfsResource) loader.getResource(name);
+		Resource resource = loader.getResource(name);
 
 		try {
 			System.out.println(resource.toString());
@@ -170,15 +165,16 @@ public class HdfsResouceLoaderTest {
 			assertFalse(resource.isReadable());
 			assertFalse(resource.isOpen());
 
-			assertTrue(resource instanceof WritableResource);
-			WritableResource wr = (WritableResource) resource;
-			assertTrue(wr.isWritable());
-
-			byte[] bytes = name.getBytes();
-			OutputStream out = wr.getOutputStream();
-
-			out.write(bytes);
-			out.close();
+			resource = TestUtils.writeToFS(loader, resource.getURI().toString());
+			//			assertTrue(resource instanceof WritableResource);
+			//			WritableResource wr = (WritableResource) resource;
+			//			assertTrue(wr.isWritable());
+			//
+			//			byte[] bytes = name.getBytes();
+			//			OutputStream out = wr.getOutputStream();
+			//
+			//			out.write(bytes);
+			//			out.close();
 
 			assertTrue(resource.exists());
 			assertTrue(resource.isReadable());

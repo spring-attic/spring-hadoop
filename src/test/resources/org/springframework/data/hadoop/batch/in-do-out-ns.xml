@@ -12,11 +12,13 @@
 	<import resource="../hadoop-ctx.xml"/>
 	
 	<job id="mainJob" xmlns="http://www.springframework.org/schema/batch">
+		<!-- 
 		<step id="import" next="do">
 			<tasklet>
 				<chunk reader="file-reader" writer="hdfs-writer" commit-interval="10"/>
 			</tasklet>
 		</step>
+		 -->
 		<step id="do">
 			<tasklet ref="hadoop-tasklet"/>
 		</step>

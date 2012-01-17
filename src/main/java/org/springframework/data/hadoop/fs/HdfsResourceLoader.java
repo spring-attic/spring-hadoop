@@ -79,6 +79,10 @@ public class HdfsResourceLoader implements ResourcePatternResolver, PriorityOrde
 		internalFS = false;
 	}
 
+	public FileSystem getFileSystem() {
+		return fs;
+	}
+
 	public ClassLoader getClassLoader() {
 		return fs.getConf().getClassLoader();
 	}

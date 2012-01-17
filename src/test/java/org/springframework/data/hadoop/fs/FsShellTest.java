@@ -51,6 +51,7 @@ import static org.junit.Assert.*;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration
+@SuppressWarnings("deprecation")
 public class FsShellTest {
 
 	{

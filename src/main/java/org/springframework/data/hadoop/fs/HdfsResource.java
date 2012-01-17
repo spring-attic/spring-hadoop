@@ -29,7 +29,6 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.RawLocalFileSystem;
 import org.springframework.core.io.ContextResource;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.WritableResource;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -38,7 +37,8 @@ import org.springframework.util.StringUtils;
  *  
  * @author Costin Leau
  */
-class HdfsResource implements WritableResource, ContextResource {
+class HdfsResource implements ContextResource {
+	//implements WritableResource,
 
 	private final String location;
 	private final Path path;

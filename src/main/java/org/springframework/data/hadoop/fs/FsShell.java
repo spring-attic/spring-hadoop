@@ -447,6 +447,10 @@ public class FsShell implements Closeable, DisposableBean {
 		}
 	}
 
+	public Collection<FileStatus> ls(String match) {
+		return ls(false, new String[] { match });
+	}
+
 	public Collection<FileStatus> ls(String... match) {
 		return ls(false, match);
 	}

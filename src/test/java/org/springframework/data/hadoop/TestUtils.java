@@ -19,10 +19,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.JobSubmissionFiles;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.WritableResource;
-import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.data.hadoop.fs.HdfsResourceLoader;
 
 /**
@@ -43,18 +43,20 @@ public class TestUtils {
 		return writeToFS(new HdfsResourceLoader(cfg), filename);
 	}
 
-	public static Resource writeToFS(ResourcePatternResolver loader, String filename) {
+	public static Resource writeToFS(HdfsResourceLoader loader, String filename) {
 		try {
 			Resource resource = loader.getResource(filename);
 			//System.out.println("Writing resource " + resource.getURI());
-			WritableResource wr = (WritableResource) resource;
+			//WritableResource wr = (WritableResource) resource;
+
+			FileSystem fs = ((HdfsResourceLoader) loader).getFileSystem();
 
 			byte[] bytes = filename.getBytes();
-			OutputStream out = wr.getOutputStream();
+			OutputStream out = fs.create(new Path(resource.getURI()));
 			out.write(bytes);
 			out.close();
 
-			return resource;
+			return loader.getResource(filename);
 		} catch (IOException ex) {
 			throw new IllegalArgumentException(ex);
 		}
