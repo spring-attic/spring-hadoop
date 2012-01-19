@@ -102,9 +102,9 @@ public abstract class HbaseSynchronizationManager {
 	 * @throws IllegalStateException if there is no value bound to the thread
 	 * @see ResourceTransactionManager#getResourceFactory()
 	 */
-	public static Object unbindResource(String key) throws IllegalStateException {
+	public static HTableInterface unbindResource(String key) throws IllegalStateException {
 		Object actualKey = unwrapResourceIfNecessary(key);
-		Object value = doUnbindResource(actualKey);
+		HTableInterface value = doUnbindResource(actualKey);
 		if (value == null) {
 			throw new IllegalStateException(
 					"No value for key [" + actualKey + "] bound to thread [" + Thread.currentThread().getName() + "]");
@@ -125,12 +125,12 @@ public abstract class HbaseSynchronizationManager {
 	/**
 	 * Actually remove the value of the resource that is bound for the given key.
 	 */
-	private static Object doUnbindResource(Object actualKey) {
+	private static HTableInterface doUnbindResource(Object actualKey) {
 		Map<String, HTableInterface> map = resources.get();
 		if (map == null) {
 			return null;
 		}
-		Object value = map.remove(actualKey);
+		HTableInterface value = map.remove(actualKey);
 		// Remove entire ThreadLocal if empty...
 		if (map.isEmpty()) {
 			resources.remove();

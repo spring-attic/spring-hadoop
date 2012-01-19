@@ -21,11 +21,15 @@ import java.util.Set;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.hadoop.hbase.client.HTableInterface;
 
 /**
  * @author Costin Leau
  */
 public class HbaseTableTracker implements MethodInterceptor {
+	private static final Log log = LogFactory.getLog(HbaseTableTracker.class);
 
 	private boolean exceptionConversionEnabled = true;
 
@@ -58,7 +62,12 @@ public class HbaseTableTracker implements MethodInterceptor {
 			Set<String> foundNames = new LinkedHashSet<String>(HbaseSynchronizationManager.getTableNames());
 			foundNames.removeAll(names);
 			for (String name : foundNames) {
-				HbaseSynchronizationManager.unbindResource(name);
+				HTableInterface table = HbaseSynchronizationManager.unbindResource(name);
+				try {
+					table.close();
+				} catch (IOException ex) {
+					log.warn("Cannot close table " + name, ex);
+				}
 			}
 		}
 	}

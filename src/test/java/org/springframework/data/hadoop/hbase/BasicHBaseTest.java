@@ -146,7 +146,7 @@ public class BasicHBaseTest {
 			}
 		}));
 
-		HbaseSynchronizationManager.unbindResource(tableName);
+		HbaseSynchronizationManager.unbindResource(tableName).close();
 		assertTrue(HbaseSynchronizationManager.getTableNames().isEmpty());
 	}
 }
