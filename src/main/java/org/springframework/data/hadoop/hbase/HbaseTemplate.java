@@ -81,7 +81,7 @@ public class HbaseTemplate implements InitializingBean {
 		Assert.notNull(action, "Callback object must not be null");
 		Assert.notNull(tableName, "No table specified");
 
-		HTable table = createTable(tableName);
+		HTable table = getTable(tableName);
 
 		try {
 			boolean previousFlushSetting = applyFlushSetting(table);
@@ -105,15 +105,25 @@ public class HbaseTemplate implements InitializingBean {
 		}
 	}
 
-	private HTable createTable(String tableName) {
-		try {
+	private HTable getTable(String tableName) {
+		if (HbaseSynchronizationManager.hasResource(tableName)) {
+			return (HTable) HbaseSynchronizationManager.getResource(tableName);
+		}
 
+		HTable t = null;
+		try {
 			if (tableFactory != null) {
 				HTableInterface table = tableFactory.createHTableInterface(configuration, tableName.getBytes(charset));
 				Assert.isInstanceOf(HTable.class, table, "The table factory needs to create HTable instances");
-				return (HTable) table;
+				t = (HTable) table;
 			}
-			return new HTable(configuration, tableName.getBytes(charset));
+			else {
+				t = new HTable(configuration, tableName.getBytes(charset));
+			}
+			HbaseSynchronizationManager.bindResource(tableName, t);
+
+			return t;
+
 		} catch (Exception ex) {
 			throw convertHbaseAccessException(ex);
 		}
@@ -134,7 +144,7 @@ public class HbaseTemplate implements InitializingBean {
 	}
 
 	public DataAccessException convertHbaseAccessException(Exception ex) {
-		return HBaseUtils.convertHBaseException(ex);
+		return HbaseUtils.convertHBaseException(ex);
 	}
 
 	public <T> T execute(String tableName, String family, final ResultsExtractor<T> action) {

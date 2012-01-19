@@ -20,7 +20,7 @@ import org.springframework.dao.DataAccessException;
 /**
  * @author Costin Leau
  */
-public class HBaseUtils {
+public class HbaseUtils {
 
 	public static DataAccessException convertHBaseException(Exception ex) {
 		return new HbaseSystemException(ex);
