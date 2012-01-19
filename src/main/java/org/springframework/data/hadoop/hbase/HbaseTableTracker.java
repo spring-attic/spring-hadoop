@@ -64,6 +64,6 @@ public class HbaseTableTracker implements MethodInterceptor {
 	}
 
 	private Exception convertHBaseException(Exception ex) {
-		return HbaseUtils.convertHBaseException(ex);
+		return HbaseUtils.convertHbaseException(ex);
 	}
 }

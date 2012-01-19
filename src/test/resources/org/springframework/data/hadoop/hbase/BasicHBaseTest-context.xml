@@ -20,5 +20,6 @@
 	 
 	<context:property-placeholder location="test.properties"/>
 	
+	<bean id="template" class="org.springframework.data.hadoop.hbase.HbaseTemplate" p:configuration-ref="hbase-configuration"/>
 	
 </beans>

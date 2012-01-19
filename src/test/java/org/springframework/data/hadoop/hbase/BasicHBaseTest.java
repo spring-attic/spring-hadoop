@@ -15,6 +15,8 @@
  */
 package org.springframework.data.hadoop.hbase;
 
+import javax.annotation.Resource;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HTableDescriptor;
@@ -27,7 +29,11 @@ import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.junit.Test;
-import org.springframework.context.support.GenericXmlApplicationContext;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.util.Assert;
 
 import static org.junit.Assert.*;
 
@@ -36,23 +42,28 @@ import static org.junit.Assert.*;
  * 
  * @author Costin Leau
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration
 public class BasicHBaseTest {
+
+	@Resource(name = "hbase-configuration")
+	Configuration config;
+
+	@Autowired
+	HbaseTemplate template;
+
+	String tableName = "myTable";
+	String columnName = "myColumnFamily";
+	String rowName = "myLittleRow";
+	String qualifier = "someQualifier";
+	String value = "Some Value";
+
 
 	@Test
 	public void testHiveConnection() throws Exception {
-		GenericXmlApplicationContext ctx = new GenericXmlApplicationContext(
-				"/org/springframework/data/hadoop/hbase/basic.xml");
+		Assert.notNull(config);
 
-		ctx.registerShutdownHook();
-
-		Configuration config = ctx.getBean("hbase-configuration", Configuration.class);
 		HBaseAdmin admin = new HBaseAdmin(config);
-		String tableName = "myTable";
-		String columnName = "myColumnFamily";
-		String rowName = "myLittleRow";
-		String qualifier = "someQualifier";
-		String value = "Some Value";
-
 		if (admin.tableExists(tableName)) {
 			System.out.println("deleting table...");
 			admin.disableTable(tableName);
@@ -64,9 +75,9 @@ public class BasicHBaseTest {
 		assertTrue(tableDescriptor.hasFamily(Bytes.toBytes(columnName)));
 		admin.createTable(tableDescriptor);
 
+		// block A
 		System.out.println("Created table...");
 		HTable table = new HTable(config, tableName);
-
 
 		Put p = new Put(Bytes.toBytes(rowName));
 		p.add(Bytes.toBytes(columnName), Bytes.toBytes(qualifier), Bytes.toBytes(value));
@@ -78,9 +89,10 @@ public class BasicHBaseTest {
 		byte[] val = r.getValue(Bytes.toBytes(columnName), Bytes.toBytes(qualifier));
 
 		assertEquals(value, Bytes.toString(val));
-
 		System.out.println("Doing get..");
 
+
+		// block B
 		Scan s = new Scan();
 		s.addColumn(Bytes.toBytes(columnName), Bytes.toBytes(qualifier));
 		ResultScanner scanner = table.getScanner(s);
@@ -97,7 +109,44 @@ public class BasicHBaseTest {
 			// Thats why we have it inside a try/finally clause
 			scanner.close();
 		}
+	}
 
+	@Test
+	public void testTemplate() throws Exception {
+		assertTrue(HbaseSynchronizationManager.getTableNames().isEmpty());
 
+		final HTable t = HbaseUtils.getHTable(config, tableName);
+
+		template.execute(tableName, new TableCallback<Object>() {
+			@Override
+			public Object doInTable(HTable table) throws Throwable {
+				assertSame(t, table);
+				Put p = new Put(Bytes.toBytes(rowName));
+				p.add(Bytes.toBytes(columnName), Bytes.toBytes(qualifier), Bytes.toBytes(value));
+				table.put(p);
+
+				System.out.println("Doing put..");
+				Get g = new Get(Bytes.toBytes(rowName));
+				Result r = table.get(g);
+				byte[] val = r.getValue(Bytes.toBytes(columnName), Bytes.toBytes(qualifier));
+
+				assertEquals(value, Bytes.toString(val));
+				return null;
+			}
+		});
+
+		assertFalse(HbaseSynchronizationManager.getTableNames().isEmpty());
+		assertTrue(HbaseSynchronizationManager.hasResource(tableName));
+
+		// equivalent of block B
+		System.out.println("Found rows " + template.query(tableName, columnName, qualifier, new RowMapper<String>() {
+			@Override
+			public String mapRow(Result result, int rowNum) throws Exception {
+				return result.toString();
+			}
+		}));
+
+		HbaseSynchronizationManager.unbindResource(tableName);
+		assertTrue(HbaseSynchronizationManager.getTableNames().isEmpty());
 	}
 }

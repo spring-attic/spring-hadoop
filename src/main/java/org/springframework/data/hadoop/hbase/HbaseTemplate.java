@@ -17,20 +17,16 @@ package org.springframework.data.hadoop.hbase;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.client.HTable;
-import org.apache.hadoop.hbase.client.HTableInterface;
 import org.apache.hadoop.hbase.client.HTableInterfaceFactory;
-import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.DataAccessException;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 
 /**
  * Central class for accessing the HBase API. Simplifies the use of HBase and helps to avoid common errors. 
@@ -60,7 +56,7 @@ public class HbaseTemplate implements InitializingBean {
 		Assert.notNull(configuration, "configuration is required");
 
 		// detect charset
-		charset = (StringUtils.hasText(encoding) ? Charset.forName(encoding) : Charset.forName("UTF-8"));
+		charset = HbaseUtils.getCharset(encoding);
 	}
 
 	public <T> T execute(TableCallback<T> action) {
@@ -106,27 +102,7 @@ public class HbaseTemplate implements InitializingBean {
 	}
 
 	private HTable getTable(String tableName) {
-		if (HbaseSynchronizationManager.hasResource(tableName)) {
-			return (HTable) HbaseSynchronizationManager.getResource(tableName);
-		}
-
-		HTable t = null;
-		try {
-			if (tableFactory != null) {
-				HTableInterface table = tableFactory.createHTableInterface(configuration, tableName.getBytes(charset));
-				Assert.isInstanceOf(HTable.class, table, "The table factory needs to create HTable instances");
-				t = (HTable) table;
-			}
-			else {
-				t = new HTable(configuration, tableName.getBytes(charset));
-			}
-			HbaseSynchronizationManager.bindResource(tableName, t);
-
-			return t;
-
-		} catch (Exception ex) {
-			throw convertHbaseAccessException(ex);
-		}
+		return HbaseUtils.getHTable(tableFactory, charset, configuration, tableName);
 	}
 
 	private boolean applyFlushSetting(HTable table) {
@@ -144,7 +120,7 @@ public class HbaseTemplate implements InitializingBean {
 	}
 
 	public DataAccessException convertHbaseAccessException(Exception ex) {
-		return HbaseUtils.convertHBaseException(ex);
+		return HbaseUtils.convertHbaseException(ex);
 	}
 
 	public <T> T execute(String tableName, String family, final ResultsExtractor<T> action) {
@@ -160,7 +136,6 @@ public class HbaseTemplate implements InitializingBean {
 		return execute(tableName, scan, action);
 	}
 
-
 	public <T> T execute(String tableName, final Scan scan, final ResultsExtractor<T> action) {
 		return execute(tableName, new TableCallback<T>() {
 			@Override
@@ -175,24 +150,20 @@ public class HbaseTemplate implements InitializingBean {
 		});
 	}
 
-	public <T> List<T> query(String tableName, final Scan scan, final RowMapper<T> action) {
-		return execute(tableName, new TableCallback<List<T>>() {
-			@Override
-			public List<T> doInTable(HTable htable) throws Throwable {
-				ResultScanner scanner = htable.getScanner(scan);
+	public <T> List<T> query(String tableName, String family, final RowMapper<T> action) {
+		Scan scan = new Scan();
+		scan.addFamily(family.getBytes(charset));
+		return query(tableName, scan, action);
+	}
 
-				List<T> results = new ArrayList<T>();
-				int rowNum = 0;
-				try {
-					for (Result result : scanner) {
-						results.add(action.mapRow(result, rowNum++));
-					}
-					return results;
-				} finally {
-					scanner.close();
-				}
-			}
-		});
+	public <T> List<T> query(String tableName, String family, String qualifier, final RowMapper<T> action) {
+		Scan scan = new Scan();
+		scan.addColumn(family.getBytes(charset), qualifier.getBytes(charset));
+		return query(tableName, scan, action);
+	}
+
+	public <T> List<T> query(String tableName, final Scan scan, final RowMapper<T> action) {
+		return execute(tableName, scan, new RowMapperResultsExtractor<T>(action));
 	}
 
 	/**
@@ -208,5 +179,26 @@ public class HbaseTemplate implements InitializingBean {
 	 */
 	public void setTableFactory(HTableInterfaceFactory tableFactory) {
 		this.tableFactory = tableFactory;
+	}
+
+	/**
+	 * @param encoding The encoding to set.
+	 */
+	public void setEncoding(String encoding) {
+		this.encoding = encoding;
+	}
+
+	/**
+	 * @param defaultTable The defaultTable to set.
+	 */
+	public void setDefaultTable(String defaultTable) {
+		this.defaultTable = defaultTable;
+	}
+
+	/**
+	 * @param configuration The configuration to set.
+	 */
+	public void setConfiguration(Configuration configuration) {
+		this.configuration = configuration;
 	}
 }

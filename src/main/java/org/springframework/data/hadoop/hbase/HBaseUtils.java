@@ -15,14 +15,54 @@
  */
 package org.springframework.data.hadoop.hbase;
 
+import java.nio.charset.Charset;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hbase.client.HTable;
+import org.apache.hadoop.hbase.client.HTableInterface;
+import org.apache.hadoop.hbase.client.HTableInterfaceFactory;
 import org.springframework.dao.DataAccessException;
+import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 /**
  * @author Costin Leau
  */
 public class HbaseUtils {
 
-	public static DataAccessException convertHBaseException(Exception ex) {
+	public static DataAccessException convertHbaseException(Exception ex) {
 		return new HbaseSystemException(ex);
+	}
+
+	public static HTable getHTable(Configuration configuration, String tableName) {
+		return getHTable(null, getCharset(null), configuration, tableName);
+	}
+
+	public static HTable getHTable(HTableInterfaceFactory tableFactory, Charset charset, Configuration configuration, String tableName) {
+		if (HbaseSynchronizationManager.hasResource(tableName)) {
+			return (HTable) HbaseSynchronizationManager.getResource(tableName);
+		}
+
+		HTable t = null;
+		try {
+			if (tableFactory != null) {
+				HTableInterface table = tableFactory.createHTableInterface(configuration, tableName.getBytes(charset));
+				Assert.isInstanceOf(HTable.class, table, "The table factory needs to create HTable instances");
+				t = (HTable) table;
+			}
+			else {
+				t = new HTable(configuration, tableName.getBytes(charset));
+			}
+			HbaseSynchronizationManager.bindResource(tableName, t);
+
+			return t;
+
+		} catch (Exception ex) {
+			throw convertHbaseException(ex);
+		}
+	}
+
+	static Charset getCharset(String encoding) {
+		return (StringUtils.hasText(encoding) ? Charset.forName(encoding) : Charset.forName("UTF-8"));
 	}
 }
