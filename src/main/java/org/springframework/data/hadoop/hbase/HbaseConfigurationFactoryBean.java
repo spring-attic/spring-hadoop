@@ -15,12 +15,15 @@
  */
 package org.springframework.data.hadoop.hbase;
 
+import java.util.Properties;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.client.HConnectionManager;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.data.hadoop.configuration.ConfigurationUtils;
 
 /**
  * Factory for creating HBase specific configuration. By default also cleans up any connection associated with the current configuration.
@@ -35,6 +38,7 @@ public class HbaseConfigurationFactoryBean implements InitializingBean, Disposab
 	private boolean stopProxy = true;
 	private Configuration config;
 	private Configuration configuration;
+	private Properties properties;
 
 	/**
 	 * Indicates whether the potential connection created by this config is destroyed at shutdown (default).
@@ -69,8 +73,16 @@ public class HbaseConfigurationFactoryBean implements InitializingBean, Disposab
 		}
 	}
 
+	/**
+	 * @param properties The properties to set.
+	 */
+	public void setProperties(Properties properties) {
+		this.properties = properties;
+	}
+
 	public void afterPropertiesSet() {
-		config = (configuration != null ? HBaseConfiguration.create(configuration) : configuration);
+		config = (configuration != null ? HBaseConfiguration.create(configuration) : HBaseConfiguration.create());
+		ConfigurationUtils.addProperties(config, properties);
 	}
 
 	public Configuration getObject() {

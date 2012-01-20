@@ -22,6 +22,8 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.data.hadoop.hive.HiveServerFactoryBean;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
+import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
 
 /**
@@ -45,6 +47,13 @@ public class HiveServerParser extends AbstractImprovedSimpleBeanDefinitionParser
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 		// parse attributes using conventions
 		super.doParse(element, parserContext, builder);
+
+		// parse properties
+		String props = DomUtils.getTextValue(element);
+
+		if (StringUtils.hasText(props)) {
+			builder.addPropertyValue("properties", props);
+		}
 
 		// parse scripts
 		Collection<BeanDefinition> scripts = PigServerParser.parseScripts(parserContext, element);

@@ -661,7 +661,7 @@ Reference to a PigServer instance. Defaults to 'hadoop-pig-server'.
 	
 	<!-- HBase -->
 	<xsd:element name="hbase-configuration">
-		<xsd:complexType>
+		<xsd:complexType mixed="true">
 			<xsd:annotation>
 			   <xsd:documentation><![CDATA[
 Defines an HBase configuration.
@@ -726,7 +726,7 @@ Bean id (default is "hive-client").
 	</xsd:element>
 	
 	<xsd:element name="hive-server">
-		<xsd:complexType>
+		<xsd:complexType mixed="true">
 			<xsd:annotation>
 			   <xsd:documentation><![CDATA[
 Defines an embedded Hive Server instance opened for access through the Thrift protocol.
@@ -738,16 +738,6 @@ Defines an embedded Hive Server instance opened for access through the Thrift pr
 		        </tool:annotation>
 		      </xsd:appinfo>
 			</xsd:annotation>
-			<xsd:sequence>
-				<xsd:element name="properties" minOccurs="0" maxOccurs="1" >
-					<xsd:annotation>
-						<xsd:documentation><![CDATA[
-Configuration properties specific to this Hive server instance. Usually added to customize the configuration specified through 'configuration-ref'.
-						]]>
-		          		</xsd:documentation>
-					</xsd:annotation>
-				</xsd:element>
-			</xsd:sequence>
 			<xsd:attribute name="id" type="xsd:ID" use="optional">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[
