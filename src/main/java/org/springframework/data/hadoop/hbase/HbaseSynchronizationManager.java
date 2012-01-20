@@ -22,10 +22,7 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.HTableInterface;
-import org.springframework.aop.scope.ScopedObject;
-import org.springframework.core.InfrastructureProxy;
 import org.springframework.core.NamedThreadLocal;
 import org.springframework.transaction.support.ResourceTransactionManager;
 import org.springframework.util.Assert;
@@ -46,15 +43,13 @@ public abstract class HbaseSynchronizationManager {
 
 
 	public static boolean hasResource(Object key) {
-		// TransactionSynchronizationUtils.unwrapResourceIfNecessary(key);
-		Object actualKey = unwrapResourceIfNecessary(key);
-		Object value = doGetResource(actualKey);
+		Object value = doGetResource(key);
 		return (value != null);
 	}
 
 
 	public static HTableInterface getResource(Object key) {
-		return doGetResource(unwrapResourceIfNecessary(key));
+		return doGetResource(key);
 	}
 
 	/**
@@ -76,7 +71,6 @@ public abstract class HbaseSynchronizationManager {
 	 * @see ResourceTransactionManager#getResourceFactory()
 	 */
 	public static void bindResource(String key, HTableInterface value) throws IllegalStateException {
-		String actualKey = unwrapResourceIfNecessary(key);
 		Assert.notNull(value, "Value must not be null");
 		Map<String, HTableInterface> map = resources.get();
 		// set ThreadLocal Map if none found
@@ -84,14 +78,14 @@ public abstract class HbaseSynchronizationManager {
 			map = new LinkedHashMap<String, HTableInterface>();
 			resources.set(map);
 		}
-		HTableInterface oldValue = map.put(actualKey, value);
+		HTableInterface oldValue = map.put(key, value);
 		if (oldValue != null) {
-			throw new IllegalStateException("Already value [" + oldValue + "] for key [" +
-					actualKey + "] bound to thread [" + Thread.currentThread().getName() + "]");
+			throw new IllegalStateException("Already value [" + oldValue + "] for key [" + key
+					+ "] bound to thread [" + Thread.currentThread().getName() + "]");
 		}
 		if (logger.isTraceEnabled()) {
-			logger.trace("Bound value [" + value + "] for key [" + actualKey + "] to thread [" +
-					Thread.currentThread().getName() + "]");
+			logger.trace("Bound value [" + value + "] for key [" + key + "] to thread ["
+					+ Thread.currentThread().getName() + "]");
 		}
 	}
 
@@ -103,11 +97,10 @@ public abstract class HbaseSynchronizationManager {
 	 * @see ResourceTransactionManager#getResourceFactory()
 	 */
 	public static HTableInterface unbindResource(String key) throws IllegalStateException {
-		Object actualKey = unwrapResourceIfNecessary(key);
-		HTableInterface value = doUnbindResource(actualKey);
+		HTableInterface value = doUnbindResource(key);
 		if (value == null) {
-			throw new IllegalStateException(
-					"No value for key [" + actualKey + "] bound to thread [" + Thread.currentThread().getName() + "]");
+			throw new IllegalStateException("No value for key [" + key + "] bound to thread ["
+					+ Thread.currentThread().getName() + "]");
 		}
 		return value;
 	}
@@ -118,8 +111,7 @@ public abstract class HbaseSynchronizationManager {
 	 * @return the previously bound value, or <code>null</code> if none bound
 	 */
 	public static Object unbindResourceIfPossible(Object key) {
-		Object actualKey = unwrapResourceIfNecessary(key);
-		return doUnbindResource(actualKey);
+		return doUnbindResource(key);
 	}
 
 	/**
@@ -137,52 +129,18 @@ public abstract class HbaseSynchronizationManager {
 		}
 
 		if (value != null && logger.isTraceEnabled()) {
-			logger.trace("Removed value [" + value + "] for key [" + actualKey + "] from thread [" +
-					Thread.currentThread().getName() + "]");
+			logger.trace("Removed value [" + value + "] for key [" + actualKey + "] from thread ["
+					+ Thread.currentThread().getName() + "]");
 		}
 		return value;
 	}
-	
+
 
 	public static Set<String> getTableNames() {
-		return Collections.unmodifiableSet(resources.get().keySet());
-	}
-
-	/**
-	 * Unwrap the given resource handle if necessary; otherwise return
-	 * the given handle as-is.
-	 * @see org.springframework.core.InfrastructureProxy#getWrappedObject()
-	 */
-	static <T> T unwrapResourceIfNecessary(Object resource) {
-		Assert.notNull(resource, "Resource must not be null");
-		Object resourceRef = resource;
-		// unwrap infrastructure proxy
-		if (resourceRef instanceof InfrastructureProxy) {
-			resourceRef = ((InfrastructureProxy) resourceRef).getWrappedObject();
+		Map<String, HTableInterface> map = resources.get();
+		if (map != null && !map.isEmpty()) {
+			return Collections.unmodifiableSet(map.keySet());
 		}
-		if (aopAvailable) {
-			// now unwrap scoped proxy
-			resourceRef = ScopedProxyUnwrapper.unwrapIfNecessary(resourceRef);
-		}
-		return (T) resourceRef;
-	}
-
-	/**
-	 * Inner class to avoid hard-coded dependency on AOP module.
-	 */
-	private static class ScopedProxyUnwrapper {
-
-		public static Object unwrapIfNecessary(Object resource) {
-			if (resource instanceof ScopedObject) {
-				return ((ScopedObject) resource).getTargetObject();
-			}
-			else {
-				return resource;
-			}
-		}
-	}
-
-	public static HTable getResource(String tableName) {
-		throw new UnsupportedOperationException();
+		return Collections.emptySet();
 	}
 }

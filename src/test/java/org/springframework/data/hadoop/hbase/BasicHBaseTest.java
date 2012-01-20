@@ -60,7 +60,7 @@ public class BasicHBaseTest {
 
 
 	@Test
-	public void testHiveConnection() throws Exception {
+	public void testHBaseConnection() throws Exception {
 		Assert.notNull(config);
 
 		HBaseAdmin admin = new HBaseAdmin(config);
