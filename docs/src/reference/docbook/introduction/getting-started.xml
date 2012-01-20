@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xml:id="getting-started"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:ns6="http://www.w3.org/1999/xlink"
+         xmlns:ns5="http://www.w3.org/1998/Math/MathML"
+         xmlns:ns4="http://www.w3.org/1999/xhtml"
+         xmlns:ns3="http://www.w3.org/2000/svg"
+         xmlns:ns="http://docbook.org/ns/docbook">
+  <title>Getting Started</title>
+
+  <para>This chaper covers tips on how to get a Hadoop cluster up and running
+  and If you don't yet have a Hadoop installation, you should at least create
+  a single-node cluster to get started. </para>
+
+  <para>For Hadoop 0.20.x, the <link
+  ns6:href="http://hadoop.apache.org/common/docs/r0.20.2/quickstart.html">Quick
+  Start</link> from the official documentation for Hadoop 0.20.x is a good
+  general guide. If you are running on Ubuntu, the tutorial from Michael G.
+  Noll, "<link
+  ns6:href="http://www.michael-noll.com/tutorials/running-hadoop-on-ubuntu-linux-single-node-cluster/">Running
+  Hadoop On Ubuntu Linux (Single-Node Cluster)</link>" provides more details.
+  </para>
+
+  <para>It is also convenience to download a Virtual Machine where Hadoop is
+  setup and ready to go. Cloudera provides virtual machines of various formats
+  <link
+  ns6:href="https://ccp.cloudera.com/display/SUPPORT/Cloudera%27s+Hadoop+Demo+VM">here</link>.</para>
+</chapter>
