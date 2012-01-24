@@ -113,7 +113,7 @@
    	 
    	 <para>For scenarios where the defaults need to be tweaked, one can pass in additional configuration files:</para>
    	 
-   	 <programlisting language="xml"><![CDATA[<hdp:configuration resources="classpath:/custom-site.xml, classpath:/hq-site.xml"]]></programlisting>
+   	 <programlisting language="xml"><![CDATA[<hdp:configuration resources="classpath:/custom-site.xml, classpath:/hq-site.xml">]]></programlisting>
    	 
    	 <para>In this example, two additional Hadoop configuration resources are added to the configuration.</para>
    	 
@@ -135,8 +135,8 @@
         http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
         
      <hdp:configuration>
-        <entry key="fs.default.name" value="hdfs://localhost:9000"/>
-        <entry key="hadoop.tmp.dir" value="/tmp/hadoop"/>
+        fs.default.name=hdfs://localhost:9000
+        hadoop.tmp.dir=/tmp/hadoop
      </hdp:configuration>
 </beans>]]></programlisting>
 
@@ -153,8 +153,8 @@
         http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
         
      <hdp:configuration>
-        <entry key="fs.default.name" value="${hd.fs}"/>
-        <entry key="hadoop.tmp.dir" value="file://${java.io.tmpdir}"/>
+        fs.default.name=${hd.fs}
+        hadoop.tmp.dir=file://${java.io.tmpdir}
      </hdp:configuration>
      
      <context:property-placeholder location="classpath:hadoop.properties" />     
@@ -162,23 +162,23 @@
      
      <para>
      Through Spring's property placeholder <ulink url="http://static.springsource.org/spring/docs/3.0.x/reference/beans.html#beans-factory-placeholderconfigurer">support</ulink>, <ulink url="http://static.springsource.org/spring/docs/3.0.x/reference/expressions.html">SpEL</ulink> and the <ulink url="http://blog.springsource.com/2011/06/09/spring-framework-3-1-m2-released/">environment 
-     abstraction</ulink> one can externalize environment specific properties from the main code base easing the deployment across multiple machines. In the example above, the default file system is
+     abstraction</ulink> (available in Spring 3.1). one can externalize environment specific properties from the main code base easing the deployment across multiple machines. In the example above, the default file system is
      replaced based on the properties available in <literal>hadoop.properties</literal> while the temp dir is determined dynamically through <literal>SpEL</literal>. Both approaches offer a lot
      of flexbility in adapting to the running environment - in fact we use this approach extensivly in the Spring Hadoop test suite to cope with the differences between the different development boxes
      and the CI server.</para>
      
      <para><anchor id="hadoop:config:inherit"/>It is possible to create configuration based on existing ones - this allows one to create dedicated configurations, slightly different from the main ones, usable for certain jobs 
-     (such as streaming - more about that below). Simply use the <literal>configuration-ref</literal> attribute to refer to the <emphasis>parent</emphasis> configuration - all its properties will be inherited and
+     (such as streaming - more on that <link linkend="hadoop:job:streaming">below</link>). Simply use the <literal>configuration-ref</literal> attribute to refer to the <emphasis>parent</emphasis> configuration - all its properties will be inherited and
      overridden as specified by the child:</para>
 
     <programlisting language="xml"><![CDATA[<!-- default name is 'hadoop-configuration' -->
 <hdp:configuration>
-    <entry key="fs.default.name" value="${hd.fs}"/>
-    <entry key="hadoop.tmp.dir" value="file://${java.io.tmpdir}"/>
+    fs.default.name=${hd.fs}
+    hadoop.tmp.dir=file://${java.io.tmpdir}
 </hdp:configuration>
      
 <hdp:configuration id="custom" configuration-ref="hadoop-configuration">
-    <entry key="fs.default.name" value="${custom.hd.fs}"/>
+    fs.default.name=${custom.hd.fs}
 </hdp:configuration>     
 
 ...
@@ -191,6 +191,9 @@
      <literal>hdfs</literal> mean.</para>
      <note><para>Since only one URL handler can be registered per VM, at most once, this option is turned off by default. Due to the reasons mentioned before, once enabled if it fails, it will log the error but will not
      throw an exception. If your <literal>hdfs</literal> URLs stop working, make sure to investigate this aspect.</para></note>
+     
+     <para>Last but not least a reminder that one can mix and match all these options to her preference. In general, consider externalizing configuration since it allows easier updates without interfering with the 
+     application configuration. When dealing with multiple, similar configuration use configuration <emphasis>composition</emphasis> as it tends to keep the definitions concise, in sync and easy to update.</para>
    </section>
    
    <section id="hadoop:job">
@@ -210,7 +213,8 @@
    	 <literal>value</literal> attributes.
    	 There are plenty of options available not shown in the example (for simplicity) such as the sort or group comparator, the combiner, the partitioner, the codecs to use or the input/output format just to name a few - 
    	 they are supported, just take a look at the SHDP schema (<xref linkend="appendix-schema"/>) or simply trigger auto-completion (usually <literal>ALT+SPACE</literal>) in your IDE; if it supports XML namespaces and is properly configured it will display the
-   	 available elements.</para>
+   	 available elements. Additionally one can extend the default Hadoop configuration object and add any special properties not available in the namespace or its backing bean 
+   	 (<classname>org.springframework.data.hadoop.mapreduce.JobFactoryBean</classname>).</para>
    	 
    	 <note>
    	 	<para>The job definition can validate the existance of the input and output paths before submitting the actual job (which is slow), to prevent its failure. Take a look at <emphasis>validate-paths</emphasis> attribute
@@ -220,18 +224,57 @@
 	 <section id="hadoop:job:streaming">
 	 	<title>Creating a Hadoop Streaming Job</title>
 	 	
-	 	<para>Hadoop <ulink url="http://hadoop.apache.org/common/docs/current/streaming.html">Streaming</ulink> jobs (or in short streaming), are a popular feature of Hadoop as they allow the creation of Map/Reduce jobs
+	 	<para>Hadoop <ulink url="http://hadoop.apache.org/common/docs/current/streaming.html">Streaming</ulink> job (or in short streaming), is a popular feature of Hadoop as they allow the creation of Map/Reduce jobs
 	 	with any executable or script (the equivalent of using the previous counting words example is to use <ulink url="http://en.wikipedia.org/wiki/Cat_%28Unix%29"><literal>cat</literal></ulink> and 
 	 	<ulink url="http://en.wikipedia.org/wiki/Wc_%28Unix%29"><literal>wc</literal></ulink> commands).
-	 	While it is rather easy to start up Streaming from the command line, doing so programatically, such as from a Java environment, can be challenging due to the various number of parameters (and their ordering) 
+	 	While it is rather easy to start up streaming from the command line, doing so programatically, such as from a Java environment, can be challenging due to the various number of parameters (and their ordering) 
 	 	that need to be parsed. SHDP simplifies such as tasks - it's as easy and straight-forward as declaring a <literal>job</literal> from the previous section; in fact most of the attributes will be the same:</para>
 	 	
    	 <programlisting language="xml"><![CDATA[<hdp:streaming id="streaming" 
   input-path="/input/" output-path="/ouput/"
   mapper="${path.cat}" reducer="${path.wc}"/>]]></programlisting>
 	 	
-	 	<para>If certain properties need to be specified (typically the <literal>-D</literal> or <literal>-cmdenv</literal> arguments), consider creating a dedicated configuration object as documented 
-	 	<link linkend="hadoop:config:inherit">above</link> and using that for the streaming job.</para>
+	 	<para>Existing users might be wondering how can they pass the command line arguments (such as <literal>-D</literal> or <literal>-cmdenv</literal>). These former customize the Hadoop configuration 
+	 	(which has been convered in the previous <link linkend="hadoop:config">section</link>) while the latter are supported through the <literal>cmd-env</literal> element:</para>
+	 	
+   	 <programlisting language="xml"><![CDATA[<hdp:streaming id="streaming-env" 
+  input-path="/input/" output-path="/ouput/"
+  mapper="${path.cat}" reducer="${path.wc}">
+  	<hdp:cmd-env>
+  		EXAMPLE_DIR=/home/example/dictionaries/
+  		...
+  	</hdp:cmd-env>
+  </hdp:streaming>]]></programlisting>	 	
 	 </section>   	 
+   </section>
+   
+   <section id="hadoop:distributed-cache">
+   	 <title>Configurating the Hadoop <literal>DistributedCache</literal></title>
+   	 
+   	 <para><ulink url="http://hadoop.apache.org/common/docs/stable/mapred_tutorial.html#DistributedCache">DistributedCache</ulink> is a Hadoop facility for distributing application-specific, large, read-only files (
+   	 text, archives, jars and so on) efficiently. Applications specify the files to be cached via urls (<literal>hdfs://</literal>) using <literal>DistributedCache</literal> and the framework will copy the necessary
+   	 files to the slave nodes before any tasks for the job are executed on that node. Its efficiency stems from the fact that the files are only copied once per job and the ability to cache archives which are 
+   	 un-archived on the slaves.
+   	 Note that <literal>DistributedCache</literal> assumes that the files to be cached (and specified via hdfs:// urls) are already present on the Hadoop <literal>FileSystem</literal>.</para>
+   	 
+   	 <para>SHDP provides first-class configuration for the distributed cache through its <literal>cache</literal> element (backed by <classname>org.springframework.data.hadoop.fs.DistributedCacheFactoryBean</classname> class), 
+   	 allowing files and archives to be easily distributed across nodes:</para>
+   	 
+  	 <programlisting language="xml"><![CDATA[<hdp:cache create-symlink="true">
+		<hdp:classpath value="/cp/some-library.jar#library.jar" />
+		<hdp:cache value="/cache/some-archive.tgz#main-archive" />
+		<hdp:cache value="/cache/some-resource.res" />
+		<hdp:local value="some-file.txt" />
+	</hdp:cache>]]></programlisting>
+	
+	<para>The definition above registers several resources with the cache (adding them to the job cache or classpath) and creates symlinks for them. As described in the <literal>DistributedCache</literal>
+	<ulink url="http://hadoop.apache.org/common/docs/stable/mapred_tutorial.html#DistributedCache">documentation</ulink>, the declaration format is (<literal>absolute-path#link-name</literal>). 
+	The link name is determined by the URI fragment (the text following the # such as <emphasis>#library.jar</emphasis> or <emphasis>#main-archive</emphasis> above) - if no name is specified, 
+	the cache bean will infer one based on the resource file name. Note that one does not have to specify the <literal>hdfs://node:port</literal> prefix as these are automatically determined based on the 
+	configuration wired into the bean; this prevents environment settings from being hard-coded into the configuration which becomes portable.  
+	Additionally based on the resource extension, the definition differentiates between archives (<literal>.tgz</literal>, <literal>.tar.gz</literal>, <literal>.zip</literal> and <literal>.tar</literal>) which will be uncompressed, and regular
+	files that are copied as-is. As with the rest of the namespace declarations, the definition above relies on defaults - since it requires a Hadoop <literal>Configuration</literal> and <literal>FileSystem</literal>
+	objects and none are specified (through <literal>configuration-ref</literal> and <literal>file-system-ref</literal>) it falls back to the default naming and is wired with the bean named 
+	<emphasis>hadoop-configuration</emphasis>, creating the <literal>FileSystem</literal> automatically.</para>
    </section>
 </chapter>
