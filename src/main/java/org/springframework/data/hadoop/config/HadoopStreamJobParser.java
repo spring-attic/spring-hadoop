@@ -15,7 +15,11 @@
  */
 package org.springframework.data.hadoop.config;
 
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.data.hadoop.mapreduce.StreamJobFactoryBean;
+import org.springframework.util.StringUtils;
+import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
 
 /**
@@ -28,5 +32,18 @@ class HadoopStreamJobParser extends AbstractImprovedSimpleBeanDefinitionParser {
 	@Override
 	protected Class<?> getBeanClass(Element element) {
 		return StreamJobFactoryBean.class;
+	}
+
+	@Override
+	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
+		// parse attributes using conventions
+		super.doParse(element, parserContext, builder);
+
+		// parse properties
+		String props = DomUtils.getChildElementValueByTagName(element, "cmd-env");
+
+		if (StringUtils.hasText(props)) {
+			builder.addPropertyValue("cmdEnv", props);
+		}
 	}
 }

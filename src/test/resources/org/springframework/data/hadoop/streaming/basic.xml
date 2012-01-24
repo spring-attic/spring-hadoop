@@ -23,9 +23,11 @@
 		
 	<hdp:streaming id="ns-stream-job"
 		configuration-ref="hadoop-configuration"
-		input-path="test"
-		output-path="output"
-		mapper="${path.cat}"
-		reducer="${path.wc}" />
+		input-path="test" output-path="output"
+        mapper="${path.cat}" reducer="${path.wc}">
+        <hdp:cmd-env>
+        	EXAMPLE_DIR=/home/example/dictionaries/
+        </hdp:cmd-env>
+    </hdp:streaming>
 		
 </beans>

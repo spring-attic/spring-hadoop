@@ -331,6 +331,14 @@ Defines a Hadoop Streaming Job.
 	      </xsd:appinfo>
 		</xsd:annotation>
 		<xsd:complexType>
+		
+		<xsd:sequence>
+			<xsd:element name="cmd-env" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+				<xsd:documentation><![CDATA[Environment variables (-cmdenv)]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
 		<xsd:attribute name="id" type="xsd:ID" use="required" />
 		<xsd:attribute name="mapper" use="required">
 		<xsd:annotation>

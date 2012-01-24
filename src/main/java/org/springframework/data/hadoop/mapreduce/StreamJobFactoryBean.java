@@ -19,21 +19,19 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Properties;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.streaming.StreamJob;
 import org.apache.hadoop.util.GenericOptionsParser;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.ReflectionUtils;
@@ -47,22 +45,16 @@ import org.springframework.util.StringUtils;
  * 
  * @author Costin Leau
  */
-// TODO: allow additional arguments to be specified command-line style
-public class StreamJobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanNameAware, ApplicationContextAware {
+public class StreamJobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanNameAware {
 
 	private Job job;
 	private String name;
-	private ApplicationContext context;
 	private String output, mapper, reducer, combiner, inputFormat, outputFormat, partitioner;
 	private Integer numReduceTasks;
 	private String[] input, file, libJar, archive;
 
 	private Configuration configuration;
-	private Map<String, String> env;
-
-	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-		this.context = applicationContext;
-	}
+	private Properties cmdEnv;
 
 	public void setBeanName(String name) {
 		this.name = name;
@@ -110,6 +102,16 @@ public class StreamJobFactoryBean implements InitializingBean, FactoryBean<Job>,
 			argsList.add(entry.getValue());
 		}
 
+		// add -cmdEnv (to the list not the map to avoid key collision)
+		if (cmdEnv != null) {
+			Enumeration<?> props = cmdEnv.propertyNames();
+			while (props.hasMoreElements()) {
+				String key = props.nextElement().toString();
+				argsList.add("-cmdenv");
+				argsList.add(key + "=" + cmdEnv.getProperty(key));
+			}
+		}
+
 		// add recurring arguments
 		addArgument(input, "-input", argsList);
 
@@ -126,14 +128,15 @@ public class StreamJobFactoryBean implements InitializingBean, FactoryBean<Job>,
 		addArgument(libJar, "-libjars", args);
 		addArgument(archive, "-archives", args);
 
-
-		// add cmd env
-		if (env != null) {
-			for (Entry<String, String> entry : env.entrySet()) {
-				args.add("-D");
-				args.add(entry.getKey() + "=" + entry.getValue());
-			}
-		}
+		//		// add -D/properties
+		//		if (properties != null) {
+		//			Enumeration<?> props = properties.propertyNames();
+		//			while (props.hasMoreElements()) {
+		//				String key = props.nextElement().toString();
+		//				args.add("-D");
+		//				args.add(key + "=" + properties.getProperty(key));
+		//			}
+		//		}
 
 		// populate config object
 		try {
@@ -269,10 +272,10 @@ public class StreamJobFactoryBean implements InitializingBean, FactoryBean<Job>,
 	/**
 	 * Sets the environment for the commands to be executed.
 	 * 
-	 * @param env The env to set.
+	 * @param cmdEnv The environment command/property to set.
 	 */
-	public void setEnv(Map<String, String> env) {
-		this.env = env;
+	public void setCmdEnv(Properties cmdEnv) {
+		this.cmdEnv = cmdEnv;
 	}
 
 	/**
