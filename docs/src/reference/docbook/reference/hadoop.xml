@@ -240,11 +240,11 @@
    	 <programlisting language="xml"><![CDATA[<hdp:streaming id="streaming-env" 
   input-path="/input/" output-path="/ouput/"
   mapper="${path.cat}" reducer="${path.wc}">
-  	<hdp:cmd-env>
-  		EXAMPLE_DIR=/home/example/dictionaries/
-  		...
-  	</hdp:cmd-env>
-  </hdp:streaming>]]></programlisting>	 	
+  <hdp:cmd-env>
+     EXAMPLE_DIR=/home/example/dictionaries/
+     ...
+  </hdp:cmd-env>
+</hdp:streaming>]]></programlisting>	 	
 	 </section>   	 
    </section>
    
@@ -261,11 +261,11 @@
    	 allowing files and archives to be easily distributed across nodes:</para>
    	 
   	 <programlisting language="xml"><![CDATA[<hdp:cache create-symlink="true">
-		<hdp:classpath value="/cp/some-library.jar#library.jar" />
-		<hdp:cache value="/cache/some-archive.tgz#main-archive" />
-		<hdp:cache value="/cache/some-resource.res" />
-		<hdp:local value="some-file.txt" />
-	</hdp:cache>]]></programlisting>
+  <hdp:classpath value="/cp/some-library.jar#library.jar" />
+  <hdp:cache value="/cache/some-archive.tgz#main-archive" />
+  <hdp:cache value="/cache/some-resource.res" />
+  <hdp:local value="some-file.txt" />
+</hdp:cache>]]></programlisting>
 	
 	<para>The definition above registers several resources with the cache (adding them to the job cache or classpath) and creates symlinks for them. As described in the <literal>DistributedCache</literal>
 	<ulink url="http://hadoop.apache.org/common/docs/stable/mapred_tutorial.html#DistributedCache">documentation</ulink>, the declaration format is (<literal>absolute-path#link-name</literal>). 
