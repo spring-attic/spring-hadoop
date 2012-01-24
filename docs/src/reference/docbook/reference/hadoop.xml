@@ -26,14 +26,15 @@
  		</areaspec>
  		<programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:hdp="http://www.springframework.org/schema/hadoop"
-	xsi:schemaLocation="
-        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-        http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
-	<bean id ... >
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xmlns:hdp="http://www.springframework.org/schema/hadoop"
+   xsi:schemaLocation="
+    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
 	
-    <hdp:configuration ...>
+   <bean id ... >
+	
+   <hdp:configuration ...>
 		
 </beans>]]></programlisting>
  		<calloutlist>
@@ -66,11 +67,11 @@
  		</areaspec>
  		<programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <beans:beans xmlns="http://www.springframework.org/schema/hadoop"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:beans="http://www.springframework.org/schema/beans"
-	xsi:schemaLocation="
-	    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-	    http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/gemfire/spring-hadoop.xsd">
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xmlns:beans="http://www.springframework.org/schema/beans"
+   xsi:schemaLocation="
+    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/gemfire/spring-hadoop.xsd">
 	    
     <beans:bean id ... >
 	
@@ -214,7 +215,7 @@
    	 There are plenty of options available not shown in the example (for simplicity) such as the sort or group comparator, the combiner, the partitioner, the codecs to use or the input/output format just to name a few - 
    	 they are supported, just take a look at the SHDP schema (<xref linkend="appendix-schema"/>) or simply trigger auto-completion (usually <literal>ALT+SPACE</literal>) in your IDE; if it supports XML namespaces and is properly configured it will display the
    	 available elements. Additionally one can extend the default Hadoop configuration object and add any special properties not available in the namespace or its backing bean 
-   	 (<classname>org.springframework.data.hadoop.mapreduce.JobFactoryBean</classname>).</para>
+   	 (<classname>JobFactoryBean</classname>).</para>
    	 
    	 <note>
    	 	<para>The job definition can validate the existance of the input and output paths before submitting the actual job (which is slow), to prevent its failure. Take a look at <emphasis>validate-paths</emphasis> attribute
@@ -257,7 +258,7 @@
    	 un-archived on the slaves.
    	 Note that <literal>DistributedCache</literal> assumes that the files to be cached (and specified via hdfs:// urls) are already present on the Hadoop <literal>FileSystem</literal>.</para>
    	 
-   	 <para>SHDP provides first-class configuration for the distributed cache through its <literal>cache</literal> element (backed by <classname>org.springframework.data.hadoop.fs.DistributedCacheFactoryBean</classname> class), 
+   	 <para>SHDP provides first-class configuration for the distributed cache through its <literal>cache</literal> element (backed by <classname>DistributedCacheFactoryBean</classname> class), 
    	 allowing files and archives to be easily distributed across nodes:</para>
    	 
   	 <programlisting language="xml"><![CDATA[<hdp:cache create-symlink="true">
