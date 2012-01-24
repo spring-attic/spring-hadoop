@@ -2,10 +2,10 @@
       <title>Requirements</title>
 
       <para>Spring Hadoop requires JDK level 6.0 (just like Hadoop) and above, Spring 
-      <ulink url="http://www.springsource.org/about">Framework</ulink> 3.0 and above and 
+      <ulink url="http://www.springsource.org/about">Framework</ulink> 3.0 (3.1 recommended) and above and 
       <ulink url="http://www.gemstone.com/products/gemfire">Hadoop</ulink> 0.20.2 (0.205.0 recommended) and above.
       Regarding Hadoop-related projects, SDHP requires <ulink url="http://hbase.apache.org/">HBase</ulink> 0.90.x, 
-      <ulink url="http://hive.apache.org/">Hive</ulink> 0.7.x and <ulink url="http://pig.apache.org/">Pig</ulink> 0.9.x or above.
+      <ulink url="http://hive.apache.org/">Hive</ulink> 0.7.x and <ulink url="http://pig.apache.org/">Pig</ulink> 0.9.x and above.
       As a rule of thumb, when using Hadoop-related projects, such as Hive or Pig, use the required Hadoop version as a basis for discovering the 
       supported versions.
       </para>
