@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.springframework.samples.batch</groupId>
+	<artifactId>spring-batch-simple</artifactId>
+	<version>2.0.0.CI-SNAPSHOT</version>
+	<packaging>jar</packaging>
+	<name>Command Line Spring Batch Module</name>
+	<url>http://www.springframework.org/spring-batch/archetypes/simple-cli-archetype</url>
+	<description>
+		<![CDATA[
+      This project is a minimal command line batch sample from Spring Batch.  
+    ]]>
+	</description>
+	<properties>
+		<maven.test.failure.ignore>true</maven.test.failure.ignore>
+		<spring.framework.version>3.0.6.RELEASE</spring.framework.version>
+		<spring.batch.version>2.1.7.RELEASE</spring.batch.version>
+	</properties>
+	<profiles>
+		<profile>
+			<id>strict</id>
+			<properties>
+				<maven.test.failure.ignore>false</maven.test.failure.ignore>
+			</properties>
+		</profile>
+		<profile>
+			<id>tiger</id>
+			<activation>
+				<jdk>1.5</jdk>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>javax.xml.stream</groupId>
+					<artifactId>com.springsource.javax.xml.stream</artifactId>
+					<version>1.0.1</version>
+				</dependency>
+			</dependencies>
+		</profile>	 
+	</profiles>
+
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.7</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<version>${spring.framework.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jdbc</artifactId>
+			<version>${spring.framework.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>${spring.framework.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>cglib</groupId>
+			<artifactId>cglib-nodep</artifactId>
+			<version>2.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-aop</artifactId>
+			<version>${spring.framework.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.batch</groupId>
+			<artifactId>spring-batch-core</artifactId>
+			<version>${spring.batch.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.batch</groupId>
+			<artifactId>spring-batch-infrastructure</artifactId>
+			<version>${spring.batch.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-dbcp</groupId>
+			<artifactId>commons-dbcp</artifactId>
+			<version>1.2.2</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>1.4</version>
+		</dependency>
+		<dependency>
+			<groupId>hsqldb</groupId>
+			<artifactId>hsqldb</artifactId>
+			<version>1.8.0.7</version>
+		</dependency>
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjrt</artifactId>
+			<version>1.6.8</version>
+		</dependency>
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjweaver</artifactId>
+			<version>1.6.8</version>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.14</version>
+		</dependency>
+		
+		<dependency>
+		 <groupId>org.springframework.data</groupId>
+		 <artifactId>spring-data-hadoop</artifactId>
+		 <version>1.0.0.BUILD-SNAPSHOT</version>
+		</dependency> 	
+		
+		<dependency>
+			<groupId>org.apache.hadoop</groupId>
+			<artifactId>hadoop-examples</artifactId>
+			<version>0.20.205.0</version>
+		</dependency>	
+	</dependencies>
+
+	<build>
+		 
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.5</source>
+					<target>1.5</target>
+				</configuration>
+			</plugin>
+			 
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.1</version>
+				<configuration>
+					<mainClass>org.springframework.batch.core.launch.support.CommandLineJobRunner</mainClass>
+					<arguments>
+						<!-- job configuration file -->
+						<argument>classpath:/launch-context.xml</argument>
+						<!-- job name -->
+						<argument>job1</argument>
+					</arguments>
+				</configuration>
+			</plugin>
+		 
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<index>true</index>
+						<manifest>
+							<mainClass>org.springframework.batch.core.launch.support.CommandLineJobRunner</mainClass>
+							<addClasspath>true</addClasspath>
+							<classpathPrefix>lib/</classpathPrefix>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<repositories>
+		<repository>
+		 <id>spring-snapshot</id>
+		 <name>Spring Maven SNAPSHOT Repository</name>
+		 <url>http://s3.amazonaws.com/maven.springframework.org/snapshot</url>
+		</repository>	
+		<repository>
+		 <id>sonatype-snapshot</id>
+		 <name>SonaType SNAPSHOT Repository</name>
+		 <url>http://oss.sonatype.org/content/repositories/snapshots</url>
+		</repository>
+		<repository>
+		 <!-- For Hive 0.8 -->
+		 <id>data-nucleus</id>
+		 <name>Data Nucleus Repository</name>
+		 <url>http://www.datanucleus.org/downloads/maven2/</url>
+		</repository>	
+		<repository>
+	     <!-- For Hive 0.7 -->
+		 <id>ext-snapshots</id>
+		 <name>External Dependency Repository - Managed by SpringSource for those not in any other public repository</name>
+		 <url>http://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo-ext/</url>
+		</repository>				
+	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>Codehaus</id>
+			<url>http://repository.codehaus.org/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
+ 
+</project>

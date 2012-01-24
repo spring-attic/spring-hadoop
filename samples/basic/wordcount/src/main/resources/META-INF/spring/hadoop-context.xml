@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:hdp="http://www.springframework.org/schema/hadoop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
+
+
+	<!--  automatically picks the hadoop-configuration reference -->
+	<hdp:resource-loader />		 
+	
+	<!--  default id is 'hadoop-configuration' -->
+	<hdp:configuration register-url-handler="false">
+		fs.default.name=${hd.fs}
+	</hdp:configuration>
+
+	
+</beans>

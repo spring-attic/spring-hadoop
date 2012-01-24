@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:hdp="http://www.springframework.org/schema/hadoop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
+		http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop-1.0.xsd">
+
+	<batch:job id="job1">
+		<batch:step id="step1">
+			<batch:tasklet ref="hadoop-tasklet" />
+		</batch:step>
+	</batch:job>
+
+	<hdp:tasklet id="hadoop-tasklet" job-ref="mr-job"
+		wait-for-job="true" />
+
+	<hdp:job id="mr-job" input-path="/ide-test/input/word/"
+		output-path="/ide-test/output/word/" 
+		mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
+		reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"
+		configuration-ref="hadoop-configuration" validate-paths="false" />
+
+</beans>
