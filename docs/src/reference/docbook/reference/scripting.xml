@@ -6,9 +6,166 @@
     <para>A common task in Hadoop is interacting with its file system, whether for provisioning, adding new files to be processed, parsing results, or performing cleanup. Hadoop offers several ways to achieve that:
     one can use its Java API (namely <ulink url="http://hadoop.apache.org/common/docs/stable/api/index.html?org/apache/hadoop/fs/FileSystem.html"><literal>FileSystem</literal></ulink>) or 
     use the <literal>hadoop</literal> command line, in particular the file system <ulink url="http://hadoop.apache.org/common/docs/stable/file_system_shell.html">shell</ulink>. However there is no middle ground,
-    one either has to use the (somewhat verbose, full of checked exceptions) API or fall back to the command line, outside the application. SHDP addresses this issue by bridging the two worlds, exposing both the FileSystem
-    and the fs shell through an intuitive, easy-to-use Java API. Add your favorite <ulink url="http://en.wikipedia.org/wiki/List_of_JVM_languages">JVM scripting</ulink> language right inside your Spring Hadoop 
-    application and you have a powerful combination.</para>
+    one either has to use the (somewhat verbose, full of checked exceptions) API or fall back to the command line, outside the application. SHDP addresses this issue by bridging the two worlds, exposing both the 
+    <literal>FileSystem</literal> and the fs shell through an intuitive, easy-to-use Java API. Add your favorite <ulink url="http://en.wikipedia.org/wiki/List_of_JVM_languages">JVM scripting</ulink> language right 
+    inside your Spring Hadoop application and you have a powerful combination.</para>
     
-    <section></section>
+    <section id="scripting:api">
+    	<title>Scripting the Hadoop API</title>
+    
+    	<para>Since Hadoop is written in Java, accessing its APIs in a <emphasis>native</emphasis> way provides maximum control and flexibility over the interaction with Hadoop. This holds true for working with
+    	its files system; in fact all the other tools that one might use are built upon these. The main entry point is the <classname>org.apache.hadoop.fs.FileSystem</classname> abstract class which provides the
+    	foundation of most (if not all) of the actual file system implementations out there. Whether one is using a local, remote or distributed store through the <classname>FileSystem</classname> API she
+    	can query and manipulate the available resources or create new ones. To do so however, one needs to write Java code, compile the classes and configure them which is somewhat cumbersome especially when
+    	performing simple, straight-forward operations (like copy a file or delete a directory).</para>
+    	
+    	<para>JVM scripting languages (such as Groovy, JRuby, Jython or Rhino to name just a few) provide a nice solution to the Java language; they run on the JVM, can interact with the Java code with no or few
+    	changes or restrictions and have a nicer, simpler, less <emphasis>ceremonial</emphasis> syntax; that is, there is no need to define a class or a method - simply write the code that you want to execute and you are done.
+    	SHDP combines the two, taking care of the configuration and the infrastructure so one can interact with the Hadoop environment from her language of choice</para>
+    	
+    	<para>Let us take a look of a JavaScript example using <ulink url="http://www.mozilla.org/rhino/">Rhino</ulink> (which is part of JDK 6 or higher, meaning one does not need any extra libraries):</para>
+
+		<programlisting language="xml"><![CDATA[<beans xmlns="http://www.springframework.org/schema/beans" ...		
+		
+		<hdp:configuration .../>
+		
+		<hdp:script id="inlined-js" language="javascript">
+importPackage(java.util);
+
+name = UUID.randomUUID().toString()
+scriptName = "src/test/resources/test.properties"
+]]>// <emphasis role="strong">fs</emphasis> - FileSystem instance based on 'hadoop-configuration' bean
+// call FileSystem#copyFromLocal(Path, Path)  
+<emphasis role="strong">fs</emphasis>.copyFromLocalFile(scriptName, name)
+// return the file length 
+<emphasis role="strong">fs</emphasis>.getLength(name)<![CDATA[
+	</hdp:script>
+	 
+</beans>]]></programlisting>
+
+		<para>The <literal>script</literal> element, part of the SHDP namespace, builds on top of the scripting support in Spring permitting script declarations to be evaluated and declared as normal bean definitions. Further
+		more it automatically exposes Hadoop-specific objects, based on the existing configuration, to the script such as the <literal>FileSystem</literal> (more on that in the next section). As one can see, the script
+		is fairly obvious: it generates a random name (using the <classname>UUID</classname> class from <literal>java.util</literal> package) and the copies a local file into HDFS under the random name. The last line returns
+		the length of the copied file which becomes the value of the declaring bean (in this case <literal>inlined-js</literal>) - note that this might vary based on the scripting engine used.</para>
+		
+		<note>The attentive reader might have noticed that the arguments passed to the <literal>FileSystem</literal> object are not of type <literal>Path</literal> but rather <literal>String</literal>. To avoid
+		the creation of <literal>Path</literal> object, SHDP uses a wrapper class (<literal>SimplerFileSystem</literal>) which automatically does the conversion so you don't have to. For more information see the 
+		<link linkend="scripting:vars">implicit variables</link> section.</note>
+		<para>Note that for inlined scripts, one can use Spring's property placeholder configurer to automatically expand variables at runtime. Using one of the examples before:</para>
+		
+		<programlisting language="xml"><![CDATA[<beans ...>
+    <context:property-placeholder location="classpath:hadoop.properties" />
+   
+    <hdp:script language="javascript">
+...
+tracker=]]><emphasis role="strong">${hd.fs}</emphasis><![CDATA[
+...
+    </hdp:script>
+</beans>]]></programlisting>
+
+		<para>Notice how the script above relies on the property placeholder to expand <literal>${hd.fs}</literal> with the values from <literal>hadoop.properties</literal> file available in the classpath.</para>
+		
+		<section id="scripting:api:scripts">
+			<title>Using scripts</title>
+			
+			<para>Inlined scripting is quite handy for doing simple operations and couple with the property expansion is quite a powerful tool that can handle a variety of use cases. However when more logic is required
+or the script is affected by XML formatting, encoding or syntax restrictions (such as Jython/Python for which white-spaces are important) one should consider externalization. That is rather then declaring the script
+directly inside the XML, one can declare it in its own file. And speaking of Python, consider the variation of the previous example:</para>
+
+			<programlisting language="xml"><![CDATA[<hdp:script location="org/company/basic-script.py"/>]]></programlisting>
+			
+			<para>The definition does not bring any surprises but do notice there is no need to specify the language (as in the case of a inlined declaration) 
+			since script extension (<literal>py</literal>) already provides that information. Just for completeness, the <literal>basic-script.py</literal> looks as follows:</para>
+			
+			<programlisting language="python"><![CDATA[from java.util import UUID
+from org.apache.hadoop.fs import Path
+
+print "Home dir is " + str(fs.homeDirectory)
+print "Work dir is " + str(fs.workingDirectory)
+print "/user exists " + str(fs.exists("/user"))
+
+name = UUID.randomUUID().toString()
+scriptName = "src/test/resources/test.properties"
+fs.copyFromLocalFile(scriptName, name)
+print Path(name).makeQualified(fs)]]></programlisting>
+
+		</section>
+	</section>
+	
+	<section id="scripting:vars">
+		<title>Scripting implicit variables</title>
+		
+		<para>To ease the interaction of the script with its enclosing context, SHDP binds by default the so-called <emphasis>implicit</emphasis> variables. These are:</para>
+		<table id="scripting:vars:tbl" pgwide="1" align="center">
+			<title>Implicit variables</title>
+		
+			<tgroup cols="4">
+    		 <colspec colname="c1" colwidth="1*"/>
+    		 <colspec colname="c2" colwidth="1*"/>
+    		 <colspec colname="c3" colwidth="4*"/>
+          	 <spanspec spanname="description" namest="c2" nameend="c3" align="center"/>
+          		
+          	  <thead>
+          	   <row>
+          	     <entry>Name</entry>
+          	     <entry>Type</entry>
+          	     <entry align="center">Description</entry>
+          	   </row>
+          	  </thead>
+          	  
+          	  <tbody>
+          	    <row>
+          	      <entry>cfg</entry>
+          	      <entry><literal>org.apache.hadoop.conf.Configuration</literal></entry>
+          	      <entry>Hadoop Configuration (relies on <emphasis>hadoop-configuration</emphasis> bean or singleton type match)</entry>
+          	    </row>
+          	    <row>
+          	      <entry>cl</entry>
+          	      <entry><literal>java.lang.ClassLoader</literal></entry>
+          	      <entry>>ClassLoader used for executing the script</entry>
+          	    </row>
+          	    <row>
+          	      <entry>ctx</entry>
+          	      <entry><literal>org.springframework.context.ApplicationContext</literal></entry>
+          	      <entry>Enclosing application context</entry>
+          	    </row>
+          	    <row>
+          	      <entry>ctxRL</entry>
+          	      <entry><literal>org.springframework.io.support.ResourcePatternResolver</literal></entry>
+          	      <entry>Enclosing application context ResourceLoader</entry>
+          	    </row>
+          	    <row>
+          	      <entry>distcp</entry>
+          	      <entry><literal>org.springframework.data.hadoop.fs.DistributedCopyUtil</literal></entry>
+          	      <entry>Programmatic access to DistCp</entry>
+          	    </row>
+          	    <row>
+          	      <entry>fs</entry>
+          	      <entry><literal>org.apache.hadoop.fs.FileSystem</literal></entry>
+          	      <entry>Hadoop File System (relies on 'hadoop-fs' bean or singleton type match, falls back to creating one based on 'cfg')</entry>
+          	    </row>
+          	    <row>
+          	      <entry>fsh</entry>
+          	      <entry><literal>org.springframework.data.hadoop.fs.FsShell</literal></entry>
+          	      <entry>File System shell, exposing hadoop 'fs' commands as an API</entry>
+          	    </row>
+          	    <row>
+          	      <entry>hdfsRL</entry>
+          	      <entry><literal>org.springframework.data.hadoop.io.HdfsResourceLoader</literal></entry>
+          	      <entry>Hdfs resource loader (relies on 'hadoop-resource-loader' or singleton type match, falls back to creating one automatically based on 'cfg')</entry>
+          	    </row>
+          	  </tbody>
+          	</tgroup>  
+		</table>
+		
+		<para>As mentioned in the <emphasis>Description</emphasis> column, the variables are first looked (either by name or by type) in the application context and, in case they are missing, created on the spot based on
+		the existing configuration. Note that it is possible to override or add new variables to the scripts through the <literal>property</literal> sub-element that can set values or references to other beans:</para>
+		
+		<programlisting language="xml"><![CDATA[<hdp:script location="org/company/basic-script.js>
+   <hdp:property name="foo" value="bar"/>
+   <hdp:property name="ref" ref="some-bean"/>
+</hdp:script>]]></programlisting>
+	
+    </section>
+    
 </chapter>
