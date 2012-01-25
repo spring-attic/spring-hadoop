@@ -26,20 +26,19 @@
     	<para>Let us take a look of a JavaScript example using <ulink url="http://www.mozilla.org/rhino/">Rhino</ulink> (which is part of JDK 6 or higher, meaning one does not need any extra libraries):</para>
 
 		<programlisting language="xml"><![CDATA[<beans xmlns="http://www.springframework.org/schema/beans" ...		
+  <hdp:configuration .../>
 		
-		<hdp:configuration .../>
-		
-		<hdp:script id="inlined-js" language="javascript">
-importPackage(java.util);
+  <hdp:script id="inlined-js" language="javascript">
+    importPackage(java.util);
 
-name = UUID.randomUUID().toString()
-scriptName = "src/test/resources/test.properties"
-]]>// <emphasis role="strong">fs</emphasis> - FileSystem instance based on 'hadoop-configuration' bean
-// call FileSystem#copyFromLocal(Path, Path)  
-<emphasis role="strong">fs</emphasis>.copyFromLocalFile(scriptName, name)
-// return the file length 
-<emphasis role="strong">fs</emphasis>.getLength(name)<![CDATA[
-	</hdp:script>
+    name = UUID.randomUUID().toString()
+    scriptName = "src/test/resources/test.properties"
+    ]]>// <emphasis role="strong">fs</emphasis> - FileSystem instance based on 'hadoop-configuration' bean
+    // call FileSystem#copyFromLocal(Path, Path)  
+    <emphasis role="strong">fs</emphasis>.copyFromLocalFile(scriptName, name)
+    // return the file length 
+    <emphasis role="strong">fs</emphasis>.getLength(name)<![CDATA[
+  </hdp:script>
 	 
 </beans>]]></programlisting>
 
@@ -54,13 +53,13 @@ scriptName = "src/test/resources/test.properties"
 		<para>Note that for inlined scripts, one can use Spring's property placeholder configurer to automatically expand variables at runtime. Using one of the examples before:</para>
 		
 		<programlisting language="xml"><![CDATA[<beans ...>
-    <context:property-placeholder location="classpath:hadoop.properties" />
+  <context:property-placeholder location="classpath:hadoop.properties" />
    
-    <hdp:script language="javascript">
-...
-tracker=]]><emphasis role="strong">${hd.fs}</emphasis><![CDATA[
-...
-    </hdp:script>
+  <hdp:script language="javascript">
+    ...
+    tracker=]]><emphasis role="strong">${hd.fs}</emphasis><![CDATA[
+    ...
+  </hdp:script>
 </beans>]]></programlisting>
 
 		<para>Notice how the script above relies on the property placeholder to expand <literal>${hd.fs}</literal> with the values from <literal>hadoop.properties</literal> file available in the classpath.</para>
@@ -99,7 +98,7 @@ print Path(name).makeQualified(fs)]]></programlisting>
 		<table id="scripting:vars:tbl" pgwide="1" align="center">
 			<title>Implicit variables</title>
 		
-			<tgroup cols="4">
+			<tgroup cols="3">
     		 <colspec colname="c1" colwidth="1*"/>
     		 <colspec colname="c2" colwidth="1*"/>
     		 <colspec colname="c3" colwidth="4*"/>
@@ -161,7 +160,7 @@ print Path(name).makeQualified(fs)]]></programlisting>
 		<para>As mentioned in the <emphasis>Description</emphasis> column, the variables are first looked (either by name or by type) in the application context and, in case they are missing, created on the spot based on
 		the existing configuration. Note that it is possible to override or add new variables to the scripts through the <literal>property</literal> sub-element that can set values or references to other beans:</para>
 		
-		<programlisting language="xml"><![CDATA[<hdp:script location="org/company/basic-script.js>
+		<programlisting language="xml"><![CDATA[<hdp:script location="org/company/basic-script.js">
    <hdp:property name="foo" value="bar"/>
    <hdp:property name="ref" ref="some-bean"/>
 </hdp:script>]]></programlisting>
