@@ -842,7 +842,7 @@ Property to pass to the script. Can be used to enhance or override the default p
 			<xsd:attribute name="id" type="xsd:ID" use="optional">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[
-Bean id (populated by default with the script filename if no value is given).
+Bean id (if no value is given, a name will be generated).
 				]]>
          		</xsd:documentation>
 			</xsd:annotation>

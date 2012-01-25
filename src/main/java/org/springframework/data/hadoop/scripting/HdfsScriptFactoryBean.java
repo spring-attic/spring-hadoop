@@ -45,14 +45,14 @@ import org.springframework.util.Assert;
  *    <td>Name</td><td>Type</td><td>Description</td>
  *  </tr>
  *  </th>
- *  <tr><td>cfg</td><td> org.apache.hadoop.conf.Configuration</td><td>Hadoop Configuration (relies on 'hadoop-configuration' bean or singleton type match)</td></tr>
- * 	<tr><td>fs</td><td>org.apache.hadoop.fs.FileSystem</td><td>Hadoop File System (relies on 'hadoop-fs' bean or singleton type match, falls back to creating one based on 'cfg')</td></tr>
- *  <tr><td>fsh</td><td>org.springframework.data.hadoop.fs.FsShell</td><td>File System shell, exposing hadoop 'fs' commands as an API</td></tr>
- *  <tr><td>distcp</td><td>org.springframework.data.hadoop.fs.DistributedCopyUtil</td><td>programmatic access to DistCp</td></tr>
- *  <tr><td>hdfsRL</td><td>org.springframework.data.hadoop.io.HdfsResourceLoader</td><td>HdfsResourceLoader (relies on 'hadoop-resource-loader' or singleton type match, falls back to creating one automatically based on 'cfg')</td></tr>
+ *  <tr><td>cfg</td><td>org.apache.hadoop.conf.Configuration</td><td>Hadoop Configuration (relies on 'hadoop-configuration' bean or singleton type match)</td></tr>
+ *  <tr><td>cl</td><td>java.lang.ClassLoader</td><td>ClassLoader used for executing this script</td></tr>
  *  <tr><td>ctx</td><td>org.springframework.context.ApplicationContext</td><td>Enclosing application context</td></tr>
  *  <tr><td>ctxRL</td><td>org.springframework.io.support.ResourcePatternResolver</td><td>Enclosing application context ResourceLoader (same as ctx)</td></tr>
- *  <tr><td>cl</td><td>java.lang.ClassLoader</td><td>ClassLoader used for executing this script</td></tr>
+ *  <tr><td>distcp</td><td>org.springframework.data.hadoop.fs.DistributedCopyUtil</td><td>programmatic access to DistCp</td></tr>
+ * 	<tr><td>fs</td><td>org.apache.hadoop.fs.FileSystem</td><td>Hadoop File System (relies on 'hadoop-fs' bean or singleton type match, falls back to creating one based on 'cfg')</td></tr>
+ *  <tr><td>fsh</td><td>org.springframework.data.hadoop.fs.FsShell</td><td>File System shell, exposing hadoop 'fs' commands as an API</td></tr>
+ *  <tr><td>hdfsRL</td><td>org.springframework.data.hadoop.io.HdfsResourceLoader</td><td>HdfsResourceLoader (relies on 'hadoop-resource-loader' or singleton type match, falls back to creating one automatically based on 'cfg')</td></tr>
  * </table>
  * 
  * <p/>

@@ -88,7 +88,6 @@ class Jsr223ScriptEvaluatorFactoryBean implements InitializingBean, BeanClassLoa
 	 * @param arguments
 	 */
 	protected void postProcess(Map<String, Object> arguments) {
-
 	}
 
 	@Override

@@ -14,9 +14,12 @@
 	<hdp:script id="script-groovy" location="org/springframework/data/hadoop/scripting/basic-script.groovy"/>
 	
 	<hdp:script id="inlined-js" language="javascript">
+		<hdp:property name="foo" value="bar"/>
 importPackage(java.util);
 importPackage(org.apache.hadoop.fs);
 
+println("${hd.fs}")
+println(foo)
 name = UUID.randomUUID().toString()
 scriptName = "src/test/resources/test.properties"
 fs.copyFromLocalFile(scriptName, name)

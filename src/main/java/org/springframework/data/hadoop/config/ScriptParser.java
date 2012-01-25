@@ -70,7 +70,11 @@ class ScriptParser extends AbstractSimpleBeanDefinitionParser {
 				parserContext.getReaderContext().error("no 'location' or nested script specified", element);
 			}
 
-			scriptSource = new StaticScriptSource(inline, element.getAttribute("id"));
+			BeanDefinitionBuilder b = BeanDefinitionBuilder.genericBeanDefinition(StaticScriptSource.class);
+			b.addConstructorArgValue(inline);
+			b.addConstructorArgValue(element.getAttribute("id"));
+
+			scriptSource = b.getBeanDefinition();
 		}
 
 		builder.addPropertyValue("scriptSource", scriptSource);
