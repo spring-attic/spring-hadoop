@@ -90,34 +90,21 @@ public class DistCp {
 	}
 
 	public void copy(EnumSet<Preserve> preserve, Boolean ignoreFailures, Boolean overwrite, Boolean update, Boolean delete, String... uris) {
-		DistCp.copy(configuration, preserve, ignoreFailures, Boolean.FALSE, null, null, overwrite, update,
-				delete, null, null, null, uris);
+		copy(preserve, ignoreFailures, Boolean.FALSE, null, null, overwrite, update, delete, null, null, null, uris);
 	}
 
 	public void copy(EnumSet<Preserve> preserve, Boolean ignoreFailures, Boolean skipCrc, String logDir, Integer mappers, Boolean overwrite, Boolean update, Boolean delete, Long fileLimit, Long sizeLimit, String fileList, String... uris) {
-		DistCp.copy(configuration, preserve, ignoreFailures, skipCrc, logDir, mappers, overwrite, update,
-				delete, fileLimit, sizeLimit, fileList, uris);
-	}
-
-	public static void copy(Configuration configuration, EnumSet<Preserve> preserve, Boolean ignoreFailures, Boolean overwrite, Boolean update, Boolean delete, String... uris) {
-
-		copy(configuration, preserve, ignoreFailures, Boolean.FALSE, null, null, overwrite, update, delete, null, null,
-				null, uris);
-	}
-
-	public static void copy(Configuration configuration, EnumSet<Preserve> preserve, Boolean ignoreFailures, Boolean skipCrc, String logDir, Integer mappers, Boolean overwrite, Boolean update, Boolean delete, Long fileLimit, Long sizeLimit, String fileList, String... uris) {
-
 		Boolean r = (preserve != null && preserve.contains(Preserve.REPLICATION));
 		Boolean b = (preserve != null && preserve.contains(Preserve.BLOCKSIZE));
 		Boolean u = (preserve != null && preserve.contains(Preserve.USER));
 		Boolean g = (preserve != null && preserve.contains(Preserve.GROUP));
 		Boolean p = (preserve != null && preserve.contains(Preserve.PERMISSION));
 
-		copy(configuration, r, b, u, g, p, ignoreFailures, skipCrc, logDir, mappers, overwrite, update, delete,
-				fileLimit, sizeLimit, fileList, uris);
+		copy(r, b, u, g, p, ignoreFailures, skipCrc, logDir, mappers, overwrite, update, delete, fileLimit, sizeLimit,
+				fileList, uris);
 	}
 
-	public static void copy(Configuration configuration, Boolean preserveReplication, Boolean preserveBlockSize, Boolean preserveUser, Boolean preserveGroup, Boolean preservePermission, Boolean ignoreFailures, Boolean skipCrc, String logDir, Integer mappers, Boolean overwrite, Boolean update, Boolean delete, Long fileLimit, Long sizeLimit, String fileList, String... uris) {
+	public void copy(Boolean preserveReplication, Boolean preserveBlockSize, Boolean preserveUser, Boolean preserveGroup, Boolean preservePermission, Boolean ignoreFailures, Boolean skipCrc, String logDir, Integer mappers, Boolean overwrite, Boolean update, Boolean delete, Long fileLimit, Long sizeLimit, String fileList, String... uris) {
 
 		List<String> args = new ArrayList<String>();
 
@@ -146,11 +133,15 @@ public class DistCp {
 			args.add("-log " + logDir);
 		}
 
-		copy(configuration, args.toArray(new String[args.size()]));
+		copy(args.toArray(new String[args.size()]));
 	}
 
-	public void copy(String... arguments) {
-		DistCp.copy(configuration, arguments);
+	public void copy(String arg1, String arg2) {
+		copy(new String[] { arg1, arg2 });
+	}
+
+	public void copy(String arg1, String arg2, String arg3) {
+		copy(new String[] { arg1, arg2, arg3 });
 	}
 
 	/**
@@ -159,7 +150,7 @@ public class DistCp {
 	 * @param configuration configuration to use
 	 * @param arguments copy arguments
 	 */
-	public static void copy(Configuration configuration, String... arguments) {
+	public void copy(String... arguments) {
 		Assert.notEmpty(arguments, "invalid number of arguments");
 		// sanitize the arguments
 		List<String> parsedArguments = new ArrayList<String>();

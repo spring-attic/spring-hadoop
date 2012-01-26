@@ -64,7 +64,7 @@ public class DistCpTest {
 		System.out.println(srcA);
 		System.out.println(dstA);
 
-		DistCp.copy(cfg, srcA, dstA);
+		new DistCp(cfg).copy(srcA, dstA);
 	}
 
 	@Test
@@ -80,6 +80,6 @@ public class DistCpTest {
 		String src2A = loader.getResource(src2).getURI().toString();
 		String dstA = loader.getResource(dir + "dst/").getURI().toString();
 
-		DistCp.copy(cfg, src1A, src2A, dstA);
+		new DistCp(cfg).copy(src1A, src2A, dstA);
 	}
 }
