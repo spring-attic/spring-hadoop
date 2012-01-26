@@ -881,10 +881,10 @@ only once for the duration of the application.
          		</xsd:restriction>
          	</xsd:simpleType>
 			</xsd:attribute>
-			<xsd:attribute name="run-at-startup" type="xsd:boolean" default="true">
+			<xsd:attribute name="run-at-startup" type="xsd:boolean" default="false">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[
-Whether the script is evaluated automatically once the application context initializes (default) or only when in use.
+Whether the script is evaluated automatically once the application context initializes or only when in use (the default).
 				]]>
          		</xsd:documentation>
          	</xsd:annotation>
