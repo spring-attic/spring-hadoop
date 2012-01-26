@@ -12,6 +12,14 @@
     
     <section id="scripting:api">
     	<title>Scripting the Hadoop API</title>
+    	
+    	<sidebar>
+    	  <title>Supported scripting languages</title>
+    	  
+    	  <para>SHDP scripting supports any <ulink url="http://www.jcp.org/en/jsr/detail?id=223">JSR-223</ulink> (also known as <literal>javax.scripting</literal>) compliant scripting engine. Simply add the 
+    	  engine jar to the classpath and the application should be able to find it. Most languages (such as Groovy or JRuby) provide JSR-233 support out of the box; for those that do not see the 
+    	  <ulink url="http://java.net/projects/scripting">scripting</ulink> project that provides various adapters.</para>
+    	</sidebar>
     
     	<para>Since Hadoop is written in Java, accessing its APIs in a <emphasis>native</emphasis> way provides maximum control and flexibility over the interaction with Hadoop. This holds true for working with
     	its files system; in fact all the other tools that one might use are built upon these. The main entry point is the <classname>org.apache.hadoop.fs.FileSystem</classname> abstract class which provides the
@@ -19,11 +27,12 @@
     	can query and manipulate the available resources or create new ones. To do so however, one needs to write Java code, compile the classes and configure them which is somewhat cumbersome especially when
     	performing simple, straight-forward operations (like copy a file or delete a directory).</para>
     	
-    	<para>JVM scripting languages (such as Groovy, JRuby, Jython or Rhino to name just a few) provide a nice solution to the Java language; they run on the JVM, can interact with the Java code with no or few
+    	<para>JVM scripting languages (such as <ulink url="http://groovy.codehaus.org/">Groovy</ulink>, <ulink url="http://jruby.org/">JRuby</ulink>, <ulink url="http://www.jython.org/">Jython</ulink> or 
+    	<ulink url="http://www.mozilla.org/rhino/">Rhino</ulink> to name just a few) provide a nice solution to the Java language; they run on the JVM, can interact with the Java code with no or few
     	changes or restrictions and have a nicer, simpler, less <emphasis>ceremonial</emphasis> syntax; that is, there is no need to define a class or a method - simply write the code that you want to execute and you are done.
     	SHDP combines the two, taking care of the configuration and the infrastructure so one can interact with the Hadoop environment from her language of choice</para>
     	
-    	<para>Let us take a look of a JavaScript example using <ulink url="http://www.mozilla.org/rhino/">Rhino</ulink> (which is part of JDK 6 or higher, meaning one does not need any extra libraries):</para>
+    	<para>Let us take a look of a JavaScript example using Rhino (which is part of JDK 6 or higher, meaning one does not need any extra libraries):</para>
 
 		<programlisting language="xml"><![CDATA[<beans xmlns="http://www.springframework.org/schema/beans" ...		
   <hdp:configuration .../>
@@ -121,7 +130,7 @@ print Path(name).makeQualified(fs)]]></programlisting>
           	    <row>
           	      <entry>cl</entry>
           	      <entry><literal>java.lang.ClassLoader</literal></entry>
-          	      <entry>>ClassLoader used for executing the script</entry>
+          	      <entry>ClassLoader used for executing the script</entry>
           	    </row>
           	    <row>
           	      <entry>ctx</entry>
@@ -165,6 +174,84 @@ print Path(name).makeQualified(fs)]]></programlisting>
    <hdp:property name="ref" ref="some-bean"/>
 </hdp:script>]]></programlisting>
 	
+    </section>
+    
+    <section id="scripting:fssh">
+    	<title>File System Shell (FsShell)</title>
+    	
+    	<para>A handy utility provided by the Hadoop distribution is the file system <ulink url="http://hadoop.apache.org/common/docs/stable/file_system_shell.html">shell</ulink> which allows UNIX-like commands to be
+    	executed against HDFS. One can check for the existance of files, delete, move, copy directories or files or setting up permissions. However the utility is only available from the command-line which makes it hard
+    	to use it from/inside a Java application. To address this problem, SHDP provides a lightweight, fully embeddable shell, called <literal>FsShell</literal> which mimics most of the commands available from the command line:
+    	rather then dealing with the <literal>System.in</literal> or <literal>System.out</literal>, one deals with objects.</para>
+    	
+    	<para>Let us take a look of using <literal>FsShell</literal> by building on the previous scripting examples:</para>
+    	
+    	<programlisting language="xml"><![CDATA[<hdp:script location="org/company/basic-script.groovy"/>]]></programlisting>
+    	
+		<programlisting language="java" linenumbering="numbered"><![CDATA[name = UUID.randomUUID().toString()
+scriptName = "src/test/resources/test.properties"
+fs.copyFromLocalFile(scriptName, name)
+
+// use the shell (made available under variable ]]><emphasis role="strong">fsh</emphasis> 
+dir = "script-dir"
+if (!fsh.test(dir)) {
+   fsh.mkdir(dir); fsh.cp(name, dir); fsh.chmodr(700, dir)
+   println "File content is " + fsh.cat(dir + name).toString()
+}
+println fsh.ls(dir).toString()
+fsh.rmr(dir)
+</programlisting>
+
+		<para>As mentioned in the previous section, a <literal>FsShell</literal> instance is automatically created and for configured for scripts, under the name <emphasis>fsh</emphasis>. 
+		Notice how the entire block relies on the usual	commands: <literal>test</literal>, <literal>mkdir</literal>, <literal>cp</literal> and so on. 
+		Their semantics are exactly the same as in the command-line version however one has access to a native Java API that returns
+		actual objects (rather then <literal>String</literal>s) making it easy to use them programmatically whether in Java or another language. Further more, the class offers enhanced methods (such as <literal>chmodr</literal>
+		which stands for <emphasis>recursive</emphasis> <literal>chmod</literal>) and multiple overloaded methods taking advantage of <ulink url="http://docs.oracle.com/javase/1.5.0/docs/guide/language/varargs.html">varargs</ulink> 
+		so that multiple parameters can be specified. Consult the <ulink url="http://static.springsource.org/spring-hadoop/docs/current/api/index.html?org/springframework/data/hadoop/fs/FsShell.html">API</ulink> for more information.
+		</para>
+		
+		<para>To be as close as possible to the command-line shell, <literal>FsShell</literal> mimics even the messages being displayed. Take a look at line 9 which prints the result of <literal>fsh.cat()</literal>. The
+		method returns a <literal>Collection</literal> of Hadoop <literal>Path</literal> objects (which one can use programatically). However when invoking <literal>toString</literal> on the collection, the same printout as from
+		the command-line shell is being displayed:</para>
+		
+		<programlisting><![CDATA[File content is ]]><emphasis>some text</emphasis></programlisting>
+		
+		<para>The same goes for the rest of the methods, such as <literal>ls</literal>. The same script in JRuby would look something like this:</para>
+
+		<programlisting language="ruby" linenumbering="numbered"><![CDATA[require 'java'
+name = java.util.UUID.randomUUID().to_s
+scriptName = "src/test/resources/test.properties"
+$fs.copyFromLocalFile(scriptName, name)
+
+# use the shell
+dir = "script-dir/"
+...
+print $fsh.ls(dir).to_s]]></programlisting>
+
+		<para>which prints out something like this:</para>
+		
+		<programlisting><![CDATA[drwx------   - user     supergroup          0 2012-01-26 14:08 /user/user/script-dir
+-rw-r--r--   3 user     supergroup        344 2012-01-26 14:08 /user/user/script-dir/520cf2f6-a0b6-427e-a232-2d5426c2bc4e]]></programlisting>
+
+		<para>As you can see, not only you can reuse the existing tools and commands with Hadoop inside SHDP, but you can also code against them in various scripting languages. And as you might have noticed, there is no
+		special configuration required - this is automatically inferred from the enclosing application context.</para>
+		
+		<note>The careful reader might have noticed that besides the syntax, there are some minor differences in how the various langauges interact with the java objects. For example the automatic <literal>toString</literal>
+		call called in Java for doing automatic <literal>String</literal> conversion is not necessarily supported (hence the <literal>to_s</literal> in Ruby or <literal>str</literal> in Python). This is to be expected
+		as each language has its own semantics - for the most part these are easy to pick up but do pay attention to details.</note>
+
+
+		<section id="scripting:fssh:distcp">
+			<title>DistCp API</title>
+			
+			<para>Similar to the <literal>FsShell</literal>, SHDP provides a lightweight, fully embeddable <ulink url="http://hadoop.apache.org/common/docs/stable/distcp.html"><literal>DistCp</literal></ulink> version 
+			that builds on top of the <literal>distcp</literal> from the Hadoop distro.	The semantics are configuration options are the same however, one can use it from within an Java application without having to use 
+			the command-line. See the <ulink url="http://static.springsource.org/spring-hadoop/docs/current/api/index.html?org/springframework/data/hadoop/fs/DistCp.html">API</ulink> for more information:</para>
+			
+			<programlisting language="xml"><![CDATA[<hdp:script language="groovy">distcp.copy(${distcp.src}, ${distcp.dst})</hdp:script>]]></programlisting>
+			
+			<para>The bean above triggers a distributed copy relying again on Spring's property placeholder variable expansion for its source and destination.</para>
+		</section>
     </section>
     
 </chapter>
