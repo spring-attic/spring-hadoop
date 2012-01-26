@@ -5,17 +5,39 @@
 	
 	<para>When working with <ulink url="http://hive.apache.org"/> from a Java environment, one can choose between the <ulink url="http://thrift.apache.org/">Thrift</ulink> client or using the Hive JDBC-like
 	<ulink url="http://hive.apache.org/docs/r0.7.1/api/org/apache/hadoop/hive/jdbc/package-summary.html">driver</ulink>. Both have their pros and cons but no matter the choice, Spring and SHDP supports both of them.</para>
+
+	<section id="hive:server">
+	    <title>Starting a Hive Server</title>
+	    
+	    <para>SHDP provides a dedicated namespace element for starting a Hive server as a Thrift service (only when using Hive 0.8 or higher). Simply specify the host, the port 
+	    (the defaults are <literal>localhost</literal> and <literal>10000</literal> respectively) and you're good to go:</para>
+	    
+	    <programlisting language="xml"><![CDATA[<!-- by default, the definition name is 'hive-server' -->
+<hdp:hive-server host="some-other-host" port="10001" />]]></programlisting>
+		
+		<para>If needed the Hadoop configuration can be passed in or additional properties specified inline:</para>
+
+	    <programlisting language="xml"><![CDATA[<hdp:hive-server host="some-other-host" port="10001" configuration-ref="hadoop-configuration">
+  someproperty=somevalue
+  hive.exec.scratchdir=/tmp/mydir
+</hdp:hive-server>]]></programlisting>
+		
+		<para>The Hive server is bound to the enclosing application context life-cycle, that is it will automatically startup and shutdown along-side the application context.</para>
+	</section>
 	
 	<section id="hive:thrift">
 	    <title>Using Hive Thrift Client</title>
 	    
-	    <para>SHDP provides a dedicated namespace element for configuring a Hive client (that is Hive accessing a server node through the Thrift). Simply specify the host, the port 
-	    (the defaults are <literal>localhost</literal> and <literal>10000</literal> respectively) and you're good to go:</para>
+	    <para>Similar to the server, SHDP provides a dedicated namespace element for configuring a Hive client (that is Hive accessing a server node through the Thrift). Likewise, simply specify the host, the port 
+	    (the defaults are <literal>localhost</literal> and <literal>10000</literal> respectively) and you're done:</para>
 	    
 	    <programlisting language="xml"><![CDATA[<!-- by default, the definition name is 'hive-client' -->
 <hdp:hive-client host="some-other-host" port="10001" />]]></programlisting>
+		<para>Just as well, the Hive client is bound to the enclosing application context life-cycle; it will automatically startup and shutdown along-side the application context.</para>
 		
-		<para>The Hive client is bound to the enclosing application context life-cycle, that is it will automatically startup and shutdown along-side the application context.</para>
+		<!-- See SHDP-22
+		<para>The client definition also allows Hive scripts to be executed/registered at startup - one can either specify them inline or import existing resources:</para>
+		 -->
 	</section>
 	
 	<section id="hive:jdbc">
@@ -58,4 +80,19 @@
 		or better yet, use Spring's <classname>JdbcTemplate</classname> as in the example above.</para>
 	</section>
 
+	<section id="hive:tasklet">
+		<title>Using the Hive tasklet</title>
+
+		<para>For Spring Batch environments, SHDP provides a dedicated tasklet to execute Hive queries, on demand, as part of a batch or workflow. The declaration is pretty straight forward:</para>
+		
+		<programlisting language="xml"><![CDATA[<hdp:hive-tasklet id="hive-script">
+   <hdp:script>
+   DROP TABLE IF EXITS testHiveBatchTable; 
+   CREATE TABLE testHiveBatchTable (key int, value string);
+   </hdp:script>
+   <hdp:script location="classpath:org/company/hive/script.q" />
+</hdp:hive-tasklet>]]></programlisting>
+
+		<para>The tasklet above executes two scripts - one declared as part of the bean definition followed by another located on the classpath.</para>	
+	</section>
 </chapter>
