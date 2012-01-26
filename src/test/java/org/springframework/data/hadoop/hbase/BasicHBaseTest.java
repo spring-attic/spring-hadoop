@@ -15,6 +15,8 @@
  */
 package org.springframework.data.hadoop.hbase;
 
+import javax.annotation.Resource;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HTableDescriptor;
@@ -27,7 +29,9 @@ import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.junit.Test;
-import org.springframework.context.support.GenericXmlApplicationContext;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.junit.Assert.*;
 
@@ -36,16 +40,15 @@ import static org.junit.Assert.*;
  * 
  * @author Costin Leau
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration("/org/springframework/data/hadoop/hbase/basic.xml")
 public class BasicHBaseTest {
+
+	@Resource(name = "hbase-configuration")
+	Configuration config;
 
 	@Test
 	public void testHiveConnection() throws Exception {
-		GenericXmlApplicationContext ctx = new GenericXmlApplicationContext(
-				"/org/springframework/data/hadoop/hbase/basic.xml");
-
-		ctx.registerShutdownHook();
-
-		Configuration config = ctx.getBean("hbase-configuration", Configuration.class);
 		HBaseAdmin admin = new HBaseAdmin(config);
 		String tableName = "myTable";
 		String columnName = "myColumnFamily";
@@ -97,7 +100,11 @@ public class BasicHBaseTest {
 			// Thats why we have it inside a try/finally clause
 			scanner.close();
 		}
+	}
 
-
+	@Test
+	public void testProperties() throws Exception {
+		assertEquals("bar", config.get("foo"));
+		assertEquals("there", config.get("lookup"));
 	}
 }

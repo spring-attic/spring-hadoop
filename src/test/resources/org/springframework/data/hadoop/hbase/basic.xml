@@ -16,7 +16,10 @@
 	<bean id="hbase-config" class="org.springframework.data.hadoop.hbase.HbaseConfigurationFactoryBean" p:configuration-ref="hadoop-configuration" />
 	-->
 	 
-	<hdp:hbase-configuration configuration-ref="hadoop-configuration" />
+	<hdp:hbase-configuration>
+		foo=bar
+		lookup=there
+	</hdp:hbase-configuration>
 	 
 	<context:property-placeholder location="test.properties"/>
 	
