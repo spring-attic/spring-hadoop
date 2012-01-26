@@ -138,6 +138,7 @@
      <hdp:configuration>
         fs.default.name=hdfs://localhost:9000
         hadoop.tmp.dir=/tmp/hadoop
+        electric=sea
      </hdp:configuration>
 </beans>]]></programlisting>
 
@@ -156,6 +157,7 @@
      <hdp:configuration>
         fs.default.name=${hd.fs}
         hadoop.tmp.dir=file://${java.io.tmpdir}
+        hangar=${number:18}
      </hdp:configuration>
      
      <context:property-placeholder location="classpath:hadoop.properties" />     

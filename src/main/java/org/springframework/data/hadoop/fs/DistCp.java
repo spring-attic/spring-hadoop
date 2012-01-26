@@ -36,7 +36,7 @@ import org.springframework.util.StringUtils;
 /**
  * Exposes the Hadoop command-line <a href="http://hadoop.apache.org/common/docs/current/distcp.html">distcp</a> as an embeddable API.
  * Due to the number of options available in DistCp, one can either specify them in a command-like style (through one or multiple {@link String}s)
- * through {@link #copy(Configuration, String...)} or specify individual arguments through the rest of the methods. 
+ * through {@link #copy(String...)} or specify individual arguments through the rest of the methods. 
  * 
  * @author Costin Leau
  */
@@ -147,7 +147,6 @@ public class DistCp {
 	/**
 	 * DistCopy using a command-line style (arguments are specified as {@link String}s).
 	 * 
-	 * @param configuration configuration to use
 	 * @param arguments copy arguments
 	 */
 	public void copy(String... arguments) {
