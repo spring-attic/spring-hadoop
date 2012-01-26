@@ -13,6 +13,8 @@
 	<hdp:script id="script-rb" location="org/springframework/data/hadoop/scripting/basic-script.rb"/>
 	<hdp:script id="script-groovy" location="org/springframework/data/hadoop/scripting/basic-script.groovy"/>
 	
+	<hdp:script id="distcp" language="javascript">distcp.copy("${distcp.src}", "${distcp.dst}")</hdp:script>
+	
 	<hdp:script id="inlined-js" language="javascript">
 		<hdp:property name="foo" value="bar"/>
 importPackage(java.util);

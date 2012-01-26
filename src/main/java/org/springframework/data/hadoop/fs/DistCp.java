@@ -25,7 +25,6 @@ import java.util.List;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.ipc.RemoteException;
-import org.apache.hadoop.tools.DistCp;
 import org.apache.hadoop.tools.DistCp.DuplicationException;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
@@ -41,19 +40,14 @@ import org.springframework.util.StringUtils;
  * 
  * @author Costin Leau
  */
-public class DistributedCopyUtil {
+public class DistCp {
 
-	private DistributedCopyUtil() {
+	private final Configuration configuration;
+
+	public DistCp(Configuration configuration) {
+		Assert.notNull(configuration, "configuration required");
+		this.configuration = configuration;
 	};
-
-	/**
-	 * Returns an instance to this class (used mainly for accessibility from a scripting environment).
-	 * 
-	 * @return an instance to this class.
-	 */
-	public static DistributedCopyUtil getInstance() {
-		return new DistributedCopyUtil();
-	}
 
 	public enum Preserve {
 		REPLICATION, BLOCKSIZE, USER, GROUP, PERMISSION;
@@ -93,6 +87,16 @@ public class DistributedCopyUtil {
 
 			return sb.toString();
 		}
+	}
+
+	public void copy(EnumSet<Preserve> preserve, Boolean ignoreFailures, Boolean overwrite, Boolean update, Boolean delete, String... uris) {
+		DistCp.copy(configuration, preserve, ignoreFailures, Boolean.FALSE, null, null, overwrite, update,
+				delete, null, null, null, uris);
+	}
+
+	public void copy(EnumSet<Preserve> preserve, Boolean ignoreFailures, Boolean skipCrc, String logDir, Integer mappers, Boolean overwrite, Boolean update, Boolean delete, Long fileLimit, Long sizeLimit, String fileList, String... uris) {
+		DistCp.copy(configuration, preserve, ignoreFailures, skipCrc, logDir, mappers, overwrite, update,
+				delete, fileLimit, sizeLimit, fileList, uris);
 	}
 
 	public static void copy(Configuration configuration, EnumSet<Preserve> preserve, Boolean ignoreFailures, Boolean overwrite, Boolean update, Boolean delete, String... uris) {
@@ -145,6 +149,10 @@ public class DistributedCopyUtil {
 		copy(configuration, args.toArray(new String[args.size()]));
 	}
 
+	public void copy(String... arguments) {
+		DistCp.copy(configuration, arguments);
+	}
+
 	/**
 	 * DistCopy using a command-line style (arguments are specified as {@link String}s).
 	 * 
@@ -164,10 +172,10 @@ public class DistributedCopyUtil {
 
 	private static void invokeCopy(Configuration config, String[] parsedArgs) {
 		try {
-			Class<DistCp> cl = DistCp.class;
+			Class<org.apache.hadoop.tools.DistCp> cl = org.apache.hadoop.tools.DistCp.class;
 			Class<?> argClass = ClassUtils.resolveClassName("org.apache.hadoop.tools.DistCp$Arguments",
 					cl.getClassLoader());
-			Method m = ReflectionUtils.findMethod(DistCp.class, "copy", Configuration.class, argClass);
+			Method m = ReflectionUtils.findMethod(cl, "copy", Configuration.class, argClass);
 			ReflectionUtils.makeAccessible(m);
 			Method v = ReflectionUtils.findMethod(argClass, "valueOf", String[].class, Configuration.class);
 			ReflectionUtils.makeAccessible(v);

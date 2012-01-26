@@ -28,6 +28,7 @@ import org.junit.runner.RunWith;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.UrlResource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
+import org.springframework.data.hadoop.TestUtils;
 import org.springframework.data.hadoop.fs.FsShell;
 import org.springframework.data.hadoop.fs.SimplerFileSystem;
 import org.springframework.scripting.ScriptSource;
@@ -45,8 +46,14 @@ import static org.junit.Assert.*;
 @ContextConfiguration
 public class ScriptingTest {
 
+	{
+		TestUtils.hackHadoopStagingOnWin();
+	}
+
 	@Resource
 	private ApplicationContext ctx;
+	@Resource
+	private Configuration config;
 
 	@Test
 	public void testRhinoScript() throws Exception {
@@ -110,5 +117,12 @@ public class ScriptingTest {
 	public void testInlinedScriptNSJavaScript() throws Exception {
 		assertTrue(ctx.containsBean("inlined-js"));
 		assertNotNull(ctx.getBean("inlined-js"));
+	}
+
+	@Test
+	public void testDistCp() throws Exception {
+		assertTrue(ctx.containsBean("distcp"));
+		System.out.println(TestUtils.writeToFS(config, "/distcp/source.txt").getURI());
+		ctx.getBean("distcp");
 	}
 }

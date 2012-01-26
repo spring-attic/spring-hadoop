@@ -26,7 +26,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.data.hadoop.fs.DistributedCopyUtil;
+import org.springframework.data.hadoop.fs.DistCp;
 import org.springframework.data.hadoop.fs.FsShell;
 import org.springframework.data.hadoop.fs.HdfsResourceLoader;
 import org.springframework.data.hadoop.fs.SimplerFileSystem;
@@ -99,8 +99,8 @@ public class HdfsScriptFactoryBean extends Jsr223ScriptEvaluatorFactoryBean impl
 
 		name = "distcp";
 
-		if (!hasBinding(args, name, DistributedCopyUtil.class)) {
-			putIfAbsent(args, name, DistributedCopyUtil.getInstance());
+		if (!hasBinding(args, name, DistCp.class)) {
+			putIfAbsent(args, name, new DistCp(cfg));
 		}
 
 		name = "fsh";
