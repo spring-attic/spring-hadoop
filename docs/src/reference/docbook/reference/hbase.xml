@@ -13,6 +13,11 @@
 	context shuts down, so will any HBase connections opened - this behavior can be adjusted through the <literal>stop-proxy</literal> and <literal>delete-connection</literal> attributes:</para>
 	
 	<programlisting language="xml"><![CDATA[<!-- delete associated connections but do not stop the proxies -->
-<hdp:hbase-configuration stop-proxy="false" delete-connection="true" />]]></programlisting>
+<hdp:hbase-configuration stop-proxy="false" delete-connection="true">
+    foo=bar
+    property=value
+</hdp:hbase-configuration>]]></programlisting>
+
+	<para>Notice that like with the other elements, one can specify additional properties specific to this configuration.</para>
 	
 </chapter>
