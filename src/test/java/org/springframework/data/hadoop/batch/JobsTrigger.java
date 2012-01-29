@@ -30,7 +30,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
  * 
  * @author Costin Leau
  */
-public class TriggerJobs //implements ApplicationListener<ContextRefreshedEvent> 
+public class JobsTrigger
 {
 
 	public void onApplicationEvent(ContextRefreshedEvent event) {

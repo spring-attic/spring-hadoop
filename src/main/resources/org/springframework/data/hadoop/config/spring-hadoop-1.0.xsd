@@ -26,7 +26,7 @@ Defines a Spring Batch tasklet for Hadoop Jobs.
           </xsd:documentation>
 	      <xsd:appinfo>
 	        <tool:annotation>
-	          <tool:exports type="org.springframework.data.hadoop.batch.HadoopTasklet"/>
+	          <tool:exports type="org.springframework.data.hadoop.mapreduce.HadoopTasklet"/>
 	        </tool:annotation>
 	      </xsd:appinfo>
 		</xsd:annotation>
@@ -38,7 +38,7 @@ Defines a Spring Batch tasklet for Hadoop Jobs.
 Hadoop Job]]></xsd:documentation>
 				<xsd:appinfo>
 					<tool:annotation kind="ref">
-						<tool:expected-type type="java.lang.Object" />
+						<tool:expected-type type="org.apache.hadoop.mapreduce.Job" />
 					</tool:annotation>
 				</xsd:appinfo>
 			</xsd:annotation>
@@ -815,21 +815,8 @@ Reference to a HiveClient instance. Defaults to 'hive-client'.
 		</xsd:complexType>
 	</xsd:element>
 
-	<!-- Script -->
-	<xsd:element name="script">
-		<xsd:complexType mixed="true">
-			<xsd:annotation>
-			   <xsd:documentation><![CDATA[
-Dedicated scripting facility for interacting with Hadoop. Allows Groovy, JavaScript (Rhino), Ruby (JRuby), Python (Jython)
-or any JSR-223 scripting language to be used for executing commands against Hadoop, in particular its file system.  
-					]]>
-	          </xsd:documentation>
-		      <xsd:appinfo>
-		        <tool:annotation>
-		          <tool:exports type="java.lang.Object"/>
-		        </tool:annotation>
-		      </xsd:appinfo>
-			</xsd:annotation>
+	<!-- Script type - NOT mean to be reused outside this schema -->
+	<xsd:complexType name="scriptingType" abstract="true" mixed="true">
 			<xsd:sequence>
 				<xsd:element name="property" type="beans:propertyType"  minOccurs="0" maxOccurs="unbounded">
 					<xsd:annotation>
@@ -839,14 +826,6 @@ Property to pass to the script. Can be used to enhance or override the default p
 					</xsd:annotation>
 				</xsd:element>
 			</xsd:sequence>			
-			<xsd:attribute name="id" type="xsd:ID" use="optional">
-			<xsd:annotation>
-				<xsd:documentation><![CDATA[
-Bean id (if no value is given, a name will be generated).
-				]]>
-         		</xsd:documentation>
-			</xsd:annotation>
-			</xsd:attribute>
 			<xsd:attribute name="location" type="xsd:string">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[
@@ -881,14 +860,90 @@ only once for the duration of the application.
          		</xsd:restriction>
          	</xsd:simpleType>
 			</xsd:attribute>
-			<xsd:attribute name="run-at-startup" type="xsd:boolean" default="false">
+	</xsd:complexType>
+	
+	<xsd:element name="script">
+		<xsd:complexType mixed="true">
+			<xsd:complexContent>
+				<xsd:annotation>
+				   <xsd:documentation><![CDATA[
+Dedicated scripting facility for interacting with Hadoop. Allows Groovy, JavaScript (Rhino), Ruby (JRuby), Python (Jython)
+or any JSR-223 scripting language to be used for executing commands against Hadoop, in particular its file system.  
+					]]>
+		          </xsd:documentation>
+			      <xsd:appinfo>
+			        <tool:annotation>
+			          <tool:exports type="java.lang.Object"/>
+			        </tool:annotation>
+			      </xsd:appinfo>
+				</xsd:annotation>
+				<xsd:extension base="scriptingType">
+				<xsd:attribute name="id" type="xsd:ID" use="optional">
+					<xsd:annotation>
+						<xsd:documentation><![CDATA[
+Bean id (if no value is given, a name will be generated).
+						]]>
+		         		</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+
+				<xsd:attribute name="run-at-startup" type="xsd:boolean" default="false">
+					<xsd:annotation>
+						<xsd:documentation><![CDATA[
+Whether the script is evaluated automatically once the application context initializes or only when in use (the default).
+						]]>
+		         		</xsd:documentation>
+		         	</xsd:annotation>
+		       	</xsd:attribute>
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="script-tasklet">
+		<xsd:complexType>
+			<xsd:annotation>
+			   <xsd:documentation><![CDATA[
+Defines a scripting Tasklet for interacting with Hadoop. Allows Groovy, JavaScript (Rhino), Ruby (JRuby), Python (Jython)
+or any JSR-223 scripting language to be used for executing commands against Hadoop, in particular its file system.  
+					]]>
+	          </xsd:documentation>
+		      <xsd:appinfo>
+		        <tool:annotation>
+		          <tool:exports type="java.lang.Object"/>
+		        </tool:annotation>
+		      </xsd:appinfo>
+			</xsd:annotation>
+			<xsd:sequence>
+				<xsd:element name="script" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+						<xsd:documentation><![CDATA[
+Nested script declaration.]]></xsd:documentation>
+			 	</xsd:annotation>
+			 	<xsd:complexType mixed="true">
+			 		<xsd:complexContent>
+			 			<xsd:extension base="scriptingType"/>
+			 		</xsd:complexContent>
+			 	</xsd:complexType>			
+				</xsd:element>
+			</xsd:sequence>			
+			<xsd:attribute name="id" type="xsd:ID" use="required">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[
-Whether the script is evaluated automatically once the application context initializes or only when in use (the default).
-				]]>
-         		</xsd:documentation>
-         	</xsd:annotation>
-         	</xsd:attribute>
+Bean id.]]></xsd:documentation>
+			</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="script-ref" type="xsd:string">
+				<xsd:annotation>
+						<xsd:documentation><![CDATA[
+Reference to a script declaration.]]></xsd:documentation>
+						<xsd:appinfo>
+							<tool:annotation kind="ref">
+								<tool:expected-type type="java.lang.Object" />
+							</tool:annotation>
+						</xsd:appinfo>
+			 	</xsd:annotation>			
+			</xsd:attribute>
 		</xsd:complexType>
 	</xsd:element>
 </xsd:schema>

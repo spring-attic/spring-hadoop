@@ -34,7 +34,7 @@ import org.springframework.util.StringUtils;
  * 
  * @author Costin Leau
  */
-public abstract class HiveScriptRunner {
+abstract class HiveScriptRunner {
 
 
 	/**

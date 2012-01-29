@@ -20,8 +20,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.hadoop.TestUtils;
-import org.springframework.data.hadoop.batch.HiveTasklet;
-import org.springframework.data.hadoop.batch.TriggerJobs;
+import org.springframework.data.hadoop.batch.JobsTrigger;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -41,7 +40,7 @@ public class HiveBatchTest {
 
 	@Test
 	public void testServerNamespace() throws Exception {
-		TriggerJobs tj = new TriggerJobs();
+		JobsTrigger tj = new JobsTrigger();
 		tj.startJobs(ctx);
 	}
 

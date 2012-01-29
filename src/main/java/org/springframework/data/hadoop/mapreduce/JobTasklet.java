@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.hadoop.batch;
+package org.springframework.data.hadoop.mapreduce;
 
 import org.apache.hadoop.mapreduce.Job;
 import org.springframework.batch.core.StepContribution;
@@ -30,7 +30,7 @@ import org.springframework.util.Assert;
  * 
  * @author Costin Leau
  */
-public class HadoopTasklet implements InitializingBean, Tasklet {
+public class JobTasklet implements InitializingBean, Tasklet {
 
 	private Job job;
 	private boolean waitForJob = true;

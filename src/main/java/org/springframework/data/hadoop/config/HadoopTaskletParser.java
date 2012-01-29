@@ -15,7 +15,7 @@
  */
 package org.springframework.data.hadoop.config;
 
-import org.springframework.data.hadoop.batch.HadoopTasklet;
+import org.springframework.data.hadoop.mapreduce.JobTasklet;
 import org.w3c.dom.Element;
 
 /**
@@ -27,6 +27,6 @@ class HadoopTaskletParser extends AbstractImprovedSimpleBeanDefinitionParser {
 
 	@Override
 	protected Class<?> getBeanClass(Element element) {
-		return HadoopTasklet.class;
+		return JobTasklet.class;
 	}
 }

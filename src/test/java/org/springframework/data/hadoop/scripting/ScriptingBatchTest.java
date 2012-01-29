@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.hadoop.pig;
+package org.springframework.data.hadoop.scripting;
 
-import org.apache.pig.PigServer;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.hadoop.TestUtils;
@@ -25,31 +25,33 @@ import org.springframework.data.hadoop.batch.JobsTrigger;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import static org.junit.Assert.*;
+
 /**
+ * 
  * @author Costin Leau
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("/org/springframework/data/hadoop/pig/batch.xml")
-public class PigBatchTest {
+@ContextConfiguration
+public class ScriptingBatchTest {
 
 	@Autowired
-	private PigServer pig;
-	@Autowired
 	private ApplicationContext ctx;
+
 
 	{
 		TestUtils.hackHadoopStagingOnWin();
 	}
 
 	@Test
-	public void testServerNamespace() throws Exception {
+	public void testNamespace() throws Exception {
 		JobsTrigger tj = new JobsTrigger();
 		tj.startJobs(ctx);
 	}
 
 	@Test
 	public void testTasklet() throws Exception {
-		PigTasklet pt = ctx.getBean("tasklet", PigTasklet.class);
-		pt.execute(null, null);
+		Tasklet st = ctx.getBean("tasklet", Tasklet.class);
+		assertNotNull(st);
 	}
 }

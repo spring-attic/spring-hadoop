@@ -1,0 +1,58 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:hdp="http://www.springframework.org/schema/hadoop"
+	xmlns:c="http://www.springframework.org/schema/c"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+      	http://www.springframework.org/schema/batch	http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
+      	http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
+
+	<import resource="../batch-common.xml"/>
+	<import resource="../hadoop-ctx.xml"/>
+	
+	<job id="mainJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="bean" next="ns">
+			<tasklet ref="tasklet"/>
+		</step>
+		<step id="ns" next="ns2">
+			<tasklet ref="script-tasklet"/>
+		</step>
+		<step id="ns2">
+			<tasklet ref="nested-script-tasklet"/>
+		</step>
+	</job>
+
+	<bean id="tasklet" class="org.springframework.batch.core.step.tasklet.MethodInvokingTaskletAdapter" p:target-object-ref="script" p:target-method="toString"/>
+
+	<hdp:script id="script" language="javascript">
+importPackage(java.util);
+importPackage(org.apache.hadoop.fs);
+
+println("${hd.fs}")
+name = UUID.randomUUID().toString()
+scriptName = "src/test/resources/test.properties"
+fs.copyFromLocalFile(scriptName, name)
+
+// use the shell
+dir = "script-dir/"
+if (!fsh.test(dir)) {
+   fsh.mkdir(dir); fsh.cp(name, dir); fsh.chmodr(700, dir)
+   println("File content is " + fsh.cat(dir + name))
+}
+
+println(fsh.ls(dir))
+fsh.rmr(dir)
+
+// return the file length 
+fs.getLength(name)
+	</hdp:script>
+	
+	<hdp:script-tasklet id="script-tasklet" script-ref="script"/>
+	
+	<hdp:script-tasklet id="nested-script-tasklet">
+		<hdp:script language="javascript">
+println(fsh.ls("/"))			
+		</hdp:script>
+	</hdp:script-tasklet>
+</beans>

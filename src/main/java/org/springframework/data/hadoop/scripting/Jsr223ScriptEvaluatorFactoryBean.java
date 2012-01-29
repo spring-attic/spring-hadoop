@@ -15,6 +15,7 @@
  */
 package org.springframework.data.hadoop.scripting;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.BeanClassLoaderAware;
@@ -74,6 +75,9 @@ class Jsr223ScriptEvaluatorFactoryBean implements InitializingBean, BeanClassLoa
 		evaluator.setLanguage(language);
 		evaluator.setExtension(extension);
 
+		if (arguments == null) {
+			arguments = new LinkedHashMap<String, Object>();
+		}
 		postProcess(arguments);
 
 		if (runAtStartup) {

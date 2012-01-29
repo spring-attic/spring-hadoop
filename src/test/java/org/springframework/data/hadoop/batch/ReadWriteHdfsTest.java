@@ -52,7 +52,7 @@ public class ReadWriteHdfsTest {
 
 		fs.delete(new Path(resource.getURI().toString()), true);
 
-		TriggerJobs tj = new TriggerJobs();
+		JobsTrigger tj = new JobsTrigger();
 		tj.startJobs(ctx);
 
 		Path p = new Path("/ide-test/output/word/");
@@ -74,7 +74,7 @@ public class ReadWriteHdfsTest {
 		FileSystem fs = FileSystem.get(ctx.getBean(Configuration.class));
 		fs.delete(new Path("/ide-test/output/word/"), true);
 
-		TriggerJobs tj = new TriggerJobs();
+		JobsTrigger tj = new JobsTrigger();
 		tj.startJobs(ctx);
 	}
 
