@@ -3,18 +3,18 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.springframework.samples.batch</groupId>
-	<artifactId>spring-batch-simple</artifactId>
-	<version>2.0.0.CI-SNAPSHOT</version>
+	<groupId>org.springframework.samples.hadoop</groupId>
+	<artifactId>spring-hadoop-simple-wordcount</artifactId>
+	<version>1.0.0.CI-SNAPSHOT</version>
 	<packaging>jar</packaging>
-	<name>Command Line Spring Batch Module</name>
-	<url>http://www.springframework.org/spring-batch/archetypes/simple-cli-archetype</url>
+	<name>Spring Hadoop Basic Word Count</name>
+	<url>http://www.springframework.org/spring-data/hadoop</url>
 	<description>
 		<![CDATA[
-      This project is a minimal command line batch sample from Spring Batch.  
+      This project is a  command line batch sample from Spring Hadoop to run wordcount.  
     ]]>
 	</description>
-	<properties>
+	<properties>	
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
 		<spring.framework.version>3.0.6.RELEASE</spring.framework.version>
 		<spring.batch.version>2.1.7.RELEASE</spring.batch.version>
@@ -134,41 +134,38 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
 				<configuration>
 					<source>1.5</source>
 					<target>1.5</target>
 				</configuration>
 			</plugin>
-			 
+			
+			
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<version>1.1</version>
-				<configuration>
-					<mainClass>org.springframework.batch.core.launch.support.CommandLineJobRunner</mainClass>
-					<arguments>
-						<!-- job configuration file -->
-						<argument>classpath:/launch-context.xml</argument>
-						<!-- job name -->
-						<argument>job1</argument>
-					</arguments>
-				</configuration>
-			</plugin>
-		 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<configuration>
-					<archive>
-						<index>true</index>
-						<manifest>
-							<mainClass>org.springframework.batch.core.launch.support.CommandLineJobRunner</mainClass>
-							<addClasspath>true</addClasspath>
-							<classpathPrefix>lib/</classpathPrefix>
-						</manifest>
-					</archive>
-				</configuration>
-			</plugin>
+			     <groupId>org.codehaus.mojo</groupId>
+			     <artifactId>appassembler-maven-plugin</artifactId>
+			     <version>1.1.1</version>
+			     <executions>
+			        <execution>
+			            <phase>package</phase>
+			            <goals>
+			                <goal>assemble</goal>
+			            </goals>
+						 <configuration>
+						   <assembledirectory>target</assembledirectory>
+			               <extrajvmarguments>-Xmx512m</extrajvmarguments>
+						          <programs>
+						            <program>
+						                <mainClass>org.springframework.batch.core.launch.support.CommandLineJobRunner</mainClass>
+						                <!--  command line args not yet supported  -->
+						                <!--  use ./target/appassembler/bin/command-line-job-runner classpath:/launch-context.xml job1 -->		              
+						            </program>
+						          </programs>         
+						 </configuration>            
+			        </execution>        
+			    </executions>			   		
+			</plugin>		
 		</plugins>
 	</build>
 
