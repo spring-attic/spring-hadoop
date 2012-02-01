@@ -12,8 +12,9 @@
 
 	<context:property-placeholder location="classpath:batch.properties" />
 
+<!-- 
 	<context:component-scan base-package="org.springframework.data.hadoop.samples" />
-
+-->
 
 	<import resource="classpath:/META-INF/spring/batch-common.xml" />
 	<import resource="classpath:/META-INF/spring/hadoop-context.xml" />
