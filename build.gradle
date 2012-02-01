@@ -1,5 +1,5 @@
 // used for artifact names, building doc upload urls, etc.
-description = 'Spring Hadoop'
+description = 'Spring Data Hadoop'
 abbreviation = 'DATAHADOOP'
 
 apply plugin: 'base'
@@ -130,6 +130,11 @@ test {
 
 // Common dependencies
 dependencies {
+    // Hadoop
+    compile("org.apache.hadoop:hadoop-core:$hadoopVersion") { optional = true }
+    compile("org.apache.hadoop:hadoop-streaming:$hadoopVersion") { optional = true }
+    compile("org.apache.hadoop:hadoop-tools:$hadoopVersion") { optional = true }
+
     // Logging
     compile "org.slf4j:slf4j-api:$slf4jVersion"
     compile "org.slf4j:jcl-over-slf4j:$slf4jVersion"
@@ -141,27 +146,22 @@ dependencies {
         exclude module: "commons-logging"
     }
     compile "org.springframework:spring-context-support:$springVersion"
-    compile "org.springframework:spring-tx:$springVersion"
-    compile "org.springframework:spring-aop:$springVersion"
-    compile "org.springframework:spring-oxm:$springVersion"
-    compile "org.springframework:spring-jdbc:$springVersion"
-    compile "org.springframework.batch:spring-batch-core:$springBatchVersion"
-    compile "org.springframework.integration:spring-integration-core:$springIntVersion"
+    compile("org.springframework:spring-tx:$springVersion") { optional = true }
+    compile("org.springframework:spring-aop:$springVersion") { optional = true }
+    //compile "org.springframework:spring-oxm:$springVersion"
+    compile("org.springframework:spring-jdbc:$springVersion") { optional = true }
+    compile("org.springframework.batch:spring-batch-core:$springBatchVersion") { optional = true }
+    compile("org.springframework.integration:spring-integration-core:$springIntVersion") { optional = true }
 
-    // Hadoop
-    compile "org.apache.hadoop:hadoop-core:$hadoopVersion"
-    compile "org.apache.hadoop:hadoop-streaming:$hadoopVersion"
-    compile "org.apache.hadoop:hadoop-tools:$hadoopVersion"
-    
-    testRuntime "commons-io:commons-io:$commonsioVersion"
-    testRuntime "org.codehaus.jackson:jackson-core-asl:$jacksonVersion"
-    testRuntime "org.codehaus.jackson:jackson-mapper-asl:$jacksonVersion"
+    //testRuntime "commons-io:commons-io:$commonsioVersion"
+    //testRuntime "org.codehaus.jackson:jackson-core-asl:$jacksonVersion"
+    //testRuntime "org.codehaus.jackson:jackson-mapper-asl:$jacksonVersion"
     testRuntime "cglib:cglib:$cglibVersion"
 
     // Hive
     testRuntime "org.apache.hive:hive-common:$hiveVersion"
-    compile "org.apache.hive:hive-jdbc:$hiveVersion"
-    compile "org.apache.hive:hive-service:$hiveVersion"
+    testRuntime "org.apache.hive:hive-jdbc:$hiveVersion"
+    compile("org.apache.hive:hive-service:$hiveVersion") { optional = true }
     testRuntime "org.apache.hive:hive-metastore:$hiveVersion"
     testRuntime "org.apache.hive:hive-shims:$hiveVersion"
     testRuntime "org.apache.hive:hive-serde:$hiveVersion"
@@ -169,11 +169,12 @@ dependencies {
     testRuntime "org.apache.thrift:libfb303:$thriftVersion"
 
     // Pig
-    compile "org.apache.pig:pig:$pigVersion"
+    compile("org.apache.pig:pig:$pigVersion") { optional = true }
     
     // HBase
     compile("org.apache.hbase:hbase:$hbaseVersion") {
         exclude module: "thrift"
+        optional = true
     }
 
     // Libs dependencies (specified to cope with incompatibilities between them)
