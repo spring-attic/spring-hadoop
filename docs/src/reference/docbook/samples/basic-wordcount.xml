@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xml:id="hive" xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:ns5="http://www.w3.org/1998/Math/MathML"
+         xmlns:ns4="http://www.w3.org/1999/xhtml"
+         xmlns:ns3="http://www.w3.org/2000/svg"
+         xmlns:ns="http://docbook.org/ns/docbook">
+  <title>Basic Wordcount sample</title>
+
+  <para>Please install the <link xlink:href="sample-prereq">sample
+  prerequisites</link> before following these instructions. The example
+  assumes you have a working Hadoop cluster and maven installation.<ulink
+  url="http://hive.apache.org" /><ulink
+  url="http://thrift.apache.org/" /><ulink
+  url="http://hive.apache.org/docs/r0.7.1/api/org/apache/hadoop/hive/jdbc/package-summary.html" /></para>
+
+  <section id="hive:server">
+    <title>Introduction</title>
+
+    This sample demonstrates how to execute the wordcount example.  It serves as a 'hello world' example that will be expanded upon in other samples.  It uses the Spring Hadoop namespace to define a hadoop tasklet and a hadoop job.  Hadoop tasklets are in turn composed into steps of execution in a Spring Batch job.  While there there are often many steps in a give Spring Batch job, this first sample contains only one job step.  We will stage the files to HDFS manually using the hadoop command line.  Examples that follow will incorporate the HDFS file manipulation into the Spring Batch job as a set.
+
+    <para>The example code is located in the distribution directory
+    &lt;spring-hadoop-install-dir&gt;/samples/basic/wordcount. The example is
+    compiled using maven.</para>
+  </section>
+
+  <section>
+    <title>Basic Spring Hadoop configuration</title>
+
+    <para>The essential parts of the configuration file to run wordcount as a
+    step in a Spring Batch job is shown below. This configuration is found in
+    the file <literal>wordcount-context.xml</literal>. </para>
+
+    <programlisting language="XML">	&lt;batch:job id="job1"&gt;
+		&lt;batch:step id="step1"&gt;
+			&lt;batch:tasklet ref="hadoop-tasklet" /&gt;
+		&lt;/batch:step&gt;
+	&lt;/batch:job&gt;
+
+	&lt;hdp:tasklet id="hadoop-tasklet" job-ref="mr-job"
+		wait-for-job="true" /&gt;
+
+	&lt;hdp:job id="mr-job" input-path="/user/gutenberg/input/word/"
+		output-path="/user/gutenberg/output/word/" mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
+		reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"
+		configuration-ref="hadoop-configuration" validate-paths="false" /&gt;</programlisting>
+
+    <para>The top portion of this XML configuration ,
+    <literal>&lt;batch:job/&gt;, &lt;batch:step/&gt;,
+    &lt;batch:tasklet&gt;</literal> is from the XML Schema for Spring Batch.
+    This is how you tell Spring batch what your 'workflow' will be for a given
+    job. Spring Hadoop builds upon Spring Batch by providing custom processing
+    modules know as 'tasklets'. In this example there is ony one step in a the
+    job, but often there are more. The <literal>&lt;hdp:tasklet&gt;</literal>
+    and <literal>&lt;hdp:job/&gt;</literal> elements are from the XML Schema
+    to configure Spring Hadoop. The hadoop tasklet is the bridge between the
+    Spring Batch world and the Hadoop world. The hadoop tasklet in turn refers
+    to your map reduce job. Various common properties of a map reduce job can
+    be set, such as the mapper and reducer. </para>
+
+    <para>The configuration-ref element refers to common hadoop configuration
+    information that can be share across many jobs. It is defined in the file
+    <literal>hadoop-context.xml</literal> and shown below</para>
+
+    <programlisting language="XML">	&lt;!--  default id is 'hadoop-configuration' --&gt;
+	&lt;hdp:configuration register-url-handler="false"&gt;
+		fs.default.name=${hd.fs}
+	&lt;/hdp:configuration&gt;</programlisting>
+
+    <para>Since this is a configuration file processed by the Spring
+    container, it supports variable substitution through the use of
+    <literal>${var}</literal>style variables. In this case the default
+    location for HDFS is parameterized. The 'standard' spring configuraiton
+    style to enable this behavior is defined in the file
+    <literal>launch-context.xml</literal>, shown below.</para>
+
+    <programlisting language="XML">	&lt;!-- where to read externalized configuration values --&gt;
+ &lt;context:property-placeholder location="classpath:batch.properties" /&gt;
+
+ &lt;!-- simple base configuration for batch components, e.g. JobRepository --&gt;
+	&lt;import resource="classpath:/META-INF/spring/batch-common.xml" /&gt;
+ &lt;!-- shared hadoop configuration --&gt;
+	&lt;import resource="classpath:/META-INF/spring/hadoop-context.xml" /&gt;
+ &lt;!-- word count workflow --&gt;
+	&lt;import resource="classpath:/META-INF/spring/wordcount-context.xml" /&gt;</programlisting>
+
+    <para>The properties file, <literal>batch.properites</literal>, is shown
+    below. It is setup assuming a single-node cluster. You should modify the
+    values as appropriate.</para>
+
+    <programlisting>hd.fs=hdfs://localhost:9000</programlisting>
+  </section>
+
+  <section>
+    <title>Download sample data and copy into HDFS</title>
+
+    <para>Project Gutenberg is a good site to download many large text files.
+    Download a few files and put them into /tmp/gutenberg</para>
+
+    <programlisting>$ mkdir /tmp/gutenberg
+$ cd /tmp/gutenberg/
+$ wget http://www.gutenberg.org/ebooks/4363.txt.utf8
+$ wget http://www.gutenberg.org/ebooks/5000.txt.utf8
+$ wget http://www.gutenberg.org/ebooks/4300.txt.utf8
+$ wget http://www.gutenberg.org/ebooks/132.txt.utf8
+</programlisting>
+
+    <para>Now copy the files into HDFS</para>
+
+    <programlisting>hadoop dfs -copyFromLocal /tmp/gutenberg /user/gutenberg/input/word</programlisting>
+
+    <note>
+      <para>It is important you place the files in the exact directory
+      /user/gutenberg/input/word as the example is configured out of the box
+      to point to that directory. In a later part of this examply you will see
+      how the input and output paths can be configured at runtime.</para>
+    </note>
+
+    <para>Executing <literal>hadoop dfs -ls
+    /user/gutenberg/input/word</literal> will verify the files are in that
+    HDFS directory.</para>
+  </section>
+
+  <section>
+    <title>Build the sample application</title>
+
+    <para>In the directory
+    <literal>&lt;spring-hadoop-install-dir&gt;/samples/basic/wordcount</literal>
+    build the mvn package</para>
+
+    <programlisting>mvn clean package</programlisting>
+
+    <para>If this is the first time you are using maven, go get a cup of
+    coffee as it downloads its own dependencies and also those for the
+    project. You should then see output similar to the following</para>
+
+    <programlisting>[INFO] Scanning for projects...
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building Spring Hadoop Basic Word Count 1.0.0.CI-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+
+... lots of log output here ...
+
+[INFO] Installing /home/mpollack/projects/spring-hadoop/samples/basic/wordcount/target/spring-hadoop-simple-wordcount-1.0.0.CI-SNAPSHOT.jar to /home/mpollack/projects/spring-hadoop/samples/basic/wordcount/target/appassembler/repo/org/springframework/samples/hadoop/spring-hadoop-simple-wordcount/1.0.0.CI-SNAPSHOT/spring-hadoop-simple-wordcount-1.0.0.CI-SNAPSHOT.jar
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 5.011s
+[INFO] Finished at: Tue Jan 31 16:58:29 PST 2012
+[INFO] Final Memory: 24M/59M
+[INFO] ------------------------------------------------------------------------
+</programlisting>
+
+    <note>
+      <para>If you run into some issues, drop us a line in the Spring
+      Community Forums.</para>
+    </note>
+  </section>
+
+  <section>
+    <title>Run the sample application</title>
+
+    <para>The build script creates a bash and ms-dos script to run the
+    application via the command line. First change the generated script to be
+    executable.</para>
+
+    <programlisting>$ chmod +x ./target/appassembler/bin/command-line-job-runner
+</programlisting>
+
+    <para>Now you can run the application. The main Java class is one that is
+    part of Spring Batch and is called
+    org.springframework.batch.core.launch.support.CommandLineJobRunner. The
+    link brings you to the javadocs where you can find out more of what
+    command line options it supports. At a minimum you need to specify a
+    spring XML configuration file and a job instance name. You can read the
+    CommandLineJobRunner <link
+    xlink:href="http://static.springsource.org/spring-batch/apidocs/org/springframework/batch/core/launch/support/CommandLineJobRunner.html">JavaDocs</link>
+    for more informaiton as well as <link
+    xlink:href="http://static.springsource.org/spring-batch/reference/html/configureJob.html#runningJobsFromCommandLine">this
+    section in the reference docs</link> for Spring Batch.</para>
+
+    <programlisting>$ ./target/appassembler/bin/command-line-job-runner classpath:/launch-context.xml job1</programlisting>
+
+    <para>And the output you should see is</para>
+
+    <programlisting>INFO support.ClassPathXmlApplicationContext: Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@12f6684: startup date [Tue Jan 31 19:28:50 PST 2012]; root of context hierarchy
+INFO xml.XmlBeanDefinitionReader: Loading XML bean definitions from class path resource [launch-context.xml]
+INFO xml.XmlBeanDefinitionReader: Loading XML bean definitions from class path resource [META-INF/spring/batch-common.xml]
+INFO xml.XmlBeanDefinitionReader: Loading XML bean definitions from class path resource [META-INF/spring/hadoop-context.xml]
+INFO xml.XmlBeanDefinitionReader: Loading XML bean definitions from class path resource [META-INF/spring/wordcount-context.xml]
+INFO support.DefaultListableBeanFactory: Overriding bean definition for bean 'job1': replacing [Generic bean: class [org.springframework.batch.core.configuration.xml.SimpleFlowFactoryBean]; scope=; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null] with [Generic bean: class [org.springframework.batch.core.configuration.xml.JobParserJobFactoryBean]; scope=; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null]
+INFO config.PropertyPlaceholderConfigurer: Loading properties file from class path resource [batch.properties]
+INFO support.DefaultListableBeanFactory: Pre-instantiating singletons in org.springframework.beans.factory.support.DefaultListableBeanFactory@1a52fdf: defining beans [org.springframework.beans.factory.config.PropertyPlaceholderConfigurer#0,jobRepository,transactionManager,jobLauncher,hadoop-resource-loader,hadoop-configuration,org.springframework.batch.core.scope.internalStepScope,org.springframework.beans.factory.config.CustomEditorConfigurer,org.springframework.batch.core.configuration.xml.CoreNamespacePostProcessor,step1,job1,hadoop-tasklet,mr-job]; root of factory hierarchy
+INFO support.SimpleJobLauncher: No TaskExecutor has been set, defaulting to synchronous executor.
+INFO support.SimpleJobLauncher: Job: [FlowJob: [name=job1]] launched with the following parameters: [{}]
+INFO job.SimpleStepHandler: Executing step: [step1]
+WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+WARN mapred.JobClient: Use GenericOptionsParser for parsing the arguments. Applications should implement Tool for the same.
+WARN mapred.JobClient: No job jar file set.  User classes may not be found. See JobConf(Class) or JobConf#setJar(String).
+INFO input.FileInputFormat: Total input paths to process : 4
+INFO util.ProcessTree: setsid exited with exit code 0
+INFO mapred.Task:  Using ResourceCalculatorPlugin : org.apache.hadoop.util.LinuxResourceCalculatorPlugin@15b0333
+INFO mapred.MapTask: io.sort.mb = 100
+INFO mapred.MapTask: data buffer = 79691776/99614720
+INFO mapred.MapTask: record buffer = 262144/327680
+INFO mapred.MapTask: Spilling map output: record full = true
+INFO mapred.MapTask: bufstart = 0; bufend = 2546054; bufvoid = 99614720
+INFO mapred.MapTask: kvstart = 0; kvend = 262144; length = 327680
+INFO mapred.MapTask: Starting flush of map output
+INFO mapred.MapTask: Finished spill 0
+INFO mapred.MapTask: Finished spill 1
+INFO mapred.Merger: Merging 2 sorted segments
+INFO mapred.Merger: Down to the last merge-pass, with 2 segments left of total size: 3137839 bytes
+INFO mapred.Task: Task:attempt_local_0001_m_000000_0 is done. And is in the process of commiting
+INFO mapred.LocalJobRunner: 
+INFO mapred.Task: Task 'attempt_local_0001_m_000000_0' done.
+INFO mapred.Task:  Using ResourceCalculatorPlugin : org.apache.hadoop.util.LinuxResourceCalculatorPlugin@ae4646
+INFO mapred.MapTask: io.sort.mb = 100
+INFO mapred.MapTask: data buffer = 79691776/99614720
+INFO mapred.MapTask: record buffer = 262144/327680
+INFO mapred.MapTask: Starting flush of map output
+
+.... truncated output ...
+
+INFO mapred.Task: Task 'attempt_local_0001_r_000000_0' done.
+INFO support.SimpleJobLauncher: Job: [FlowJob: [name=job1]] completed with the following parameters: [{}] and the following status: [COMPLETED]
+INFO support.ClassPathXmlApplicationContext: Closing org.springframework.context.support.ClassPathXmlApplicationContext@12f6684: startup date [Tue Jan 31 19:28:50 PST 2012]; root of context hierarchy
+INFO support.DefaultListableBeanFactory: Destroying singletons in org.springframework.beans.factory.support.DefaultListableBeanFactory@1a52fdf: defining beans [org.springframework.beans.factory.config.PropertyPlaceholderConfigurer#0,jobRepository,transactionManager,jobLauncher,hadoop-resource-loader,hadoop-configuration,org.springframework.batch.core.scope.internalStepScope,org.springframework.beans.factory.config.CustomEditorConfigurer,org.springframework.batch.core.configuration.xml.CoreNamespacePostProcessor,step1,job1,hadoop-tasklet,mr-job]; root of factory hierarchy
+</programlisting>
+
+    <para>You can then verify the output from work count is present and cat it
+    to the screen</para>
+
+    <programlisting>$ hadoop dfs -ls /user/gutenberg/output/word
+Warning: $HADOOP_HOME is deprecated.
+
+Found 2 items
+-rw-r--r--   3 mpollack supergroup          0 2012-01-31 19:29 /user/gutenberg/output/word/_SUCCESS
+-rw-r--r--   3 mpollack supergroup     918472 2012-01-31 19:29 /user/gutenberg/output/word/part-r-00000
+
+$ hadoop dfs -cat /user/gutenberg/output/word/part-r-00000 | more
+Warning: $HADOOP_HOME is deprecated.
+
+"'Spells 1
+"'army'  1
+"(1)     1
+"(Lo)cra"1
+"13      4
+"1490    1
+"1498,"  1
+"35"     1
+"40,"    1
+"A       9
+"AS-IS". 1
+"AWAY    1
+"A_      1
+"Abide   1
+"About   1
+</programlisting>
+  </section>
+</chapter>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter linkend="sample-prereq" version="5.0" xml:id="hive"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:ns5="http://www.w3.org/1998/Math/MathML"
+         xmlns:ns4="http://www.w3.org/1999/xhtml"
+         xmlns:ns3="http://www.w3.org/2000/svg"
+         xmlns:ns="http://docbook.org/ns/docbook">
+  <title>Sample prerequisites</title>
+
+  <para>In order to run the examples you need a working Hadoop installation
+  and maven 3.0.x installed. for instructions on installing Hadoop refer to
+  your distribution documentation or you can refer to the <link
+  linkend="getting-started">Getting Started</link> section of this
+  documentation for instructions based off the Apache download distribution.
+  To install maven, follow the the official <link
+  xlink:href="http://maven.apache.org/download.html">maven
+  instructions</link><link xlink:href="???" />.<ulink
+  url="http://hive.apache.org" /><ulink
+  url="http://thrift.apache.org/" /><ulink
+  url="http://hive.apache.org/docs/r0.7.1/api/org/apache/hadoop/hive/jdbc/package-summary.html" /></para>
+</chapter>
