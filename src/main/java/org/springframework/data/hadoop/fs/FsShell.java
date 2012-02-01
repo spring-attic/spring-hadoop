@@ -85,7 +85,7 @@ public class FsShell implements Closeable, DisposableBean {
 			this.internalFs = (fs == null);
 			this.trash = new Trash(configuration);
 		} catch (IOException ex) {
-			throw new HadoopException("Cannot create shell", ex);
+			throw new HadoopException("Cannot create shell " + ex.getMessage(), ex);
 		}
 	}
 
@@ -135,7 +135,7 @@ public class FsShell implements Closeable, DisposableBean {
 				}
 			}
 		} catch (IOException ex) {
-			throw new HadoopException("Cannot execute command", ex);
+			throw new HadoopException("Cannot execute command " + ex.getMessage(), ex);
 		}
 
 		return Collections.unmodifiableCollection(results);
@@ -251,7 +251,7 @@ public class FsShell implements Closeable, DisposableBean {
 			FileSystem dstFs = dstPath.getFileSystem(configuration);
 			dstFs.copyFromLocalFile(false, false, srcs.toArray(new Path[srcs.size()]), dstPath);
 		} catch (IOException ex) {
-			throw new HadoopException("Cannot copy resources", ex);
+			throw new HadoopException("Cannot copy resources " + ex.getMessage(), ex);
 		}
 	}
 
@@ -281,7 +281,7 @@ public class FsShell implements Closeable, DisposableBean {
 				copyToLocal(srcFs, p, f, crc);
 			}
 		} catch (IOException ex) {
-			throw new HadoopException("Cannot copy resources", ex);
+			throw new HadoopException("Cannot copy resources " + ex.getMessage(), ex);
 		}
 
 	}
@@ -366,7 +366,7 @@ public class FsShell implements Closeable, DisposableBean {
 					results.put(p, fs.getContentSummary(p));
 				}
 			} catch (IOException ex) {
-				throw new HadoopException("Cannot find listing", ex);
+				throw new HadoopException("Cannot find listing " + ex.getMessage(), ex);
 			}
 		}
 
@@ -407,7 +407,7 @@ public class FsShell implements Closeable, DisposableBean {
 				}
 			}
 		} catch (IOException ex) {
-			throw new HadoopException("Cannot copy resources", ex);
+			throw new HadoopException("Cannot copy resources " + ex.getMessage(), ex);
 		}
 	}
 
@@ -463,7 +463,7 @@ public class FsShell implements Closeable, DisposableBean {
 				}
 			}
 		} catch (IOException ex) {
-			throw new HadoopException("Cannot copy resources", ex);
+			throw new HadoopException("Cannot inspect resources " + ex.getMessage(), ex);
 		}
 
 		return Collections.unmodifiableMap(results);
@@ -482,7 +482,7 @@ public class FsShell implements Closeable, DisposableBean {
 			trash.expunge();
 			trash.checkpoint();
 		} catch (IOException ex) {
-			throw new HadoopException("Cannot expunge trash");
+			throw new HadoopException("Cannot expunge trash" + ex.getMessage(), ex);
 		}
 	}
 
@@ -515,7 +515,7 @@ public class FsShell implements Closeable, DisposableBean {
 				}
 			}
 		} catch (IOException ex) {
-			throw new HadoopException("Cannot getmerge", ex);
+			throw new HadoopException("Cannot getmerge " + ex.getMessage(), ex);
 		}
 	}
 
@@ -570,7 +570,7 @@ public class FsShell implements Closeable, DisposableBean {
 			return Collections.unmodifiableCollection(results);
 
 		} catch (IOException ex) {
-			throw new HadoopException("Cannot list resources", ex);
+			throw new HadoopException("Cannot list resources " + ex.getMessage(), ex);
 		}
 	}
 
@@ -627,7 +627,7 @@ public class FsShell implements Closeable, DisposableBean {
 					}
 				}
 			} catch (IOException ex) {
-				throw new HadoopException("Cannot create directory", ex);
+				throw new HadoopException("Cannot create directory " + ex.getMessage(), ex);
 			}
 		}
 	}
@@ -646,7 +646,7 @@ public class FsShell implements Closeable, DisposableBean {
 			FileSystem dstFs = dstPath.getFileSystem(configuration);
 			dstFs.moveFromLocalFile(srcs.toArray(new Path[srcs.size()]), dstPath);
 		} catch (IOException ex) {
-			throw new HadoopException("Cannot move resources", ex);
+			throw new HadoopException("Cannot move resources " + ex.getMessage(), ex);
 		}
 	}
 
@@ -711,7 +711,7 @@ public class FsShell implements Closeable, DisposableBean {
 				}
 			}
 		} catch (IOException ex) {
-			throw new HadoopException("Cannot rename resources", ex);
+			throw new HadoopException("Cannot rename resources " + ex.getMessage(), ex);
 		}
 	}
 
@@ -762,7 +762,7 @@ public class FsShell implements Closeable, DisposableBean {
 					srcFs.delete(p, recursive);
 				}
 			} catch (IOException ex) {
-				throw new HadoopException("Cannot delete (all) resources", ex);
+				throw new HadoopException("Cannot delete (all) resources " + ex.getMessage(), ex);
 			}
 		}
 	}
@@ -864,7 +864,7 @@ public class FsShell implements Closeable, DisposableBean {
 				}
 			}
 		} catch (IOException ex) {
-			throw new HadoopException("Cannot set replication", ex);
+			throw new HadoopException("Cannot set replication " + ex.getMessage(), ex);
 		}
 	}
 
@@ -914,7 +914,7 @@ public class FsShell implements Closeable, DisposableBean {
 
 			return result;
 		} catch (IOException ex) {
-			throw new HadoopException("Cannot test resource " + uri, ex);
+			throw new HadoopException("Cannot test resource " + uri + ";" + ex.getMessage(), ex);
 		}
 	}
 
@@ -959,7 +959,7 @@ public class FsShell implements Closeable, DisposableBean {
 					texts.add(getContent(in));
 				}
 			} catch (IOException ex) {
-				throw new HadoopException("Cannot read " + uri, ex);
+				throw new HadoopException("Cannot read " + uri + ";" + ex.getMessage(), ex);
 			} finally {
 				IOUtils.closeStream(in);
 				IOUtils.closeStream(i);
@@ -991,7 +991,7 @@ public class FsShell implements Closeable, DisposableBean {
 					IOUtils.closeStream(srcFs.create(src));
 				}
 			} catch (IOException ex) {
-				throw new HadoopException("Cannot touchz " + uri, ex);
+				throw new HadoopException("Cannot touchz " + uri + ";" + ex.getMessage(), ex);
 			}
 		}
 	}
