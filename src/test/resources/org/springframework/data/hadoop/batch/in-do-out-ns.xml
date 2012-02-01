@@ -12,13 +12,9 @@
 	<import resource="../hadoop-ctx.xml"/>
 	
 	<job id="mainJob" xmlns="http://www.springframework.org/schema/batch">
-		<!-- 
 		<step id="import" next="do">
-			<tasklet>
-				<chunk reader="file-reader" writer="hdfs-writer" commit-interval="10"/>
-			</tasklet>
+			<tasklet ref="script-tasklet"/>
 		</step>
-		 -->
 		<step id="do">
 			<tasklet ref="hadoop-tasklet"/>
 		</step>
@@ -43,4 +39,12 @@
 		configuration-ref="hadoop-configuration"
 		validate-paths="false"
 	/>
+	
+	<hdp:script-tasklet id="script-tasklet">
+		<hdp:script language="javascript">
+fsh.rmr("/ide-test/input")
+fsh.put("src/test/resources/input/word", "/ide-test/input/word")			
+		</hdp:script>
+	</hdp:script-tasklet>
+	
 </beans>

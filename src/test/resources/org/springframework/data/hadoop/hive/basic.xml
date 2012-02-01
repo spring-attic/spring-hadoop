@@ -29,10 +29,13 @@
 	<hdp:hive-client host="${hive.host}" port="${hive.port}"/>
 
 	<bean id="hive-driver" class="org.apache.hadoop.hive.jdbc.HiveDriver"/>
-	<bean id="hive-ds" class="org.springframework.jdbc.datasource.SimpleDriverDataSource"
-		c:driver-ref="hive-driver"
-		c:url="${hive.url}"/>
-
-	<bean id="template" class="org.springframework.jdbc.core.JdbcTemplate" c:data-source-ref="hive-ds"/>		
+	<bean id="hive-ds" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
+		<constructor-arg name="driver" ref="hive-driver"/>
+		<constructor-arg name="url" value="${hive.url}"/>
+	</bean>
+	
+	<bean id="template" class="org.springframework.jdbc.core.JdbcTemplate">
+		<constructor-arg ref="hive-ds"/>
+	</bean>		
 	
 </beans>
