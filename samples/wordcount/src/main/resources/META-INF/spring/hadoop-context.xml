@@ -12,7 +12,8 @@
 	
 	<!--  default id is 'hadoop-configuration' -->
 	<hdp:configuration register-url-handler="false">
-		fs.default.name=${hd.fs}
+	    <!-- The value after the question mark is the default value if another value for hd.fs is not provided -->
+		fs.default.name=${hd.fs:hdfs://localhost:9000}
 	</hdp:configuration>
 
 	

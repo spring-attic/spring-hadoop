@@ -7,17 +7,45 @@
 		http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop-1.0.xsd">
 
 	<batch:job id="job1">
-		<batch:step id="step1">
-			<batch:tasklet ref="hadoop-tasklet" />
+		<!-- 
+		<batch:step id="import" next="wordcount">
+			<batch:tasklet ref="script-tasklet"/>
+		</batch:step>
+		-->	
+		<batch:step id="wordcount">
+			<batch:tasklet ref="wordcount-tasklet" />
 		</batch:step>
 	</batch:job>
 
-	<hdp:tasklet id="hadoop-tasklet" job-ref="mr-job"
-		wait-for-job="true" />
+	<hdp:tasklet id="wordcount-tasklet" job-ref="wordcount-job" wait-for-job="true" />
 
-	<hdp:job id="mr-job" input-path="/user/gutenberg/input/word/"
-		output-path="/user/gutenberg/output/word/" mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
+	<hdp:job id="wordcount-job" input-path="${wordcount.input.path:/user/gutenberg/input/word/}"
+		output-path="${wordcount.output.path:/user/gutenberg/output/word/}" 
+		mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
 		reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"
 		configuration-ref="hadoop-configuration" validate-paths="false" />
-
+	
+	<!--  copy in sample data at start and clean directories -->
+	<hdp:script language="groovy" run-at-startup="true">
+inputPath = "${wordcount.input.path:/user/gutenberg/input/word/}"
+outputPath = "${wordcount.output.path:/user/gutenberg/output/word/}"	
+if (fsh.test(inputPath)) {
+  fsh.rmr(inputPath)
+}
+if (fsh.test(outputPath)) {
+  fsh.rmr(outputPath)
+}
+inputFile = System.getProperty('basedir') + "${file.separator}" + "etc" + "${file.separator}" + "nietzsche-chapter-1.txt"
+fsh.put(inputFile, inputPath)			
+	</hdp:script>	
+	
+<!-- 
+	<hdp:script-tasklet id="script-tasklet" script-ref="wc-script">
+ 
+		<hdp:script id="wc-script" language="javascript">
+fsh.rmr("${wordcount.input.path:/user/gutenberg/input/word/}")
+fsh.rmr("${wordcount.output.path:/user/gutenberg/output/word/")
+fsh.put("src/test/resources/input/word", "${wordcount.input.path:/user/gutenberg/input/word/}")			
+		</hdp:script>	
+-->		
 </beans>

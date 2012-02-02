@@ -10,11 +10,12 @@
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
-	<context:property-placeholder location="classpath:batch.properties" />
+	<context:property-placeholder location="classpath:batch.properties,classpath:hadoop.properties"
+						ignore-resource-not-found="true" 
+						ignore-unresolvable="true" />
 
-<!-- 
 	<context:component-scan base-package="org.springframework.data.hadoop.samples" />
--->
+
 
 	<import resource="classpath:/META-INF/spring/batch-common.xml" />
 	<import resource="classpath:/META-INF/spring/hadoop-context.xml" />

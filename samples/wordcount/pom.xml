@@ -2,19 +2,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-	<modelVersion>4.0.0</modelVersion>
+	<modelVersion>4.0.0</modelVersion>	
 	<groupId>org.springframework.samples.hadoop</groupId>
 	<artifactId>spring-hadoop-simple-wordcount</artifactId>
 	<version>1.0.0.CI-SNAPSHOT</version>
 	<packaging>jar</packaging>
-	<name>Spring Hadoop Basic Word Count</name>
+	<name>Spring Hadoop Basic Word Count using Spring Batch</name>
 	<url>http://www.springframework.org/spring-data/hadoop</url>
 	<description>
 		<![CDATA[
-      This project is a  command line batch sample from Spring Hadoop to run wordcount.  
+      This project is a minimal command line batch sample from Spring Batch.  
     ]]>
 	</description>
-	<properties>	
+	<properties>
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
 		<spring.framework.version>3.0.6.RELEASE</spring.framework.version>
 		<spring.batch.version>2.1.7.RELEASE</spring.batch.version>
@@ -38,7 +38,7 @@
 					<version>1.0.1</version>
 				</dependency>
 			</dependencies>
-		</profile>	 
+		</profile>
 	</profiles>
 
 	<dependencies>
@@ -90,11 +90,6 @@
 			<version>1.2.2</version>
 		</dependency>
 		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>1.4</version>
-		</dependency>
-		<dependency>
 			<groupId>hsqldb</groupId>
 			<artifactId>hsqldb</artifactId>
 			<version>1.8.0.7</version>
@@ -114,23 +109,38 @@
 			<artifactId>log4j</artifactId>
 			<version>1.2.14</version>
 		</dependency>
-		
+
 		<dependency>
-		 <groupId>org.springframework.data</groupId>
-		 <artifactId>spring-data-hadoop</artifactId>
-		 <version>1.0.0.BUILD-SNAPSHOT</version>
-		</dependency> 	
-		
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-hadoop</artifactId>
+			<version>1.0.0.BUILD-SNAPSHOT</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.apache.hadoop</groupId>
 			<artifactId>hadoop-examples</artifactId>
 			<version>0.20.205.0</version>
-		</dependency>	
+		</dependency>
+
+		<dependency>
+			<groupId>org.codehaus.groovy</groupId>
+			<artifactId>groovy</artifactId>
+			<version>1.8.5</version>
+		</dependency>
+		
+		<!-- investigate -->
+		<dependency>
+		  <groupId>org.codehaus.jackson</groupId>
+		  <artifactId>jackson-mapper-asl</artifactId>
+		  <version>1.7.1</version>
+		</dependency>
+
+		
 	</dependencies>
 
 	<build>
-		 
-		<plugins>
+
+		<plugins>			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -140,8 +150,7 @@
 					<target>1.5</target>
 				</configuration>
 			</plugin>
-			
-			
+ 		
 			<plugin>
 			     <groupId>org.codehaus.mojo</groupId>
 			     <artifactId>appassembler-maven-plugin</artifactId>
@@ -153,45 +162,65 @@
 			                <goal>assemble</goal>
 			            </goals>
 						 <configuration>
-						   <assembledirectory>target</assembledirectory>
+						   <assembledirectory>target</assembledirectory>				   
 			               <extrajvmarguments>-Xmx512m</extrajvmarguments>
 						          <programs>
 						            <program>
 						                <mainClass>org.springframework.batch.core.launch.support.CommandLineJobRunner</mainClass>
-						                <!--  command line args not yet supported  -->
-						                <!--  use ./target/appassembler/bin/command-line-job-runner classpath:/launch-context.xml job1 -->		              
 						            </program>
 						          </programs>         
 						 </configuration>            
 			        </execution>        
 			    </executions>			   		
-			</plugin>		
+			</plugin>
+				
+		      <plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-antrun-plugin</artifactId>
+		        <executions>
+		          <execution>
+		            <id>config</id>
+			        <phase>package</phase>
+		            <configuration>
+		              <tasks>
+		                <mkdir dir="target/appassembler/etc" />
+		                <copy todir="target/appassembler/etc">
+		                  <fileset dir="src/main/config" />
+		                </copy>
+		              </tasks>
+		            </configuration>
+		            <goals>
+		              <goal>run</goal>
+		            </goals>
+		          </execution>
+		        </executions>
+		      </plugin>					
 		</plugins>
 	</build>
 
 	<repositories>
 		<repository>
-		 <id>spring-snapshot</id>
-		 <name>Spring Maven SNAPSHOT Repository</name>
-		 <url>http://s3.amazonaws.com/maven.springframework.org/snapshot</url>
-		</repository>	
-		<repository>
-		 <id>sonatype-snapshot</id>
-		 <name>SonaType SNAPSHOT Repository</name>
-		 <url>http://oss.sonatype.org/content/repositories/snapshots</url>
+			<id>spring-snapshot</id>
+			<name>Spring Maven SNAPSHOT Repository</name>
+			<url>http://s3.amazonaws.com/maven.springframework.org/snapshot</url>
 		</repository>
 		<repository>
-		 <!-- For Hive 0.8 -->
-		 <id>data-nucleus</id>
-		 <name>Data Nucleus Repository</name>
-		 <url>http://www.datanucleus.org/downloads/maven2/</url>
-		</repository>	
+			<id>sonatype-snapshot</id>
+			<name>SonaType SNAPSHOT Repository</name>
+			<url>http://oss.sonatype.org/content/repositories/snapshots</url>
+		</repository>
 		<repository>
-	     <!-- For Hive 0.7 -->
-		 <id>ext-snapshots</id>
-		 <name>External Dependency Repository - Managed by SpringSource for those not in any other public repository</name>
-		 <url>http://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo-ext/</url>
-		</repository>				
+			<!-- For Hive 0.8 -->
+			<id>data-nucleus</id>
+			<name>Data Nucleus Repository</name>
+			<url>http://www.datanucleus.org/downloads/maven2/</url>
+		</repository>
+		<repository>
+			<!-- For Hive 0.7 -->
+			<id>ext-snapshots</id>
+			<name>External Dependency Repository - Managed by SpringSource for those not in any other public repository</name>
+			<url>http://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo-ext/</url>
+		</repository>
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
@@ -202,5 +231,5 @@
 			</snapshots>
 		</pluginRepository>
 	</pluginRepositories>
- 
+
 </project>

@@ -26,7 +26,8 @@ public class WordCountWorkflowTests {
 		FileSystem fs = FileSystem.get(ctx.getBean(Configuration.class));
 		fs.delete(new Path("/user/gutenberg/output/word/"), true);
 
-		//startJobs(ctx);
+		
+		startJobs(ctx);
 	}
 	
 	public void startJobs(ApplicationContext ctx) {
