@@ -1,5 +1,6 @@
 package org.springframework.data;
 
+import java.io.File;
 import java.util.Map;
 
 import org.apache.hadoop.conf.Configuration;
@@ -22,7 +23,8 @@ public class WordCountWorkflowTests {
 				"/launch-context.xml");
 
 		ctx.registerShutdownHook();
-
+		//to keep dev and runtime deployment configuration the same
+		System.setProperty("basedir", "src" + File.separator + "main");
 		FileSystem fs = FileSystem.get(ctx.getBean(Configuration.class));
 		fs.delete(new Path("/user/gutenberg/output/word/"), true);
 

@@ -84,26 +84,7 @@
 			<artifactId>spring-batch-infrastructure</artifactId>
 			<version>${spring.batch.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>commons-dbcp</groupId>
-			<artifactId>commons-dbcp</artifactId>
-			<version>1.2.2</version>
-		</dependency>
-		<dependency>
-			<groupId>hsqldb</groupId>
-			<artifactId>hsqldb</artifactId>
-			<version>1.8.0.7</version>
-		</dependency>
-		<dependency>
-			<groupId>org.aspectj</groupId>
-			<artifactId>aspectjrt</artifactId>
-			<version>1.6.8</version>
-		</dependency>
-		<dependency>
-			<groupId>org.aspectj</groupId>
-			<artifactId>aspectjweaver</artifactId>
-			<version>1.6.8</version>
-		</dependency>
+
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
@@ -129,12 +110,13 @@
 		</dependency>
 		
 		<!-- investigate -->
+		 
 		<dependency>
 		  <groupId>org.codehaus.jackson</groupId>
 		  <artifactId>jackson-mapper-asl</artifactId>
 		  <version>1.7.1</version>
 		</dependency>
-
+		
 		
 	</dependencies>
 
@@ -162,7 +144,8 @@
 			                <goal>assemble</goal>
 			            </goals>
 						 <configuration>
-						   <assembledirectory>target</assembledirectory>				   
+						   <assembledirectory>target</assembledirectory>	
+						   <configurationDirectory>config</configurationDirectory>			   
 			               <extrajvmarguments>-Xmx512m</extrajvmarguments>
 						          <programs>
 						            <program>
@@ -183,8 +166,8 @@
 			        <phase>package</phase>
 		            <configuration>
 		              <tasks>
-		                <mkdir dir="target/appassembler/etc" />
-		                <copy todir="target/appassembler/etc">
+		                <mkdir dir="target/appassembler/config" />
+		                <copy todir="target/appassembler/config">
 		                  <fileset dir="src/main/config" />
 		                </copy>
 		              </tasks>
