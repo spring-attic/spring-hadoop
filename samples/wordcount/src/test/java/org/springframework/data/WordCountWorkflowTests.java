@@ -25,8 +25,8 @@ public class WordCountWorkflowTests {
 		ctx.registerShutdownHook();
 		//to keep dev and runtime deployment configuration the same
 		System.setProperty("basedir", "src" + File.separator + "main");
-		FileSystem fs = FileSystem.get(ctx.getBean(Configuration.class));
-		fs.delete(new Path("/user/gutenberg/output/word/"), true);
+		//FileSystem fs = FileSystem.get(ctx.getBean(Configuration.class));
+		//fs.delete(new Path("/user/gutenberg/output/word/"), true);
 
 		
 		startJobs(ctx);

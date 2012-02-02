@@ -28,7 +28,7 @@
 	
 
 	<hdp:script-tasklet id="script-tasklet">
-	  <hdp:script language="groovy">
+  	   <hdp:script language="groovy">
 		inputPath = "${wordcount.input.path:/user/gutenberg/input/word/}"
 		outputPath = "${wordcount.output.path:/user/gutenberg/output/word/}"	
 		if (fsh.test(inputPath)) {
@@ -40,5 +40,8 @@
 		inputFile = System.getProperty('basedir') + "${file.separator}" + "config" + "${file.separator}" + "nietzsche-chapter-1.txt"
 		fsh.put(inputFile, inputPath)			
 	  </hdp:script>	
-    </hdp:script-tasklet>	
+    </hdp:script-tasklet>
+    
+    	
+   
 </beans>
