@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter xmlns="http://docbook.org/ns/docbook" version="5.0"  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" xml:id="hadoop">
   
-  <title>Spring and Hadoop</title>
+  <title>Hadoop Configuration, MapReduce, and Distributed Cache</title>
 
   <para>One of the common tasks when using Hadoop is interacting with its <emphasis>runtime</emphasis> - whether it is a local setup or a remote cluster, one needs to properly configure and bootstrap Hadoop
   in order to submit the required jobs. This chapter will focus on how Spring Hadoop (SHDP) leverages Spring's lightweight IoC container to simplify the interaction with Hadoop and make deployment, testing and provisioning
