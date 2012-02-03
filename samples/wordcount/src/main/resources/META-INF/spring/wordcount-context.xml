@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<beans:beans xmlns="http://www.springframework.org/schema/hadoop"
+	xmlns:beans="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:batch="http://www.springframework.org/schema/batch"
-	xmlns:hdp="http://www.springframework.org/schema/hadoop"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
-		http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop-1.0.xsd">
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
 
 	<batch:job id="job1">
-		
 		<batch:step id="import" next="wordcount">
 			<batch:tasklet ref="script-tasklet"/>
 		</batch:step>
@@ -15,20 +14,18 @@
 		<batch:step id="wordcount">
 			<batch:tasklet ref="wordcount-tasklet" />
 		</batch:step>
-		
 	</batch:job>
 
-	<hdp:tasklet id="wordcount-tasklet" job-ref="wordcount-job" wait-for-job="true" />
+	<tasklet id="wordcount-tasklet" job-ref="wordcount-job" wait-for-job="true" />
 
-	<hdp:job id="wordcount-job" input-path="${wordcount.input.path:/user/gutenberg/input/word/}"
+	<job id="wordcount-job" input-path="${wordcount.input.path:/user/gutenberg/input/word/}"
 		output-path="${wordcount.output.path:/user/gutenberg/output/word/}" 
 		mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
 		reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"
 		configuration-ref="hadoop-configuration" validate-paths="false" />
-	
 
-	<hdp:script-tasklet id="script-tasklet">
-  	   <hdp:script language="groovy">
+	<script-tasklet id="script-tasklet">
+  	   <script language="groovy">
 		inputPath = "${wordcount.input.path:/user/gutenberg/input/word/}"
 		outputPath = "${wordcount.output.path:/user/gutenberg/output/word/}"	
 		if (fsh.test(inputPath)) {
@@ -37,11 +34,9 @@
 		if (fsh.test(outputPath)) {
 		  fsh.rmr(outputPath)
 		}
-		inputFile = System.getProperty('basedir') + "${file.separator}" + "config" + "${file.separator}" + "nietzsche-chapter-1.txt"
+		inputFile = "src/main/resources/data/nietzsche-chapter-1.txt"
 		fsh.put(inputFile, inputPath)			
-	  </hdp:script>	
-    </hdp:script-tasklet>
-    
-    	
-   
-</beans>
+	  </script>	
+    </script-tasklet>
+
+</beans:beans>
