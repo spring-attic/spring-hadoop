@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0"  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" xml:id="sb-hadoop">
+  
+  <title>Spring Batch and Hadoop</title>
+
+  <para>TBD</para>
+  
+  <section id="sb-hadoop:ns">
+  	<title>Using the Spring Hadoop Namespace in Batch Applicatiosn</title>
+  	
+  	<para>To simplify configuration, SHDP provides a dedicated namespace for most of its components. However, one can opt to configure the beans
+  	directly through the usual <literal>&lt;bean&gt;</literal> definition. For more information about XML Schema-based configuration in Spring, see 
+  	<ulink url="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/xsd-config.html">this</ulink> appendix in the
+  	Spring Framework reference documentation.</para>
+  	
+  	<para>To use the SHDP namespace, one just needs to import it inside the configuration:</para>
+
+ 	<programlistingco>
+ 		<areaspec>
+ 			<area id="hdp#ns#prefix" coords="4 11"/>
+ 			<area id="hdp#ns#uri" coords="4 58"/>
+ 			<area id="hdp#ns#uri#loc" coords="7 119"/>
+ 			<area id="hdp#ns#example" coords="10 9"/>
+ 		</areaspec>
+ 		<programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xmlns:hdp="http://www.springframework.org/schema/hadoop"
+   xsi:schemaLocation="
+    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
+	
+   <bean id ... >
+	
+   <hdp:configuration ...>
+		
+</beans>]]></programlisting>
+ 		<calloutlist>
+ 			<callout arearefs="hdp#ns#prefix">
+ 				<para>Spring Hadoop namespace prefix. Any name can do but through out the reference documentation, the <literal>hdp</literal> will be used.</para>
+ 			</callout>
+ 			<callout arearefs="hdp#ns#uri">
+ 				<para>The namespace URI.</para>
+ 			</callout>
+ 			<callout arearefs="hdp#ns#uri#loc">
+ 				<para>The namespace URI location. Note that even though the location points to an external address (which exists and is valid), Spring will resolve
+ 				the schema locally as it is included in the Spring Hadoop library.</para>
+ 			</callout>
+ 			<callout arearefs="hdp#ns#example">
+ 				<para>Declaration example for the Hadoop namespace. Notice the prefix usage.</para>
+ 			</callout>
+ 		</calloutlist>
+ 	</programlistingco>
+
+   </section>
+</chapter>

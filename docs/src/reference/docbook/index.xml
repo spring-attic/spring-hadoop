@@ -33,14 +33,33 @@
       <xi:include href="introduction/requirements.xml"/>      
   </part>
   
-  <part id="reference">
-      <title>Reference Documentation</title>
+  <part id="springhadoop">
+      <title>Spring and Hadoop</title>
       <xi:include href="reference/introduction.xml"/>
       <xi:include href="reference/hadoop.xml"/>
       <xi:include href="reference/scripting.xml"/>
       <xi:include href="reference/hbase.xml"/>
       <xi:include href="reference/hive.xml"/>
       <xi:include href="reference/pig.xml"/>
+  </part>
+
+  <part id="springhadoop">
+      <title>Spring Batch and Hadoop</title>
+      <xi:include href="reference/sb-introduction.xml"/>
+      <xi:include href="reference/sb-hadoop.xml"/>
+      <xi:include href="reference/sb-scripting.xml"/>
+      <xi:include href="reference/sb-hbase.xml"/>
+      <xi:include href="reference/sb-hive.xml"/>
+      <xi:include href="reference/sb-pig.xml"/>
+  </part>
+
+
+  <part id="samples">
+      <title>Spring Hadoop sample applications</title>
+      <xi:include href="samples/introduction.xml"/>
+      <xi:include href="samples/sample-prerequisites.xml"/>
+      <xi:include href="samples/spring-wordcount.xml"/>
+      <xi:include href="samples/batch-wordcount.xml"/>
   </part>
 
   <part id="resources">

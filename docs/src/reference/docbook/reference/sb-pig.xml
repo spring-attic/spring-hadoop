@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0"  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" xml:id="pig">
+
+	<title>Pig support</title>
+	
+	<para>For <ulink url="http://pig.apache.org">Pig</ulink> users, SHDP provides easy creation and configuration of <interfacename>PigServer</interfacename> instances for registering and executing scripts either locally
+	or remotely. In its simplest form, the declaration looks as follows:</para>
+	
+	<section id="pig:tasklet">
+		<title>Using the Pig tasklet</title>
+
+		<para>For Spring Batch environments, SHDP provides a dedicated tasklet to execute Pig queries, on demand, as part of a batch or workflow. The declaration is pretty straight forward:</para>
+		
+		<programlisting language="xml"><![CDATA[<hdp:pig-tasklet id="pig-script">
+   <hdp:script location="org/company/pig/handsome.pig" />
+</hdp:pig-tasklet>]]></programlisting>
+
+		<para>The syntax of the scripts declaration is similar to that of the <literal>pig</literal> namespace.</para>	
+	</section>
+	
+</chapter>

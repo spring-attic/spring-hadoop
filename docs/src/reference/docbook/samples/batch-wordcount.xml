@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xml:id="batch-wordcount" xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:ns5="http://www.w3.org/1998/Math/MathML"
+         xmlns:ns4="http://www.w3.org/1999/xhtml"
+         xmlns:ns3="http://www.w3.org/2000/svg"
+         xmlns:ns="http://docbook.org/ns/docbook">
+  <title>Spring Batch Wordcount sample</title>
+
+  <para>Please install the <link xlink:href="sample-prereq">sample
+  prerequisites</link> before following these instructions. The example
+  assumes you have a working Hadoop cluster and maven installation.
+  </para>
+
+  <section id="sb:wordcount">
+    <title>Introduction</title>
+
+    This sample demonstrates how to execute the wordcount example.  It serves as a 'hello world' example that will be expanded upon in other samples.  It uses the Spring Hadoop namespace to define a hadoop tasklet and a hadoop job.  Hadoop tasklets are in turn composed into steps of execution in a Spring Batch job.  While there there are often many steps in a give Spring Batch job, this first sample contains only one job step.  We will stage the files to HDFS manually using the hadoop command line.  Examples that follow will incorporate the HDFS file manipulation into the Spring Batch job as a set.
+
+    <para>The example code is located in the distribution directory
+    &lt;spring-hadoop-install-dir&gt;/samples/basic/wordcount. The example is
+    compiled using maven.</para>
+  </section>
+</chapter>

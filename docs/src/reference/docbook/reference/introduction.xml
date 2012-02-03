@@ -2,18 +2,18 @@
    <title>Document structure</title>
 
    <para>This part of the reference documentation explains the core functionality
-   offered by Spring Hadoop (SHDP) integration.</para>
+   that Spring Hadoop (SHDP) provides to any Spring based application.</para>
 
-   <para><xref linkend="hadoop"/> describes the configuration support provided for
+   <para><xref linkend="hadoop"/> describes the Spring support for
    bootstrapping, initializing and working with core Hadoop.</para>
 
-   <para><xref linkend="hbase"/> explains the integration between HBase and Spring Hadoop.
+   <para><xref linkend="hbase"/> describes the Spring support for HBase.
    </para>
 
    <para><xref linkend="hive"/> describes the Spring support for Hive.
    </para>
    
-   <para><xref linkend="pig"/> provides an tour of the Pig integration.
+   <para><xref linkend="pig"/> describes the Spring support for Pig.
    </para>
    <!-- 
    <para><xref linkend="samples"/> describes the samples provided with the distribution

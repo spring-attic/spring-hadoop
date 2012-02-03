@@ -1,0 +1,27 @@
+<partintro>
+   <title>Document structure</title>
+
+   <para>This part of the reference documentation explains the functionality
+   that Spring Hadoop (SHDP) provides Spring Batch based applications.  This integration
+   enables Hadoop related tasks to become executable components within a Spring Batch job.</para>
+
+   <para><xref linkend="sb-hadoop"/> describes the Spring Batch support for
+   bootstrapping, initializing and working with core Hadoop.</para>
+
+   <para><xref linkend="sb-hbase"/> describes the Spring Batch support for HBase.
+   </para>
+
+   <para><xref linkend="sb-hive"/> describes the Spring Batch support for Hive.
+   </para>
+   
+   <para><xref linkend="sb-pig"/> describes the Spring Batch support for Pig.
+   </para>
+   <!-- 
+   <para><xref linkend="samples"/> describes the samples provided with the distribution
+   for showcasing the various features available in Spring GemFire.
+   </para>
+
+   <para><xref linkend="testing"/> showcases various ways of testing GemFire inside
+   Spring framework.</para>
+ 	-->
+</partintro>

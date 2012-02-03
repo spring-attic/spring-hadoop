@@ -3,8 +3,10 @@
 <partintro xmlns="http://docbook.org/ns/docbook" version="5.0">
     <para>
       <para>This document is the reference guide for Spring Hadoop project (SHDP). It explains the relationship
-      between Spring framework and Hadoop (and the various related projects) 0.20.x, defines the basic concepts and semantics of the integration
-      and how these can be used effectively.
+      between the Spring framework and Hadoop as well as related projects such as Spring Batch and Spring Integration.
+      The first part describes the integration wtih the Spring framework to define the base concepts and semantics of the 
+      integration and how they can be use effectively.  The second part describes how you can build upon these base 
+      concepts and create workflow based solutions provided by the integration with Spring Batch.
       </para>
     </para>
 </partintro>
