@@ -114,7 +114,7 @@ public class JobRunner implements FactoryBean<Object>, InitializingBean, Disposa
 	/**
 	 * Sets the Jobs to run.
 	 * 
-	 * @param job The jobs to run.
+	 * @param jobs The jobs to run.
 	 */
 	public void setJobs(Collection<Job> jobs) {
 		this.jobs = jobs;

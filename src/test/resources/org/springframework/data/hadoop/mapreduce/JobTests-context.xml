@@ -8,9 +8,10 @@
 	<import resource="../hadoop-ctx.xml"/>
 
 	<hdp:script id="script" language="javascript">
-fsh.rmr("/ide-test/input/word")
-fsh.rmr("/ide-test/runner/output")
-fsh.put("src/test/resources/input/word", "/ide-test/input/word")			
+	if (fsh.test("/ide-test/input/word")) { fsh.rmr("/ide-test/input/word") }
+	if (fsh.test("/ide-test/runner/output")) { fsh.rmr("/ide-test/runner/output") }
+	
+	fsh.put("src/test/resources/input/word", "/ide-test/input/word")			
 	</hdp:script>
 
 	<bean id="runner" class="org.springframework.data.hadoop.mapreduce.JobRunner" depends-on="script" p:jobs-ref="ns-job"/>
