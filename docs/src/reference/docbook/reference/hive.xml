@@ -65,7 +65,7 @@
     <bean id="hive-driver" class="org.apache.hadoop.hive.jdbc.HiveDriver"/>
 
     <!-- wrapping a basic datasource around the driver -->
-    <!-- notice the 'c:' namespace for inlining constructor arguments, 
+    <!-- notice the 'c:' namespace (available in Spring 3.1+) for inlining constructor arguments, 
          in this case the url (default is 'jdbc:hive://localhost:10000/default') -->
     <bean id="hive-ds" class="org.springframework.jdbc.datasource.SimpleDriverDataSource"
        c:driver-ref="hive-driver" c:url="${hive.url}"/>
