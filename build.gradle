@@ -155,7 +155,7 @@ dependencies {
 
     //testRuntime "commons-io:commons-io:$commonsioVersion"
     //testRuntime "org.codehaus.jackson:jackson-core-asl:$jacksonVersion"
-    //testRuntime "org.codehaus.jackson:jackson-mapper-asl:$jacksonVersion"
+    testRuntime "org.codehaus.jackson:jackson-mapper-asl:$jacksonVersion"
     testRuntime "cglib:cglib:$cglibVersion"
 
     // Hive
