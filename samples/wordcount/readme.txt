@@ -32,6 +32,8 @@ b) To build and run the sample as a standalone Java application:
 $ ../../gradlew installApp
 $ ./build/install/wordcount/bin/wordcount classpath:/launch-context.xml job1
 
+This uses the CommandLineJobRunner launcher from the Spring Batch project. 
+
 4. Importing sample code to eclipse
 
 run the command
