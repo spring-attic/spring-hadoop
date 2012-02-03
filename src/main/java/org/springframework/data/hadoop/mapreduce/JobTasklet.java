@@ -25,8 +25,8 @@ import org.springframework.data.hadoop.HadoopException;
 import org.springframework.util.Assert;
 
 /**
- * Batch tasklet for executing one or more Hadoop jobs.
- * Can be configured to wait for the job to finish - by default, the job is submited and the tasklet returns.
+ * Batch tasklet for executing one Hadoop job.
+ * Can be configured to not wait for the job to finish - by default the tasklet waits for the job submitted to finish.
  * 
  * @author Costin Leau
  */
