@@ -14,13 +14,28 @@ The Hadoop settings can be configured through hadoop.properties (more info in th
 This directory contains the source files.
 For building, JDK 1.6+ are required
 
-To build the sample, use the following command:
+a) To build and run the sample as a JUnit test, use the following command:
 
 *nix/BSD OS:
-# ../../gradlew
+$ ../../gradlew
 
 Windows OS:
-# ..\..\gradlew
+$ ..\..\gradlew
 
 If you have Gradle installed and available in your classpath, you can simply type:
-# gradle
+$ gradle
+
+The rest of the document refers to only the *nix/BSD OS style command line
+
+b) To build and run the sample as a standalone Java application:
+
+$ ../../gradlew installApp
+$ ./build/install/wordcount/bin/wordcount classpath:/launch-context.xml job1
+
+4. Importing sample code to eclipse
+
+run the command
+
+$ ../../gradlew eclipse
+
+This will generate an eclipse .profile file that you can import into eclipse.
