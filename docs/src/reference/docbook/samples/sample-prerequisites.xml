@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter xml:id="sample-prereq" version="5.0"
+<chapter version="5.0" xml:id="sample-prereq"
          xmlns="http://docbook.org/ns/docbook"
          xmlns:xlink="http://www.w3.org/1999/xlink"
          xmlns:xi="http://www.w3.org/2001/XInclude"
@@ -10,14 +10,14 @@
   <title>Sample prerequisites</title>
 
   <para>In order to run the examples you need a working Hadoop installation
-  and maven 3.0.x installed. for instructions on installing Hadoop refer to
-  your distribution documentation or you can refer to the <link
-  linkend="getting-started">Getting Started</link> section of this
-  documentation for instructions based off the Apache download distribution.
-  To install maven, follow the the official <link
-  xlink:href="http://maven.apache.org/download.html">maven
-  instructions</link><link xlink:href="???" />.<ulink
+  and JDK 1.6+ installed on the machine that runs the samples.<link
+  linkend="getting-started" /><link xlink:href="???" /><ulink
   url="http://hive.apache.org" /><ulink
   url="http://thrift.apache.org/" /><ulink
   url="http://hive.apache.org/docs/r0.7.1/api/org/apache/hadoop/hive/jdbc/package-summary.html" /></para>
+
+  <para>For instructions on installing Hadoop refer to your distribution
+  documentation or you can refer to the <link
+  linkend="getting-started">Getting Started</link> section of this for
+  instructions based off the Apache download distribution.</para>
 </chapter>

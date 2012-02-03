@@ -176,7 +176,7 @@ print Path(name).makeQualified(fs)]]></programlisting>
 	
     </section>
     
-    <section id="scripting:fssh">
+    <section id="scripting-fssh">
     	<title>File System Shell (FsShell)</title>
     	
     	<para>A handy utility provided by the Hadoop distribution is the file system <ulink url="http://hadoop.apache.org/common/docs/stable/file_system_shell.html">shell</ulink> which allows UNIX-like commands to be
@@ -295,5 +295,30 @@ print $fsh.ls(dir).to_s]]></programlisting>
           	</tgroup>  
 		
 		</table>
-	</section>    
+	</section>  
+
+	<section id="scripting-tasklet">
+		<title>Using the Scripting tasklet</title>
+
+		<para>For Spring Batch environments, SHDP provides a dedicated tasklet to execute scripts.</para>
+		
+		<programlisting language="xml"><![CDATA[<script-tasklet id="script-tasklet">
+  <script language="groovy">
+    inputPath = "/user/gutenberg/input/word/"
+    outputPath = "/user/gutenberg/output/word/"
+    if (fsh.test(inputPath)) {
+      fsh.rmr(inputPath)
+    }
+    if (fsh.test(outputPath)) {
+      fsh.rmr(outputPath)
+    }
+    inputFile = "src/main/resources/data/nietzsche-chapter-1.txt"
+    fsh.put(inputFile, inputPath)
+  </script>
+</script-tasklet>]]></programlisting>
+
+		<para>The tasklet above embedds the script as a nested element.  You can also declare a reference to another script definition, using the script-ref attribute which allows you to externalize the scripting code to an external resource.</para>	
+		<programlisting language="xml"><![CDATA[<script-tasklet id="script-tasklet" script-ref="clean-up">
+<hdp:script id="clean-up" location="org/company/myapp/clean-up-wordcount.groovy"/>]]></programlisting>
+	</section>   
 </chapter>
