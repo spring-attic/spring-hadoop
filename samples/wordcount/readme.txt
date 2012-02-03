@@ -4,10 +4,10 @@
 
 1. MOTIVATION
 
-A basic word count demo that illustrates the configuration
-and interaction with the Hadoop through Spring Hadoop.
-
-The demo counts the word from a given resource through a Map Reduce job.
+A basic word count demo that illustrates the configuration and interaction with the Hadoop through Spring Hadoop.
+The demo copies local resources into HDFS and executes the Hadoop example that counts words against it. The demo
+requires a running Hadoop instance (by default at localhost:9000). 
+The Hadoop settings can be configured through hadoop.properties (more info in the Spring Hadoop reference docs).
 
 2. BUILD AND DEPLOYMENT
 
