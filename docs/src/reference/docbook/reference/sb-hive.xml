@@ -1,25 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter xmlns="http://docbook.org/ns/docbook" version="5.0"  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" xml:id="hive">
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0"  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" xml:id="batch-hive">
 
 	<title>Hive integration</title>
 	
-	<para>When working with <ulink url="http://hive.apache.org"/> from a Java environment, one can choose between the <ulink url="http://thrift.apache.org/">Thrift</ulink> client or using the Hive JDBC-like
-	<ulink url="http://hive.apache.org/docs/r0.7.1/api/org/apache/hadoop/hive/jdbc/package-summary.html">driver</ulink>. Both have their pros and cons but no matter the choice, Spring and SHDP supports both of them.</para>
+  <para>TBD</para>
 
-
-	<section id="hive:tasklet">
-		<title>Using the Hive tasklet</title>
-
-		<para>For Spring Batch environments, SHDP provides a dedicated tasklet to execute Hive queries, on demand, as part of a batch or workflow. The declaration is pretty straight forward:</para>
-		
-		<programlisting language="xml"><![CDATA[<hdp:hive-tasklet id="hive-script">
-   <hdp:script>
-   DROP TABLE IF EXITS testHiveBatchTable; 
-   CREATE TABLE testHiveBatchTable (key int, value string);
-   </hdp:script>
-   <hdp:script location="classpath:org/company/hive/script.q" />
-</hdp:hive-tasklet>]]></programlisting>
-
-		<para>The tasklet above executes two scripts - one declared as part of the bean definition followed by another located on the classpath.</para>	
-	</section>
 </chapter>

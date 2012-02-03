@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter xmlns="http://docbook.org/ns/docbook" version="5.0"  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" xml:id="scripting">
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0"  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" xml:id="batch-scripting">
 
     <title>Working with the Hadoop File System</title>
     
     <para>A common task in Hadoop is interacting with its file system, whether for provisioning, adding new files to be processed, parsing results, or performing cleanup.
     </para>
     
-    <section id="sb-scripting:api">
+    <section id="batch-scripting:api">
     	<title>Scripting the Hadoop API</title>
 
     	<para>Tasklet blah blah blah</para>

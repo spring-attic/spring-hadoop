@@ -1,6 +1,6 @@
 // used for artifact names, building doc upload urls, etc.
 description = 'Spring Data Hadoop'
-abbreviation = 'DATAHADOOP'
+abbreviation = 'SHDP'
 
 apply plugin: 'base'
 
@@ -227,7 +227,7 @@ javadoc {
 //      ]
   
      links = [
-        "http://static.springframework.org/spring/docs/3.1.x/javadoc-api",
+        "http://static.springframework.org/spring/docs/3.0.x/javadoc-api",
         "http://download.oracle.com/javase/6/docs/api",
         "http://logging.apache.org/log4j/docs/api/",
         "http://hadoop.apache.org/common/docs/current/api/",
@@ -297,6 +297,14 @@ task dist(type: Zip) {
         from('/docs/build/') {
             into 'docs'
             include 'reference/**/*'
+        }
+        from('samples/') {
+            into 'samples'
+            exclude '**/build/**'
+            exclude '**/bin/**'
+            exclude '**/.settings/**'
+            exclude '**/.gradle/**'
+            exclude '**/.*'
         }
         from('build/') {
             into 'docs'

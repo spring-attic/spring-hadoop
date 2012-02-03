@@ -5,16 +5,16 @@
    that Spring Hadoop (SHDP) provides Spring Batch based applications.  This integration
    enables Hadoop related tasks to become executable components within a Spring Batch job.</para>
 
-   <para><xref linkend="sb-hadoop"/> describes the Spring Batch support for
+   <para><xref linkend="batch-hadoop"/> describes the Spring Batch support for
    bootstrapping, initializing and working with core Hadoop.</para>
 
-   <para><xref linkend="sb-hbase"/> describes the Spring Batch support for HBase.
+   <para><xref linkend="batch-hbase"/> describes the Spring Batch support for HBase.
    </para>
 
-   <para><xref linkend="sb-hive"/> describes the Spring Batch support for Hive.
+   <para><xref linkend="batch-hive"/> describes the Spring Batch support for Hive.
    </para>
    
-   <para><xref linkend="sb-pig"/> describes the Spring Batch support for Pig.
+   <para><xref linkend="batch-pig"/> describes the Spring Batch support for Pig.
    </para>
    <!-- 
    <para><xref linkend="samples"/> describes the samples provided with the distribution
