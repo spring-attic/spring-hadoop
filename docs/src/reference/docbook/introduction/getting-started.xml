@@ -6,7 +6,7 @@
          xmlns:ns4="http://www.w3.org/1999/xhtml"
          xmlns:ns3="http://www.w3.org/2000/svg"
          xmlns:ns="http://docbook.org/ns/docbook">
-  <title linkend="getting-started">Overview of Spring Hadoop</title>
+  <title>Overview of Spring Hadoop</title>
 
   <para>This chapter describes the various components that Spirng Hadoop uses
   and builds upon.</para>
