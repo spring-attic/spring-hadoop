@@ -33,11 +33,17 @@
 	    
 	    <programlisting language="xml"><![CDATA[<!-- by default, the definition name is 'hive-client' -->
 <hdp:hive-client host="some-other-host" port="10001" />]]></programlisting>
-		<para>Just as well, the Hive client is bound to the enclosing application context life-cycle; it will automatically startup and shutdown along-side the application context.</para>
+		<para>Just as well, the Hive client is bound to the enclosing application context life-cycle; it will automatically startup and shutdown along-side the application context. Further more, the client definition
+		also allows Hive scripts ()either declared inlined or externally) to be executed at startup, once the client connects; this quite useful for doing Hive specific initialization:</para>
 		
-		<!-- See SHDP-22
-		<para>The client definition also allows Hive scripts to be executed/registered at startup - one can either specify them inline or import existing resources:</para>
-		 -->
+		<programlisting language="xml"><![CDATA[<hive-client host="some-host" port="some-port" xmlns="http://www.springframework.org/schema/hadoop">
+   <hdp:script>
+   DROP TABLE IF EXITS testHiveBatchTable; 
+   CREATE TABLE testHiveBatchTable (key int, value string);
+   </hdp:script>
+   <hdp:script location="classpath:org/company/hive/script.q" />
+</hive-client> />]]></programlisting>
+		
 	</section>
 	
 	<section id="hive:jdbc">

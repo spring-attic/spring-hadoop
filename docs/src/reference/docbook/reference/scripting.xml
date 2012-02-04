@@ -34,7 +34,7 @@
     	
     	<para>Let us take a look of a JavaScript example using Rhino (which is part of JDK 6 or higher, meaning one does not need any extra libraries):</para>
 
-		<programlisting language="xml"><![CDATA[<beans xmlns="http://www.springframework.org/schema/beans" ...		
+		<programlisting language="xml"><![CDATA[<beans xmlns="http://www.springframework.org/schema/beans" ...>		
   <hdp:configuration .../>
 		
   <hdp:script id="inlined-js" language="javascript">
@@ -318,7 +318,7 @@ print $fsh.ls(dir).to_s]]></programlisting>
 </script-tasklet>]]></programlisting>
 
 		<para>The tasklet above embedds the script as a nested element.  You can also declare a reference to another script definition, using the script-ref attribute which allows you to externalize the scripting code to an external resource.</para>	
-		<programlisting language="xml"><![CDATA[<script-tasklet id="script-tasklet" script-ref="clean-up">
+		<programlisting language="xml"><![CDATA[<script-tasklet id="script-tasklet" script-ref="clean-up"/>
 <hdp:script id="clean-up" location="org/company/myapp/clean-up-wordcount.groovy"/>]]></programlisting>
 	</section>   
 </chapter>

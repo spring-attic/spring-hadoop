@@ -248,6 +248,33 @@
      ...
   </hdp:cmd-env>
 </hdp:streaming>]]></programlisting>	 	
+	 </section>
+	 
+	 <section id="hadoop:job:runner">
+	    <title>Running a Hadoop Job</title>
+	 
+	 	<para>The jobs, after being created and configured, need to be submitted for execution to a Hadoop cluster. For non-trivial cases, a coordinating, workflow solution such as Spring Batch is recommended (see 
+	 	<xref linkend="dev-guidance"/> for more information). However for basic job submission SHDP provides <classname>JobRunner</classname> class which submits several jobs sequentially (and waits by default for their
+	 	completion): </para>
+	 	
+	 	<programlisting language="xml"><![CDATA[<bean id="runner" class="org.springframework.data.hadoop.mapreduce.JobRunner" p:jobs-ref="job"/>
+
+<hdp:job id="job"  input-path="/input/" output-path="/output/"
+	mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
+	reducer="org.apache.hadoop.examples.WordCount.IntSumReducer" />]]></programlisting>
+
+		<para>Multiple jobs can be specified and even nested if they are not used outside the runner:</para>
+		
+	 	<programlisting language="xml"><![CDATA[<bean id="runner" class="org.springframework.data.hadoop.mapreduce.JobRunner">
+   <property name="jobs"><list>
+       <!-- reference to another job named 'job' -->
+       <ref bean="streaming-job"/>
+       <!-- nested bean definition -->
+	   <hdp:job id="nested-job" .... /> 
+	</list></property>
+</bean>
+	 	
+<hdp:job id="job"  ... />]]></programlisting>
 	 </section>   	 
    </section>
    
@@ -280,7 +307,8 @@
 	objects and none are specified (through <literal>configuration-ref</literal> and <literal>file-system-ref</literal>) it falls back to the default naming and is wired with the bean named 
 	<emphasis>hadoop-configuration</emphasis>, creating the <literal>FileSystem</literal> automatically.</para>
    </section>
-	<section id="hadoop:tasklet">
+   
+   <section id="hadoop:tasklet">
 		<title>Using the Hadoop Job tasklet</title>
 
 		<para>For Spring Batch environments, SHDP provides a dedicated tasklet to execute Hadoop jobs as a step in a Spring Batch workflow. An example declaration is shown below:</para>
