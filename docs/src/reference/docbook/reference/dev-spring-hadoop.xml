@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter xmlns="http://docbook.org/ns/docbook" version="5.0"
 	xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude"
-	xml:id="hbase">
+	xml:id="dev-guidance">
 	<title>Guidance and Examples</title>
 	<para>In this Chapter we will provide some guidance on how you can use the Spring
 		Hadoop project in conjunction with other Spring projects, starting with the Spring Framework
