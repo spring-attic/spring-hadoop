@@ -10,11 +10,7 @@
   <title>Sample prerequisites</title>
 
   <para>In order to run the examples you need a working Hadoop installation
-  and JDK 1.6+ installed on the machine that runs the samples.<link
-  linkend="getting-started" /><link xlink:href="???" /><ulink
-  url="http://hive.apache.org" /><ulink
-  url="http://thrift.apache.org/" /><ulink
-  url="http://hive.apache.org/docs/r0.7.1/api/org/apache/hadoop/hive/jdbc/package-summary.html" /></para>
+  and JDK 1.6+ installed on the machine that runs the samples.</para>
 
   <para>For instructions on installing Hadoop refer to your distribution
   documentation or you can refer to the <link
