@@ -1,0 +1,40 @@
+description = 'Spring Hadoop Samples - WordCount'
+
+apply plugin: 'base'
+apply plugin: 'idea'
+apply plugin: 'java'
+apply plugin: 'eclipse'  // `gradle eclipse` to generate .classpath/.project
+apply plugin: 'application'
+
+[compileJava, compileTestJava]*.options*.compilerArgs = ["-Xlint:-serial"]
+
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    // Public Spring artefacts
+    mavenRepo name: "spring-release", urls: "http://repo.springsource.org/release"
+    mavenRepo name: "spring-milestone", urls: "http://repo.springsource.org/milestone"
+    mavenRepo name: "spring-snapshot", urls: "http://repo.springsource.org/snapshot"
+}
+
+dependencies {
+    compile "org.springframework.data:spring-data-hadoop:$version"
+    compile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
+    compile "org.springframework.batch:spring-batch-core:$springBatchVersion"
+    // update the version that comes with Batch
+    compile "org.springframework:spring-tx:$springVersion"
+    runtime "org.codehaus.groovy:groovy:$groovyVersion"
+    // see HADOOP-7461
+    runtime "org.codehaus.jackson:jackson-mapper-asl:$jacksonVersion"
+    
+    testCompile "junit:junit:$junitVersion"
+    testCompile "org.springframework:spring-test:$springVersion"
+}
+
+sourceCompatibility = 1.6
+targetCompatibility = 1.6 
+
+mainClassName = "org.springframework.batch.core.launch.support.CommandLineJobRunner"
+// defaultTasks 'run'
+defaultTasks 'clean', 'build'
