@@ -58,8 +58,6 @@ public class PigTasklet implements InitializingBean, Tasklet {
 			return RepeatStatus.FINISHED;
 		} catch (Exception ex) {
 			exc = ex;
-		} finally {
-			pig.shutdown();
 		}
 
 		throw new HadoopException("Cannot execute Pig script(s)", exc);
