@@ -1,13 +1,10 @@
-description = 'Spring Batch Hadoop Samples - WordCount'
+description = 'Spring Hadoop Samples - Spring Batch WordCount'
 
 apply plugin: 'base'
 apply plugin: 'idea'
 apply plugin: 'java'
 apply plugin: 'eclipse'  // `gradle eclipse` to generate .classpath/.project
 apply plugin: 'application'
-
-[compileJava, compileTestJava]*.options*.compilerArgs = ["-Xlint:-serial"]
-
 
 repositories {
     mavenLocal()
@@ -32,11 +29,5 @@ dependencies {
     testCompile "org.springframework:spring-test:$springVersion"
 }
 
-sourceCompatibility = 1.6
-targetCompatibility = 1.6 
-
 mainClassName = "org.springframework.batch.core.launch.support.CommandLineJobRunner"
-applicationName = 'batch-wordcount'
-
-// defaultTasks 'run'
 defaultTasks 'clean', 'build'

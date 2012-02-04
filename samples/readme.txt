@@ -12,7 +12,10 @@ SAMPLES OVERVIEW
 ----------------
 
 * wordcount
-A 'traditional' Hadoop example a - word count MapReduce app configured with Spring Hadoop and using Spring Batch
+The 'traditional' Hadoop example - a word count MapReduce app configured with Spring Hadoop
+
+* batch-wordcount
+The same word count application featuring Spring Batch
 
 
 BUILDING AND DEPLOYMENT
@@ -22,4 +25,10 @@ All demos require JDK 1.6+.
 
 Each module can be run from its top folder using gradle wrapper:
 
-# ../../gradlew
+*nix/BSD
+# ../gradlew 
+
+or
+
+Widows
+# ..\gradlew

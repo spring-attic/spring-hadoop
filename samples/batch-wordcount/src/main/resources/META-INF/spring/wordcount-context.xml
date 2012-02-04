@@ -44,7 +44,7 @@
 		}
 
 		// copy using the streams directly (to be portable across envs)
-		inStream = getClass().getResourceAsStream("/data/nietzsche-chapter-1.txt")
+		inStream = cl.getResourceAsStream("data/nietzsche-chapter-1.txt")
 		org.apache.hadoop.io.IOUtils.copyBytes(inStream, fs.create(inputPath), cfg)
 	  </script>	
     </script-tasklet>

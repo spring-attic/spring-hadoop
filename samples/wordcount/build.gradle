@@ -1,13 +1,9 @@
-description = 'Spring Batch Hadoop Samples - WordCount'
+description = 'Spring Hadoop Samples - WordCount'
 
 apply plugin: 'base'
-apply plugin: 'idea'
 apply plugin: 'java'
-apply plugin: 'eclipse'  // `gradle eclipse` to generate .classpath/.project
-apply plugin: 'application'
-
-[compileJava, compileTestJava]*.options*.compilerArgs = ["-Xlint:-serial"]
-
+apply plugin: 'idea'
+apply plugin: 'eclipse'
 
 repositories {
     mavenLocal()
@@ -21,10 +17,6 @@ repositories {
 dependencies {
     compile "org.springframework.data:spring-data-hadoop:$version"
     compile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
-    compile "org.springframework.batch:spring-batch-core:$springBatchVersion"
-    // update the version that comes with Batch
-    compile "org.springframework:spring-tx:$springVersion"
-    runtime "org.codehaus.groovy:groovy:$groovyVersion"
     // see HADOOP-7461
     runtime "org.codehaus.jackson:jackson-mapper-asl:$jacksonVersion"
     
@@ -32,9 +24,10 @@ dependencies {
     testCompile "org.springframework:spring-test:$springVersion"
 }
 
-sourceCompatibility = 1.6
-targetCompatibility = 1.6 
+task run(type: JavaExec) {
+       description = 'Runs the application'
+       main = "org.springframework.data.hadoop.samples.wordcount.Main"
+       classpath = sourceSets.main.runtimeClasspath
+}
 
-mainClassName = "org.springframework.batch.core.launch.support.CommandLineJobRunner"
-// defaultTasks 'run'
-defaultTasks 'clean', 'build'
+defaultTasks 'run'

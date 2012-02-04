@@ -17,10 +17,10 @@ For building, JDK 1.6+ are required
 a) To build and run the sample as a JUnit test, use the following command:
 
 *nix/BSD OS:
-$ ../../gradlew
+$ ../gradlew
 
 Windows OS:
-$ ..\..\gradlew
+$ ..\gradlew
 
 If you have Gradle installed and available in your classpath, you can simply type:
 $ gradle
@@ -29,19 +29,19 @@ The rest of the document refers to only the *nix/BSD OS style command line
 
 b) To build and run the sample as a standalone Java application:
 
-$ ../../gradlew installApp
-$ ./build/install/wordcount/bin/wordcount classpath:/launch-context.xml job1
+$ ../gradlew installApp
+$ ./build/install/batch-wordcount/bin/batch-wordcount classpath:/launch-context.xml job1
 
 This uses the CommandLineJobRunner launcher from the Spring Batch project. 
 
-4. Importing sample code to the IDE
+3. IDE IMPORT
 
-run the command
+To import the code inside an IDE run the command
 
 For Eclipse 
-$ ../../gradlew eclipse
+$ ../gradlew eclipse
 
 For IDEA
-$ ../../gradlew idea
+$ ../gradlew idea
 
 This will generate the IDE specific project files.
