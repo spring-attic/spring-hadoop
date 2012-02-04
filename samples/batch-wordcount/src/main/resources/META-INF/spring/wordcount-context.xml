@@ -22,7 +22,7 @@
 		output-path="${wordcount.output.path:/user/gutenberg/output/word/}" 
 		mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
 		reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"
-		configuration-ref="hadoop-configuration" validate-paths="false" />
+		validate-paths="false" />
 
 	<script-tasklet id="script-tasklet">
   	   <script language="groovy">
