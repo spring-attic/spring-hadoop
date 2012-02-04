@@ -45,11 +45,7 @@
 
   <part id="springhadoopdev">
       <title>Developing Spring Hadoop Applications</title>
-      <xi:include href="reference/developing-spring-hadoop-apps.xml"/>
-      <xi:include href="reference/dev-spring.xml"/>
-      <xi:include href="reference/dev-spring-batch.xml"/>
-      <xi:include href="reference/dev-scheduling.xml"/>
-      <xi:include href="reference/dev-spring-integration.xml"/>
+      <xi:include href="reference/dev-spring-hadoop.xml"/>
   </part>
 
 

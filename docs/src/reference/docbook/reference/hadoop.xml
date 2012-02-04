@@ -199,7 +199,7 @@
      application configuration. When dealing with multiple, similar configuration use configuration <emphasis>composition</emphasis> as it tends to keep the definitions concise, in sync and easy to update.</para>
    </section>
    
-   <section id="hadoop:job">
+   <section id="hadoop-job">
    	 <title>Creating a Hadoop Job</title>
    	 
    	 <para>Once the Hadoop configuration is taken care of, one needs to actually submit some work to it. SHDP makes it easy to configure and run Hadoop jobs whether they are vanilla map-reduce type or streaming.
