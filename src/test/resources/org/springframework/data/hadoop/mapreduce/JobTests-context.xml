@@ -10,6 +10,7 @@
 	<hdp:script id="script" language="javascript">
 	if (fsh.test("/ide-test/input/word")) { fsh.rmr("/ide-test/input/word") }
 	if (fsh.test("/ide-test/runner/output")) { fsh.rmr("/ide-test/runner/output") }
+	if (fsh.test("/ide-test/runner/output-2")) { fsh.rmr("/ide-test/runner/output-2") }
 	
 	fsh.put("src/test/resources/input/word", "/ide-test/input/word")			
 	</hdp:script>
@@ -20,6 +21,14 @@
 		<property name="jobs">
 			<list>
 				<ref local="ns-job"/>
+				
+				<hdp:job id="nested-job" 
+	   	input-path="/ide-test/input/word/" output-path="/ide-test/runner/output-2/"
+		mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
+		reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"
+		configuration-ref="hadoop-configuration"
+		validate-paths="false"/>
+				
 			</list>
 		</property>
 	</bean>
