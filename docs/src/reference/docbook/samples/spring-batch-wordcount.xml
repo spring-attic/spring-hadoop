@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter version="5.0" xml:id="spring-wordcount"
+<chapter version="5.0" xml:id="spring-batch-wordcount"
          xmlns="http://docbook.org/ns/docbook"
          xmlns:xlink="http://www.w3.org/1999/xlink"
          xmlns:xi="http://www.w3.org/2001/XInclude"
@@ -12,7 +12,7 @@
   <para>Please read the <link linkend="sample-prereq">sample
   prerequistes</link> before following these instructions.</para>
 
-  <section>
+  <section id="spring:batch-wordcount">
     <title>Introduction</title>
 
     <para>This sample demonstrates how to execute the wordcount example in the
