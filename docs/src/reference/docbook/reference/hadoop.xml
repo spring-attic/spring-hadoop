@@ -252,7 +252,7 @@
    </section>
    
    <section id="hadoop:distributed-cache">
-   	 <title>Configurating the Hadoop <literal>DistributedCache</literal></title>
+   	 <title>Configuring the Hadoop <literal>DistributedCache</literal></title>
    	 
    	 <para><ulink url="http://hadoop.apache.org/common/docs/stable/mapred_tutorial.html#DistributedCache">DistributedCache</ulink> is a Hadoop facility for distributing application-specific, large, read-only files (
    	 text, archives, jars and so on) efficiently. Applications specify the files to be cached via urls (<literal>hdfs://</literal>) using <literal>DistributedCache</literal> and the framework will copy the necessary
@@ -280,4 +280,14 @@
 	objects and none are specified (through <literal>configuration-ref</literal> and <literal>file-system-ref</literal>) it falls back to the default naming and is wired with the bean named 
 	<emphasis>hadoop-configuration</emphasis>, creating the <literal>FileSystem</literal> automatically.</para>
    </section>
+	<section id="hadoop:tasklet">
+		<title>Using the Hadoop Job tasklet</title>
+
+		<para>For Spring Batch environments, SHDP provides a dedicated tasklet to execute Hadoop jobs as a step in a Spring Batch workflow. An example declaration is shown below:</para>
+		
+		<programlisting language="xml"><![CDATA[<hdp:tasklet id="hadoop-tasklet" job-ref="mr-job" wait-for-job="true" />]]></programlisting>
+
+		<para>The tasklet above references a Hadoop job definition named "mr-job".  By default, wait-for-job is true so that the tasklet will wait for the job to complete when it executes.  Setting wait-for-job to false will submit the job to the Hadoop cluster but not wait for it to complete.</para>	
+	</section>
+
 </chapter>

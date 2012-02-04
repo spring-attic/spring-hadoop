@@ -6,14 +6,12 @@
          xmlns:ns4="http://www.w3.org/1999/xhtml"
          xmlns:ns3="http://www.w3.org/2000/svg"
          xmlns:ns="http://docbook.org/ns/docbook">
-  <title>Spring Batch Wordcount sample</title>
+  <title>Spring Wordcount sample</title>
 
-  <para>Please install the <link xlink:href="sample-prereq">sample
-  prerequisites</link> before following these instructions. The example
-  assumes you have a working Hadoop cluster and maven installation.
-  </para>
+  <para>Please read the <link linkend="sample-prereq">sample
+  prerequistes</link> before following these instructions.</para>
 
-  <section id="sb:wordcount">
+  <section id="spring:wordcount">
     <title>Introduction</title>
 
     This sample demonstrates how to execute the wordcount example.  It serves as a 'hello world' example that will be expanded upon in other samples.  It uses the Spring Hadoop namespace to define a hadoop tasklet and a hadoop job.  Hadoop tasklets are in turn composed into steps of execution in a Spring Batch job.  While there there are often many steps in a give Spring Batch job, this first sample contains only one job step.  We will stage the files to HDFS manually using the hadoop command line.  Examples that follow will incorporate the HDFS file manipulation into the Spring Batch job as a set.

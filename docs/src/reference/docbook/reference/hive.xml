@@ -26,7 +26,7 @@
 	</section>
 	
 	<section id="hive:thrift">
-	    <title>Using Hive Thrift Client</title>
+	    <title>Using the Hive Thrift Client</title>
 	    
 	    <para>Similar to the server, SHDP provides a dedicated namespace element for configuring a Hive client (that is Hive accessing a server node through the Thrift). Likewise, simply specify the host, the port 
 	    (the defaults are <literal>localhost</literal> and <literal>10000</literal> respectively) and you're done:</para>
@@ -41,7 +41,7 @@
 	</section>
 	
 	<section id="hive:jdbc">
-	    <title>Using Hive JDBC</title>
+	    <title>Using the Hive JDBC Client</title>
 	    
 	    <para>Another attractive option for accessing Hive is through its JDBC driver. This exposes Hive through the <ulink url="http://docs.oracle.com/javase/6/docs/technotes/guides/jdbc/">JDBC API</ulink> meaning 
 	    one can use the standard API or its derived utilities to interact with Hive, such as the rich 

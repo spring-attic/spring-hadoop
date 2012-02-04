@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0"
+	xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude"
+	xml:id="hbase">
+	<title>Developing Spring Hadoop Applications</title>
+	<para>In this Chapter we will give some guidance and examples of how you can use the Spring
+		Hadoop project in conjunction with other Spring projects, starting with the Spring Framework
+		itself, then Spring Batch, and then Spring Integration.  </para>
+	<para>Spring Hadoop provides integration with the Spring Framework to create and run Hadoop
+		MapReduce, Hive, and Pig jobs as well as work with HDFS and HBase.  If you have simple needs
+		to work with Hadoop, including basic scheduling, you can add the Spring Hadoop namespace to
+		your Spring based project and get going quickly using Hadoop.</para>
+	<para>As the complexity of your Hadoop application increases, you may want to use Spring Batch
+		to regin in the complexity of developing a large Hadoop application.  Spring Batch provides
+		an extension to the Spring programming model to support common batch job scenarios
+		characterized by the processing of large amounts of data from flat files, databases and
+		messaging systems.  It also provides a workflow style processing model, persistent tracking
+		of steps within the workflow, event notification, as well as administrative functionality to
+		start/stop/restart a workflow.  As Spring Batch was designed to be extended, Spring Hadoop
+		plugs into those extensibilty points, allowing for Hadoop related processing to be a first
+		class citizen in the Spring Batch processing model.</para>
+	<para>Another project of interest to Hadoop developers is Spring Integration.  Spring
+		Integration provides an extension of the Spring programming model to support the well-known
+			<link xlink:href="http://www.eaipatterns.com">Enterprise Integration Patterns</link>. It
+		enables lightweight messaging <emphasis role="italic">within</emphasis> Spring-based
+		applications and supports integration with external systems via declarative adapters. These
+		adapters are of particular interest to Hadoop developers, as they directly support common
+		Hadoop use-cases such as polling a directory or FTP folder for the presence of a file or
+		group of files.  Then once the files are present, a message is sent internal to the
+		application to do additional processing.  This additional processing can be calling a Hadoop
+		MapReduce job directly or starting a more complex Spring Batch based workflow.  Similarly, a
+		step in a Spring Batch workflow can invoke functionality in Spring Integration, for example
+		to send a message though an email adapter.</para>
+	<para>Not matter if you use the Spring Batch project with the Spring Framework by itself or with
+		additional extentions such as Spring Batch and Spring Integration that focus on a particular
+		domain, you will you benefit from the core values that Spring projects bring to the table,
+		namely enabling modularity, reuse and extensive support for unit and integration
+		testing.</para>
+	<section>
+		<title>Spring Framework based applications</title>
+	</section>
+	<para>By Spring Framework based applications</para>
+</chapter>
