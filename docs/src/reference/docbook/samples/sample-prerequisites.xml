@@ -13,7 +13,6 @@
   and JDK 1.6+ installed on the machine that runs the samples.</para>
 
   <para>For instructions on installing Hadoop refer to your distribution
-  documentation or you can refer to the <link
-  linkend="getting-started">Getting Started</link> section of this for
+  documentation or you can refer to the Getting Started section of this for
   instructions based off the Apache download distribution.</para>
 </chapter>
