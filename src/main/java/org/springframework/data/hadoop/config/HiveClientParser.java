@@ -15,8 +15,12 @@
  */
 package org.springframework.data.hadoop.config;
 
+import java.util.Collection;
+
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.data.hadoop.hive.HiveClientFactoryBean;
+import org.springframework.util.CollectionUtils;
 import org.w3c.dom.Element;
 
 /**
@@ -34,5 +38,17 @@ class HiveClientParser extends AbstractImprovedSimpleBeanDefinitionParser {
 	@Override
 	protected String defaultId(ParserContext context, Element element) {
 		return "hive-client";
+	}
+
+	@Override
+	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
+		// parse attributes using conventions
+		super.doParse(element, parserContext, builder);
+
+		// parse scripts
+		Collection<Object> scripts = HiveTaskletParser.parseScripts(parserContext, element);
+		if (!CollectionUtils.isEmpty(scripts)) {
+			builder.addPropertyValue("scripts", scripts);
+		}
 	}
 }

@@ -7,7 +7,7 @@
 	targetNamespace="http://www.springframework.org/schema/hadoop"
 	elementFormDefault="qualified"
 	attributeFormDefault="unqualified"
-	version="1.0.0.M1">
+	version="0.9">
 
 	<xsd:import namespace="http://www.springframework.org/schema/beans" />
 	<xsd:import namespace="http://www.springframework.org/schema/tool" />
@@ -719,6 +719,14 @@ Defines a Hive client for connecting to a Hive server through the Thrift protoco
 		        </tool:annotation>
 		      </xsd:appinfo>
 			</xsd:annotation>
+			<xsd:sequence>
+				<xsd:element name="script" type="scriptType" minOccurs="0" maxOccurs="unbounded">
+					<xsd:annotation>
+					<xsd:documentation><![CDATA[
+Hive script to be executed during start-up.]]></xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+			</xsd:sequence>
 			<xsd:attribute name="id" type="xsd:ID" use="optional">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[

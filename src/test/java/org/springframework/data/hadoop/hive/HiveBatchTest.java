@@ -15,6 +15,7 @@
  */
 package org.springframework.data.hadoop.hive;
 
+import org.apache.hadoop.hive.service.HiveClient;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,11 @@ public class HiveBatchTest {
 
 	{
 		TestUtils.hackHadoopStagingOnWin();
+	}
+
+	@Test
+	public void testHiveClient() throws Exception {
+		ctx.getBean("hive-client", HiveClient.class);
 	}
 
 	@Test

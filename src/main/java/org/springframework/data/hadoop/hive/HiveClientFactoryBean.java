@@ -16,6 +16,8 @@
 package org.springframework.data.hadoop.hive;
 
 
+import java.util.Collection;
+
 import org.apache.hadoop.hive.service.HiveClient;
 import org.apache.hadoop.hive.service.ThriftHive;
 import org.apache.thrift.protocol.TBinaryProtocol;
@@ -27,6 +29,9 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.SmartLifecycle;
+import org.springframework.core.io.Resource;
+import org.springframework.data.hadoop.HadoopException;
+import org.springframework.util.CollectionUtils;
 
 /**
  * FactoryBean for easy declaration and creation of a {@link HiveClient} using {@link ThriftHive}.
@@ -34,6 +39,8 @@ import org.springframework.context.SmartLifecycle;
  * @author Costin Leau
  */
 public class HiveClientFactoryBean implements SmartLifecycle, FactoryBean<HiveClient>, InitializingBean, DisposableBean {
+
+	private Collection<Resource> scripts;
 
 	private HiveClient hive;
 	private String host = "localhost";
@@ -83,8 +90,15 @@ public class HiveClientFactoryBean implements SmartLifecycle, FactoryBean<HiveCl
 		if (!isRunning()) {
 			try {
 				transport.open();
+
+				if (!CollectionUtils.isEmpty(scripts)) {
+					HiveScriptRunner.run(hive, scripts);
+				}
+
 			} catch (TTransportException ex) {
 				throw new BeanCreationException("Cannot start transport", ex);
+			} catch (Exception ex) {
+				throw new HadoopException("Cannot execute Hive script(s)", ex);
 			}
 		}
 	}
@@ -154,5 +168,12 @@ public class HiveClientFactoryBean implements SmartLifecycle, FactoryBean<HiveCl
 	 */
 	public void setTimeout(int timeout) {
 		this.timeout = timeout;
+	}
+
+	/**
+	 * @param scripts The scripts to set.
+	 */
+	public void setScripts(Collection<Resource> scripts) {
+		this.scripts = scripts;
 	}
 }
