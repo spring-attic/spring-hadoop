@@ -1,21 +1,22 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:hdp="http://www.springframework.org/schema/hadoop"
-	xmlns:c="http://www.springframework.org/schema/c"
+	xmlns:util="http://www.springframework.org/schema/util"
 	xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
       	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
-      	http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
+      	http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd
+      	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
 	<import resource="../hadoop-ctx.xml"/>
  	
 	<bean id="pig-ctx" class="org.springframework.data.hadoop.pig.PigContextFactoryBean" p:exec-type="LOCAL" p:configuration-ref="hadoop-configuration"/>
 	<bean id="pig" class="org.springframework.data.hadoop.pig.PigServerFactoryBean" p:pig-context-ref="pig-ctx"/>
 	
-	<pig exec-type="LOCAL" job-name="pig-script" configuration-ref="hadoop-configuration" xmlns="http://www.springframework.org/schema/hadoop">
-		<properties>
-			ivy=blue
-		</properties>
+	<pig exec-type="LOCAL" job-name="pig-script" configuration-ref="hadoop-configuration" xmlns="http://www.springframework.org/schema/hadoop" 
+		properties-ref="props" properties-location="cfg-1.properties, cfg-2.properties">
+		ivy=blue
+		
 		<script location="org/springframework/data/hadoop/pig/script.pig">
 			<arguments>
 				war=web
@@ -31,4 +32,6 @@
 			DUMP B;
 		</script>
 	</pig>
+	
+	<util:properties id="props" location="props.properties"/>
 </beans>

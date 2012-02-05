@@ -66,4 +66,17 @@ public class PigTest {
 		assertEquals("blue", props.get("ivy"));
 		assertEquals(ExecType.LOCAL, server.getPigContext().getExecType());
 	}
+
+	@Test
+	public void testPigProperties() throws Exception {
+		Properties props = pig.getPigContext().getProperties();
+		assertEquals("blue", props.get("ivy"));
+
+		assertEquals("chasing", props.get("star"));
+		assertEquals("captain eo", props.get("return"));
+		assertEquals("last", props.get("train"));
+		assertEquals("the dream", props.get("dancing"));
+		assertEquals("in the mirror", props.get("tears"));
+		assertEquals("eo", props.get("captain"));
+	}
 }

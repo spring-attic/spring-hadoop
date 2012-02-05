@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
@@ -40,7 +41,7 @@ import org.w3c.dom.Element;
  * 
  * @author Costin Leau
  */
-class PigServerParser extends AbstractImprovedSimpleBeanDefinitionParser {
+class PigServerParser extends AbstractPropertiesConfiguredBeanDefinitionParser {
 
 	@Override
 	protected Class<?> getBeanClass(Element element) {
@@ -78,14 +79,17 @@ class PigServerParser extends AbstractImprovedSimpleBeanDefinitionParser {
 		// parse nested PigContext definition
 		BeanDefinitionBuilder contextBuilder = BeanDefinitionBuilder.genericBeanDefinition(PigContextFactoryBean.class);
 
-		String props = DomUtils.getChildElementValueByTagName(element, "properties");
-		if (StringUtils.hasText(props)) {
-			contextBuilder.addPropertyValue("properties", props);
-		}
-
 		NamespaceUtils.setPropertyValue(element, contextBuilder, "job-tracker");
 		NamespaceUtils.setPropertyValue(element, contextBuilder, "exec-type");
 		NamespaceUtils.setPropertyReference(element, contextBuilder, "configuration-ref");
+
+		// move properties setting from PigServer to PigContext class
+		MutablePropertyValues pv = builder.getRawBeanDefinition().getPropertyValues();
+		String prop = "properties";
+		if (pv.contains(prop)) {
+			contextBuilder.addPropertyValue(prop, pv.getPropertyValue(prop).getValue());
+			pv.removePropertyValue(prop);
+		}
 
 		builder.addPropertyValue("pigContext", contextBuilder.getBeanDefinition());
 	}

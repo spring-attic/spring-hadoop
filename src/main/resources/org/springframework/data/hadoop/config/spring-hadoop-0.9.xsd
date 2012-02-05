@@ -550,14 +550,9 @@ Defines a PigServer 'template' (note that since PigServer is not thread-safe, ea
 	      </xsd:appinfo>
 		</xsd:annotation>
 		<xsd:complexType>
+		<xsd:complexContent mixed="true">
+		<xsd:extension base="propertiesConfigurableType">
 			<xsd:sequence>
-					<xsd:element name="properties" minOccurs="0" maxOccurs="1">
-						<xsd:annotation>
-						<xsd:documentation><![CDATA[
-Configuration properties specific to this PigServer instance. Usually added to customize the configuration specified through 'configuration-ref'.
-						]]></xsd:documentation>
-						</xsd:annotation>
-					</xsd:element>
 					<xsd:element name="script" type="scriptWithArgumentsType" minOccurs="0" maxOccurs="unbounded">
 						<xsd:annotation>
 						<xsd:documentation><![CDATA[
@@ -603,6 +598,8 @@ Reference to the Hadoop Configuration. Can be tweaked through the 'configuration
 					  </xsd:restriction>
 					</xsd:simpleType>
 				</xsd:attribute>
+		</xsd:extension>
+		</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
 	
