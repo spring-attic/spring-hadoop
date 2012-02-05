@@ -17,6 +17,8 @@ package org.springframework.data.hadoop.pig;
 
 import java.util.Properties;
 
+import javax.annotation.Resource;
+
 import org.apache.pig.ExecType;
 import org.apache.pig.PigServer;
 import org.junit.After;
@@ -37,8 +39,9 @@ import static org.junit.Assert.*;
 @ContextConfiguration("/org/springframework/data/hadoop/pig/basic.xml")
 public class PigTest {
 
-	@Autowired
+	@Resource(name = "pig-raw")
 	private PigServer pig;
+
 	@Autowired
 	private ApplicationContext ctx;
 
@@ -69,6 +72,7 @@ public class PigTest {
 
 	@Test
 	public void testPigProperties() throws Exception {
+		PigServer pig = ctx.getBean("pig", PigServer.class);
 		Properties props = pig.getPigContext().getProperties();
 		assertEquals("blue", props.get("ivy"));
 
