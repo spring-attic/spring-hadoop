@@ -23,7 +23,7 @@ import org.w3c.dom.Element;
  * 
  * @author Costin Leau
  */
-class HadoopJobParser extends AbstractImprovedSimpleBeanDefinitionParser {
+class HadoopJobParser extends AbstractPropertiesConfiguredBeanDefinitionParser {
 
 	@Override
 	protected Class<?> getBeanClass(Element element) {

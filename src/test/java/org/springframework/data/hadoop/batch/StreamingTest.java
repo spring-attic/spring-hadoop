@@ -15,14 +15,21 @@
  */
 package org.springframework.data.hadoop.batch;
 
+import javax.annotation.Resource;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.Job;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.GenericXmlApplicationContext;
 import org.springframework.data.hadoop.TestUtils;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import static org.junit.Assert.*;
 
 /**
  * Test running a basic streaming example
@@ -37,7 +44,14 @@ import org.springframework.data.hadoop.TestUtils;
  * 
  * @author Costin Leau
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration("/org/springframework/data/hadoop/streaming/basic.xml")
 public class StreamingTest {
+
+	@Autowired
+	private ApplicationContext ctx;
+	@Resource(name = "ns-stream-job")
+	private Job job;
 
 	{
 		TestUtils.hackHadoopStagingOnWin();
@@ -45,11 +59,6 @@ public class StreamingTest {
 
 	@Test
 	public void testStreaming() throws Exception {
-		GenericXmlApplicationContext ctx = new GenericXmlApplicationContext(
-				"/org/springframework/data/hadoop/streaming/basic.xml");
-
-		ctx.registerShutdownHook();
-
 		cleanOutput(ctx);
 
 		Job job = ctx.getBean("vanilla-stream-job", Job.class);
@@ -61,17 +70,13 @@ public class StreamingTest {
 		//	stream.setConf(cfg);
 		//	String[] args = new String[] { "-verbose", "-input", "test", "-output", "output", "-mapper",
 		//				"E:\\tools\\nix\\unxutils\\cat", "-reducer", "E:\\tools\\nix\\unxutils\\wc" };
-//	stream.run(args);
+		//	stream.run(args);
+		//
 
 	}
 
 	@Test
 	public void testStreamingNS() throws Exception {
-		GenericXmlApplicationContext ctx = new GenericXmlApplicationContext(
-				"/org/springframework/data/hadoop/streaming/basic.xml");
-
-		ctx.registerShutdownHook();
-
 		cleanOutput(ctx);
 		Job job = ctx.getBean("ns-stream-job", Job.class);
 		job.waitForCompletion(true);
@@ -81,5 +86,19 @@ public class StreamingTest {
 		FileSystem fs = FileSystem.get(ctx.getBean(Configuration.class));
 		fs.copyFromLocalFile(new Path("./build.gradle"), new Path("test/"));
 		fs.delete(new Path("output"), true);
+	}
+
+	@Test
+	public void testJobProperties() throws Exception {
+		assertNotNull(job);
+		Configuration cfg = job.getConfiguration();
+		assertNotNull(cfg);
+
+		assertEquals("chasing", cfg.get("star"));
+		assertEquals("captain eo", cfg.get("return"));
+		assertEquals("last", cfg.get("train"));
+		assertEquals("the dream", cfg.get("dancing"));
+		assertEquals("in the mirror", cfg.get("tears"));
+		assertEquals("eo", cfg.get("captain"));
 	}
 }

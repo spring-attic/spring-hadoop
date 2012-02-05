@@ -3,12 +3,13 @@
 	xmlns:batch="http://www.springframework.org/schema/batch"
 	xmlns:hdp="http://www.springframework.org/schema/hadoop"
 	xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:c="http://www.springframework.org/schema/c"
+	xmlns:util="http://www.springframework.org/schema/util"
 	xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
       	http://www.springframework.org/schema/batch	http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
       	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
-      	http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop-1.0.xsd">
+      	http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd
+      	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
 	<import resource="../hadoop-ctx.xml"/>
 	 
@@ -24,10 +25,17 @@
 	<hdp:streaming id="ns-stream-job"
 		configuration-ref="hadoop-configuration"
 		input-path="test" output-path="output"
-        mapper="${path.cat}" reducer="${path.wc}">
+        mapper="${path.cat}" reducer="${path.wc}"
+        properties-ref="props" 
+		properties-location="cfg-1.properties, cfg-2.properties">
         <hdp:cmd-env>
         	EXAMPLE_DIR=/home/example/dictionaries/
         </hdp:cmd-env>
+		star=chasing
+		return=captain eo
+		train=last
     </hdp:streaming>
+    
+    <util:properties id="props" location="props.properties"/>
 		
 </beans>

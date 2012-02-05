@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:hdp="http://www.springframework.org/schema/hadoop"
+	xmlns:util="http://www.springframework.org/schema/util"
 	xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
+		http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
 	<import resource="../hadoop-ctx.xml"/>
 
@@ -11,6 +13,7 @@
 	if (fsh.test("/ide-test/input/word")) { fsh.rmr("/ide-test/input/word") }
 	if (fsh.test("/ide-test/runner/output")) { fsh.rmr("/ide-test/runner/output") }
 	if (fsh.test("/ide-test/runner/output-2")) { fsh.rmr("/ide-test/runner/output-2") }
+	if (fsh.test("/ide-test/runner/output-3")) { fsh.rmr("/ide-test/runner/output-3") }
 	
 	fsh.put("src/test/resources/input/word", "/ide-test/input/word")			
 	</hdp:script>
@@ -21,23 +24,38 @@
 		<property name="jobs">
 			<list>
 				<ref local="ns-job"/>
-				
 				<hdp:job id="nested-job" 
 	   	input-path="/ide-test/input/word/" output-path="/ide-test/runner/output-2/"
 		mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
 		reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"
-		configuration-ref="hadoop-configuration"
 		validate-paths="false"/>
-				
 			</list>
 		</property>
 	</bean>
+
+
+	<bean id="jar-job-runner" class="org.springframework.data.hadoop.mapreduce.JobRunner" depends-on="script" p:jobs-ref="jar-job"/>
+
+	<hdp:job id="jar-job" 
+	   	input-path="/ide-test/input/word/" output-path="/ide-test/runner/output-3/"
+		mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
+		reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"
+		validate-paths="false" jar-by-class="org.apache.hadoop.examples.WordCount" /> 
+	
 	 
 	<hdp:job id="ns-job" 
 	   	input-path="/ide-test/input/word/" output-path="/ide-test/runner/output/"
 		mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
 		reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"
-		configuration-ref="hadoop-configuration"
-		validate-paths="false"/>
+		validate-paths="false"
+		properties-ref="props" 
+		properties-location="cfg-1.properties, cfg-2.properties">
+
+		star=chasing
+		return=captain eo
+		train=last
+	</hdp:job>
+
+	<util:properties id="props" location="props.properties"/>
 
 </beans>

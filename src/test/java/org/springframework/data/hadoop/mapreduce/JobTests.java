@@ -15,6 +15,10 @@
  */
 package org.springframework.data.hadoop.mapreduce;
 
+import javax.annotation.Resource;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.mapreduce.Job;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +38,8 @@ public class JobTests {
 
 	@Autowired
 	private ApplicationContext ctx;
+	@Resource(name = "ns-job")
+	private Job job;
 
 	{
 		TestUtils.hackHadoopStagingOnWin();
@@ -42,5 +48,25 @@ public class JobTests {
 	@Test
 	public void testSanityTest() throws Exception {
 		assertNotNull(ctx);
+	}
+
+	@Test
+	public void testJarJob() throws Exception {
+		Job job = ctx.getBean("jar-job", Job.class);
+		assertNotNull(job.getJar());
+	}
+
+	@Test
+	public void testJobProperties() throws Exception {
+		assertNotNull(job);
+		Configuration cfg = job.getConfiguration();
+		assertNotNull(cfg);
+
+		assertEquals("chasing", cfg.get("star"));
+		assertEquals("captain eo", cfg.get("return"));
+		assertEquals("last", cfg.get("train"));
+		assertEquals("the dream", cfg.get("dancing"));
+		assertEquals("in the mirror", cfg.get("tears"));
+		assertEquals("eo", cfg.get("captain"));
 	}
 }

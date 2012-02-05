@@ -32,6 +32,7 @@ import org.apache.hadoop.util.GenericOptionsParser;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.data.hadoop.configuration.ConfigurationUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.ReflectionUtils;
@@ -54,6 +55,7 @@ public class StreamJobFactoryBean implements InitializingBean, FactoryBean<Job>,
 	private String[] input, file, libJar, archive;
 
 	private Configuration configuration;
+	private Properties properties;
 	private Properties cmdEnv;
 
 	public void setBeanName(String name) {
@@ -76,7 +78,7 @@ public class StreamJobFactoryBean implements InitializingBean, FactoryBean<Job>,
 		Assert.isTrue(!ObjectUtils.isEmpty(input), "at least one input required");
 		Assert.hasText(output, "the output is required");
 
-		Configuration cfg = (configuration != null ? new Configuration(configuration) : new Configuration());
+		Configuration cfg = (properties != null ? ConfigurationUtils.createFrom(configuration, properties) : (configuration != null ? configuration : new Configuration()));
 
 		buildGenericOptions(cfg);
 
@@ -290,5 +292,12 @@ public class StreamJobFactoryBean implements InitializingBean, FactoryBean<Job>,
 	 */
 	public void setLibJar(String[] libJars) {
 		this.libJar = libJars;
+	}
+
+	/**
+	 * @param properties The properties to set.
+	 */
+	public void setProperties(Properties properties) {
+		this.properties = properties;
 	}
 }

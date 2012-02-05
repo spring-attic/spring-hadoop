@@ -20,6 +20,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -40,6 +41,7 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.data.hadoop.configuration.ConfigurationUtils;
 import org.springframework.data.hadoop.fs.HdfsResourceLoader;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -55,6 +57,7 @@ public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanN
 
 	private Job job;
 	private Configuration configuration;
+	private Properties properties;
 
 	private String name;
 
@@ -72,10 +75,9 @@ public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanN
 	private Class<? extends Partitioner> partitioner;
 	private Class<? extends RawComparator> sortComparator;
 	private Class<? extends RawComparator> groupingComparator;
-
+	
 	private String workingDir;
 	private Integer numReduceTasks;
-	private Boolean userClassPrecendence;
 
 	private Class<?> jarClass;
 	private Resource jar;
@@ -84,7 +86,7 @@ public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanN
 	private String outputPath;
 	private Boolean compressOutput;
 	private Class<? extends CompressionCodec> codecClass;
-	private Boolean validatePaths = Boolean.FALSE;
+	private Boolean validatePaths = Boolean.TRUE;
 
 	public void setBeanName(String name) {
 		this.name = name;
@@ -103,7 +105,8 @@ public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanN
 	}
 
 	public void afterPropertiesSet() throws Exception {
-		job = (configuration != null ? new Job(configuration) : new Job());
+		Configuration cfg = (properties != null ? ConfigurationUtils.createFrom(configuration, properties) : configuration);
+		job = (cfg != null ? new Job(cfg) : new Job());
 
 
 		// set first to enable auto-detection of K/V to skip the key/value types to be specified
@@ -204,14 +207,14 @@ public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanN
 			if (params.length == 4) {
 				// set each param (if possible);
 				if (params[2] instanceof Class) {
-					Class clz = (Class) params[2];
+					Class<?> clz = (Class<?>) params[2];
 					if (!clz.isInterface())
 						j.setMapOutputKeyClass(clz);
 				}
 
 				// set each param (if possible);
 				if (params[3] instanceof Class) {
-					Class clz = (Class) params[3];
+					Class<?> clz = (Class<?>) params[3];
 					if (!clz.isInterface()) {
 						j.setMapOutputValueClass(clz);
 					}
@@ -359,7 +362,7 @@ public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanN
 	/**
 	 * @param jarClass The jarClass to set.
 	 */
-	public void setJarClass(Class<?> jarClass) {
+	public void setJarByClass(Class<?> jarClass) {
 		this.jarClass = jarClass;
 	}
 
@@ -412,5 +415,12 @@ public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanN
 	 */
 	public void setValidatePaths(Boolean validatePaths) {
 		this.validatePaths = validatePaths;
+	}
+
+	/**
+	 * @param properties The properties to set.
+	 */
+	public void setProperties(Properties properties) {
+		this.properties = properties;
 	}
 }

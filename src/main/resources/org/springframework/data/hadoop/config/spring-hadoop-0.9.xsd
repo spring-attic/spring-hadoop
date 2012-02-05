@@ -54,10 +54,8 @@ Whether to synchronously wait for the job to finish (the default) or not.
 	</xsd:complexType>
 	</xsd:element>
 	
-	<!-- 
-		common attributes shared by properties based configurations 
-		not meant for extensibility - do NOT rely on this type as it might be removed in the future 
-	-->
+	<!-- common attributes shared by properties based configurations 
+		 NOT meant for extensibility - do NOT rely on this type as it might be removed in the future -->
 	<xsd:complexType name="propertiesConfigurableType" mixed="true">
 		<xsd:attribute name="properties-ref" type="xsd:string">
 			<xsd:annotation>
@@ -171,19 +169,11 @@ Reference to the Hadoop Configuration. Defaults to 'hadoop-configuration'.]]></x
 		</xsd:complexType>
 	</xsd:element>
 	
-	
-	<xsd:element name="job">
-		<xsd:annotation>
-		   <xsd:documentation><![CDATA[
-Defines a Hadoop Job.
-				]]></xsd:documentation>
-	      <xsd:appinfo>
-	        <tool:annotation>
-	          <tool:exports type="org.apache.hadoop.mapreduce.Job"/>
-	        </tool:annotation>
-	      </xsd:appinfo>
-		</xsd:annotation>
-		<xsd:complexType>
+	<!-- common attributes shared by properties based configurations 
+		 NOT meant for extensibility - do NOT rely on this type as it might be removed in the future -->
+	<xsd:complexType name="jobType">
+		<xsd:complexContent>
+		<xsd:extension base="propertiesConfigurableType">
 		<xsd:attribute name="id" type="xsd:ID" use="required" />
 		<xsd:attribute name="mapper" use="required">
 		<xsd:annotation>
@@ -203,180 +193,6 @@ Defines a Hadoop Job.
 					<tool:assignable-to type="org.apache.hadoop.mapreduce.Reducer" />
 				</tool:annotation>
 			</xsd:appinfo>
-	 	</xsd:annotation>			
-		</xsd:attribute>
-		<xsd:attribute name="combiner">
-		<xsd:annotation>
-			<xsd:appinfo>
-				<tool:annotation kind="direct">
-					<tool:expected-type type="java.lang.Class" />
-					<tool:assignable-to type="org.apache.hadoop.mapreduce.Reducer" />
-				</tool:annotation>
-			</xsd:appinfo>
-	 	</xsd:annotation>			
-		</xsd:attribute>
-		<xsd:attribute name="input-format">
-		<xsd:annotation>
-			<xsd:appinfo>
-				<tool:annotation kind="direct">
-					<tool:expected-type type="java.lang.Class" />
-					<tool:assignable-to type="org.apache.hadoop.mapreduce.InputFormat" />
-				</tool:annotation>
-			</xsd:appinfo>
-	 	</xsd:annotation>			
-		</xsd:attribute>
-		<xsd:attribute name="output-format">
-		<xsd:annotation>
-			<xsd:appinfo>
-				<tool:annotation kind="direct">
-					<tool:expected-type type="java.lang.Class" />
-					<tool:assignable-to type="org.apache.hadoop.mapreduce.OutputFormat" />
-				</tool:annotation>
-			</xsd:appinfo>
-	 	</xsd:annotation>			
-		</xsd:attribute>
-		<xsd:attribute name="partitioner">
-		<xsd:annotation>
-			<xsd:appinfo>
-				<tool:annotation kind="direct">
-					<tool:expected-type type="java.lang.Class" />
-					<tool:assignable-to type="org.apache.hadoop.mapreduce.Partitioner" />
-				</tool:annotation>
-			</xsd:appinfo>
-	 	</xsd:annotation>			
-		</xsd:attribute>
-		<xsd:attribute name="sort-comparator">
-		<xsd:annotation>
-			<xsd:appinfo>
-				<tool:annotation kind="direct">
-					<tool:expected-type type="java.lang.Class" />
-					<tool:assignable-to type="org.apache.hadoop.io.RawComparator" />
-				</tool:annotation>
-			</xsd:appinfo>
-	 	</xsd:annotation>			
-		</xsd:attribute>
-		<xsd:attribute name="grouping-comparator">
-		<xsd:annotation>
-			<xsd:appinfo>
-				<tool:annotation kind="direct">
-					<tool:expected-type type="java.lang.Class" />
-					<tool:assignable-to type="org.apache.hadoop.io.RawComparator" />
-				</tool:annotation>
-			</xsd:appinfo>
-	 	</xsd:annotation>			
-		</xsd:attribute>
-		<xsd:attribute name="key">
-		<xsd:annotation>
-			<xsd:appinfo>
-				<tool:annotation kind="direct">
-					<tool:expected-type type="java.lang.Class" />
-				</tool:annotation>
-			</xsd:appinfo>
-	 	</xsd:annotation>			
-		</xsd:attribute>
-		<xsd:attribute name="value">
-		<xsd:annotation>
-			<xsd:appinfo>
-				<tool:annotation kind="direct">
-					<tool:expected-type type="java.lang.Class" />
-				</tool:annotation>
-			</xsd:appinfo>
-	 	</xsd:annotation>			
-		</xsd:attribute>
-		<xsd:attribute name="map-key">
-		<xsd:annotation>
-			<xsd:appinfo>
-				<tool:annotation kind="direct">
-					<tool:expected-type type="java.lang.Class" />
-				</tool:annotation>
-			</xsd:appinfo>
-	 	</xsd:annotation>			
-		</xsd:attribute>
-		<xsd:attribute name="map-value">
-		<xsd:annotation>
-			<xsd:appinfo>
-				<tool:annotation kind="direct">
-					<tool:expected-type type="java.lang.Class" />
-				</tool:annotation>
-			</xsd:appinfo>
-	 	</xsd:annotation>			
-		</xsd:attribute>
-		<xsd:attribute name="codec">
-		<xsd:annotation>
-			<xsd:appinfo>
-				<tool:annotation kind="direct">
-					<tool:expected-type type="java.lang.Class" />
-				</tool:annotation>
-			</xsd:appinfo>
-	 	</xsd:annotation>			
-		</xsd:attribute>
-		<xsd:attribute name="input-path" use="required">
-		<xsd:annotation>
-			<xsd:appinfo>
-				<tool:annotation kind="direct">
-					<tool:expected-type type="java.lang.String" />
-				</tool:annotation>
-			</xsd:appinfo>
-	 	</xsd:annotation>			
-		</xsd:attribute>
-		<xsd:attribute name="output-path" use="required">
-		<xsd:annotation>
-			<xsd:appinfo>
-				<tool:annotation kind="direct">
-					<tool:expected-type type="java.lang.String" />
-				</tool:annotation>
-			</xsd:appinfo>
-	 	</xsd:annotation>			
-		</xsd:attribute>
-		<xsd:attribute name="validate-paths" default="true">
-		</xsd:attribute>
-		<xsd:attribute name="configuration-ref" use="optional" default="hadoop-configuration">
-		<xsd:annotation>
-				<xsd:documentation source="java:org.apache.hadoop.conf.Configuration"><![CDATA[
-Reference to the Hadoop Configuration. Defaults to 'hadoop-configuration'.]]></xsd:documentation>
-				<xsd:appinfo>
-					<tool:annotation kind="ref">
-						<tool:expected-type type="org.apache.hadoop.conf.Configuration" />
-					</tool:annotation>
-				</xsd:appinfo>
-	 	</xsd:annotation>			
-		</xsd:attribute>
-		</xsd:complexType>
-	</xsd:element>
-	
-	<xsd:element name="streaming">
-		<xsd:annotation>
-		   <xsd:documentation><![CDATA[
-Defines a Hadoop Streaming Job.
-				]]></xsd:documentation>
-	      <xsd:appinfo>
-	        <tool:annotation>
-	          <tool:exports type="org.apache.hadoop.mapreduce.Job"/>
-	        </tool:annotation>
-	      </xsd:appinfo>
-		</xsd:annotation>
-		<xsd:complexType>
-		
-		<xsd:sequence>
-			<xsd:element name="cmd-env" minOccurs="0" maxOccurs="1">
-				<xsd:annotation>
-				<xsd:documentation><![CDATA[Environment variables (-cmdenv)]]></xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
-		</xsd:sequence>
-		<xsd:attribute name="id" type="xsd:ID" use="required" />
-		<xsd:attribute name="mapper" use="required">
-		<xsd:annotation>
-			<xsd:documentation><![CDATA[
-The streaming mapper command to run.
-			]]></xsd:documentation>
-		</xsd:annotation>
-		</xsd:attribute>
-		<xsd:attribute name="reducer" use="required">
-		<xsd:annotation>
-			<xsd:documentation><![CDATA[
-The streaming reducer command to run.
-			]]></xsd:documentation>
 	 	</xsd:annotation>			
 		</xsd:attribute>
 		<xsd:attribute name="combiner">
@@ -451,6 +267,148 @@ Reference to the Hadoop Configuration. Defaults to 'hadoop-configuration'.]]></x
 				</xsd:appinfo>
 	 	</xsd:annotation>			
 		</xsd:attribute>
+		</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	
+	<xsd:element name="job">
+		<xsd:annotation>
+		   <xsd:documentation><![CDATA[
+Defines a Hadoop Job.
+				]]></xsd:documentation>
+	      <xsd:appinfo>
+	        <tool:annotation>
+	          <tool:exports type="org.apache.hadoop.mapreduce.Job"/>
+	        </tool:annotation>
+	      </xsd:appinfo>
+		</xsd:annotation>
+		<xsd:complexType>
+		<xsd:complexContent mixed="true">
+		<xsd:extension base="jobType">
+		<xsd:attribute name="sort-comparator">
+		<xsd:annotation>
+			<xsd:appinfo>
+				<tool:annotation kind="direct">
+					<tool:expected-type type="java.lang.Class" />
+					<tool:assignable-to type="org.apache.hadoop.io.RawComparator" />
+				</tool:annotation>
+			</xsd:appinfo>
+	 	</xsd:annotation>			
+		</xsd:attribute>
+		<xsd:attribute name="grouping-comparator">
+		<xsd:annotation>
+			<xsd:appinfo>
+				<tool:annotation kind="direct">
+					<tool:expected-type type="java.lang.Class" />
+					<tool:assignable-to type="org.apache.hadoop.io.RawComparator" />
+				</tool:annotation>
+			</xsd:appinfo>
+	 	</xsd:annotation>			
+		</xsd:attribute>
+		<xsd:attribute name="key">
+		<xsd:annotation>
+			<xsd:appinfo>
+				<tool:annotation kind="direct">
+					<tool:expected-type type="java.lang.Class" />
+				</tool:annotation>
+			</xsd:appinfo>
+	 	</xsd:annotation>			
+		</xsd:attribute>
+		<xsd:attribute name="value">
+		<xsd:annotation>
+			<xsd:appinfo>
+				<tool:annotation kind="direct">
+					<tool:expected-type type="java.lang.Class" />
+				</tool:annotation>
+			</xsd:appinfo>
+	 	</xsd:annotation>			
+		</xsd:attribute>
+		<xsd:attribute name="map-key">
+		<xsd:annotation>
+			<xsd:appinfo>
+				<tool:annotation kind="direct">
+					<tool:expected-type type="java.lang.Class" />
+				</tool:annotation>
+			</xsd:appinfo>
+	 	</xsd:annotation>			
+		</xsd:attribute>
+		<xsd:attribute name="map-value">
+		<xsd:annotation>
+			<xsd:appinfo>
+				<tool:annotation kind="direct">
+					<tool:expected-type type="java.lang.Class" />
+				</tool:annotation>
+			</xsd:appinfo>
+	 	</xsd:annotation>			
+		</xsd:attribute>
+		<xsd:attribute name="codec">
+		<xsd:annotation>
+			<xsd:appinfo>
+				<tool:annotation kind="direct">
+					<tool:expected-type type="java.lang.Class" />
+				</tool:annotation>
+			</xsd:appinfo>
+	 	</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="jar">
+		<xsd:annotation>
+			<xsd:documentation><![CDATA[
+Indicates the user jar for the map-reduce job.
+			]]></xsd:documentation>
+			<xsd:appinfo>
+				<tool:annotation>
+					<tool:expected-type type="org.springframework.core.io.Resource" />
+				</tool:annotation>
+			</xsd:appinfo>
+	 	</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="jar-by-class">
+		<xsd:annotation>
+			<xsd:documentation><![CDATA[
+Indicates the job's jar file by finding an example class location.
+			]]></xsd:documentation>
+			<xsd:appinfo>
+				<tool:annotation kind="direct">
+					<tool:expected-type type="java.lang.Class" />
+				</tool:annotation>
+			</xsd:appinfo>
+	 	</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="validate-paths" default="true">
+		<xsd:annotation>
+		   <xsd:documentation><![CDATA[
+Indicates whether the job input/output paths are validated before submitting. This
+saves time as the validation is done locally without having to interact with the job
+tracker. The validation checks whether the input path exists and the output does not.
+				]]></xsd:documentation>
+		</xsd:annotation>		
+		</xsd:attribute>
+		</xsd:extension>
+		</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="streaming">
+		<xsd:annotation>
+		   <xsd:documentation><![CDATA[
+Defines a Hadoop Streaming Job.
+				]]></xsd:documentation>
+	      <xsd:appinfo>
+	        <tool:annotation>
+	          <tool:exports type="org.apache.hadoop.mapreduce.Job"/>
+	        </tool:annotation>
+	      </xsd:appinfo>
+		</xsd:annotation>
+		<xsd:complexType>
+		<xsd:complexContent mixed="true">
+		<xsd:extension base="jobType">
+		<xsd:sequence>
+			<xsd:element name="cmd-env" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+				<xsd:documentation><![CDATA[Environment variables (-cmdenv)]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
 		<xsd:attribute name="number-reducers">
 		<xsd:annotation>
 			<xsd:appinfo>
@@ -487,6 +445,8 @@ Reference to the Hadoop Configuration. Defaults to 'hadoop-configuration'.]]></x
 			</xsd:appinfo>
 	 	</xsd:annotation>			
 		</xsd:attribute>
+		</xsd:extension>
+		</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
 
