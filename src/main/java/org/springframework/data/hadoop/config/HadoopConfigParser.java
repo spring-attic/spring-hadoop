@@ -19,7 +19,6 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.data.hadoop.configuration.ConfigurationFactoryBean;
 import org.springframework.util.StringUtils;
-import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
 
 /**
@@ -27,7 +26,7 @@ import org.w3c.dom.Element;
  * 
  * @author Costin Leau
  */
-class HadoopConfigParser extends AbstractImprovedSimpleBeanDefinitionParser {
+class HadoopConfigParser extends AbstractPropertiesConfiguredBeanDefinitionParser {
 
 	@Override
 	protected Class<?> getBeanClass(Element element) {
@@ -41,7 +40,6 @@ class HadoopConfigParser extends AbstractImprovedSimpleBeanDefinitionParser {
 
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
-		// parse attributes using conventions
 		super.doParse(element, parserContext, builder);
 
 		// parse resources
@@ -49,12 +47,6 @@ class HadoopConfigParser extends AbstractImprovedSimpleBeanDefinitionParser {
 
 		if (StringUtils.hasText(attr)) {
 			builder.addPropertyValue("resources", StringUtils.commaDelimitedListToStringArray(attr));
-		}
-
-		String props = DomUtils.getTextValue(element);
-
-		if (StringUtils.hasText(props)) {
-			builder.addPropertyValue("properties", props);
 		}
 	}
 

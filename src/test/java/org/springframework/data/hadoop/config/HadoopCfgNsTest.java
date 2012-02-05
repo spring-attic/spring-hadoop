@@ -38,6 +38,10 @@ public class HadoopCfgNsTest {
 	@Resource
 	private Configuration complex;
 
+	@Resource
+	private Configuration propsBased;
+
+
 	@Test
 	public void testSimpleConfiguration() throws Exception {
 		assertNotNull(simple);
@@ -54,5 +58,16 @@ public class HadoopCfgNsTest {
 		assertEquals("complex", complex.get("test.name.2"));
 		assertEquals("test-site.xml", complex.get("resource.property"));
 		assertEquals("test-site-2.xml", complex.get("resource.property.2"));
+	}
+
+	@Test
+	public void testPropertiesConfiguration() throws Exception {
+		assertNotNull(propsBased);
+		assertEquals("chasing", propsBased.get("star"));
+		assertEquals("captain eo", propsBased.get("return"));
+		assertEquals("last", propsBased.get("train"));
+		assertEquals("the dream", propsBased.get("dancing"));
+		assertEquals("in the mirror", propsBased.get("tears"));
+		assertEquals("eo", propsBased.get("captain"));
 	}
 }

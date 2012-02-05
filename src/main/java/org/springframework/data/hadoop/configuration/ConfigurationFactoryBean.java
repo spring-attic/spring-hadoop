@@ -37,7 +37,7 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 
 	private static final Log log = LogFactory.getLog(ConfigurationFactoryBean.class);
 
-	private Configuration config;
+	private Configuration internalConfig;
 	private Configuration configuration;
 	private boolean loadDefaults = true;
 	private Set<Resource> resources;
@@ -48,22 +48,22 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 	private boolean registerJvmUrl = false;
 
 	public void afterPropertiesSet() throws Exception {
-		config = createConfiguration(configuration);
+		internalConfig = createConfiguration(configuration);
 
-		config.setClassLoader(beanClassLoader);
+		internalConfig.setClassLoader(beanClassLoader);
 		if (resources != null) {
 			for (Resource resource : resources) {
-				config.addResource(resource.getInputStream());
+				internalConfig.addResource(resource.getInputStream());
 			}
 		}
 
-		ConfigurationUtils.addProperties(config, properties);
+		ConfigurationUtils.addProperties(internalConfig, properties);
 
 		if (initialize) {
-			config.size();
+			internalConfig.size();
 		}
 
-		postProcessConfiguration(config);
+		postProcessConfiguration(internalConfig);
 
 		if (registerJvmUrl) {
 			try {
@@ -92,11 +92,11 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 
 
 	public Configuration getObject() {
-		return config;
+		return internalConfig;
 	}
 
 	public Class<?> getObjectType() {
-		return (config != null ? config.getClass() : Configuration.class);
+		return (internalConfig != null ? internalConfig.getClass() : Configuration.class);
 	}
 
 	public boolean isSingleton() {

@@ -2,10 +2,13 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
 	xmlns:hdp="http://www.springframework.org/schema/hadoop"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd" default-lazy-init="true">
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
+		default-lazy-init="true">
 
 
 	<!-- default -->
@@ -16,6 +19,14 @@
 	<hdp:configuration id="complex" resources="classpath:/test-site.xml, classpath:/test-site-2.xml" configuration-ref="hadoop-configuration">
 		test.name.2=complex
 	</hdp:configuration>
+	
+	<hdp:configuration id="propsBased" properties-ref="props" properties-location="cfg-1.properties, cfg-2.properties">
+		star=chasing
+		return=captain eo
+		train=last
+	</hdp:configuration>
+	
+	<util:properties id="props" location="props.properties"/>
 	
 	<!-- default hdfs resource loader 
 	<hdp:resource-loader />
