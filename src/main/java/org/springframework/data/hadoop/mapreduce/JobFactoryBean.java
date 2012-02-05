@@ -105,9 +105,15 @@ public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanN
 	}
 
 	public void afterPropertiesSet() throws Exception {
-		Configuration cfg = (properties != null ? ConfigurationUtils.createFrom(configuration, properties) : configuration);
-		job = (cfg != null ? new Job(cfg) : new Job());
+		Configuration cfg = (properties != null ? ConfigurationUtils.createFrom(configuration, properties) : (configuration != null ? configuration : new Configuration()));
 
+		// set property to remove Hadoop warning
+		// make sure the conf is modified before the job is created
+		if (cfg.get("mapred.used.genericoptionsparser") == null) {
+			cfg.setBoolean("mapred.used.genericoptionsparser", true);
+		}
+
+		job = new Job(cfg);
 
 		// set first to enable auto-detection of K/V to skip the key/value types to be specified
 		if (mapper != null) {

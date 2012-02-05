@@ -54,6 +54,7 @@ public class JobTests {
 	public void testJarJob() throws Exception {
 		Job job = ctx.getBean("jar-job", Job.class);
 		assertNotNull(job.getJar());
+		assertEquals("true", job.getConfiguration().get("mapred.used.genericoptionsparser"));
 	}
 
 	@Test
@@ -68,5 +69,7 @@ public class JobTests {
 		assertEquals("the dream", cfg.get("dancing"));
 		assertEquals("in the mirror", cfg.get("tears"));
 		assertEquals("eo", cfg.get("captain"));
+
+		assertEquals("true", job.getConfiguration().get("mapred.used.genericoptionsparser"));
 	}
 }
