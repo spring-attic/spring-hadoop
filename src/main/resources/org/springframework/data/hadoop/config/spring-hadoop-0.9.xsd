@@ -715,7 +715,9 @@ Bean id (default is "hive-client").
 	</xsd:element>
 	
 	<xsd:element name="hive-server">
-		<xsd:complexType mixed="true">
+		<xsd:complexType>
+		<xsd:complexContent mixed="true">
+		<xsd:extension base="propertiesConfigurableType">
 			<xsd:annotation>
 			   <xsd:documentation><![CDATA[
 Defines an embedded Hive Server instance opened for access through the Thrift protocol.
@@ -748,7 +750,8 @@ Reference to the Hadoop configuration.]]></xsd:documentation>
 					</xsd:appinfo>
 		 	</xsd:annotation>
 		 	</xsd:attribute>		
-			
+		</xsd:extension>
+		</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
 

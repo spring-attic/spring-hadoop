@@ -17,7 +17,6 @@ package org.springframework.data.hadoop.config;
 
 import java.util.Collection;
 
-import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.data.hadoop.hive.HiveServerFactoryBean;
@@ -29,7 +28,7 @@ import org.w3c.dom.Element;
  * 
  * @author Costin Leau
  */
-public class HiveServerParser extends AbstractImprovedSimpleBeanDefinitionParser {
+public class HiveServerParser extends AbstractPropertiesConfiguredBeanDefinitionParser {
 
 	@Override
 	protected Class<?> getBeanClass(Element element) {
@@ -47,7 +46,7 @@ public class HiveServerParser extends AbstractImprovedSimpleBeanDefinitionParser
 		super.doParse(element, parserContext, builder);
 
 		// parse scripts
-		Collection<BeanDefinition> scripts = PigServerParser.parseScripts(parserContext, element);
+		Collection<Object> scripts = HiveTaskletParser.parseScripts(parserContext, element);
 		if (!CollectionUtils.isEmpty(scripts)) {
 			builder.addPropertyValue("scripts", scripts);
 		}
