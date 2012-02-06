@@ -80,4 +80,9 @@ public class BasicHiveTest {
 
 	}
 
+	//@Test
+	// disabled due to antlr incompatibility between Pig (which requires antlr 3.4) and Hive (3.0.x) 
+	public void testHiveServer() throws Exception {
+		assertNotNull(ctx.getBean("hive-server"));
+	}
 }
