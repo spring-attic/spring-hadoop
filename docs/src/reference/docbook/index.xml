@@ -44,6 +44,7 @@
   </part>
   <part id="dev">
       <title>Developing Spring Hadoop Applications</title>
+      <xi:include href="reference/dev-guide/introduction.xml"/>
       <xi:include href="reference/dev-guide/dev-spring-hadoop.xml"/>
   </part>
   <part id="samples">
