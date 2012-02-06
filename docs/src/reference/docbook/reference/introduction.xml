@@ -7,6 +7,10 @@
    <para><xref linkend="hadoop"/> describes the Spring support for
    bootstrapping, initializing and working with core Hadoop.</para>
 
+   <para><xref linkend="scripting"/> describes the Spring support for interacting
+   with the Hadoop file system.
+   </para>
+
    <para><xref linkend="hbase"/> describes the Spring support for HBase.
    </para>
 
@@ -15,12 +19,4 @@
    
    <para><xref linkend="pig"/> describes the Spring support for Pig.
    </para>
-   <!-- 
-   <para><xref linkend="samples"/> describes the samples provided with the distribution
-   for showcasing the various features available in Spring GemFire.
-   </para>
-
-   <para><xref linkend="testing"/> showcases various ways of testing GemFire inside
-   Spring framework.</para>
- 	-->
 </partintro>

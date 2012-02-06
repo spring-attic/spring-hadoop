@@ -1,31 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter version="5.0" xml:id="requirements"
          xmlns="http://docbook.org/ns/docbook"
-         xmlns:ns6="http://www.w3.org/1999/xlink"
-         xmlns:ns5="http://www.w3.org/1998/Math/MathML"
-         xmlns:ns4="http://www.w3.org/1999/xhtml"
-         xmlns:ns3="http://www.w3.org/2000/svg"
-         xmlns:ns="http://docbook.org/ns/docbook">
+         xmlns:ns6="http://www.w3.org/1999/xlink">
   <title>Requirements</title>
 
   <para>Spring Hadoop requires JDK level 6.0 (just like Hadoop) and above,
   Spring <ulink url="http://www.springsource.org/about">Framework</ulink> 3.0
   (3.1 recommended) and above and <ulink
   url="http://www.gemstone.com/products/gemfire">Hadoop</ulink> 0.20.2
-  (0.205.0 recommended) and above. Regarding Hadoop-related projects, SDHP
-  requires <ulink url="http://hbase.apache.org/">HBase</ulink> 0.90.x, <ulink
+  (1.0.0 recommended) and above. Regarding Hadoop-related projects, SDHP
+  supports <ulink url="http://hbase.apache.org/">HBase</ulink> 0.90.x, <ulink
   url="http://hive.apache.org/">Hive</ulink> 0.7.x and <ulink
   url="http://pig.apache.org/">Pig</ulink> 0.9.x and above. As a rule of
   thumb, when using Hadoop-related projects, such as Hive or Pig, use the
   required Hadoop version as a basis for discovering the supported
   versions.</para>
 
-  <para>Spirng Hadoop also requires you have a Hadoop installation up and
+  <para>Spring Hadoop also requires you have a Hadoop installation up and
   running. If you don't already have a Hadoop cluster up and running in your
   environment, a good first step is to create a single-node cluster. To
-  install Hadoop 0.20.x, follow the <link
-  ns6:href="http://hadoop.apache.org/common/docs/r0.20.2/quickstart.html">Quick
-  Start</link> from the official Apache documentation is a good general guide.
+  install Hadoop 0.20.x+, the <link
+  ns6:href="http://hadoop.apache.org/common/docs/stable/#Getting+Started">Getting
+  Started</link> page from the official Apache documentation is a good general guide.
   If you are running on Ubuntu, the tutorial from Michael G. Noll, "<link
   ns6:href="http://www.michael-noll.com/tutorials/running-hadoop-on-ubuntu-linux-single-node-cluster/">Running
   Hadoop On Ubuntu Linux (Single-Node Cluster)</link>" provides more details.
@@ -34,7 +30,7 @@
   ns6:href="https://ccp.cloudera.com/display/SUPPORT/Cloudera%27s+Hadoop+Demo+VM">here</link>.
   You can also download the <link
   ns6:href="http://www.greenplum.com/products/greenplum-hd">EMC Greenplum
-  HD</link> distribution and get a tech preview of the <link
+  HD</link> distribution or get a tech preview of the <link
   ns6:href="http://hortonworks.com/technology/techpreview/">Hortonworks
   distribution</link>.</para>
 </chapter>

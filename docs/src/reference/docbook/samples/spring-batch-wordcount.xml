@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter version="5.0" xml:id="spring-batch-wordcount"
+<chapter version="5.0" xml:id="batch-wordcount"
          xmlns="http://docbook.org/ns/docbook"
          xmlns:xlink="http://www.w3.org/1999/xlink"
          xmlns:xi="http://www.w3.org/2001/XInclude"
@@ -19,7 +19,7 @@
     context of a Spring Batch application. It serves as a starting point that
     will be expanded upon in other samples. The sample code is located in the
     distribution directory
-    <literal>&lt;spring-hadoop-install-dir&gt;/samples/wordcount</literal></para>
+    <literal>&lt;spring-hadoop-install-dir&gt;/samples/batch-wordcount</literal></para>
 
     <para>The sample uses the Spring Hadoop namespace to define a Spring Batch
     Tasklet that runs a Hadoop job. A <link

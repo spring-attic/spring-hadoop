@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter version="5.0" xml:id="spring-wordcount-temp" xmlns="http://docbook.org/ns/docbook"
+<chapter version="5.0" xml:id="wordcount" xmlns="http://docbook.org/ns/docbook"
          xmlns:xlink="http://www.w3.org/1999/xlink"
          xmlns:xi="http://www.w3.org/2001/XInclude"
          xmlns:ns5="http://www.w3.org/1998/Math/MathML"
@@ -17,6 +17,6 @@
     This sample demonstrates how to execute a MapReduce application and a script that interacts with HDFS inside a Spring based application. It does not use spring Batch or Spring Integration.
 
     <para>The example code is located in the distribution directory
-    &lt;spring-hadoop-install-dir&gt;/samples/basic/spring-wordcount.</para>
+    <literal>&lt;spring-hadoop-install-dir&gt;/samples/wordcount</literal>.</para>
   </section>
 </chapter>

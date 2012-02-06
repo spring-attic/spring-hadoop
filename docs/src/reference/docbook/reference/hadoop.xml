@@ -253,8 +253,8 @@
 	 <section id="hadoop:job:runner">
 	    <title>Running a Hadoop Job</title>
 	 
-	 	<para>The jobs, after being created and configured, need to be submitted for execution to a Hadoop cluster. For non-trivial cases, a coordinating, workflow solution such as Spring Batch is recommended (see 
-	 	<xref linkend="dev-guidance"/> for more information). However for basic job submission SHDP provides <classname>JobRunner</classname> class which submits several jobs sequentially (and waits by default for their
+	 	<para>The jobs, after being created and configured, need to be submitted for execution to a Hadoop cluster. For non-trivial cases, a coordinating, workflow solution such as Spring Batch is recommended <!--(see 
+	 	<xref linkend="dev-guidance"/> for more information)-->. However for basic job submission SHDP provides <classname>JobRunner</classname> class which submits several jobs sequentially (and waits by default for their
 	 	completion): </para>
 	 	
 	 	<programlisting language="xml"><![CDATA[<bean id="runner" class="org.springframework.data.hadoop.mapreduce.JobRunner" p:jobs-ref="job"/>

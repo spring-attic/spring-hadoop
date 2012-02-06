@@ -33,7 +33,7 @@
       <xi:include href="introduction/requirements.xml"/>      
   </part>
   
-  <part id="springhadoop">
+  <part id="core">
       <title>Spring and Hadoop</title>
       <xi:include href="reference/introduction.xml"/>
       <xi:include href="reference/hadoop.xml"/>
@@ -42,13 +42,12 @@
       <xi:include href="reference/hive.xml"/>
       <xi:include href="reference/pig.xml"/>
   </part>
-
-  <part id="springhadoopdev">
+  <!--
+  <part id="dev">
       <title>Developing Spring Hadoop Applications</title>
-      <xi:include href="reference/dev-spring-hadoop.xml"/>
+      <xi:include href="reference/dev-guide/dev-spring-hadoop.xml"/>
   </part>
-
-
+   -->
   <part id="samples">
       <title>Spring Hadoop sample applications</title>
       <xi:include href="samples/introduction.xml"/>
