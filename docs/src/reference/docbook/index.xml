@@ -42,12 +42,10 @@
       <xi:include href="reference/hive.xml"/>
       <xi:include href="reference/pig.xml"/>
   </part>
-  <!--
   <part id="dev">
       <title>Developing Spring Hadoop Applications</title>
       <xi:include href="reference/dev-guide/dev-spring-hadoop.xml"/>
   </part>
-   -->
   <part id="samples">
       <title>Spring Hadoop sample applications</title>
       <xi:include href="samples/introduction.xml"/>
