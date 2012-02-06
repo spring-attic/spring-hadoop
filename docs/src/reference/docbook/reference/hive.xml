@@ -15,9 +15,10 @@
 	    <programlisting language="xml"><![CDATA[<!-- by default, the definition name is 'hive-server' -->
 <hdp:hive-server host="some-other-host" port="10001" />]]></programlisting>
 		
-		<para>If needed the Hadoop configuration can be passed in or additional properties specified inline:</para>
+		<para>If needed the Hadoop configuration can be passed in or additional properties specified. In fact <literal>hiver-server</literal> provides the same properties configuration <literal>knobs</literal> 
+		as <link linkend="hadoop:config:properties">hadoop configuration</link>:</para>:
 
-	    <programlisting language="xml"><![CDATA[<hdp:hive-server host="some-other-host" port="10001" configuration-ref="hadoop-configuration">
+	    <programlisting language="xml"><![CDATA[<hdp:hive-server host="some-other-host" port="10001" properties-location="classpath:hive-dev.properties" configuration-ref="hadoop-configuration">
   someproperty=somevalue
   hive.exec.scratchdir=/tmp/mydir
 </hdp:hive-server>]]></programlisting>
@@ -38,8 +39,8 @@
 		
 		<programlisting language="xml"><![CDATA[<hive-client host="some-host" port="some-port" xmlns="http://www.springframework.org/schema/hadoop">
    <hdp:script>
-   DROP TABLE IF EXITS testHiveBatchTable; 
-   CREATE TABLE testHiveBatchTable (key int, value string);
+     DROP TABLE IF EXITS testHiveBatchTable; 
+     CREATE TABLE testHiveBatchTable (key int, value string);
    </hdp:script>
    <hdp:script location="classpath:org/company/hive/script.q" />
 </hive-client> />]]></programlisting>
@@ -76,7 +77,7 @@
     <bean id="hive-ds" class="org.springframework.jdbc.datasource.SimpleDriverDataSource"
        c:driver-ref="hive-driver" c:url="${hive.url}"/>
 
-	<!-- standard JdbcTemplate declaration -->
+    <!-- standard JdbcTemplate declaration -->
     <bean id="template" class="org.springframework.jdbc.core.JdbcTemplate" c:data-source-ref="hive-ds"/>
 	
     <context:property-placeholder location="hive.properties"/>
@@ -93,8 +94,8 @@
 		
 		<programlisting language="xml"><![CDATA[<hdp:hive-tasklet id="hive-script">
    <hdp:script>
-   DROP TABLE IF EXITS testHiveBatchTable; 
-   CREATE TABLE testHiveBatchTable (key int, value string);
+     DROP TABLE IF EXITS testHiveBatchTable; 
+     CREATE TABLE testHiveBatchTable (key int, value string);
    </hdp:script>
    <hdp:script location="classpath:org/company/hive/script.q" />
 </hdp:hive-tasklet>]]></programlisting>

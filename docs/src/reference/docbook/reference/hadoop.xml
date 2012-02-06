@@ -170,6 +170,42 @@
      of flexbility in adapting to the running environment - in fact we use this approach extensivly in the Spring Hadoop test suite to cope with the differences between the different development boxes
      and the CI server.</para>
      
+     
+     <para>
+     <anchor id="hadoop:config:properties"/>
+     Additionally, external <literal>Properties</literal> files can be loaded, <literal>Properties</literal> beans (typically declared through Spring's <literal>
+     <ulink url="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/xsd-config.html#xsd-config-body-schemas-util-properties">util</ulink></literal> namespace). 
+     Along with the nested properties declaration, this allows customized configurations to be easily declared:
+     </para>
+     
+    <programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:hdp="http://www.springframework.org/schema/hadoop"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+        http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
+
+   <!-- merge the local properties, the props bean and the two properties files -->        
+   <hdp:configuration properties-ref="props" properties-location="cfg-1.properties, cfg-2.properties">
+      star=chasing
+      captain=eo
+   </hdp:configuration>
+     
+   <util:properties id="props" location="props.properties"/>     
+</beans>]]></programlisting>
+     
+     <para>When merging several properties, ones defined locally win. In the example above the configuration properties are the primary source, followed by the <literal>props</literal> bean followed by the external
+     properties file based on their defined order. While it's not typical for a configuration to refer to use so many properties, the example showcases the various options available.
+     
+     <note>For more properties utilities, including using the System as a source or fallback, or control over the merging order, consider using Spring's <literal>
+     <ulink url="http://static.springsource.org/spring/docs/3.0.x/api/org/springframework/beans/factory/config/PropertiesFactoryBean.html">PropertiesFactoryBean</ulink></literal> (which is what Spring Hadoop and 
+     <literal>util:properties</literal> use underneath).</note>
+     </para>
+     
      <para><anchor id="hadoop:config:inherit"/>It is possible to create configuration based on existing ones - this allows one to create dedicated configurations, slightly different from the main ones, usable for certain jobs 
      (such as streaming - more on that <link linkend="hadoop:job:streaming">below</link>). Simply use the <literal>configuration-ref</literal> attribute to refer to the <emphasis>parent</emphasis> configuration - all its properties will be inherited and
      overridden as specified by the child:</para>
@@ -214,10 +250,21 @@
    	 because, if not specified, the default naming convention (<literal>hadoop-configuration</literal>) will be used instead. Neither are the key or value types - these two are automatically determined through a best-effort attempt
    	 by analyzing the class information of the mapper and the reducer. Of course, these settings can be overridden: the former through the <literal>configuration-ref</literal> element, the latter through <literal>key</literal> and
    	 <literal>value</literal> attributes.
-   	 There are plenty of options available not shown in the example (for simplicity) such as the sort or group comparator, the combiner, the partitioner, the codecs to use or the input/output format just to name a few - 
+   	 There are plenty of options available not shown in the example (for simplicity) such as the jar (specified directly or by class), sort or group comparator, the combiner, the partitioner, the codecs to use or the input/output format just to name a few - 
    	 they are supported, just take a look at the SHDP schema (<xref linkend="appendix-schema"/>) or simply trigger auto-completion (usually <literal>ALT+SPACE</literal>) in your IDE; if it supports XML namespaces and is properly configured it will display the
    	 available elements. Additionally one can extend the default Hadoop configuration object and add any special properties not available in the namespace or its backing bean 
    	 (<classname>JobFactoryBean</classname>).</para>
+   	 
+   	 <para>It is worth pointing out that per-job specific configurations are supported by specifying the custom properties directly or referring to them (more information on the pattern is available 
+   	 <link linkend="hadoop:config:properties">here</link>):</para>
+
+   	 <programlisting language="xml"><![CDATA[<hdp:job id="mr-job" 
+  input-path="/input/" output-path="/ouput/"
+  mapper="mapper class" reducer="reducer class"
+  jar-by-class="class used for jar detection"
+  properties-location="classpath:special-job.properties">
+    electric=sea
+  </hdp:job>]]></programlisting>
    	 
    	 <note>
    	 	<para>The job definition can validate the existance of the input and output paths before submitting the actual job (which is slow), to prevent its failure. Take a look at <emphasis>validate-paths</emphasis> attribute

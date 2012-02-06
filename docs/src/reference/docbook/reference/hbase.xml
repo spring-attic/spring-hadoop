@@ -18,6 +18,9 @@
     property=value
 </hdp:hbase-configuration>]]></programlisting>
 
-	<para>Notice that like with the other elements, one can specify additional properties specific to this configuration.</para>
+	<para>Notice that like with the other elements, one can specify additional properties specific to this configuration. In fact <literal>hbase-configuration</literal> provides the same properties
+	configuration <literal>knobs</literal> as <link linkend="hadoop:config:properties">hadoop configuration</link>:</para>
+	
+	<programlisting language="xml"><![CDATA[<hdp:hbase-configuration properties-ref="some-props-bean" properties-location="classpath:/conf/testing/hbase.properties"/>]]></programlisting>	
 	
 </chapter>

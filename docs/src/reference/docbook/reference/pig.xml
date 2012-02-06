@@ -12,10 +12,9 @@
 	executing scripts in <literal>MapReduce</literal> mode. In typical scenarios however, one might want to connect to a remote Hadoop tracker and register some scripts automatically so let us take a look of how the
 	configuration might look like:</para>
 	
-	<programlisting language="xml"><![CDATA[<pig exec-type="LOCAL" job-name="pig-script" configuration-ref="hadoop-configuration" xmlns="http://www.springframework.org/schema/hadoop">
-   <properties>
+	<programlisting language="xml"><![CDATA[<pig exec-type="LOCAL" job-name="pig-script" configuration-ref="hadoop-configuration" properties-location="pig-dev.properties" 
+   xmlns="http://www.springframework.org/schema/hadoop">
      source=${pig.script.src}
-   </properties>
    <script location="org/company/pig/script.pig">
      <arguments>electric=sea</arguments>
    </script>
@@ -27,7 +26,9 @@
 </pig> />]]></programlisting>
 	
 	<para>The example exposes quite a few options so let us review them one by one. First the top-level pig definition configures the pig instance: the execution type, the Hadoop configuration used and the job name. Notice that
-	additional properties can be specified through the <literal>properties</literal> element. The definition contains also two scripts: <literal>script.pig</literal> (read from the classpath) to which one pair of arguments, 
+	additional properties can be specified (either by declaring them inlined or/and loading them from an external file) - in fact, <literal><![CDATA[<hdp:pig/>]]></literal> just like the rest of the libraries configuration
+	elements, supports common properties attributes as described in the <link linkend="hadoop:config:properties">hadoop configuration</link> section.</para>
+	<para>The definition contains also two scripts: <literal>script.pig</literal> (read from the classpath) to which one pair of arguments, 
 	relevant to the script, is passed (notice the use of property placeholder) but also an inlined script, declared as part of the definition, without any arguments.</para>
 	
 	<para>As you can tell, the <literal>pig</literal> namespace offers several options pertaining to Pig configuration. 
