@@ -106,5 +106,12 @@ public class BasicHBaseTest {
 	public void testProperties() throws Exception {
 		assertEquals("bar", config.get("foo"));
 		assertEquals("there", config.get("lookup"));
+
+		assertEquals("chasing", config.get("star"));
+		assertEquals("captain eo", config.get("return"));
+		assertEquals("last", config.get("train"));
+		assertEquals("the dream", config.get("dancing"));
+		assertEquals("in the mirror", config.get("tears"));
+		assertEquals("eo", config.get("captain"));
 	}
 }

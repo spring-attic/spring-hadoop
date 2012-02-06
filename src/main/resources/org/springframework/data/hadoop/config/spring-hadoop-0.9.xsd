@@ -581,23 +581,23 @@ The path to be skipped while automatically shipping binaries for streaming. Mult
 			<xsd:attribute name="job-tracker" type="xsd:string"/>
 			<xsd:attribute name="configuration-ref">
 				<xsd:annotation>
-						<xsd:documentation source="java:org.apache.hadoop.conf.Configuration"><![CDATA[
+					<xsd:documentation source="java:org.apache.hadoop.conf.Configuration"><![CDATA[
 Reference to the Hadoop Configuration. Can be tweaked through the 'configuration' element or the other attributes.]]></xsd:documentation>
-						<xsd:appinfo>
-							<tool:annotation kind="ref">
-								<tool:expected-type type="org.apache.hadoop.conf.Configuration" />
-							</tool:annotation>
-						</xsd:appinfo>
+					<xsd:appinfo>
+						<tool:annotation kind="ref">
+							<tool:expected-type type="org.apache.hadoop.conf.Configuration" />
+						</tool:annotation>
+					</xsd:appinfo>
 			 	</xsd:annotation>
-			 	</xsd:attribute>			
-				<xsd:attribute name="exec-type" default="MAPREDUCE">
-					<xsd:simpleType>
-					  <xsd:restriction base="xsd:string">
-					  	<xsd:enumeration value="MAPREDUCE"/>
-					  	<xsd:enumeration value="LOCAL"/>
-					  </xsd:restriction>
-					</xsd:simpleType>
-				</xsd:attribute>
+			</xsd:attribute>			
+			<xsd:attribute name="exec-type" default="MAPREDUCE">
+				<xsd:simpleType>
+				  <xsd:restriction base="xsd:string">
+				  	<xsd:enumeration value="MAPREDUCE"/>
+				  	<xsd:enumeration value="LOCAL"/>
+				  </xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
 		</xsd:extension>
 		</xsd:complexContent>
 		</xsd:complexType>
@@ -646,7 +646,9 @@ Reference to a PigServer instance. Defaults to 'hadoop-pig-server'.
 	
 	<!-- HBase -->
 	<xsd:element name="hbase-configuration">
-		<xsd:complexType mixed="true">
+		<xsd:complexType>
+		<xsd:complexContent mixed="true">
+		<xsd:extension base="propertiesConfigurableType">
 			<xsd:annotation>
 			   <xsd:documentation><![CDATA[
 Defines an HBase configuration.
@@ -677,6 +679,8 @@ Reference to the Hadoop configuration.]]></xsd:documentation>
 					</xsd:appinfo>
 		 	</xsd:annotation>
 		 	</xsd:attribute>		
+		</xsd:extension>
+		</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
 	
