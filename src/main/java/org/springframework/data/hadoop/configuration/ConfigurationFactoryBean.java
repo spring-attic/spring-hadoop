@@ -109,6 +109,8 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 
 
 	/**
+	 * Sets the parent configuration.
+	 * 
 	 * @param configuration The configuration to set.
 	 */
 	public void setConfiguration(Configuration configuration) {
@@ -116,6 +118,8 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 	}
 
 	/**
+	 * Indicates whether to load the defaults (the default) or not for this configuration.
+	 * 
 	 * @param loadDefaults The loadDefaults to set.
 	 */
 	public void setLoadDefaults(boolean loadDefaults) {
@@ -123,6 +127,8 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 	}
 
 	/**
+	 * Sets the configuration resources.
+	 * 
 	 * @param resources The resources to set.
 	 */
 	public void setResources(Set<Resource> resources) {
@@ -130,6 +136,8 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 	}
 
 	/**
+	 * Sets the configuration properties.
+	 * 
 	 * @param properties The properties to set.
 	 */
 	public void setProperties(Properties properties) {
@@ -137,12 +145,23 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 	}
 
 	/**
-	 * @param initialize The initialize to set.
+	 * Indicates whether the configuration object should be initialized (true) or not.
+	 * This option should normally be set to true as it causes the jars, streams and resources
+	 * set to be loaded - postponing the initializing might cause these to become unreadable.
+	 * 
+	 * @param initialize whether to initialize or not.
 	 */
 	public void setInitialize(boolean initialize) {
 		this.initialize = initialize;
 	}
 
+	/**
+	 * Indicates whether the configuration should register an URL handler (for allowing urls
+	 * to understand HDFS prefixes, such as hdfs) or not. As this operation impacts an entire VM
+	 * and can be invoked at most once per JVM, by default it is false.
+	 * 
+	 * @param register whether to register an URL handler or not
+	 */
 	public void setRegisterUrlHandler(boolean register) {
 		this.registerJvmUrl = register;
 	}

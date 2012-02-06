@@ -23,10 +23,21 @@ package org.springframework.data.hadoop;
 @SuppressWarnings("serial")
 public class HadoopSecurityException extends HadoopException {
 
+	/**
+	 * Constructs a new <code>HadoopSecurityException</code> instance.
+	 *
+	 * @param message message
+	 * @param ex exception
+	 */
 	public HadoopSecurityException(String message, Throwable ex) {
 		super(message, ex);
 	}
 
+	/**
+	 * Constructs a new <code>HadoopSecurityException</code> instance.
+	 *
+	 * @param message message
+	 */
 	public HadoopSecurityException(String message) {
 		super(message);
 	}

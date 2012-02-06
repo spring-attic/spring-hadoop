@@ -31,8 +31,8 @@ public abstract class ConfigurationUtils {
 	/**
 	 * Adds the specified properties to the given {@link Configuration} object.  
 	 * 
-	 * @param configuration
-	 * @param properties
+	 * @param configuration configuration to manipulate. Should not be null.
+	 * @param properties properties to add to the configuration. May be null.
 	 */
 	public static void addProperties(Configuration configuration, Properties properties) {
 		Assert.notNull(configuration, "A non-null configuration is required");
@@ -48,8 +48,9 @@ public abstract class ConfigurationUtils {
 	/**
 	 * Creates a new {@link Configuration} based on the given arguments.
 	 * 
-	 * @param original
-	 * @param properties
+	 * @param original initial configuration to read from. May be null. 
+	 * @param properties properties object to add to the newly created configuration. May be null.
+	 * @return newly created configuration based on the input parameters.
 	 */
 	public static Configuration createFrom(Configuration original, Properties properties) {
 		Configuration cfg = (original != null ? new Configuration(original) : new Configuration());
