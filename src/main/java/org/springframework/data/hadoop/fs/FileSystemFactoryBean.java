@@ -62,6 +62,8 @@ public class FileSystemFactoryBean implements InitializingBean, DisposableBean, 
 	}
 
 	/**
+	 * Sets the Hadoop configuration for this file system.
+	 * 
 	 * @param configuration The configuration to set.
 	 */
 	public void setConfiguration(Configuration configuration) {
@@ -69,6 +71,8 @@ public class FileSystemFactoryBean implements InitializingBean, DisposableBean, 
 	}
 
 	/**
+	 * Sets the URI (if available) for this file system.
+	 * 
 	 * @param uri The uri to set.
 	 */
 	public void setUri(URI uri) {

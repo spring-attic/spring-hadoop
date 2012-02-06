@@ -44,6 +44,11 @@ public class SimplerFileSystem extends FileSystem {
 
 	private final FileSystem fs;
 
+	/**
+	 * Constructs a new <code>SimplerFileSystem</code> instance.
+	 *
+	 * @param fs Hadoop file system to use.
+	 */
 	public SimplerFileSystem(FileSystem fs) {
 		Assert.notNull(fs, "fs is required");
 		this.fs = fs;

@@ -42,7 +42,7 @@ import org.springframework.util.Assert;
  * 
  * @author Costin Leau
  */
-public class ChainedResourceLoader implements ApplicationContextAware, InitializingBean, ResourcePatternResolver,
+class ChainedResourceLoader implements ApplicationContextAware, InitializingBean, ResourcePatternResolver,
 		BeanFactoryPostProcessor, Ordered {
 
 	private ResourcePatternResolver fallback;

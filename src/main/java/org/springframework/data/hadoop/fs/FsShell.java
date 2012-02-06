@@ -70,14 +70,25 @@ public class FsShell implements Closeable, DisposableBean {
 
 	private boolean internalFs = false;
 	private FileSystem fs;
-	private Configuration configuration;
+	private final Configuration configuration;
 	private Trash trash;
 
 
+	/**
+	 * Constructs a new <code>FsShell</code> instance.
+	 *
+	 * @param configuration Hadoop configuration to use.
+	 */
 	public FsShell(Configuration configuration) {
 		this(configuration, null);
 	}
 
+	/**
+	 * Constructs a new <code>FsShell</code> instance.
+	 *
+	 * @param configuration Hadoop configuration to use.
+	 * @param fs Hadoop file system to use.
+	 */
 	public FsShell(Configuration configuration, FileSystem fs) {
 		this.configuration = configuration;
 		try {

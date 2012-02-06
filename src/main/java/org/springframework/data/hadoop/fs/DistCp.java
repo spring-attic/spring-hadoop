@@ -44,11 +44,21 @@ public class DistCp {
 
 	private final Configuration configuration;
 
+	/**
+	 * Constructs a new <code>DistCp</code> instance.
+	 *
+	 * @param configuration Hadoop configuration to use.
+	 */
 	public DistCp(Configuration configuration) {
 		Assert.notNull(configuration, "configuration required");
 		this.configuration = configuration;
 	};
 
+	/**
+	 * Enumeration for the possible attributes that can be preserved by a copy operation.
+	 * 
+	 * @author Costin Leau
+	 */
 	public enum Preserve {
 		REPLICATION, BLOCKSIZE, USER, GROUP, PERMISSION;
 
@@ -89,10 +99,36 @@ public class DistCp {
 		}
 	}
 
+	/**
+	 * Copy operation.
+	 * 
+	 * @param preserve
+	 * @param ignoreFailures
+	 * @param overwrite
+	 * @param update
+	 * @param delete
+	 * @param uris
+	 */
 	public void copy(EnumSet<Preserve> preserve, Boolean ignoreFailures, Boolean overwrite, Boolean update, Boolean delete, String... uris) {
 		copy(preserve, ignoreFailures, Boolean.FALSE, null, null, overwrite, update, delete, null, null, null, uris);
 	}
 
+	/**
+	 * Copies the given resources using the given parameters.
+	 * 
+	 * @param preserve
+	 * @param ignoreFailures
+	 * @param skipCrc
+	 * @param logDir
+	 * @param mappers
+	 * @param overwrite
+	 * @param update
+	 * @param delete
+	 * @param fileLimit
+	 * @param sizeLimit
+	 * @param fileList
+	 * @param uris
+	 */
 	public void copy(EnumSet<Preserve> preserve, Boolean ignoreFailures, Boolean skipCrc, String logDir, Integer mappers, Boolean overwrite, Boolean update, Boolean delete, Long fileLimit, Long sizeLimit, String fileList, String... uris) {
 		Boolean r = (preserve != null && preserve.contains(Preserve.REPLICATION));
 		Boolean b = (preserve != null && preserve.contains(Preserve.BLOCKSIZE));
@@ -100,10 +136,29 @@ public class DistCp {
 		Boolean g = (preserve != null && preserve.contains(Preserve.GROUP));
 		Boolean p = (preserve != null && preserve.contains(Preserve.PERMISSION));
 
-		copy(r, b, u, g, p, ignoreFailures, skipCrc, logDir, mappers, overwrite, update, delete, fileLimit, sizeLimit,
-				fileList, uris);
+		copy(r, b, u, g, p, ignoreFailures, skipCrc, logDir, mappers, overwrite, update, delete, fileLimit, sizeLimit, fileList, uris);
 	}
 
+	/**
+	 * Copies the given resources using the given parameters.
+	 * 
+	 * @param preserveReplication
+	 * @param preserveBlockSize
+	 * @param preserveUser
+	 * @param preserveGroup
+	 * @param preservePermission
+	 * @param ignoreFailures
+	 * @param skipCrc
+	 * @param logDir
+	 * @param mappers
+	 * @param overwrite
+	 * @param update
+	 * @param delete
+	 * @param fileLimit
+	 * @param sizeLimit
+	 * @param fileList
+	 * @param uris
+	 */
 	public void copy(Boolean preserveReplication, Boolean preserveBlockSize, Boolean preserveUser, Boolean preserveGroup, Boolean preservePermission, Boolean ignoreFailures, Boolean skipCrc, String logDir, Integer mappers, Boolean overwrite, Boolean update, Boolean delete, Long fileLimit, Long sizeLimit, String fileList, String... uris) {
 
 		List<String> args = new ArrayList<String>();
@@ -136,10 +191,23 @@ public class DistCp {
 		copy(args.toArray(new String[args.size()]));
 	}
 
+	/**
+	 * Basic copy operation, between a source and a destination using the defaults.
+	 * 
+	 * @param arg1
+	 * @param arg2
+	 */
 	public void copy(String arg1, String arg2) {
 		copy(new String[] { arg1, arg2 });
 	}
 
+	/**
+	 * Basic copy operation, between a source and a destination using the defaults.
+	 * 
+	 * @param arg1
+	 * @param arg2
+	 * @param arg3
+	 */
 	public void copy(String arg1, String arg2, String arg3) {
 		copy(new String[] { arg1, arg2, arg3 });
 	}

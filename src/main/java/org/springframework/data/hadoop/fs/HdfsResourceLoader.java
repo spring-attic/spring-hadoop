@@ -48,10 +48,22 @@ public class HdfsResourceLoader implements ResourcePatternResolver, PriorityOrde
 	private final PathMatcher pathMatcher = new AntPathMatcher();
 	private final boolean internalFS;
 
+	/**
+	 * Constructs a new <code>HdfsResourceLoader</code> instance.
+	 *
+	 * @param config Hadoop configuration to use.
+	 */
 	public HdfsResourceLoader(Configuration config) {
 		this(config, null);
 	}
 
+	/**
+	 * Constructs a new <code>HdfsResourceLoader</code> instance.
+	 *
+	 * @param config Hadoop configuration to use.
+	 * @param uri Hadoop file system URI.
+	 * @param user Hadoop user for accessing the file system.
+	 */
 	public HdfsResourceLoader(Configuration config, URI uri, String user) {
 		internalFS = true;
 		FileSystem tempFS = null;
@@ -69,16 +81,32 @@ public class HdfsResourceLoader implements ResourcePatternResolver, PriorityOrde
 		}
 	}
 
+	/**
+	 * Constructs a new <code>HdfsResourceLoader</code> instance.
+	 *
+	 * @param config Hadoop configuration to use.
+	 * @param uri Hadoop file system URI.
+	 */
 	public HdfsResourceLoader(Configuration config, URI uri) {
 		this(config, uri, null);
 	}
 
+	/**
+	 * Constructs a new <code>HdfsResourceLoader</code> instance.
+	 *
+	 * @param fs Hadoop file system to use.
+	 */
 	public HdfsResourceLoader(FileSystem fs) {
 		Assert.notNull(fs, "a non-null file-system required");
 		this.fs = fs;
 		internalFS = false;
 	}
 
+	/**
+	 * Returns the Hadoop file system used by this resource loader.
+	 * 
+	 * @return the Hadoop file system in use.
+	 */
 	public FileSystem getFileSystem() {
 		return fs;
 	}
