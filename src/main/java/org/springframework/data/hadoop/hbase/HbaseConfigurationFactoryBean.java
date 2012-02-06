@@ -26,7 +26,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.data.hadoop.configuration.ConfigurationUtils;
 
 /**
- * Factory for creating HBase specific configuration. By default also cleans up any connection associated with the current configuration.
+ * Factory for creating HBase specific configuration. By default cleans up any connection associated with the current configuration.
  * 
  * 
  * @see HConnectionManager
@@ -74,6 +74,8 @@ public class HbaseConfigurationFactoryBean implements InitializingBean, Disposab
 	}
 
 	/**
+	 * Sets the configuration properties.
+	 * 
 	 * @param properties The properties to set.
 	 */
 	public void setProperties(Properties properties) {
