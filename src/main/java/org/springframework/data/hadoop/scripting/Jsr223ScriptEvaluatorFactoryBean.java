@@ -30,16 +30,12 @@ import org.springframework.scripting.ScriptSource;
  */
 class Jsr223ScriptEvaluatorFactoryBean implements InitializingBean, BeanClassLoaderAware, FactoryBean<Object> {
 
-	public enum EvaluationType {
-		ONCE, IF_MODIFIED, ALWAYS;
-	}
-
 	private ClassLoader classLoader;
 	private ScriptSource script;
 	private Jsr223ScriptEvaluator evaluator;
 	private String language, extension;
 	private Map<String, Object> arguments;
-	private EvaluationType evaluation = EvaluationType.ALWAYS;
+	private EvaluationPolicy evaluation = EvaluationPolicy.ALWAYS;
 	private final Object monitor = new Object();
 	private volatile boolean evaluated;
 	private Object result = null;
@@ -101,7 +97,7 @@ class Jsr223ScriptEvaluatorFactoryBean implements InitializingBean, BeanClassLoa
 
 	@Override
 	public boolean isSingleton() {
-		return EvaluationType.ONCE.equals(evaluation);
+		return EvaluationPolicy.ONCE.equals(evaluation);
 	}
 
 	@Override
@@ -110,20 +106,26 @@ class Jsr223ScriptEvaluatorFactoryBean implements InitializingBean, BeanClassLoa
 	}
 
 	/**
-	 * @param script The resource to set.
+	 * Sets the script source to evaluate.
+	 * 
+	 * @param script The script to evaluate.
 	 */
 	public void setScriptSource(ScriptSource script) {
 		this.script = script;
 	}
 
 	/**
-	 * @param language The language to set.
+	 * Sets the script language. 
+	 * 
+	 * @param language The script language.
 	 */
 	public void setLanguage(String language) {
 		this.language = language;
 	}
 
 	/**
+	 * Sets the script extension. Used for detecting the language.
+	 * 
 	 * @param extension The extension to set.
 	 */
 	public void setExtension(String extension) {
@@ -131,15 +133,17 @@ class Jsr223ScriptEvaluatorFactoryBean implements InitializingBean, BeanClassLoa
 	}
 
 	/**
-	 * Sets the way the script is modified.
+	 * Sets the way the script is evaluated.
 	 * 
 	 * @param evaluation
 	 */
-	public void setEvaluate(EvaluationType evaluation) {
+	public void setEvaluate(EvaluationPolicy evaluation) {
 		this.evaluation = evaluation;
 	}
 
 	/**
+	 * Sets the arguments for evaluating this script.
+	 * 
 	 * @param arguments The arguments to set.
 	 */
 	public void setArguments(Map<String, Object> arguments) {
@@ -156,6 +160,8 @@ class Jsr223ScriptEvaluatorFactoryBean implements InitializingBean, BeanClassLoa
 	}
 
 	/**
+	 * Indicates whether to evaluate the script at startup (default) or not.
+	 *
 	 * @param runAtStartup The runStartUp to set.
 	 */
 	public void setRunAtStartup(boolean runAtStartup) {
