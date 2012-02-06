@@ -39,7 +39,8 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.data.hadoop.configuration.ConfigurationUtils;
 
 /**
- * FactoryBean for easy declaration and creation of an embeddable {@link HiveServer}. 
+ * FactoryBean for easy declaration and creation of an embeddable Hive server. 
+ * Similar in functionality to {@link HiveServer} but not tied to the command line. 
  * 
  * @author Costin Leau
  */
@@ -152,13 +153,17 @@ public class HiveServerFactoryBean implements FactoryBean<TServer>, Initializing
 	}
 
 	/**
-	 * @param autoStartup The autoStartup to set.
+	 * Indicates whether the Hive client should start automatically (default) or not.
+	 * 
+	 * @param autoStart whether to automatically start or not
 	 */
 	public void setAutoStartup(boolean autoStartup) {
 		this.autoStartup = autoStartup;
 	}
 
 	/**
+	 * Sets the server port.
+	 * 
 	 * @param port The port to set.
 	 */
 	public void setPort(int port) {
@@ -166,6 +171,8 @@ public class HiveServerFactoryBean implements FactoryBean<TServer>, Initializing
 	}
 
 	/**
+	 * Sets the minimum number of threads serving this server.
+	 * 
 	 * @param minThreads The minThreads to set.
 	 */
 	public void setMinThreads(int minThreads) {
@@ -173,6 +180,8 @@ public class HiveServerFactoryBean implements FactoryBean<TServer>, Initializing
 	}
 
 	/**
+	 * Sets the maximum number of threads serving this server.
+	 * 
 	 * @param maxThreads The maxThreads to set.
 	 */
 	public void setMaxThreads(int maxThreads) {
@@ -180,6 +189,8 @@ public class HiveServerFactoryBean implements FactoryBean<TServer>, Initializing
 	}
 
 	/**
+	 * Sets the Hadoop configuration to use.
+	 * 
 	 * @param configuration The configuration to set.
 	 */
 	public void setConfiguration(Configuration configuration) {
@@ -187,14 +198,18 @@ public class HiveServerFactoryBean implements FactoryBean<TServer>, Initializing
 	}
 
 	/**
+	 * Sets the configuration properties.
 	 * 
-	 * @param properties
+	 * @param properties The properties to set.
 	 */
 	public void setProperties(Properties properties) {
 		this.properties = properties;
 	}
 
 	/**
+	 * Sets the executor for starting the server (which is a blocking operation).
+	 * By default, an internal {@link SimpleAsyncTaskExecutor} instance is used.
+	 * 
 	 * @param executor The executor to set.
 	 */
 	public void setExecutor(Executor executor) {

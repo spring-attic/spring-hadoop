@@ -118,6 +118,11 @@ public class HiveClientFactoryBean implements SmartLifecycle, FactoryBean<HiveCl
 		return Integer.MIN_VALUE;
 	}
 
+	/**
+	 * Indicates whether the Hive client should start automatically (default) or not.
+	 * 
+	 * @param autoStart whether to automatically start or not
+	 */
 	public void setAutoStartup(boolean autoStart) {
 		this.autoStartup = autoStart;
 	}
@@ -132,6 +137,8 @@ public class HiveClientFactoryBean implements SmartLifecycle, FactoryBean<HiveCl
 	}
 
 	/**
+	 * Sets the server host. 
+	 * 
 	 * @param host The host to set.
 	 */
 	public void setHost(String host) {
@@ -148,6 +155,8 @@ public class HiveClientFactoryBean implements SmartLifecycle, FactoryBean<HiveCl
 	}
 
 	/**
+	 * Sets the server port.
+	 * 
 	 * @param port The port to set.
 	 */
 	public void setPort(int port) {
@@ -164,6 +173,8 @@ public class HiveClientFactoryBean implements SmartLifecycle, FactoryBean<HiveCl
 	}
 
 	/**
+	 * Sets the connection timeout.
+	 * 
 	 * @param timeout The timeout to set.
 	 */
 	public void setTimeout(int timeout) {
@@ -171,6 +182,8 @@ public class HiveClientFactoryBean implements SmartLifecycle, FactoryBean<HiveCl
 	}
 
 	/**
+	 * Sets the scripts to execute once the client connects.
+	 * 
 	 * @param scripts The scripts to set.
 	 */
 	public void setScripts(Collection<Resource> scripts) {

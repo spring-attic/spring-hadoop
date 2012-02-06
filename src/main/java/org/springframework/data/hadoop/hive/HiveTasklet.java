@@ -57,6 +57,8 @@ public class HiveTasklet implements InitializingBean, Tasklet {
 	}
 
 	/**
+	 * Sets the scripts to be executed by this tasklet.
+	 * 
 	 * @param scripts The scripts to set.
 	 */
 	public void setScripts(Collection<Resource> scripts) {
@@ -64,6 +66,8 @@ public class HiveTasklet implements InitializingBean, Tasklet {
 	}
 
 	/**
+	 * Sets the hive client for this tasklet.
+	 *  
 	 * @param hive HiveClient to set
 	 */
 	public void setHiveClient(HiveClient hive) {
