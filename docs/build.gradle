@@ -19,7 +19,8 @@ docbookFoPdf.stylesheet = new File(projectDir, 'src/reference/resources/xsl/pdf-
 
 def imagesDir = new File(projectDir, 'src/reference/resources/images');
 [docbookHtml, docbookFoPdf, docbookHtmlSingle]*.admonGraphicsPath = "./images/admon/"
-[docbookHtml, docbookFoPdf, docbookHtmlSingle]*.imgSrcPath = "${imagesDir}"
+[docbookFoPdf]*.imgSrcPath = "${imagesDir}"
+[docbookHtml, docbookHtmlSingle]*.imgSrcPath = "./images/"
 
 // defined separately to prevent the replacement from taking place (seems to affect the images)
 imgSpec = copySpec {
