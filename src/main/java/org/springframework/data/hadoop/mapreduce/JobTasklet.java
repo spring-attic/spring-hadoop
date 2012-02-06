@@ -58,12 +58,20 @@ public class JobTasklet implements InitializingBean, Tasklet {
 	}
 
 	/**
-	 * @param job The job to set.
+	 * Sets the job to execute.
+	 * 
+	 * @param job The job to execute.
 	 */
 	public void setJob(Job job) {
 		this.job = job;
 	}
 
+	/**
+	 * Indicates whether the tasklet should return for the job to complete (default)
+	 * after submission or not.
+	 * 
+	 * @param waitForJob whether to wait for the job to complete or not.
+	 */
 	public void setWaitForJob(boolean waitForJob) {
 		this.waitForJob = waitForJob;
 	}

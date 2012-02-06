@@ -195,6 +195,8 @@ public class StreamJobFactoryBean implements InitializingBean, FactoryBean<Job>,
 	}
 
 	/**
+	 * Sets the job input paths.
+	 * 
 	 * @param input The input to set.
 	 */
 	public void setInputPath(String[] input) {
@@ -202,6 +204,8 @@ public class StreamJobFactoryBean implements InitializingBean, FactoryBean<Job>,
 	}
 
 	/**
+	 * Sets the job output paths.
+	 * 
 	 * @param output The output to set.
 	 */
 	public void setOutputPath(String output) {
@@ -209,6 +213,8 @@ public class StreamJobFactoryBean implements InitializingBean, FactoryBean<Job>,
 	}
 
 	/**
+	 * Sets the job mapper.
+	 * 
 	 * @param mapper The mapper to set.
 	 */
 	public void setMapper(String mapper) {
@@ -216,6 +222,7 @@ public class StreamJobFactoryBean implements InitializingBean, FactoryBean<Job>,
 	}
 
 	/**
+	 * Sets the job reducer.
 	 * @param reducer The reducer to set.
 	 */
 	public void setReducer(String reducer) {
@@ -223,6 +230,8 @@ public class StreamJobFactoryBean implements InitializingBean, FactoryBean<Job>,
 	}
 
 	/**
+	 * Sets the job combiner.
+	 * 
 	 * @param combiner The combiner to set.
 	 */
 	public void setCombiner(String combiner) {
@@ -230,6 +239,8 @@ public class StreamJobFactoryBean implements InitializingBean, FactoryBean<Job>,
 	}
 
 	/**
+	 * Sets the job input format.
+	 * 
 	 * @param inputFormat The inputFormat to set.
 	 */
 	public void setInputFormat(String inputFormat) {
@@ -237,6 +248,8 @@ public class StreamJobFactoryBean implements InitializingBean, FactoryBean<Job>,
 	}
 
 	/**
+	 * Sets the job output format.
+	 * 
 	 * @param outputFormat The outputFormat to set.
 	 */
 	public void setOutputFormat(String outputFormat) {
@@ -244,6 +257,8 @@ public class StreamJobFactoryBean implements InitializingBean, FactoryBean<Job>,
 	}
 
 	/**
+	 * Sets the job partitioner.
+	 * 
 	 * @param partitioner The partitioner to set.
 	 */
 	public void setPartitioner(String partitioner) {
@@ -251,6 +266,8 @@ public class StreamJobFactoryBean implements InitializingBean, FactoryBean<Job>,
 	}
 
 	/**
+	 * Sets the job files.
+	 * 
 	 * @param files The cacheFile to set.
 	 */
 	public void setFile(String[] files) {
@@ -258,6 +275,8 @@ public class StreamJobFactoryBean implements InitializingBean, FactoryBean<Job>,
 	}
 
 	/**
+	 * Sets the job archives.
+	 * 
 	 * @param archives The cacheArchive to set.
 	 */
 	public void setArchive(String[] archives) {
@@ -265,6 +284,8 @@ public class StreamJobFactoryBean implements InitializingBean, FactoryBean<Job>,
 	}
 
 	/**
+	 * Sets the Hadoop configuration to use.
+	 * 
 	 * @param configuration The configuration to set.
 	 */
 	public void setConfiguration(Configuration configuration) {
@@ -281,6 +302,8 @@ public class StreamJobFactoryBean implements InitializingBean, FactoryBean<Job>,
 	}
 
 	/**
+	 * Sets the job number of reducer tasks.
+	 * 
 	 * @param numReduceTasks The numReduceTasks to set.
 	 */
 	public void setNumReduceTasks(Integer numReduceTasks) {
@@ -288,6 +311,8 @@ public class StreamJobFactoryBean implements InitializingBean, FactoryBean<Job>,
 	}
 
 	/**
+	 * Sets the job jar libraries.
+	 * 
 	 * @param libJars The libJars to set.
 	 */
 	public void setLibJar(String[] libJars) {
@@ -295,6 +320,8 @@ public class StreamJobFactoryBean implements InitializingBean, FactoryBean<Job>,
 	}
 
 	/**
+	 * Sets the configuration properties to use.
+	 * 
 	 * @param properties The properties to set.
 	 */
 	public void setProperties(Properties properties) {

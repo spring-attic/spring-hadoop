@@ -48,7 +48,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Factory bean for creating Hadoop jobs.
+ * Factory bean for creating a Hadoop Map-Reduce job.
  * 
  * @author Costin Leau
  */
@@ -254,6 +254,8 @@ public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanN
 	}
 
 	/**
+	 * Sets the Hadoop configuration to use.
+	 * 
 	 * @param configuration The configuration to set.
 	 */
 	public void setConfiguration(Configuration configuration) {
@@ -261,6 +263,8 @@ public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanN
 	}
 
 	/**
+	 * Sets the job name.
+	 * 
 	 * @param name The name to set.
 	 */
 	public void setName(String name) {
@@ -268,6 +272,8 @@ public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanN
 	}
 
 	/**
+	 * Sets the job key class.
+	 * 
 	 * @param keyClass The keyClass to set.
 	 */
 	public void setKey(Class<?> keyClass) {
@@ -275,6 +281,8 @@ public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanN
 	}
 
 	/**
+	 * Sets the job value class.
+	 * 
 	 * @param valueClass The valueClass to set.
 	 */
 	public void setValue(Class<?> valueClass) {
@@ -282,6 +290,8 @@ public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanN
 	}
 
 	/**
+	 * Sets the job map key class.
+	 * 
 	 * @param mapKeyClass The mapKeyClass to set.
 	 */
 	public void setMapKey(Class<?> mapKeyClass) {
@@ -289,6 +299,8 @@ public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanN
 	}
 
 	/**
+	 * Sets the job map value class.
+	 * 
 	 * @param mapValueClass The mapValueClass to set.
 	 */
 	public void setMapValue(Class<?> mapValueClass) {
@@ -296,6 +308,8 @@ public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanN
 	}
 
 	/**
+	 * Sets the job mapper class.
+	 * 
 	 * @param mapper The mapper to set.
 	 */
 	public void setMapper(Class<? extends Mapper> mapper) {
@@ -303,6 +317,8 @@ public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanN
 	}
 
 	/**
+	 * Sets the job reducer class.
+	 * 
 	 * @param reducer The reducer to set.
 	 */
 	public void setReducer(Class<? extends Reducer> reducer) {
@@ -310,6 +326,8 @@ public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanN
 	}
 
 	/**
+	 * Sets the job combiner class.
+	 * 
 	 * @param combiner The combiner to set.
 	 */
 	public void setCombiner(Class<? extends Reducer> combiner) {
@@ -317,6 +335,8 @@ public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanN
 	}
 
 	/**
+	 * Sets the job input format class.
+	 * 
 	 * @param inputFormat The inputFormat to set.
 	 */
 	public void setInputFormat(Class<? extends InputFormat> inputFormat) {
@@ -324,6 +344,8 @@ public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanN
 	}
 
 	/**
+	 * Sets the job output format class.
+	 * 
 	 * @param outputFormat The outputFormat to set.
 	 */
 	public void setOutputFormat(Class<? extends OutputFormat> outputFormat) {
@@ -331,6 +353,8 @@ public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanN
 	}
 
 	/**
+	 * Sets the job partitioner class.
+	 * 
 	 * @param partitioner The partitioner to set.
 	 */
 	public void setPartitioner(Class<? extends Partitioner> partitioner) {
@@ -338,6 +362,8 @@ public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanN
 	}
 
 	/**
+	 * Sets the job sort comparator class.
+	 * 
 	 * @param sortComparator The sortComparator to set.
 	 */
 	public void setSortComparator(Class<? extends RawComparator> sortComparator) {
@@ -345,6 +371,8 @@ public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanN
 	}
 
 	/**
+	 * Sets the job grouping comparator class.
+	 * 
 	 * @param groupingComparator The groupingComparator to set.
 	 */
 	public void setGroupingComparator(Class<? extends RawComparator> groupingComparator) {
@@ -352,6 +380,8 @@ public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanN
 	}
 
 	/**
+	 * Sets the job working directory.
+	 * 
 	 * @param workingDir The workingDir to set.
 	 */
 	public void setWorkingDir(String workingDir) {
@@ -359,6 +389,8 @@ public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanN
 	}
 
 	/**
+	 * Sets the number of reduce task for this job.
+	 *  
 	 * @param numReduceTasks The numReduceTasks to set.
 	 */
 	public void setNumReduceTasks(Integer numReduceTasks) {
@@ -366,6 +398,8 @@ public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanN
 	}
 
 	/**
+	 * Determines the job jar based on the given class.
+	 * 
 	 * @param jarClass The jarClass to set.
 	 */
 	public void setJarByClass(Class<?> jarClass) {
@@ -373,6 +407,8 @@ public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanN
 	}
 
 	/**
+	 * Sets the job jar.
+	 * 
 	 * @param jar The jar to set.
 	 */
 	public void setJar(Resource jar) {
@@ -380,8 +416,9 @@ public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanN
 	}
 
 	/**
+	 * Sets the job input path.
 	 * 
-	 * @param inputPath
+	 * @param inputPath job input path.
 	 */
 	public void setInputPath(String inputPath) {
 		this.inputPaths = new ArrayList<String>(1);
@@ -389,6 +426,8 @@ public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanN
 	}
 
 	/**
+	 * Sets the job input paths.
+	 * 
 	 * @param inputPaths The inputPaths to set.
 	 */
 	public void setInputPaths(List<String> inputPaths) {
@@ -396,6 +435,8 @@ public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanN
 	}
 
 	/**
+	 * Sets the job output path.
+	 * 
 	 * @param outputPath The outputPath to set.
 	 */
 	public void setOutputPath(String outputPath) {
@@ -403,6 +444,8 @@ public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanN
 	}
 
 	/**
+	 * Indicates whether the job output should be compressed or not.
+	 * 
 	 * @param compressOutput The compressOutput to set.
 	 */
 	public void setCompressOutput(Boolean compressOutput) {
@@ -410,6 +453,8 @@ public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanN
 	}
 
 	/**
+	 * Sets the job codec class.
+	 * 
 	 * @param codecClass The codecClass to set.
 	 */
 	public void setCodec(Class<? extends CompressionCodec> codecClass) {
@@ -417,6 +462,9 @@ public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanN
 	}
 
 	/**
+	 * Indicates whether the job input/output paths should be validated
+	 * (default) before the job is submitted.
+	 * 
 	 * @param validatePaths The validatePaths to set.
 	 */
 	public void setValidatePaths(Boolean validatePaths) {
@@ -424,6 +472,8 @@ public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanN
 	}
 
 	/**
+	 * The configuration properties to set for this job.
+	 * 
 	 * @param properties The properties to set.
 	 */
 	public void setProperties(Properties properties) {
