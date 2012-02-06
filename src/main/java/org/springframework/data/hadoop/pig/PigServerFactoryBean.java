@@ -19,8 +19,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.pig.PigServer;
 import org.apache.pig.impl.PigContext;
@@ -38,8 +36,6 @@ import org.springframework.util.StringUtils;
  * @author Costin Leau
  */
 public class PigServerFactoryBean implements FactoryBean<PigServer>, BeanNameAware {
-
-	private static final Log log = LogFactory.getLog(PigServerFactoryBean.class);
 
 	private PigContext pigContext;
 	private Collection<String> pathToSkip;
@@ -118,6 +114,8 @@ public class PigServerFactoryBean implements FactoryBean<PigServer>, BeanNameAwa
 	}
 
 	/**
+	 * Sets the {@link PigContext} to use.
+	 * 
 	 * @param pigContext The pigContext to set.
 	 */
 	public void setPigContext(PigContext pigContext) {
@@ -125,6 +123,8 @@ public class PigServerFactoryBean implements FactoryBean<PigServer>, BeanNameAwa
 	}
 
 	/**
+	 * Sets the paths to skip.
+	 * 
 	 * @param pathToSkip The pathToSkip to set.
 	 */
 	public void setPathsToSkip(Collection<String> pathToSkip) {
@@ -132,6 +132,8 @@ public class PigServerFactoryBean implements FactoryBean<PigServer>, BeanNameAwa
 	}
 
 	/**
+	 * Sets the scripts to execute at startup.
+	 * 
 	 * @param scripts The scripts to set.
 	 */
 	public void setScripts(Collection<PigScript> scripts) {
@@ -139,6 +141,8 @@ public class PigServerFactoryBean implements FactoryBean<PigServer>, BeanNameAwa
 	}
 
 	/**
+	 * Sets the parallelism.
+	 * 
 	 * @param parallelism The parallelism to set.
 	 */
 	public void setParallelism(Integer parallelism) {
@@ -146,6 +150,8 @@ public class PigServerFactoryBean implements FactoryBean<PigServer>, BeanNameAwa
 	}
 
 	/**
+	 * Sets the job name.
+	 * 
 	 * @param jobName The jobName to set.
 	 */
 	public void setJobName(String jobName) {
@@ -153,6 +159,8 @@ public class PigServerFactoryBean implements FactoryBean<PigServer>, BeanNameAwa
 	}
 
 	/**
+	 * Sets the job priority.
+	 * 
 	 * @param jobPriority The jobPriority to set.
 	 */
 	public void setJobPriority(String jobPriority) {
@@ -160,7 +168,9 @@ public class PigServerFactoryBean implements FactoryBean<PigServer>, BeanNameAwa
 	}
 
 	/**
-	 * @param validateEachStatement The validateEachStatement to set.
+	 * Indicates whether each statement should be validated or not.
+	 * 
+	 * @param validateEachStatement whether to validate each statement or not.
 	 */
 	public void setValidateEachStatement(Boolean validateEachStatement) {
 		this.validateEachStatement = validateEachStatement;

@@ -23,13 +23,14 @@ import java.util.Properties;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.pig.ExecType;
+import org.apache.pig.PigServer;
 import org.apache.pig.impl.PigContext;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.StringUtils;
 
 /**
- * Factory for creating a {@link PigContext} instance.
+ * Factory for creating a {@link PigContext} instance. Used for detailed configuration of a {@link PigServer} instance.
  * 
  * @author Costin Leau
  */
@@ -89,6 +90,8 @@ public class PigContextFactoryBean implements InitializingBean, FactoryBean<PigC
 	}
 
 	/**
+	 * Sets the last alias.
+	 * 
 	 * @param lastAlias The lastAlias to set.
 	 */
 	public void setLastAlias(String lastAlias) {
@@ -96,6 +99,8 @@ public class PigContextFactoryBean implements InitializingBean, FactoryBean<PigC
 	}
 
 	/**
+	 * Sets the job tracker.
+	 * 
 	 * @param jobTracker The jobTracker to set.
 	 */
 	public void setJobTracker(String jobTracker) {
@@ -103,6 +108,8 @@ public class PigContextFactoryBean implements InitializingBean, FactoryBean<PigC
 	}
 
 	/**
+	 * Sets the execution type.
+	 * 
 	 * @param execType The execType to set.
 	 */
 	public void setExecType(ExecType execType) {
@@ -110,6 +117,8 @@ public class PigContextFactoryBean implements InitializingBean, FactoryBean<PigC
 	}
 
 	/**
+	 * Sets the configuration properties.
+	 * 
 	 * @param properties The properties to set.
 	 */
 	public void setProperties(Properties properties) {
@@ -117,6 +126,8 @@ public class PigContextFactoryBean implements InitializingBean, FactoryBean<PigC
 	}
 
 	/**
+	 * Sets the Hadoop configuration to use.
+	 * 
 	 * @param configuration The configuration to set.
 	 */
 	public void setConfiguration(Configuration configuration) {

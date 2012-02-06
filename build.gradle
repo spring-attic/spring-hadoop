@@ -237,7 +237,7 @@ javadoc {
         "http://hive.apache.org/docs/r0.8.1/api/",
         "http://static.springsource.org/spring-batch/apidocs/",
         "http://static.springsource.org/spring-integration/api/",
-        "http://builds.apache.org/job/Thrift/javadoc/",
+        "https://builds.apache.org/job/Thrift/javadoc/",
         "http://jakarta.apache.org/commons/logging/apidocs/"
      ]
      

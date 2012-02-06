@@ -32,7 +32,7 @@ import org.springframework.data.hadoop.HadoopException;
 import org.springframework.util.Assert;
 
 /**
- * Pig tasklet. Usually used as a prototype as a new {@link PigServer} instance is required every time (to prevent concurrency issues).
+ * Pig tasklet. Note the same {@link PigServer} is shared between invocations. 
  * 
  * @author Costin Leau
  */
@@ -80,6 +80,8 @@ public class PigTasklet implements InitializingBean, Tasklet {
 	}
 
 	/**
+	 * Sets the pig scripts to be executed by this tasklet.
+	 * 
 	 * @param scripts The scripts to set.
 	 */
 	public void setScripts(Collection<PigScript> scripts) {
@@ -87,6 +89,8 @@ public class PigTasklet implements InitializingBean, Tasklet {
 	}
 
 	/**
+	 * Sets the pig server instance used by this tasklet.
+	 * 
 	 * @param pig The pig to set.
 	 */
 	public void setPigServer(PigServer pig) {

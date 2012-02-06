@@ -33,10 +33,23 @@ public class PigScript {
 	private Resource resource;
 	private Map<String, String> arguments;
 
+	/**
+	 * Constructs a new <code>PigScript</code> instance from the given
+	 * resource.
+	 *
+	 * @param resource script resource.
+	 */
 	public PigScript(Resource resource) {
 		this(resource, null);
 	}
 
+	/**
+	 * Constructs a new <code>PigScript</code> instance. Both the script
+	 * content and its parameters are supplied.
+	 *
+	 * @param resource script content.
+	 * @param args script arguments.
+	 */
 	public PigScript(Resource resource, Properties args) {
 		Assert.notNull(resource, "a valid resource is required");
 		this.resource = resource;
@@ -52,7 +65,7 @@ public class PigScript {
 	}
 
 	/**
-	 * Returns the resource.
+	 * Returns the script resource.
 	 *
 	 * @return Returns the resource
 	 */
