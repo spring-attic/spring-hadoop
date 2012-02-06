@@ -155,7 +155,7 @@ public class HiveServerFactoryBean implements FactoryBean<TServer>, Initializing
 	/**
 	 * Indicates whether the Hive client should start automatically (default) or not.
 	 * 
-	 * @param autoStart whether to automatically start or not
+	 * @param autoStartup whether to automatically start or not
 	 */
 	public void setAutoStartup(boolean autoStartup) {
 		this.autoStartup = autoStartup;
