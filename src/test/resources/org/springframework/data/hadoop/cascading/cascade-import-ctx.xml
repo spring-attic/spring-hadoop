@@ -1,0 +1,57 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<bean id="scheme" class="cascading.scheme.hadoop.TextLine"/>
+	
+	<bean id="logTap" class="cascading.tap.hadoop.Hfs">
+		<constructor-arg ref="scheme"/>
+		<constructor-arg value="/test/cascading/logs/input"/>
+	</bean>
+	
+	<bean id="fields" class="cascading.tuple.Fields">
+		<constructor-arg>
+			<array>
+				<value>ip</value>
+				<value>time</value>
+				<value>method</value>
+				<value>event</value>
+				<value>status</value>
+				<value>size</value>
+			</array>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="regex" class="java.lang.String">
+		<constructor-arg><value><![CDATA[^([^ ]*) +[^ ]* +[^ ]* +\[([^]]*)\] +\"([^ ]*) ([^ ]*) [^ ]*\" ([^ ]*) ([^ ]*).*$]]></value></constructor-arg>
+	</bean>
+	
+	<bean id="parser" class="cascading.operation.regex.RegexParser">
+		<constructor-arg ref="fields"/>
+		<constructor-arg ref="regex"/>
+		<constructor-arg>
+			<array>
+				<value>1</value>
+				<value>2</value>
+				<value>3</value>
+				<value>4</value>
+				<value>5</value>
+				<value>6</value>
+			</array>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="importPipe" class="cascading.pipe.Each">
+		<constructor-arg value="import"/>
+		<constructor-arg><bean class="cascading.tuple.Fields"><constructor-arg value="line"/></bean></constructor-arg>
+		<constructor-arg ref="parser"/>
+	</bean>
+	
+	<bean id="parsedTap" class="cascading.tap.hadoop.Hfs">
+		<constructor-arg ref="fields"/>
+		<constructor-arg value="/test/cascading/logparser/"/>
+		<constructor-arg><util:constant static-field="cascading.tap.SinkMode.REPLACE"/></constructor-arg>
+	</bean>
+</beans>

@@ -15,6 +15,7 @@ buildscript {
         mavenLocal()
         mavenRepo name: "springsource-org-release", urls: "http://repository.springsource.com/maven/bundles/release"
         mavenRepo name: "springsource-org-external", urls: "http://repository.springsource.com/maven/bundles/external"
+        
     }
 
     dependencies {
@@ -42,10 +43,9 @@ allprojects {
         mavenRepo name: "sonatype-snapshot", urls: "http://oss.sonatype.org/content/repositories/snapshots"
         mavenRepo name: "ext-snapshots", urls: "http://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo-ext/"
         mavenRepo name: "data-nucleus", urls: "http://www.datanucleus.org/downloads/maven2/"
+        mavenRepo name: "conjars.org", urls: "http://conjars.org/repo"
 	}
-
 }
-
 
 apply plugin: "java"
 apply plugin: "maven"
@@ -153,6 +153,9 @@ dependencies {
     compile("org.springframework.batch:spring-batch-core:$springBatchVersion") { optional = true }
     compile("org.springframework.integration:spring-integration-core:$springIntVersion") { optional = true }
 
+    // cascading
+    compile("cascading:cascading-hadoop:$cascadingVersion") { optional = true }
+    
     //testRuntime "commons-io:commons-io:$commonsioVersion"
     //testRuntime "org.codehaus.jackson:jackson-core-asl:$jacksonVersion"
     testRuntime "org.codehaus.jackson:jackson-mapper-asl:$jacksonVersion"
@@ -202,6 +205,8 @@ dependencies {
     //testCompile "org.datanucleus:datanucleus-enhancer:$dataNucleusVersion"
     //testCompile "org.datanucleus:datanucleus-rdbms:$dataNucleusVersion"
     //testCompile "javax.jdo:jdo2-api:$jdoVersion"
+    
+    testCompile "cascading:cascading-local:$cascadingVersion"
 }
 
 javaprojects = rootProject
