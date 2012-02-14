@@ -16,6 +16,7 @@
 package org.springframework.data.hadoop.configuration;
 
 import java.util.Enumeration;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.hadoop.conf.Configuration;
@@ -56,5 +57,51 @@ public abstract class ConfigurationUtils {
 		Configuration cfg = (original != null ? new Configuration(original) : new Configuration());
 		addProperties(cfg, properties);
 		return cfg;
+	}
+
+	/**
+	 * Returns a static {@link Properties} copy of the given configuration.
+	 * 
+	 * @param configuration Hadoop configuration
+	 */
+	public static Properties asProperties(Configuration configuration) {
+		Properties props = new Properties();
+
+		if (configuration != null) {
+			for (Map.Entry<String, String> entry : configuration) {
+				props.setProperty(entry.getKey(), entry.getValue());
+			}
+		}
+
+		return props;
+	}
+
+	/**
+	 * Creates a new {@link Configuration} by merging the given configurations.
+	 * Ordering is important - the second configuration overriding values in the first.
+	 * 
+	 * @param one configuration to read from. May be null.
+	 * @param two configuration to read from. May be null.
+	 * @return the result of merging the two configurations.
+	 */
+	public static Configuration merge(Configuration one, Configuration two) {
+		if (one == null) {
+			if (two == null) {
+				return new Configuration();
+			}
+			return new Configuration(two);
+		}
+
+		Configuration c = new Configuration(one);
+
+		if (two == null) {
+			return c;
+		}
+
+		for (Map.Entry<String, String> entry : two) {
+			c.set(entry.getKey(), entry.getValue());
+		}
+
+		return c;
 	}
 }
