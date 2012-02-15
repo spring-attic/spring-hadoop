@@ -258,6 +258,11 @@ public class HadoopFlowFactoryBean implements InitializingBean, BeanNameAware, F
 		this.tails = tails;
 	}
 
+	/**
+	 * Sets the tail.
+	 *
+	 * @param tail the new tail
+	 */
 	public void setTail(Pipe tail) {
 		this.tails = new ArrayList<Pipe>(1);
 		tails.add(tail);
