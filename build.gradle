@@ -330,4 +330,4 @@ task uploadDist(type: org.springframework.gradle.tasks.S3DistroUpload, dependsOn
 }
 
 assemble.dependsOn = ['jar', 'sourceJar', 'javadocJar']
-defaultTasks 'clean', 'build'
+defaultTasks 'build'

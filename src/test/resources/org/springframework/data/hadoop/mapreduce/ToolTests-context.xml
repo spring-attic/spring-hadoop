@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:hdp="http://www.springframework.org/schema/hadoop"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<import resource="../hadoop-ctx.xml"/>
+
+	<hdp:tool-runner id="simple" tool-class="org.springframework.data.hadoop.mapreduce.ToolTests$TestTool" />
+	
+	<bean id="test-tool" class="org.springframework.data.hadoop.mapreduce.ToolTests$TestTool">
+		<constructor-arg ref="hadoop-configuration" />
+	</bean>
+	
+	<hdp:tool-runner id="ref" tool-ref="test-tool"/>
+	
+	<hdp:tool-runner id="nested">
+		<bean class="org.springframework.data.hadoop.mapreduce.ToolTests$TestTool">
+			<constructor-arg ref="hadoop-configuration" />
+		</bean>
+		<hdp:arg value="--local"/>
+		<hdp:arg value="data/in.txt"/>
+		<hdp:arg value="data/out.txt"/>
+		cookies=for santa
+	</hdp:tool-runner>
+	
+</beans>

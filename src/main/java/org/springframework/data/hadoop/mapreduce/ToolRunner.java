@@ -45,7 +45,7 @@ public class ToolRunner implements FactoryBean<Integer>, InitializingBean {
 
 	@Override
 	public Integer getObject() throws Exception {
-		if (result != null) {
+		if (result == null) {
 			Tool t = (tool != null ? tool : BeanUtils.instantiateClass(toolClass));
 			Configuration cfg = ConfigurationUtils.createFrom(configuration, properties);
 			result = org.apache.hadoop.util.ToolRunner.run(cfg, t, arguments);

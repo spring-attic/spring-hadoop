@@ -19,11 +19,13 @@ import javax.annotation.Resource;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.Job;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.hadoop.TestUtils;
+import org.springframework.data.hadoop.mapreduce.ToolTests.TestTool;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -43,6 +45,13 @@ public class JobTests {
 
 	{
 		TestUtils.hackHadoopStagingOnWin();
+	}
+
+	@Before
+	public void before() {
+		TestTool.conf = null;
+		TestTool.obj = null;
+		TestTool.args = null;
 	}
 
 	@Test
@@ -72,4 +81,5 @@ public class JobTests {
 
 		assertEquals("true", job.getConfiguration().get("mapred.used.genericoptionsparser"));
 	}
+
 }
