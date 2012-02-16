@@ -21,6 +21,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.data.hadoop.batch.JobsTrigger;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -96,5 +97,11 @@ public class ToolTests {
 		assertEquals("--local", args[0]);
 		assertEquals("data/in.txt", args[1]);
 		assertEquals("data/out.txt", args[2]);
+	}
+
+	@Test
+	public void testTasklet() throws Exception {
+		JobsTrigger tj = new JobsTrigger();
+		tj.startJobs(ctx);
 	}
 }
