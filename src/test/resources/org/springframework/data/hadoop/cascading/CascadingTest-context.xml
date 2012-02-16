@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:hdp="http://www.springframework.org/schema/hadoop"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<import resource="../hadoop-ctx.xml"/>
+	
+	<hdp:script id="script" language="javascript">
+fsh.mkdir("/test/cascading/logs/test/")
+fsh.rmr("/test/cascading/logs/")
+fsh.put("src/test/resources/logs/apache_access.log", "/test/cascading/logs/input");
+	</hdp:script>
+	
+	<!-- XML config -->
+	<import resource="cascade-import-ctx.xml"/>
+	<!-- code config -->
+	<bean class="org.springframework.data.hadoop.cascading.CascadingAnalysisConfig"/>
+
+		
+	<bean id="cascade" class="org.springframework.data.hadoop.cascading.CascadeFactoryBean" p:configuration-ref="hadoop-configuration">
+		<property name="flows">
+		<list>
+			<!-- import -->
+			<bean class="org.springframework.data.hadoop.cascading.HadoopFlowFactoryBean" p:configuration-ref="hadoop-configuration">
+				<property name="source" ref="logTap" />
+				<property name="sink" ref="parsedTap" />
+				<property name="tail" ref="importPipe" />
+			</bean>
+			<!-- parse -->
+			<bean class="org.springframework.data.hadoop.cascading.HadoopFlowFactoryBean" p:configuration-ref="hadoop-configuration">
+				<property name="source" ref="parsedTap" />
+				<property name="sinks" ref="sinks" />
+				<property name="tails">
+					<list>
+						<ref bean="tsCountPipe"/>
+						<ref bean="tmCountPipe"/>
+					</list>
+				</property>
+			</bean>
+		</list>			
+		</property>
+	</bean>
+</beans>
