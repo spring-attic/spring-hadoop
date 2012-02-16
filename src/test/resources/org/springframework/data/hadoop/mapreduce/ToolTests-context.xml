@@ -20,6 +20,8 @@
 	
 	<hdp:tool-runner id="ref" tool-ref="test-tool"/>
 	
+	<hdp:tool-runner id="ref-start" tool-ref="test-tool" run-at-startup="true"/>
+	
 	<hdp:tool-runner id="nested">
 		<bean class="org.springframework.data.hadoop.mapreduce.ToolTests$TestTool">
 			<constructor-arg ref="hadoop-configuration" />

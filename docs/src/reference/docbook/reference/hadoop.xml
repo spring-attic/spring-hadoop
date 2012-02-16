@@ -364,5 +364,46 @@
 
 		<para>The tasklet above references a Hadoop job definition named "mr-job".  By default, wait-for-job is true so that the tasklet will wait for the job to complete when it executes.  Setting wait-for-job to false will submit the job to the Hadoop cluster but not wait for it to complete.</para>	
 	</section>
+	
+	<section id="hadoop:tool-runner">
+		<title>Running a Hadoop Tool</title>
+		
+		<para>It is common for Hadoop utilities and libraries to be started from the command-line (ex: <literal>hadoop jar</literal> <emphasis>some.jar</emphasis>). SHDP offers generic support for such cases provided
+		that the packages in question are built on top of Hadoop standard infrastructure, namely <interfacename>Tool</interfacename> and <classname>ToolRunner</classname> classes. As oppose to the command-line usage,
+		<interfacename>Tool</interfacename> instances benefit from Spring's IoC features; they can be parameterized, created and destroyed on demand and have their properties (such as the Hadoop configuration) injected. 
+		</para>
+		<para>Consider the typical <literal>jar</literal> example - invoking a class with some (two in this case) arguments (notice that the Hadoop configuration properties are passed as well):</para>
+		<programlisting language=""><![CDATA[bin/hadoop jar -conf hadoop-site.xml -jt darwin:50020 -D property=value someJar.jar]]> <emphasis>org.foo.SomeTool</emphasis> <literal>data/in.txt data/out.txt</literal></programlisting>
+		
+		<para>Since SHDP has first-class support for <link linkend="hadoop:config">configuring</link> Hadoop, the so called <literal>generic options</literal> aren't needed any more, even more so since typically there is only one Hadoop configuration 
+		per application. Through <literal>tool-runner</literal> element (and its backing <literal>ToolRunner</literal> class) one typically just needs to specify the <literal>Tool</literal> implementation and its arguments:
+		</para>
+		
+		<programlisting language="xml"><![CDATA[<hdp:tool-runner id="someTool" tool-class="org.foo.SomeTool" configuration-ref="hadoop-configuration">
+   <hdp:arg value="data/in.txt"/>
+   <hdp:arg value="data/out.txt"/>
+   
+   property=value
+</hdp:tool-runner>]]></programlisting>
 
+		<para>Like the rest of the SHDP elements, <literal>tool-runner</literal> allows the passed Hadoop configuration (by default <literal>hadoop-configuration</literal> but specified in the example for clarity) to be
+		<link linkend="hadoop:config:properties">customized</link> accordingly; the snippet only highlights the property initialization for simplicity but more options are available. Since usually the <literal>Tool</literal>
+		implementation has a default argument, one can use the <literal>tool-class</literal> attribute however it is possible to refer to another <literal>Tool</literal> instance or declare a nested one: </para> 
+
+		<programlisting language="xml"><![CDATA[<hdp:tool-runner id="someTool" run-at-startup="true">
+   <bean class="org.foo.AnotherTool" p:input="data/in.txt" p:output="data/out.txt"/>
+</hdp:tool-runner>]]></programlisting>
+
+		<para>This is quite convenient if the <literal>Tool</literal> class provides setters or richer constructors. Note that by default the <literal>tool-runner</literal> does not executes the <literal>Tool</literal>until
+		its definition is actually called - this behavior can be changed through the <literal>run-at-startup</literal> attribute above.</para>
+	</section>
+
+	<section id="hadoop:tool-tasklet">
+		<title>Using the Hadoop Tool tasklet</title>
+
+		<para>For Spring Batch environments, SHDP provides a dedicated tasklet to execute Hadoop tasks as a step in a Spring Batch workflow. The tasklet element supports the same configuration options as 
+		<link linkend="hadoop:tool-runner">tool-runner</link> except for <literal>run-at-startup</literal> (which does not apply for a workflow):</para>
+		
+		<programlisting language="xml"><![CDATA[<hdp:tool-tasklet id="tool-tasklet" tool-ref="some-tool" />]]></programlisting>
+	</section>
 </chapter>
