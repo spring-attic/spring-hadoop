@@ -23,7 +23,6 @@ fsh.put("src/test/resources/logs/apache_access.log", "/test/cascading/logs/input
 	<!-- code config -->
 	<bean class="org.springframework.data.hadoop.cascading.CascadingAnalysisConfig"/>
 
-		
 	<bean id="cascade" class="org.springframework.data.hadoop.cascading.CascadeFactoryBean" p:configuration-ref="hadoop-configuration">
 		<property name="flows">
 		<list>
@@ -47,4 +46,7 @@ fsh.put("src/test/resources/logs/apache_access.log", "/test/cascading/logs/input
 		</list>			
 		</property>
 	</bean>
+	
+	<bean id="cascade-runner" class="org.springframework.data.hadoop.cascading.CascadeRunner" p:unit-of-work-ref="cascade" p:run-at-startup="true" />
+	
 </beans>

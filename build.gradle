@@ -52,10 +52,6 @@ apply plugin: "maven"
 apply plugin: 'eclipse'  // `gradle eclipse` to generate .classpath/.project
 apply plugin: 'idea'     // `gradle idea` to generate .ipr/.iml
 apply plugin: 'docbook'
-apply plugin: 'bundlor'  // all core projects should be OSGi-compliant
-
-bundlor.useProjectProps = true
-[compileJava, compileTestJava]*.options*.compilerArgs = ["-Xlint:-serial"]
 
 skipPig = true
 skipHive = true
@@ -243,7 +239,8 @@ javadoc {
         "http://static.springsource.org/spring-batch/apidocs/",
         "http://static.springsource.org/spring-integration/api/",
         "https://builds.apache.org/job/Thrift/javadoc/",
-        "http://jakarta.apache.org/commons/logging/apidocs/"
+        "http://jakarta.apache.org/commons/logging/apidocs/",
+        "http://www.cascading.org/1.2/javadoc/"
      ]
      
      exclude "org/springframework/data/hadoop/config/**"

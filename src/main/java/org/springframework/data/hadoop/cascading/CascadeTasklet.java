@@ -19,67 +19,34 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.util.Assert;
 
 import cascading.cascade.Cascade;
 import cascading.flow.Flow;
+import cascading.management.UnitOfWork;
+import cascading.stats.CascadingStats;
 
 /**
  * Batch tasklet for executing a {@link Cascade} or a {@link Flow} as part of a job.
  * 
  * @author Costin Leau
  */
-public class CascadeTasklet implements InitializingBean, Tasklet {
+public class CascadeTasklet implements Tasklet {
 
-	private Cascade cascade;
-	private Flow flow;
+	private UnitOfWork<CascadingStats> unitOfWork;
 	private boolean waitToComplete = true;
 
 	@Override
-	public void afterPropertiesSet() {
-		Assert.isTrue(cascade != null || flow != null, "either a flow or cascade need to be specified");
-		Assert.isTrue(!(cascade == null || flow == null), "either a flow or cascade need to be specified; not both");
-	}
-
-	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		if (waitToComplete) {
-			if (cascade != null) {
-				cascade.complete();
-			}
-			else {
-				flow.complete();
-			}
-		}
-
-		else {
-			if (cascade != null) {
-				cascade.start();
-			}
-			else {
-				flow.start();
-			}
-		}
-
+		Runner.run(unitOfWork, waitToComplete);
 		return RepeatStatus.FINISHED;
 	}
 
 	/**
-	 * Sets the cascade.
+	 * Sets the unit of work. Can be of type {@link Flow} or {@link Cascade}.
 	 *
-	 * @param cascade the new cascade
+	 * @param unitOfWork the new cascade
 	 */
-	public void setCascade(Cascade cascade) {
-		this.cascade = cascade;
-	}
-
-	/**
-	 * Sets the flow.
-	 *
-	 * @param flow the new flow
-	 */
-	public void setFlow(Flow flow) {
-		this.flow = flow;
+	public void setUnitOfWork(UnitOfWork<CascadingStats> unitOfWork) {
+		this.unitOfWork = unitOfWork;
 	}
 }

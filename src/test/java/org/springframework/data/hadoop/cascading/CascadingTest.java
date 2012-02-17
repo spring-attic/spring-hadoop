@@ -48,6 +48,5 @@ public class CascadingTest {
 	public void testCascade() throws Exception {
 		List<Flow> flows = cascade.getFlows();
 		System.out.println(flows);
-		cascade.complete();
 	}
 }

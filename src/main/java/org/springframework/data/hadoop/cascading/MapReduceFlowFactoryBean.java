@@ -29,7 +29,7 @@ import cascading.cascade.Cascade;
 import cascading.flow.hadoop.MapReduceFlow;
 
 /**
- * Factory for declarative {@link HadoopFlowFlow} creation. Usually used with a {@link Cascade}. 
+ * Factory for declarative {@link MapReduceFlow} creation. Usually used with a {@link Cascade}. 
  * 
  * Note the flow is not started.
  * @author Costin Leau

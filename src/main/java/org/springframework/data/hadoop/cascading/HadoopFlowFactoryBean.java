@@ -42,7 +42,7 @@ import cascading.tap.Tap;
 
 
 /**
- * Factory for declarative {@link HadoopFlowFlow} creation. Usually used with a {@link Cascade}. 
+ * Factory for declarative {@link HadoopFlow} creation. Usually used with a {@link Cascade}. 
  * 
  * Note the flow is not started.
  * 
