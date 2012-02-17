@@ -15,6 +15,7 @@
  */
 package org.springframework.data.hadoop.cascading;
 
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 
@@ -28,7 +29,7 @@ import cascading.stats.CascadingStats;
  * 
  * @author Costin Leau
  */
-public class CascadeRunner implements InitializingBean, FactoryBean<CascadingStats> {
+public class CascadeRunner implements InitializingBean, DisposableBean, FactoryBean<CascadingStats> {
 
 	private CascadingStats stats;
 	private boolean waitToComplete = true;
@@ -41,6 +42,13 @@ public class CascadeRunner implements InitializingBean, FactoryBean<CascadingSta
 	public void afterPropertiesSet() {
 		if (runAtStartup) {
 			getObject();
+		}
+	}
+
+	@Override
+	public void destroy() {
+		if (uow != null) {
+			uow.stop();
 		}
 	}
 
