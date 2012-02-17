@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0"  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" xml:id="cascading">
+
+	<title>Cascading integration</title>
+	
+	<para>SHDP provides basic support for <ulink url="http://www.cascading.org/">Cascading</ulink> library through the <literal>org.springframework.data.hadoop.cascading</literal> package - 
+	one can create <literal>Flow</literal>s or <literal>Cascade</literal>s, either through XML or/and Java and execute them, either in a simplistic manner or as part of a Spring Batch job.</para>
+	
+	<para>As Cascading is aimed at code configuration, typically one would configure the library programatically. This type of configuration is supported through Spring's <literal>@Configuration</literal>
+	and <literal>@Bean</literal> (see <ulink url="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/beans.html#beans-java">this chapter</ulink> for more information). In short
+	one use Java code (or any JVM language for that matter) to create beans. Below is an example of using that to create various Cascading components (do refer to the Cascading 
+	<ulink url="http://github.com/cwensel/cascading.samples/">examples</ulink> for more context):</para>
+	
+	<programlisting language="java"><![CDATA[@Configuration
+public class CascadingAnalysisConfig {
+    // fields that act as placeholders for externalized values
+    @Value("${cascade.sec}") private String sec;
+    @Value("${cascade.min}") private String min;
+    
+    @Bean public Pipe tsPipe() {
+        DateParser dateParser = new DateParser(new Fields("ts"), "dd/MMM/yyyy:HH:mm:ss Z");
+        return new Each("arrival rate", new Fields("time"), dateParser);
+    }
+
+    @Bean public Pipe tsCountPipe() {
+        Pipe tsCountPipe = new Pipe("tsCount", tsPipe());
+        tsCountPipe = new GroupBy(tsCountPipe, new Fields("ts"));
+        return new Every(tsCountPipe, Fields.GROUP, new Count());
+    }
+
+    @Bean public Pipe tmCountPipe() {
+        Pipe tmPipe = new Each(tsPipe(),
+                new ExpressionFunction(new Fields("tm"), "ts - (ts % (60 * 1000))", long.class));
+        Pipe tmCountPipe = new Pipe("tmCount", tmPipe);
+        tmCountPipe = new GroupBy(tmCountPipe, new Fields("tm"));
+        return new Every(tmCountPipe, Fields.GROUP, new Count());
+    }
+
+    @Bean public Map<String, Tap> sinks(){
+        Tap tsSinkTap = new Hfs(new TextLine(), sec);
+        Tap tmSinkTap = new Hfs(new TextLine(), min);
+        return Cascades.tapsMap(Pipe.pipes(tsCountPipe(), tmCountPipe()), Tap.taps(tsSinkTap, tmSinkTap));
+    }
+
+    @Bean public String regex() {
+        return "^([^ ]*) +[^ ]* +[^ ]* +\\[([^]]*)\\] +\\\"([^ ]*) ([^ ]*) [^ ]*\\\" ([^ ]*) ([^ ]*).*$";
+    }
+    
+    @Bean public Fields fields() {
+        return new Fields("ip", "time", "method", "event", "status", "size");
+    }
+}]]></programlisting>
+
+	<para>The class above creates several objects (all part of the Cascading package) (named after the methods) which can be injected or wired just like any other bean 
+	(notice how the wiring is done between the beans by point to their methods). One can mix and match (if needed) code and XML configurations inside the same application:</para>
+	
+	<programlisting language="xml"><![CDATA[<!-- code configuration class -->
+<bean class="org.springframework.data.hadoop.cascading.CascadingAnalysisConfig"/>
+
+<!-- Tap created through XML rather then code (using Spring's 3.1 c: namespace)-->
+<bean id="tap" class="cascading.tap.hadoop.Hfs" c:fields-ref="fields" c:string-path-value="${cascade.input}"/>
+
+<bean id="cascade" class="org.springframework.data.hadoop.cascading.CascadeFactoryBean" p:configuration-ref="hadoop-configuration">
+  <property name="flows"><list>
+    <bean class="org.springframework.data.hadoop.cascading.HadoopFlowFactoryBean"
+      p:configuration-ref="hadoop-configuration" p:source-ref="tap" p:sinks-ref="sinks">
+     <property name="tails"><list>
+         <ref bean="tsCountPipe"/>
+         <ref bean="tmCountPipe"/>
+     </list></property>
+    </bean>
+  </list></property>
+</bean>
+	
+<bean id="cascade-runner" class="org.springframework.data.hadoop.cascading.CascadeRunner" p:unit-of-work-ref="cascade" p:run-at-startup="true" />]]></programlisting>
+
+	<para>The XML above, whose main purpose is to illustrate possible ways of configuring, uses SHDP classes to create a <literal>Cascade</literal> with one nested <literal>Flow</literal> using the taps and sinks
+	configured by the code class. Additionally it also shows how the cascade is ran (through <literal>CascadeRunner</literal>).</para>
+	
+	<para>Whether XML or Java config is better is up to the user and is usually based on the type of the configuration required. Java config suits Cascading better but note that the <literal>FactoryBean</literal>s
+	above handle the life-cycle and some default configuration for both the <literal>Flow</literal> and <literal>Cascade</literal> object. Either way, whatever option is used, SHDP fully supports it.</para>
+	
+	<section id="cascading:tasklet">
+		<title>Using the Cascading tasklet</title>
+
+		<para>For Spring Batch environments, SHDP provides a dedicated tasklet (similar to <literal>CascadeRunner</literal> above) for executing <literal>Cascade</literal> or <literal>Flow</literal> instances, 
+		on demand, as part of a batch or workflow. The declaration is pretty straight forward:</para>
+		
+		<programlisting language="xml"><![CDATA[<bean id="cascade-tasklet" class="org.springframework.data.hadoop.cascading.CascadeTasklet" p:unit-of-work-ref="cascade" />]]></programlisting>
+	</section>
+	
+	<section id="cascading:scalding">
+		<title>Using Scalding</title>
+		
+		<para>There are quite a number of DSLs built on top of Cascading, most noteably <ulink url="https://github.com/nathanmarz/cascalog">Cascalog</ulink> (written in Clojure) and 
+		<ulink url="https://github.com/twitter/scalding">Scalding</ulink> (written in Scala). This documentation will cover Scalding however the same concepts can be applied across the board to the
+		DSLs.</para>
+		
+		<para>As with the rest of the DSLs, Scalding offers a simplified, fluent syntax for creating units of code that built on top of Cascading. This in turn translate to Map Reduce jobs that get executed on Hadoop.
+		Once compiled, the DSL gets translated into actual JVM classes that get executed by Scalding through its own <literal>Tool</literal> instance (namely <classname>com.twitter.scalding.Tool</classname>).
+		One has the option or either deploy the Scalding jobs directly (by invoking the aforementioned <literal>Tool</literal>) or use Scalding's <literal>scald.rb</literal> script which does the same thing based
+		on the various attributes passed to it. Both approaches can be used in SHDP, the former through the <link linkend="hadoop:tool-runner">Tool</link> support (described below) and the latter by invoking the 
+		<literal>scald.rb</literal> script directly through the <link linkend="scripting">scripting</link> feature.</para>
+		
+		<para>For example, to run the tutorial examples (say Tutorial1), one can issue the following command:</para>
+		<programlisting>scripts/scald.rb --local tutorial/Tutorial1.scala</programlisting>
+		
+		<para>which compiles Tutorial1, creates a bundled jar and runs it on a local Hadoop instance. When using the <literal>Tool</literal> support, the compilation and the library provisioning are external tasks 
+		(just as in the case of typical Hadoop jobs). The SHDP configuration to run the tutorial looks as follows:</para>
+		
+		<programlisting language="xml"><![CDATA[<!-- the tool automatically is injected with 'hadoop-configuration' -->
+<hdp:tool-runner id="scalding" tool-class="com.twitter.scalding.Tool">
+   <hdp:arg value="tutorial/Tutorial1"/>
+   <hdp:arg value="--local"/>
+</hdp:tool-runner>]]></programlisting>
+	</section>
+	
+</chapter>
