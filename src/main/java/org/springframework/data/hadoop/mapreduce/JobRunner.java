@@ -68,6 +68,7 @@ public class JobRunner implements FactoryBean<Object>, InitializingBean, Disposa
 	@Override
 	public Object getObject() throws Exception {
 		if (!executed) {
+			executed = true;
 			for (Job job : jobs) {
 				if (!waitForJobs) {
 					job.submit();
