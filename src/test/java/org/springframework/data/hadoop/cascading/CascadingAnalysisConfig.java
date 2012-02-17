@@ -17,6 +17,7 @@ package org.springframework.data.hadoop.cascading;
 
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -39,21 +40,21 @@ import cascading.tuple.Fields;
 @Configuration
 public class CascadingAnalysisConfig {
 
-	@Bean
-	public Pipe tsPipe() {
+	@Value("${cascade.sec}") private String sec;
+	@Value("${cascade.min}") private String min;
+	
+	@Bean public Pipe tsPipe() {
 		DateParser dateParser = new DateParser(new Fields("ts"), "dd/MMM/yyyy:HH:mm:ss Z");
 		return new Each("arrival rate", new Fields("time"), dateParser);
 	}
 
-	@Bean
-	public Pipe tsCountPipe() {
+	@Bean public Pipe tsCountPipe() {
 		Pipe tsCountPipe = new Pipe("tsCount", tsPipe());
 		tsCountPipe = new GroupBy(tsCountPipe, new Fields("ts"));
 		return new Every(tsCountPipe, Fields.GROUP, new Count());
 	}
 
-	@Bean
-	public Pipe tmCountPipe() {
+	@Bean public Pipe tmCountPipe() {
 		Pipe tmPipe = new Each(tsPipe(),
 				new ExpressionFunction(new Fields("tm"), "ts - (ts % (60 * 1000))", long.class));
 		Pipe tmCountPipe = new Pipe("tmCount", tmPipe);
@@ -61,15 +62,17 @@ public class CascadingAnalysisConfig {
 		return new Every(tmCountPipe, Fields.GROUP, new Count());
 	}
 
-	@Bean
-	public Map<String, Tap> sinks(){
-	    Tap tsSinkTap = new Hfs( new TextLine(), "/test/cascading/loganalysis/sec" );
-	    Tap tmSinkTap = new Hfs( new TextLine(), "/test/cascading/loganalysis/min" );
+	@Bean public Map<String, Tap> sinks(){
+		Tap tsSinkTap = new Hfs(new TextLine(), sec);
+		Tap tmSinkTap = new Hfs(new TextLine(), min);
 		return Cascades.tapsMap(Pipe.pipes(tsCountPipe(), tmCountPipe()), Tap.taps(tsSinkTap, tmSinkTap));
 	}
 
-	@Bean
-	public String regex() {
+	@Bean public String regex() {
 		return "^([^ ]*) +[^ ]* +[^ ]* +\\[([^]]*)\\] +\\\"([^ ]*) ([^ ]*) [^ ]*\\\" ([^ ]*) ([^ ]*).*$";
+	}
+
+	@Bean public Fields fields() {
+		return new Fields("ip", "time", "method", "event", "status", "size");
 	}
 }

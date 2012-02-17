@@ -11,19 +11,6 @@
 		<constructor-arg value="/test/cascading/logs/input"/>
 	</bean>
 	
-	<bean id="fields" class="cascading.tuple.Fields">
-		<constructor-arg>
-			<array>
-				<value>ip</value>
-				<value>time</value>
-				<value>method</value>
-				<value>event</value>
-				<value>status</value>
-				<value>size</value>
-			</array>
-		</constructor-arg>
-	</bean>
-	
 	<bean id="parser" class="cascading.operation.regex.RegexParser">
 		<constructor-arg ref="fields"/>
 		<constructor-arg ref="regex"/>

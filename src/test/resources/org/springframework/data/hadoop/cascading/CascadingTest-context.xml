@@ -59,6 +59,6 @@ fsh.put("src/test/resources/logs/apache_access.log", "/test/cascading/logs/input
 		</property>
 	</bean>
 	
-	<bean id="cascade-runner" class="org.springframework.data.hadoop.cascading.CascadeRunner" p:unit-of-work-ref="cascade" p:run-at-startup="true" />
+	<bean id="cascade-runner" class="org.springframework.data.hadoop.cascading.CascadeRunner" p:unit-of-work-ref="cascade" p:run-at-startup="true" depends-on="script" />
 	
 </beans>
