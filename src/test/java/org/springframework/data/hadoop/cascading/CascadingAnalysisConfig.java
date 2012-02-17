@@ -67,4 +67,9 @@ public class CascadingAnalysisConfig {
 	    Tap tmSinkTap = new Hfs( new TextLine(), "/test/cascading/loganalysis/min" );
 		return Cascades.tapsMap(Pipe.pipes(tsCountPipe(), tmCountPipe()), Tap.taps(tsSinkTap, tmSinkTap));
 	}
+
+	@Bean
+	public String regex() {
+		return "^([^ ]*) +[^ ]* +[^ ]* +\\[([^]]*)\\] +\\\"([^ ]*) ([^ ]*) [^ ]*\\\" ([^ ]*) ([^ ]*).*$";
+	}
 }

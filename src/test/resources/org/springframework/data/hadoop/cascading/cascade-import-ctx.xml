@@ -24,10 +24,6 @@
 		</constructor-arg>
 	</bean>
 	
-	<bean id="regex" class="java.lang.String">
-		<constructor-arg><value><![CDATA[^([^ ]*) +[^ ]* +[^ ]* +\[([^]]*)\] +\"([^ ]*) ([^ ]*) [^ ]*\" ([^ ]*) ([^ ]*).*$]]></value></constructor-arg>
-	</bean>
-	
 	<bean id="parser" class="cascading.operation.regex.RegexParser">
 		<constructor-arg ref="fields"/>
 		<constructor-arg ref="regex"/>
