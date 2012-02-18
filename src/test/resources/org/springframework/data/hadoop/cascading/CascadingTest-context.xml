@@ -31,12 +31,6 @@ fsh.put("src/test/resources/logs/apache_access.log", "/test/cascading/logs/input
 				<property name="source" ref="logTap" />
 				<property name="sink" ref="parsedTap" />
 				<property name="tail" ref="importPipe" />
-				<property name="properties">
-					<props>
-						<prop key="cascading.app.name">cascade-test</prop>
-						<prop key="cascading.app.version">1.0</prop>						
-					</props>
-				</property>
 			</bean>
 			<!-- parse -->
 			<bean class="org.springframework.data.hadoop.cascading.HadoopFlowFactoryBean" p:configuration-ref="hadoop-configuration">
@@ -47,12 +41,6 @@ fsh.put("src/test/resources/logs/apache_access.log", "/test/cascading/logs/input
 						<ref bean="tsCountPipe"/>
 						<ref bean="tmCountPipe"/>
 					</list>
-				</property>
-				<property name="properties">
-					<props>
-						<prop key="cascading.app.name">cascade-test</prop>
-						<prop key="cascading.app.version">1.0</prop>
-					</props>
 				</property>
 			</bean>
 		</list>			
