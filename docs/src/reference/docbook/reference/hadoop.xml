@@ -264,7 +264,7 @@
   jar-by-class="class used for jar detection"
   properties-location="classpath:special-job.properties">
     electric=sea
-  </hdp:job>]]></programlisting>
+</hdp:job>]]></programlisting>
    	 
    	 <note>
    	 	<para>The job definition can validate the existance of the input and output paths before submitting the actual job (which is slow), to prevent its failure. Take a look at <emphasis>validate-paths</emphasis> attribute
