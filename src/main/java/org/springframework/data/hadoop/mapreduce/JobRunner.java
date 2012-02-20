@@ -79,7 +79,7 @@ public class JobRunner implements FactoryBean<Object>, InitializingBean, Disposa
 			}
 		}
 
-		return (waitForJobs ? null : succesful);
+		return (waitForJobs ? succesful : null);
 	}
 
 	@Override

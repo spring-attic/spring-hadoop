@@ -3,9 +3,11 @@
 	xmlns:hdp="http://www.springframework.org/schema/hadoop"
 	xmlns:util="http://www.springframework.org/schema/util"
 	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:task="http://www.springframework.org/schema/task" 
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd
-		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
 
 	<import resource="../hadoop-ctx.xml"/>
 
@@ -58,4 +60,11 @@
 
 	<util:properties id="props" location="props.properties"/>
 
+
+ 	<task:scheduler id="myScheduler" pool-size="10"/>
+ 
+	<task:scheduled-tasks scheduler="myScheduler">
+ 		<task:scheduled ref="&amp;runner" method="getObject" fixed-rate="60000"/>
+ 	</task:scheduled-tasks>
+ 	
 </beans>
