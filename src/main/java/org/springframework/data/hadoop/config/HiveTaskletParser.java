@@ -34,7 +34,7 @@ import org.w3c.dom.Element;
  *
  * @author Costin Leau
  */
-public class HiveTaskletParser extends AbstractImprovedSimpleBeanDefinitionParser {
+class HiveTaskletParser extends AbstractImprovedSimpleBeanDefinitionParser {
 
 	@Override
 	protected Class<?> getBeanClass(Element element) {

@@ -29,7 +29,7 @@ import org.w3c.dom.Element;
  * 
  * @author Costin Leau
  */
-public class PigTaskletParser extends AbstractImprovedSimpleBeanDefinitionParser {
+class PigTaskletParser extends AbstractImprovedSimpleBeanDefinitionParser {
 
 	@Override
 	protected Class<?> getBeanClass(Element element) {

@@ -28,7 +28,7 @@ import org.w3c.dom.Element;
  * 
  * @author Costin Leau
  */
-public class HiveServerParser extends AbstractPropertiesConfiguredBeanDefinitionParser {
+class HiveServerParser extends AbstractPropertiesConfiguredBeanDefinitionParser {
 
 	@Override
 	protected Class<?> getBeanClass(Element element) {
