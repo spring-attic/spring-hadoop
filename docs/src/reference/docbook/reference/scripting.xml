@@ -188,7 +188,7 @@ print Path(name).makeQualified(fs)]]></programlisting>
     	
     	<programlisting language="xml"><![CDATA[<hdp:script location="org/company/basic-script.groovy"/>]]></programlisting>
     	
-		<programlisting language="java" linenumbering="numbered"><![CDATA[name = UUID.randomUUID().toString()
+		<programlisting language="java"><![CDATA[name = UUID.randomUUID().toString()
 scriptName = "src/test/resources/test.properties"
 fs.copyFromLocalFile(scriptName, name)
 
@@ -218,7 +218,7 @@ fsh.rmr(dir)
 		
 		<para>The same goes for the rest of the methods, such as <literal>ls</literal>. The same script in JRuby would look something like this:</para>
 
-		<programlisting language="ruby" linenumbering="numbered"><![CDATA[require 'java'
+		<programlisting language="ruby"><![CDATA[require 'java'
 name = java.util.UUID.randomUUID().to_s
 scriptName = "src/test/resources/test.properties"
 $fs.copyFromLocalFile(scriptName, name)

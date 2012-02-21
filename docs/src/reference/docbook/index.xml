@@ -5,7 +5,7 @@
     xmlns:xlink="http://www.w3.org/1999/xlink">
   <bookinfo>
     <title>Spring Hadoop Reference Guide</title>
-	  <releaseinfo>@version@</releaseinfo>
+	  <releaseinfo>${version}</releaseinfo>
     
     <authorgroup>
       <author>

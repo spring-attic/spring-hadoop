@@ -1,57 +1,119 @@
-// used for artifact names, building doc upload urls, etc.
-description = 'Spring Data Hadoop'
-abbreviation = 'SHDP'
-
-apply plugin: 'base'
-
 buildscript {
     repositories {
-        add(new org.apache.ivy.plugins.resolver.URLResolver()) {
-            name = "GitHub"
-            addIvyPattern 'http://cloud.github.com/downloads/costin/gradle-stuff/[organization].[module]-[artifact]-[revision].[ext]'
-            addArtifactPattern 'http://cloud.github.com/downloads/costin/gradle-stuff/[organization].[module]-[revision].[ext]'
-        }
-        mavenCentral()
-        mavenLocal()
-        mavenRepo name: "springsource-org-release", urls: "http://repository.springsource.com/maven/bundles/release"
-        mavenRepo name: "springsource-org-external", urls: "http://repository.springsource.com/maven/bundles/external"
-        
+        maven { url 'http://repo.springsource.org/plugins-snapshot' }
     }
-
     dependencies {
-        classpath 'org.springframework:gradle-stuff:0.1-20110421'
-        classpath 'net.sf.docbook:docbook-xsl:1.75.2:ns-resources@zip'
+        classpath 'org.springframework.build.gradle:docbook-reference-plugin:0.1.2-SNAPSHOT'
     }
 }
 
-allprojects {
-    group = 'org.springframework.data.hadoop'
-    version = "$springHadoopVersion"
-    
-    releaseBuild = version.endsWith('RELEASE')
-    snapshotBuild = version.endsWith('SNAPSHOT')
+description = 'Spring Hadoop'
+group = 'org.springframework.data.hadoop'
 
-
-    repositories {
-        mavenLocal()
-        mavenCentral()
-        // Public Spring artefacts
-        mavenRepo name: "springsource-org-release", urls: "http://repository.springsource.com/maven/bundles/release"
-        mavenRepo name: "spring-release", urls: "http://maven.springframework.org/release"
-        mavenRepo name: "spring-milestone", urls: "http://maven.springframework.org/milestone"
-        mavenRepo name: "spring-snapshot", urls: "http://maven.springframework.org/snapshot"
-        mavenRepo name: "sonatype-snapshot", urls: "http://oss.sonatype.org/content/repositories/snapshots"
-        mavenRepo name: "ext-snapshots", urls: "http://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo-ext/"
-        mavenRepo name: "data-nucleus", urls: "http://www.datanucleus.org/downloads/maven2/"
-        mavenRepo name: "conjars.org", urls: "http://conjars.org/repo"
-	}
+repositories {
+  maven { url "http://repo.springsource.org/libs-release" }
+  maven { url "http://repo.springsource.org/libs-snapshot" }
 }
 
 apply plugin: "java"
-apply plugin: "maven"
-apply plugin: 'eclipse'  // `gradle eclipse` to generate .classpath/.project
-apply plugin: 'idea'     // `gradle idea` to generate .ipr/.iml
-apply plugin: 'docbook'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply from: "$rootDir/maven.gradle"
+apply plugin: 'docbook-reference'
+
+
+// Common dependencies
+dependencies {
+    // Hadoop
+    compile("org.apache.hadoop:hadoop-core:$hadoopVersion", optional)
+    compile("org.apache.hadoop:hadoop-streaming:$hadoopVersion", optional)
+    compile("org.apache.hadoop:hadoop-tools:$hadoopVersion", optional)
+
+    // Logging
+    compile "org.slf4j:slf4j-api:$slf4jVersion"
+    compile ("org.slf4j:jcl-over-slf4j:$slf4jVersion", optional)
+    runtime "log4j:log4j:$log4jVersion"
+    runtime "org.slf4j:slf4j-log4j12:$slf4jVersion"
+    
+    // Spring Framework
+    compile("org.springframework:spring-core:$springVersion") {
+        exclude module: "commons-logging"
+    }
+    compile "org.springframework:spring-context-support:$springVersion"
+    compile("org.springframework:spring-tx:$springVersion", optional)
+    compile("org.springframework:spring-aop:$springVersion", optional)
+    //compile "org.springframework:spring-oxm:$springVersion"
+    compile("org.springframework:spring-jdbc:$springVersion", optional)
+    compile("org.springframework.batch:spring-batch-core:$springBatchVersion", optional)
+    compile("org.springframework.integration:spring-integration-core:$springIntVersion", optional)
+
+    // cascading
+    compile("cascading:cascading-hadoop:$cascadingVersion", optional)
+    
+    //testRuntime "commons-io:commons-io:$commonsioVersion"
+    //testRuntime "org.codehaus.jackson:jackson-core-asl:$jacksonVersion"
+    testRuntime "org.codehaus.jackson:jackson-mapper-asl:$jacksonVersion"
+    testRuntime "cglib:cglib:$cglibVersion"
+
+    // Hive
+    testRuntime "org.apache.hive:hive-common:$hiveVersion"
+    testRuntime "org.apache.hive:hive-jdbc:$hiveVersion"
+    compile("org.apache.hive:hive-metastore:$hiveVersion") 
+    //{ dep ->
+         //exclude group: 'javax.jdo', module: 'jdo2-api'
+    //}
+    compile("org.apache.hive:hive-service:$hiveVersion", optional)
+
+    testRuntime "org.apache.hive:hive-shims:$hiveVersion"
+    testRuntime "org.apache.hive:hive-serde:$hiveVersion"
+    testRuntime "org.apache.thrift:libthrift:$thriftVersion"
+    testRuntime "org.apache.thrift:libfb303:$thriftVersion"
+
+    // Pig
+    compile("org.apache.pig:pig:$pigVersion", optional)
+    
+    // HBase
+    compile("org.apache.hbase:hbase:$hbaseVersion") {
+        exclude module: "thrift"
+        optional = true
+    }
+
+    // Libs dependencies (specified to cope with incompatibilities between them)
+    testRuntime "org.antlr:antlr:$antlrVersion"
+    testRuntime "org.antlr:antlr-runtime:$antlrVersion"
+
+    
+    // Testing
+    testCompile "junit:junit:$junitVersion"
+    testCompile "org.mockito:mockito-core:$mockitoVersion"
+    testCompile "org.springframework:spring-test:$springVersion"
+    testCompile("javax.annotation:jsr250-api:1.0", optional)
+    testCompile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
+    testRuntime "org.springframework.integration:spring-integration-event:$springIntVersion"
+    testRuntime "org.springframework.integration:spring-integration-file:$springIntVersion"
+    testRuntime "org.codehaus.groovy:groovy:$groovyVersion"
+    testRuntime "org.jruby:jruby:$jrubyVersion"
+    testRuntime "org.python:jython-standalone:$jythonVersion"
+    testRuntime "org.apache.hive:hive-builtins:$hiveVersion"
+    // specify a version of antlr that works with both hive and pig
+    testRuntime "org.antlr:antlr-runtime:$antlrVersion"
+    // hive optional dependencies
+    //testCompile "org.datanucleus:datanucleus-connectionpool:$dataNucleusVersion"
+    //testCompile "org.datanucleus:datanucleus-core:$dataNucleusVersion"
+    //testCompile "org.datanucleus:datanucleus-enhancer:$dataNucleusVersion"
+    //testCompile "org.datanucleus:datanucleus-rdbms:$dataNucleusVersion"
+    //testCompile "javax.jdo:jdo2-api:$jdoVersion"
+    
+    testCompile "cascading:cascading-local:$cascadingVersion"
+}
+// config to exclude missing jdo-2.3-ec from hive
+configurations.all {
+    resolutionStrategy.force 'javax.jdo:jdo2-api:2.3-eb'
+}
+
+sourceCompatibility = 1.6
+targetCompatibility = 1.6 
+
 
 skipPig = true
 skipHive = true
@@ -124,92 +186,6 @@ test {
     }
 }
 
-// Common dependencies
-dependencies {
-    // Hadoop
-    compile("org.apache.hadoop:hadoop-core:$hadoopVersion") { optional = true }
-    compile("org.apache.hadoop:hadoop-streaming:$hadoopVersion") { optional = true }
-    compile("org.apache.hadoop:hadoop-tools:$hadoopVersion") { optional = true }
-
-    // Logging
-    compile "org.slf4j:slf4j-api:$slf4jVersion"
-    compile "org.slf4j:jcl-over-slf4j:$slf4jVersion"
-    runtime "log4j:log4j:$log4jVersion"
-    runtime "org.slf4j:slf4j-log4j12:$slf4jVersion"
-    
-    // Spring Framework
-    compile("org.springframework:spring-core:$springVersion") {
-        exclude module: "commons-logging"
-    }
-    compile "org.springframework:spring-context-support:$springVersion"
-    compile("org.springframework:spring-tx:$springVersion") { optional = true }
-    compile("org.springframework:spring-aop:$springVersion") { optional = true }
-    //compile "org.springframework:spring-oxm:$springVersion"
-    compile("org.springframework:spring-jdbc:$springVersion") { optional = true }
-    compile("org.springframework.batch:spring-batch-core:$springBatchVersion") { optional = true }
-    compile("org.springframework.integration:spring-integration-core:$springIntVersion") { optional = true }
-
-    // cascading
-    compile("cascading:cascading-hadoop:$cascadingVersion") { optional = true }
-    
-    //testRuntime "commons-io:commons-io:$commonsioVersion"
-    //testRuntime "org.codehaus.jackson:jackson-core-asl:$jacksonVersion"
-    testRuntime "org.codehaus.jackson:jackson-mapper-asl:$jacksonVersion"
-    testRuntime "cglib:cglib:$cglibVersion"
-
-    // Hive
-    testRuntime "org.apache.hive:hive-common:$hiveVersion"
-    testRuntime "org.apache.hive:hive-jdbc:$hiveVersion"
-    compile("org.apache.hive:hive-service:$hiveVersion") { optional = true }
-    testRuntime "org.apache.hive:hive-metastore:$hiveVersion"
-    testRuntime "org.apache.hive:hive-shims:$hiveVersion"
-    testRuntime "org.apache.hive:hive-serde:$hiveVersion"
-    testRuntime "org.apache.thrift:libthrift:$thriftVersion"
-    testRuntime "org.apache.thrift:libfb303:$thriftVersion"
-
-    // Pig
-    compile("org.apache.pig:pig:$pigVersion") { optional = true }
-    
-    // HBase
-    compile("org.apache.hbase:hbase:$hbaseVersion") {
-        exclude module: "thrift"
-        optional = true
-    }
-
-    // Libs dependencies (specified to cope with incompatibilities between them)
-    testRuntime "org.antlr:antlr:$antlrVersion"
-    testRuntime "org.antlr:antlr-runtime:$antlrVersion"
-
-    
-    // Testing
-    testCompile "junit:junit:$junitVersion"
-    testCompile "org.mockito:mockito-core:$mockitoVersion"
-    testCompile "org.springframework:spring-test:$springVersion"
-    testCompile("javax.annotation:jsr250-api:1.0") { optional = true }
-    testCompile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
-    testRuntime "org.springframework.integration:spring-integration-event:$springIntVersion"
-    testRuntime "org.springframework.integration:spring-integration-file:$springIntVersion"
-    testRuntime "org.codehaus.groovy:groovy:$groovyVersion"
-    testRuntime "org.jruby:jruby:$jrubyVersion"
-    testRuntime "org.python:jython-standalone:$jythonVersion"
-    testRuntime "org.apache.hive:hive-builtins:$hiveVersion"
-    // specify a version of antlr that works with both hive and pig
-    testRuntime "org.antlr:antlr-runtime:$antlrVersion"
-    // hive optional dependencies
-    //testCompile "org.datanucleus:datanucleus-connectionpool:$dataNucleusVersion"
-    //testCompile "org.datanucleus:datanucleus-core:$dataNucleusVersion"
-    //testCompile "org.datanucleus:datanucleus-enhancer:$dataNucleusVersion"
-    //testCompile "org.datanucleus:datanucleus-rdbms:$dataNucleusVersion"
-    //testCompile "javax.jdo:jdo2-api:$jdoVersion"
-    
-    testCompile "cascading:cascading-local:$cascadingVersion"
-}
-
-javaprojects = rootProject
-
-sourceCompatibility = 1.6
-targetCompatibility = 1.6 
-
 javadoc {
   srcDir = file("${projectDir}/docs/src/api")
   destinationDir = file("${buildDir}/api")
@@ -248,88 +224,157 @@ javadoc {
     
   title = "${rootProject.description} ${version} API"
 
-  // collect all the sources that will be included in the javadoc output
-  source javaprojects.collect {project ->
-      project.sourceSets.main.allJava
-  }
-
   // collect all main classpaths to be able to resolve @see refs, etc.
   // this collection also determines the set of projects that this
   // task dependsOn, thus the runtimeClasspath is used to ensure all
   // projects are included, not just *dependencies* of all classes.
   // this is awkward and took me a while to figure out.
-  classpath = files(javaprojects.collect {project ->
-      project.sourceSets.main.runtimeClasspath
-  })
+//  classpath = files(javaprojects.collect {project ->
+//      project.sourceSets.main.runtimeClasspath
+//  })
 
   // copy the images from the doc-files dir over to the target
-  doLast { task ->
-      copy {
-          from file("${task.srcDir}/doc-files")
-          into file("${task.destinationDir}/doc-files")
-      }
-  }
+//  doLast { task ->
+//      copy {
+//          from file("${task.srcDir}/doc-files")
+//          into file("${task.destinationDir}/doc-files")
+//      }
+//  }
 }
 
-ideaProject {
-	withXml { provider ->
-		provider.node.component.find { it.@name == 'VcsDirectoryMappings' }.mapping.@vcs = 'Git'
-	}
+jar {
+    manifest.attributes['Implementation-Title'] = 'spring-data-hadoop'
+    manifest.attributes['Implementation-Version'] = project.version
+
+    from("$rootDir/docs/src/info") {
+        include "license.txt"
+        include "notice.txt"
+        into "META-INF"
+        expand(copyright: new Date().format('yyyy'), version: project.version)
+    }
+}
+
+task sourcesJar(type: Jar, dependsOn:classes) {
+    classifier = 'sources'
+    from sourceSets.main.allJava
+}
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+reference {
+    sourceDir = file('docs/src/reference/docbook')
+}
+
+
+task docsZip(type: Zip) {
+    group = 'Distribution'
+    classifier = 'docs'
+    description = "Builds -${classifier} archive containing api and reference for deployment"
+
+    from('docs/src/info') {
+        include 'changelog.txt'
+    }
+
+    from (javadoc) {
+        into 'api'
+    }
+
+    from (reference) {
+        into 'reference'
+    }
+}
+
+task schemaZip(type: Zip) {
+    group = 'Distribution'
+    classifier = 'schema'
+    description = "Builds -${classifier} archive containing all XSDs for deployment"
+
+    def Properties schemas = new Properties();
+    
+    sourceSets.main.resources.find {
+        it.path.endsWith('META-INF/spring.schemas')
+    }?.withInputStream { schemas.load(it) }
+
+    logger.info('Schema properties ' + schemas)
+    
+
+    paths = []
+
+    for (def key : schemas.keySet()) {
+        def shortName = key.replaceAll(/http.*schema.(.*).spring-.*/, '$1')
+        assert shortName != key
+        File xsdFile = sourceSets.main.resources.find {
+            it.path.endsWith(schemas.get(key))
+        }
+        assert xsdFile != null
+        paths.add(xsdFile.path)
+        into (shortName) {
+            from xsdFile.path
+        }
+    }
+    
+    zipRootDir = "${project.name}-${project.version}"
+    
+    into (zipRootDir) {
+        from paths
+    }
+}
+
+task distZip(type: Zip, dependsOn: [jar, docsZip, schemaZip, sourcesJar, javadocJar]) {
+    group = 'Distribution'
+    classifier = 'dist'
+    description = "Builds -${classifier} archive, containing all jars and docs, " +
+                  "suitable for community download page."
+
+    zipRootDir = "${project.name}-${project.version}"
+
+    into (zipRootDir) {
+        from('docs/src/info') {
+            include 'readme.txt'
+            include 'license.txt'
+            include 'notice.txt'
+            expand(copyright: new Date().format('yyyy'), version: project.version)
+        }
+
+        from('samples/') {
+                into 'samples'
+                exclude '**/build/**'
+                exclude '**/bin/**'
+                exclude '**/.settings/**'
+                exclude '**/.gradle/**'
+                exclude '**/.*'
+        }
+        
+        from(zipTree(docsZip.archivePath)) {
+            into "docs"
+        }
+
+        from(zipTree(schemaZip.archivePath)) {
+            into "schema"
+        }
+        into ("dist") {
+            from rootProject.collect { project -> project.libsDir }
+        }
+    }
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+
+    archives docsZip
+    archives schemaZip
+    archives distZip
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.0-milestone-3'
-    description = "Generate the Gradle wrapper"
-    group = "Distribution"
+    description = 'Generates gradlew[.bat] scripts'
+    gradleVersion = '1.0-milestone-8a'
+    jarFile = '.wrapper/gradle-wrapper.jar'
 }
 
-apply from: "$rootDir/maven.gradle"
-
-// Distribution tasks
-task dist(type: Zip) {
-    description = "Generate the ZIP Distribution"
-    group = "Distribution"
-    dependsOn assemble, subprojects*.tasks*.matching { task -> task.name == 'assemble' }
-
-    evaluationDependsOn(':docs')
-
-    def zipRootDir = "${project.name}-$version"
-    into(zipRootDir) {
-        from('/docs/src/info') {
-            include '*.txt'
-        }
-        from('/docs/build/') {
-            into 'docs'
-            include 'reference/**/*'
-        }
-        from('samples/') {
-            into 'samples'
-            exclude '**/build/**'
-            exclude '**/bin/**'
-            exclude '**/.settings/**'
-            exclude '**/.gradle/**'
-            exclude '**/.*'
-        }
-        from('build/') {
-            into 'docs'
-            include 'api/**/*'
-        }
-            into('dist') {
-            from javaprojects.collect {project -> project.libsDir }
-        }
-    }
-    doLast {
-        ant.checksum(file: archivePath, algorithm: 'SHA1', fileext: '.sha1')
-    }
-}
-
-task uploadDist(type: org.springframework.gradle.tasks.S3DistroUpload, dependsOn: dist) {
-    description = "Upload the ZIP Distribution"
-    group = "Distribution"
-    archiveFile = dist.archivePath
-    projectKey = 'SHDP'
-    projectName = 'Spring Data Hadoop'
-}
-
-assemble.dependsOn = ['jar', 'sourceJar', 'javadocJar']
+assemble.dependsOn = ['jar', 'sourcesJar']
 defaultTasks 'build'

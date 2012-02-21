@@ -1,5 +1,5 @@
 rootProject.name = 'spring-data-hadoop'
 
-include 'docs'
+//include 'docs'
        
-docs = findProject(':docs')
+//docs = findProject(':docs')
