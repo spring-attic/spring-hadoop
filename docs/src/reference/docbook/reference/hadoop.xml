@@ -299,13 +299,13 @@
 		
 	 	<programlisting language="xml"><![CDATA[<bean id="runner" class="org.springframework.data.hadoop.mapreduce.JobRunner">
    <property name="jobs"><list>
-       <!-- reference to another job named 'job' -->
-       <ref bean="streaming-job"/>
-       <!-- nested bean definition -->
-	   <hdp:job id="nested-job" .... /> 
-	</list></property>
+     <!-- reference to another job named 'job' -->
+     <ref bean="streaming-job"/>
+     <!-- nested bean definition -->
+	 <hdp:job id="nested-job" .... /> 
+   </list></property>
 </bean>
-	 	
+ 	
 <hdp:job id="job"  ... />]]></programlisting>
 	 </section>   	 
    </section>
