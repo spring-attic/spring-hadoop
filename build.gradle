@@ -8,7 +8,7 @@ buildscript {
 }
 
 description = 'Spring Hadoop'
-group = 'org.springframework.data.hadoop'
+group = 'org.springframework.data'
 
 repositories {
   maven { url "http://repo.springsource.org/libs-release" }
