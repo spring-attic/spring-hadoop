@@ -77,7 +77,7 @@
     provides a nice visualization and authoring help for Spring Batch
     workflows as shown below.<mediaobject>
         <imageobject role="html">
-          <imagedata fileref="batch-wordcount-ide.jpg" format="JPG"/>
+          <imagedata fileref="images/batch-wordcount-ide.jpg" format="JPG"/>
         </imageobject>
       </mediaobject></para>
 
