@@ -5,6 +5,24 @@ http://www.springsource.org/spring-data/hadoop
 Commit changelog: http://github.com/SpringSource/spring-hadoop/tree/[version]
 Issues changelog: http://jira.springsource.org/secure/ReleaseNote.jspa?projectId=10801
 
+Changes in version 1.0 M1 (2012-02-23)
+--------------------------------------
+
+General
+* Aligned build system with Spring Framework 3.2
+* Introduced support for Hadoop Tool
+* Introduced support for Cascading
+
+Package org.springframework.data.hadoop.batch
+* Introduce Spring Batch ItemReader for HDFS
+
+Package org.springframework.data.hadoop.configuration
+* Introduced more utility methods
+
+Package org.springframework.data.hadoop.mapreduce
+* Introduced support for Hadoop Tool
+* Fixed incorrect return value/type for JobRunner
+
 
 Changes in version 0.9 RELEASE (2012-02-06)
 -------------------------------------------
