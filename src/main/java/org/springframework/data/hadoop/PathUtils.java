@@ -17,6 +17,7 @@
 package org.springframework.data.hadoop;
 
 import java.util.Calendar;
+import java.io.File;
 
 
 /**
@@ -31,32 +32,33 @@ public class PathUtils {
 	private String rootPath;
 
 
+	/**
+	 * get file path based on time. For example "/user/hadoop/data/2012/2/22/17/20/10"
+	 * 
+	 * @return the file path appended with time.
+	 */
 	public String getTimeBasedPathFromRoot() {
 		if (rootPath == null || rootPath.length() == 0) {
 			return "";
 		}
 		StringBuffer strBuffer = new StringBuffer();
-		if (!rootPath.startsWith("/")) {
-			strBuffer.append("/");
-		}
-
 		strBuffer.append(rootPath);
-		if (!rootPath.endsWith("/")) {
-			strBuffer.append("/");
+		if (!rootPath.endsWith(File.separator)) {
+			strBuffer.append(File.separator);
 		}
 		Calendar cal = Calendar.getInstance();
 		strBuffer.append(cal.get(Calendar.YEAR));
-		strBuffer.append("/");
+		strBuffer.append(File.separator);
 		strBuffer.append(cal.get(Calendar.MONTH) + 1);
-		strBuffer.append("/");
+		strBuffer.append(File.separator);
 		strBuffer.append(cal.get(Calendar.DAY_OF_MONTH));
-		strBuffer.append("/");
+		strBuffer.append(File.separator);
 		strBuffer.append(cal.get(Calendar.HOUR_OF_DAY));
-		strBuffer.append("/");
+		strBuffer.append(File.separator);
 		strBuffer.append(cal.get(Calendar.MINUTE));
-		strBuffer.append("/");
+		strBuffer.append(File.separator);
 		strBuffer.append(cal.get(Calendar.SECOND));
-		strBuffer.append("/");
+		strBuffer.append(File.separator);
 		return strBuffer.toString();
 	}
 
