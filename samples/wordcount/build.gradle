@@ -6,12 +6,10 @@ apply plugin: 'idea'
 apply plugin: 'eclipse'
 
 repositories {
-    mavenLocal()
-    mavenCentral()
     // Public Spring artefacts
-    mavenRepo name: "spring-release", urls: "http://repo.springsource.org/release"
-    mavenRepo name: "spring-milestone", urls: "http://repo.springsource.org/milestone"
-    mavenRepo name: "spring-snapshot", urls: "http://repo.springsource.org/snapshot"
+    maven { url "http://repo.springsource.org/libs-release" }
+    maven { url "http://repo.springsource.org/libs-milestone" }
+    maven { url "http://repo.springsource.org/libs-snapshot" }
 }
 
 dependencies {
