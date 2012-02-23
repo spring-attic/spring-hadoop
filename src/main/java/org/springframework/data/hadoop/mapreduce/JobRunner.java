@@ -15,7 +15,8 @@
  */
 package org.springframework.data.hadoop.mapreduce;
 
-import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -42,19 +43,20 @@ public class JobRunner implements FactoryBean<Object>, InitializingBean, Disposa
 
 	private boolean runAtStartup = true;
 	private boolean waitForJobs = true;
-	private Collection<Job> jobs;
-	private boolean executed = false;
-	private boolean succesful = false;
+	private Set<String> jobNames;
+	private Set<Job> jobs = new HashSet<Job>();
+	//private boolean executed = false;
+	//private boolean succesful = false;
 	
-	private String jobBeanName;
+	//private String jobBeanName;
 	private ApplicationContext ctx;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.notEmpty(jobs, "at least one job needs to be specified");
+		Assert.notEmpty(jobNames, "at least one job needs to be specified");
 
 		if (runAtStartup) {
-			getObject();
+			runJob();
 		}
 	}
 
@@ -73,19 +75,8 @@ public class JobRunner implements FactoryBean<Object>, InitializingBean, Disposa
 
 	@Override
 	public Object getObject() throws Exception {
-		if (!executed) {
-			executed = true;
-			for (Job job : jobs) {
-				if (!waitForJobs) {
-					job.submit();
-				}
-				else {
-					succesful &= job.waitForCompletion(true);
-				}
-			}
-		}
-
-		return (waitForJobs ? null : succesful);
+		//TODO: figure out what should be returned
+		return jobNames.size();
 	}
 
 	@Override
@@ -123,8 +114,8 @@ public class JobRunner implements FactoryBean<Object>, InitializingBean, Disposa
 	 * 
 	 * @param jobs The jobs to run.
 	 */
-	public void setJobs(Collection<Job> jobs) {
-		this.jobs = jobs;
+	public void setJobNames(Set<String> names) {
+		this.jobNames = names;
 	}
 
 	@Override
@@ -134,17 +125,24 @@ public class JobRunner implements FactoryBean<Object>, InitializingBean, Disposa
 		
 	}
 	
+	/**
+	 * Run all the jobs.
+	 * 
+	 * @throws Exception 
+	 */
 	public void runJob() throws Exception{
-		Job job = ctx.getBean(this.jobBeanName, Job.class);
-		job.submit();
-		
+		for(String jobName : jobNames){
+			log.info("run job : " + jobName);
+			Job job = ctx.getBean(jobName, Job.class);
+			jobs.add(job);
+			if(!this.waitForJobs){
+				job.submit();
+			}
+			else{
+				job.waitForCompletion(true);
+			}
+		}		
 	}
 
-	public String getJobBeanName() {
-		return jobBeanName;
-	}
 
-	public void setJobBeanName(String jobBeanName) {
-		this.jobBeanName = jobBeanName;
-	}
 }
