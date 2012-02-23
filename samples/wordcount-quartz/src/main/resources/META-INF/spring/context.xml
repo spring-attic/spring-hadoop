@@ -50,7 +50,7 @@
 	
 	<!-- simple job runner -->
 	<bean id="runner" class="org.springframework.data.hadoop.mapreduce.JobRunner" depends-on="clean-script" 
-              p:runAtStartup="false" scope="prototype">
+              p:runAtStartup="false">
           <property name="jobNames">
             <set>
               <value>wc-job</value>
