@@ -298,9 +298,6 @@ task schemaZip(type: Zip) {
         it.path.endsWith('META-INF/spring.schemas')
     }?.withInputStream { schemas.load(it) }
 
-    logger.info('Schema properties ' + schemas)
-    
-
     paths = []
 
     for (def key : schemas.keySet()) {
@@ -314,12 +311,6 @@ task schemaZip(type: Zip) {
         into (shortName) {
             from xsdFile.path
         }
-    }
-    
-    zipRootDir = "${project.name}-${project.version}"
-    
-    into (zipRootDir) {
-        from paths
     }
 }
 
