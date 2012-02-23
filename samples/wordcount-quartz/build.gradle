@@ -17,6 +17,8 @@ repositories {
 dependencies {
     compile "org.springframework.data:spring-data-hadoop:$version"
     compile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
+    compile("org.springframework:spring-tx:$springVersion")
+    compile "org.quartz-scheduler:quartz:$quartzVersion"
     // see HADOOP-7461
     runtime "org.codehaus.jackson:jackson-mapper-asl:$jacksonVersion"
     
