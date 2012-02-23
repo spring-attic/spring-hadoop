@@ -50,6 +50,7 @@ dependencies {
 ~~~~~
 
 The latest milestone is _1.0.0.M1_
+
 The latest nightly is _1.0.0.BUILD-SNAPSHOT_
 
 # Building
