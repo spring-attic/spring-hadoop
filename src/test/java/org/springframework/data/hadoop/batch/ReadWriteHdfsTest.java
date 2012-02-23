@@ -25,6 +25,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.data.hadoop.TestUtils;
 import org.springframework.data.hadoop.fs.HdfsResourceLoader;
 
+import static org.junit.Assert.*;
+
 
 /**
  * Basic data workflow test writing data into HDFS, executing a basic job and then reading data out of HDFS.
@@ -50,6 +52,8 @@ public class ReadWriteHdfsTest {
 		HdfsResourceLoader hrl = ctx.getBean(HdfsResourceLoader.class);
 		Resource resource = hrl.getResource("/ide-test/output/word/");
 
+		assertTrue(ctx.isPrototype("script-tasklet"));
+
 		fs.delete(new Path(resource.getURI().toString()), true);
 
 		JobsTrigger tj = new JobsTrigger();
@@ -73,6 +77,8 @@ public class ReadWriteHdfsTest {
 
 		FileSystem fs = FileSystem.get(ctx.getBean(Configuration.class));
 		fs.delete(new Path("/ide-test/output/word/"), true);
+
+		assertTrue(ctx.isPrototype("hadoop-tasklet"));
 
 		JobsTrigger tj = new JobsTrigger();
 		tj.startJobs(ctx);

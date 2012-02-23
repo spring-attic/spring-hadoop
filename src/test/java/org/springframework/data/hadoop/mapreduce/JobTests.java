@@ -62,6 +62,7 @@ public class JobTests {
 	@Test
 	public void testJarJob() throws Exception {
 		Job job = ctx.getBean("jar-job", Job.class);
+		assertTrue(ctx.isPrototype("jar-job"));
 		assertNotNull(job.getJar());
 		assertEquals("true", job.getConfiguration().get("mapred.used.genericoptionsparser"));
 	}

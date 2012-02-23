@@ -39,7 +39,7 @@
 		<hdp:script location="org/springframework/data/hadoop/hive/script.q" />
 	</hdp:hive-client> 
 	
-	<hdp:hive-tasklet id="hive-script">
+	<hdp:hive-tasklet id="hive-script" scope="prototype">
 		<hdp:script>
 			DROP TABLE IF EXITS testHiveBatchTable; 
 			CREATE TABLE testHiveBatchTable (key int, value string);

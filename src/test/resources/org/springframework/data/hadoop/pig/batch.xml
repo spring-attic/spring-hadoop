@@ -32,7 +32,7 @@
 
 	<hdp:pig configuration-ref="hadoop-configuration" exec-type="LOCAL" job-name="pig-script"/> 
 	
-	<hdp:pig-tasklet id="pig-script">
+	<hdp:pig-tasklet id="pig-script" scope="prototype">
 		<hdp:script location="org/springframework/data/hadoop/pig/script.pig" />
 	</hdp:pig-tasklet> 
 	

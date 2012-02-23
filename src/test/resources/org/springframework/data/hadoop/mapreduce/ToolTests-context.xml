@@ -43,7 +43,7 @@
 	
 	<bean id="tasklet" class="org.springframework.data.hadoop.mapreduce.ToolTasklet" p:tool-ref="test-tool" p:configuration-ref="hadoop-configuration" />
 	
-	<hdp:tool-tasklet id="tasklet-ns">
+	<hdp:tool-tasklet id="tasklet-ns" scope="prototype">
 		<bean class="org.springframework.data.hadoop.mapreduce.ToolTests$TestTool">
 			<constructor-arg ref="hadoop-configuration" />
 		</bean>

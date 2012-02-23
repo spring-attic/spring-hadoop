@@ -51,6 +51,7 @@ Whether to synchronously wait for the job to finish (the default) or not.
 			</xsd:annotation>
 		</xsd:attribute>
 		<xsd:attribute name="id" type="xsd:ID" use="required" />
+		<xsd:attribute name="scope" type="xsd:string" use="optional" />
 	</xsd:complexType>
 	</xsd:element>
 	
@@ -175,6 +176,7 @@ Reference to the Hadoop Configuration. Defaults to 'hadoop-configuration'.]]></x
 		<xsd:complexContent>
 		<xsd:extension base="propertiesConfigurableType">
 		<xsd:attribute name="id" type="xsd:ID" use="required" />
+		<xsd:attribute name="scope" type="xsd:string" use="optional" />
 		<xsd:attribute name="mapper" use="required">
 		<xsd:annotation>
 			<xsd:appinfo>
@@ -531,11 +533,18 @@ Whether the Tool runs at startup or not (default).
 		</xsd:complexType>
 	</xsd:element>
 
-	<xsd:element name="tool-tasklet" type="toolRunnerType">
+	<xsd:element name="tool-tasklet">
 		<xsd:annotation>
 		   <xsd:documentation><![CDATA[
 Defines a Hadoop Tool Tasklet.]]></xsd:documentation>
 		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="toolRunnerType">
+					<xsd:attribute name="scope" type="xsd:string" use="optional" />
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
 	</xsd:element>
 
 
@@ -729,6 +738,7 @@ Reference to a PigServer instance. Defaults to 'hadoop-pig-server'.
 					</xsd:appinfo>
 				</xsd:annotation>
 			</xsd:attribute>
+			<xsd:attribute name="scope" type="xsd:string" use="optional" />
 		</xsd:complexType>
 	</xsd:element>
 	
@@ -885,6 +895,7 @@ Reference to a HiveClient instance. Defaults to 'hive-client'.
 					</xsd:appinfo>
 				</xsd:annotation>
 			</xsd:attribute>
+			<xsd:attribute name="scope" type="xsd:string" use="optional" />			
 		</xsd:complexType>
 	</xsd:element>
 
@@ -1012,6 +1023,7 @@ Reference to a script declaration.]]></xsd:documentation>
 						</xsd:appinfo>
 			 	</xsd:annotation>			
 			</xsd:attribute>
+			<xsd:attribute name="scope" type="xsd:string" use="optional" />			
 		</xsd:complexType>
 	</xsd:element>
 </xsd:schema>

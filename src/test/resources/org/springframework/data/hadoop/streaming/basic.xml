@@ -20,7 +20,8 @@
 		p:input-path="test"
 		p:output-path="output"
 		p:mapper="${path.cat}"
-		p:reducer="${path.wc}"/>
+		p:reducer="${path.wc}"
+		scope="prototype"/>
 		
 	<hdp:streaming id="ns-stream-job"
 		configuration-ref="hadoop-configuration"

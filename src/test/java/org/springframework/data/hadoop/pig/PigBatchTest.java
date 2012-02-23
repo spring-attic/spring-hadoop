@@ -25,6 +25,8 @@ import org.springframework.data.hadoop.batch.JobsTrigger;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import static org.junit.Assert.*;
+
 /**
  * @author Costin Leau
  */
@@ -43,6 +45,7 @@ public class PigBatchTest {
 
 	@Test
 	public void testServerNamespace() throws Exception {
+		assertTrue(ctx.isPrototype("pig-script"));
 		JobsTrigger tj = new JobsTrigger();
 		tj.startJobs(ctx);
 	}

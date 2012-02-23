@@ -19,6 +19,7 @@ import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractSimpleBeanDefinitionParser;
+import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -35,6 +36,12 @@ abstract class AbstractImprovedSimpleBeanDefinitionParser extends AbstractSimple
 
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
+		// set scope
+		String scope = element.getAttribute(BeanDefinitionParserDelegate.SCOPE_ATTRIBUTE);
+		if (StringUtils.hasText(scope)) {
+			builder.setScope(scope);
+		}
+
 		NamedNodeMap attributes = element.getAttributes();
 		for (int x = 0; x < attributes.getLength(); x++) {
 			Attr attribute = (Attr) attributes.item(x);
@@ -56,6 +63,12 @@ abstract class AbstractImprovedSimpleBeanDefinitionParser extends AbstractSimple
 		}
 		postProcess(builder, element);
 	}
+
+	protected boolean isEligibleAttribute(String attributeName) {
+		return super.isEligibleAttribute(attributeName)
+				&& !BeanDefinitionParserDelegate.SCOPE_ATTRIBUTE.equals(attributeName);
+	}
+
 
 	protected String defaultId(ParserContext context, Element element) {
 		context.getReaderContext().error(

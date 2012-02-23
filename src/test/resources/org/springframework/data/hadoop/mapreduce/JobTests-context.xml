@@ -42,7 +42,8 @@
 	   	input-path="/ide-test/input/word/" output-path="/ide-test/runner/output-3/"
 		mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
 		reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"
-		validate-paths="false" jar-by-class="org.apache.hadoop.examples.WordCount" /> 
+		validate-paths="false" jar-by-class="org.apache.hadoop.examples.WordCount"
+		scope="prototype" /> 
 	
 	 
 	<hdp:job id="ns-job" 
@@ -51,7 +52,8 @@
 		reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"
 		validate-paths="false"
 		properties-ref="props" 
-		properties-location="cfg-1.properties, cfg-2.properties">
+		properties-location="cfg-1.properties, cfg-2.properties"
+		scope="singleton" >
 
 		star=chasing
 		return=captain eo

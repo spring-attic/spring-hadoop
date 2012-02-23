@@ -100,6 +100,11 @@ public class ToolTests {
 	}
 
 	@Test
+	public void testTaskletScope() throws Exception {
+		assertTrue(ctx.isPrototype("tasklet-ns"));
+	}
+
+	@Test
 	public void testTasklet() throws Exception {
 		JobsTrigger tj = new JobsTrigger();
 		tj.startJobs(ctx);

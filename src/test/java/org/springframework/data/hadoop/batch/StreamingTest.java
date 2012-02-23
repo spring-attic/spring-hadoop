@@ -61,6 +61,7 @@ public class StreamingTest {
 	public void testStreaming() throws Exception {
 		cleanOutput(ctx);
 
+		assertTrue(ctx.isPrototype("vanilla-stream-job"));
 		Job job = ctx.getBean("vanilla-stream-job", Job.class);
 		job.waitForCompletion(true);
 
