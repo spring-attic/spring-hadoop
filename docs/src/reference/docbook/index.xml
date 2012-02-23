@@ -4,8 +4,10 @@
     xmlns:xi="http://www.w3.org/2001/XInclude"
     xmlns:xlink="http://www.w3.org/1999/xlink">
   <bookinfo>
-    <title>Spring Hadoop Reference Guide</title>
-	  <releaseinfo>${version}</releaseinfo>
+    <title>Spring Hadoop Reference Manual</title>
+    <releaseinfo>${version}</releaseinfo>
+    <productname>Spring Hadoop</productname>
+
     
     <authorgroup>
       <author>

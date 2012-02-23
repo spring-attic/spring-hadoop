@@ -10,6 +10,7 @@ Changes in version 1.0 M1 (2012-02-23)
 
 General
 * Aligned build system with Spring Framework 3.2
+* Improved namespace
 * Introduced support for Hadoop Tool
 * Introduced support for Cascading
 
