@@ -15,10 +15,17 @@
 		fs.default.name=${hd.fs}
 	</hdp:configuration>
 
-	<hdp:job id="wordcount-job" validate-paths="false"
-	    input-path="${wordcount.input.path}" output-path="${wordcount.output.path}" 
-		mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
-		reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"/>
+        <bean name="pathUtils" class="org.springframework.data.hadoop.PathUtils" p:rootPath="${wordcount.output.path}"/>
+
+        <bean id="wc-job" class="org.springframework.data.hadoop.mapreduce.JobFactoryBean"
+                p:configuration-ref="hadoop-configuration"
+                p:input-paths="${wordcount.input.path}"
+                p:output-path="#{@pathUtils.getTimeBasedPathFromRoot()}"
+                p:mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
+                p:reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"
+                p:validate-paths="false"
+                scope="prototype"
+        />
 
 
   	<hdp:script id="clean-script" language="javascript">
@@ -40,6 +47,12 @@
 	</hdp:script>
 	
 	<!-- simple job runner -->
-	<bean id="runner" class="org.springframework.data.hadoop.mapreduce.JobRunner" depends-on="clean-script" p:jobs-ref="wordcount-job"/>
+	<bean id="runner" class="org.springframework.data.hadoop.mapreduce.JobRunner" depends-on="clean-script" p:runAtStartup="true">
+          <property name="jobNames">
+            <set>
+              <value>wc-job</value>
+            </set>
+          </property>
+        </bean>            
 	
 </beans>

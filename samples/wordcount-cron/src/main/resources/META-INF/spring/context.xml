@@ -50,8 +50,12 @@
 	
 	<!-- simple job runner -->
 	<bean id="runner" class="org.springframework.data.hadoop.mapreduce.JobRunner" depends-on="clean-script" 
-              p:jobs-ref="wordcount-job" p:runAtStartup="false" scope="prototype">
-          <property name="jobBeanName" value="wc-job"/>
+              p:runAtStartup="false">
+          <property name="jobNames">
+            <set>
+              <value>wc-job</value>
+            </set>
+          </property>
         </bean>
 
         <task:scheduler id="myScheduler" pool-size="10"/>

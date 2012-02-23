@@ -27,7 +27,7 @@ import java.util.Calendar;
  *
  */
 public class PathUtils {
-	
+
 	private String rootPath;
 
 
@@ -36,18 +36,18 @@ public class PathUtils {
 			return "";
 		}
 		StringBuffer strBuffer = new StringBuffer();
-		if(!rootPath.startsWith("/")){
+		if (!rootPath.startsWith("/")) {
 			strBuffer.append("/");
 		}
-			
+
 		strBuffer.append(rootPath);
-		if(!rootPath.endsWith("/")){
+		if (!rootPath.endsWith("/")) {
 			strBuffer.append("/");
 		}
 		Calendar cal = Calendar.getInstance();
 		strBuffer.append(cal.get(Calendar.YEAR));
 		strBuffer.append("/");
-		strBuffer.append(cal.get(Calendar.MONTH)+1);
+		strBuffer.append(cal.get(Calendar.MONTH) + 1);
 		strBuffer.append("/");
 		strBuffer.append(cal.get(Calendar.DAY_OF_MONTH));
 		strBuffer.append("/");
