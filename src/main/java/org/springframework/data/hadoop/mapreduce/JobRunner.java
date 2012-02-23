@@ -20,9 +20,12 @@ import java.util.Collection;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.mapreduce.Job;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.util.Assert;
 
 /**
@@ -33,7 +36,7 @@ import org.springframework.util.Assert;
  * 
  * @author Costin Leau
  */
-public class JobRunner implements FactoryBean<Object>, InitializingBean, DisposableBean {
+public class JobRunner implements FactoryBean<Object>, InitializingBean, DisposableBean, ApplicationContextAware {
 
 	private static final Log log = LogFactory.getLog(JobRunner.class);
 
@@ -42,6 +45,9 @@ public class JobRunner implements FactoryBean<Object>, InitializingBean, Disposa
 	private Collection<Job> jobs;
 	private boolean executed = false;
 	private boolean succesful = false;
+	
+	private String jobBeanName;
+	private ApplicationContext ctx;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -79,7 +85,7 @@ public class JobRunner implements FactoryBean<Object>, InitializingBean, Disposa
 			}
 		}
 
-		return (waitForJobs ? succesful : null);
+		return (waitForJobs ? null : succesful);
 	}
 
 	@Override
@@ -119,5 +125,26 @@ public class JobRunner implements FactoryBean<Object>, InitializingBean, Disposa
 	 */
 	public void setJobs(Collection<Job> jobs) {
 		this.jobs = jobs;
+	}
+
+	@Override
+	public void setApplicationContext(ApplicationContext applicationContext)
+			throws BeansException {
+		this.ctx = applicationContext;
+		
+	}
+	
+	public void runJob() throws Exception{
+		Job job = ctx.getBean(this.jobBeanName, Job.class);
+		job.submit();
+		
+	}
+
+	public String getJobBeanName() {
+		return jobBeanName;
+	}
+
+	public void setJobBeanName(String jobBeanName) {
+		this.jobBeanName = jobBeanName;
 	}
 }
