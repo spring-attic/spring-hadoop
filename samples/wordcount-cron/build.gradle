@@ -1,0 +1,33 @@
+description = 'Spring Hadoop Samples - WordCount'
+
+apply plugin: 'base'
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'eclipse'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    // Public Spring artefacts
+    mavenRepo name: "spring-release", urls: "http://repo.springsource.org/release"
+    mavenRepo name: "spring-milestone", urls: "http://repo.springsource.org/milestone"
+    mavenRepo name: "spring-snapshot", urls: "http://repo.springsource.org/snapshot"
+}
+
+dependencies {
+    compile "org.springframework.data:spring-data-hadoop:$version"
+    compile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
+    // see HADOOP-7461
+    runtime "org.codehaus.jackson:jackson-mapper-asl:$jacksonVersion"
+    
+    testCompile "junit:junit:$junitVersion"
+    testCompile "org.springframework:spring-test:$springVersion"
+}
+
+task run(type: JavaExec) {
+       description = 'Runs the application'
+       main = "org.springframework.data.hadoop.samples.wordcount.Main"
+       classpath = sourceSets.main.runtimeClasspath
+}
+
+defaultTasks 'run'
