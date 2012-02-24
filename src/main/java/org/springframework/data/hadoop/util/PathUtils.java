@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.data.hadoop;
+package org.springframework.data.hadoop.util;
 
 import java.util.Calendar;
 import java.io.File;
