@@ -46,7 +46,7 @@ public class JobRunner implements FactoryBean<Object>, InitializingBean, Disposa
 	private Set<String> jobNames;
 	private Set<Job> jobs = new HashSet<Job>();
 	//private boolean executed = false;
-	//private boolean succesful = false;
+	private boolean succesful = false;
 	
 	//private String jobBeanName;
 	private ApplicationContext ctx;
@@ -76,7 +76,7 @@ public class JobRunner implements FactoryBean<Object>, InitializingBean, Disposa
 	@Override
 	public Object getObject() throws Exception {
 		//TODO: figure out what should be returned
-		return jobNames.size();
+		return this.succesful;
 	}
 
 	@Override
@@ -141,7 +141,8 @@ public class JobRunner implements FactoryBean<Object>, InitializingBean, Disposa
 			else{
 				job.waitForCompletion(true);
 			}
-		}		
+		}
+		this.succesful = true;
 	}
 
 
