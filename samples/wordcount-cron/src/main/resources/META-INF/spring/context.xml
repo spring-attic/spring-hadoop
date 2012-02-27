@@ -19,7 +19,8 @@
 
         <bean name="pathUtils" class="org.springframework.data.hadoop.util.PathUtils" 
         p:rootPath="${wordcount.output.path}"
-        p:pathFormat="year/month/day/hour/minute/second"/>
+        p:pathFormat="year/month/day/hour/minute/second"
+        p:appendUUID="true"/>
 
         <bean id="wc-job" class="org.springframework.data.hadoop.mapreduce.JobFactoryBean"
 		p:configuration-ref="hadoop-configuration"

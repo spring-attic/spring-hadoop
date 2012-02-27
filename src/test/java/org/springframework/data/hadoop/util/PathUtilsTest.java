@@ -269,5 +269,47 @@ public class PathUtilsTest {
 	}
 	
 	
+	@Test
+	public void testGetTimeBasedPathFromRootOnlyHour(){
+		String rootPath = "/home/hadoop/input";
+		util.setRootPath(rootPath);
+		util.setPathFormat("hour");
+		String result = util.getTimeBasedPathFromRoot();
+		log.info("path is:" + result);
+		assertTrue("time based path is not start with root path",result.startsWith(rootPath));
+		
+		Calendar cal = Calendar.getInstance();
+		int expectedHour = cal.get(Calendar.HOUR_OF_DAY);
+		
+		String appendedStr = result.substring(rootPath.length()+1);
+		log.info("appended str is:" + appendedStr);
+		int hour = Integer.parseInt(appendedStr.substring(0,appendedStr.indexOf(File.separator)));		
+		assertEquals("hour is incorrect",expectedHour,hour);
+		
+		
+		
+	}
+	
+	@Test
+	public void testGetTimeBasedPathFromRootOnlyHourWithUUID(){
+		String rootPath = "/home/hadoop/input";
+		util.setRootPath(rootPath);
+		util.setPathFormat("hour");
+		util.setAppendUUID(true);
+		String result = util.getTimeBasedPathFromRoot();
+		log.info("path is:" + result);
+		assertTrue("time based path is not start with root path",result.startsWith(rootPath));
+		
+		Calendar cal = Calendar.getInstance();
+		int expectedHour = cal.get(Calendar.HOUR_OF_DAY);
+		
+		String appendedStr = result.substring(rootPath.length()+1);
+		log.info("appended str is:" + appendedStr);
+		int hour = Integer.parseInt(appendedStr.substring(0,appendedStr.indexOf(File.separator)));		
+		assertEquals("hour is incorrect",expectedHour,hour);		
+		
+		
+	}
+	
 
 }

@@ -17,6 +17,7 @@
 package org.springframework.data.hadoop.util;
 
 import java.util.Calendar;
+import java.util.UUID;
 import java.io.File;
 
 
@@ -33,6 +34,8 @@ public class PathUtils {
 	private String rootPath;
 
 	private String pathFormat = "year/month/day/hour/minute/second";
+
+	private boolean appendUUID;
 
 
 	/**
@@ -60,7 +63,7 @@ public class PathUtils {
 
 		String[] formats = this.pathFormat.split(File.separator);
 		for (String format : formats) {
-			switch(PathSeparator.valueOf(format.toLowerCase())){
+			switch (PathSeparator.valueOf(format.toLowerCase())) {
 			case year:
 				strBuffer.append(year);
 				strBuffer.append(File.separator);
@@ -89,7 +92,11 @@ public class PathUtils {
 				break;
 			}
 		}
-		
+		if (this.appendUUID) {
+			strBuffer.append(UUID.randomUUID());
+			strBuffer.append(File.separator);
+		}
+
 		return strBuffer.toString();
 	}
 
@@ -126,13 +133,24 @@ public class PathUtils {
 	public void setPathFormat(String pathFormat) {
 		this.pathFormat = pathFormat;
 	}
+
+
+	/**
+	 * @return the appendUUID
+	 */
+	public boolean isAppendUUID() {
+		return appendUUID;
+	}
+
+
+	/**
+	 * @param appendUUID the appendUUID to set
+	 */
+	public void setAppendUUID(boolean appendUUID) {
+		this.appendUUID = appendUUID;
+	}
 }
 
-enum PathSeparator{
-	year,
-	month,
-	day,
-	hour,
-	minute,
-	second
+enum PathSeparator {
+	year, month, day, hour, minute, second
 }
