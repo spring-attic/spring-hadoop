@@ -17,7 +17,9 @@
 		fs.default.name=${hd.fs}
 	</hdp:configuration>
 
-        <bean name="pathUtils" class="org.springframework.data.hadoop.PathUtils" p:rootPath="${wordcount.output.path}"/>
+        <bean name="pathUtils" class="org.springframework.data.hadoop.util.PathUtils" 
+        p:rootPath="${wordcount.output.path}"
+        p:pathFormat="year/month/day/hour/minute/second"/>
 
         <bean id="wc-job" class="org.springframework.data.hadoop.mapreduce.JobFactoryBean"
 		p:configuration-ref="hadoop-configuration"

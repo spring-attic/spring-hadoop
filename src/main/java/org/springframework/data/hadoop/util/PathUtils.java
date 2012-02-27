@@ -22,7 +22,8 @@ import java.io.File;
 
 /**
  * Utility class to generate new path based on give path. 
- * The patter is ${rootPath}/${Year}/${Month}/${Day}/${Hour}/${Minute}/{Second}. For example,"/user/hadoop/data/2012/2/22/17/20/10"
+ * The pattern is like ${rootPath}/${Year}/${Month}/${Day}/${Hour}/${Minute}/{Second} based on pathFormat. 
+ * For example, the return path will be "/user/hadoop/data/2012/2/22/17/20/10" if pathFormat is "year/month/day/hour/minute/second"
  * 
  * @author Jarred Li
  *
@@ -30,6 +31,8 @@ import java.io.File;
 public class PathUtils {
 
 	private String rootPath;
+
+	private String pathFormat = "year/month/day/hour/minute/second";
 
 
 	/**
@@ -46,29 +49,90 @@ public class PathUtils {
 		if (!rootPath.endsWith(File.separator)) {
 			strBuffer.append(File.separator);
 		}
+
 		Calendar cal = Calendar.getInstance();
-		strBuffer.append(cal.get(Calendar.YEAR));
-		strBuffer.append(File.separator);
-		strBuffer.append(cal.get(Calendar.MONTH) + 1);
-		strBuffer.append(File.separator);
-		strBuffer.append(cal.get(Calendar.DAY_OF_MONTH));
-		strBuffer.append(File.separator);
-		strBuffer.append(cal.get(Calendar.HOUR_OF_DAY));
-		strBuffer.append(File.separator);
-		strBuffer.append(cal.get(Calendar.MINUTE));
-		strBuffer.append(File.separator);
-		strBuffer.append(cal.get(Calendar.SECOND));
-		strBuffer.append(File.separator);
+		int year = cal.get(Calendar.YEAR);
+		int month = cal.get(Calendar.MONTH) + 1;
+		int day = cal.get(Calendar.DAY_OF_MONTH);
+		int hour = cal.get(Calendar.HOUR_OF_DAY);
+		int minute = cal.get(Calendar.MINUTE);
+		int second = cal.get(Calendar.SECOND);
+
+		String[] formats = this.pathFormat.split(File.separator);
+		for (String format : formats) {
+			switch(PathSeparator.valueOf(format.toLowerCase())){
+			case year:
+				strBuffer.append(year);
+				strBuffer.append(File.separator);
+				break;
+			case month:
+				strBuffer.append(month);
+				strBuffer.append(File.separator);
+				break;
+			case day:
+				strBuffer.append(day);
+				strBuffer.append(File.separator);
+				break;
+			case hour:
+				strBuffer.append(hour);
+				strBuffer.append(File.separator);
+				break;
+			case minute:
+				strBuffer.append(minute);
+				strBuffer.append(File.separator);
+				break;
+			case second:
+				strBuffer.append(second);
+				strBuffer.append(File.separator);
+				break;
+			default:
+				break;
+			}
+		}
+		
 		return strBuffer.toString();
 	}
 
 
+	/**
+	 * get root path
+	 * @return root path
+	 */
 	public String getRootPath() {
 		return rootPath;
 	}
 
 
+	/**
+	 * set root path
+	 * @param rootPath root path name
+	 */
 	public void setRootPath(String rootPath) {
 		this.rootPath = rootPath;
 	}
+
+
+	/**
+	 * @return the pathFormat
+	 */
+	public String getPathFormat() {
+		return pathFormat;
+	}
+
+
+	/**
+	 * @param pathFormat the pathFormat to set
+	 */
+	public void setPathFormat(String pathFormat) {
+		this.pathFormat = pathFormat;
+	}
+}
+
+enum PathSeparator{
+	year,
+	month,
+	day,
+	hour,
+	minute,
+	second
 }

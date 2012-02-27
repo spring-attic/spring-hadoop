@@ -52,9 +52,10 @@ public class PathUtilsTest {
 	}
 	
 	@Test
-	public void testGetTimeBasedPathFromRoot(){
+	public void testGetTimeBasedPathFromRootWithSecond(){
 		String rootPath = "/home/hadoop/input";
 		util.setRootPath(rootPath);
+		util.setPathFormat("year/month/day/hour/minute/second");
 		String result = util.getTimeBasedPathFromRoot();
 		log.info("path is:" + result);
 		assertTrue("time based path is not start with root path",result.startsWith(rootPath));
@@ -87,5 +88,186 @@ public class PathUtilsTest {
 		
 		
 	}
+	
+	@Test
+	public void testGetTimeBasedPathFromRootWithMinute(){
+		String rootPath = "/home/hadoop/input";
+		util.setRootPath(rootPath);
+		util.setPathFormat("year/month/day/hour/minute");
+		String result = util.getTimeBasedPathFromRoot();
+		log.info("path is:" + result);
+		assertTrue("time based path is not start with root path",result.startsWith(rootPath));
+		
+		Calendar cal = Calendar.getInstance();
+		int expectedYear = cal.get(Calendar.YEAR);
+		int expectedMonth = cal.get(Calendar.MONTH) +1;
+		int expectedDay = cal.get(Calendar.DAY_OF_MONTH);
+		int expectedHour = cal.get(Calendar.HOUR_OF_DAY);
+		
+		String appendedStr = result.substring(rootPath.length()+1);
+		log.info("appended str is:" + appendedStr);
+		int actualYear = Integer.parseInt(appendedStr.substring(0,appendedStr.indexOf(File.separator)));		
+		assertEquals("Year is incorrect",expectedYear,actualYear);
+		
+		appendedStr = appendedStr.substring(String.valueOf(actualYear).length()+1);
+		log.info("appended str without year is:" + appendedStr);
+		int actualMonth = Integer.parseInt(appendedStr.substring(0,appendedStr.indexOf(File.separator)));
+		assertEquals("Month is incorrect", expectedMonth, actualMonth);
+		
+		appendedStr = appendedStr.substring(String.valueOf(actualMonth).length()+1);
+		log.info("appended str without month is:" + appendedStr);
+		int actualDay = Integer.parseInt(appendedStr.substring(0,appendedStr.indexOf(File.separator)));
+		assertEquals("Day is incorrect", expectedDay, actualDay);
+		
+		appendedStr = appendedStr.substring(String.valueOf(actualDay).length()+1);
+		log.info("appended str without day is:" + appendedStr);
+		int actualHour = Integer.parseInt(appendedStr.substring(0,appendedStr.indexOf(File.separator)));
+		assertEquals("Hour is incorrect",expectedHour,actualHour);
+		
+		
+	}
+	
+	@Test
+	public void testGetTimeBasedPathFromRootWithHour(){
+		String rootPath = "/home/hadoop/input";
+		util.setRootPath(rootPath);
+		util.setPathFormat("year/month/day/hour");
+		String result = util.getTimeBasedPathFromRoot();
+		log.info("path is:" + result);
+		assertTrue("time based path is not start with root path",result.startsWith(rootPath));
+		
+		Calendar cal = Calendar.getInstance();
+		int expectedYear = cal.get(Calendar.YEAR);
+		int expectedMonth = cal.get(Calendar.MONTH) +1;
+		int expectedDay = cal.get(Calendar.DAY_OF_MONTH);
+		int expectedHour = cal.get(Calendar.HOUR_OF_DAY);
+		
+		String appendedStr = result.substring(rootPath.length()+1);
+		log.info("appended str is:" + appendedStr);
+		int actualYear = Integer.parseInt(appendedStr.substring(0,appendedStr.indexOf(File.separator)));		
+		assertEquals("Year is incorrect",expectedYear,actualYear);
+		
+		appendedStr = appendedStr.substring(String.valueOf(actualYear).length()+1);
+		log.info("appended str without year is:" + appendedStr);
+		int actualMonth = Integer.parseInt(appendedStr.substring(0,appendedStr.indexOf(File.separator)));
+		assertEquals("Month is incorrect", expectedMonth, actualMonth);
+		
+		appendedStr = appendedStr.substring(String.valueOf(actualMonth).length()+1);
+		log.info("appended str without month is:" + appendedStr);
+		int actualDay = Integer.parseInt(appendedStr.substring(0,appendedStr.indexOf(File.separator)));
+		assertEquals("Day is incorrect", expectedDay, actualDay);
+		
+		appendedStr = appendedStr.substring(String.valueOf(actualDay).length()+1);
+		log.info("appended str without day is:" + appendedStr);
+		int actualHour = Integer.parseInt(appendedStr.substring(0,appendedStr.indexOf(File.separator)));
+		assertEquals("Hour is incorrect",expectedHour,actualHour);
+		
+		
+	}
+	
+	@Test
+	public void testGetTimeBasedPathFromRootWithDay(){
+		String rootPath = "/home/hadoop/input";
+		util.setRootPath(rootPath);
+		util.setPathFormat("year/month/day");
+		String result = util.getTimeBasedPathFromRoot();
+		log.info("path is:" + result);
+		assertTrue("time based path is not start with root path",result.startsWith(rootPath));
+		
+		Calendar cal = Calendar.getInstance();
+		int expectedYear = cal.get(Calendar.YEAR);
+		int expectedMonth = cal.get(Calendar.MONTH) +1;
+		int expectedDay = cal.get(Calendar.DAY_OF_MONTH);
+		
+		String appendedStr = result.substring(rootPath.length()+1);
+		log.info("appended str is:" + appendedStr);
+		int actualYear = Integer.parseInt(appendedStr.substring(0,appendedStr.indexOf(File.separator)));		
+		assertEquals("Year is incorrect",expectedYear,actualYear);
+		
+		appendedStr = appendedStr.substring(String.valueOf(actualYear).length()+1);
+		log.info("appended str without year is:" + appendedStr);
+		int actualMonth = Integer.parseInt(appendedStr.substring(0,appendedStr.indexOf(File.separator)));
+		assertEquals("Month is incorrect", expectedMonth, actualMonth);
+		
+		appendedStr = appendedStr.substring(String.valueOf(actualMonth).length()+1);
+		log.info("appended str without month is:" + appendedStr);
+		int actualDay = Integer.parseInt(appendedStr.substring(0,appendedStr.indexOf(File.separator)));
+		assertEquals("Day is incorrect", expectedDay, actualDay);
+		
+	
+		
+	}
+	
+	
+	@Test
+	public void testGetTimeBasedPathFromRootWithMonth(){
+		String rootPath = "/home/hadoop/input";
+		util.setRootPath(rootPath);
+		util.setPathFormat("year/month");
+		String result = util.getTimeBasedPathFromRoot();
+		log.info("path is:" + result);
+		assertTrue("time based path is not start with root path",result.startsWith(rootPath));
+		
+		Calendar cal = Calendar.getInstance();
+		int expectedYear = cal.get(Calendar.YEAR);
+		int expectedMonth = cal.get(Calendar.MONTH) +1;
+
+		
+		String appendedStr = result.substring(rootPath.length()+1);
+		log.info("appended str is:" + appendedStr);
+		int actualYear = Integer.parseInt(appendedStr.substring(0,appendedStr.indexOf(File.separator)));		
+		assertEquals("Year is incorrect",expectedYear,actualYear);
+		
+		appendedStr = appendedStr.substring(String.valueOf(actualYear).length()+1);
+		log.info("appended str without year is:" + appendedStr);
+		int actualMonth = Integer.parseInt(appendedStr.substring(0,appendedStr.indexOf(File.separator)));
+		assertEquals("Month is incorrect", expectedMonth, actualMonth);
+		
+		
+	}
+	
+	@Test
+	public void testGetTimeBasedPathFromRootWithYear(){
+		String rootPath = "/home/hadoop/input";
+		util.setRootPath(rootPath);
+		util.setPathFormat("year");
+		String result = util.getTimeBasedPathFromRoot();
+		log.info("path is:" + result);
+		assertTrue("time based path is not start with root path",result.startsWith(rootPath));
+		
+		Calendar cal = Calendar.getInstance();
+		int expectedYear = cal.get(Calendar.YEAR);
+		
+		String appendedStr = result.substring(rootPath.length()+1);
+		log.info("appended str is:" + appendedStr);
+		int actualYear = Integer.parseInt(appendedStr.substring(0,appendedStr.indexOf(File.separator)));		
+		assertEquals("Year is incorrect",expectedYear,actualYear);
+		
+		
+		
+	}
+	
+	@Test
+	public void testGetTimeBasedPathFromRootWithYearAndSecond(){
+		String rootPath = "/home/hadoop/input";
+		util.setRootPath(rootPath);
+		util.setPathFormat("year/second");
+		String result = util.getTimeBasedPathFromRoot();
+		log.info("path is:" + result);
+		assertTrue("time based path is not start with root path",result.startsWith(rootPath));
+		
+		Calendar cal = Calendar.getInstance();
+		int expectedYear = cal.get(Calendar.YEAR);
+		
+		String appendedStr = result.substring(rootPath.length()+1);
+		log.info("appended str is:" + appendedStr);
+		int actualYear = Integer.parseInt(appendedStr.substring(0,appendedStr.indexOf(File.separator)));		
+		assertEquals("Year is incorrect",expectedYear,actualYear);
+		
+		
+		
+	}
+	
+	
 
 }
