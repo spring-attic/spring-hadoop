@@ -1,11 +1,11 @@
-====================
-== WordCount Demo ==
-====================
+=======================================
+== WordCount with cron schedule Demo ==
+=======================================
 
 1. MOTIVATION
 
-A basic word count demo that illustrates the configuration and interaction with Hadoop through Spring Hadoop.
-The demo copies local resources into HDFS and executes the Hadoop example that counts words against it. The demo
+A scheduled basic word count demo with spring cron that illustrates schedule MR jobs through Spring Hadoop.
+The demo copies local resources into HDFS and executes the Hadoop example that counts words with scheduling. The demo
 requires a running Hadoop instance (by default at localhost:9000). 
 The Hadoop settings can be configured through hadoop.properties (more info in the Spring Hadoop reference docs).
 
