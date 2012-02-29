@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/hadoop"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:batch="http://www.springframework.org/schema/batch"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+    <context:property-placeholder location="classpath:hadoop.properties"
+			ignore-resource-not-found="true" ignore-unresolvable="true" />
+
+ 	
+ 	<configuration>
+	    <!-- The value after the question mark is the default value if another value for hd.fs is not provided -->
+		fs.default.name=${hd.fs:hdfs://localhost:9000}
+	</configuration>
+	
+	<batch:job id="job1">
+		<batch:step id="import" next="wordcount">
+			<batch:tasklet ref="script-tasklet"/>
+		</batch:step>
+			
+		<batch:step id="wordcount">
+			<batch:tasklet ref="wordcount-tasklet" />
+		</batch:step>
+	</batch:job>
+
+	<tasklet id="wordcount-tasklet" job-ref="wc-job"/>
+
+    <beans:bean name="pathUtils" class="org.springframework.data.hadoop.util.PathUtils" 
+    p:rootPath="/user/hadoop/output"
+    p:pathFormat="year/month/day/hour/minute/second"/>
+
+    <beans:bean id="wc-job" class="org.springframework.data.hadoop.mapreduce.JobFactoryBean"
+              p:configuration-ref="hadoop-configuration"
+              p:input-paths="/user/hadoop/input"
+              p:output-path="#{@pathUtils.getTimeBasedPathFromRoot()}"
+              p:mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
+              p:reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"
+              p:validate-paths="false"
+              scope="prototype"/>
+
+
+	<script-tasklet id="script-tasklet">
+  	   <script language="groovy">
+  	   	// 'hack' default permissions to make Hadoop work on Windows
+		if (System.getProperty("os.name").startsWith("Windows")) {
+			// 0655 = -rwxr-xr-x
+			 org.apache.hadoop.mapreduce.JobSubmissionFiles.JOB_DIR_PERMISSION.fromShort((short) 0655);
+			 org.apache.hadoop.mapreduce.JobSubmissionFiles.JOB_FILE_PERMISSION.fromShort((short) 0655);
+		}
+
+  	   
+		inputPath = "/user/hadoop/input"
+		outputPath = "/user/hadoop/output"	
+		if (fsh.test(inputPath)) {
+		  fsh.rmr(inputPath)
+		}
+		if (fsh.test(outputPath)) {
+		  fsh.rmr(outputPath)
+		}
+
+		// copy using the streams directly (to be portable across envs)
+		inStream = cl.getResourceAsStream("data/nietzsche-chapter-1.txt")
+		org.apache.hadoop.io.IOUtils.copyBytes(inStream, fs.create(inputPath), cfg)
+	  </script>	
+    </script-tasklet>
+
+</beans:beans>
