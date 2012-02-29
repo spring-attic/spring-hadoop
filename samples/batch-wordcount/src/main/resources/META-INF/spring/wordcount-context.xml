@@ -20,9 +20,9 @@
 
 	<tasklet id="wordcount-tasklet" job-ref="wc-job"/>
 
-        <beans:bean name="pathUtils" class="org.springframework.data.hadoop.util.PathUtils" p:rootPath="${wordcount.output.path}"/>
+    <beans:bean name="pathUtils" class="org.springframework.data.hadoop.util.PathUtils" p:rootPath="${wordcount.output.path}"/>
 
-        <beans:bean id="wc-job" class="org.springframework.data.hadoop.mapreduce.JobFactoryBean"
+    <beans:bean id="wc-job" class="org.springframework.data.hadoop.mapreduce.JobFactoryBean"
               p:configuration-ref="hadoop-configuration"
               p:input-paths="${wordcount.input.path}"
               p:output-path="#{@pathUtils.getTimeBasedPathFromRoot()}"
