@@ -7,18 +7,23 @@ import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.client.HBaseAdmin;
-import org.apache.hadoop.hbase.client.HTable;
-import org.apache.hadoop.hbase.client.Result;
-import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.mapreduce.TableMapReduceUtil;
-import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 
 public class HBaseMR {
 
+	/**
+	 * To create Map Reduce Job with input from HBase, output to HBase
+	 * 
+	 * @param sourceTable
+	 * @param targetTable
+	 * @throws IOException
+	 * @throws InterruptedException
+	 * @throws ClassNotFoundException
+	 */
 	public void createHBaseMRJob(String sourceTable, String targetTable)
 			throws IOException, InterruptedException, ClassNotFoundException {
 		Configuration config = HBaseConfiguration.create();
@@ -30,7 +35,8 @@ public class HBaseMR {
 		}
 
 		HTableDescriptor tableDes = new HTableDescriptor(targetTable);
-		HColumnDescriptor cf1 = new HColumnDescriptor("cf");
+		HColumnDescriptor cf1 = new HColumnDescriptor(
+				HBaseMain.columnFamilyName);
 		tableDes.addFamily(cf1);
 		admin.createTable(tableDes);
 
@@ -62,15 +68,6 @@ public class HBaseMR {
 			throw new IOException("error with job!");
 		}
 
-		HTable table = new HTable(config, targetTable);
-
-		Scan scanResult = new Scan();
-		scanResult.addColumn(Bytes.toBytes("cf"), Bytes.toBytes("count"));
-		ResultScanner scanner = table.getScanner(scanResult);
-		for (Result r : scanner) {
-			System.out.println(new String(r.getRow()) + ": "
-					+ new String(r.value()));
-		}
 	}
 
 }
