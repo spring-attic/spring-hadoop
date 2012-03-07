@@ -21,10 +21,10 @@ import org.springframework.data.hadoop.mapreduce.JobRunner;
 
 public class HBaseMain {
 
-	private static String tableName = "table1";
-	private static String targetTableName = "table2";
-	private static String columnFamilyName = "cf";
-	private static String qualifierName = "attr1";
+	public static String tableName = "table1";
+	public static String targetTableName = "table2";
+	public static String columnFamilyName = "cf";
+	public static String qualifierName = "attr1";
 
 	/**
 	 * @param args
@@ -47,13 +47,16 @@ public class HBaseMain {
 			e.printStackTrace();
 		}
 
-		// runHBaseMR();
+		
 
 		try {
 			initTable(config, targetTableName);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		// runHBaseMR();
+		
 
 		JobRunner runner = ctx.getBean("&runner", JobRunner.class);
 		try {
@@ -70,36 +73,10 @@ public class HBaseMain {
 
 	}
 
-	public static void initTable(Configuration config, String targetTable)
-			throws IOException {
-		HBaseAdmin admin = new HBaseAdmin(config);
-
-		if (admin.tableExists(targetTable)) {
-			admin.disableTable(targetTable);
-			admin.deleteTable(targetTable);
-		}
-
-		HTableDescriptor tableDes = new HTableDescriptor(targetTable);
-		HColumnDescriptor cf1 = new HColumnDescriptor("cf");
-		tableDes.addFamily(cf1);
-		admin.createTable(tableDes);
-
-	}
-
-	private static void checkValue(String targetTable, Configuration config)
-			throws IOException {
-		HTable table = new HTable(config, targetTable);
-
-		Scan scanResult = new Scan();
-		scanResult.addColumn(Bytes.toBytes("cf"), Bytes.toBytes("count"));
-		ResultScanner scanner = table.getScanner(scanResult);
-		for (Result r : scanner) {
-			System.out.println(new String(r.getRow()) + ": "
-					+ new String(r.value()));
-		}
-	}
-
-	public static void runHBaseMR() {
+	/**
+	 * run HBase MR job without spring hadoop
+	 */
+	private static void runHBaseMR() {
 
 		HBaseMR mr = new HBaseMR();
 		try {
@@ -113,6 +90,15 @@ public class HBaseMain {
 		}
 	}
 
+	/**
+	 * init source table
+	 * @param tableName
+	 * @param cfName
+	 * @param qualifier
+	 * @throws MasterNotRunningException
+	 * @throws ZooKeeperConnectionException
+	 * @throws IOException
+	 */
 	private static void createTableAndInitData(String tableName, String cfName,
 			String qualifier) throws MasterNotRunningException,
 			ZooKeeperConnectionException, IOException {
@@ -155,4 +141,47 @@ public class HBaseMain {
 		 * System.out.println("scan row:" + new String(r.value())); }
 		 */
 	}
+
+	/**
+	 * init target table to store result
+	 * @param config
+	 * @param targetTable
+	 * @throws IOException
+	 */
+	private static void initTable(Configuration config, String targetTable)
+			throws IOException {
+		HBaseAdmin admin = new HBaseAdmin(config);
+
+		if (admin.tableExists(targetTable)) {
+			admin.disableTable(targetTable);
+			admin.deleteTable(targetTable);
+		}
+
+		HTableDescriptor tableDes = new HTableDescriptor(targetTable);
+		HColumnDescriptor cf1 = new HColumnDescriptor(columnFamilyName);
+		tableDes.addFamily(cf1);
+		admin.createTable(tableDes);
+
+	}
+
+	/**
+	 * check the value in the target table.
+	 * @param targetTable
+	 * @param config
+	 * @throws IOException
+	 */
+	private static void checkValue(String targetTable, Configuration config)
+			throws IOException {
+		HTable table = new HTable(config, targetTable);
+
+		Scan scanResult = new Scan();
+		scanResult.addColumn(Bytes.toBytes(columnFamilyName),
+				Bytes.toBytes("count"));
+		ResultScanner scanner = table.getScanner(scanResult);
+		for (Result r : scanner) {
+			System.out.println(new String(r.getRow()) + ": "
+					+ new String(r.value()));
+		}
+	}
+
 }
