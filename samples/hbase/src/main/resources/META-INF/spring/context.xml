@@ -15,4 +15,25 @@
 		fs.default.name=${hd.fs}
 	</hdp:configuration>
 	
+	<bean id="hbase-cellvaluecount-job" class="org.springframework.data.hadoop.hbase.HbaseJobFactoryBean"
+		p:configuration-ref="hadoop-configuration"
+		p:inputTable="${inputTable}"
+		p:outputTable="${outputTable}"
+		p:mapper="org.springframework.data.hadoop.samples.hbase.CellValueCountMapper"
+		p:reducer="org.springframework.data.hadoop.samples.hbase.CellValueCountReducer"
+		p:mapKey="org.apache.hadoop.io.Text"
+		p:mapValue="org.apache.hadoop.io.IntWritable"
+		p:numReduceTasks="1"
+		p:validate-paths="false"
+        scope="prototype"
+	/>
+	
+	<bean id="runner" class="org.springframework.data.hadoop.mapreduce.JobRunner" p:runAtStartup="false">
+		<property name="jobNames">
+			<set>
+				<value>hbase-cellvaluecount-job</value>
+			</set>
+		</property>
+	</bean>
+	
 </beans>

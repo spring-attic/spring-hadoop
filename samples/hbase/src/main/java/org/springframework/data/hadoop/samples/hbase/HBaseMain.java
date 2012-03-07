@@ -11,8 +11,13 @@ import org.apache.hadoop.hbase.ZooKeeperConnectionException;
 import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Put;
+import org.apache.hadoop.hbase.client.Result;
+import org.apache.hadoop.hbase.client.ResultScanner;
+import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.data.hadoop.mapreduce.JobRunner;
 
 public class HBaseMain {
 
@@ -27,7 +32,10 @@ public class HBaseMain {
 	 */
 	public static void main(String[] args) {
 		// Initialize spring hadoop application context
-		new ClassPathXmlApplicationContext("META-INF/spring/context.xml");
+		ApplicationContext ctx = new ClassPathXmlApplicationContext(
+				"META-INF/spring/context.xml");
+
+		Configuration config = HBaseConfiguration.create();
 
 		try {
 			createTableAndInitData(tableName, columnFamilyName, qualifierName);
@@ -39,7 +47,56 @@ public class HBaseMain {
 			e.printStackTrace();
 		}
 
-		runHBaseMR();
+		// runHBaseMR();
+
+		try {
+			initTable(config, targetTableName);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		JobRunner runner = ctx.getBean("&runner", JobRunner.class);
+		try {
+			runner.runJob();
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+
+		try {
+			checkValue(targetTableName, config);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public static void initTable(Configuration config, String targetTable)
+			throws IOException {
+		HBaseAdmin admin = new HBaseAdmin(config);
+
+		if (admin.tableExists(targetTable)) {
+			admin.disableTable(targetTable);
+			admin.deleteTable(targetTable);
+		}
+
+		HTableDescriptor tableDes = new HTableDescriptor(targetTable);
+		HColumnDescriptor cf1 = new HColumnDescriptor("cf");
+		tableDes.addFamily(cf1);
+		admin.createTable(tableDes);
+
+	}
+
+	private static void checkValue(String targetTable, Configuration config)
+			throws IOException {
+		HTable table = new HTable(config, targetTable);
+
+		Scan scanResult = new Scan();
+		scanResult.addColumn(Bytes.toBytes("cf"), Bytes.toBytes("count"));
+		ResultScanner scanner = table.getScanner(scanResult);
+		for (Result r : scanner) {
+			System.out.println(new String(r.getRow()) + ": "
+					+ new String(r.value()));
+		}
 	}
 
 	public static void runHBaseMR() {
@@ -81,24 +138,21 @@ public class HBaseMain {
 		for (int i = 0; i < 1000; i++) {
 			Put p = new Put(Bytes.toBytes(rowName + i));
 			p.add(Bytes.toBytes(cfName), Bytes.toBytes(qualifier),
-					Bytes.toBytes(value + i%7));
+					Bytes.toBytes(value + i % 7));
 			table.put(p);
 		}
 
 		/*
-		Get get = new Get(Bytes.toBytes(rowName + "2"));
-		Result result = table.get(get);
-		byte[] valueByte = result.getValue(Bytes.toBytes(cfName),
-				Bytes.toBytes(qualifier));
-		System.out.println("get value is:" + new String(valueByte));
-
-		
-		Scan scan = new Scan();
-		scan.addColumn(Bytes.toBytes(cfName), Bytes.toBytes(qualifier));
-		ResultScanner scanner = table.getScanner(scan);
-		for (Result r : scanner) {
-			System.out.println("scan row:" + new String(r.value()));
-		}
-		*/
+		 * Get get = new Get(Bytes.toBytes(rowName + "2")); Result result =
+		 * table.get(get); byte[] valueByte =
+		 * result.getValue(Bytes.toBytes(cfName), Bytes.toBytes(qualifier));
+		 * System.out.println("get value is:" + new String(valueByte));
+		 * 
+		 * 
+		 * Scan scan = new Scan(); scan.addColumn(Bytes.toBytes(cfName),
+		 * Bytes.toBytes(qualifier)); ResultScanner scanner =
+		 * table.getScanner(scan); for (Result r : scanner) {
+		 * System.out.println("scan row:" + new String(r.value())); }
+		 */
 	}
 }

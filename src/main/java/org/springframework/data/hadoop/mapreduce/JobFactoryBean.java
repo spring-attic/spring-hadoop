@@ -324,6 +324,14 @@ public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanN
 	public void setReducer(Class<? extends Reducer> reducer) {
 		this.reducer = reducer;
 	}
+	
+	/**
+	 * get the reduce class
+	 * @return
+	 */
+	public Class<? extends Reducer> getReducer(){
+		return this.reducer;
+	}
 
 	/**
 	 * Sets the job combiner class.

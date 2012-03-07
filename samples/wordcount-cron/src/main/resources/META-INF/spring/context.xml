@@ -1,70 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:hdp="http://www.springframework.org/schema/hadoop"
-	xmlns:p="http://www.springframework.org/schema/p"
-        xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:hdp="http://www.springframework.org/schema/hadoop" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:task="http://www.springframework.org/schema/task"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
 	http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd
         http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
 
 
-	<context:property-placeholder location="hadoop.properties"/>
+	<context:property-placeholder location="hadoop.properties" />
 
 	<hdp:configuration>
 		fs.default.name=${hd.fs}
 	</hdp:configuration>
 
-        <bean name="pathUtils" class="org.springframework.data.hadoop.util.PathUtils" 
-        p:rootPath="${wordcount.output.path}"
-        p:pathFormat="year/month/day/hour/minute/second"
-        p:appendUUID="true"/>
+	<bean name="pathUtils" class="org.springframework.data.hadoop.util.PathUtils"
+		p:rootPath="${wordcount.output.path}" p:pathFormat="year/month/day/hour/minute/second"
+		p:appendUUID="true" />
 
-        <bean id="wc-job" class="org.springframework.data.hadoop.mapreduce.JobFactoryBean"
-		p:configuration-ref="hadoop-configuration"
-		p:input-paths="${wordcount.input.path}"
-		p:output-path="#{@pathUtils.getTimeBasedPathFromRoot()}"
-		p:mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
+	<bean id="wc-job"
+		class="org.springframework.data.hadoop.mapreduce.JobFactoryBean"
+		p:configuration-ref="hadoop-configuration" p:input-paths="${wordcount.input.path}"
+		p:output-path="#{@pathUtils.getTimeBasedPathFromRoot()}" p:mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
 		p:reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"
-		p:validate-paths="false"
-                scope="prototype"
-	/>
+		p:validate-paths="false" scope="prototype" />
 
 
-  	<hdp:script id="clean-script" language="javascript">
-  	   	// 'hack' default permissions to make Hadoop work on Windows
-		if (java.lang.System.getProperty("os.name").startsWith("Windows")) {
-			// 0655 = -rwxr-xr-x
-			 org.apache.hadoop.mapreduce.JobSubmissionFiles.JOB_DIR_PERMISSION.fromShort(0655)
-			 org.apache.hadoop.mapreduce.JobSubmissionFiles.JOB_FILE_PERMISSION.fromShort(0655)
+	<hdp:script id="clean-script" language="javascript">
+		// 'hack' default permissions to make Hadoop work on Windows
+		if
+		(java.lang.System.getProperty("os.name").startsWith("Windows")) {
+		// 0655 = -rwxr-xr-x
+		org.apache.hadoop.mapreduce.JobSubmissionFiles.JOB_DIR_PERMISSION.fromShort(0655)
+		org.apache.hadoop.mapreduce.JobSubmissionFiles.JOB_FILE_PERMISSION.fromShort(0655)
 		}
-  	   
+
 		inputPath = "${wordcount.input.path}"
-		outputPath = "${wordcount.output.path}"	
+		outputPath = "${wordcount.output.path}"
 		if (fsh.test(inputPath)) { fsh.rmr(inputPath) }
-		if (fsh.test(outputPath)) { fsh.rmr(outputPath) }
+		if (fsh.test(outputPath))
+		{ fsh.rmr(outputPath) }
 
-		// copy using the streams directly (to be portable across envs)
-		inStream = cl.getResourceAsStream("data/nietzsche-chapter-1.txt")
-		org.apache.hadoop.io.IOUtils.copyBytes(inStream, fs.create(inputPath), cfg)
+		// copy using the streams directly (to be
+		portable across envs)
+		inStream =
+		cl.getResourceAsStream("data/nietzsche-chapter-1.txt")
+		org.apache.hadoop.io.IOUtils.copyBytes(inStream, fs.create(inputPath),
+		cfg)
 	</hdp:script>
-	
-	<!-- simple job runner -->
-	<bean id="runner" class="org.springframework.data.hadoop.mapreduce.JobRunner" depends-on="clean-script" 
-              p:runAtStartup="false">
-          <property name="jobNames">
-            <set>
-              <value>wc-job</value>
-            </set>
-          </property>
-        </bean>
 
-        <task:scheduler id="myScheduler" pool-size="10"/>
+	<!-- simple job runner -->
+	<bean id="runner" class="org.springframework.data.hadoop.mapreduce.JobRunner"
+		depends-on="clean-script" p:runAtStartup="false">
+		<property name="jobNames">
+			<set>
+				<value>wc-job</value>
+			</set>
+		</property>
+	</bean>
+
+	<task:scheduler id="myScheduler" pool-size="10" />
 	<task:scheduled-tasks scheduler="myScheduler">
-		<task:scheduled ref="&amp;runner" method="runJob" cron="10 * * * * *"/>
+		<task:scheduled ref="&amp;runner" method="runJob" cron="10 * * * * *" />
 	</task:scheduled-tasks>
 
-	
+
 </beans>
