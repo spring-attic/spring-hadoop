@@ -5,8 +5,10 @@
 1. MOTIVATION
 
 The demo is on how to use HBase with Spring Hadoop. The demo
-requires a running Hadoop instance (by default at localhost:9000). 
+requires a running Hadoop instance (by default at localhost:9000) and HBase instance
 The Hadoop settings can be configured through hadoop.properties (more info in the Spring Hadoop reference docs).
+
+The demo is to count the number of occurency in HBase table 
 
 2. BUILD AND DEPLOYMENT
 
