@@ -1,4 +1,4 @@
-description = 'Spring Hadoop Samples - WordCount'
+description = 'Spring Hadoop Samples - HBase'
 
 apply plugin: 'base'
 apply plugin: 'java'
