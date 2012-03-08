@@ -1,3 +1,19 @@
+/*
+ * Copyright 2011 the original author or authors.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.springframework.data.hadoop.samples.hbase;
 
 import java.io.IOException;
@@ -19,12 +35,12 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.data.hadoop.mapreduce.JobRunner;
 
+/**
+ * 
+ * @author Jarred Li
+ * 
+ */
 public class HBaseMain {
-
-	public static String tableName = "table1";
-	public static String targetTableName = "table2";
-	public static String columnFamilyName = "cf";
-	public static String qualifierName = "attr1";
 
 	/**
 	 * @param args
@@ -38,7 +54,8 @@ public class HBaseMain {
 		Configuration config = HBaseConfiguration.create();
 
 		try {
-			createTableAndInitData(tableName, columnFamilyName, qualifierName);
+			createTableAndInitData(Constant.tableName,
+					Constant.columnFamilyName, Constant.qualifierName);
 		} catch (MasterNotRunningException e) {
 			e.printStackTrace();
 		} catch (ZooKeeperConnectionException e) {
@@ -47,16 +64,13 @@ public class HBaseMain {
 			e.printStackTrace();
 		}
 
-		
-
 		try {
-			initTable(config, targetTableName);
+			initTargetTable(config, Constant.targetTableName);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		// runHBaseMR();
-		
 
 		JobRunner runner = ctx.getBean("&runner", JobRunner.class);
 		try {
@@ -66,7 +80,7 @@ public class HBaseMain {
 		}
 
 		try {
-			checkValue(targetTableName, config);
+			checkValue(Constant.targetTableName, config);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -80,7 +94,7 @@ public class HBaseMain {
 
 		HBaseMR mr = new HBaseMR();
 		try {
-			mr.createHBaseMRJob(tableName, targetTableName);
+			mr.createHBaseMRJob(Constant.tableName, Constant.targetTableName);
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
@@ -92,6 +106,7 @@ public class HBaseMain {
 
 	/**
 	 * init source table
+	 * 
 	 * @param tableName
 	 * @param cfName
 	 * @param qualifier
@@ -107,7 +122,7 @@ public class HBaseMain {
 		HBaseAdmin admin = new HBaseAdmin(config);
 
 		String rowName = "row";
-		String value = "value";
+		String value = "http://blog.springsource.org/2012/02/29/introducing-spring-hadoop/";
 
 		if (admin.tableExists(tableName)) {
 			admin.disableTable(tableName);
@@ -144,11 +159,12 @@ public class HBaseMain {
 
 	/**
 	 * init target table to store result
+	 * 
 	 * @param config
 	 * @param targetTable
 	 * @throws IOException
 	 */
-	private static void initTable(Configuration config, String targetTable)
+	private static void initTargetTable(Configuration config, String targetTable)
 			throws IOException {
 		HBaseAdmin admin = new HBaseAdmin(config);
 
@@ -158,7 +174,7 @@ public class HBaseMain {
 		}
 
 		HTableDescriptor tableDes = new HTableDescriptor(targetTable);
-		HColumnDescriptor cf1 = new HColumnDescriptor(columnFamilyName);
+		HColumnDescriptor cf1 = new HColumnDescriptor(Constant.columnFamilyName);
 		tableDes.addFamily(cf1);
 		admin.createTable(tableDes);
 
@@ -166,6 +182,7 @@ public class HBaseMain {
 
 	/**
 	 * check the value in the target table.
+	 * 
 	 * @param targetTable
 	 * @param config
 	 * @throws IOException
@@ -175,7 +192,7 @@ public class HBaseMain {
 		HTable table = new HTable(config, targetTable);
 
 		Scan scanResult = new Scan();
-		scanResult.addColumn(Bytes.toBytes(columnFamilyName),
+		scanResult.addColumn(Bytes.toBytes(Constant.columnFamilyName),
 				Bytes.toBytes("count"));
 		ResultScanner scanner = table.getScanner(scanResult);
 		for (Result r : scanner) {
