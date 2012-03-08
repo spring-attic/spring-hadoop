@@ -29,21 +29,22 @@ dependencies {
     compile("org.apache.hadoop:hadoop-streaming:$hadoopVersion") 
     compile("org.apache.hadoop:hadoop-tools:$hadoopVersion") 
     
-    runtime "org.springframework.batch:spring-batch-core:$springBatchVersion"
-    runtime "org.springframework.batch:spring-batch-admin-manager:$springBatchAdminVersion"
-    runtime "org.springframework.batch:spring-batch-admin-resources:$springBatchAdminVersion"
-    runtime "org.springframework:spring-tx:$springVersion"
+    compile "org.springframework.batch:spring-batch-core:$springBatchVersion"
+    compile "org.springframework.batch:spring-batch-admin-manager:$springBatchAdminVersion"
+    compile "org.springframework.batch:spring-batch-admin-resources:$springBatchAdminVersion"
+    compile "org.springframework:spring-tx:$springVersion"
     
     runtime "javax.jdo:jdo2-api:$jdoVersion"
     runtime "org.apache.hive:hive-service:$hiveVersion"
     runtime "org.apache.hive:hive-metastore:$hiveVersion"
+    runtime "org.apache.hive:hive-jdbc:$hiveVersion"
     
     
     // see HADOOP-7461
     runtime "org.codehaus.jackson:jackson-mapper-asl:$jacksonVersion"
     
-    compile "org.slf4j:slf4j-api:$slf4jVersion"
-    compile "org.slf4j:jcl-over-slf4j:$slf4jVersion"
+    runtime "org.slf4j:slf4j-api:$slf4jVersion"
+    runtime "org.slf4j:jcl-over-slf4j:$slf4jVersion"
     runtime "log4j:log4j:$log4jVersion"
     runtime "org.slf4j:slf4j-log4j12:$slf4jVersion"
     
