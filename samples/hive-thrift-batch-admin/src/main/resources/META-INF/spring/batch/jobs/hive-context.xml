@@ -1,10 +1,7 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:batch="http://www.springframework.org/schema/batch"
-	xmlns:hdp="http://www.springframework.org/schema/hadoop"
-	xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:c="http://www.springframework.org/schema/c"
-	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:hdp="http://www.springframework.org/schema/hadoop" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:c="http://www.springframework.org/schema/c" xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
       	http://www.springframework.org/schema/batch	http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
       	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
@@ -23,20 +20,19 @@
 
 	<hdp:hive-client host="localhost" port="10000">
 	</hdp:hive-client>
-	
-	
+
+
 	<job id="hiveJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="init" next="loadData">
 			<tasklet ref="initTableTasklet" />
 		</step>
-		<step id="loadData">
+		<step id="loadData" next="showData">
 			<tasklet ref="loadDataScriptTasklet" />
 		</step>
-		<!-- 
-		<step id="cleanData">
-			<tasklet ref="cleanDataTasklet" />
+		<step id="showData">
+			<tasklet ref="hiveJdbcClient" />
 		</step>
-		 -->
+		<!-- <step id="cleanData"> <tasklet ref="cleanDataTasklet" /> </step> -->
 	</job>
 
 	<bean id="initTableTasklet" class="org.springframework.data.hadoop.hive.HiveTasklet"
@@ -48,17 +44,35 @@
 		</property>
 	</bean>
 
-
-	<hdp:hive-tasklet id="loadDataScriptTasklet" hive-client-ref="hive-client">
-		<hdp:script>			
+	<hdp:hive-tasklet id="loadDataScriptTasklet"
+		hive-client-ref="hive-client">
+		<hdp:script>
 			LOAD DATA LOCAL INPATH 'data.txt' OVERWRITE INTO TABLE t1;
 		</hdp:script>
 	</hdp:hive-tasklet>
-	
-	<hdp:hive-tasklet id="cleanDataTasklet" hive-client-ref="hive-client">
-		<hdp:script>			
+
+	<hdp:hive-tasklet id="cleanDataTasklet"
+		hive-client-ref="hive-client">
+		<hdp:script>
 			drop table t1;
 		</hdp:script>
 	</hdp:hive-tasklet>
+
+	<bean id="hive-driver" class="org.apache.hadoop.hive.jdbc.HiveDriver" />
+
+	<bean id="hive-ds"
+		class="org.springframework.jdbc.datasource.SimpleDriverDataSource"
+		c:driver-ref="hive-driver" c:url="jdbc:hive://localhost:10000/default" />
+
+	<bean id="templateBean" class="org.springframework.jdbc.core.JdbcTemplate"
+		c:data-source-ref="hive-ds" />
+
+	<bean id="hiveJdbcClient"
+		class="org.springframework.data.hadoop.hive.HiveJdbcClientTasklet"
+		p:template-ref="templateBean">
+		<property name="sql">
+			<value>select * from t1</value>
+		</property>
+	</bean>
 
 </beans>
