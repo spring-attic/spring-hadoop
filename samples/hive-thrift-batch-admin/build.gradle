@@ -1,0 +1,58 @@
+description = 'Spring Hadoop Samples - HBase'
+
+apply plugin: 'base'
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'eclipse'
+apply plugin: 'war'
+apply plugin: 'jetty'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    // Public Spring artefacts
+    mavenRepo name: "spring-release", urls: "http://repo.springsource.org/release"
+    mavenRepo name: "spring-milestone", urls: "http://repo.springsource.org/milestone"
+    mavenRepo name: "spring-snapshot", urls: "http://repo.springsource.org/snapshot"
+    mavenRepo name: "springsource-org-release", urls: "http://repository.springsource.com/maven/bundles/release"
+    mavenRepo name: "sonatype-snapshot", urls: "http://oss.sonatype.org/content/repositories/snapshots"
+    mavenRepo name: "ext-snapshots", urls: "http://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo-ext/"
+    mavenRepo name: "data-nucleus", urls: "http://www.datanucleus.org/downloads/maven2/"
+    mavenRepo name: "conjars.org", urls: "http://conjars.org/repo"
+    //mavenRepo name: "hadoop", urls: "http://mavenhub.com/mvn/central/org.apache.mahout.hadoop/"
+}
+
+dependencies {
+    compile "org.springframework.data:spring-data-hadoop:$version"
+    
+    compile("org.apache.hadoop:hadoop-core:$hadoopVersion") 
+    compile("org.apache.hadoop:hadoop-streaming:$hadoopVersion") 
+    compile("org.apache.hadoop:hadoop-tools:$hadoopVersion") 
+    
+    runtime "org.springframework.batch:spring-batch-core:$springBatchVersion"
+    runtime "org.springframework.batch:spring-batch-admin-manager:$springBatchAdminVersion"
+    runtime "org.springframework.batch:spring-batch-admin-resources:$springBatchAdminVersion"
+    runtime "org.springframework:spring-tx:$springVersion"
+    
+    runtime "javax.jdo:jdo2-api:$jdoVersion"
+    runtime "org.apache.hive:hive-service:$hiveVersion"
+    runtime "org.apache.hive:hive-metastore:$hiveVersion"
+    
+    
+    // see HADOOP-7461
+    runtime "org.codehaus.jackson:jackson-mapper-asl:$jacksonVersion"
+    
+    compile "org.slf4j:slf4j-api:$slf4jVersion"
+    compile "org.slf4j:jcl-over-slf4j:$slf4jVersion"
+    runtime "log4j:log4j:$log4jVersion"
+    runtime "org.slf4j:slf4j-log4j12:$slf4jVersion"
+    
+    testCompile "junit:junit:$junitVersion"
+    testCompile "org.springframework:spring-test:$springVersion"
+}
+
+
+httpPort = 8081
+stopPort = 9451
+
+defaultTasks 'jettyRun'
