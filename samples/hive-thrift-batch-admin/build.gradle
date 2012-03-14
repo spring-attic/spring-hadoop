@@ -8,8 +8,8 @@ apply plugin: 'war'
 apply plugin: 'jetty'
 
 repositories {
-    mavenLocal()
     mavenCentral()
+    mavenLocal()
     // Public Spring artefacts
     mavenRepo name: "spring-release", urls: "http://repo.springsource.org/release"
     mavenRepo name: "spring-milestone", urls: "http://repo.springsource.org/milestone"
