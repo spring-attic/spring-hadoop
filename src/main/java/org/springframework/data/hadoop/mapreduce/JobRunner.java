@@ -15,7 +15,9 @@
  */
 package org.springframework.data.hadoop.mapreduce;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -23,7 +25,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.mapreduce.Job;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -37,7 +38,7 @@ import org.springframework.util.Assert;
  * 
  * @author Costin Leau
  */
-public class JobRunner implements FactoryBean<Object>, InitializingBean, DisposableBean, ApplicationContextAware {
+public class JobRunner implements InitializingBean, DisposableBean, ApplicationContextAware {
 
 	private static final Log log = LogFactory.getLog(JobRunner.class);
 
@@ -45,10 +46,7 @@ public class JobRunner implements FactoryBean<Object>, InitializingBean, Disposa
 	private boolean waitForJobs = true;
 	private Set<String> jobNames;
 	private Set<Job> jobs = new HashSet<Job>();
-	//private boolean executed = false;
-	private boolean succesful = false;
-	
-	//private String jobBeanName;
+
 	private ApplicationContext ctx;
 
 	@Override
@@ -56,7 +54,7 @@ public class JobRunner implements FactoryBean<Object>, InitializingBean, Disposa
 		Assert.notEmpty(jobNames, "at least one job needs to be specified");
 
 		if (runAtStartup) {
-			runJob();
+			runJobs();
 		}
 	}
 
@@ -71,22 +69,6 @@ public class JobRunner implements FactoryBean<Object>, InitializingBean, Disposa
 				}
 			}
 		}
-	}
-
-	@Override
-	public Object getObject() throws Exception {
-		//TODO: figure out what should be returned
-		return this.succesful;
-	}
-
-	@Override
-	public Class<?> getObjectType() {
-		return Boolean.class;
-	}
-
-	@Override
-	public boolean isSingleton() {
-		return true;
 	}
 
 
@@ -119,30 +101,31 @@ public class JobRunner implements FactoryBean<Object>, InitializingBean, Disposa
 	}
 
 	@Override
-	public void setApplicationContext(ApplicationContext applicationContext)
-			throws BeansException {
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.ctx = applicationContext;
-		
+
 	}
-	
+
 	/**
 	 * Run all the jobs.
 	 * 
 	 * @throws Exception 
 	 */
-	public void runJob() throws Exception{
-		for(String jobName : jobNames){
+	public Map<String, Boolean> runJobs() throws Exception {
+		Map<String, Boolean> result = new HashMap<String, Boolean>();
+		for (String jobName : jobNames) {
 			log.info("run job : " + jobName);
 			Job job = ctx.getBean(jobName, Job.class);
 			jobs.add(job);
-			if(!this.waitForJobs){
+			if (!this.waitForJobs) {
 				job.submit();
 			}
-			else{
+			else {
 				job.waitForCompletion(true);
 			}
+			result.put(jobName, true);
 		}
-		this.succesful = true;
+		return result;
 	}
 
 
