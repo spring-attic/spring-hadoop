@@ -1,4 +1,4 @@
-description = 'Spring Hadoop Samples - Hive with Thrift'
+description = 'Spring Hadoop Samples - Hive with JDBC'
 
 apply plugin: 'base'
 apply plugin: 'java'
@@ -54,5 +54,6 @@ dependencies {
 
 
 httpPort = 8081
+stopPort = 9451
 
 defaultTasks 'jettyRun'
