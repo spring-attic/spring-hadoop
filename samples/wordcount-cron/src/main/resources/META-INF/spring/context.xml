@@ -57,7 +57,7 @@
 
 	<task:scheduler id="myScheduler" pool-size="10" />
 	<task:scheduled-tasks scheduler="myScheduler">
-		<task:scheduled ref="&amp;runner" method="runJob" cron="10 * * * * *" />
+		<task:scheduled ref="runner" method="runJobs" cron="10 * * * * *" />
 	</task:scheduled-tasks>
 
 
