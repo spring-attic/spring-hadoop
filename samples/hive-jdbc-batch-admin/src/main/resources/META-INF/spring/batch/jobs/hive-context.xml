@@ -28,13 +28,12 @@
 			<tasklet ref="loadDataScriptTasklet" />
 		</step>
 		<step id="showData">
-			<tasklet ref="showDataTasklet" />
+			<tasklet ref="hiveJdbcClient" />
 		</step>
 	</job>
 
-	<hdp:hive-tasklet id="initTableTasklet"
-		hive-client-ref="hive-client">
-		<hdp:script location="org/springframework/data/hadoop/samples/hive/script.sql" />
+	<hdp:hive-tasklet id="initTableTasklet" hive-client-ref="hive-client">
+		<hdp:script location="org/springframework/data/hadoop/samples/hive/script.sql"/>
 	</hdp:hive-tasklet>
 
 	<hdp:hive-tasklet id="loadDataScriptTasklet"
@@ -44,12 +43,21 @@
 		</hdp:script>
 	</hdp:hive-tasklet>
 
-	<hdp:hive-tasklet id="showDataTasklet"
-		hive-client-ref="hive-client">
-		<hdp:script>
-			select * from table t1;
-		</hdp:script>
-	</hdp:hive-tasklet>
+	<bean id="hive-driver" class="org.apache.hadoop.hive.jdbc.HiveDriver" />
 
+	<bean id="hive-ds"
+		class="org.springframework.jdbc.datasource.SimpleDriverDataSource"
+		c:driver-ref="hive-driver" c:url="jdbc:hive://localhost:10000/default" />
+
+	<bean id="templateBean" class="org.springframework.jdbc.core.JdbcTemplate"
+		c:data-source-ref="hive-ds" />
+
+	<bean id="hiveJdbcClient"
+		class="org.springframework.data.hadoop.samples.hive.HiveJdbcClientTasklet"
+		p:template-ref="templateBean">
+		<property name="sql">
+			<value>select * from t1</value>
+		</property>
+	</bean>
 
 </beans>

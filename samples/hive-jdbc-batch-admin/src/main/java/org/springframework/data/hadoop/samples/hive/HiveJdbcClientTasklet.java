@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.hadoop.hive;
+package org.springframework.data.hadoop.samples.hive;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
