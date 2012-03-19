@@ -75,8 +75,8 @@
 
 	<bean id="job1"
 		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-		<property name="targetObject" ref="&amp;runner" />
-		<property name="targetMethod" value="runJob" />
+		<property name="targetObject" ref="runner" />
+		<property name="targetMethod" value="runJobs" />
 		<property name="concurrent" value="false" />
 	</bean>
 	
