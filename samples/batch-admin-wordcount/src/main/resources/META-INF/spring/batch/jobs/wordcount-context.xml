@@ -14,9 +14,8 @@
 			ignore-resource-not-found="true" ignore-unresolvable="true" />
 
  	
- 	<configuration>
-	    <!-- The value after the question mark is the default value if another value for hd.fs is not provided -->
-		fs.default.name=${hd.fs:hdfs://localhost:9000}
+ 	<configuration>	   
+		fs.default.name=hdfs://localhost:9000
 	</configuration>
 	
 	<batch:job id="job1">
