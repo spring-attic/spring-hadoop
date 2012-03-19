@@ -2,7 +2,7 @@
    <title>Document structure</title>
 
    <para>This part of the reference documentation explains the core functionality
-   that Spring Hadoop (SHDP) provides to any Spring based application.</para>
+   that Spring for Apache Hadoop (SHDP) provides to any Spring based application.</para>
 
    <para><xref linkend="hadoop"/> describes the Spring support for
    bootstrapping, initializing and working with core Hadoop.</para>

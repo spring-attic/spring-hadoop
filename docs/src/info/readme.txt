@@ -1,10 +1,10 @@
-SPRING DATA HADOOP
-------------------
+SPRING for APACHE HADOOP
+------------------------
 http://www.springsource.org/spring-data/hadoop
 
 1. INTRODUCTION
 
-Spring Hadoop is a framework extension for writing Hadoop jobs that
+Spring for Apache Hadoop is a framework extension for writing Hadoop jobs that
 benefit from the features of Spring, Spring Batch and Spring Integration.
 
 2. RELEASE NOTES
@@ -14,7 +14,7 @@ details, consult the provided javadoc for specific packages and classes.
 
 3. DISTRIBUTION JAR FILES
 
-The Spring Hadoop jars files can be found in the 'dist' directory. 
+The Spring for Apache Hadoop jars files can be found in the 'dist' directory. 
 
 4. GETTING STARTED
 
@@ -23,5 +23,5 @@ Additionally the blog at http://blog.springsource.com as well
 as sections of interest in the reference documentation.
 
 ADDITIONAL RESOURCES
-Spring Hadoop Homepage: http://www.springsource.org/spring-data/hadoop
+Spring for Apache Hadoop Homepage: http://www.springsource.org/spring-data/hadoop
 Hadoop Homepage: http://hadoop.apache.org

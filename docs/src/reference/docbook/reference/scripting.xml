@@ -8,7 +8,7 @@
     use the <literal>hadoop</literal> command line, in particular the file system <ulink url="http://hadoop.apache.org/common/docs/stable/file_system_shell.html">shell</ulink>. However there is no middle ground,
     one either has to use the (somewhat verbose, full of checked exceptions) API or fall back to the command line, outside the application. SHDP addresses this issue by bridging the two worlds, exposing both the 
     <literal>FileSystem</literal> and the fs shell through an intuitive, easy-to-use Java API. Add your favorite <ulink url="http://en.wikipedia.org/wiki/List_of_JVM_languages">JVM scripting</ulink> language right 
-    inside your Spring Hadoop application and you have a powerful combination.</para>
+    inside your Spring for Apache Hadoop application and you have a powerful combination.</para>
     
     <section id="scripting:api">
     	<title>Scripting the Hadoop API</title>

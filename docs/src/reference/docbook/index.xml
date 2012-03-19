@@ -46,12 +46,12 @@
       <xi:include href="reference/cascading.xml"/>
   </part>
   <part id="dev">
-      <title>Developing Spring Hadoop Applications</title>
+      <title>Developing Spring for Apache Hadoop Applications</title>
       <xi:include href="reference/dev-guide/introduction.xml"/>
       <xi:include href="reference/dev-guide/dev-spring-hadoop.xml"/>
   </part>
   <part id="samples">
-      <title>Spring Hadoop sample applications</title>
+      <title>Spring for Apache Hadoop sample applications</title>
       <xi:include href="samples/introduction.xml"/>
       <xi:include href="samples/sample-prerequisites.xml"/>
       <xi:include href="samples/spring-wordcount.xml"/>

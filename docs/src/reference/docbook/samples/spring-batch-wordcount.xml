@@ -21,7 +21,7 @@
     distribution directory
     <literal>&lt;spring-hadoop-install-dir&gt;/samples/batch-wordcount</literal></para>
 
-    <para>The sample uses the Spring Hadoop namespace to define a Spring Batch
+    <para>The sample uses the Spring for Apache Hadoop namespace to define a Spring Batch
     Tasklet that runs a Hadoop job. A <link
     xlink:href="http://static.springsource.org/spring-batch/reference/html/domain.html#domainJob">Spring
     Batch Job</link> (not to be confused with a Hadoop job) combines multiple
@@ -40,13 +40,13 @@
 
     <para>Spring Batch provides Tasklets for reading, writing, and processing
     data from flat files, databases, messaging systems and executing system
-    (shell) commands. Spring Hadoop provides Tasklets for running Hadoop
+    (shell) commands. Spring for Apache Hadoop provides Tasklets for running Hadoop
     MapReduce, Streaming, Hive, and Pig jobs as well as executing script files
     that have build in support for ease of use interaction with HDFS.</para>
   </section>
 
   <section>
-    <title>Basic Spring Hadoop configuration</title>
+    <title>Basic Spring for Apache Hadoop configuration</title>
 
     <para>The part of the configuration file that defines the Spring Batch Job
     flow is shown below and can be found in the file
@@ -102,7 +102,7 @@
 
     <para>The script makes use of the predefined variable fsh, which is the
     embedded <link linkend="scripting-fssh">Filesystem Shell</link> that
-    Spring Hadoop provides. It also uses Spring's <link
+    Spring for Apache Hadoop provides. It also uses Spring's <link
     xlink:href="http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/beans.html#beans-factory-placeholderconfigurer">Property
     Placeholder</link> functionality so that the input and out paths can be
     configured external to the application, for example using property files.

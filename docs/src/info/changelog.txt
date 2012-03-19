@@ -1,5 +1,5 @@
-SPRING HADOOP CHANGELOG
-=======================
+SPRING for APACHE HADOOP CHANGELOG
+==================================
 http://www.springsource.org/spring-data/hadoop
 
 Commit changelog: http://github.com/SpringSource/spring-hadoop/tree/[version]

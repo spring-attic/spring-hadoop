@@ -1,7 +1,7 @@
 <partintro>
    <title>Document structure</title>
 
-   <para>This part of the reference documentation covers the sample applications included with Spring Hadoop that demonstrate features in a code centric manner. </para>
+   <para>This part of the reference documentation covers the sample applications included with Spring for Apache Hadoop that demonstrate features in a code centric manner. </para>
 
    <para><xref linkend="wordcount"/> describes a standard Spring application that executes the wordcount map-reduce job</para>
 

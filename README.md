@@ -1,8 +1,8 @@
-The [Spring Hadoop](http://www.springsource.org/spring-data/hadoop) provides extensions to [Spring](http://www.springsource.org/spring-core), [Spring Batch](http://www.springsource.org/spring-batch), and [Spring Integration](http://www.springsource.org/spring-integration) to build manageable and robust pipeline solutions around Hadoop.  
+The [Spring for Hadoop](http://www.springsource.org/spring-data/hadoop) provides extensions to [Spring](http://www.springsource.org/spring-core), [Spring Batch](http://www.springsource.org/spring-batch), and [Spring Integration](http://www.springsource.org/spring-integration) to build manageable and robust pipeline solutions around Hadoop.  
 
-Spring Hadoop extends Spring Batch by providing support for reading from and writing to HDFS, running various types of Hadoop jobs (Java MapReduce, Streaming, [Hive](http://hive.apache.org),  [Pig](http://pig.apache.org)), [HBase](http://hbase.apache.org) and [Cascading](http://cascading.org) interactions. An important goal is to provide excellent support for non-Java based developers to be productive using Spring Hadoop and not have to write any Java code to use the core feature set.
+Spring for Hadoop extends Spring Batch by providing support for reading from and writing to HDFS, running various types of Hadoop jobs (Java MapReduce, Streaming, [Hive](http://hive.apache.org),  [Pig](http://pig.apache.org)), [HBase](http://hbase.apache.org) and [Cascading](http://cascading.org) interactions. An important goal is to provide excellent support for non-Java based developers to be productive using Spring Hadoop and not have to write any Java code to use the core feature set.
 
-Spring Hadoop also applies the familiar Spring programming model to Java MapReduce jobs by providing support for dependency injection of simple jobs as well as a POJO based MapReduce programming model that decouples your MapReduce classes from Hadoop specific details such as base classes and data types.
+Spring for Hadoop also applies the familiar Spring programming model to Java MapReduce jobs by providing support for dependency injection of simple jobs as well as a POJO based MapReduce programming model that decouples your MapReduce classes from Hadoop specific details such as base classes and data types.
 
 # Docs
 
@@ -55,7 +55,7 @@ The latest nightly is _1.0.0.BUILD-SNAPSHOT_
 
 # Building
 
-Spring Hadoop uses Gradle as its build system. To build the system simply run:
+Spring for Hadoop uses Gradle as its build system. To build the system simply run:
 
     gradlew
 
@@ -69,8 +69,7 @@ You can disable all tests by skipping the `test` task:
 
 Here are some ways for you to get involved in the community:
 
-* Get involved with the Spring community on the Spring Community Forums.  Please help out on the [forum](http://forum.springsource.org/forumdisplay.php?f=80) by responding to questions and joining the debate.
-Please add 'Hadoop' as a prefix to easily spot the post topic.
+* Get involved with the Spring community on the Spring Community Forums.  Please help out on the [forum](http://forum.springsource.org/forumdisplay.php?87-Hadoop) by responding to questions and joining the debate.
 * Create [JIRA](https://jira.springframework.org/browse/SHDP) tickets for bugs and new features and comment and vote on the ones that you are interested in.  
 * Watch for upcoming articles on Spring by [subscribing](http://www.springsource.org/node/feed) to springframework.org
 

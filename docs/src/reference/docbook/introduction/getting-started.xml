@@ -6,7 +6,7 @@
          xmlns:ns4="http://www.w3.org/1999/xhtml"
          xmlns:ns3="http://www.w3.org/2000/svg"
          xmlns:ns="http://docbook.org/ns/docbook">
-  <title>Overview of Spring Hadoop</title>
+  <title>Overview of Spring for Apache Hadoop</title>
 
   <para>This chapter describes the various components that Spirng Hadoop uses
   and builds upon.</para>
@@ -28,7 +28,7 @@
 
     <para>Spring Batch It is developed by SpringSource in collaboration with
     Accenture. The first 1.0 release was made in 2007 and is now at version
-    2.2.x. It has been designed with extensibility in mind. The Spring Hadoop
+    2.2.x. It has been designed with extensibility in mind. The Spring for Apache Hadoop
     hooks into those extensibility points so that in addition to interacting
     with traditional data sources in an enterprise batch job, Spring Batch
     jobs can now interact with a wide range of Hadoop projects, from HDFS and

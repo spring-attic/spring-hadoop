@@ -2,7 +2,7 @@
    <title>Document structure</title>
 
    <para>This part of the reference documentation explains the functionality
-   that Spring Hadoop (SHDP) provides Spring Batch based applications.  This integration
+   that Spring for Apache Hadoop (SHDP) provides Spring Batch based applications. This integration
    enables Hadoop related tasks to become executable components within a Spring Batch job.</para>
 
    <para><xref linkend="batch-hadoop"/> describes the Spring Batch support for

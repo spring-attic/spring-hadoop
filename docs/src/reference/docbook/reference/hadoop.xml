@@ -4,11 +4,11 @@
   <title>Hadoop Configuration, MapReduce, and Distributed Cache</title>
 
   <para>One of the common tasks when using Hadoop is interacting with its <emphasis>runtime</emphasis> - whether it is a local setup or a remote cluster, one needs to properly configure and bootstrap Hadoop
-  in order to submit the required jobs. This chapter will focus on how Spring Hadoop (SHDP) leverages Spring's lightweight IoC container to simplify the interaction with Hadoop and make deployment, testing and provisioning
+  in order to submit the required jobs. This chapter will focus on how Spring for Apache Hadoop (SHDP) leverages Spring's lightweight IoC container to simplify the interaction with Hadoop and make deployment, testing and provisioning
   easier and more manageable.</para>
   
   <section id="hadoop:ns">
-  	<title>Using the Spring Hadoop Namespace</title>
+  	<title>Using the Spring for Apache Hadoop Namespace</title>
   	
   	<para>To simplify configuration, SHDP provides a dedicated namespace for most of its components. However, one can opt to configure the beans
   	directly through the usual <literal>&lt;bean&gt;</literal> definition. For more information about XML Schema-based configuration in Spring, see 
@@ -32,14 +32,14 @@
 
  		<calloutlist>
  			<callout arearefs="hdp-ns-prefix">
- 				<para>Spring Hadoop namespace prefix. Any name can do but through out the reference documentation, the <literal>hdp</literal> will be used.</para>
+ 				<para>Spring for Apache Hadoop namespace prefix. Any name can do but through out the reference documentation, the <literal>hdp</literal> will be used.</para>
  			</callout>
  			<callout arearefs="hdp-ns-uri">
  				<para>The namespace URI.</para>
  			</callout>
  			<callout arearefs="hdp-ns-uri-loc">
  				<para>The namespace URI location. Note that even though the location points to an external address (which exists and is valid), Spring will resolve
- 				the schema locally as it is included in the Spring Hadoop library.</para>
+ 				the schema locally as it is included in the Spring for Apache Hadoop library.</para>
  			</callout>
  			<callout arearefs="hdp-ns-example">
  				<para>Declaration example for the Hadoop namespace. Notice the prefix usage.</para>
@@ -66,7 +66,7 @@
 
  		<calloutlist>
  			<callout arearefs="hdp-def-ns-prefix">
- 				<para>The default namespace declaration for this XML file points to the Spring Hadoop namespace.</para>
+ 				<para>The default namespace declaration for this XML file points to the Spring for Apache Hadoop namespace.</para>
  			</callout>
  			<callout arearefs="hdp-def-ns-beans-prefix">
  				<para>The beans namespace prefix declaration.</para>
@@ -152,7 +152,7 @@
      Through Spring's property placeholder <ulink url="http://static.springsource.org/spring/docs/3.0.x/reference/beans.html#beans-factory-placeholderconfigurer">support</ulink>, <ulink url="http://static.springsource.org/spring/docs/3.0.x/reference/expressions.html">SpEL</ulink> and the <ulink url="http://blog.springsource.com/2011/06/09/spring-framework-3-1-m2-released/">environment 
      abstraction</ulink> (available in Spring 3.1). one can externalize environment specific properties from the main code base easing the deployment across multiple machines. In the example above, the default file system is
      replaced based on the properties available in <literal>hadoop.properties</literal> while the temp dir is determined dynamically through <literal>SpEL</literal>. Both approaches offer a lot
-     of flexbility in adapting to the running environment - in fact we use this approach extensivly in the Spring Hadoop test suite to cope with the differences between the different development boxes
+     of flexbility in adapting to the running environment - in fact we use this approach extensivly in the Spring for Apache Hadoop test suite to cope with the differences between the different development boxes
      and the CI server.</para>
      
      
@@ -187,7 +187,7 @@
      properties file based on their defined order. While it's not typical for a configuration to refer to use so many properties, the example showcases the various options available.
      
      <note>For more properties utilities, including using the System as a source or fallback, or control over the merging order, consider using Spring's <literal>
-     <ulink url="http://static.springsource.org/spring/docs/3.0.x/api/org/springframework/beans/factory/config/PropertiesFactoryBean.html">PropertiesFactoryBean</ulink></literal> (which is what Spring Hadoop and 
+     <ulink url="http://static.springsource.org/spring/docs/3.0.x/api/org/springframework/beans/factory/config/PropertiesFactoryBean.html">PropertiesFactoryBean</ulink></literal> (which is what Spring for Apache Hadoop and 
      <literal>util:properties</literal> use underneath).</note>
      </para>
      

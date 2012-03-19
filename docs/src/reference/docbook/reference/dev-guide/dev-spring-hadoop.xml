@@ -9,10 +9,10 @@
          xmlns:ns="http://docbook.org/ns/docbook">
   <title>Guidance and Examples</title>
 
-  <para>Spring Hadoop provides integration with the Spring Framework to create
+  <para>Spring for Apache Hadoop provides integration with the Spring Framework to create
   and run Hadoop MapReduce, Hive, and Pig jobs as well as work with HDFS and
   HBase. If you have simple needs to work with Hadoop, including basic
-  scheduling, you can add the Spring Hadoop namespace to your Spring based
+  scheduling, you can add the Spring for Apache Hadoop namespace to your Spring based
   project and get going quickly using Hadoop.</para>
 
   <para>As the complexity of your Hadoop application increases, you may want
@@ -23,7 +23,7 @@
   It also provides a workflow style processing model, persistent tracking of
   steps within the workflow, event notification, as well as administrative
   functionality to start/stop/restart a workflow. As Spring Batch was designed
-  to be extended, Spring Hadoop plugs into those extensibilty points, allowing
+  to be extended, Spring for Apache Hadoop plugs into those extensibilty points, allowing
   for Hadoop related processing to be a first class citizen in the Spring
   Batch processing model.</para>
 
@@ -69,7 +69,7 @@
     updated to provide some more directed examples with Hadoop, check for
     updates on the <link
     xlink:href="http://www.springsource.org/spring-data/hadoop">main web site
-    of Spring Hadoop</link>.</para>
+    of Spring for Apache Hadoop</link>.</para>
   </section>
 
   <section>

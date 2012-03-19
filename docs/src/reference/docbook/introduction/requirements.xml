@@ -4,7 +4,7 @@
          xmlns:ns6="http://www.w3.org/1999/xlink">
   <title>Requirements</title>
 
-  <para>Spring Hadoop requires JDK level 6.0 (just like Hadoop) and above,
+  <para>Spring for Apache Hadoop requires JDK level 6.0 (just like Hadoop) and above,
   Spring <ulink url="http://www.springsource.org/about">Framework</ulink> 3.0
   (3.1 recommended) and above and <ulink
   url="http://www.gemstone.com/products/gemfire">Hadoop</ulink> 0.20.2
@@ -16,7 +16,7 @@
   required Hadoop version as a basis for discovering the supported
   versions.</para>
 
-  <para>Spring Hadoop also requires you have a Hadoop installation up and
+  <para>Spring for Apache Hadoop also requires you have a Hadoop installation up and
   running. If you don't already have a Hadoop cluster up and running in your
   environment, a good first step is to create a single-node cluster. To
   install Hadoop 0.20.x+, the <link
