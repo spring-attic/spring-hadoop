@@ -38,6 +38,10 @@ dependencies {
     runtime "org.apache.hive:hive-service:$hiveVersion"
     runtime "org.apache.hive:hive-metastore:$hiveVersion"
     runtime "org.apache.hive:hive-jdbc:$hiveVersion"
+	
+	runtime "org.apache.ant:ant:$antVersion"
+	runtime "org.apache.ant:ant-launcher:$antVersion"
+	runtime "org.codehaus.groovy:groovy:$groovyVersion"
     
     
     // see HADOOP-7461
@@ -54,5 +58,11 @@ dependencies {
 
 
 httpPort = 8081
+
+task run(type: JavaExec) {
+	description = 'Runs the application'
+	main = "org.springframework.data.hadoop.samples.hive.DataRetriever"
+	classpath = sourceSets.main.runtimeClasspath
+}
 
 defaultTasks 'jettyRun'
