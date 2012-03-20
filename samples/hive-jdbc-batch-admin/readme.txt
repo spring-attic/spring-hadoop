@@ -1,5 +1,5 @@
 ======================
-== Hive Thrift Demo ==
+== Hive JDBC Demo   ==
 ======================
 
 1. MOTIVATION
@@ -17,11 +17,19 @@ For building, JDK 1.6+ are required
 
 To build and run the sample with Spring Batch Admin:
 
-copy "data.txt" to Hive home directory
+look at script in src/main/resources/META-INF/spring/context.xml, and change proxy settings per your env.
+
+$ ../gradlew run
+
+$ cd src/main/resources
+
+$ unzip ml-100k.zip 
+
+$ cd ../../..
 
 $ ../gradlew jettyRun
 
-then open internet explorer and input "http://localhost:8081/hive-thrift-batch-admin", click "Jobs" -> "hiveJob". In the Job Parameters text field,
+then open internet explorer and input "http://localhost:8081/hive-jdbc-batch-admin", click "Jobs" -> "hiveJob". In the Job Parameters text field,
  input "fail=false run.id=1", and click "Launch" button.
 
 3. IDE IMPORT
