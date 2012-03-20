@@ -17,7 +17,15 @@ For building, JDK 1.6+ are required
 
 To build and run the sample with Spring Batch Admin:
 
-copy "data.txt" to Hive home directory
+look at script in src/main/resources/META-INF/spring/context.xml, and change proxy settings per your env.
+
+$ ../gradlew run
+
+$ cd src/main/resources
+
+$ unzip ml-100k.zip 
+
+$ cd ../../..
 
 $ ../gradlew
 

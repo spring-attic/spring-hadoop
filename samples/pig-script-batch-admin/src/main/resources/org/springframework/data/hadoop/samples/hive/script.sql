@@ -1,2 +1,0 @@
-CREATE TABLE t1 (key int, value string) ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t';
-
