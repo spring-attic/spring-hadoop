@@ -34,7 +34,6 @@ dependencies {
 }
 
 httpPort = 8081
-stopPort = 9451
 
 mainClassName = "org.springframework.batch.core.launch.support.CommandLineJobRunner"
 defaultTasks 'clean', 'build'

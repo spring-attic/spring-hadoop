@@ -20,6 +20,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.hive.service.HiveClient;
 import org.apache.hadoop.hive.service.HiveServerException;
 import org.apache.hadoop.io.IOUtils;
@@ -36,6 +38,7 @@ import org.springframework.util.StringUtils;
  */
 abstract class HiveScriptRunner {
 
+	private static final Log log = LogFactory.getLog(HiveScriptRunner.class);
 
 	/**
 	 * Runs (or executes) all the given scripts (using "UTF-8" as the script encoding).
@@ -111,6 +114,10 @@ abstract class HiveScriptRunner {
 		List<String> results;
 		do {
 			results = hive.fetchN(batchSize);
+			for(String msg : results){
+				log.debug("command message:" + msg);
+			}
 		} while (results.size() == batchSize);
+		
 	}
 }
