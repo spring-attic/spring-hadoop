@@ -14,8 +14,33 @@ SAMPLES OVERVIEW
 * wordcount
 The 'traditional' Hadoop example - a word count MapReduce app configured with Spring Hadoop
 
-* batch-wordcount
+* wordcount-batch
 The same word count application featuring Spring Batch
+
+* wordcount-cron
+Word count application with cron scheduler
+
+* wordcount-quartz
+Word count application with quartz scheduler
+
+* wordcount-batch-admin
+Word count application with spring batch admin
+
+* hbase-mapreduce
+Run map reduce with HBase
+
+* hive-thrift-batch-admin
+Run hive script with thrift API 
+
+* hive-jdbc-batch-admin
+Run hiveQL with JDBC
+
+* pig-script-batch-admin
+Run pig script with spring batch admin
+
+
+
+
 
 
 BUILDING AND DEPLOYMENT

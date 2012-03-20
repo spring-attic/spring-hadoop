@@ -21,7 +21,10 @@
 
 
 	<job id="hiveJob" xmlns="http://www.springframework.org/schema/batch">
-		<step id="init" next="loadData">
+		<step id="prepareData" next="initTable">
+			<tasklet ref="prepareDataTasklet" />
+		</step>
+		<step id="initTable" next="loadData">
 			<tasklet ref="initTableTasklet" />
 		</step>
 		<step id="loadData" next="showData">
@@ -31,15 +34,28 @@
 			<tasklet ref="hiveJdbcClient" />
 		</step>
 	</job>
+	
+	<hdp:script-tasklet id="prepareDataTasklet">
+		<hdp:script language="groovy">
+		<![CDATA[						
+			if (fsh.test("u.data")) {
+		  		fsh.rmr("u.data")
+			}
+			inStream = cl.getResourceAsStream("ml-100k/u.data")
+			org.apache.hadoop.io.IOUtils.copyBytes(inStream, fs.create("u.data"), cfg)
+		]]>	
+		</hdp:script>
+	</hdp:script-tasklet>
 
-	<hdp:hive-tasklet id="initTableTasklet" hive-client-ref="hive-client">
-		<hdp:script location="org/springframework/data/hadoop/samples/hive/script.sql"/>
+	<hdp:hive-tasklet id="initTableTasklet"
+		hive-client-ref="hive-client">
+		<hdp:script location="org/springframework/data/hadoop/samples/hive/script.sql" />
 	</hdp:hive-tasklet>
 
 	<hdp:hive-tasklet id="loadDataScriptTasklet"
 		hive-client-ref="hive-client">
 		<hdp:script>
-			LOAD DATA LOCAL INPATH 'data.txt' OVERWRITE INTO TABLE t1;
+			LOAD DATA INPATH 'u.data' OVERWRITE INTO TABLE u_data;
 		</hdp:script>
 	</hdp:hive-tasklet>
 
@@ -49,14 +65,14 @@
 		class="org.springframework.jdbc.datasource.SimpleDriverDataSource"
 		c:driver-ref="hive-driver" c:url="jdbc:hive://localhost:10000/default" />
 
-	<bean id="templateBean" class="org.springframework.jdbc.core.JdbcTemplate"
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate"
 		c:data-source-ref="hive-ds" />
 
 	<bean id="hiveJdbcClient"
 		class="org.springframework.data.hadoop.samples.hive.HiveJdbcClientTasklet"
-		p:template-ref="templateBean">
+		p:template-ref="jdbcTemplate">
 		<property name="sql">
-			<value>select * from t1</value>
+			<value>select movieid, avg(rating) from u_data group by movieid</value>
 		</property>
 	</bean>
 
