@@ -1,0 +1,44 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:hdp="http://www.springframework.org/schema/hadoop" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:c="http://www.springframework.org/schema/c" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+      	http://www.springframework.org/schema/batch	http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
+      	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+      	http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
+
+	<hdp:configuration>
+		fs.default.name=hdfs://localhost:9000
+		mapred.job.tracker=localhost:9001
+	</hdp:configuration>
+
+
+	<hdp:pig configuration-ref="hadoop-configuration" exec-type="MAPREDUCE"/> 
+
+	<job id="pigJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="prepareData" next="loadData">
+			<tasklet ref="prepareDataTasklet" />
+		</step>
+		<step id="loadData">
+			<tasklet ref="loadDataTasklet" />
+		</step>		
+	</job>
+	
+	<hdp:script-tasklet id="prepareDataTasklet">
+		<hdp:script language="groovy">
+		<![CDATA[			
+			if (fsh.test("u.data")) {
+		  		fsh.rmr("u.data")
+			}
+			inStream = cl.getResourceAsStream("ml-100k/u.data")
+			org.apache.hadoop.io.IOUtils.copyBytes(inStream, fs.create("u.data"), cfg)
+		]]>	
+		</hdp:script>
+	</hdp:script-tasklet>
+	
+	<hdp:pig-tasklet id="loadDataTasklet">
+		<hdp:script location="org/springframework/data/hadoop/samples/pig/script.pig" />
+	</hdp:pig-tasklet> 
+	
+
+</beans>

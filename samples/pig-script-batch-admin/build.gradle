@@ -33,11 +33,13 @@ dependencies {
     compile "org.springframework.batch:spring-batch-admin-manager:$springBatchAdminVersion"
     compile "org.springframework.batch:spring-batch-admin-resources:$springBatchAdminVersion"
     compile "org.springframework:spring-tx:$springVersion"
-    
-    runtime "javax.jdo:jdo2-api:$jdoVersion"
-    runtime "org.apache.hive:hive-service:$hiveVersion"
-    runtime "org.apache.hive:hive-metastore:$hiveVersion"
-    runtime "org.apache.hive:hive-jdbc:$hiveVersion"
+	
+	runtime "org.apache.pig:pig:$pigVersion"
+	runtime "jline:jline:1.0"
+	runtime "org.antlr:antlr:3.1.1"
+	
+
+	runtime "org.codehaus.groovy:groovy:$groovyVersion"
     
     
     // see HADOOP-7461
@@ -54,5 +56,11 @@ dependencies {
 
 
 httpPort = 8081
+
+task run(type: JavaExec) {
+	description = 'Runs the application'
+	main = "org.springframework.data.hadoop.samples.pig.DataRetriever"
+	classpath = sourceSets.main.runtimeClasspath
+}
 
 defaultTasks 'jettyRun'
