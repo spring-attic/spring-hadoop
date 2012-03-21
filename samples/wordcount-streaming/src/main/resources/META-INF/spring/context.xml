@@ -18,13 +18,10 @@
 	<bean name="pathUtils" class="org.springframework.data.hadoop.util.PathUtils"
 		p:rootPath="${wordcount.output.path}" />
 
-	<bean id="wc-job"
-		class="org.springframework.data.hadoop.mapreduce.JobFactoryBean"
-		p:configuration-ref="hadoop-configuration" p:input-paths="${wordcount.input.path}"
-		p:output-path="#{@pathUtils.getTimeBasedPathFromRoot()}" p:mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
-		p:reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"
-		p:validate-paths="false" scope="prototype" />
 
+	<hdp:streaming id="wc-streaming-job" configuration-ref="hadoop-configuration" input-path="${wordcount.input.path}"
+		output-path="#{@pathUtils.getTimeBasedPathFromRoot()}" mapper="${path.cat}" reducer="${path.wc}">
+	</hdp:streaming>
 
   	<hdp:script id="clean-script" language="javascript">
   	   	// 'hack' default permissions to make Hadoop work on Windows
@@ -49,7 +46,7 @@
 		depends-on="clean-script" p:runAtStartup="true">
 		<property name="jobNames">
 			<set>
-				<value>wc-job</value>
+				<value>wc-streaming-job</value>
 			</set>
 		</property>
 	</bean>            
