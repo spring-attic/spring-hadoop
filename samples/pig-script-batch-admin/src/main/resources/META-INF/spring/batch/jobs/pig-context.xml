@@ -9,7 +9,7 @@
 
 	<hdp:configuration>
 		fs.default.name=hdfs://localhost:9000
-		mapred.job.tracker=localhost:9001
+
 	</hdp:configuration>
 
 

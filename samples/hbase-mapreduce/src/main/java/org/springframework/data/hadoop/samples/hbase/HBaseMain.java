@@ -72,9 +72,9 @@ public class HBaseMain {
 
 		// runHBaseMR();
 
-		JobRunner runner = ctx.getBean("&runner", JobRunner.class);
+		JobRunner runner = ctx.getBean("runner", JobRunner.class);
 		try {
-			runner.runJob();
+			runner.runJobs();
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
