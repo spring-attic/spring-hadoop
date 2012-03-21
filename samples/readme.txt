@@ -17,6 +17,9 @@ The 'traditional' Hadoop example - a word count MapReduce app configured with Sp
 * wordcount-batch
 The same word count application featuring Spring Batch
 
+* wordcount-streaming
+Word count application with streaming
+
 * wordcount-cron
 Word count application with cron scheduler
 
@@ -25,6 +28,9 @@ Word count application with quartz scheduler
 
 * wordcount-batch-admin
 Word count application with spring batch admin
+
+* hbase-crud-java
+HBase create table, put, get, increment, scan with Java API
 
 * hbase-mapreduce
 Run map reduce with HBase
