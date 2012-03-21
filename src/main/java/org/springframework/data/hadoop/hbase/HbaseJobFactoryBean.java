@@ -43,6 +43,9 @@ public class HbaseJobFactoryBean extends JobFactoryBean {
 
 	private String inputTable;
 	private String outputTable;
+	
+	private boolean cacheBlocks = false;
+	private int cachingNum = 500;
 
 	@Override
 	protected void processJob(Job job) throws Exception {
@@ -54,8 +57,8 @@ public class HbaseJobFactoryBean extends JobFactoryBean {
 			conf.set(TableInputFormat.INPUT_TABLE, inputTable);
 		}
 		Scan scan = new Scan();
-		scan.setCaching(500);
-		scan.setCacheBlocks(false);
+		scan.setCaching(cachingNum);
+		scan.setCacheBlocks(cacheBlocks);
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(out);
 		scan.write(dos);
@@ -84,6 +87,34 @@ public class HbaseJobFactoryBean extends JobFactoryBean {
 
 	public void setOutputTable(String outputTable) {
 		this.outputTable = outputTable;
+	}
+
+	/**
+	 * @return the cacheBlocks
+	 */
+	public boolean isCacheBlocks() {
+		return cacheBlocks;
+	}
+
+	/**
+	 * @param cacheBlocks the cacheBlocks to set
+	 */
+	public void setCacheBlocks(boolean cacheBlocks) {
+		this.cacheBlocks = cacheBlocks;
+	}
+
+	/**
+	 * @return the cachingNum
+	 */
+	public int getCachingNum() {
+		return cachingNum;
+	}
+
+	/**
+	 * @param cachingNum the cachingNum to set
+	 */
+	public void setCachingNum(int cachingNum) {
+		this.cachingNum = cachingNum;
 	}
 
 }
