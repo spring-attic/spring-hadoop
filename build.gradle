@@ -142,6 +142,7 @@ dependencies {
         exclude module: "commons-logging"
     }
     compile "org.springframework:spring-context-support:$springVersion"
+	compile "opensymphony:quartz:$quartzVersion"
     compile("org.springframework:spring-tx:$springVersion") { optional = true }
     compile("org.springframework:spring-aop:$springVersion") { optional = true }
     //compile "org.springframework:spring-oxm:$springVersion"
