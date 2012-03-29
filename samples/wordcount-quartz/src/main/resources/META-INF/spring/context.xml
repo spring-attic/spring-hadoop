@@ -43,18 +43,8 @@
 
 		// copy using the streams directly (to be portable across envs)
 		inStream = cl.getResourceAsStream("data/nietzsche-chapter-1.txt")
-		org.apache.hadoop.io.IOUtils.copyBytles(inStream, fs.create(inputPath), cfg)
+		org.apache.hadoop.io.IOUtils.copyBytes(inStream, fs.create(inputPath), cfg)
 	</hdp:script>
-	
-	<!-- simple job runner -->
-	<bean id="runner" class="org.springframework.data.hadoop.mapreduce.JobRunner"
-		depends-on="clean-script" p:runAtStartup="false">
-		<property name="jobNames">
-			<set>
-				<value>wc-job</value>
-			</set>
-		</property>
-    </bean>
 
 	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
 		<property name="triggers">
@@ -65,15 +55,17 @@
 	</bean>
 
 	<bean id="cronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
-		<property name="jobDetail" ref="job1" />
+		<property name="jobDetail" ref="hadoopJobDetail" />
 		<property name="cronExpression" value="10 * * * * ?" />
 	</bean>
-
-	<bean id="job1"
-		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-		<property name="targetObject" ref="runner" />
-		<property name="targetMethod" value="runJobs" />
-		<property name="concurrent" value="false" />
+	
+	<bean id="hadoopJobDetail" class="org.springframework.data.hadoop.mapreduce.HadoopJobDetailBean" p:waitForJobs="true">
+		<property name="jobNames">
+			<set>
+				<value>wc-job</value>
+			</set>
+		</property>
 	</bean>
+
 	
 </beans>
