@@ -5,6 +5,11 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd" default-lazy-init="true">
 
-	<bean id="fs" class="org.springframework.data.hadoop.fs.FileSystemFactoryBean" p:configuration-ref="hadoop-configuration"/>
+	<import resource="../hadoop-ctx.xml"/>
+
+	<bean id="fsShell" class="org.springframework.data.hadoop.fs.FsShell">
+		<constructor-arg name="configuration" ref="hadoop-configuration"/> 
+		<constructor-arg name="fs" ref="fs"/>
+	</bean>
 	
 </beans>
