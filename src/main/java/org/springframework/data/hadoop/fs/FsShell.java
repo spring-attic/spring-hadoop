@@ -131,7 +131,8 @@ public class FsShell implements Closeable, DisposableBean {
 			@Override
 			public String toString(Path e) throws IOException {
 				try {
-					return getContent(fs.open(e));
+					final FileSystem srcFS = getFS(e);
+					return getContent(srcFS.open(e));
 				} catch (IOException ex) {
 					return "No such file or directory " + e.toUri();
 				}
@@ -142,7 +143,8 @@ public class FsShell implements Closeable, DisposableBean {
 			if (!ObjectUtils.isEmpty(uris)) {
 				for (String uri : uris) {
 					Path src = new Path(uri);
-					results.addAll(Arrays.asList(FileUtil.stat2Paths(fs.globStatus(src), src)));
+					FileSystem srcFS = getFS(src);
+					results.addAll(Arrays.asList(FileUtil.stat2Paths(srcFS.globStatus(src), src)));
 				}
 			}
 		} catch (IOException ex) {
@@ -259,7 +261,7 @@ public class FsShell implements Closeable, DisposableBean {
 		Path dstPath = (Path) va[1];
 
 		try {
-			FileSystem dstFs = dstPath.getFileSystem(configuration);
+			FileSystem dstFs = getFS(dstPath);
 			dstFs.copyFromLocalFile(false, false, srcs.toArray(new Path[srcs.size()]), dstPath);
 		} catch (IOException ex) {
 			throw new HadoopException("Cannot copy resources " + ex.getMessage(), ex);
@@ -275,7 +277,7 @@ public class FsShell implements Closeable, DisposableBean {
 		Path srcpath = new Path(src);
 
 		try {
-			FileSystem srcFs = srcpath.getFileSystem(configuration);
+			FileSystem srcFs = getFS(srcpath);
 			srcFs.setVerifyChecksum(ignorecrc);
 			if (crc && !(srcFs instanceof ChecksumFileSystem)) {
 				crc = false;
@@ -369,7 +371,7 @@ public class FsShell implements Closeable, DisposableBean {
 		for (String src : uris) {
 			try {
 				Path srcPath = new Path(src);
-				final FileSystem fs = srcPath.getFileSystem(configuration);
+				final FileSystem fs = getFS(srcPath);
 				FileStatus[] statuses = fs.globStatus(srcPath);
 				Assert.notEmpty(statuses, "Can not find listing for " + src);
 				for (FileStatus s : statuses) {
@@ -455,7 +457,7 @@ public class FsShell implements Closeable, DisposableBean {
 		try {
 			for (String src : strings) {
 				Path srcPath = new Path(src);
-				FileSystem srcFs = srcPath.getFileSystem(configuration);
+				FileSystem srcFs = getFS(srcPath);
 				FileStatus[] fileStatus = srcFs.globStatus(srcPath);
 				if (summary) {
 					for (FileStatus status : fileStatus) {
@@ -513,7 +515,7 @@ public class FsShell implements Closeable, DisposableBean {
 		Path srcPath = new Path(src);
 		Path dst = new Path(localdst);
 		try {
-			FileSystem srcFs = srcPath.getFileSystem(configuration);
+			FileSystem srcFs = getFS(srcPath);
 			Path[] srcs = FileUtil.stat2Paths(srcFs.globStatus(srcPath), srcPath);
 			for (int i = 0; i < srcs.length; i++) {
 				if (addnl) {
@@ -566,7 +568,7 @@ public class FsShell implements Closeable, DisposableBean {
 			for (String src : match) {
 				Path srcPath = new Path(src);
 
-				FileSystem srcFs = srcPath.getFileSystem(configuration);
+				FileSystem srcFs = getFS(srcPath);
 				FileStatus[] srcs = srcFs.globStatus(srcPath);
 				if (!ObjectUtils.isEmpty(srcs)) {
 					for (FileStatus status : srcs) {
@@ -622,7 +624,7 @@ public class FsShell implements Closeable, DisposableBean {
 		for (String src : uris) {
 			try {
 				Path p = new Path(src);
-				FileSystem srcFs = p.getFileSystem(configuration);
+				FileSystem srcFs = getFS(p);
 				FileStatus fstatus = null;
 				try {
 					fstatus = srcFs.getFileStatus(p);
@@ -680,7 +682,7 @@ public class FsShell implements Closeable, DisposableBean {
 		Path dstPath = (Path) va[1];
 
 		try {
-			FileSystem dstFs = dstPath.getFileSystem(configuration);
+			FileSystem dstFs = getFS(dstPath);
 			boolean isDstDir = !dstFs.isFile(dstPath);
 
 			if (sources.size() > 1 && !isDstDir) {
@@ -688,7 +690,7 @@ public class FsShell implements Closeable, DisposableBean {
 			}
 
 			for (Path srcPath : sources) {
-				FileSystem srcFs = srcPath.getFileSystem(configuration);
+				FileSystem srcFs = getFS(srcPath);
 				URI srcURI = srcFs.getUri();
 				URI dstURI = dstFs.getUri();
 				if (srcURI.compareTo(dstURI) != 0) {
@@ -754,9 +756,9 @@ public class FsShell implements Closeable, DisposableBean {
 		for (String uri : uris) {
 			try {
 				Path src = new Path(uri);
-				FileSystem srcFs = src.getFileSystem(configuration);
+				FileSystem srcFs = getFS(src);
 
-				for (Path p : FileUtil.stat2Paths(fs.globStatus(src), src)) {
+				for (Path p : FileUtil.stat2Paths(srcFs.globStatus(src), src)) {
 					FileStatus status = srcFs.getFileStatus(p);
 					if (status.isDir() && !recursive) {
 						throw new IllegalStateException("Cannot remove directory \"" + src
@@ -838,7 +840,7 @@ public class FsShell implements Closeable, DisposableBean {
 		try {
 			for (String uri : uris) {
 				Path srcPath = new Path(uri);
-				FileSystem srcFs = srcPath.getFileSystem(configuration);
+				FileSystem srcFs = getFS(srcPath);
 				Path[] srcs = FileUtil.stat2Paths(srcFs.globStatus(srcPath), srcPath);
 				for (Path src : srcs) {
 					setrep(replication, recursive, srcFs, src, waitList);
@@ -850,13 +852,14 @@ public class FsShell implements Closeable, DisposableBean {
 				long timeLeft = TimeUnit.SECONDS.toMillis(secondsToWait);
 
 				for (Path path : waitList) {
-					FileStatus status = fs.getFileStatus(path);
+					FileSystem srcFs = getFS(path);
+					FileStatus status = srcFs.getFileStatus(path);
 					long len = status.getLen();
 
 					boolean done = false;
 
 					while (!done) {
-						BlockLocation[] locations = fs.getFileBlockLocations(status, 0, len);
+						BlockLocation[] locations = srcFs.getFileBlockLocations(status, 0, len);
 						int i = 0;
 						for (; i < locations.length && locations[i].getHosts().length == replication; i++) {
 						}
@@ -912,7 +915,7 @@ public class FsShell implements Closeable, DisposableBean {
 
 		boolean result = true;
 		try {
-			FileSystem srcFs = f.getFileSystem(configuration);
+			FileSystem srcFs = getFS(f);
 			// mandatory check - if this fails, so will the others (with a NPE)
 			result = srcFs.exists(f);
 
@@ -949,7 +952,7 @@ public class FsShell implements Closeable, DisposableBean {
 
 			try {
 				Path srcPat = new Path(uri);
-				FileSystem srcFs = srcPat.getFileSystem(configuration);
+				FileSystem srcFs = getFS(srcPat);
 
 				for (Path src : FileUtil.stat2Paths(srcFs.globStatus(srcPat), srcPat)) {
 					Assert.isTrue(!srcFs.isFile(src), "Source must be a file");
@@ -987,7 +990,7 @@ public class FsShell implements Closeable, DisposableBean {
 		for (String uri : uris) {
 			try {
 				Path src = new Path(uri);
-				FileSystem srcFs = src.getFileSystem(configuration);
+				FileSystem srcFs = getFS(src);
 				FileStatus st;
 				if (srcFs.exists(src)) {
 					st = srcFs.getFileStatus(src);
@@ -1028,5 +1031,19 @@ public class FsShell implements Closeable, DisposableBean {
 		}
 
 		return new Object[] { srcs, dstPath };
+	}
+
+	/**
+	 * Utility that checks whether the given path has a URI - if it doesn't, it falls back 
+	 * to the specified FS (rather then always HDFS as Hadoop does).
+	 * 
+	 * @param path path
+	 * @return associated file system
+	 */
+	private FileSystem getFS(Path path) throws IOException {
+		if (StringUtils.hasText(path.toUri().getScheme())) {
+			return path.getFileSystem(configuration);
+		}
+		return fs;
 	}
 }
