@@ -100,7 +100,6 @@ public class FsShell implements Closeable, DisposableBean {
 		}
 	}
 
-
 	@Override
 	public void destroy() throws Exception {
 		close();
