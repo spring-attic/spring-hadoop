@@ -28,7 +28,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration
-public class HftpFsShellTest extends AbstractFsShellTest {
+public class HftpFsShellTest extends AbstractROFsShellTest {
 
 	@Override
 	Class<? extends FileSystem> fsClass() {

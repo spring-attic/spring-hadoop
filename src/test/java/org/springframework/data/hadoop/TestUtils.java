@@ -39,6 +39,19 @@ public class TestUtils {
 		}
 	}
 
+	public static Resource mkdir(Configuration cfg, String dir) {
+		HdfsResourceLoader loader = new HdfsResourceLoader(cfg);
+		try {
+			Resource resource = loader.getResource(dir);
+			FileSystem fs = ((HdfsResourceLoader) loader).getFileSystem();
+			fs.mkdirs(new Path(resource.getURI()));
+			return loader.getResource(dir);
+		} catch (IOException ex) {
+			throw new IllegalArgumentException(ex);
+		}
+
+	}
+
 	public static Resource writeToFS(Configuration cfg, String filename) {
 		return writeToFS(new HdfsResourceLoader(cfg), filename);
 	}

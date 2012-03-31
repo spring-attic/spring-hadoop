@@ -916,7 +916,7 @@ public class FsShell implements Closeable, DisposableBean {
 		boolean result = true;
 		try {
 			FileSystem srcFs = getFS(f);
-			// mandatory check - if this fails, so will the others (with a NPE)
+			// mandatory check - if this fails, so will the others (with a NPE most likely)
 			result = srcFs.exists(f);
 
 			if (result && zero) {

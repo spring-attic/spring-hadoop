@@ -18,26 +18,12 @@ package org.springframework.data.hadoop.fs;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.UUID;
 
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.ContentSummary;
-import org.apache.hadoop.fs.FileStatus;
-import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.fs.permission.FsAction;
-import org.apache.hadoop.fs.permission.FsPermission;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.data.hadoop.TestUtils;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.util.Assert;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.util.FileSystemUtils;
 
@@ -48,75 +34,10 @@ import static org.junit.Assert.*;
  * 
  * @author Costin Leau
  */
-@ContextConfiguration
-@SuppressWarnings("deprecation")
-public abstract class AbstractFsShellTest {
+public abstract class AbstractFsShellTest extends AbstractROFsShellTest {
 
 	{
 		TestUtils.hackHadoopStagingOnWin();
-	}
-
-	@Before
-	public void init() throws Exception {
-		TestUtils.writeToFS(cfg, "local/" + UUID.randomUUID() + ".txt");
-	}
-
-	@After
-	public void destroy() throws Exception {
-		FileSystem fs = FileSystem.get(cfg);
-		fs.delete(new Path("local/"), true);
-	}
-
-	@Autowired
-	FsShell shell;
-	@Autowired
-	Configuration cfg;
-	@Autowired
-	FileSystem fs;
-
-	@Test
-	public void testFSImplementation() {
-		Assert.isInstanceOf(fsClass(), fs);
-	}
-
-	abstract Class<? extends FileSystem> fsClass();
-
-	@Test
-	public void testChmod() throws Exception {
-		String name = "local/" + UUID.randomUUID() + ".txt";
-		TestUtils.writeToFS(cfg, name);
-		FsPermission perm = fs.getFileStatus(new Path(name)).getPermission();
-		assertTrue(perm.getGroupAction().implies(FsAction.READ));
-		assertTrue(perm.getOtherAction().implies(FsAction.READ));
-
-		shell.chmod("700", name);
-
-		perm = fs.getFileStatus(new Path(name)).getPermission();
-		assertTrue(perm.getUserAction().equals(FsAction.READ_WRITE));
-		assertTrue(perm.getGroupAction().implies(FsAction.NONE));
-		assertTrue(perm.getOtherAction().implies(FsAction.NONE));
-	}
-
-	@Test
-	public void testCat() throws Exception {
-		String name = "local/" + UUID.randomUUID() + ".txt";
-		Resource res = TestUtils.writeToFS(cfg, name);
-		Collection<Path> cat = shell.cat(name);
-		assertEquals(name, cat.toString());
-		assertEquals(res.getURI().getPath(), cat.iterator().next().toUri().getPath());
-	}
-
-	@Test
-	public void testCatMulti() throws Exception {
-		String name1 = "local/" + UUID.randomUUID() + ".txt";
-		String name2 = "local/" + UUID.randomUUID() + ".txt";
-		Resource res1 = TestUtils.writeToFS(cfg, name1);
-		Resource res2 = TestUtils.writeToFS(cfg, name2);
-		Collection<Path> cat = shell.cat(name1, name2);
-		assertEquals(name1 + "\n" + name2, cat.toString());
-		Iterator<Path> it = cat.iterator();
-		assertEquals(res1.getURI().getPath(), it.next().toUri().getPath());
-		assertEquals(res2.getURI().getPath(), it.next().toUri().getPath());
 	}
 
 	@Test
@@ -203,44 +124,10 @@ public abstract class AbstractFsShellTest {
 	}
 
 	@Test
-	public void testCount() throws Exception {
-		String name1 = "local/" + UUID.randomUUID() + ".txt";
-		String name2 = "local/" + UUID.randomUUID() + ".txt";
-		Resource res1 = TestUtils.writeToFS(cfg, name1);
-		Resource res2 = TestUtils.writeToFS(cfg, name2);
-
-		Map<Path, ContentSummary> count = shell.count(name1, name2);
-		assertTrue(count.size() >= 2);
-		for (ContentSummary summary : count.values()) {
-			assertEquals(name2.length(), summary.getLength());
-		}
-
-		assertTrue(count.toString().contains(name1));
-		assertTrue(count.toString().contains(name2));
-	}
-
-	@Test
-	public void testCountWithQuota() throws Exception {
-		String name1 = "local/" + UUID.randomUUID() + ".txt";
-		String name2 = "local/" + UUID.randomUUID() + ".txt";
-		Resource res1 = TestUtils.writeToFS(cfg, name1);
-		Resource res2 = TestUtils.writeToFS(cfg, name2);
-
-		Map<Path, ContentSummary> count = shell.count(true, name1, name2);
-		assertTrue(count.size() >= 2);
-		for (ContentSummary summary : count.values()) {
-			assertEquals(name2.length(), summary.getLength());
-		}
-
-		assertTrue(count.toString().contains(name1));
-		assertTrue(count.toString().contains(name2));
-	}
-
-	@Test
 	public void testCp() throws Exception {
 		String fName = UUID.randomUUID() + ".txt";
 		String name1 = "local/" + fName;
-		TestUtils.writeToFS(cfg, name1);
+		Resource res = TestUtils.writeToFS(cfg, name1);
 
 		String dst = "local/cp/";
 		shell.mkdir(dst);
@@ -268,35 +155,6 @@ public abstract class AbstractFsShellTest {
 		assertTrue(shell.test(dst + fName2));
 		assertEquals(shell.cat(name1).toString(), shell.cat(dst + fName1).toString());
 		assertEquals(shell.cat(name2).toString(), shell.cat(dst + fName2).toString());
-	}
-
-	@Test
-	public void testDUS() throws Exception {
-		String fName1 = UUID.randomUUID() + ".txt";
-		String name1 = "local/" + fName1;
-		Resource res1 = TestUtils.writeToFS(cfg, name1);
-
-		String fName2 = UUID.randomUUID() + ".txt";
-		String name2 = "local/" + fName2;
-		Resource res2 = TestUtils.writeToFS(cfg, name2);
-
-		assertEquals(stripPrefix(shell.dus(name1)), stripPrefix(res1.getURI()) + "\t" + name1.length());
-		assertEquals(stripPrefix(shell.dus(name2)), stripPrefix(res2.getURI()) + "\t" + name2.length());
-	}
-
-	@Test
-	public void testDU() throws Exception {
-		String fName1 = UUID.randomUUID() + ".txt";
-		String name1 = "local/" + fName1;
-		Resource res1 = TestUtils.writeToFS(cfg, name1);
-
-		String fName2 = UUID.randomUUID() + ".txt";
-		String name2 = "local/" + fName2;
-		Resource res2 = TestUtils.writeToFS(cfg, name2);
-
-		String s = shell.du("local/").toString();
-		assertTrue(s.contains(res1.getURI().getPath()));
-		assertTrue(s.contains(res2.getURI().getPath()));
 	}
 
 	@Test
@@ -363,33 +221,6 @@ public abstract class AbstractFsShellTest {
 		} finally {
 			FileSystemUtils.deleteRecursively(dir);
 		}
-	}
-
-	@Test
-	public void testLSR() throws Exception {
-		String fName1 = UUID.randomUUID() + ".txt";
-		String name1 = "local/merge/" + fName1;
-		TestUtils.writeToFS(cfg, name1);
-
-		Collection<FileStatus> lsr = shell.lsr(".");
-		assertTrue(lsr.size() > 1);
-		String output = lsr.toString();
-		assertTrue(output.contains(name1));
-	}
-
-	@Test
-	public void testLS() throws Exception {
-		String fName1 = UUID.randomUUID() + ".txt";
-		String name1 = "local/ls/" + fName1;
-		TestUtils.writeToFS(cfg, name1);
-
-		Collection<FileStatus> ls = shell.ls(".");
-		assertTrue(ls.size() >= 1);
-		assertTrue(ls.toString().contains("drwx"));
-		assertFalse(ls.toString().contains(name1));
-		ls = shell.ls("local/ls/");
-		assertEquals(2, ls.size());
-		assertTrue(shell.ls(name1).toString().contains(name1));
 	}
 
 	@Test
@@ -536,72 +367,6 @@ public abstract class AbstractFsShellTest {
 		assertFalse(shell.test(name2));
 	}
 
-	//@Test - disabled for now as Trash is disabled by default as well
-	public void testTrash() throws Exception {
-		String name1 = "local/rmr/" + UUID.randomUUID() + ".txt";
-		TestUtils.writeToFS(cfg, name1);
-		shell.rmr("local/rmr/");
-		assertTrue(shell.test(".Trash"));
-		System.out.println(shell.ls(".Trash"));
-	}
-
-	@Test
-	public void testSetrep() throws Exception {
-		String name1 = "local/setrep/" + UUID.randomUUID() + ".txt";
-		TestUtils.writeToFS(cfg, name1);
-		Path p = new Path(name1);
-		short replication = fs.getReplication(p);
-		shell.setrep((short) (replication + 1), name1);
-		assertEquals(replication + 1, fs.getReplication(p));
-	}
-
-	@Test
-	public void testMultiSetrep() throws Exception {
-		String name1 = "local/setrep/" + UUID.randomUUID() + ".txt";
-		String name2 = "local/setrep/" + UUID.randomUUID() + ".txt";
-
-		TestUtils.writeToFS(cfg, name1);
-		TestUtils.writeToFS(cfg, name2);
-
-		Path p1 = new Path(name1);
-		Path p2 = new Path(name2);
-
-		short replication = fs.getReplication(p1);
-		shell.setrep(true, (short) (replication + 1), "local/setrep/");
-		assertEquals(replication + 1, fs.getReplication(p1));
-		assertEquals(replication + 1, fs.getReplication(p2));
-	}
-
-	@Test
-	public void testTest() throws Exception {
-		String name1 = "local/" + UUID.randomUUID() + ".txt";
-		assertFalse(shell.test(name1));
-		TestUtils.writeToFS(cfg, name1);
-		assertTrue(shell.test(name1));
-		assertFalse(shell.test(false, true, false, name1));
-		assertFalse(shell.test(false, false, true, name1));
-	}
-
-	@Test
-	public void testTestDir() throws Exception {
-		String name1 = "local/" + UUID.randomUUID();
-		assertFalse(shell.test(name1));
-		shell.mkdir(name1);
-		assertTrue(shell.test(name1));
-		assertTrue(shell.test(false, true, false, name1));
-		assertTrue(shell.test(false, false, true, name1));
-	}
-
-	@Test
-	public void testTestFile() throws Exception {
-		String name1 = "local/" + UUID.randomUUID();
-		assertFalse(shell.test(name1));
-		shell.touchz(name1);
-		assertTrue(shell.test(name1));
-		assertTrue(shell.test(false, true, false, name1));
-		assertFalse(shell.test(false, false, true, name1));
-	}
-
 	@Test
 	public void testTouchz() throws Exception {
 		String name1 = "local/" + UUID.randomUUID() + ".txt";
@@ -611,9 +376,12 @@ public abstract class AbstractFsShellTest {
 		assertEquals(0, fs.getLength(new Path(name1)));
 	}
 
-	private static String stripPrefix(Object obj) {
-		String s = obj.toString();
-		s = s.substring(s.lastIndexOf(":"));
-		return s.substring(s.indexOf("/"));
+	//@Test - disabled for now as Trash is disabled by default as well
+	public void testTrash() throws Exception {
+		String name1 = "local/rmr/" + UUID.randomUUID() + ".txt";
+		TestUtils.writeToFS(cfg, name1);
+		shell.rmr("local/rmr/");
+		assertTrue(shell.test(".Trash"));
+		System.out.println(shell.ls(".Trash"));
 	}
 }
