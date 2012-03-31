@@ -60,7 +60,7 @@ Spring for Apache Hadoop uses Gradle as its build system. To build the system si
     gradlew
 
 from the project root folder. This will compile the sources, run the tests and create the artifacts. 
-Note that by default, only the vanilla Hadoop tests are running - you can enable additional tests by adding the tasks `enableHBaseTests`, `enableHiveTests` and `enablePigTests` (or `enableAllTests` in short).
+Note that by default, only the vanilla Hadoop tests are running - you can enable additional tests by adding the tasks `enableHBaseTests`, `enableHiveTests`, `enablePigTests` and `webHdfsTests` (or `enableAllTests` in short).
 You can disable all tests by skipping the `test` task:
 
     gradlew -x test
