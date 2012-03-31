@@ -7,7 +7,7 @@ buildscript {
     }
 }
 
-description = 'Spring Hadoop'
+description = 'Spring for Apache Hadoop'
 group = 'org.springframework.data'
 
 repositories {
@@ -41,7 +41,6 @@ dependencies {
     compile "org.springframework:spring-context-support:$springVersion"
     compile("org.springframework:spring-tx:$springVersion", optional)
     compile("org.springframework:spring-aop:$springVersion", optional)
-    //compile "org.springframework:spring-oxm:$springVersion"
     compile("org.springframework:spring-jdbc:$springVersion", optional)
     compile("org.springframework.batch:spring-batch-core:$springBatchVersion", optional)
     compile("org.springframework.integration:spring-integration-core:$springIntVersion", optional)
@@ -117,6 +116,7 @@ targetCompatibility = 1.6
 skipPig = true
 skipHive = true
 skipHBase = true
+skipWebHdfs = true
 
 task enablePigTests {
     description = "Enable Pig tests"
@@ -143,14 +143,23 @@ task enableHBaseTests {
     }
 }
 
+task enableWebHdfsTests {
+    description = "Enable WebHdfs tests"
+    group = "Verification"
+    doLast() {
+        project.skipWebHdfs = false
+    }
+}
+
 task enableAllTests() {
-    description = "Enable all (incl. Pig, Hive, HBase) tests"
+    description = "Enable all (incl. Pig, Hive, HBase, WebHdfs) tests"
     group = "Verification"
     doFirst() {
       println "Enable all tests"
       project.skipPig = false
       project.skipHBase = false
       project.skipHive = false
+      project.skipWebHdfs = false
     }
 }
 
@@ -163,21 +172,23 @@ test {
     doFirst() {
         msg = ""
         
-        if (skipPig) 
-        {
+        if (skipPig) {
             msg += "Pig "
             excludes.add("**/pig/**")
         }
-        if (skipHBase)
-        {
+        if (skipHBase) {
             msg += "HBase "
             excludes.add("**/hbase/**")
         }
         
-        if (skipHive) 
-        {
-            msg += "Hive"
+        if (skipHive) {
+            msg += "Hive "
             excludes.add("**/hive/**")
+        }
+
+        if (skipWebHdfs) {
+            msg += "WebHdfs"
+            excludes.add("**/WebHdfs*")
         }
         
         if (!msg.isEmpty())
@@ -222,23 +233,6 @@ javadoc {
   }
     
   title = "${rootProject.description} ${version} API"
-
-  // collect all main classpaths to be able to resolve @see refs, etc.
-  // this collection also determines the set of projects that this
-  // task dependsOn, thus the runtimeClasspath is used to ensure all
-  // projects are included, not just *dependencies* of all classes.
-  // this is awkward and took me a while to figure out.
-//  classpath = files(javaprojects.collect {project ->
-//      project.sourceSets.main.runtimeClasspath
-//  })
-
-  // copy the images from the doc-files dir over to the target
-//  doLast { task ->
-//      copy {
-//          from file("${task.srcDir}/doc-files")
-//          into file("${task.destinationDir}/doc-files")
-//      }
-//  }
 }
 
 jar {
