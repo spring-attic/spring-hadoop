@@ -135,8 +135,49 @@ in a given JVM hence the default is false.
 		</xsd:complexType>
 	</xsd:element>
 	
+	<xsd:element name="file-system">
+		<xsd:annotation>
+		   <xsd:documentation><![CDATA[
+Defines a HDFS file system.
+				]]>
+          </xsd:documentation>
+	      <xsd:appinfo>
+	        <tool:annotation>
+	          <tool:exports type="org.apache.hadoop.fs.FileSystem"/>
+	        </tool:annotation>
+	      </xsd:appinfo>
+		</xsd:annotation>
+		<xsd:complexType>
+		<xsd:attribute name="id" type="xsd:ID" use="optional">
+		<xsd:annotation>
+		<xsd:documentation><![CDATA[
+Bean id (default is "hadoop-fs").
+		]]></xsd:documentation>
+		</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="configuration-ref" use="optional" default="hadoop-configuration">
+		<xsd:annotation>
+				<xsd:documentation source="java:org.apache.hadoop.conf.Configuration"><![CDATA[
+Reference to the Hadoop Configuration. Defaults to 'hadoop-configuration'.]]></xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref">
+						<tool:expected-type type="org.apache.hadoop.conf.Configuration" />
+					</tool:annotation>
+				</xsd:appinfo>
+	 	</xsd:annotation>			
+		</xsd:attribute>
+		<xsd:attribute name="uri" use="optional">
+		<xsd:annotation>
+		<xsd:documentation><![CDATA[
+The underlying HDFS system URI (by default the configuration settings will be used).
+		]]></xsd:documentation>
+		</xsd:annotation>
+		</xsd:attribute>
+		</xsd:complexType>		
+	</xsd:element>
+	
 	<xsd:element name="resource-loader">
-			<xsd:annotation>
+		<xsd:annotation>
 		   <xsd:documentation><![CDATA[
 Defines a HDFS-aware resource loader.
 				]]>
@@ -166,7 +207,24 @@ Reference to the Hadoop Configuration. Defaults to 'hadoop-configuration'.]]></x
 				</xsd:appinfo>
 	 	</xsd:annotation>			
 		</xsd:attribute>
-		<xsd:attribute name="uri" use="optional"/>
+		<xsd:attribute name="uri" use="optional">
+		<xsd:annotation>
+		<xsd:documentation><![CDATA[
+The underlying HDFS system URI (by default the configuration settings will be used).
+		]]></xsd:documentation>
+		</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="file-system-ref">
+			<xsd:annotation>
+				<xsd:documentation source="java:org.apache.hadoop.fs.FileSystem"><![CDATA[
+Reference to the Hadoop FileSystem. Overrides the 'uri' or 'configuration-ref' properties.]]></xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref">
+						<tool:expected-type type="org.apache.hadoop.fs.FileSystem" />
+					</tool:annotation>
+				</xsd:appinfo>
+		 	</xsd:annotation>
+	 	</xsd:attribute>			
 		</xsd:complexType>
 	</xsd:element>
 	

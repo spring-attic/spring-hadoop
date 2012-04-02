@@ -9,7 +9,7 @@
 
 	<bean id="fsShell" class="org.springframework.data.hadoop.fs.FsShell">
 		<constructor-arg name="configuration" ref="hadoop-configuration"/> 
-		<constructor-arg name="fs" ref="fs"/>
+		<constructor-arg name="fs" ref="hadoop-fs"/>
 	</bean>
 	
 </beans>

@@ -160,8 +160,11 @@ public class HdfsScriptFactoryBean extends Jsr223ScriptEvaluatorFactoryBean impl
 		String defaultName = "hadoop-fs";
 		Class<?> defaultType = FileSystem.class;
 
-		if (ctx.containsBean(defaultName))
-			return ctx.getBean(defaultName, defaultType);
+		if (ctx.containsBean(defaultName)) {
+			FileSystem fs = (FileSystem) ctx.getBean(defaultName, defaultType);
+			return (fs instanceof SimplerFileSystem ? fs : new SimplerFileSystem(fs));
+		}
+
 		String[] names = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(ctx, defaultType);
 		if (names != null && names.length == 1) {
 			return ctx.getBean(defaultName, defaultType);

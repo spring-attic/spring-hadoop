@@ -15,13 +15,19 @@
  */
 package org.springframework.data.hadoop.config;
 
+import java.lang.reflect.Field;
+
 import org.springframework.beans.factory.BeanDefinitionStoreException;
+import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.xml.AbstractSimpleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.core.Conventions;
 import org.springframework.util.Assert;
+import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
@@ -64,6 +70,19 @@ abstract class AbstractImprovedSimpleBeanDefinitionParser extends AbstractSimple
 		postProcess(builder, element);
 	}
 
+	protected void registerBeanDefinition(BeanDefinitionHolder definition, BeanDefinitionRegistry registry) {
+		String name = defaultId(null, null);
+		// register name as alias
+		if (name != null) {
+			String alias = Conventions.attributeNameToPropertyName(name);
+			Field as = ReflectionUtils.findField(BeanDefinitionHolder.class, "aliases");
+			ReflectionUtils.makeAccessible(as);
+			ReflectionUtils.setField(as, definition, new String[] { alias });
+		}
+		super.registerBeanDefinition(definition, registry);
+	}
+
+
 	protected boolean isEligibleAttribute(String attributeName) {
 		return super.isEligibleAttribute(attributeName)
 				&& !BeanDefinitionParserDelegate.SCOPE_ATTRIBUTE.equals(attributeName);
@@ -71,10 +90,11 @@ abstract class AbstractImprovedSimpleBeanDefinitionParser extends AbstractSimple
 
 
 	protected String defaultId(ParserContext context, Element element) {
-		context.getReaderContext().error(
-				"Id is required for element '" + context.getDelegate().getLocalName(element)
-						+ "' when used as a top-level tag", element);
-
+		if (context != null) {
+			context.getReaderContext().error(
+					"Id is required for element '" + context.getDelegate().getLocalName(element)
+							+ "' when used as a top-level tag", element);
+		}
 		return null;
 	}
 

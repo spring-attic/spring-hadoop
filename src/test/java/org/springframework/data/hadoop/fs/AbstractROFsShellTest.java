@@ -30,6 +30,7 @@ import org.apache.hadoop.fs.permission.FsPermission;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.data.hadoop.TestUtils;
@@ -66,11 +67,12 @@ public abstract class AbstractROFsShellTest {
 	@Autowired
 	protected Configuration cfg;
 	@Autowired
-	FileSystem fs;
+	FileSystem hadoopFs;
+	BeanFactory bf;
 
 	@Test
 	public void testFSImplementation() {
-		Assert.isInstanceOf(fsClass(), fs);
+		Assert.isInstanceOf(fsClass(), hadoopFs);
 	}
 
 	abstract Class<? extends FileSystem> fsClass();
@@ -81,13 +83,13 @@ public abstract class AbstractROFsShellTest {
 		Resource res = TestUtils.writeToFS(cfg, name);
 		name = res.getURI().getPath();
 	
-		FsPermission perm = fs.getFileStatus(new Path(name)).getPermission();
+		FsPermission perm = hadoopFs.getFileStatus(new Path(name)).getPermission();
 		assertTrue(perm.getGroupAction().implies(FsAction.READ));
 		assertTrue(perm.getOtherAction().implies(FsAction.READ));
 	
 		shell.chmod("700", name);
 	
-		perm = fs.getFileStatus(new Path(name)).getPermission();
+		perm = hadoopFs.getFileStatus(new Path(name)).getPermission();
 		assertTrue(perm.getUserAction().equals(FsAction.READ_WRITE));
 		assertTrue(perm.getGroupAction().implies(FsAction.NONE));
 		assertTrue(perm.getOtherAction().implies(FsAction.NONE));
@@ -230,9 +232,9 @@ public abstract class AbstractROFsShellTest {
 		Resource res1 = TestUtils.writeToFS(cfg, name1);
 		name1 = res1.getURI().getPath();
 		Path p = new Path(name1);
-		short replication = fs.getReplication(p);
+		short replication = hadoopFs.getReplication(p);
 		shell.setrep((short) (replication + 1), name1);
-		assertTrue(replication <= fs.getReplication(p));
+		assertTrue(replication <= hadoopFs.getReplication(p));
 	}
 
 	@Test
@@ -251,10 +253,10 @@ public abstract class AbstractROFsShellTest {
 		Path p1 = new Path(name1);
 		Path p2 = new Path(name2);
 	
-		short replication = fs.getReplication(p1);
+		short replication = hadoopFs.getReplication(p1);
 		shell.setrep(true, (short) (replication + 1), dir);
-		assertTrue(replication <= fs.getReplication(p1));
-		assertTrue(replication <= fs.getReplication(p2));
+		assertTrue(replication <= hadoopFs.getReplication(p1));
+		assertTrue(replication <= hadoopFs.getReplication(p2));
 	}
 
 	@Test

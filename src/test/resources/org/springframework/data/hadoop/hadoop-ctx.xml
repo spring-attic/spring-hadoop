@@ -22,12 +22,9 @@
  	-->
  
 	<!--  automatically picks the hadoop-configuration reference -->
-	<hdp:resource-loader />	
-	<!-- 
-	<bean id="hdfsResourceLoader" class="org.springframework.data.hadoop.fs.HdfsResourceLoader" c:fs-ref="fs"/>
-	<bean id="fs" class="org.springframework.data.hadoop.fs.FileSystemFactoryBean" p:configuration-ref="fs-config"/>
-	 -->
-	 
+	<bean id="hadoop-fs" class="org.springframework.data.hadoop.fs.FileSystemFactoryBean" p:configuration-ref="hadoop-configuration"/>
+	
+	<hdp:resource-loader file-system-ref="hadoop-fs"/>	
 	
 	<!--  default id is 'hadoop-configuration' -->
 	<hdp:configuration register-url-handler="false">

@@ -38,14 +38,25 @@ class HadoopResourceLoaderParser extends AbstractImprovedSimpleBeanDefinitionPar
 
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
+		String fs = element.getAttribute("file-system-ref");
 		// get configuration
 		String config = element.getAttribute("configuration-ref");
-		builder.addConstructorArgReference(config.trim());
-
 		// get uri (if available)
 		String uri = element.getAttribute("uri");
-		if (StringUtils.hasText(uri)) {
-			builder.addConstructorArgValue(uri);
+
+		if (StringUtils.hasText(fs)) {
+			if (StringUtils.hasText(uri)) {
+				parserContext.getReaderContext().error("cannot specify both 'uri' and a the file system; use only one",
+						element);
+			}
+			builder.addConstructorArgReference(fs.trim());
+		}
+		else {
+			builder.addConstructorArgReference(config.trim());
+
+			if (StringUtils.hasText(uri)) {
+				builder.addConstructorArgValue(uri);
+			}
 		}
 
 		postProcess(builder, element);

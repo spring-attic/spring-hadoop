@@ -373,7 +373,7 @@ public abstract class AbstractFsShellTest extends AbstractROFsShellTest {
 		assertFalse(shell.test(name1));
 		shell.touchz(name1);
 		assertTrue(shell.test(true, true, false, name1));
-		assertEquals(0, fs.getLength(new Path(name1)));
+		assertEquals(0, hadoopFs.getLength(new Path(name1)));
 	}
 
 	//@Test - disabled for now as Trash is disabled by default as well
