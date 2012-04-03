@@ -53,7 +53,7 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 		internalConfig.setClassLoader(beanClassLoader);
 		if (resources != null) {
 			for (Resource resource : resources) {
-				internalConfig.addResource(resource.getInputStream());
+				internalConfig.addResource(resource.getURL());
 			}
 		}
 
