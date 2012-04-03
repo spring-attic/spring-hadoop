@@ -2,11 +2,12 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:batch="http://www.springframework.org/schema/batch"
 	xmlns:hdp="http://www.springframework.org/schema/hadoop"
-	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:c="http://www.springframework.org/schema/c"
 	xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
       	http://www.springframework.org/schema/batch	http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
-      	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+      	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
       	http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
 
 	<import resource="../hadoop-ctx.xml"/>
@@ -15,13 +16,12 @@
 	<bean id="hbase-config" class="org.springframework.data.hadoop.hbase.HbaseConfigurationFactoryBean" p:configuration-ref="hadoop-configuration" />
 	-->
 	 
-	<hdp:hbase-configuration properties-ref="props" properties-location="cfg-1.properties, cfg-2.properties">
-		foo=bar
-		lookup=there
-		star=chasing
-		return=captain eo
-		train=last
+	<hdp:hbase-configuration configuration-ref="hadoop-configuration">
+		#hbase.zookeeper.quorum=v-debian.lan
 	</hdp:hbase-configuration>
 	 
-	<util:properties id="props" location="props.properties"/>
+	<context:property-placeholder location="test.properties"/>
+	
+	<bean id="template" class="org.springframework.data.hadoop.hbase.HbaseTemplate" p:configuration-ref="hbase-configuration"/>
+	
 </beans>
