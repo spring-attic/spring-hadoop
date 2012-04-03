@@ -28,7 +28,7 @@ import org.springframework.util.StringUtils;
 /**
  * @author Costin Leau
  */
-public class HbaseUtilss {
+public class HbaseUtils {
 
 	public static DataAccessException convertHbaseException(Exception ex) {
 		return new HbaseSystemException(ex);
