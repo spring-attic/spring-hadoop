@@ -32,9 +32,14 @@ import org.apache.hadoop.mapreduce.Job;
 import org.springframework.data.hadoop.mapreduce.JobFactoryBean;
 
 /**
- * Factory Bean to generate HBase based Map Reduce Jobs
+ * Factory Bean to generate HBase based Map Reduce Jobs. It has similiar function with 
+ * {@link org.springframework.data.hadoop.mapreduce.JobFactoryBean} which is used to generate
+ * {@link org.apache.hadoop.mapreduce.Job}. But here the job has more properties which are HBase
+ * specific. It is done by overriding <code>processJob</code>. 
  * 
  * @author Jarred Li
+ * @since 1.0
+ * @see org.springframework.data.hadoop..mapreduce.JobFactoryBean
  * 
  */
 public class HbaseJobFactoryBean extends JobFactoryBean {
