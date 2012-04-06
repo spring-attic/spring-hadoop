@@ -18,7 +18,7 @@
 	<hdp:script id="prepareDataTasklet" language="groovy">
 		<![CDATA[
 			//comment out the following if you don't use proxy
-			System.properties.putAll( ["http.proxyHost":"proxy.vmware.com", "http.proxyPort":"3128"])
+			//System.properties.putAll( ["http.proxyHost":"proxy.vmware.com", "http.proxyPort":"3128"])
 			
 			def file= new FileOutputStream("src/main/resources/ml-100k.zip")
 			def out = new BufferedOutputStream(file);
