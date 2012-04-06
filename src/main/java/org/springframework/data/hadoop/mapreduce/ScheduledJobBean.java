@@ -25,13 +25,18 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 /**
+ * Quartz Job wrapper to schedule Hadoop Job. 
+ * 
  * @author Jarred Li
  *
+ * @since 1.0
+ * @see org.springframework.scheduling.quartz.QuartzJobBean
+ * @see HadoopJobDetailBean
  */
 
-public class ScheduledJob extends QuartzJobBean {
+public class ScheduledJobBean extends QuartzJobBean {
 
-	private static final Log log = LogFactory.getLog(ScheduledJob.class);
+	private static final Log log = LogFactory.getLog(ScheduledJobBean.class);
 
 	/* (non-Javadoc)
 	 * @see org.springframework.scheduling.quartz.QuartzJobBean#executeInternal(org.quartz.JobExecutionContext)
