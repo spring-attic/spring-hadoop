@@ -25,7 +25,6 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.xml.AbstractSimpleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.core.Conventions;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
@@ -73,8 +72,9 @@ abstract class AbstractImprovedSimpleBeanDefinitionParser extends AbstractSimple
 	protected void registerBeanDefinition(BeanDefinitionHolder definition, BeanDefinitionRegistry registry) {
 		String name = defaultId(null, null);
 		// register name as alias
-		if (name != null) {
-			String alias = Conventions.attributeNameToPropertyName(name);
+		if (name != null && name.equals(definition.getBeanName())) {
+			String alias = camelCaseToHyphenated(name);
+			System.out.println("name is " + name + "| alias is = " + alias);
 			Field as = ReflectionUtils.findField(BeanDefinitionHolder.class, "aliases");
 			ReflectionUtils.makeAccessible(as);
 			ReflectionUtils.setField(as, definition, new String[] { alias });
@@ -106,5 +106,26 @@ abstract class AbstractImprovedSimpleBeanDefinitionParser extends AbstractSimple
 			name = defaultId(parserContext, element);
 		}
 		return name;
+	}
+
+	private static String camelCaseToHyphenated(String camelCase) {
+		Assert.notNull(camelCase, "'attributeName' must not be null");
+		char[] chars = camelCase.toCharArray();
+		StringBuilder sb = new StringBuilder(chars.length + 2);
+		boolean upperCase = false;
+		for (char c : chars) {
+			if (Character.isUpperCase(c)) {
+				if (!upperCase) {
+					sb.append("-");
+					c = Character.toLowerCase(c);
+					upperCase = true;
+				}
+			}
+			else {
+				upperCase = false;
+			}
+			sb.append(c);
+		}
+		return new String(sb);
 	}
 }

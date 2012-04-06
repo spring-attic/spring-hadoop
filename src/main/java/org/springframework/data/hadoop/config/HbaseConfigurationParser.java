@@ -36,7 +36,7 @@ class HbaseConfigurationParser extends AbstractPropertiesConfiguredBeanDefinitio
 
 	@Override
 	protected String defaultId(ParserContext context, Element element) {
-		return "hbase-configuration";
+		return "hbaseConfiguration";
 	}
 	
 

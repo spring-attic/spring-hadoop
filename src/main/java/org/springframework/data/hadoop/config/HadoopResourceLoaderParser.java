@@ -33,7 +33,7 @@ class HadoopResourceLoaderParser extends AbstractImprovedSimpleBeanDefinitionPar
 
 	@Override
 	protected String defaultId(ParserContext context, Element element) {
-		return "hadoop-resource-loader";
+		return "hadoopResourceLoader";
 	}
 
 	@Override

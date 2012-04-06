@@ -41,7 +41,7 @@ class DistributedCacheParser extends AbstractImprovedSimpleBeanDefinitionParser 
 
 	@Override
 	protected String defaultId(ParserContext context, Element element) {
-		return "hadoop-cache";
+		return "hadoopCache";
 	}
 
 	@Override

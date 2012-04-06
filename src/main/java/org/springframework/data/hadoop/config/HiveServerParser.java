@@ -39,7 +39,7 @@ class HiveServerParser extends AbstractPropertiesConfiguredBeanDefinitionParser 
 
 	@Override
 	protected String defaultId(ParserContext context, Element element) {
-		return "hive-server";
+		return "hiveServer";
 	}
 
 	@Override

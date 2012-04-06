@@ -37,7 +37,7 @@ class HiveClientParser extends AbstractImprovedSimpleBeanDefinitionParser {
 
 	@Override
 	protected String defaultId(ParserContext context, Element element) {
-		return "hive-client";
+		return "hiveClient";
 	}
 
 	@Override

@@ -31,6 +31,6 @@ class HadoopFileSystemParser extends AbstractImprovedSimpleBeanDefinitionParser 
 
 	@Override
 	protected String defaultId(ParserContext context, Element element) {
-		return "hadoop-fs";
+		return "hadoopFs";
 	}
 }

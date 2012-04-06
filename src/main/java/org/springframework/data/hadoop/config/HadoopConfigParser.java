@@ -52,6 +52,6 @@ class HadoopConfigParser extends AbstractPropertiesConfiguredBeanDefinitionParse
 
 	@Override
 	protected String defaultId(ParserContext context, Element element) {
-		return "hadoop-configuration";
+		return "hadoopConfiguration";
 	}
 }
