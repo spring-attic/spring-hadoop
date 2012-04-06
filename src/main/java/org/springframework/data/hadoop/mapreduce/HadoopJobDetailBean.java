@@ -26,8 +26,13 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.scheduling.quartz.JobDetailBean;
 
 /**
+ * Quartz JobDetail wrapper to schedule Hadoop Job. This class extends 
+ * {@link org.springframework.scheduling.quartz.JobDetailBean} to provide more properties to JobDetail.
+ *  
  * @author Jarred Li
- *
+ * @since 1.0
+ * @see org.springframework.scheduling.quartz.JobDetailBean
+ * @see ScheduledJobBean
  */
 public class HadoopJobDetailBean extends JobDetailBean 
 						implements BeanNameAware, ApplicationContextAware, InitializingBean {
@@ -47,7 +52,7 @@ public class HadoopJobDetailBean extends JobDetailBean
 	@Override
 	public void afterPropertiesSet() {
 		super.afterPropertiesSet();
-		super.setJobClass(ScheduledJob.class);
+		super.setJobClass(ScheduledJobBean.class);
 		StringBuilder strBuilder = new StringBuilder();
 		String[] names = jobNames.toArray(new String[0]);
 		for (int i = 0, j = names.length; i < j; i++) {
