@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter xmlns="http://docbook.org/ns/docbook" version="5.0"  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" xml:id="scripting">
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0"  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" xml:id="fs">
 
     <title>Working with the Hadoop File System</title>
     
@@ -10,7 +10,95 @@
     <literal>FileSystem</literal> and the fs shell through an intuitive, easy-to-use Java API. Add your favorite <ulink url="http://en.wikipedia.org/wiki/List_of_JVM_languages">JVM scripting</ulink> language right 
     inside your Spring for Apache Hadoop application and you have a powerful combination.</para>
     
-    <section id="scripting:api">
+ 	<section id="fs:hdfs">
+ 		<title>Configuring the file-system</title>
+ 	
+ 		<para>The Hadoop file-system, HDFS, can be accessed in various ways - this section will cover the most popular protocols for interacting with HDFS and their pros and cons. SHDP does not enforce any specific protocol
+ 		to be used - in fact, as described in this section any <literal>FileSystem</literal> implementation can be used, allowing even other implementations then HDFS to be used.</para> 
+ 		
+ 		<para>The table below describes the common HDFS APIs in use:</para>
+ 		
+ 		<table id="fs:hdfs:api" pgwide="1" align="center">
+ 			<title>HDFS APIs</title>
+ 			
+ 			<tgroup cols="5">
+ 			<colspec colname="c1" colwidth="1*"/>
+    		<colspec colname="c2" colwidth="1*"/>
+    		<colspec colname="c3" colwidth="1*"/>
+    		<colspec colname="c4" colwidth="1*"/>
+    		<colspec colname="c5" colwidth="1*"/>
+    		
+    		<thead>
+          	   <row>
+          	     <entry>File System</entry>
+          	     <entry>Comm. Method</entry>
+          	     <entry>Scheme / Prefix</entry>
+          	     <entry>Read / Write</entry>
+          	     <entry>Cross Version</entry>
+          	   </row>
+       	    </thead>
+       	    <tbody>
+          	   <row>
+          	      <entry>HDFS</entry>
+          	      <entry>RPC</entry>
+          	      <entry><literal>hdfs://</literal></entry>
+          	      <entry>Read / Write</entry>
+          	      <entry>Same HDFS version only</entry>
+          	    </row>
+          	   <row>
+          	      <entry>HFTP</entry>
+          	      <entry>HTTP</entry>
+          	      <entry><literal>hftp://</literal></entry>
+          	      <entry>Read only</entry>
+          	      <entry>Version independent</entry>
+          	    </row>
+          	   <row>
+          	      <entry>WebHDFS</entry>
+          	      <entry>HTTP (REST)</entry>
+          	      <entry><literal>webhdfs://</literal></entry>
+          	      <entry>Read / Write</entry>
+          	      <entry>Version independent</entry>
+          	    </row>
+          	</tbody>
+          	</tgroup>   
+ 		</table>
+ 		  
+ 		<para><literal>hdfs://</literal> protocol should be familiar to most reader - most docs (and in fact the previous chapter as well) mention it. It works out of the box and it's fairly efficient however because it is
+ 		RPC based, it requires both the client and the Hadoop cluster to share the same version. Upgrading one without the other causes serialization errors meaning the client cannot interact with the cluster. As an alternative
+ 		one can use <literal>hftp://</literal> which is HTTP-based or its more secure brother <literal>hsftp://</literal> (based on SSL) which gives you a version independent protocol meaning you can use it to interact
+ 		with clusters with an unknown or different version then that of the client. <literal>hftp</literal> is read only (write operations will fail right away) and it is typically used with <literal>disctp</literal> for
+ 		reading data. <literal>webhdfs://</literal> is one of the additions in Hadoop 1.0 and is a mixture between <literal>hdfs</literal> and <literal>hftp</literal> protocol - it provides a version-independent, read-write, 
+ 		REST-based protocol which means that you can read and write to/from Hadoop clusters no matter their version. Further more, since <literal>webhdfs://</literal> is backed by a REST APIs, clients in other languages can
+ 		use it with minimal effort.</para>
+ 		
+ 		<note>
+ 			<para>Not all file-system work out of the box. For example WebHDFS needs to be enabled first in the cluster (through <literal>dfs.webhdfs.enabled</literal> property) see this 
+ 			<ulink url="http://hadoop.apache.org/common/docs/r1.0.0/webhdfs.html#Document+Conventions">document</ulink> for more information) while the secure <literal>hftp</literal>, <literal>hsftp</literal> 
+ 			requires the SSL configuration (such as certificates) to be specified. More about this (and how to use <literal>hftp/hsftp</literal> for proxying) in 
+ 			this <ulink url="http://hadoop.apache.org/hdfs/docs/r0.21.0/hdfsproxy.html">page</ulink>.</para> 
+ 		</note>
+ 		 		
+ 		<para>Once the schema has been decided upon, one can specify it through the standard Hadoop <link linkend="hadoop:config">configuration</link>, either through the Hadoop configuration files and its properties:</para>
+ 		
+ 		<programlisting language="xml"><![CDATA[<hdp:configuration>
+  fs.default.name=webhdfs://localhost
+  ...
+</hdp:configuration>]]></programlisting>
+ 		
+ 		<para>This instructs Hadoop (and automatically SHDP) what the default, implied file-system is. In SHDP, one can create additional file-systems (potentially to connect to other clusters) and specify a different 
+ 		schema:</para>
+ 		
+ 		<programlisting language="xml"><![CDATA[<!-- manually creates the default SHDP file-system named 'hadoopFs' -->
+<hdp:file-system uri="webhdfs://localhost"/>
+ 
+<!-- create a different FileSystem instance --> 
+<hdp:file-system id="old-cluster" uri="hftp://old-cluster/"/>]]></programlisting>
+ 
+ 		<para>As with the rest of the components, the file systems can be injected where needed - such as file shell or inside scripts (see the next section).</para>
+ 		
+ 	</section>
+    
+    <section id="scripting:api" xmlns="http://docbook.org/ns/docbook" version="5.0"  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" xml:id="scripting">
     	<title>Scripting the Hadoop API</title>
     	
     	<sidebar>
@@ -321,4 +409,5 @@ print $fsh.ls(dir).to_s]]></programlisting>
 		<programlisting language="xml"><![CDATA[<script-tasklet id="script-tasklet" script-ref="clean-up"/>
 <hdp:script id="clean-up" location="org/company/myapp/clean-up-wordcount.groovy"/>]]></programlisting>
 	</section>   
+      
 </chapter>

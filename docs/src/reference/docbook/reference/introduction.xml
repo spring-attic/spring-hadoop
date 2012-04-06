@@ -7,7 +7,7 @@
    <para><xref linkend="hadoop"/> describes the Spring support for
    bootstrapping, initializing and working with core Hadoop.</para>
 
-   <para><xref linkend="scripting"/> describes the Spring support for interacting
+   <para><xref linkend="fs"/> describes the Spring support for interacting
    with the Hadoop file system.
    </para>
 

@@ -39,7 +39,7 @@
       <title>Spring and Hadoop</title>
       <xi:include href="reference/introduction.xml"/>
       <xi:include href="reference/hadoop.xml"/>
-      <xi:include href="reference/scripting.xml"/>
+      <xi:include href="reference/fs.xml"/>
       <xi:include href="reference/hbase.xml"/>
       <xi:include href="reference/hive.xml"/>
       <xi:include href="reference/pig.xml"/>
