@@ -28,6 +28,8 @@ import org.springframework.scheduling.quartz.JobDetailBean;
 /**
  * Quartz JobDetail wrapper to schedule Hadoop Job. This class extends 
  * {@link org.springframework.scheduling.quartz.JobDetailBean} to provide more properties to JobDetail.
+ * This class will be injected to {@link org.springframework.scheduling.quartz.CronTriggerBean} as property\
+ *  "jobDetail".
  *  
  * @author Jarred Li
  * @since 1.0
