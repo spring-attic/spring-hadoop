@@ -25,7 +25,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 /**
- * Quartz Job wrapper to schedule Hadoop Job. 
+ * Quartz Job wrapper to schedule Hadoop Job. This class is corresponding {@link org.quartz.Job} which
+ * actually execute the tasks. Here, it will get all the Hadoop job names sperated by "," and submit them
+ * to Hadoop cluster.
  * 
  * @author Jarred Li
  *
