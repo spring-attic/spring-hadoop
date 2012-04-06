@@ -37,6 +37,8 @@ You can find out more details from the [user documentation](http://static.spring
 
 * Gradle: 
 
+Based on the artifact type, pick one of the repos below:
+
 ~~~~~ groovy
 repositories {
   maven { url "http://repo.springsource.org/release" }
@@ -73,5 +75,9 @@ Here are some ways for you to get involved in the community:
 * Create [JIRA](https://jira.springframework.org/browse/SHDP) tickets for bugs and new features and comment and vote on the ones that you are interested in.  
 * Watch for upcoming articles on Spring by [subscribing](http://www.springsource.org/node/feed) to springframework.org
 
-Github is for social coding: if you want to write code, we encourage contributions through pull requests from [forks of this repository](http://help.github.com/forking/). If you want to contribute code this way, please reference a tracker ticket as well covering the specific issue you are addressing. Before we accept a non-trivial patch or pull request we will need you to sign the [contributor's agreement](https://support.springsource.com/spring_committer_signup).  Signing the contributor's agreement does not grant anyone commit rights to the main repository, but it does mean that we can accept your contributions, and you will get an author credit if we do.  Active contributors might be asked to join the core team, and given the ability to merge pull requests.
+Github is for social coding: if you want to write code, we encourage contributions through pull requests from [forks of this repository](http://help.github.com/forking/). If you want to contribute code this way, read the [contributor guidelines] (https://github.com/SpringSource/spring-framework/wiki/Contributor-guidelines)
 
+# Staying in touch
+
+Follow the project team ([Costin](http://twitter.com/costinl), [Mark](http://twitter.com/markpollack)) on Twitter. In-depth articles can be
+found at the SpringSource [team blog](http://blog.springsource.org), and releases are announced via our [news feed](http://www.springsource.org/news-events).
