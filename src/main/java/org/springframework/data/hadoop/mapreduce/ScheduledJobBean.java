@@ -15,6 +15,8 @@
  */
 package org.springframework.data.hadoop.mapreduce;
 
+import java.util.Set;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.mapreduce.Job;
@@ -26,8 +28,7 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 
 /**
  * Quartz Job wrapper to schedule Hadoop Job. This class is corresponding {@link org.quartz.Job} which
- * actually execute the tasks. Here, it will get all the Hadoop job names sperated by "," and submit them
- * to Hadoop cluster.
+ * actually execute the tasks. Here, it will get all the Hadoop jobs and submit them to Hadoop cluster.
  * 
  * @author Jarred Li
  *
@@ -46,10 +47,10 @@ public class ScheduledJobBean extends QuartzJobBean {
 	@Override
 	protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
 		JobDataMap dataMap = context.getJobDetail().getJobDataMap();
-		String jobNamesStr = dataMap.getString("jobNames");
+		@SuppressWarnings("unchecked")
+		Set<String> jobNames = (Set<String>)dataMap.get("jobNames");
 		boolean waitForJobs = dataMap.getBoolean("waitForJobs");
-		ApplicationContext ctx = (ApplicationContext) dataMap.get("applicatonContext");
-		String[] jobNames = jobNamesStr.split(",");
+		ApplicationContext ctx = (ApplicationContext) dataMap.get("applicatonContext");		
 		for (String jobName : jobNames) {
 			log.info("run job : " + jobName);
 			Job job = ctx.getBean(jobName, Job.class);
