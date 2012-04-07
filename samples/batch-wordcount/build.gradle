@@ -8,8 +8,6 @@ apply plugin: 'application'
 
 repositories {
     // Public Spring artefacts
-    maven { url "http://repo.springsource.org/libs-release" }
-    maven { url "http://repo.springsource.org/libs-milestone" }
     maven { url "http://repo.springsource.org/libs-snapshot" }
 }
 
@@ -20,8 +18,6 @@ dependencies {
     // update the version that comes with Batch
     compile "org.springframework:spring-tx:$springVersion"
     runtime "org.codehaus.groovy:groovy:$groovyVersion"
-    // see HADOOP-7461
-    runtime "org.codehaus.jackson:jackson-mapper-asl:$jacksonVersion"
     
     testCompile "junit:junit:$junitVersion"
     testCompile "org.springframework:spring-test:$springVersion"

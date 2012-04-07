@@ -7,16 +7,12 @@ apply plugin: 'eclipse'
 
 repositories {
     // Public Spring artefacts
-    maven { url "http://repo.springsource.org/libs-release" }
-    maven { url "http://repo.springsource.org/libs-milestone" }
     maven { url "http://repo.springsource.org/libs-snapshot" }
 }
 
 dependencies {
     compile "org.springframework.data:spring-data-hadoop:$version"
     compile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
-    // see HADOOP-7461
-    runtime "org.codehaus.jackson:jackson-mapper-asl:$jacksonVersion"
     
     testCompile "junit:junit:$junitVersion"
     testCompile "org.springframework:spring-test:$springVersion"

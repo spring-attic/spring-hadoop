@@ -25,7 +25,7 @@ $ ..\gradlew
 If you have Gradle installed and available in your classpath, you can simply type:
 $ gradle
 
-The rest of the document refers to only the *nix/BSD OS style command line
+The rest of the document refers to only the *nix/BSD OS style command line (modify for Windows accordingly)
 
 b) To build and run the sample as a standalone Java application:
 
