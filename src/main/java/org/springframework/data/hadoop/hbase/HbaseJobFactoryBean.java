@@ -52,6 +52,7 @@ public class HbaseJobFactoryBean extends JobFactoryBean {
 	private boolean cacheBlocks = false;
 	private int cachingNum = 500;
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	protected void processJob(Job job) throws Exception {
 		job.setInputFormatClass(TableInputFormat.class);
