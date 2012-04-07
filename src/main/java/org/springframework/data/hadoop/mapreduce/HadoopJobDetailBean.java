@@ -36,8 +36,8 @@ import org.springframework.scheduling.quartz.JobDetailBean;
  * @see org.springframework.scheduling.quartz.JobDetailBean
  * @see ScheduledJobBean
  */
-public class HadoopJobDetailBean extends JobDetailBean 
-						implements BeanNameAware, ApplicationContextAware, InitializingBean {
+public class HadoopJobDetailBean extends JobDetailBean implements BeanNameAware, ApplicationContextAware,
+		InitializingBean {
 
 	private static final long serialVersionUID = -220421481403040926L;
 
@@ -50,24 +50,18 @@ public class HadoopJobDetailBean extends JobDetailBean
 	private ApplicationContext applicationContext;
 
 
-
+	/**
+	 * set more properties into JobDataMap used by <code>ScheduledJobBean</code>
+	 */
 	@Override
 	public void afterPropertiesSet() {
 		super.afterPropertiesSet();
 		super.setJobClass(ScheduledJobBean.class);
-		StringBuilder strBuilder = new StringBuilder();
-		String[] names = jobNames.toArray(new String[0]);
-		for (int i = 0, j = names.length; i < j; i++) {
-			String name = names[i];
-			strBuilder.append(name);
-			if (i != j - 1) {
-				strBuilder.append(",");
-			}
-		}
-		getJobDataMap().put("jobNames", strBuilder.toString());
+
+		getJobDataMap().put("jobNames", jobNames);
 		getJobDataMap().put("waitForJobs", this.waitForJobs);
 		getJobDataMap().put("applicatonContext", applicationContext);
-		log.debug("after property set" + jobNames);
+		log.debug("after property set");
 	}
 
 	/**
@@ -97,5 +91,3 @@ public class HadoopJobDetailBean extends JobDetailBean
 	}
 
 }
-
-
