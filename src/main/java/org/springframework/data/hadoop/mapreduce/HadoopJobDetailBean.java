@@ -89,5 +89,17 @@ public class HadoopJobDetailBean extends JobDetailBean implements BeanNameAware,
 		this.applicationContext = applicationContext;
 		super.setApplicationContext(applicationContext);
 	}
+	
+	Set<String> getJobNames(){
+		return this.jobNames;
+	}
+	
+	boolean isWaitForJobs(){
+		return this.waitForJobs;
+	}
+	
+	ApplicationContext getApplicationContext(){
+		return this.applicationContext;
+	}
 
 }
