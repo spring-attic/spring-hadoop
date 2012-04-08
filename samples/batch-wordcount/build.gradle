@@ -11,6 +11,11 @@ repositories {
     maven { url "http://repo.springsource.org/libs-snapshot" }
 }
 
+//load version from the root folder
+def props = new Properties();
+new File("../gradle.properties").withInputStream { props.load(it) }
+props.each({ project.setProperty(it.key, it.value)} )
+
 dependencies {
     compile "org.springframework.data:spring-data-hadoop:$version"
     compile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
