@@ -54,14 +54,14 @@ dependencies {
     testRuntime "cglib:cglib:$cglibVersion"
 
     // Hive
-    testRuntime "org.apache.hive:hive-common:$hiveVersion"
-    testRuntime "org.apache.hive:hive-jdbc:$hiveVersion"
-    compile("org.apache.hive:hive-metastore:$hiveVersion") 
+    compile("org.apache.hive:hive-metastore:$hiveVersion", optional) 
     //{ dep ->
          //exclude group: 'javax.jdo', module: 'jdo2-api'
     //}
     compile("org.apache.hive:hive-service:$hiveVersion", optional)
 
+    testRuntime "org.apache.hive:hive-common:$hiveVersion"
+    testRuntime "org.apache.hive:hive-jdbc:$hiveVersion"
     testRuntime "org.apache.hive:hive-shims:$hiveVersion"
     testRuntime "org.apache.hive:hive-serde:$hiveVersion"
     testRuntime "org.apache.thrift:libthrift:$thriftVersion"
