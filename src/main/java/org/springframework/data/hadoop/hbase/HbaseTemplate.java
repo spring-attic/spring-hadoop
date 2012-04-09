@@ -20,8 +20,10 @@ import java.nio.charset.Charset;
 import java.util.List;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.HTableInterfaceFactory;
+import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
 import org.springframework.beans.factory.InitializingBean;
@@ -127,7 +129,6 @@ public class HbaseTemplate implements InitializingBean {
 		Scan scan = new Scan();
 		scan.addFamily(family.getBytes(charset));
 		return execute(tableName, scan, action);
-
 	}
 
 	public <T> T execute(String tableName, String family, String qualifier, final ResultsExtractor<T> action) {
@@ -150,20 +151,49 @@ public class HbaseTemplate implements InitializingBean {
 		});
 	}
 
-	public <T> List<T> query(String tableName, String family, final RowMapper<T> action) {
+	public <T> List<T> find(String tableName, String family, final RowMapper<T> action) {
 		Scan scan = new Scan();
 		scan.addFamily(family.getBytes(charset));
-		return query(tableName, scan, action);
+		return find(tableName, scan, action);
 	}
 
-	public <T> List<T> query(String tableName, String family, String qualifier, final RowMapper<T> action) {
+	public <T> List<T> find(String tableName, String family, String qualifier, final RowMapper<T> action) {
 		Scan scan = new Scan();
 		scan.addColumn(family.getBytes(charset), qualifier.getBytes(charset));
-		return query(tableName, scan, action);
+		return find(tableName, scan, action);
 	}
 
-	public <T> List<T> query(String tableName, final Scan scan, final RowMapper<T> action) {
+	public <T> List<T> find(String tableName, final Scan scan, final RowMapper<T> action) {
 		return execute(tableName, scan, new RowMapperResultsExtractor<T>(action));
+	}
+
+	public <T> T get(String tableName, String rowName, final RowMapper<T> mapper) {
+		return get(tableName, rowName, null, null, mapper);
+	}
+
+	public <T> T get(String tableName, String rowName, String familyName, final RowMapper<T> mapper) {
+		return get(tableName, rowName, familyName, null, mapper);
+	}
+
+	public <T> T get(String tableName, final String rowName, final String familyName, final String qualifier, final RowMapper<T> mapper) {
+		return execute(tableName, new TableCallback<T>() {
+			@Override
+			public T doInTable(HTable htable) throws Throwable {
+				Get get = new Get(rowName.getBytes(charset));
+				if (familyName != null) {
+					byte[] family = familyName.getBytes(charset);
+
+					if (qualifier != null) {
+						get.addColumn(family, qualifier.getBytes(charset));
+					}
+					else {
+						get.addFamily(family);
+					}
+				}
+				Result result = htable.get(get);
+				return mapper.mapRow(result, 0);
+			}
+		});
 	}
 
 	/**

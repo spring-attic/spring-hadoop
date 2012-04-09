@@ -139,7 +139,7 @@ public class BasicHBaseTest {
 		assertTrue(HbaseSynchronizationManager.hasResource(tableName));
 
 		// equivalent of block B
-		System.out.println("Found rows " + template.query(tableName, columnName, qualifier, new RowMapper<String>() {
+		System.out.println("Found rows " + template.find(tableName, columnName, qualifier, new RowMapper<String>() {
 			@Override
 			public String mapRow(Result result, int rowNum) throws Exception {
 				return result.toString();
