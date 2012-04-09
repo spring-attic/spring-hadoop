@@ -74,7 +74,6 @@ abstract class AbstractImprovedSimpleBeanDefinitionParser extends AbstractSimple
 		// register name as alias
 		if (name != null && name.equals(definition.getBeanName())) {
 			String alias = camelCaseToHyphenated(name);
-			System.out.println("name is " + name + "| alias is = " + alias);
 			Field as = ReflectionUtils.findField(BeanDefinitionHolder.class, "aliases");
 			ReflectionUtils.makeAccessible(as);
 			ReflectionUtils.setField(as, definition, new String[] { alias });
