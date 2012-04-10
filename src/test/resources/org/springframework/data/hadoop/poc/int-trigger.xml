@@ -20,7 +20,7 @@
 
 	<int:logging-channel-adapter id="done"/>
 	
-	<int:resource-inbound-channel-adapter id="hdfs-trigger" channel="logger" pattern-resolver="hadoop-resource-loader" pattern="**/*">
+	<int:resource-inbound-channel-adapter id="hdfs-trigger" channel="logger" pattern-resolver="hadoopResourceLoader" pattern="**/*">
 		<int:poller fixed-rate="200"/>
 	</int:resource-inbound-channel-adapter>
 
