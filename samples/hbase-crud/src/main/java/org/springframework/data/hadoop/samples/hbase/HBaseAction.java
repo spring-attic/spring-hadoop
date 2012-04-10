@@ -157,8 +157,7 @@ public class HBaseAction {
 	 */
 
 	private void scanData() {
-
-		t.query(tableName, columnFamilyName, linkAddress, new RowMapper<String>() {
+		t.find(tableName, columnFamilyName, linkAddress, new RowMapper<String>() {
 			public String mapRow(Result result, int rowNum) throws Exception {
 				return Bytes.toString(result.value());
 			}
