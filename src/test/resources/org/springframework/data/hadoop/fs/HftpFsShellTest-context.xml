@@ -7,7 +7,7 @@
 
 	<hdp:file-system uri="hftp://localhost/"/>
 	 
-	<!--  default id is 'hadoop-configuration'
+	<!--  default id is 'hadoopConfiguration'
 	
 	alternative configuration
 	<hdp:configuration register-url-handler="false">

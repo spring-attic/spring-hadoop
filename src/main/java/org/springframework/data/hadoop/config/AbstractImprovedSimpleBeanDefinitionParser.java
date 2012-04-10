@@ -15,8 +15,6 @@
  */
 package org.springframework.data.hadoop.config;
 
-import java.lang.reflect.Field;
-
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
@@ -26,7 +24,6 @@ import org.springframework.beans.factory.xml.AbstractSimpleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.Assert;
-import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
@@ -70,14 +67,17 @@ abstract class AbstractImprovedSimpleBeanDefinitionParser extends AbstractSimple
 	}
 
 	protected void registerBeanDefinition(BeanDefinitionHolder definition, BeanDefinitionRegistry registry) {
-		String name = defaultId(null, null);
-		// register name as alias
-		if (name != null && name.equals(definition.getBeanName())) {
-			String alias = camelCaseToHyphenated(name);
-			Field as = ReflectionUtils.findField(BeanDefinitionHolder.class, "aliases");
-			ReflectionUtils.makeAccessible(as);
-			ReflectionUtils.setField(as, definition, new String[] { alias });
-		}
+
+		// disable this for now
+		//		String name = defaultId(null, null);
+		//		// register name as alias
+		//		if (name != null && name.equals(definition.getBeanName())) {
+		//			String alias = camelCaseToHyphenated(name);
+		//			Field as = ReflectionUtils.findField(BeanDefinitionHolder.class, "aliases");
+		//			ReflectionUtils.makeAccessible(as);
+		//			ReflectionUtils.setField(as, definition, new String[] { alias });
+		//		}
+
 		super.registerBeanDefinition(definition, registry);
 	}
 

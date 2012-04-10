@@ -23,17 +23,17 @@ fsh.put("src/test/resources/logs/apache_access.log", "/test/cascading/logs/input
 	<!-- code config -->
 	<bean class="org.springframework.data.hadoop.cascading.CascadingAnalysisConfig"/>
 
-	<bean id="cascade" class="org.springframework.data.hadoop.cascading.CascadeFactoryBean" p:configuration-ref="hadoop-configuration">
+	<bean id="cascade" class="org.springframework.data.hadoop.cascading.CascadeFactoryBean" p:configuration-ref="hadoopConfiguration">
 		<property name="flows">
 		<list>
 			<!-- import -->
-			<bean class="org.springframework.data.hadoop.cascading.HadoopFlowFactoryBean" p:configuration-ref="hadoop-configuration">
+			<bean class="org.springframework.data.hadoop.cascading.HadoopFlowFactoryBean" p:configuration-ref="hadoopConfiguration">
 				<property name="source" ref="logTap" />
 				<property name="sink" ref="parsedTap" />
 				<property name="tail" ref="importPipe" />
 			</bean>
 			<!-- parse -->
-			<bean class="org.springframework.data.hadoop.cascading.HadoopFlowFactoryBean" p:configuration-ref="hadoop-configuration">
+			<bean class="org.springframework.data.hadoop.cascading.HadoopFlowFactoryBean" p:configuration-ref="hadoopConfiguration">
 				<property name="source" ref="parsedTap" />
 				<property name="sinks" ref="sinks" />
 				<property name="tails">

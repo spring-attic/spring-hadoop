@@ -19,9 +19,9 @@
 			hive.metastore.metadb.dir=.${file.separator}build
 			hive.metastore.warehouse.dir=.${file.separator}build
 			]]>
-	<bean id="hive-server" class="org.springframework.data.hadoop.hive.HiveServerFactoryBean" p:port="${hive.port}" p:configuration-ref="hadoop-configuration"/>
+	<bean id="hive-server" class="org.springframework.data.hadoop.hive.HiveServerFactoryBean" p:port="${hive.port}" p:configuration-ref="hadoopConfiguration"/>
 
-	<hdp:hive-server properties-ref="props" properties-location="cfg-1.properties, cfg-2.properties" port="${hive.port}" configuration-ref="hadoop-configuration">
+	<hdp:hive-server properties-ref="props" properties-location="cfg-1.properties, cfg-2.properties" port="${hive.port}" configuration-ref="hadoopConfiguration">
 		star=chasing
 		return=captain eo
 		train=last
@@ -32,9 +32,9 @@
 	
 	<hdp:hive-client host="${hive.host}" port="${hive.port}"/>
 
-	<bean id="hive-driver" class="org.apache.hadoop.hive.jdbc.HiveDriver"/>
-	<bean id="hive-ds" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
-		<constructor-arg name="driver" ref="hive-driver"/>
+	<bean id="hiveDriver" class="org.apache.hadoop.hive.jdbc.HiveDriver"/>
+	<bean id="hiveDs" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
+		<constructor-arg name="driver" ref="hiveDriver"/>
 		<constructor-arg name="url" value="${hive.url}"/>
 	</bean>
 	

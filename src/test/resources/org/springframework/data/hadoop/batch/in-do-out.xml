@@ -25,7 +25,7 @@
 	<bean id="hadoop-tasklet" class="org.springframework.data.hadoop.mapreduce.JobTasklet" p:job-ref="mr-job" p:wait-for-job="true"/>
 	
 	<bean id="mr-job" class="org.springframework.data.hadoop.mapreduce.JobFactoryBean"
-		p:configuration-ref="hadoop-configuration"
+		p:configuration-ref="hadoopConfiguration"
 		p:input-paths="/ide-test/input/word/"
 		p:output-path="/ide-test/output/word/"
 		p:mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"

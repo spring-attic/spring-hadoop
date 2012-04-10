@@ -29,7 +29,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.hadoop.TestUtils;
-import org.springframework.data.hadoop.fs.HdfsResourceLoader;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -56,7 +55,7 @@ public class DistributedCacheTest {
 
 		HdfsResourceLoader loader = new HdfsResourceLoader(cfg);
 		assertTrue(loader.getResources("~/local/*.txt").length >= 3);
-		ctx.getBean("hadoop-cache");
+		ctx.getBean("hadoopCache");
 	}
 
 	@After
@@ -116,7 +115,7 @@ public class DistributedCacheTest {
 
 	@Test
 	public void testMisc() throws Exception {
-		assertTrue(ctx.containsBean("hadoop-cache"));
+		assertTrue(ctx.containsBean("hadoopCache"));
 		assertTrue(DistributedCache.getSymlink(cfg));
 	}
 }

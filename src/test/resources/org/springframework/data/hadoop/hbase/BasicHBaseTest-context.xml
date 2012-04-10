@@ -13,15 +13,15 @@
 	<import resource="../hadoop-ctx.xml"/>
 	 
 	<!-- 
-	<bean id="hbase-config" class="org.springframework.data.hadoop.hbase.HbaseConfigurationFactoryBean" p:configuration-ref="hadoop-configuration" />
+	<bean id="hbase-config" class="org.springframework.data.hadoop.hbase.HbaseConfigurationFactoryBean" p:configuration-ref="hadoopConfiguration" />
 	-->
 	 
-	<hdp:hbase-configuration configuration-ref="hadoop-configuration">
+	<hdp:hbase-configuration configuration-ref="hadoopConfiguration">
 		#hbase.zookeeper.quorum=v-debian.lan
 	</hdp:hbase-configuration>
 	 
 	<context:property-placeholder location="test.properties"/>
 	
-	<bean id="template" class="org.springframework.data.hadoop.hbase.HbaseTemplate" p:configuration-ref="hbase-configuration"/>
+	<bean id="template" class="org.springframework.data.hadoop.hbase.HbaseTemplate" p:configuration-ref="hbaseConfiguration"/>
 	
 </beans>

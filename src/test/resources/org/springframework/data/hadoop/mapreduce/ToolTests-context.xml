@@ -15,7 +15,7 @@
 	<hdp:tool-runner id="simple" tool-class="org.springframework.data.hadoop.mapreduce.ToolTests$TestTool" />
 	
 	<bean id="test-tool" class="org.springframework.data.hadoop.mapreduce.ToolTests$TestTool">
-		<constructor-arg ref="hadoop-configuration" />
+		<constructor-arg ref="hadoopConfiguration" />
 	</bean>
 	
 	<hdp:tool-runner id="ref" tool-ref="test-tool"/>
@@ -24,7 +24,7 @@
 	
 	<hdp:tool-runner id="nested">
 		<bean class="org.springframework.data.hadoop.mapreduce.ToolTests$TestTool">
-			<constructor-arg ref="hadoop-configuration" />
+			<constructor-arg ref="hadoopConfiguration" />
 		</bean>
 		<hdp:arg value="--local"/>
 		<hdp:arg value="data/in.txt"/>
@@ -41,11 +41,11 @@
 		</step>
 	</job>
 	
-	<bean id="tasklet" class="org.springframework.data.hadoop.mapreduce.ToolTasklet" p:tool-ref="test-tool" p:configuration-ref="hadoop-configuration" />
+	<bean id="tasklet" class="org.springframework.data.hadoop.mapreduce.ToolTasklet" p:tool-ref="test-tool" p:configuration-ref="hadoopConfiguration" />
 	
 	<hdp:tool-tasklet id="tasklet-ns" scope="prototype">
 		<bean class="org.springframework.data.hadoop.mapreduce.ToolTests$TestTool">
-			<constructor-arg ref="hadoop-configuration" />
+			<constructor-arg ref="hadoopConfiguration" />
 		</bean>
 	</hdp:tool-tasklet>
 	

@@ -122,14 +122,14 @@ public class HdfsScriptFactoryBean extends Jsr223ScriptEvaluatorFactoryBean impl
 	}
 
 	private Configuration detectCfg(String variableName) {
-		String defaultName = "hadoop-configuration";
+		String defaultName = "hadoopConfiguration";
 		Class<Configuration> defaultType = Configuration.class;
 
 		if (ctx.containsBean(defaultName))
 			return ctx.getBean(defaultName, defaultType);
 		String[] names = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(ctx, defaultType);
 		if (names != null && names.length == 1) {
-			return ctx.getBean(defaultName, defaultType);
+			return ctx.getBean(names[0], defaultType);
 		}
 
 		if (log.isDebugEnabled()) {
@@ -141,14 +141,14 @@ public class HdfsScriptFactoryBean extends Jsr223ScriptEvaluatorFactoryBean impl
 	}
 
 	private HdfsResourceLoader detectHdfsRL(String variableName, Configuration cfg) {
-		String defaultName = "hadoop-resource-loader";
+		String defaultName = "hadoopResourceLoader";
 		Class<HdfsResourceLoader> defaultType = HdfsResourceLoader.class;
 
 		if (ctx.containsBean(defaultName))
 			return ctx.getBean(defaultName, defaultType);
 		String[] names = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(ctx, defaultType);
 		if (names != null && names.length == 1) {
-			return ctx.getBean(defaultName, defaultType);
+			return ctx.getBean(names[0], defaultType);
 		}
 
 		// create one instance
@@ -157,7 +157,7 @@ public class HdfsScriptFactoryBean extends Jsr223ScriptEvaluatorFactoryBean impl
 
 
 	private Object detectFS(String variableName, Configuration detectedCfg) {
-		String defaultName = "hadoop-fs";
+		String defaultName = "hadoopFs";
 		Class<?> defaultType = FileSystem.class;
 
 		if (ctx.containsBean(defaultName)) {
@@ -167,7 +167,7 @@ public class HdfsScriptFactoryBean extends Jsr223ScriptEvaluatorFactoryBean impl
 
 		String[] names = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(ctx, defaultType);
 		if (names != null && names.length == 1) {
-			return ctx.getBean(defaultName, defaultType);
+			return ctx.getBean(names[0], defaultType);
 		}
 
 		try {

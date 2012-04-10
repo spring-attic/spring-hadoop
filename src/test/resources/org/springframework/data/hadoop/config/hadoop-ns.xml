@@ -16,7 +16,7 @@
 		test.name=default
 	</hdp:configuration>
 
-	<hdp:configuration id="complex" resources="classpath:/test-site.xml, classpath:/test-site-2.xml" configuration-ref="hadoop-configuration">
+	<hdp:configuration id="complex" resources="classpath:/test-site.xml, classpath:/test-site-2.xml" configuration-ref="hadoopConfiguration">
 		test.name.2=complex
 	</hdp:configuration>
 	

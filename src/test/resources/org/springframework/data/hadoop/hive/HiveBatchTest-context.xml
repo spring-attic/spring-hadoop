@@ -22,7 +22,7 @@
 		</step>
 	</job>
 
-	<bean id="tasklet" class="org.springframework.data.hadoop.hive.HiveTasklet" p:hive-client-ref="hive-client">
+	<bean id="tasklet" class="org.springframework.data.hadoop.hive.HiveTasklet" p:hive-client-ref="hiveClient">
 		<property name="scripts">
 			<list>
 				<value>org/springframework/data/hadoop/hive/script.q</value>

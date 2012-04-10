@@ -9,7 +9,7 @@
 	<import resource="../hadoop-ctx.xml"/>
 	
 	<bean id="ir" class="org.springframework.data.hadoop.batch.HdfsItemReader" p:location="/batch/test.properties" depends-on="script">
-		<constructor-arg ref="hadoop-configuration" />
+		<constructor-arg ref="hadoopConfiguration" />
 		<property name="lineMapper">
 			<bean class="org.springframework.batch.item.file.mapping.PassThroughLineMapper"/>
 		</property>

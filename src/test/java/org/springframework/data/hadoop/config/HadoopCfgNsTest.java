@@ -32,7 +32,7 @@ import static org.junit.Assert.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 public class HadoopCfgNsTest {
 
-	@Resource(name = "hadoop-configuration")
+	@Resource(name = "hadoopConfiguration")
 	private Configuration simple;
 
 	@Resource

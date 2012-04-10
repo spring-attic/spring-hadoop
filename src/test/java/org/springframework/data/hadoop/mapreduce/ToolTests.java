@@ -87,7 +87,7 @@ public class ToolTests {
 		assertEquals(0, ctx.getBean("nested"));
 		assertNotNull(TestTool.conf);
 		Configuration conf = TestTool.conf;
-		assertFalse(ctx.getBean("hadoop-configuration").equals(conf));
+		assertFalse(ctx.getBean("hadoopConfiguration").equals(conf));
 
 		assertEquals("for santa", conf.get("cookies"));
 

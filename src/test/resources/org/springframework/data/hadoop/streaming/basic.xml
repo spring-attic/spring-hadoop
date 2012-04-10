@@ -16,7 +16,7 @@
 	<context:property-placeholder location="test.properties"/>
 	
 	<bean id="vanilla-stream-job" class="org.springframework.data.hadoop.mapreduce.StreamJobFactoryBean"
-		p:configuration-ref="hadoop-configuration"
+		p:configuration-ref="hadoopConfiguration"
 		p:input-path="test"
 		p:output-path="output"
 		p:mapper="${path.cat}"
@@ -24,7 +24,7 @@
 		scope="prototype"/>
 		
 	<hdp:streaming id="ns-stream-job"
-		configuration-ref="hadoop-configuration"
+		configuration-ref="hadoopConfiguration"
 		input-path="test" output-path="output"
         mapper="${path.cat}" reducer="${path.wc}"
         properties-ref="props" 
