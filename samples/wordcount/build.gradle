@@ -4,6 +4,7 @@ apply plugin: 'base'
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'eclipse'
+apply plugin: 'application'
 
 repositories {
     // Public Spring artefacts
@@ -24,11 +25,5 @@ dependencies {
 }
 
 sourceSets { main { resources { srcDir file('../resources') } } }
- 
-task run(type: JavaExec) {
-    description = 'Runs the application'
-    main = "org.springframework.data.hadoop.samples.wordcount.Main"
-    classpath = sourceSets.main.runtimeClasspath
-}
-
+mainClassName = "org.springframework.data.hadoop.samples.wordcount.Main"
 defaultTasks 'run'

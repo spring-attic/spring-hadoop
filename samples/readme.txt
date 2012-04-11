@@ -7,6 +7,8 @@ Please see each folder for detailed instructions (readme.txt).
 
 As a general rule, each demo provides an integration tests that bootstraps
 Hadoop, installs the demo and its dependencies and interacts with the application.
+Shared data sets and project settings (such as the dependencies versions) reside in 
+the parent folder but are copied by each project at build time.
 
 SAMPLES OVERVIEW
 ----------------
@@ -16,6 +18,9 @@ The 'traditional' Hadoop example - a word count MapReduce app configured with Sp
 
 * batch-wordcount
 The same word count application featuring Spring Batch
+
+* hbase-crud
+Basic CRUD application interacting with HBase showcasing the support in Spring Hadoop
 
 
 BUILDING AND DEPLOYMENT
