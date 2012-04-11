@@ -46,7 +46,7 @@ import static org.junit.Assert.*;
 @ContextConfiguration
 public class BasicHBaseTest {
 
-	@Resource(name = "hbase-configuration")
+	@Resource(name = "hbaseConfiguration")
 	Configuration config;
 
 	@Autowired
