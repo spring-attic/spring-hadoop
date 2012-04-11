@@ -25,14 +25,7 @@ $ ..\gradlew
 If you have Gradle installed and available in your classpath, you can simply type:
 $ gradle
 
-The rest of the document refers to only the *nix/BSD OS style command line (modify for Windows accordingly)
-
-b) To build and run the sample as a standalone Java application:
-
-$ ../gradlew installApp
-$ ./build/install/batch-wordcount/bin/batch-wordcount classpath:/launch-context.xml job1
-
-This uses the CommandLineJobRunner launcher from the Spring Batch project. 
+This launches the Spring Batch CommandLineJobRunner and triggers the job.
 
 3. IDE IMPORT
 

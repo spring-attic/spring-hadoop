@@ -23,10 +23,12 @@ dependencies {
     testCompile "org.springframework:spring-test:$springVersion"
 }
 
+sourceSets { main { resources { srcDir file('../resources') } } }
+ 
 task run(type: JavaExec) {
-       description = 'Runs the application'
-       main = "org.springframework.data.hadoop.samples.wordcount.Main"
-       classpath = sourceSets.main.runtimeClasspath
+    description = 'Runs the application'
+    main = "org.springframework.data.hadoop.samples.wordcount.Main"
+    classpath = sourceSets.main.runtimeClasspath
 }
 
 defaultTasks 'run'

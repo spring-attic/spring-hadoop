@@ -28,5 +28,12 @@ dependencies {
     testCompile "org.springframework:spring-test:$springVersion"
 }
 
+sourceSets { main { resources { srcDir file('../resources') } } }
+
 mainClassName = "org.springframework.batch.core.launch.support.CommandLineJobRunner"
-defaultTasks 'build'
+
+run {
+  args 'classpath:/launch-context.xml', 'job1'
+}
+
+defaultTasks 'run'
