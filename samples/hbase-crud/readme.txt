@@ -4,8 +4,7 @@
 
 1. MOTIVATION
 
-A demo that illustrates use of HBase Java API through Spring Hadoop. The demo counts occurrencies
-in an HBase table.
+A demo that illustrates use of HBase Java API through Spring Hadoop. The demo counts occurrences in an HBase table.
 The demo requires a running Hadoop instance (by default at localhost:9000) and a HBase instance (using default settings).
 Both the Hadoop & HBase settings can be configured through hadoop.properties (more info in the Spring Hadoop reference docs).
 
