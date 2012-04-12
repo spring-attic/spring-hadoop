@@ -228,11 +228,47 @@ Reference to the Hadoop FileSystem. Overrides the 'uri' or 'configuration-ref' p
 		</xsd:complexType>
 	</xsd:element>
 	
+	<!-- generic options shared by the various jobs 
+	 NOT meant for extensibility - do NOT rely on this type as it might be removed in the future -->
+	<xsd:complexType name="genericOptionsType">
+		<xsd:complexContent>
+		<xsd:extension base="propertiesConfigurableType">
+		<xsd:attribute name="files">
+		<xsd:annotation>
+			<xsd:appinfo>
+				<tool:annotation kind="direct">
+					<tool:expected-type type="java:org.springframework.core.io.Resource" />
+				</tool:annotation>
+			</xsd:appinfo>
+	 	</xsd:annotation>			
+		</xsd:attribute>
+		<xsd:attribute name="archives">
+		<xsd:annotation>
+			<xsd:appinfo>
+				<tool:annotation kind="direct">
+					<tool:expected-type type="java:org.springframework.core.io.Resource" />
+				</tool:annotation>
+			</xsd:appinfo>
+	 	</xsd:annotation>			
+		</xsd:attribute>
+		<xsd:attribute name="libs">
+		<xsd:annotation>
+			<xsd:appinfo>
+				<tool:annotation kind="direct">
+					<tool:expected-type type="java:org.springframework.core.io.Resource" />
+				</tool:annotation>
+			</xsd:appinfo>
+	 	</xsd:annotation>			
+		</xsd:attribute>
+		</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	
 	<!-- common attributes shared by properties based configurations 
 		 NOT meant for extensibility - do NOT rely on this type as it might be removed in the future -->
 	<xsd:complexType name="jobType">
 		<xsd:complexContent>
-		<xsd:extension base="propertiesConfigurableType">
+		<xsd:extension base="genericOptionsType">
 		<xsd:attribute name="id" type="xsd:ID" use="required" />
 		<xsd:attribute name="scope" type="xsd:string" use="optional" />
 		<xsd:attribute name="mapper" use="required">
@@ -478,33 +514,6 @@ Defines a Hadoop Streaming Job.
 			</xsd:appinfo>
 	 	</xsd:annotation>			
 		</xsd:attribute>
-		<xsd:attribute name="file">
-		<xsd:annotation>
-			<xsd:appinfo>
-				<tool:annotation kind="direct">
-					<tool:expected-type type="java.lang.String[]" />
-				</tool:annotation>
-			</xsd:appinfo>
-	 	</xsd:annotation>			
-		</xsd:attribute>
-		<xsd:attribute name="archive">
-		<xsd:annotation>
-			<xsd:appinfo>
-				<tool:annotation kind="direct">
-					<tool:expected-type type="java.lang.String[]" />
-				</tool:annotation>
-			</xsd:appinfo>
-	 	</xsd:annotation>			
-		</xsd:attribute>
-		<xsd:attribute name="lib">
-		<xsd:annotation>
-			<xsd:appinfo>
-				<tool:annotation kind="direct">
-					<tool:expected-type type="java.lang.String[]" />
-				</tool:annotation>
-			</xsd:appinfo>
-	 	</xsd:annotation>			
-		</xsd:attribute>
 		</xsd:extension>
 		</xsd:complexContent>
 		</xsd:complexType>
@@ -514,7 +523,7 @@ Defines a Hadoop Streaming Job.
 		 NOT meant for extensibility - do NOT rely on this type as it might be removed in the future -->
 	<xsd:complexType name="toolRunnerType">
 		<xsd:complexContent mixed="true">
-		<xsd:extension base="propertiesConfigurableType">
+		<xsd:extension base="genericOptionsType">
 			<xsd:sequence>
 				<xsd:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="1"/>
 				<xsd:element name="arg" minOccurs="0" maxOccurs="unbounded">

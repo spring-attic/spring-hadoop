@@ -21,6 +21,7 @@
 		p:output-path="output"
 		p:mapper="${path.cat}"
 		p:reducer="${path.wc}"
+		p:libs="cfg-1.properties"
 		scope="prototype"/>
 		
 	<hdp:streaming id="ns-stream-job"
@@ -28,7 +29,10 @@
 		input-path="test" output-path="output"
         mapper="${path.cat}" reducer="${path.wc}"
         properties-ref="props" 
-		properties-location="cfg-1.properties, cfg-2.properties">
+		properties-location="cfg-1.properties, cfg-2.properties"
+		files="cfg-1.properties"
+		archives="cfg-2.properties"
+		libs="te*t.properties">
         <hdp:cmd-env>
         	EXAMPLE_DIR=/home/example/dictionaries/
         </hdp:cmd-env>

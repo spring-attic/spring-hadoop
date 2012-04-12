@@ -53,7 +53,7 @@ import org.springframework.util.StringUtils;
  * @author Costin Leau
  */
 // TODO: extract input/output format configs
-public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanNameAware {
+public class JobFactoryBean extends JobGenericOptions implements InitializingBean, FactoryBean<Job>, BeanNameAware {
 
 	private Job job;
 	private Configuration configuration;
@@ -107,11 +107,7 @@ public class JobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanN
 	public void afterPropertiesSet() throws Exception {
 		Configuration cfg = (properties != null ? ConfigurationUtils.createFrom(configuration, properties) : (configuration != null ? configuration : new Configuration()));
 
-		// set property to remove Hadoop warning
-		// make sure the conf is modified before the job is created
-		if (cfg.get("mapred.used.genericoptionsparser") == null) {
-			cfg.setBoolean("mapred.used.genericoptionsparser", true);
-		}
+		buildGenericOptions(cfg);
 
 		job = new Job(cfg);
 

@@ -15,85 +15,22 @@
  */
 package org.springframework.data.hadoop.mapreduce;
 
-import java.util.Properties;
-
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.util.Tool;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.beans.BeanUtils;
-import org.springframework.data.hadoop.configuration.ConfigurationUtils;
-import org.springframework.util.Assert;
 
 /**
  * Tasklet for executing Hadoop {@link Tool}s.
  * 
  * @author Costin Leau
  */
-public class ToolTasklet implements Tasklet {
-
-	private String[] arguments;
-	private Configuration configuration;
-	private Properties properties;
-	private Tool tool;
-	private Class<? extends Tool> toolClass;
-
+public class ToolTasklet extends ToolExecutor implements Tasklet {
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		Tool t = (tool != null ? tool : BeanUtils.instantiateClass(toolClass));
-		Configuration cfg = ConfigurationUtils.createFrom(configuration, properties);
-		org.apache.hadoop.util.ToolRunner.run(cfg, t, arguments);
-
+		runTool();
 		return RepeatStatus.FINISHED;
-	}
-
-	/**
-	 * Sets the tool.
-	 *
-	 * @param tool The tool to set.
-	 */
-	public void setTool(Tool tool) {
-		Assert.isNull(toolClass, "a Tool class already set");
-		this.tool = tool;
-	}
-
-	/**
-	 * Sets the tool class.
-	 *
-	 * @param toolClass the new tool class
-	 */
-	public void setToolClass(Class<? extends Tool> toolClass) {
-		Assert.isNull(tool, "a Tool instance already set");
-		this.toolClass = toolClass;
-	}
-
-	/**
-	 * Sets the arguments.
-	 *
-	 * @param arguments The arguments to set.
-	 */
-	public void setArguments(String[] arguments) {
-		this.arguments = arguments;
-	}
-
-	/**
-	 * Sets the configuration.
-	 *
-	 * @param configuration The configuration to set.
-	 */
-	public void setConfiguration(Configuration configuration) {
-		this.configuration = configuration;
-	}
-
-	/**
-	 * Sets the properties.
-	 *
-	 * @param properties The properties to set.
-	 */
-	public void setProperties(Properties properties) {
-		this.properties = properties;
 	}
 }

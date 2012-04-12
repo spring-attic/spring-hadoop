@@ -15,7 +15,6 @@
  */
 package org.springframework.data.hadoop.mapreduce;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -28,7 +27,6 @@ import java.util.Properties;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.streaming.StreamJob;
-import org.apache.hadoop.util.GenericOptionsParser;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -46,13 +44,14 @@ import org.springframework.util.StringUtils;
  * 
  * @author Costin Leau
  */
-public class StreamJobFactoryBean implements InitializingBean, FactoryBean<Job>, BeanNameAware {
+public class StreamJobFactoryBean extends JobGenericOptions implements InitializingBean, FactoryBean<Job>,
+		BeanNameAware {
 
 	private Job job;
 	private String name;
 	private String output, mapper, reducer, combiner, inputFormat, outputFormat, partitioner;
 	private Integer numReduceTasks;
-	private String[] input, file, libJar, archive;
+	private String[] input;
 
 	private Configuration configuration;
 	private Properties properties;
@@ -121,33 +120,6 @@ public class StreamJobFactoryBean implements InitializingBean, FactoryBean<Job>,
 		job.setJobName(name);
 	}
 
-	private void buildGenericOptions(Configuration cfg) {
-
-		List<String> args = new ArrayList<String>();
-
-		// add known arguments first
-		addArgument(file, "-files", args);
-		addArgument(libJar, "-libjars", args);
-		addArgument(archive, "-archives", args);
-
-		//		// add -D/properties
-		//		if (properties != null) {
-		//			Enumeration<?> props = properties.propertyNames();
-		//			while (props.hasMoreElements()) {
-		//				String key = props.nextElement().toString();
-		//				args.add("-D");
-		//				args.add(key + "=" + properties.getProperty(key));
-		//			}
-		//		}
-
-		// populate config object
-		try {
-			new GenericOptionsParser(cfg, args.toArray(new String[args.size()]));
-		} catch (IOException ex) {
-			throw new IllegalStateException(ex);
-		}
-	}
-
 	private Configuration createStreamJob(Configuration cfg, String[] args) {
 		// ugly reflection to add an extra method to #createJob
 		StreamJob job = new StreamJob();
@@ -185,7 +157,8 @@ public class StreamJobFactoryBean implements InitializingBean, FactoryBean<Job>,
 		}
 	}
 
-	private static void addArgument(String[] args, String name, List<String> list) {
+
+	static void addArgument(String[] args, String name, List<String> list) {
 		if (!ObjectUtils.isEmpty(args)) {
 			for (String string : args) {
 				list.add(name);
@@ -199,7 +172,7 @@ public class StreamJobFactoryBean implements InitializingBean, FactoryBean<Job>,
 	 * 
 	 * @param input The input to set.
 	 */
-	public void setInputPath(String[] input) {
+	public void setInputPath(String... input) {
 		this.input = input;
 	}
 
@@ -266,24 +239,6 @@ public class StreamJobFactoryBean implements InitializingBean, FactoryBean<Job>,
 	}
 
 	/**
-	 * Sets the job files.
-	 * 
-	 * @param files The cacheFile to set.
-	 */
-	public void setFile(String[] files) {
-		this.file = files;
-	}
-
-	/**
-	 * Sets the job archives.
-	 * 
-	 * @param archives The cacheArchive to set.
-	 */
-	public void setArchive(String[] archives) {
-		this.archive = archives;
-	}
-
-	/**
 	 * Sets the Hadoop configuration to use.
 	 * 
 	 * @param configuration The configuration to set.
@@ -308,15 +263,6 @@ public class StreamJobFactoryBean implements InitializingBean, FactoryBean<Job>,
 	 */
 	public void setNumReduceTasks(Integer numReduceTasks) {
 		this.numReduceTasks = numReduceTasks;
-	}
-
-	/**
-	 * Sets the job jar libraries.
-	 * 
-	 * @param libJars The libJars to set.
-	 */
-	public void setLibJar(String[] libJars) {
-		this.libJar = libJars;
 	}
 
 	/**

@@ -15,14 +15,9 @@
  */
 package org.springframework.data.hadoop.mapreduce;
 
-import java.util.Properties;
-
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.util.Tool;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.data.hadoop.configuration.ConfigurationUtils;
 import org.springframework.util.Assert;
 
 /**
@@ -32,23 +27,15 @@ import org.springframework.util.Assert;
  * 
  * @author Costin Leau
  */
-public class ToolRunner implements FactoryBean<Integer>, InitializingBean {
+public class ToolRunner extends ToolExecutor implements FactoryBean<Integer>, InitializingBean {
 
 	private volatile Integer result = null;
-	private String[] arguments;
 	private boolean runAtStartup = false;
-
-	private Configuration configuration;
-	private Properties properties;
-	private Tool tool;
-	private Class<? extends Tool> toolClass;
 
 	@Override
 	public Integer getObject() throws Exception {
 		if (result == null) {
-			Tool t = (tool != null ? tool : BeanUtils.instantiateClass(toolClass));
-			Configuration cfg = ConfigurationUtils.createFrom(configuration, properties);
-			result = org.apache.hadoop.util.ToolRunner.run(cfg, t, arguments);
+			result = runTool();
 		}
 		return result;
 	}
@@ -73,58 +60,11 @@ public class ToolRunner implements FactoryBean<Integer>, InitializingBean {
 	}
 
 	/**
-	 * Sets the tool.
-	 *
-	 * @param tool The tool to set.
-	 */
-	public void setTool(Tool tool) {
-		Assert.isNull(toolClass, "a Tool class already set");
-		this.tool = tool;
-	}
-
-	/**
-	 * Sets the tool class.
-	 *
-	 * @param toolClass the new tool class
-	 */
-	public void setToolClass(Class<? extends Tool> toolClass) {
-		Assert.isNull(tool, "a Tool instance already set");
-		this.toolClass = toolClass;
-	}
-
-	/**
-	 * Sets the arguments.
-	 *
-	 * @param arguments The arguments to set.
-	 */
-	public void setArguments(String[] arguments) {
-		this.arguments = arguments;
-	}
-
-	/**
 	 * Sets the run at startup.
 	 *
 	 * @param runAtStartup The runAtStartup to set.
 	 */
 	public void setRunAtStartup(boolean runAtStartup) {
 		this.runAtStartup = runAtStartup;
-	}
-
-	/**
-	 * Sets the configuration.
-	 *
-	 * @param configuration The configuration to set.
-	 */
-	public void setConfiguration(Configuration configuration) {
-		this.configuration = configuration;
-	}
-
-	/**
-	 * Sets the properties.
-	 *
-	 * @param properties The properties to set.
-	 */
-	public void setProperties(Properties properties) {
-		this.properties = properties;
 	}
 }
