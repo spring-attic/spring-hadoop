@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:hdp="http://www.springframework.org/schema/hadoop"
+	xmlns:batch="http://www.springframework.org/schema/batch"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	  http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+	  http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd
+	  http://www.springframework.org/schema/batch	http://www.springframework.org/schema/batch/spring-batch.xsd">
+
+
+	<import resource="batch-common.xml"/>
+	
+	<context:property-placeholder location="hadoop.properties"/>
+
+	<hdp:configuration>
+		fs.default.name=${hd.fs}
+	</hdp:configuration>
+
+	<hdp:pig configuration-ref="hadoopConfiguration" exec-type="MAPREDUCE"/> 
+
+	<job id="pigJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="prepareData" next="loadData">
+			<tasklet ref="prepareDataTasklet" />
+		</step>
+		<step id="loadData">
+			<tasklet ref="loadDataTasklet" />
+		</step>		
+	</job>
+	
+	<hdp:script-tasklet id="prepareDataTasklet">
+		<hdp:script location="cp-data.js">
+          <hdp:property name="inputPath" value="${input.path}" />
+	      <hdp:property name="outputPath" value="${output.path}" />
+	      <hdp:property name="localResource" value="${local.data}" />
+		</hdp:script>
+	</hdp:script-tasklet>
+	
+	<hdp:pig-tasklet id="loadDataTasklet">
+		<hdp:script location="script.pig" />
+	</hdp:pig-tasklet> 
+</beans>

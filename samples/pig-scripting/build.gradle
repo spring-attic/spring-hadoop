@@ -1,0 +1,38 @@
+description = 'Spring Hadoop Samples - Running a Pig script'
+
+apply plugin: 'base'
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'eclipse'
+apply plugin: 'application'
+
+repositories {
+    // Public Spring artefacts
+    maven { url "http://repo.springsource.org/libs-snapshot" }
+}
+
+//load version from the root folder
+def props = new Properties();
+new File("../gradle.properties").withInputStream { props.load(it) }
+props.each({ project.setProperty(it.key, it.value)} )
+
+dependencies {
+    compile "org.springframework.data:spring-data-hadoop:$version"
+    compile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
+    compile "org.springframework.batch:spring-batch-core:$springBatchVersion"
+    // update the version that comes with Batch
+    compile "org.springframework:spring-tx:$springVersion"
+    compile "org.apache.pig:pig:$pigVersion"
+    runtime "org.antlr:antlr-runtime:$antlrVersion"
+    
+    testCompile "junit:junit:$junitVersion"
+    testCompile "org.springframework:spring-test:$springVersion"
+}
+
+sourceSets { main { resources { srcDir file('../resources') } } }
+
+run {
+  args 'classpath:META-INF/spring/context.xml', 'pigJob'
+}
+mainClassName = "org.springframework.batch.core.launch.support.CommandLineJobRunner"
+defaultTasks 'run'
