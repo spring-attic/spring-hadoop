@@ -49,4 +49,8 @@
 		</bean>
 	</hdp:tool-tasklet>
 	
+	
+	<hdp:tool-runner id="tool-jar" tool-class="test.SomeTool" jar="some-tool.jar">
+		<hdp:arg value="13"/>
+	</hdp:tool-runner>
 </beans>

@@ -545,11 +545,24 @@ Bean id.]]></xsd:documentation>
 	       	<xsd:attribute name="tool-class" type="xsd:string">
 				<xsd:annotation>
 					<xsd:documentation><![CDATA[
-Indicates the job's jar file by finding an example class location.
+Indicates the Tool class name. This is useful when referring to an external jar (not required
+in the classpath).
 					]]></xsd:documentation>
 					<xsd:appinfo>
 						<tool:annotation kind="direct">
 							<tool:expected-type type="java.lang.Class" />
+						</tool:annotation>
+					</xsd:appinfo>
+			 	</xsd:annotation>
+	       	</xsd:attribute>
+	       	<xsd:attribute name="jar" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+Indicates the jar (not required to be in the classpath) providing the Tool (and its dependencies).
+					]]></xsd:documentation>
+					<xsd:appinfo>
+						<tool:annotation>
+							<tool:expected-type type="org.springframework.core.io.Resource" />
 						</tool:annotation>
 					</xsd:appinfo>
 			 	</xsd:annotation>

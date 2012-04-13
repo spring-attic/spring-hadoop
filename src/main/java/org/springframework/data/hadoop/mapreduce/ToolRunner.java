@@ -19,6 +19,7 @@ import org.apache.hadoop.util.Tool;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 /**
  * Wrapper around {@link org.apache.hadoop.util.ToolRunner} allowing for an easier configuration and execution
@@ -52,7 +53,7 @@ public class ToolRunner extends ToolExecutor implements FactoryBean<Integer>, In
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.isTrue(tool != null || toolClass != null, "a Tool instance or class is required");
+		Assert.isTrue(tool != null || StringUtils.hasText(toolClassName), "a Tool instance or class name is required");
 
 		if (runAtStartup) {
 			getObject();

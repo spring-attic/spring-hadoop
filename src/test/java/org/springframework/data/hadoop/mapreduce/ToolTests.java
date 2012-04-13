@@ -109,4 +109,14 @@ public class ToolTests {
 		JobsTrigger tj = new JobsTrigger();
 		tj.startJobs(ctx);
 	}
+
+	@Test
+	public void testToolJarLoading() throws Exception {
+		ClassLoader loader = getClass().getClassLoader();
+		Object bean = ctx.getBean("tool-jar");
+		
+		assertNotNull(System.getProperty("org.springframework.data.tool.init"));
+		assertEquals(Integer.valueOf(13), bean);
+		assertFalse(org.springframework.util.ClassUtils.isPresent("test.SomeTool", loader));
+	}
 }

@@ -19,7 +19,8 @@ import java.util.Properties;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.util.Tool;
-import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.BeanClassLoaderAware;
+import org.springframework.core.io.Resource;
 import org.springframework.data.hadoop.configuration.ConfigurationUtils;
 import org.springframework.util.Assert;
 
@@ -28,17 +29,20 @@ import org.springframework.util.Assert;
  * 
  * @author Costin Leau
  */
-abstract class ToolExecutor extends JobGenericOptions {
+abstract class ToolExecutor extends JobGenericOptions implements BeanClassLoaderAware {
 
 	String[] arguments;
 	Configuration configuration;
 	Properties properties;
 	Tool tool;
-	Class<? extends Tool> toolClass;
+	Tool t;
+	String toolClassName;
+	Resource jar;
+	private ClassLoader beanClassLoader;
 
 
 	int runTool() throws Exception {
-		Tool t = (tool != null ? tool : BeanUtils.instantiateClass(toolClass));
+		t = (Tool) (tool != null ? tool : ClassUtils.loadClassParentLast(jar, beanClassLoader, toolClassName));
 		Configuration cfg = ConfigurationUtils.createFrom(configuration, properties);
 		return org.apache.hadoop.util.ToolRunner.run(cfg, t, arguments);
 	}
@@ -49,18 +53,22 @@ abstract class ToolExecutor extends JobGenericOptions {
 	 * @param tool The tool to set.
 	 */
 	public void setTool(Tool tool) {
-		Assert.isNull(toolClass, "a Tool class already set");
+		Assert.isNull(toolClassName, "a Tool class already set");
 		this.tool = tool;
 	}
 
 	/**
-	 * Sets the tool class.
+	 * Sets the tool class by name.
 	 *
 	 * @param toolClass the new tool class
 	 */
-	public void setToolClass(Class<? extends Tool> toolClass) {
+	public void setToolClass(String toolClassName) {
 		Assert.isNull(tool, "a Tool instance already set");
-		this.toolClass = toolClass;
+		this.toolClassName = toolClassName;
+	}
+
+	public void setJar(Resource jar) {
+		this.jar = jar;
 	}
 
 	/**
@@ -88,5 +96,10 @@ abstract class ToolExecutor extends JobGenericOptions {
 	 */
 	public void setProperties(Properties properties) {
 		this.properties = properties;
+	}
+
+	@Override
+	public void setBeanClassLoader(ClassLoader classLoader) {
+		this.beanClassLoader = classLoader;
 	}
 }
