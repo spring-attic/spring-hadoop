@@ -81,7 +81,7 @@ class Jsr223ScriptEvaluator implements ScriptEvaluator {
 		} catch (IOException ex) {
 			throw new ScriptCompilationException(script, "Cannot access script", ex);
 		} catch (ScriptException ex) {
-			throw new ScriptCompilationException(script, ex);
+			throw new ScriptCompilationException(script, "Execution failure", ex);
 		}
 	}
 
