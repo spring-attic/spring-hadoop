@@ -35,11 +35,35 @@ public class ClassUtilsTest {
 		assertNotNull(System.getProperty(SomeClass.CLASS_LOADED + ".2"));
 
 		// use v2 CL as a parent
-		Object obj = ClassUtils.loadClassParentLast(jar, v2.getClass().getClassLoader(), "test.SomeClass");
+		Object obj = ClassUtils.loadClassParentLast(jar, v2.getClass().getClassLoader(), "test.SomeClass", null);
 
 		// check the jar classes are preferred
 		assertEquals("Class-v1", System.getProperty(SomeClass.LAST_LOADED));
 		assertNotNull(System.getProperty(SomeClass.CLASS_LOADED + ".1"));
 		assertFalse(v2.getClass().equals(obj.getClass()));
+	}
+
+	// disabled test
+	public void testNestedClass() throws Exception {
+		Resource jar = new DefaultResourceLoader().getResource("jar-with-classes.jar");
+
+		Object obj = ClassUtils.loadClassParentLast(jar, getClass().getClassLoader(), "test.SomeNestedClass", null);
+
+		// check the jar classes are preferred
+		assertEquals("NestedClass", System.getProperty(SomeClass.LAST_LOADED));
+		assertNotNull(System.getProperty(SomeClass.CLASS_LOADED + ".nested"));
+		assertFalse(org.springframework.util.ClassUtils.isPresent(obj.getClass().getName(), getClass().getClassLoader()));
+	}
+
+	@Test
+	public void testNestedLib() throws Exception {
+		Resource jar = new DefaultResourceLoader().getResource("jar-with-libs.jar");
+
+		Object obj = ClassUtils.loadClassParentLast(jar, getClass().getClassLoader(), "test.SomeLibClass", null);
+
+		// check the jar classes are preferred
+		assertEquals("LibClass", System.getProperty(SomeClass.LAST_LOADED));
+		assertNotNull(System.getProperty(SomeClass.CLASS_LOADED + ".lib"));
+		assertFalse(org.springframework.util.ClassUtils.isPresent(obj.getClass().getName(), getClass().getClassLoader()));
 	}
 }
