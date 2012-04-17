@@ -24,5 +24,4 @@ if (fsh.test(outputPath)) { fsh.rmr(outputPath) }
 
 // copy local resource using the streams directly (to be portable across envs)
 inStream = cl.getResourceAsStream(localResource)
-println(inStream)
 org.apache.hadoop.io.IOUtils.copyBytes(inStream, fs.create(inputPath), cfg)

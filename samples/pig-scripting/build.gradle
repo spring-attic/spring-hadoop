@@ -29,10 +29,21 @@ dependencies {
     testCompile "org.springframework:spring-test:$springVersion"
 }
 
+task downloadSampleSet(type:Copy) {
+   if (!new File('src/main/resources/ml-100k.zip').isFile()) {
+    ant.get(src: 'http://www.grouplens.org/system/files/ml-100k.zip', 
+           dest: 'src/main/resources/', usetimestamp:true)
+   }
+   copy {
+       from zipTree('src/main/resources/ml-100k.zip')
+         into ('src/main/resources/')
+         include 'ml-100k/u.data'
+         exclude '**/*'
+   }
+}
+
 sourceSets { main { resources { srcDir file('../resources') } } }
 
-run {
-  args 'classpath:META-INF/spring/context.xml', 'pigJob'
-}
+run {  args 'classpath:META-INF/spring/context.xml', 'pigJob' }
 mainClassName = "org.springframework.batch.core.launch.support.CommandLineJobRunner"
 defaultTasks 'run'
