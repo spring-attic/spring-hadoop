@@ -20,9 +20,13 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.data.hadoop.HadoopException;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 /**
  * Batch tasklet for executing one Hadoop job.
@@ -30,30 +34,39 @@ import org.springframework.util.Assert;
  * 
  * @author Costin Leau
  */
-public class JobTasklet implements InitializingBean, Tasklet {
+public class JobTasklet implements InitializingBean, Tasklet, BeanFactoryAware {
 
 	private Job job;
+	private String jobName;
 	private boolean waitForJob = true;
+	private BeanFactory beanFactory;
 
 	public void afterPropertiesSet() {
-		Assert.notNull(job, "A Hadoop job is required");
+		Assert.isTrue(job != null || StringUtils.hasText(jobName), "A Hadoop job or its name is required");
+
+		if (StringUtils.hasText(jobName)) {
+			Assert.notNull(beanFactory, "a bean factory is required if the job is specified by name");
+			Assert.isTrue(beanFactory.containsBean(jobName), "beanFactory does not contain any bean named [" + jobName + "]");
+		}
 	}
 
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		Exception exc = null;
 
+		Job j = (job != null ? job : beanFactory.getBean(jobName, Job.class));
+
 		try {
 			if (!waitForJob) {
-				job.submit();
+				j.submit();
 			}
 			else {
-				job.waitForCompletion(false);
+				j.waitForCompletion(false);
 			}
 			return RepeatStatus.FINISHED;
 		} catch (Exception ex) {
 			exc = ex;
 		}
-		String message = "Job [" + job.getJobID() + "|" + job.getJobName() + " ] failed";
+		String message = "Job [" + j.getJobID() + "|" + j.getJobName() + " ] failed";
 		throw (exc != null ? new HadoopException(message, exc) : new HadoopException(message));
 	}
 
@@ -67,6 +80,17 @@ public class JobTasklet implements InitializingBean, Tasklet {
 	}
 
 	/**
+	 * Sets the job to execute by (bean) name. This is the default
+	 * method used by the hdp name space to allow lazy initialization and potential scoping
+	 * to kick in.
+	 * 
+	 * @param job The job to execute.
+	 */
+	public void setJobName(String jobName) {
+		this.jobName = jobName;
+	}
+
+	/**
 	 * Indicates whether the tasklet should return for the job to complete (default)
 	 * after submission or not.
 	 * 
@@ -74,5 +98,10 @@ public class JobTasklet implements InitializingBean, Tasklet {
 	 */
 	public void setWaitForJob(boolean waitForJob) {
 		this.waitForJob = waitForJob;
+	}
+
+	@Override
+	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+		this.beanFactory = beanFactory;
 	}
 }

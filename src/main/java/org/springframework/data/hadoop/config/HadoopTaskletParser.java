@@ -15,6 +15,8 @@
  */
 package org.springframework.data.hadoop.config;
 
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.data.hadoop.mapreduce.JobTasklet;
 import org.w3c.dom.Element;
 
@@ -29,4 +31,20 @@ class HadoopTaskletParser extends AbstractImprovedSimpleBeanDefinitionParser {
 	protected Class<?> getBeanClass(Element element) {
 		return JobTasklet.class;
 	}
+
+	@Override
+	protected boolean isEligibleAttribute(String attributeName) {
+		return (!"job-ref".equals(attributeName)) && super.isEligibleAttribute(attributeName);
+	}
+
+	@Override
+	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
+		// parse attributes using conventions
+		super.doParse(element, parserContext, builder);
+
+		builder.addPropertyValue("jobName", element.getAttribute("job-ref"));
+	}
+
+
+
 }
