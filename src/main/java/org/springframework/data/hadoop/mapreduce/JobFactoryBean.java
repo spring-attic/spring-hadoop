@@ -18,7 +18,7 @@ package org.springframework.data.hadoop.mapreduce;
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
@@ -416,18 +416,12 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 	 * 
 	 * @param inputPath job input path.
 	 */
-	public void setInputPath(String inputPath) {
-		this.inputPaths = new ArrayList<String>(1);
-		inputPaths.add(inputPath);
-	}
-
-	/**
-	 * Sets the job input paths.
-	 * 
-	 * @param inputPaths The inputPaths to set.
-	 */
-	public void setInputPaths(List<String> inputPaths) {
-		this.inputPaths = inputPaths;
+	public void setInputPath(String... inputPath) {
+		// handle , strings here instead of the namespace to allow SpEL to kick in (if needed)  
+		if (inputPath != null && inputPath.length == 1) {
+			inputPath = StringUtils.commaDelimitedListToStringArray(inputPath[0]);
+		}
+		this.inputPaths = Arrays.asList(inputPath);
 	}
 
 	/**

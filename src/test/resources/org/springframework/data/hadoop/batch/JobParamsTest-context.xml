@@ -1,0 +1,54 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:hdp="http://www.springframework.org/schema/hadoop"
+	xmlns:c="http://www.springframework.org/schema/c"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+      	http://www.springframework.org/schema/batch	http://www.springframework.org/schema/batch/spring-batch.xsd
+      	http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
+
+	<import resource="../batch-common.xml"/>
+	<import resource="../hadoop-ctx.xml"/>
+
+	<!-- required since Job is a class not an interface -->
+	<bean class="org.springframework.batch.core.scope.StepScope" p:proxyTargetClass="true"/>
+	
+	<job id="mainJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="import" next="do">
+			<tasklet ref="script-tasklet"/>
+		</step>
+		<step id="do">
+			<tasklet ref="hadoop-tasklet"/>
+		</step>
+		<!-- 
+		<step id="export">
+			<tasklet>
+				<chunk reader="hdfs-reader" writer="file-writer" commit-interval="10"/>
+			</tasklet>
+		</step>
+		 -->
+	</job>
+	 
+	<bean id="file-reader" class="org.springframework.batch.item.file.ResourcesItemReader" p:resources="classpath:input/word/*.txt"/>
+
+	<hdp:tasklet id="hadoop-tasklet" job-ref="mr-job" wait-for-job="true" />
+	
+ 	<hdp:job id="mr-job" 
+	    input-path="#{jobParameters['mr.input']}" output-path="#{jobParameters['mr.output']}"
+		mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
+		reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"
+		validate-paths="false"
+		scope="step"
+	/>
+	
+	<hdp:script-tasklet id="script-tasklet">
+		<hdp:script language="javascript">
+if (fsh.test("/batch-param-test/input")) fsh.rmr("/batch-param-test/input")
+if (fsh.test("/batch-param-test/output")) fsh.rmr("/batch-param-test/output")
+fsh.mkdir("/batch-param-test/input");
+fsh.put("src/test/resources/input/word", "/batch-param-test/input")			
+		</hdp:script>
+	</hdp:script-tasklet>
+	
+</beans>
