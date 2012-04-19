@@ -51,7 +51,7 @@ public class JobParamsTest {
 	@Before
 	public void setup() {
 		Map<String, JobParameter> p = new LinkedHashMap<String, JobParameter>();
-		p.put("mr.input", new JobParameter("/batch-param-test/input"));
+		p.put("mr.input", new JobParameter("/batch-param-test/input/"));
 		p.put("mr.output", new JobParameter("/batch-param-test/output"));
 		params = new JobParameters(p);
 	}
