@@ -45,6 +45,7 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.data.hadoop.configuration.ConfigurationUtils;
 import org.springframework.data.hadoop.fs.HdfsResourceLoader;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -128,7 +129,7 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 		if (jar != null) {
 			JobConf conf = (JobConf) job.getConfiguration();
 			conf.setJar(jar.getURI().toString());
-			loader = ClassUtils.createParentLastClassLoader(jar, beanClassLoader, cfg);
+			loader = ClassLoadingUtils.createParentLastClassLoader(jar, beanClassLoader, cfg);
 		}
 		
 
@@ -213,7 +214,7 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 
 	@SuppressWarnings("unchecked")
 	private <T> Class<? extends T> resolveClass(String className, ClassLoader cl, Class<T> type) {
-		return (Class<? extends T>) org.springframework.util.ClassUtils.resolveClassName(className, cl);
+		return (Class<? extends T>) ClassUtils.resolveClassName(className, cl);
 	}
 
 	private void configureMapperTypesIfPossible(Job j, Class<? extends Mapper> mapper) {

@@ -29,6 +29,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.IOUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.core.io.Resource;
+import org.springframework.util.ClassUtils;
 
 /**
  * Class-related utilities.
@@ -37,12 +38,12 @@ import org.springframework.core.io.Resource;
  */
 // NOTE: jars with nested /classes/ are supported as well but this functionality is disabled
 // as it seems to have not been used in hadoop.
-abstract class ClassUtils {
+abstract class ClassLoadingUtils {
 
 	@SuppressWarnings("unchecked")
 	public static <T> T loadClassParentLast(Resource jar, ClassLoader parentClassLoader, String className, Configuration cfg) {
 		ClassLoader cl = createParentLastClassLoader(jar, parentClassLoader, cfg);
-		Class<?> clazz = org.springframework.util.ClassUtils.resolveClassName(className, cl);
+		Class<?> clazz = ClassUtils.resolveClassName(className, cl);
 		return (T) BeanUtils.instantiateClass(clazz);
 	}
 
@@ -51,7 +52,7 @@ abstract class ClassUtils {
 
 		// sanity check
 		if (parentClassLoader == null) {
-			parentClassLoader = org.springframework.util.ClassUtils.getDefaultClassLoader();
+			parentClassLoader = ClassUtils.getDefaultClassLoader();
 			cl = parentClassLoader;
 		}
 

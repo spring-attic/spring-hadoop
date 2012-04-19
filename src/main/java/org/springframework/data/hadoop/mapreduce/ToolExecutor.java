@@ -43,7 +43,7 @@ abstract class ToolExecutor extends JobGenericOptions implements BeanClassLoader
 
 	int runTool() throws Exception {
 		Configuration cfg = ConfigurationUtils.createFrom(configuration, properties);
-		t = (Tool) (tool != null ? tool : ClassUtils.loadClassParentLast(jar, beanClassLoader, toolClassName, cfg));
+		t = (Tool) (tool != null ? tool : ClassLoadingUtils.loadClassParentLast(jar, beanClassLoader, toolClassName, cfg));
 		return org.apache.hadoop.util.ToolRunner.run(cfg, t, arguments);
 	}
 
