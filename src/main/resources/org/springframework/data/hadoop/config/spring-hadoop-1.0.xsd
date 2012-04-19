@@ -1054,6 +1054,7 @@ Whether the script is evaluated automatically once the application context initi
 						]]></xsd:documentation>
 		         	</xsd:annotation>
 		       	</xsd:attribute>
+				<xsd:attribute name="scope" type="xsd:string" use="optional" />			       	
 				</xsd:extension>
 			</xsd:complexContent>
 		</xsd:complexType>

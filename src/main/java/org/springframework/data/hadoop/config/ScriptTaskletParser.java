@@ -47,6 +47,7 @@ class ScriptTaskletParser extends AbstractSimpleBeanDefinitionParser {
 	 */
 	private static class ScriptFactoryBeanCallable extends HdfsScriptFactoryBean {
 
+
 		private Object accessibleGetObject() {
 			return super.getObject();
 		}
@@ -93,7 +94,6 @@ class ScriptTaskletParser extends AbstractSimpleBeanDefinitionParser {
 			builder.setScope(scope);
 		}
 
-
 		String attribute = element.getAttribute("script-ref");
 
 		Element nestedScript = DomUtils.getChildElementByTagName(element, "script");
@@ -106,6 +106,9 @@ class ScriptTaskletParser extends AbstractSimpleBeanDefinitionParser {
 			BeanDefinition parse = new ScriptParser().parse(nestedScript, parserContext);
 			// ugly but we know the type (as the class is private and under our control)
 			((AbstractBeanDefinition) parse).setBeanClass(ScriptFactoryBeanCallable.class);
+			if (StringUtils.hasText(scope)) {
+				parse.setScope(scope);
+			}
 			builder.addPropertyValue("scriptCallback", parse);
 		}
 		else {

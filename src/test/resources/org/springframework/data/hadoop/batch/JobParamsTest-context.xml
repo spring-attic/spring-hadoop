@@ -1,0 +1,69 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:hdp="http://www.springframework.org/schema/hadoop"
+	xmlns:c="http://www.springframework.org/schema/c"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+      	http://www.springframework.org/schema/batch	http://www.springframework.org/schema/batch/spring-batch.xsd
+      	http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
+
+	<import resource="../batch-common.xml"/>
+	<import resource="../hadoop-ctx.xml"/>
+
+	<!-- required since Job is a class not an interface -->
+	<bean class="org.springframework.batch.core.scope.StepScope" p:proxyTargetClass="true"/>
+	
+	<job id="mainJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="import" next="import-2">
+			<tasklet ref="nested-script-tasklet"/>
+		</step>
+		<step id="import-2" next="do">
+			<tasklet ref="ref-script-tasklet"/>
+		</step>
+		<step id="do">
+			<tasklet ref="hadoop-tasklet"/>
+		</step>
+		<!-- 
+		<step id="export">
+			<tasklet>
+				<chunk reader="hdfs-reader" writer="file-writer" commit-interval="10"/>
+			</tasklet>
+		</step>
+		 -->
+	</job>
+	 
+	<bean id="file-reader" class="org.springframework.batch.item.file.ResourcesItemReader" p:resources="classpath:input/word/*.txt"/>
+
+	<hdp:tasklet id="hadoop-tasklet" job-ref="mr-job" wait-for-job="true" />
+	
+ 	<hdp:job id="mr-job" 
+	    input-path="#{jobParameters['mr.input']}" output-path="#{jobParameters['mr.output']}"
+		mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
+		reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"
+		validate-paths="false"
+		scope="step"
+	/>
+	
+	<hdp:script-tasklet id="ref-script-tasklet" scope="step" script-ref="script"/>
+	
+	<hdp:script language="javascript" id="script" scope="step">
+if (fsh.test(input)) fsh.rmr(input)
+if (fsh.test(output)) fsh.rmr(output)
+fsh.mkdir(input);
+fsh.put("src/test/resources/input/word", input)
+		<hdp:property name="input" value="#{jobParameters['mr.input']}"/>			
+		<hdp:property name="output" value="#{jobParameters['mr.output']}"/>
+	</hdp:script>
+	
+	<hdp:script-tasklet id="nested-script-tasklet" scope="step">
+	<hdp:script language="javascript">
+if (fsh.test(input)) fsh.rmr(input)
+if (fsh.test(output)) fsh.rmr(output)
+fsh.mkdir(input);
+fsh.put("src/test/resources/input/word", input)
+		<hdp:property name="input" value="#{jobParameters['mr.input']}"/>			
+		<hdp:property name="output" value="#{jobParameters['mr.output']}"/>
+	</hdp:script>
+	</hdp:script-tasklet>
+</beans>

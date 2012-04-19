@@ -33,18 +33,21 @@ import org.springframework.context.event.ContextRefreshedEvent;
 public class JobsTrigger
 {
 
-	public void onApplicationEvent(ContextRefreshedEvent event) {
+	public static void onApplicationEvent(ContextRefreshedEvent event) {
 		startJobs(event.getApplicationContext());
 	}
 
-	public void startJobs(ApplicationContext ctx) {
+	public static void startJobs(ApplicationContext ctx) {
+		startJobs(ctx, new JobParameters());
+	}
+
+	public static void startJobs(ApplicationContext ctx, JobParameters params) {
 		JobLauncher launcher = ctx.getBean(JobLauncher.class);
 		Map<String, Job> jobs = ctx.getBeansOfType(Job.class);
 
 		for (Map.Entry<String, Job> entry : jobs.entrySet()) {
-			System.out.println("Executing job " + entry.getKey());
 			try {
-				if (launcher.run(entry.getValue(), new JobParameters()).getStatus().equals(BatchStatus.FAILED)){
+				if (launcher.run(entry.getValue(), params).getStatus().equals(BatchStatus.FAILED)) {
 					throw new BeanInitializationException("Failed executing job " + entry.getKey());
 				}
 			} catch (Exception ex) {

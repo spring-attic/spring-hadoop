@@ -26,7 +26,7 @@
 	
 	<bean id="mr-job" class="org.springframework.data.hadoop.mapreduce.JobFactoryBean"
 		p:configuration-ref="hadoopConfiguration"
-		p:input-paths="/ide-test/input/word/"
+		p:input-path="/ide-test/input/word/"
 		p:output-path="/ide-test/output/word/"
 		p:mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
 		p:reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"
