@@ -36,6 +36,7 @@ import org.apache.hadoop.mapreduce.Partitioner;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -49,11 +50,15 @@ import org.springframework.util.StringUtils;
 
 /**
  * Factory bean for creating a Hadoop Map-Reduce job.
+ * Note that the setters for the class access class names (String) instead of direct
+ * classes. This is done on purpose in case the job itself and its dependencies are
+ * on a jar not available on the classpath ({@link #setJar(Resource)}) in which case
+ * a special, on-the-fly classloader is used.
  * 
  * @author Costin Leau
  */
 // TODO: extract input/output format configs
-public class JobFactoryBean extends JobGenericOptions implements InitializingBean, FactoryBean<Job>, BeanNameAware {
+public class JobFactoryBean extends JobGenericOptions implements InitializingBean, FactoryBean<Job>, BeanNameAware, BeanClassLoaderAware {
 
 	private Job job;
 	private Configuration configuration;
@@ -61,20 +66,20 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 
 	private String name;
 
-	private Class<?> keyClass;
-	private Class<?> valueClass;
+	private String key;
+	private String value;
 
-	private Class<?> mapKeyClass;
-	private Class<?> mapValueClass;
+	private String mapKey;
+	private String mapValue;
 
-	private Class<? extends Mapper> mapper;
-	private Class<? extends Reducer> reducer;
-	private Class<? extends Reducer> combiner;
-	private Class<? extends InputFormat> inputFormat;
-	private Class<? extends OutputFormat> outputFormat;
-	private Class<? extends Partitioner> partitioner;
-	private Class<? extends RawComparator> sortComparator;
-	private Class<? extends RawComparator> groupingComparator;
+	private String mapper;
+	private String reducer;
+	private String combiner;
+	private String inputFormat;
+	private String outputFormat;
+	private String partitioner;
+	private String sortComparator;
+	private String groupingComparator;
 	
 	private String workingDir;
 	private Integer numReduceTasks;
@@ -85,9 +90,15 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 	private List<String> inputPaths;
 	private String outputPath;
 	private Boolean compressOutput;
-	private Class<? extends CompressionCodec> codecClass;
+	private String codecClass;
 	private Boolean validatePaths = Boolean.TRUE;
+	private ClassLoader beanClassLoader;
 
+	@Override
+	public void setBeanClassLoader(ClassLoader classLoader) {
+		this.beanClassLoader = classLoader;
+	}
+	
 	public void setBeanName(String name) {
 		this.name = name;
 	}
@@ -104,6 +115,7 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 		return true;
 	}
 
+	@SuppressWarnings("rawtypes")
 	public void afterPropertiesSet() throws Exception {
 		Configuration cfg = (properties != null ? ConfigurationUtils.createFrom(configuration, properties) : (configuration != null ? configuration : new Configuration()));
 
@@ -111,63 +123,69 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 
 		job = new Job(cfg);
 
+		ClassLoader loader = (beanClassLoader != null ? beanClassLoader : org.springframework.util.ClassUtils.getDefaultClassLoader());
+				
+		if (jar != null) {
+			JobConf conf = (JobConf) job.getConfiguration();
+			conf.setJar(jar.getURI().toString());
+			loader = ClassUtils.createParentLastClassLoader(jar, beanClassLoader, cfg);
+		}
+		
+
 		// set first to enable auto-detection of K/V to skip the key/value types to be specified
 		if (mapper != null) {
-			job.setMapperClass(mapper);
-			configureMapperTypesIfPossible(job, mapper);
+			Class<? extends Mapper> mapperClass = resolveClass(mapper, loader, Mapper.class);
+			job.setMapperClass(mapperClass);
+			configureMapperTypesIfPossible(job, mapperClass);
 		}
 
 		if (reducer != null) {
-			job.setReducerClass(reducer);
-			configureReducerTypesIfPossible(job, reducer);
+			Class<? extends Reducer> reducerClass = resolveClass(reducer, loader, Reducer.class);
+			job.setReducerClass(reducerClass);
+			configureReducerTypesIfPossible(job, reducerClass);
 		}
-
 
 		if (StringUtils.hasText(name)) {
 			job.setJobName(name);
 		}
 		if (combiner != null) {
-			job.setCombinerClass(combiner);
+			job.setCombinerClass(resolveClass(combiner, loader, Reducer.class));
 		}
 		if (groupingComparator != null) {
-			job.setGroupingComparatorClass(groupingComparator);
+			job.setGroupingComparatorClass(resolveClass(groupingComparator, loader, RawComparator.class));
 		}
 		if (inputFormat != null) {
-			job.setInputFormatClass(inputFormat);
+			job.setInputFormatClass(resolveClass(inputFormat, loader, InputFormat.class));
 		}
-		if (mapKeyClass != null) {
-			job.setMapOutputKeyClass(mapKeyClass);
+		if (mapKey != null) {
+			job.setMapOutputKeyClass(resolveClass(mapKey, loader, Object.class));
 		}
-		if (mapValueClass != null) {
-			job.setMapOutputValueClass(mapValueClass);
+		if (mapValue != null) {
+			job.setMapOutputValueClass(resolveClass(mapValue, loader, Object.class));
 		}
 		if (numReduceTasks != null) {
 			job.setNumReduceTasks(numReduceTasks);
 		}
-		if (keyClass != null) {
-			job.setOutputKeyClass(keyClass);
+		if (key != null) {
+			job.setOutputKeyClass(resolveClass(key, loader, Object.class));
 		}
-		if (valueClass != null) {
-			job.setOutputValueClass(valueClass);
+		if (value != null) {
+			job.setOutputValueClass(resolveClass(value, loader, Object.class));
 		}
 		if (outputFormat != null) {
-			job.setOutputFormatClass(outputFormat);
+			job.setOutputFormatClass(resolveClass(outputFormat, loader, OutputFormat.class));
 		}
 		if (partitioner != null) {
-			job.setPartitionerClass(partitioner);
+			job.setPartitionerClass(resolveClass(partitioner, loader, Partitioner.class));
 		}
 		if (sortComparator != null) {
-			job.setSortComparatorClass(sortComparator);
+			job.setSortComparatorClass(resolveClass(sortComparator, loader, RawComparator.class));
 		}
 		if (StringUtils.hasText(workingDir)) {
 			job.setWorkingDirectory(new Path(workingDir));
 		}
 		if (jarClass != null) {
 			job.setJarByClass(jarClass);
-		}
-		if (jar != null) {
-			JobConf conf = (JobConf) job.getConfiguration();
-			conf.setJar(jar.getURI().toString());
 		}
 
 		ResourcePatternResolver rl = new HdfsResourceLoader(FileSystem.get(job.getConfiguration()));
@@ -187,10 +205,15 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 		}
 
 		if (codecClass != null) {
-			FileOutputFormat.setOutputCompressorClass(job, codecClass);
+			FileOutputFormat.setOutputCompressorClass(job, resolveClass(codecClass, loader, CompressionCodec.class));
 		}
 
 		processJob(job);
+	}
+
+	@SuppressWarnings("unchecked")
+	private <T> Class<? extends T> resolveClass(String className, ClassLoader cl, Class<T> type) {
+		return (Class<? extends T>) org.springframework.util.ClassUtils.resolveClassName(className, cl);
 	}
 
 	private void configureMapperTypesIfPossible(Job j, Class<? extends Mapper> mapper) {
@@ -270,37 +293,37 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 	/**
 	 * Sets the job key class.
 	 * 
-	 * @param keyClass The keyClass to set.
+	 * @param key The keyClass to set.
 	 */
-	public void setKey(Class<?> keyClass) {
-		this.keyClass = keyClass;
+	public void setKey(String key) {
+		this.key = key;
 	}
 
 	/**
 	 * Sets the job value class.
 	 * 
-	 * @param valueClass The valueClass to set.
+	 * @param value The valueClass to set.
 	 */
-	public void setValue(Class<?> valueClass) {
-		this.valueClass = valueClass;
+	public void setValue(String value) {
+		this.value = value;
 	}
 
 	/**
 	 * Sets the job map key class.
 	 * 
-	 * @param mapKeyClass The mapKeyClass to set.
+	 * @param mapKey The mapKeyClass to set.
 	 */
-	public void setMapKey(Class<?> mapKeyClass) {
-		this.mapKeyClass = mapKeyClass;
+	public void setMapKey(String mapKey) {
+		this.mapKey = mapKey;
 	}
 
 	/**
 	 * Sets the job map value class.
 	 * 
-	 * @param mapValueClass The mapValueClass to set.
+	 * @param mapValue The mapValueClass to set.
 	 */
-	public void setMapValue(Class<?> mapValueClass) {
-		this.mapValueClass = mapValueClass;
+	public void setMapValue(String mapValue) {
+		this.mapValue = mapValue;
 	}
 
 	/**
@@ -308,7 +331,7 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 	 * 
 	 * @param mapper The mapper to set.
 	 */
-	public void setMapper(Class<? extends Mapper> mapper) {
+	public void setMapper(String mapper) {
 		this.mapper = mapper;
 	}
 
@@ -317,7 +340,7 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 	 * 
 	 * @param reducer The reducer to set.
 	 */
-	public void setReducer(Class<? extends Reducer> reducer) {
+	public void setReducer(String reducer) {
 		this.reducer = reducer;
 	}
 
@@ -326,7 +349,7 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 	 * 
 	 * @param combiner The combiner to set.
 	 */
-	public void setCombiner(Class<? extends Reducer> combiner) {
+	public void setCombiner(String combiner) {
 		this.combiner = combiner;
 	}
 
@@ -335,7 +358,7 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 	 * 
 	 * @param inputFormat The inputFormat to set.
 	 */
-	public void setInputFormat(Class<? extends InputFormat> inputFormat) {
+	public void setInputFormat(String inputFormat) {
 		this.inputFormat = inputFormat;
 	}
 
@@ -344,7 +367,7 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 	 * 
 	 * @param outputFormat The outputFormat to set.
 	 */
-	public void setOutputFormat(Class<? extends OutputFormat> outputFormat) {
+	public void setOutputFormat(String outputFormat) {
 		this.outputFormat = outputFormat;
 	}
 
@@ -353,7 +376,7 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 	 * 
 	 * @param partitioner The partitioner to set.
 	 */
-	public void setPartitioner(Class<? extends Partitioner> partitioner) {
+	public void setPartitioner(String partitioner) {
 		this.partitioner = partitioner;
 	}
 
@@ -362,7 +385,7 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 	 * 
 	 * @param sortComparator The sortComparator to set.
 	 */
-	public void setSortComparator(Class<? extends RawComparator> sortComparator) {
+	public void setSortComparator(String sortComparator) {
 		this.sortComparator = sortComparator;
 	}
 
@@ -371,7 +394,7 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 	 * 
 	 * @param groupingComparator The groupingComparator to set.
 	 */
-	public void setGroupingComparator(Class<? extends RawComparator> groupingComparator) {
+	public void setGroupingComparator(String groupingComparator) {
 		this.groupingComparator = groupingComparator;
 	}
 
@@ -394,7 +417,7 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 	}
 
 	/**
-	 * Determines the job jar based on the given class.
+	 * Determines the job jar (available on the classpath) based on the given class.
 	 * 
 	 * @param jarClass The jarClass to set.
 	 */
@@ -403,7 +426,7 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 	}
 
 	/**
-	 * Sets the job jar.
+	 * Sets the job jar (which might not be on the classpath).
 	 * 
 	 * @param jar The jar to set.
 	 */
@@ -447,7 +470,7 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 	 * 
 	 * @param codecClass The codecClass to set.
 	 */
-	public void setCodec(Class<? extends CompressionCodec> codecClass) {
+	public void setCodec(String codecClass) {
 		this.codecClass = codecClass;
 	}
 
