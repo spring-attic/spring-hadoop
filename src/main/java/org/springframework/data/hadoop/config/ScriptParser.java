@@ -23,6 +23,7 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.xml.AbstractSimpleBeanDefinitionParser;
+import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.data.hadoop.scripting.HdfsScriptFactoryBean;
 import org.springframework.scripting.support.ResourceScriptSource;
@@ -48,6 +49,12 @@ class ScriptParser extends AbstractSimpleBeanDefinitionParser {
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 		// parse attributes using conventions
 		super.doParse(element, parserContext, builder);
+
+		// set scope
+		String scope = element.getAttribute(BeanDefinitionParserDelegate.SCOPE_ATTRIBUTE);
+		if (StringUtils.hasText(scope)) {
+			builder.setScope(scope);
+		}
 
 		// parse source
 		String location = element.getAttribute("location");

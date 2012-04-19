@@ -15,8 +15,11 @@
 	<bean class="org.springframework.batch.core.scope.StepScope" p:proxyTargetClass="true"/>
 	
 	<job id="mainJob" xmlns="http://www.springframework.org/schema/batch">
-		<step id="import" next="do">
-			<tasklet ref="script-tasklet"/>
+		<step id="import" next="import-2">
+			<tasklet ref="nested-script-tasklet"/>
+		</step>
+		<step id="import-2" next="do">
+			<tasklet ref="ref-script-tasklet"/>
 		</step>
 		<step id="do">
 			<tasklet ref="hadoop-tasklet"/>
@@ -42,13 +45,25 @@
 		scope="step"
 	/>
 	
-	<hdp:script-tasklet id="script-tasklet">
-		<hdp:script language="javascript">
-if (fsh.test("/batch-param-test/input")) fsh.rmr("/batch-param-test/input")
-if (fsh.test("/batch-param-test/output")) fsh.rmr("/batch-param-test/output")
-fsh.mkdir("/batch-param-test/input");
-fsh.put("src/test/resources/input/word", "/batch-param-test/input")			
-		</hdp:script>
-	</hdp:script-tasklet>
+	<hdp:script-tasklet id="ref-script-tasklet" scope="step" script-ref="script"/>
 	
+	<hdp:script language="javascript" id="script" scope="step">
+if (fsh.test(input)) fsh.rmr(input)
+if (fsh.test(output)) fsh.rmr(output)
+fsh.mkdir(input);
+fsh.put("src/test/resources/input/word", input)
+		<hdp:property name="input" value="#{jobParameters['mr.input']}"/>			
+		<hdp:property name="output" value="#{jobParameters['mr.output']}"/>
+	</hdp:script>
+	
+	<hdp:script-tasklet id="nested-script-tasklet" scope="step">
+	<hdp:script language="javascript">
+if (fsh.test(input)) fsh.rmr(input)
+if (fsh.test(output)) fsh.rmr(output)
+fsh.mkdir(input);
+fsh.put("src/test/resources/input/word", input)
+		<hdp:property name="input" value="#{jobParameters['mr.input']}"/>			
+		<hdp:property name="output" value="#{jobParameters['mr.output']}"/>
+	</hdp:script>
+	</hdp:script-tasklet>
 </beans>
