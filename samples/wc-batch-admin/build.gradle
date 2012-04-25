@@ -26,6 +26,7 @@ dependencies {
     // update the version that comes with Batch
     compile "org.springframework:spring-tx:$springVersion"
     runtime "org.codehaus.groovy:groovy:$groovyVersion"
+	runtime "hsqldb:hsqldb:$hsqldbVersion"
     // see HADOOP-7461
     runtime "org.codehaus.jackson:jackson-mapper-asl:$jacksonVersion"
     

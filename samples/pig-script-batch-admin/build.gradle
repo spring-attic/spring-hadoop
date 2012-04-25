@@ -37,8 +37,7 @@ dependencies {
 	runtime "org.apache.pig:pig:$pigVersion"
 	runtime "jline:jline:1.0"
 	runtime "org.antlr:antlr:3.1.1"
-	
-
+	runtime "hsqldb:hsqldb:$hsqldbVersion"
 	runtime "org.codehaus.groovy:groovy:$groovyVersion"
     
     

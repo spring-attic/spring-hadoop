@@ -42,7 +42,7 @@ dependencies {
 	runtime "org.apache.ant:ant:$antVersion"
 	runtime "org.apache.ant:ant-launcher:$antVersion"
 	runtime "org.codehaus.groovy:groovy:$groovyVersion"
-    
+	runtime "hsqldb:hsqldb:$hsqldbVersion"    
     
     // see HADOOP-7461
     runtime "org.codehaus.jackson:jackson-mapper-asl:$jacksonVersion"
