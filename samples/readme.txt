@@ -26,7 +26,7 @@ Word count application with cron scheduler
 * wordcount-quartz
 Word count application with quartz scheduler
 
-* wordcount-batch-admin
+* wc-batch-admin
 Word count application with spring batch admin
 
 * hbase-crud-java

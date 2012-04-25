@@ -30,7 +30,7 @@ The rest of the document refers to only the *nix/BSD OS style command line
 b) To build and run the sample as a standalone Java application:
 
 $ ../gradlew installApp
-$ ./build/install/batch-wordcount/bin/batch-wordcount classpath:/launch-context.xml job1
+$ ./build/install/wordcount-batch/bin/wordcount-batch classpath:/launch-context.xml job1
 
 This uses the CommandLineJobRunner launcher from the Spring Batch project. 
 

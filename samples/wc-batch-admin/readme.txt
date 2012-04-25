@@ -27,18 +27,12 @@ $ gradle
 
 The rest of the document refers to only the *nix/BSD OS style command line
 
-b) To build and run the sample as a standalone Java application:
 
-$ ../gradlew installApp
-$ ./build/install/batch-admin-wordcount/bin/batch-admin-wordcount classpath:/launch-context.xml job1 fail=false run.id=1
-
-This uses the CommandLineJobRunner launcher from the Spring Batch project. 
-
-c) To build and run the sample with Spring Batch Admin:
+b) To build and run the sample with Spring Batch Admin:
 
 $ ../gradlew jettyRun
 
-then open internet explorer and input "http://localhost:8081/batch-admin-wordcount", click "Jobs" -> "job1". In the Job Parameters text field,
+then open internet explorer and input "http://localhost:8081/wc-batch-admin", click "Jobs" -> "job1". In the Job Parameters text field,
  input "fail=false run.id=1", and click "Launch" button.
 
 3. IDE IMPORT

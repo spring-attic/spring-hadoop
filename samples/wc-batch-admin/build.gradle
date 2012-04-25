@@ -1,12 +1,12 @@
 description = 'Spring Hadoop Samples - Spring Batch WordCount'
 
 apply plugin: 'base'
-apply plugin: 'idea'
 apply plugin: 'java'
-apply plugin: 'eclipse'  // `gradle eclipse` to generate .classpath/.project
-apply plugin: 'application'
 apply plugin: 'war'
 apply plugin: 'jetty'
+
+apply plugin: 'eclipse'
+apply plugin: 'idea'
 
 repositories {
     mavenLocal()
@@ -35,5 +35,4 @@ dependencies {
 
 httpPort = 8081
 
-mainClassName = "org.springframework.batch.core.launch.support.CommandLineJobRunner"
 defaultTasks 'clean', 'build'

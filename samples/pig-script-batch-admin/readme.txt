@@ -19,15 +19,9 @@ To build and run the sample with Spring Batch Admin:
 
 look at script in src/main/resources/META-INF/spring/context.xml, and change proxy settings per your env.
 
-$ ../gradlew run
+$ ../gradlew downloadSampleSet
 
-$ cd src/main/resources
-
-$ unzip ml-100k.zip 
-
-$ cd ../../..
-
-$ ../gradlew
+$ ../gradlew jettyRun
 
 then open internet explorer and input "http://localhost:8081/pig-script-batch-admin", click "Jobs" -> "pigJob". In the Job Parameters text field,
  input "fail=false run.id=1", and click "Launch" button.
