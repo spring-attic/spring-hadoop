@@ -19,10 +19,12 @@ import java.util.Properties;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.util.Tool;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.core.io.Resource;
 import org.springframework.data.hadoop.configuration.ConfigurationUtils;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 
 /**
  * Base class for configuring a Tool.
@@ -35,7 +37,6 @@ abstract class ToolExecutor extends JobGenericOptions implements BeanClassLoader
 	Configuration configuration;
 	Properties properties;
 	Tool tool;
-	Tool t;
 	String toolClassName;
 	Resource jar;
 	private ClassLoader beanClassLoader;
@@ -43,8 +44,31 @@ abstract class ToolExecutor extends JobGenericOptions implements BeanClassLoader
 
 	int runTool() throws Exception {
 		Configuration cfg = ConfigurationUtils.createFrom(configuration, properties);
-		t = (Tool) (tool != null ? tool : ClassLoadingUtils.loadClassParentLast(jar, beanClassLoader, toolClassName, cfg));
-		return org.apache.hadoop.util.ToolRunner.run(cfg, t, arguments);
+
+		ClassLoader cl = beanClassLoader;
+		Tool t = tool;
+
+		if (t == null) {
+			cl = ClassLoadingUtils.createParentLastClassLoader(jar, beanClassLoader, cfg);
+			cfg.setClassLoader(cl);
+			t = loadTool(toolClassName, cl);
+		}
+
+		Thread th = Thread.currentThread();
+		ClassLoader oldTccl = th.getContextClassLoader();
+
+		try {
+			th.setContextClassLoader(cl);
+			return org.apache.hadoop.util.ToolRunner.run(cfg, t, arguments);
+		} finally {
+			th.setContextClassLoader(oldTccl);
+		}
+
+	}
+
+	private Tool loadTool(String toolClassName, ClassLoader cl) {
+		Class<?> clazz = ClassUtils.resolveClassName(toolClassName, cl);
+		return (Tool) BeanUtils.instantiateClass(clazz);
 	}
 
 	/**

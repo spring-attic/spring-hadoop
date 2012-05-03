@@ -16,8 +16,10 @@
 package org.springframework.data.hadoop.mapreduce;
 
 import org.junit.Test;
+import org.springframework.beans.BeanUtils;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
+import org.springframework.util.ClassUtils;
 
 import test.SomeClass;
 import static org.junit.Assert.*;
@@ -35,7 +37,7 @@ public class ClassUtilsTest {
 		assertNotNull(System.getProperty(SomeClass.CLASS_LOADED + ".2"));
 
 		// use v2 CL as a parent
-		Object obj = ClassLoadingUtils.loadClassParentLast(jar, v2.getClass().getClassLoader(), "test.SomeClass", null);
+		Object obj = loadFromJar(jar, v2.getClass().getClassLoader(), "test.SomeClass");
 
 		// check the jar classes are preferred
 		assertEquals("Class-v1", System.getProperty(SomeClass.LAST_LOADED));
@@ -47,7 +49,7 @@ public class ClassUtilsTest {
 	public void testNestedClass() throws Exception {
 		Resource jar = new DefaultResourceLoader().getResource("jar-with-classes.jar");
 
-		Object obj = ClassLoadingUtils.loadClassParentLast(jar, getClass().getClassLoader(), "test.SomeNestedClass", null);
+		Object obj = loadFromJar(jar, getClass().getClassLoader(), "test.SomeNestedClass");
 
 		// check the jar classes are preferred
 		assertEquals("NestedClass", System.getProperty(SomeClass.LAST_LOADED));
@@ -59,11 +61,17 @@ public class ClassUtilsTest {
 	public void testNestedLib() throws Exception {
 		Resource jar = new DefaultResourceLoader().getResource("jar-with-libs.jar");
 
-		Object obj = ClassLoadingUtils.loadClassParentLast(jar, getClass().getClassLoader(), "test.SomeLibClass", null);
+		Object obj = loadFromJar(jar, getClass().getClassLoader(), "test.SomeLibClass");
 
 		// check the jar classes are preferred
 		assertEquals("LibClass", System.getProperty(SomeClass.LAST_LOADED));
 		assertNotNull(System.getProperty(SomeClass.CLASS_LOADED + ".lib"));
 		assertFalse(org.springframework.util.ClassUtils.isPresent(obj.getClass().getName(), getClass().getClassLoader()));
+	}
+
+	private static Object loadFromJar(Resource jar, ClassLoader parentCL, String className) {
+		ClassLoader cl = ClassLoadingUtils.createParentLastClassLoader(jar, parentCL, null);
+		Class<?> clazz = ClassUtils.resolveClassName(className, cl);
+		return BeanUtils.instantiateClass(clazz);
 	}
 }
