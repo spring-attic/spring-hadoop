@@ -147,8 +147,8 @@ dependencies {
     compile("org.springframework:spring-aop:$springVersion") { optional = true }
     //compile "org.springframework:spring-oxm:$springVersion"
     compile("org.springframework:spring-jdbc:$springVersion") { optional = true }
-    compile("org.springframework.batch:spring-batch-core:$springBatchVersion") { optional = true }
-    compile("org.springframework.integration:spring-integration-core:$springIntVersion") { optional = true }
+    //compile("org.springframework.batch:spring-batch-core:$springBatchVersion") { optional = true }
+    //compile("org.springframework.integration:spring-integration-core:$springIntVersion") { optional = true }
 
     // cascading
     compile("cascading:cascading-hadoop:$cascadingVersion") { optional = true }

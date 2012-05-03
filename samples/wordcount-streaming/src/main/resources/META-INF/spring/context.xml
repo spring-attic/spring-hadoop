@@ -13,6 +13,7 @@
 
 	<hdp:configuration>
 		fs.default.name=${hd.fs}
+		mapred.job.tracker=${mapred.job.tracker}
 	</hdp:configuration>
 
 	<bean name="pathUtils" class="org.springframework.data.hadoop.util.PathUtils"

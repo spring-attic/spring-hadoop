@@ -116,6 +116,7 @@ public class JobRunner implements InitializingBean, DisposableBean, ApplicationC
 		for (String jobName : jobNames) {
 			log.info("run job : " + jobName);
 			Job job = ctx.getBean(jobName, Job.class);
+			log.info("job configuration:" +job.getConfiguration().toString());
 			jobs.add(job);
 			if (!this.waitForJobs) {
 				job.submit();

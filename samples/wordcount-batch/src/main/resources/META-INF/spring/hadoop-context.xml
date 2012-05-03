@@ -8,6 +8,7 @@
 	<configuration>
 	    <!-- The value after the question mark is the default value if another value for hd.fs is not provided -->
 		fs.default.name=${hd.fs:hdfs://localhost:9000}
+		mapred.job.tracker=${mapred.job.tracker:localhost:9001}
 	</configuration>
 
 </beans:beans>

@@ -13,6 +13,7 @@
 
 	<hdp:configuration>
 		fs.default.name=${hd.fs}
+		mapred.job.tracker=${mapred.job.tracker}
 	</hdp:configuration>
 
 	<bean name="pathUtils" class="org.springframework.data.hadoop.util.PathUtils"
@@ -23,6 +24,7 @@
 		p:configuration-ref="hadoop-configuration" p:input-paths="${wordcount.input.path}"
 		p:output-path="#{@pathUtils.getTimeBasedPathFromRoot()}" p:mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
 		p:reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"
+		p:jar="${wordcount.jar.path}"
 		p:validate-paths="false" scope="prototype" />
 
 

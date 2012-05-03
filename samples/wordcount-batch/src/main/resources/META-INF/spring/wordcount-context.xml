@@ -28,6 +28,7 @@
               p:output-path="#{@pathUtils.getTimeBasedPathFromRoot()}"
               p:mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
               p:reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"
+              p:jar="${wordcount.jar.path}"
               p:validate-paths="false"
               scope="prototype"/>
 
