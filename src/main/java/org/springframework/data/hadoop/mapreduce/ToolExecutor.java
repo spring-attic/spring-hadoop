@@ -15,9 +15,11 @@
  */
 package org.springframework.data.hadoop.mapreduce;
 
+import java.security.PrivilegedExceptionAction;
 import java.util.Properties;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.util.Tool;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.BeanClassLoaderAware;
@@ -25,6 +27,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.data.hadoop.configuration.ConfigurationUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * Base class for configuring a Tool.
@@ -41,9 +44,11 @@ abstract class ToolExecutor extends JobGenericOptions implements BeanClassLoader
 	Resource jar;
 	private ClassLoader beanClassLoader;
 
+	private String user;
+
 
 	int runTool() throws Exception {
-		Configuration cfg = ConfigurationUtils.createFrom(configuration, properties);
+		final Configuration cfg = ConfigurationUtils.createFrom(configuration, properties);
 
 		ClassLoader cl = beanClassLoader;
 		Tool t = tool;
@@ -57,9 +62,24 @@ abstract class ToolExecutor extends JobGenericOptions implements BeanClassLoader
 		Thread th = Thread.currentThread();
 		ClassLoader oldTccl = th.getContextClassLoader();
 
+		final Tool ft = t;
+
 		try {
 			th.setContextClassLoader(cl);
-			return org.apache.hadoop.util.ToolRunner.run(cfg, t, arguments);
+
+			if (StringUtils.hasText(user)) {
+				UserGroupInformation ugi = UserGroupInformation.createProxyUser(user, UserGroupInformation.getLoginUser());
+				return ugi.doAs(new PrivilegedExceptionAction<Integer>() {
+
+					@Override
+					public Integer run() throws Exception {
+						return org.apache.hadoop.util.ToolRunner.run(cfg, ft, arguments);
+					}
+				});
+			}
+			else {
+				return org.apache.hadoop.util.ToolRunner.run(cfg, ft, arguments);
+			}
 		} finally {
 			th.setContextClassLoader(oldTccl);
 		}
@@ -125,5 +145,15 @@ abstract class ToolExecutor extends JobGenericOptions implements BeanClassLoader
 	@Override
 	public void setBeanClassLoader(ClassLoader classLoader) {
 		this.beanClassLoader = classLoader;
+	}
+
+	/**
+	 * Sets the user impersonation (optional) for running this task.
+	 * Should be used when running against a Hadoop Kerberos cluster. 
+	 * 
+	 * @param user user/group information
+	 */
+	public void setUser(String user) {
+		this.user = user;
 	}
 }

@@ -18,6 +18,7 @@ package org.springframework.data.hadoop.mapreduce;
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.security.PrivilegedExceptionAction;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
@@ -36,6 +37,7 @@ import org.apache.hadoop.mapreduce.Partitioner;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.security.UserGroupInformation;
 import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
@@ -95,6 +97,8 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 	private Boolean validatePaths = Boolean.TRUE;
 	private ClassLoader beanClassLoader;
 
+	private String user;
+
 	@Override
 	public void setBeanClassLoader(ClassLoader classLoader) {
 		this.beanClassLoader = classLoader;
@@ -118,11 +122,24 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 
 	@SuppressWarnings("rawtypes")
 	public void afterPropertiesSet() throws Exception {
-		Configuration cfg = (properties != null ? ConfigurationUtils.createFrom(configuration, properties) : (configuration != null ? configuration : new Configuration()));
+		final Configuration cfg = (properties != null ? ConfigurationUtils.createFrom(configuration, properties) : (configuration != null ? configuration : new Configuration()));
 
 		buildGenericOptions(cfg);
 
-		job = new Job(cfg);
+		if (StringUtils.hasText(user)) {
+			UserGroupInformation ugi = UserGroupInformation.createProxyUser(user, UserGroupInformation.getLoginUser());
+			ugi.doAs(new PrivilegedExceptionAction<Void>() {
+
+				@Override
+				public Void run() throws Exception {
+					job = new Job(cfg);
+					return null;
+				}
+			});
+		}
+		else {
+			job = new Job(cfg);
+		}
 
 		ClassLoader loader = (beanClassLoader != null ? beanClassLoader : org.springframework.util.ClassUtils.getDefaultClassLoader());
 				
@@ -492,5 +509,15 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 	 */
 	public void setProperties(Properties properties) {
 		this.properties = properties;
+	}
+
+	/**
+	 * Sets the user impersonation (optional) for running this job.
+	 * Should be used when running against a Hadoop Kerberos cluster. 
+	 * 
+	 * @param user user/group information
+	 */
+	public void setUser(String user) {
+		this.user = user;
 	}
 }
