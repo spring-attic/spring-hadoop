@@ -33,6 +33,7 @@ import org.springframework.data.hadoop.configuration.ConfigurationUtils;
 import cascading.cascade.Cascade;
 import cascading.flow.Flow;
 import cascading.flow.FlowListener;
+import cascading.flow.FlowProps;
 import cascading.flow.FlowSkipStrategy;
 import cascading.flow.FlowStepStrategy;
 import cascading.flow.hadoop.HadoopFlow;
@@ -118,11 +119,11 @@ public class HadoopFlowFactoryBean implements InitializingBean, BeanNameAware, F
 		Properties props = ConfigurationUtils.asProperties(ConfigurationUtils.createFrom(configuration, properties));
 
 		if (jobPoolingInterval != null) {
-			HadoopFlow.setJobPollingInterval(props, jobPoolingInterval);
+			FlowProps.setJobPollingInterval(props, jobPoolingInterval);
 		}
 
 		if (maxConcurrentSteps != null) {
-			HadoopFlow.setMaxConcurrentSteps(props, maxConcurrentSteps);
+			FlowProps.setMaxConcurrentSteps(props, maxConcurrentSteps);
 		}
 
 		flow = (HadoopFlow) new HadoopFlowConnector(props).connect(beanName, sources, sinks, traps, tails.toArray(new Pipe[tails.size()]));

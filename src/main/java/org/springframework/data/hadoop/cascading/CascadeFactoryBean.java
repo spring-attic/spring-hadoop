@@ -26,6 +26,7 @@ import org.springframework.data.hadoop.configuration.ConfigurationUtils;
 
 import cascading.cascade.Cascade;
 import cascading.cascade.CascadeConnector;
+import cascading.cascade.CascadeProps;
 import cascading.flow.Flow;
 import cascading.flow.FlowSkipStrategy;
 
@@ -64,7 +65,7 @@ public class CascadeFactoryBean implements InitializingBean, BeanNameAware, Fact
 	public void afterPropertiesSet() throws Exception {
 		Properties props = ConfigurationUtils.asProperties(ConfigurationUtils.createFrom(configuration, properties));
 
-		Cascade.setMaxConcurrentFlows(props, concurrentFlows);
+		CascadeProps.setMaxConcurrentFlows(props, concurrentFlows);
 
 		cascade = new CascadeConnector(properties).connect(beanName, flows);
 		if (skipStrategy != null) {
