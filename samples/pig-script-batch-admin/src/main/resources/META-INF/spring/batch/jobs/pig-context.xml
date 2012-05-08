@@ -37,7 +37,7 @@
 	</hdp:script-tasklet>
 	
 	<hdp:pig-tasklet id="loadDataTasklet">
-		<hdp:script location="org/springframework/data/hadoop/samples/pig/script.pig" />
+		<hdp:script location="classpath:org/springframework/data/hadoop/samples/pig/script.pig" />
 	</hdp:pig-tasklet> 
 	
 
