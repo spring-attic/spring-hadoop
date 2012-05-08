@@ -1,4 +1,6 @@
-a = load 'u.data' as (userid:int, movieid:int, rating:int, unixtime:chararray);
-good_rating = filter a by rating > 3;
-user_rating = group good_rating by movieid;
-dump user_rating;
+a = LOAD 'u.data' as (userid:int, movieid:int, rating:int, unixtime:chararray);
+top_rating = FILTER a by rating > 4;
+user_rating = GROUP top_rating BY movieid;
+top_three = LIMIT user_rating 3;
+DUMP top_three;
+
