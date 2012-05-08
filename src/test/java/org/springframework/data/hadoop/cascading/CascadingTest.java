@@ -16,17 +16,31 @@
 package org.springframework.data.hadoop.cascading;
 
 import java.util.List;
+import java.util.Properties;
 
+import org.apache.hadoop.conf.Configuration;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.hadoop.TestUtils;
+import org.springframework.data.hadoop.configuration.ConfigurationUtils;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cascading.cascade.Cascade;
 import cascading.flow.Flow;
+import cascading.flow.FlowConnector;
+import cascading.flow.FlowConnectorProps;
+import cascading.flow.hadoop.HadoopFlowConnector;
+import cascading.operation.DebugLevel;
+import cascading.pipe.Pipe;
+import cascading.scheme.Scheme;
+import cascading.scheme.hadoop.TextDelimited;
+import cascading.tap.SinkMode;
+import cascading.tap.Tap;
+import cascading.tap.hadoop.Hfs;
+import cascading.tuple.Fields;
 
 /**
  * @author Costin Leau
@@ -43,10 +57,36 @@ public class CascadingTest {
 	private ApplicationContext ctx;
 	@Autowired
 	private Cascade cascade;
+	@Autowired
+	private Configuration hadoopConfiguration;
 
 	@Test
 	public void testCascade() throws Exception {
 		List<Flow> flows = cascade.getFlows();
 		System.out.println(flows);
+	}
+
+	@Test
+	public void testManualCascade() throws Exception {
+		ctx.getBean("script");
+
+		Scheme sourceScheme = new TextDelimited(new Fields("name", "definition"), ",");
+		Tap source = new Hfs(sourceScheme, "/test/cascading/names/input/babynamedefinitions.csv.gz");
+
+		Scheme sinkScheme = new TextDelimited(new Fields("definition", "name"), " $$ ");
+		Tap sink = new Hfs(sinkScheme, "/test/cascading/names/output/simplepipe", SinkMode.REPLACE);
+
+		Pipe assembly = new Pipe("flip");
+		//OPTIONAL: Debug the tuple
+		//assembly = new Each(assembly, DebugLevel.VERBOSE, new Debug());
+
+		// wire the existing Hadoop config into HadoopFlow
+		Properties properties = ConfigurationUtils.asProperties(hadoopConfiguration);
+
+		FlowConnector flowConnector = new HadoopFlowConnector(properties);
+
+		FlowConnectorProps.setDebugLevel(properties, DebugLevel.VERBOSE);
+		Flow flow = flowConnector.connect("flipflow", source, sink, assembly);
+		flow.complete();
 	}
 }
