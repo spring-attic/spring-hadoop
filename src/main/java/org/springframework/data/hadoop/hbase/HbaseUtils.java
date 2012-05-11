@@ -33,6 +33,11 @@ public class HbaseUtils {
 	public static DataAccessException convertHbaseException(Exception ex) {
 		return new HbaseSystemException(ex);
 	}
+	
+	public void closeHTable(HTable table) {
+		table.close();
+		HbaseSynchronizationManager.unbindResource(Bytes.toString(table.getTableName());
+	}
 
 	public static HTable getHTable(Configuration configuration, String tableName) {
 		return getHTable(null, getCharset(null), configuration, tableName);
