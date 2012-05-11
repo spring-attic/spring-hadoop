@@ -34,6 +34,7 @@ import org.springframework.util.AntPathMatcher;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.PathMatcher;
+import org.springframework.util.StringUtils;
 
 /**
  * Spring ResourceLoader over Hadoop FileSystem.
@@ -72,7 +73,7 @@ public class HdfsResourceLoader implements ResourcePatternResolver, PriorityOrde
 			if (uri == null) {
 				uri = FileSystem.getDefaultUri(config);
 			}
-			tempFS = (user != null ? FileSystem.get(uri, config, user) : FileSystem.get(uri, config));
+			tempFS = (StringUtils.hasText(user) ? FileSystem.get(uri, config, user) : FileSystem.get(uri, config));
 		} catch (Exception ex) {
 			tempFS = null;
 			throw new IllegalStateException("Cannot create filesystem", ex);

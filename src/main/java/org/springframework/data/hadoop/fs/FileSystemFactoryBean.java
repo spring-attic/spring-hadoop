@@ -22,6 +22,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.util.StringUtils;
 
 /**
  * FactoryBean for creating Hadoop {@link FileSystem} instances. Useful for interacting with
@@ -35,10 +36,19 @@ public class FileSystemFactoryBean implements InitializingBean, DisposableBean, 
 	private FileSystem fs;
 	private Configuration configuration;
 	private URI uri;
+	private String user;
 
 	public void afterPropertiesSet() throws Exception {
 		Configuration cfg = (configuration != null ? configuration : new Configuration(true));
-		fs = (uri != null ? FileSystem.get(uri, cfg) : FileSystem.get(cfg));
+		if (uri == null) {
+			uri = FileSystem.getDefaultUri(cfg);
+		}
+		if (StringUtils.hasText(user)) {
+			fs = FileSystem.get(uri, cfg, user);
+		}
+		else {
+			fs = FileSystem.get(uri, cfg);
+		}
 	}
 
 	public void destroy() throws Exception {
@@ -77,5 +87,15 @@ public class FileSystemFactoryBean implements InitializingBean, DisposableBean, 
 	 */
 	public void setUri(URI uri) {
 		this.uri = uri;
+	}
+
+	/**
+	 * Sets the user impersonation (optional) for creating this file-system.
+	 * Should be used when running against a Hadoop Kerberos cluster. 
+	 * 
+	 * @param user user/group information
+	 */
+	public void setUser(String user) {
+		this.user = user;
 	}
 }

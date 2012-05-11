@@ -17,9 +17,11 @@ package org.springframework.data.hadoop.pig;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.PrivilegedExceptionAction;
 import java.util.Collection;
 
 import org.apache.hadoop.io.IOUtils;
+import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.pig.PigServer;
 import org.apache.pig.impl.PigContext;
 import org.springframework.beans.factory.BeanInitializationException;
@@ -46,6 +48,8 @@ public class PigServerFactoryBean implements FactoryBean<PigServer>, BeanNameAwa
 	private Boolean validateEachStatement;
 	private String beanName;
 
+	private String user;
+
 	public PigServer getObject() throws Exception {
 		return createPigInstance();
 	}
@@ -58,11 +62,24 @@ public class PigServerFactoryBean implements FactoryBean<PigServer>, BeanNameAwa
 		return false;
 	}
 
-	protected PigServer createPigInstance() throws IOException {
-		PigContext ctx = (pigContext != null ? pigContext : new PigContext());
+	protected PigServer createPigInstance() throws Exception {
+		final PigContext ctx = (pigContext != null ? pigContext : new PigContext());
 
 		// apparently if not connected, pig can cause all kind of errors
-		PigServer pigServer = new PigServer(ctx, true);
+		PigServer pigServer = null;
+
+		if (StringUtils.hasText(user)) {
+			UserGroupInformation ugi = UserGroupInformation.createProxyUser(user, UserGroupInformation.getLoginUser());
+			pigServer = ugi.doAs(new PrivilegedExceptionAction<PigServer>() {
+				@Override
+				public PigServer run() throws Exception {
+					return new PigServer(ctx, true);
+				}
+			});
+		}
+		else {
+			pigServer = new PigServer(ctx, true);
+		}
 
 		if (!CollectionUtils.isEmpty(pathToSkip)) {
 			for (String path : pathToSkip) {
@@ -174,5 +191,15 @@ public class PigServerFactoryBean implements FactoryBean<PigServer>, BeanNameAwa
 	 */
 	public void setValidateEachStatement(Boolean validateEachStatement) {
 		this.validateEachStatement = validateEachStatement;
+	}
+
+	/**
+	 * Sets the user impersonation (optional) for executing Pig jobs.
+	 * Should be used when running against a Hadoop Kerberos cluster. 
+	 * 
+	 * @param user user/group information
+	 */
+	public void setUser(String user) {
+		this.user = user;
 	}
 }

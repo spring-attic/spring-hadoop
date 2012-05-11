@@ -17,6 +17,7 @@ package org.springframework.data.hadoop.mapreduce;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
@@ -26,6 +27,7 @@ import java.util.Properties;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.streaming.StreamJob;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
@@ -57,6 +59,8 @@ public class StreamJobFactoryBean extends JobGenericOptions implements Initializ
 	private Properties properties;
 	private Properties cmdEnv;
 
+	private String user;
+
 	public void setBeanName(String name) {
 		this.name = name;
 	}
@@ -77,7 +81,7 @@ public class StreamJobFactoryBean extends JobGenericOptions implements Initializ
 		Assert.isTrue(!ObjectUtils.isEmpty(input), "at least one input required");
 		Assert.hasText(output, "the output is required");
 
-		Configuration cfg = (properties != null ? ConfigurationUtils.createFrom(configuration, properties) : (configuration != null ? configuration : new Configuration()));
+		final Configuration cfg = (properties != null ? ConfigurationUtils.createFrom(configuration, properties) : (configuration != null ? configuration : new Configuration()));
 
 		buildGenericOptions(cfg);
 
@@ -96,7 +100,7 @@ public class StreamJobFactoryBean extends JobGenericOptions implements Initializ
 			addArgument(numReduceTasks.toString(), "-numReduceTasks", args);
 
 		// translate map to list
-		List<String> argsList = new ArrayList<String>(args.size() * 2 + 16);
+		final List<String> argsList = new ArrayList<String>(args.size() * 2 + 16);
 
 		for (Map.Entry<String, String> entry : args.entrySet()) {
 			argsList.add(entry.getKey());
@@ -116,7 +120,21 @@ public class StreamJobFactoryBean extends JobGenericOptions implements Initializ
 		// add recurring arguments
 		addArgument(input, "-input", argsList);
 
-		job = new Job(createStreamJob(cfg, argsList.toArray(new String[argsList.size()])));
+		if (StringUtils.hasText(user)) {
+			UserGroupInformation ugi = UserGroupInformation.createProxyUser(user, UserGroupInformation.getLoginUser());
+			ugi.doAs(new PrivilegedExceptionAction<Void>() {
+
+				@Override
+				public Void run() throws Exception {
+					job = new Job(createStreamJob(cfg, argsList.toArray(new String[argsList.size()])));
+					return null;
+				}
+			});
+		}
+		else {
+			job = new Job(createStreamJob(cfg, argsList.toArray(new String[argsList.size()])));
+		}
+
 		job.setJobName(name);
 	}
 
@@ -272,5 +290,15 @@ public class StreamJobFactoryBean extends JobGenericOptions implements Initializ
 	 */
 	public void setProperties(Properties properties) {
 		this.properties = properties;
+	}
+
+	/**
+	 * Sets the user impersonation (optional) for running this job.
+	 * Should be used when running against a Hadoop Kerberos cluster. 
+	 * 
+	 * @param user user/group information
+	 */
+	public void setUser(String user) {
+		this.user = user;
 	}
 }
