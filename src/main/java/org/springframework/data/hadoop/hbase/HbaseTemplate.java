@@ -96,15 +96,21 @@ public class HbaseTemplate implements InitializingBean {
 			throw convertHbaseAccessException((Exception) th);
 		} finally {
 			try {
-				table.close();
+				closeTable(table);
 			} catch (IOException ex) {
 				throw convertHbaseAccessException(ex);
+			} catch (IllegalStateException e) {
+				throw convertHbaseAccessException(e);
 			}
 		}
 	}
 
 	private HTable getTable(String tableName) {
 		return HbaseUtils.getHTable(tableFactory, charset, configuration, tableName);
+	}
+	
+	private void closeTable(HTable table) throws IOException, IllegalStateException {
+		HbaseUtils.closeHTable(table);
 	}
 
 	private boolean applyFlushSetting(HTable table) {
