@@ -100,7 +100,7 @@ public class HbaseTemplate implements InitializingBean {
 			} catch (IOException ex) {
 				throw convertHbaseAccessException(ex);
 			} catch (IllegalStateException e) {
-				;
+				throw convertHbaseAccessException(e);
 			}
 		}
 	}
