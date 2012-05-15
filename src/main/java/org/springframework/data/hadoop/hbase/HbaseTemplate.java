@@ -99,6 +99,8 @@ public class HbaseTemplate implements InitializingBean {
 				closeTable(table);
 			} catch (IOException ex) {
 				throw convertHbaseAccessException(ex);
+			} catch (IllegalStateException e) {
+				;
 			}
 		}
 	}
@@ -107,7 +109,7 @@ public class HbaseTemplate implements InitializingBean {
 		return HbaseUtils.getHTable(tableFactory, charset, configuration, tableName);
 	}
 	
-	private void closeTable(HTable table) {
+	private void closeTable(HTable table) throws IOException, IllegalStateException {
 		HbaseUtils.closeHTable(table);
 	}
 

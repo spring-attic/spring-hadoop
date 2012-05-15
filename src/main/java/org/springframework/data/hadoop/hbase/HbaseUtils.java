@@ -24,6 +24,9 @@ import org.apache.hadoop.hbase.client.HTableInterfaceFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+import org.apache.hadoop.hbase.util.Bytes;
+
+import java.io.IOException;
 
 /**
  * @author Costin Leau
@@ -34,9 +37,9 @@ public class HbaseUtils {
 		return new HbaseSystemException(ex);
 	}
 	
-	public void closeHTable(HTable table) {
+	public static void closeHTable(HTable table) throws IOException, IllegalStateException {
 		table.close();
-		HbaseSynchronizationManager.unbindResource(Bytes.toString(table.getTableName());
+		HbaseSynchronizationManager.unbindResource(Bytes.toString(table.getTableName()));
 	}
 
 	public static HTable getHTable(Configuration configuration, String tableName) {
