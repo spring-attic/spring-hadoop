@@ -49,6 +49,7 @@ abstract class ToolExecutor extends JobGenericOptions implements BeanClassLoader
 
 	int runTool() throws Exception {
 		final Configuration cfg = ConfigurationUtils.createFrom(configuration, properties);
+		buildGenericOptions(cfg);
 
 		ClassLoader cl = beanClassLoader;
 		Tool t = tool;

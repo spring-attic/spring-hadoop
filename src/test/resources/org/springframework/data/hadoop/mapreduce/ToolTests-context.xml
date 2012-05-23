@@ -43,14 +43,14 @@
 	
 	<bean id="tasklet" class="org.springframework.data.hadoop.mapreduce.ToolTasklet" p:tool-ref="test-tool" p:configuration-ref="hadoopConfiguration" />
 	
-	<hdp:tool-tasklet id="tasklet-ns" scope="prototype">
+	<hdp:tool-tasklet id="tasklet-ns" scope="prototype" files="some-tool.jar" libs="some-tool.jar">
 		<bean class="org.springframework.data.hadoop.mapreduce.ToolTests$TestTool">
 			<constructor-arg ref="hadoopConfiguration" />
 		</bean>
 	</hdp:tool-tasklet>
 	
 	
-	<hdp:tool-runner id="tool-jar" tool-class="test.SomeTool" jar="some-tool.jar">
+	<hdp:tool-runner id="tool-jar" tool-class="test.SomeTool" jar="some-tool.jar" archives="some-tool.jar" libs="some-tool.jar">
 		<hdp:arg value="13"/>
 	</hdp:tool-runner>
 </beans>
