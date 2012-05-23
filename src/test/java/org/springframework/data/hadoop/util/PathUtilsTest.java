@@ -25,7 +25,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-
 import static org.junit.Assert.*;
 
 
@@ -35,7 +34,7 @@ import static org.junit.Assert.*;
  * @author Jarred Li
  *
  */
-public class PathUtilsTest {
+public abstract class PathUtilsTest {
 	
 	private static final Log log = LogFactory.getLog(PathUtilsTest.class);
 	
