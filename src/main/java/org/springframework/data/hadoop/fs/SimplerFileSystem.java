@@ -396,6 +396,10 @@ public class SimplerFileSystem extends FileSystem {
 		return fs.mkdirs(f);
 	}
 
+	public boolean mkdirs(String f) throws IOException {
+		return fs.mkdirs(path(f));
+	}
+
 	public boolean mkdirs(Path f, FsPermission permission) throws IOException {
 		return fs.mkdirs(f, permission);
 	}
