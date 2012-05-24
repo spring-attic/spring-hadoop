@@ -61,7 +61,7 @@ public class PathUtils {
 		int minute = cal.get(Calendar.MINUTE);
 		int second = cal.get(Calendar.SECOND);
 
-		String[] formats = this.pathFormat.split("\\" + File.separator);
+		String[] formats = this.pathFormat.split("/");
 		for (String format : formats) {
 			switch (PathSeparator.valueOf(format.toLowerCase())) {
 			case year:

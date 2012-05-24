@@ -34,7 +34,7 @@ import static org.junit.Assert.*;
  * @author Jarred Li
  *
  */
-public abstract class PathUtilsTest {
+public class PathUtilsTest {
 	
 	private static final Log log = LogFactory.getLog(PathUtilsTest.class);
 	
@@ -52,7 +52,7 @@ public abstract class PathUtilsTest {
 	
 	@Test
 	public void testGetTimeBasedPathFromRootWithSecond(){
-		String rootPath = "/home/hadoop/input";
+		String rootPath = ".";
 		util.setRootPath(rootPath);
 		util.setPathFormat("year/month/day/hour/minute/second");
 		String result = util.getTimeBasedPathFromRoot();
@@ -90,7 +90,7 @@ public abstract class PathUtilsTest {
 	
 	@Test
 	public void testGetTimeBasedPathFromRootWithMinute(){
-		String rootPath = "/home/hadoop/input";
+		String rootPath = ".";
 		util.setRootPath(rootPath);
 		util.setPathFormat("year/month/day/hour/minute");
 		String result = util.getTimeBasedPathFromRoot();
@@ -128,7 +128,7 @@ public abstract class PathUtilsTest {
 	
 	@Test
 	public void testGetTimeBasedPathFromRootWithHour(){
-		String rootPath = "/home/hadoop/input";
+		String rootPath = ".";
 		util.setRootPath(rootPath);
 		util.setPathFormat("year/month/day/hour");
 		String result = util.getTimeBasedPathFromRoot();
@@ -166,7 +166,7 @@ public abstract class PathUtilsTest {
 	
 	@Test
 	public void testGetTimeBasedPathFromRootWithDay(){
-		String rootPath = "/home/hadoop/input";
+		String rootPath = ".";
 		util.setRootPath(rootPath);
 		util.setPathFormat("year/month/day");
 		String result = util.getTimeBasedPathFromRoot();
@@ -200,7 +200,7 @@ public abstract class PathUtilsTest {
 	
 	@Test
 	public void testGetTimeBasedPathFromRootWithMonth(){
-		String rootPath = "/home/hadoop/input";
+		String rootPath = ".";
 		util.setRootPath(rootPath);
 		util.setPathFormat("year/month");
 		String result = util.getTimeBasedPathFromRoot();
@@ -227,7 +227,7 @@ public abstract class PathUtilsTest {
 	
 	@Test
 	public void testGetTimeBasedPathFromRootWithYear(){
-		String rootPath = "/home/hadoop/input";
+		String rootPath = ".";
 		util.setRootPath(rootPath);
 		util.setPathFormat("year");
 		String result = util.getTimeBasedPathFromRoot();
@@ -248,7 +248,7 @@ public abstract class PathUtilsTest {
 	
 	@Test
 	public void testGetTimeBasedPathFromRootWithYearAndSecond(){
-		String rootPath = "/home/hadoop/input";
+		String rootPath = ".";
 		util.setRootPath(rootPath);
 		util.setPathFormat("year/second");
 		String result = util.getTimeBasedPathFromRoot();
@@ -270,7 +270,7 @@ public abstract class PathUtilsTest {
 	
 	@Test
 	public void testGetTimeBasedPathFromRootOnlyHour(){
-		String rootPath = "/home/hadoop/input";
+		String rootPath = ".";
 		util.setRootPath(rootPath);
 		util.setPathFormat("hour");
 		String result = util.getTimeBasedPathFromRoot();
@@ -291,7 +291,7 @@ public abstract class PathUtilsTest {
 	
 	@Test
 	public void testGetTimeBasedPathFromRootOnlyHourWithUUID(){
-		String rootPath = "/home/hadoop/input";
+		String rootPath = ".";
 		util.setRootPath(rootPath);
 		util.setPathFormat("hour");
 		util.setAppendUUID(true);
