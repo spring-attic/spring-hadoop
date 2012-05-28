@@ -16,6 +16,7 @@
 package org.springframework.data.hadoop;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.apache.hadoop.conf.Configuration;
@@ -75,4 +76,27 @@ public class TestUtils {
 		}
 	}
 
+	public static boolean compareStreams(InputStream expected, InputStream actual) {
+		try {
+			int i = 0;
+			while ((i = expected.read()) != -1) {
+				int j = actual.read();
+				if (i != j) {
+					return false;
+				}
+			}
+			return true;
+		} catch (IOException ex) {
+			return false;
+		} finally {
+			try {
+				expected.close();
+			} catch (Exception ex) {
+			}
+			try {
+				actual.close();
+			} catch (Exception ex) {
+			}
+		}
+	}
 }
