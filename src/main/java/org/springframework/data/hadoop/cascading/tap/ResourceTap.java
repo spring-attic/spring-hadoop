@@ -36,6 +36,12 @@ public class ResourceTap extends SourceTap<Properties, Resource> {
 
 	private final Resource resource;
 	
+	/**
+	 * Constructs a new <code>ResourceTap</code> instance.
+	 *
+	 * @param scheme scheme to use
+	 * @param resource Resource to read from
+	 */
 	public ResourceTap(Scheme<Properties, Resource, ?, ?, ?> scheme, Resource resource) {
 		super(scheme);
 		this.resource = resource;
