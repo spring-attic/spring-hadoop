@@ -43,7 +43,8 @@ dependencies {
     compile("org.springframework:spring-aop:$springVersion", optional)
     compile("org.springframework:spring-jdbc:$springVersion", optional)
     compile("org.springframework.batch:spring-batch-core:$springBatchVersion", optional)
-    compile("org.springframework.integration:spring-integration-core:$springIntVersion", optional)
+    compile("org.springframework.integration:spring-integration-stream:$springIntVersion", optional)
+
 
     // cascading
     compile("cascading:cascading-hadoop:$cascadingVersion", optional)
@@ -87,8 +88,10 @@ dependencies {
     testCompile "org.springframework:spring-test:$springVersion"
     testCompile("javax.annotation:jsr250-api:1.0", optional)
     testCompile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
+    
     testRuntime "org.springframework.integration:spring-integration-event:$springIntVersion"
     testRuntime "org.springframework.integration:spring-integration-file:$springIntVersion"
+    
     testRuntime "org.codehaus.groovy:groovy:$groovyVersion"
     testRuntime "org.jruby:jruby:$jrubyVersion"
     testRuntime "org.python:jython-standalone:$jythonVersion"
@@ -103,6 +106,7 @@ dependencies {
     //testCompile "javax.jdo:jdo2-api:$jdoVersion"
     
     testCompile "cascading:cascading-local:$cascadingVersion"
+    
 }
 // config to exclude missing jdo-2.3-ec from hive
 configurations.all {
