@@ -44,6 +44,7 @@ dependencies {
     compile("org.springframework:spring-jdbc:$springVersion", optional)
     compile("org.springframework.batch:spring-batch-core:$springBatchVersion", optional)
     compile("org.springframework.integration:spring-integration-stream:$springIntVersion", optional)
+    compile("org.springframework.integration:spring-integration-file:$springIntVersion", optional)
 
 
     // cascading
@@ -90,7 +91,6 @@ dependencies {
     testCompile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
     
     testRuntime "org.springframework.integration:spring-integration-event:$springIntVersion"
-    testRuntime "org.springframework.integration:spring-integration-file:$springIntVersion"
     
     testRuntime "org.codehaus.groovy:groovy:$groovyVersion"
     testRuntime "org.jruby:jruby:$jrubyVersion"
