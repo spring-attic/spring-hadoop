@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import org.springframework.core.io.Resource;
+import org.springframework.util.Assert;
 
 import cascading.flow.FlowProcess;
 import cascading.scheme.Scheme;
@@ -28,7 +29,8 @@ import cascading.tuple.TupleEntryIterator;
 import cascading.tuple.TupleEntrySchemeIterator;
 
 /**
- * {@link SourceTap} for Spring's {@link Resource} abstraction.
+ * {@link SourceTap} for Spring's {@link Resource} abstraction. 
+ * This tap can work against one resource or multiple (useful for using pattern matching). 
  * 
  * @author Costin Leau
  */
@@ -43,8 +45,20 @@ public class ResourceTap extends SourceTap<Properties, Resource> {
 	 * @param resource Resource to read from
 	 */
 	public ResourceTap(Scheme<Properties, Resource, ?, ?, ?> scheme, Resource resource) {
+		this(scheme, new Resource[] { resource });
+	}
+
+	/**
+	 * Constructs a new <code>ResourceTap</code> instance. Backed by multiple resources (
+	 * allowing for pattern matching to occur).
+	 *
+	 * @param scheme
+	 * @param resource
+	 */
+	public ResourceTap(Scheme<Properties, Resource, ?, ?, ?> scheme, Resource[] resources) {
 		super(scheme);
-		this.resource = resource;
+		Assert.notEmpty(resources, "at least one resource is required");
+		this.resource = (resources.length == 1 ? resources[0] : new DelegatingResource(resources));
 	}
 
 	@Override

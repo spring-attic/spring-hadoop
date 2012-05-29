@@ -23,6 +23,7 @@ import org.junit.Test;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.data.hadoop.TestSinkTap;
 import org.springframework.data.hadoop.TestUtils;
 
@@ -81,6 +82,25 @@ public class ResourceTapTest {
 		Flow flow = new LocalFlowConnector().connect(source, sink, pipe);
 		flow.complete();
 		String str = out.toString();
+		assertTrue(str.contains("AARON"));
+		assertTrue(str.contains("ABIBA"));
+	}
+
+	@Test
+	public void testMultipleResources() throws Exception {
+		Resource[] resources = new PathMatchingResourcePatternResolver(loader).getResources("/data/*.txt");
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+		Scheme sourceScheme = new TextLine(new Fields("line"));
+		Tap source = new ResourceTap(sourceScheme, resources);
+
+		Tap sink = new TestSinkTap(sourceScheme, out);
+		Pipe pipe = new Pipe("io");
+		Flow flow = new LocalFlowConnector().connect(source, sink, pipe);
+		flow.complete();
+		String str = out.toString();
+
+		assertTrue(str.contains("Mozilla"));
 		assertTrue(str.contains("AARON"));
 		assertTrue(str.contains("ABIBA"));
 	}
