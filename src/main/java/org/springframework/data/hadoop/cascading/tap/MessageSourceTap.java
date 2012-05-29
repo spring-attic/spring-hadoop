@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import org.springframework.integration.core.MessageSource;
+import org.springframework.integration.transformer.Transformer;
 
 import cascading.flow.FlowProcess;
 import cascading.scheme.Scheme;
@@ -36,9 +37,27 @@ public class MessageSourceTap extends SourceTap<Properties, InputStream> {
 
 	private InputStream source;
 
+	/**
+	 * Constructs a new <code>MessageSourceTap</code> instance.
+	 *
+	 * @param scheme data scheme
+	 * @param source a byte[] based message source
+	 */
 	public MessageSourceTap(Scheme<Properties, InputStream, ?, ?, ?> scheme, MessageSource<byte[]> source) {
 		super(scheme);
 		this.source = new MessageSourceInputStream(source);
+	}
+
+	/**
+	 * Constructs a new <code>MessageSourceTap</code> instance. Allows arbitrary message sources to be passed in along-side
+	 * a transformer acting as a serializer.
+	 *
+	 * @param scheme data scheme
+	 * @param source an arbitrary message source
+	 * @param transformer a transformer converting the given message source type to byte[] 
+	 */
+	public MessageSourceTap(Scheme<Properties, InputStream, ?, ?, ?> scheme, MessageSource<?> source, Transformer transformer) {
+		this(scheme, new TransformingMessageSource<byte[]>(source, transformer));
 	}
 
 	@Override

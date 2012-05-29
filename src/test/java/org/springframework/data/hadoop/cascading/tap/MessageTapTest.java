@@ -17,11 +17,18 @@ package org.springframework.data.hadoop.cascading.tap;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.InputStream;
+import java.net.URI;
 
 import org.junit.Test;
 import org.springframework.data.hadoop.TestSinkTap;
 import org.springframework.data.hadoop.TestUtils;
+import org.springframework.integration.file.FileReadingMessageSource;
+import org.springframework.integration.file.filters.AcceptOnceFileListFilter;
+import org.springframework.integration.file.filters.CompositeFileListFilter;
+import org.springframework.integration.file.filters.SimplePatternFileListFilter;
+import org.springframework.integration.file.transformer.FileToByteArrayTransformer;
 import org.springframework.integration.stream.ByteStreamReadingMessageSource;
 import org.springframework.integration.stream.ByteStreamWritingMessageHandler;
 
@@ -81,6 +88,35 @@ public class MessageTapTest {
 		assertTrue(str.contains("ABIBA"));
 	}
 
+	@Test
+	public void testMessageSourceWithTransformer() throws Exception {
+		Scheme sourceScheme = new TextLine(new Fields("line"));
+		
+		FileReadingMessageSource fileSource = new FileReadingMessageSource();
+		URI uri = getClass().getResource("/data").toURI();
+		fileSource.setDirectory(new File(uri));
+		CompositeFileListFilter f = new CompositeFileListFilter();
+		f.addFilter(new SimplePatternFileListFilter("apache-short.txt"));
+		f.addFilter(new AcceptOnceFileListFilter());
+		fileSource.setFilter(f);
+		
+		Tap source = new MessageSourceTap(sourceScheme, 
+				fileSource,
+				new FileToByteArrayTransformer());
+		
+
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		Tap sink = new TestSinkTap(sourceScheme, out);
+
+		Pipe pipe = new Pipe("io");
+
+		Flow flow = new LocalFlowConnector().connect(source, sink, pipe);
+		flow.complete();
+
+		byte[] byteArray = out.toByteArray();
+		InputStream stream = getClass().getResourceAsStream("/data/apache-short.txt");
+		assertTrue(TestUtils.compareStreams(stream, new ByteArrayInputStream(byteArray)));
+	}
 
 	@Test
 	public void testMessageHandler() throws Exception {

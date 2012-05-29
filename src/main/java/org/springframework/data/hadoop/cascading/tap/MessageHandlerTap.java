@@ -30,7 +30,10 @@ import cascading.tuple.TupleEntrySchemeCollector;
 
 /**
  * {@link SinkTap} on top of Spring Integration {@link MessageHandler}.
- * Creates a Message (with payload of type byte[]) for each tuple entry.
+ * <p/>
+ * The creation of the message depends on the behaviour of the underlying stream.
+ * Each time it is flushed, a Message will be created (with payload of type byte[]).
+ * If supported by the underlying stream, a message will be created for each tuple.
  * 
  * @author Costin Leau
  */

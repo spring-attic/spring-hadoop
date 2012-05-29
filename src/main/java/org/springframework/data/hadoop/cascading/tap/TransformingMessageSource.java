@@ -15,50 +15,33 @@
  */
 package org.springframework.data.hadoop.cascading.tap;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import org.springframework.integration.Message;
 import org.springframework.integration.core.MessageSource;
 import org.springframework.integration.transformer.Transformer;
 
 /**
- * InputStream over a {@link MessageSource}.
+ * Utility MessageSource using internally a {@link Transformer} and a wrapped {@link MessageSource}. 
  * 
  * @author Costin Leau
  */
-class MessageSourceInputStream extends InputStream {
+class TransformingMessageSource<T> implements MessageSource<T> {
 
-	private final MessageSource<byte[]> source;
-	private volatile byte[] currentPayload;
-	private volatile int index = 0;
+	private final MessageSource<?> source;
+	private final Transformer transformer;
 
-	MessageSourceInputStream(MessageSource<byte[]> source) {
+	TransformingMessageSource(MessageSource<?> source, Transformer transformer) {
 		this.source = source;
+		this.transformer = transformer;
 	}
 
-	MessageSourceInputStream(MessageSource<?> source, Transformer transformer) {
-		this.source = new TransformingMessageSource<byte[]>(source, transformer);
-	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public int read() throws IOException {
-		if (currentPayload == null || index >= currentPayload.length) {
-			Message<byte[]> msg = source.receive();
-			if (msg != null) {
-				currentPayload = msg.getPayload();
-				index = 0;
-			}
-			else {
-				return -1;
-			}
+	public Message<T> receive() {
+		Message<?> orig = source.receive();
+		if (orig != null) {
+			return (Message<T>) transformer.transform(orig);
 		}
-
-		return (currentPayload[index++] & 0xff);
-	}
-
-	@Override
-	public String toString() {
-		return "InputStream for " + source;
+		return null;
 	}
 }
