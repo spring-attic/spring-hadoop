@@ -174,7 +174,7 @@ class HdfsResource implements ContextResource {
 	}
 
 	public String getPathWithinContext() {
-		return path.getName();
+		return path.toUri().getPath();
 	}
 
 	public OutputStream getOutputStream() throws IOException {
