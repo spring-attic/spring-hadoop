@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.mapred.JobConf;
 import org.springframework.util.Assert;
 
 /**
@@ -54,9 +55,28 @@ public abstract class ConfigurationUtils {
 	 * @return newly created configuration based on the input parameters.
 	 */
 	public static Configuration createFrom(Configuration original, Properties properties) {
-		Configuration cfg = (original != null ? new Configuration(original) : new Configuration());
+		Configuration cfg = null;
+		if (original != null) {
+			cfg = (original instanceof JobConf ? new JobConf(original) : new Configuration(original));
+		}
+		else {
+			cfg = new JobConf(original);
+		}
 		addProperties(cfg, properties);
 		return cfg;
+	}
+
+	/**
+	 * Creates a new {@link JobConf} based on the given arguments. Identical to 
+	 * {@link #createFrom(Configuration, Properties)} but forces the use of
+	 * {@link JobConf}.
+	 * 
+	 * @param original initial configuration to read from. May be null. 
+	 * @param properties properties object to add to the newly created configuration. May be null.
+	 * @return newly created configuration based on the input parameters.
+	 */
+	public static JobConf createFrom(JobConf original, Properties properties) {
+		return (JobConf) createFrom((Configuration) original, properties);
 	}
 
 	/**
@@ -87,12 +107,12 @@ public abstract class ConfigurationUtils {
 	public static Configuration merge(Configuration one, Configuration two) {
 		if (one == null) {
 			if (two == null) {
-				return new Configuration();
+				return new JobConf();
 			}
-			return new Configuration(two);
+			return new JobConf(two);
 		}
 
-		Configuration c = new Configuration(one);
+		Configuration c = new JobConf(one);
 
 		if (two == null) {
 			return c;
