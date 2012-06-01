@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.hadoop.cascading.tap;
+package org.springframework.data.hadoop.cascading.tap.local;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,7 +30,7 @@ import cascading.tuple.TupleEntrySchemeIterator;
 
 /**
  * {@link SourceTap} for Spring's {@link Resource} abstraction. 
- * This tap can work against one resource or multiple (useful for using pattern matching). 
+ * Multiple resources (resulting from pattern matching for example) can be used. 
  * 
  * @author Costin Leau
  */

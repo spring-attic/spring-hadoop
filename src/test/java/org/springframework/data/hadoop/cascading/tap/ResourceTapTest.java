@@ -26,6 +26,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.data.hadoop.TestSinkTap;
 import org.springframework.data.hadoop.TestUtils;
+import org.springframework.data.hadoop.cascading.tap.local.ResourceTap;
 
 import cascading.flow.Flow;
 import cascading.flow.local.LocalFlowConnector;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.hadoop.cascading.tap;
+package org.springframework.data.hadoop.cascading.tap.local;
 
 import java.io.IOException;
 import java.io.InputStream;

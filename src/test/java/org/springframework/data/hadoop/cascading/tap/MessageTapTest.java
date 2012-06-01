@@ -24,6 +24,8 @@ import java.net.URI;
 import org.junit.Test;
 import org.springframework.data.hadoop.TestSinkTap;
 import org.springframework.data.hadoop.TestUtils;
+import org.springframework.data.hadoop.cascading.tap.local.MessageHandlerTap;
+import org.springframework.data.hadoop.cascading.tap.local.MessageSourceTap;
 import org.springframework.integration.file.FileReadingMessageSource;
 import org.springframework.integration.file.filters.AcceptOnceFileListFilter;
 import org.springframework.integration.file.filters.CompositeFileListFilter;
