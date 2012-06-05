@@ -54,7 +54,7 @@ public class PathUtilsTest {
 	public void testGetTimeBasedPathFromRootWithSecond(){
 		String rootPath = ".";
 		util.setRootPath(rootPath);
-		util.setPathFormat("yyyy/MM/dd/HH/mm/ss");
+		util.setPathFormat("yyyy"+File.separator+"MM" + File.separator + "dd" + File.separator + "HH" + File.separator +"mm" + File.separator + "ss");
 		String result = util.format();
 		log.info("path is:" + result);
 		assertTrue("time based path is not start with root path",result.startsWith(rootPath));
@@ -92,7 +92,7 @@ public class PathUtilsTest {
 	public void testGetTimeBasedPathFromRootWithMinute(){
 		String rootPath = ".";
 		util.setRootPath(rootPath);
-		util.setPathFormat("yyyy/MM/dd/HH/mm");
+		util.setPathFormat("yyyy"+File.separator+"MM" + File.separator + "dd" + File.separator + "HH" + File.separator +"mm" + File.separator + "ss");
 		String result = util.format();
 		log.info("path is:" + result);
 		assertTrue("time based path is not start with root path",result.startsWith(rootPath));
@@ -130,7 +130,7 @@ public class PathUtilsTest {
 	public void testGetTimeBasedPathFromRootWithHour(){
 		String rootPath = ".";
 		util.setRootPath(rootPath);
-		util.setPathFormat("yyyy/MM/dd/HH");
+		util.setPathFormat("yyyy"+File.separator+"MM" + File.separator + "dd" + File.separator + "HH");
 		String result = util.format();
 		log.info("path is:" + result);
 		assertTrue("time based path is not start with root path",result.startsWith(rootPath));
@@ -168,7 +168,7 @@ public class PathUtilsTest {
 	public void testGetTimeBasedPathFromRootWithDay(){
 		String rootPath = ".";
 		util.setRootPath(rootPath);
-		util.setPathFormat("yyyy/MM/dd");
+		util.setPathFormat("yyyy"+File.separator+"MM" + File.separator + "dd");
 		String result = util.format();
 		log.info("path is:" + result);
 		assertTrue("time based path is not start with root path",result.startsWith(rootPath));
@@ -202,7 +202,7 @@ public class PathUtilsTest {
 	public void testGetTimeBasedPathFromRootWithMonth(){
 		String rootPath = ".";
 		util.setRootPath(rootPath);
-		util.setPathFormat("yyyy/MM");
+		util.setPathFormat("yyyy"+File.separator+"MM");
 		String result = util.format();
 		log.info("path is:" + result);
 		assertTrue("time based path is not start with root path",result.startsWith(rootPath));
@@ -250,7 +250,7 @@ public class PathUtilsTest {
 	public void testGetTimeBasedPathFromRootWithYearAndSecond(){
 		String rootPath = ".";
 		util.setRootPath(rootPath);
-		util.setPathFormat("yyyy/ss");
+		util.setPathFormat("yyyy"+File.separator+"ss");
 		String result = util.format();
 		log.info("path is:" + result);
 		assertTrue("time based path is not start with root path",result.startsWith(rootPath));
