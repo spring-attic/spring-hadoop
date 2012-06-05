@@ -145,6 +145,7 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 			JobConf conf = (JobConf) job.getConfiguration();
 			conf.setJar(jar.getURI().toString());
 			loader = ClassLoadingUtils.createParentLastClassLoader(jar, beanClassLoader, cfg);
+			conf.setClassLoader(loader);
 		}
 		
 
@@ -240,7 +241,7 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 		do {
 			targetType = targetClass.getGenericSuperclass();
 			targetClass = targetClass.getSuperclass();
-		} while (targetClass != null && targetClass != Object.class && Mapper.class.equals(targetType));
+		} while (targetClass != null && targetClass != Object.class && !Mapper.class.equals(targetClass));
 
 
 		if (targetType instanceof ParameterizedType) {
