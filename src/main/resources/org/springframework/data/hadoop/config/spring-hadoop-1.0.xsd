@@ -292,7 +292,7 @@ The security user (ugi) to use for impersonation at runtime.
 		<xsd:extension base="genericOptionsType">
 		<xsd:attribute name="id" type="xsd:ID" use="required" />
 		<xsd:attribute name="scope" type="xsd:string" use="optional" />
-		<xsd:attribute name="mapper" use="required">
+		<xsd:attribute name="mapper" default="org.apache.hadoop.mapreduce.Mapper">
 		<xsd:annotation>
 			<xsd:appinfo>
 				<tool:annotation kind="direct">
@@ -302,7 +302,7 @@ The security user (ugi) to use for impersonation at runtime.
 			</xsd:appinfo>
 	 	</xsd:annotation>			
 		</xsd:attribute>
-		<xsd:attribute name="reducer" use="required">
+		<xsd:attribute name="reducer" default="org.apache.hadoop.mapreduce.Reducer">
 		<xsd:annotation>
 			<xsd:appinfo>
 				<tool:annotation kind="direct">
