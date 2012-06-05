@@ -17,14 +17,17 @@
 package org.springframework.data.hadoop.util;
 
 import java.io.File;
-import java.util.Calendar;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.UUID;
 
 
 /**
- * Utility class to generate new path based on give path. 
- * The pattern is like ${rootPath}/${Year}/${Month}/${Day}/${Hour}/${Minute}/{Second} based on pathFormat. 
- * For example, the return path will be "/user/hadoop/data/2012/2/22/17/20/10" if pathFormat is "year/month/day/hour/minute/second"
+ * Utility class to generate new time based path. The "pathFormat" is used to specify path format in the 
+ * {@link java.text.SimpleDateFormat} style.
+ *  
+ * For example, the return path will be "/user/hadoop/data/2012/2/22/17/20/10" 
+ * if pathFormat is "yyyy/MM/dd/HH/mm/ss" and rootPath is "/user/hadoop/data".
  * 
  * @author Jarred Li
  *
@@ -33,17 +36,17 @@ public class PathUtils {
 
 	private String rootPath;
 
-	private String pathFormat = "year/month/day/hour/minute/second";
+	private String pathFormat = "yyyy/MM/dd/HH/mm/ss";
 
 	private boolean appendUUID;
 
 
 	/**
-	 * get file path based on time. For example "/user/hadoop/data/2012/2/22/17/20/10"
+	 * get file time based path in the format of {@link java.text.SimpleDateFormat}.
 	 * 
 	 * @return the file path appended with time.
 	 */
-	public String getTimeBasedPathFromRoot() {
+	public String format() {
 		if (rootPath == null || rootPath.length() == 0) {
 			return "";
 		}
@@ -53,45 +56,11 @@ public class PathUtils {
 			strBuffer.append(File.separator);
 		}
 
-		Calendar cal = Calendar.getInstance();
-		int year = cal.get(Calendar.YEAR);
-		int month = cal.get(Calendar.MONTH) + 1;
-		int day = cal.get(Calendar.DAY_OF_MONTH);
-		int hour = cal.get(Calendar.HOUR_OF_DAY);
-		int minute = cal.get(Calendar.MINUTE);
-		int second = cal.get(Calendar.SECOND);
-
-		String[] formats = this.pathFormat.split("/");
-		for (String format : formats) {
-			switch (PathSeparator.valueOf(format.toLowerCase())) {
-			case year:
-				strBuffer.append(year);
-				strBuffer.append(File.separator);
-				break;
-			case month:
-				strBuffer.append(month);
-				strBuffer.append(File.separator);
-				break;
-			case day:
-				strBuffer.append(day);
-				strBuffer.append(File.separator);
-				break;
-			case hour:
-				strBuffer.append(hour);
-				strBuffer.append(File.separator);
-				break;
-			case minute:
-				strBuffer.append(minute);
-				strBuffer.append(File.separator);
-				break;
-			case second:
-				strBuffer.append(second);
-				strBuffer.append(File.separator);
-				break;
-			default:
-				break;
-			}
-		}
+		Date date = new Date();
+		SimpleDateFormat format = new SimpleDateFormat(pathFormat);
+		strBuffer.append(format.format(date));
+		strBuffer.append(File.separator);
+		
 		if (this.appendUUID) {
 			strBuffer.append(UUID.randomUUID());
 			strBuffer.append(File.separator);
