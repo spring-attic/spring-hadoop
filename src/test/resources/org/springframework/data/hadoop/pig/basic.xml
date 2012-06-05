@@ -14,7 +14,7 @@
 	<bean id="pig-raw" class="org.springframework.data.hadoop.pig.PigServerFactoryBean" p:pig-context-ref="pig-ctx"/>
 	
 	<pig exec-type="LOCAL" job-name="pig-script" configuration-ref="hadoopConfiguration" xmlns="http://www.springframework.org/schema/hadoop" 
-		properties-ref="props" properties-location="cfg-1.properties, cfg-2.properties">
+		properties-ref="props" properties-location="cfg-1.properties, cfg-2.properties" user="costin">
 		ivy=blue
 
 		star=chasing

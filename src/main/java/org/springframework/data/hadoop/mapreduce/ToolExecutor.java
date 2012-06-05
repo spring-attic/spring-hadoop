@@ -44,9 +44,6 @@ abstract class ToolExecutor extends JobGenericOptions implements BeanClassLoader
 	Resource jar;
 	private ClassLoader beanClassLoader;
 
-	private String user;
-
-
 	int runTool() throws Exception {
 		final Configuration cfg = ConfigurationUtils.createFrom(configuration, properties);
 		buildGenericOptions(cfg);
@@ -146,15 +143,5 @@ abstract class ToolExecutor extends JobGenericOptions implements BeanClassLoader
 	@Override
 	public void setBeanClassLoader(ClassLoader classLoader) {
 		this.beanClassLoader = classLoader;
-	}
-
-	/**
-	 * Sets the user impersonation (optional) for running this task.
-	 * Should be used when running against a Hadoop Kerberos cluster. 
-	 * 
-	 * @param user user/group information
-	 */
-	public void setUser(String user) {
-		this.user = user;
 	}
 }

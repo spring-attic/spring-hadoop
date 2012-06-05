@@ -59,8 +59,6 @@ public class StreamJobFactoryBean extends JobGenericOptions implements Initializ
 	private Properties properties;
 	private Properties cmdEnv;
 
-	private String user;
-
 	public void setBeanName(String name) {
 		this.name = name;
 	}
@@ -290,15 +288,5 @@ public class StreamJobFactoryBean extends JobGenericOptions implements Initializ
 	 */
 	public void setProperties(Properties properties) {
 		this.properties = properties;
-	}
-
-	/**
-	 * Sets the user impersonation (optional) for running this job.
-	 * Should be used when running against a Hadoop Kerberos cluster. 
-	 * 
-	 * @param user user/group information
-	 */
-	public void setUser(String user) {
-		this.user = user;
 	}
 }

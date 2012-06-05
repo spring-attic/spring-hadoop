@@ -32,6 +32,7 @@ import org.springframework.util.ObjectUtils;
 abstract class JobGenericOptions {
 
 	Resource[] files, libJars, archives;
+	String user;
 
 
 	/**
@@ -98,5 +99,16 @@ abstract class JobGenericOptions {
 			}
 			list.add(sb.toString());
 		}
+	}
+
+
+	/**
+	 * Sets the user impersonation (optional) for running this job.
+	 * Should be used when running against a Hadoop Kerberos cluster. 
+	 * 
+	 * @param user user/group information
+	 */
+	public void setUser(String user) {
+		this.user = user;
 	}
 }

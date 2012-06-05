@@ -97,8 +97,6 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 	private Boolean validatePaths = Boolean.TRUE;
 	private ClassLoader beanClassLoader;
 
-	private String user;
-
 	@Override
 	public void setBeanClassLoader(ClassLoader classLoader) {
 		this.beanClassLoader = classLoader;
@@ -509,15 +507,5 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 	 */
 	public void setProperties(Properties properties) {
 		this.properties = properties;
-	}
-
-	/**
-	 * Sets the user impersonation (optional) for running this job.
-	 * Should be used when running against a Hadoop Kerberos cluster. 
-	 * 
-	 * @param user user/group information
-	 */
-	public void setUser(String user) {
-		this.user = user;
 	}
 }

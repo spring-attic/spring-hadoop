@@ -173,6 +173,13 @@ The underlying HDFS system URI (by default the configuration settings will be us
 		]]></xsd:documentation>
 		</xsd:annotation>
 		</xsd:attribute>
+		<xsd:attribute name="user" type="xsd:string">
+			<xsd:annotation>
+			<xsd:documentation><![CDATA[
+The security user (ugi) to use for impersonation at runtime.				
+				]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
 		</xsd:complexType>		
 	</xsd:element>
 	
@@ -224,7 +231,14 @@ Reference to the Hadoop FileSystem. Overrides the 'uri' or 'configuration-ref' p
 					</tool:annotation>
 				</xsd:appinfo>
 		 	</xsd:annotation>
-	 	</xsd:attribute>			
+	 	</xsd:attribute>
+		<xsd:attribute name="user" type="xsd:string">
+			<xsd:annotation>
+			<xsd:documentation><![CDATA[
+The security user (ugi) to use for impersonation at runtime.				
+				]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
 		</xsd:complexType>
 	</xsd:element>
 	
@@ -259,6 +273,13 @@ Reference to the Hadoop FileSystem. Overrides the 'uri' or 'configuration-ref' p
 				</tool:annotation>
 			</xsd:appinfo>
 	 	</xsd:annotation>			
+		</xsd:attribute>
+		<xsd:attribute name="user" type="xsd:string">
+			<xsd:annotation>
+			<xsd:documentation><![CDATA[
+The security user (ugi) to use for impersonation at runtime.				
+				]]></xsd:documentation>
+			</xsd:annotation>
 		</xsd:attribute>
 		</xsd:extension>
 		</xsd:complexContent>
@@ -774,6 +795,13 @@ Reference to the Hadoop Configuration. Can be tweaked through the 'configuration
 				  	<xsd:enumeration value="LOCAL"/>
 				  </xsd:restriction>
 				</xsd:simpleType>
+			</xsd:attribute>
+			<xsd:attribute name="user" type="xsd:string">
+				<xsd:annotation>
+				<xsd:documentation><![CDATA[
+The security user (ugi) to use for impersonation at runtime.				
+				]]></xsd:documentation>
+				</xsd:annotation>
 			</xsd:attribute>
 		</xsd:extension>
 		</xsd:complexContent>
