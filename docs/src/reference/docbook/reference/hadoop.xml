@@ -94,7 +94,7 @@
    	 <programlisting language="xml"><![CDATA[<hdp:configuration />]]></programlisting>
    	 
    	 <para>The declaration above defines a <classname>Configuration</classname> bean (to be precise a factory bean of type <classname>ConfigurationFactoryBean</classname>) named, by default, 
-   	 <literal>hadoop-configuration</literal>. The default name is used, by conventions, by the other elements that require a configuration - this leads to simple and very concise configurations as the 
+   	 <literal>hadoopConfiguration</literal>. The default name is used, by conventions, by the other elements that require a configuration - this leads to simple and very concise configurations as the 
    	 main components can automatically wire themselves up without requiring any specific configuration.</para>
    	 
    	 <para>For scenarios where the defaults need to be tweaked, one can pass in additional configuration files:</para>
@@ -195,13 +195,13 @@
      (such as streaming - more on that <link linkend="hadoop:job:streaming">below</link>). Simply use the <literal>configuration-ref</literal> attribute to refer to the <emphasis>parent</emphasis> configuration - all its properties will be inherited and
      overridden as specified by the child:</para>
 
-    <programlisting language="xml"><![CDATA[<!-- default name is 'hadoop-configuration' -->
+    <programlisting language="xml"><![CDATA[<!-- default name is 'hadoopConfiguration' -->
 <hdp:configuration>
     fs.default.name=${hd.fs}
     hadoop.tmp.dir=file://${java.io.tmpdir}
 </hdp:configuration>
      
-<hdp:configuration id="custom" configuration-ref="hadoop-configuration">
+<hdp:configuration id="custom" configuration-ref="hadoopConfiguration">
     fs.default.name=${custom.hd.fs}
 </hdp:configuration>     
 
@@ -232,7 +232,7 @@
   reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"/>]]></programlisting>
    	 
    	 <para>The declaration above creates a typical Hadoop <literal>Job</literal>: specifies its input and output, the mapper and the reducer classes. Notice that there is no reference to the Hadoop configuration above - that's
-   	 because, if not specified, the default naming convention (<literal>hadoop-configuration</literal>) will be used instead. Neither are the key or value types - these two are automatically determined through a best-effort attempt
+   	 because, if not specified, the default naming convention (<literal>hadoopConfiguration</literal>) will be used instead. Neither are the key or value types - these two are automatically determined through a best-effort attempt
    	 by analyzing the class information of the mapper and the reducer. Of course, these settings can be overridden: the former through the <literal>configuration-ref</literal> element, the latter through <literal>key</literal> and
    	 <literal>value</literal> attributes.
    	 There are plenty of options available not shown in the example (for simplicity) such as the jar (specified directly or by class), sort or group comparator, the combiner, the partitioner, the codecs to use or the input/output format just to name a few - 
@@ -341,7 +341,7 @@
 		per application. Through <literal>tool-runner</literal> element (and its backing <literal>ToolRunner</literal> class) one typically just needs to specify the <literal>Tool</literal> implementation and its arguments:
 		</para>
 		
-		<programlisting language="xml"><![CDATA[<hdp:tool-runner id="someTool" tool-class="org.foo.SomeTool" configuration-ref="hadoop-configuration">
+		<programlisting language="xml"><![CDATA[<hdp:tool-runner id="someTool" tool-class="org.foo.SomeTool" configuration-ref="hadoopConfiguration">
    <hdp:arg value="data/in.txt"/>
    <hdp:arg value="data/out.txt"/>
    
@@ -357,7 +357,8 @@
     <para>The jar is used to instantiate and start the tool - in fact all its dependencies are loaded from the jar meaning they no longer need to be part of the classpath. This mechanism provides proper
     isolation between tools as each of them might depend on certain libraries with different versions; rather then adding them all into the same app (which might be impossible due to versioning conflicts
     ), one can simply point to the different jars and be on her way.</para>
-		<para>Like the rest of the SHDP elements, <literal>tool-runner</literal> allows the passed Hadoop configuration (by default <literal>hadoop-configuration</literal> but specified in the example for clarity) to be
+	
+	<para>Like the rest of the SHDP elements, <literal>tool-runner</literal> allows the passed Hadoop configuration (by default <literal>hadoopConfiguration</literal> but specified in the example for clarity) to be
 		<link linkend="hadoop:config:properties">customized</link> accordingly; the snippet only highlights the property initialization for simplicity but more options are available. Since usually the <literal>Tool</literal>
 		implementation has a default argument, one can use the <literal>tool-class</literal> attribute however it is possible to refer to another <literal>Tool</literal> instance or declare a nested one: </para> 
 
@@ -367,6 +368,40 @@
 
 		<para>This is quite convenient if the <literal>Tool</literal> class provides setters or richer constructors. Note that by default the <literal>tool-runner</literal> does not executes the <literal>Tool</literal>until
 		its definition is actually called - this behavior can be changed through the <literal>run-at-startup</literal> attribute above.</para>
+		
+		<section id="hadoop:tool-scripts">
+			<title>Replacing Hadoop shell invocations with <literal>tool</literal></title>
+		
+			<para><literal>tool</literal> is a nice way for migrating series or shell invocations or scripts into fully wired, managed Java objects. Consider the following shell script:</para>
+<programlisting><![CDATA[hadoop jar job1.jar -files fullpath:props.properties -Dconfig=config.properties ...
+hadoop jar job2.jar arg1 arg2...
+...
+hadoop jar job10.jar ...]]></programlisting>
+			
+			<para>Each job is fully contained in the specified jar, including all the dependencies (which might conflict with the ones from other jobs). Additionally each invocation might provide some generic
+			options or arguments but for the most part all will share the same configuration (as they will execute against the same cluster).</para>
+			
+			<para>The script can be fully ported to SHDP, through the <literal>tool</literal> element:</para>
+<programlisting language="xml"><![CDATA[<hdp:tool id="job1" tool-class="job1.Tool" jar="job1.jar" files="fullpath:props.properties" properties-location="config.properties"/>
+<hdp:tool id="job2" tool-class="job2.Tool" jar="job2.jar">
+	<hdp:arg value="arg1"/>
+	<hdp:arg value="arg2"/>
+</hdp:tool>
+<hdp:tool id="job3" tool-class="job3.Tool" jar="job3.jar"/>
+...]]></programlisting>
+
+			<para>All the features have been explained in the previous sections but let us review what happens here. 
+			As mentioned before, each tool gets autowired with the <literal>hadoopConfiguration</literal>; <literal>job1</literal> goes beyond this and uses its own properties instead.
+			For each jar, the main <classname>Tool</classname> class needs to be specified to kickstart the actual job. When needed (such as with <literal>job1</literal>), 
+			additional files or libs are provisioned in the cluster. Same thing with the job arguments.</para>
+			
+			<para>However more things that go beyond scripting, can be applied to this configuration - each job can have multiple properties loaded or declared inlined - not just from the local file system, but also
+			from the classpath or any url for that matter. In fact, the whole configuration can be externalized and parameterized (through Spring's 
+			<ulink url="http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/beans.html#beans-factory-placeholderconfigurer">property placeholder</ulink> and/or 
+			<ulink url="http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/new-in-3.1.html#d0e1313">Environment abstraction</ulink>). 
+			Moreover, each job can be ran by itself (through the <classname>JobRunner</classname>) or as part of a workflow - either through Spring's 
+			<literal>depends-on</literal> or the much more powerful Spring Batch and <literal>tool-tasklet</literal>.</para>
+		</section>
 	</section>
 
 	<section id="hadoop:tool-tasklet">
@@ -415,7 +450,7 @@
 	Additionally based on the resource extension, the definition differentiates between archives (<literal>.tgz</literal>, <literal>.tar.gz</literal>, <literal>.zip</literal> and <literal>.tar</literal>) which will be uncompressed, and regular
 	files that are copied as-is. As with the rest of the namespace declarations, the definition above relies on defaults - since it requires a Hadoop <literal>Configuration</literal> and <literal>FileSystem</literal>
 	objects and none are specified (through <literal>configuration-ref</literal> and <literal>file-system-ref</literal>) it falls back to the default naming and is wired with the bean named 
-	<emphasis>hadoop-configuration</emphasis>, creating the <literal>FileSystem</literal> automatically.</para>
+	<emphasis>hadoopConfiguration</emphasis>, creating the <literal>FileSystem</literal> automatically.</para>
    </section>
 
 </chapter>
