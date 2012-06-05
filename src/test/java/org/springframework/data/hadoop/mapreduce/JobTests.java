@@ -68,6 +68,17 @@ public class JobTests {
 	}
 
 	@Test
+	public void testCustomJarJob() throws Exception {
+		Job job = ctx.getBean("custom-jar-job", Job.class);
+		assertTrue(ctx.isPrototype("custom-jar-job"));
+		assertNotNull(job.getJar());
+		assertEquals("true", job.getConfiguration().get("mapred.used.genericoptionsparser"));
+
+		ClassLoader loader = job.getConfiguration().getClassLoader();
+		assertFalse(Thread.currentThread().getContextClassLoader().equals(loader));
+	}
+
+	@Test
 	public void testJobProperties() throws Exception {
 		assertNotNull(job);
 		Configuration cfg = job.getConfiguration();
@@ -82,5 +93,4 @@ public class JobTests {
 
 		assertEquals("true", job.getConfiguration().get("mapred.used.genericoptionsparser"));
 	}
-
 }

@@ -19,6 +19,7 @@ import java.util.Collection;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.hadoop.mapred.RunningJob;
 import org.apache.hadoop.mapreduce.Job;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
@@ -41,7 +42,8 @@ public class JobRunner implements FactoryBean<Object>, InitializingBean, Disposa
 	private boolean waitForJobs = true;
 	private Collection<Job> jobs;
 	private boolean executed = false;
-	private boolean succesful = false;
+	private boolean succesful = true;
+	private boolean ignoreFailures = false;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -75,6 +77,11 @@ public class JobRunner implements FactoryBean<Object>, InitializingBean, Disposa
 				}
 				else {
 					succesful &= job.waitForCompletion(true);
+					if (!ignoreFailures && !succesful) {
+						RunningJob rj = JobUtils.getRunningJob(job);
+						throw new IllegalStateException("Job [" + job.getJobName() + "] failed - "
+								+ rj.getFailureInfo());
+					}
 				}
 			}
 		}
@@ -119,5 +126,17 @@ public class JobRunner implements FactoryBean<Object>, InitializingBean, Disposa
 	 */
 	public void setJobs(Collection<Job> jobs) {
 		this.jobs = jobs;
+	}
+
+	/**
+	 * Indicates whether job failures are ignored (simply logged) or not (default), meaning
+	 * the runner propagates the error further down the stack.
+	 * Note this setting applies only if the runner monitors/waits for the jobs.
+	 *
+	 * @see #setWaitForJobs(boolean)
+	 * @param ignoreFailures the new ignore failures
+	 */
+	public void setIgnoreFailures(boolean ignoreFailures) {
+		this.ignoreFailures = ignoreFailures;
 	}
 }

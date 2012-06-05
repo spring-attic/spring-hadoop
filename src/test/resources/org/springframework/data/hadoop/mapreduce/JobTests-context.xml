@@ -11,14 +11,25 @@
 
 	<import resource="../hadoop-ctx.xml"/>
 
-	<hdp:script id="script" language="javascript">
+	<hdp:script id="script" language="javascript" run-at-startup="true">
 	if (fsh.test("/ide-test/input/word")) { fsh.rmr("/ide-test/input/word") }
 	if (fsh.test("/ide-test/runner/output")) { fsh.rmr("/ide-test/runner/output") }
 	if (fsh.test("/ide-test/runner/output-2")) { fsh.rmr("/ide-test/runner/output-2") }
 	if (fsh.test("/ide-test/runner/output-3")) { fsh.rmr("/ide-test/runner/output-3") }
+	if (fsh.test("/ide-test/runner/output-4")) { fsh.rmr("/ide-test/runner/output-4") }
 	
 	fsh.put("src/test/resources/input/word", "/ide-test/input/word")			
 	</hdp:script>
+
+	<bean id="jar-job-runner" class="org.springframework.data.hadoop.mapreduce.JobRunner" depends-on="script" >
+		<property name="jobs">
+			<list>
+			  <ref bean="custom-jar-job"/>
+			  <ref bean="jar-job"/>
+			</list>
+		</property>
+	</bean>
+
 
 	<bean id="runner" class="org.springframework.data.hadoop.mapreduce.JobRunner" depends-on="script" p:jobs-ref="ns-job"/>
 	
@@ -35,17 +46,21 @@
 		</property>
 	</bean>
 
-
-	<bean id="jar-job-runner" class="org.springframework.data.hadoop.mapreduce.JobRunner" depends-on="script" p:jobs-ref="jar-job"/>
-
 	<hdp:job id="jar-job" 
 	   	input-path="/ide-test/input/word/" output-path="/ide-test/runner/output-3/"
 		mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
 		reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"
 		validate-paths="false" jar-by-class="org.apache.hadoop.examples.WordCount"
 		scope="prototype" /> 
+
+	<hdp:job id="custom-jar-job" 
+	   	input-path="/ide-test/input/word/" output-path="/ide-test/runner/output-4/"
+		mapper="test.SomeTool$CustomMapper"
+		validate-paths="false"
+		jar="some-tool.jar"
+		libs="some-tool.jar"
+		scope="prototype" /> 
 	
-	 
 	<hdp:job id="ns-job" 
 	   	input-path="/ide-test/input/word/" output-path="/ide-test/runner/output/"
 		mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
@@ -62,11 +77,9 @@
 
 	<util:properties id="props" location="props.properties"/>
 
-
  	<task:scheduler id="myScheduler" pool-size="10"/>
  
 	<task:scheduled-tasks scheduler="myScheduler">
  		<task:scheduled ref="&amp;runner" method="getObject" fixed-rate="60000"/>
  	</task:scheduled-tasks>
- 	
 </beans>

@@ -66,7 +66,8 @@ public class JobTasklet implements InitializingBean, Tasklet, BeanFactoryAware {
 		} catch (Exception ex) {
 			exc = ex;
 		}
-		String message = "Job [" + j.getJobID() + "|" + j.getJobName() + " ] failed";
+		String message = "Job [" + j.getJobID() + "|" + j.getJobName() + " ] failed - "
+				+ JobUtils.getRunningJob(job).cleanupProgress();
 		throw (exc != null ? new HadoopException(message, exc) : new HadoopException(message));
 	}
 
