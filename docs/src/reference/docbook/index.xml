@@ -44,6 +44,7 @@
       <xi:include href="reference/hive.xml"/>
       <xi:include href="reference/pig.xml"/>
       <xi:include href="reference/cascading.xml"/>
+      <xi:include href="reference/security.xml"/>
   </part>
   <part id="dev">
       <title>Developing Spring for Apache Hadoop Applications</title>
