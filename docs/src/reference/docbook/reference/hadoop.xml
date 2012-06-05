@@ -252,9 +252,14 @@
 </hdp:job>]]></programlisting>
    	 
    	 <note>
-   	 	<para>The job definition can validate the existance of the input and output paths before submitting the actual job (which is slow), to prevent its failure. Take a look at <emphasis>validate-paths</emphasis> attribute
-   	 	to avoid these errors early on without having to touch the job tracker only to get an exception.</para>
+   	 	<para>The job definition can validate the existance of the input and output paths before submitting the actual job (which is slow), to prevent its failure. 
+   	 	Take a look at <emphasis>validate-paths</emphasis> attribute avoid these errors early on without having to touch the job tracker only to get an exception.</para>
    	 </note>
+
+   <para><literal>job</literal> provides additional properties, such as the <link linkend="hadoop:generic-options">generic options</link>, however one that is worth mentioning is <literal>jar</literal> which
+   allows a job (and its dependencies) to be loaded form entirely from a specified jar. This is useful for isolating jobs and avoiding classpath and versioning collisions. Note that provisioning of the jar 
+   into the cluster, still depends on the target environment - see the aforementioned <link linkend="hadoop:generic-options">section</link> for more info (such as <literal>libs</literal>).
+   </para>
 
 	 <section id="hadoop:job:streaming">
 	 	<title>Creating a Hadoop Streaming Job</title>
@@ -279,7 +284,9 @@
      EXAMPLE_DIR=/home/example/dictionaries/
      ...
   </hdp:cmd-env>
-</hdp:streaming>]]></programlisting>	 	
+</hdp:streaming>]]></programlisting>
+		
+		<para>Just like <literal>job</literal>, <literal>streaming</literal> supports the <link linkend="hadoop:generic-options">generic options</link>; follow the link for more information.</para>	 	
 	 </section>
 	 
 	 <section id="hadoop:job:runner">
@@ -302,42 +309,12 @@
      <!-- reference to another job named 'job' -->
      <ref bean="streaming-job"/>
      <!-- nested bean definition -->
-	 <hdp:job id="nested-job" .... /> 
+     <hdp:job id="nested-job" .... /> 
    </list></property>
 </bean>
  	
 <hdp:job id="job"  ... />]]></programlisting>
 	 </section>   	 
-   </section>
-   
-   <section id="hadoop:distributed-cache">
-   	 <title>Configuring the Hadoop <literal>DistributedCache</literal></title>
-   	 
-   	 <para><ulink url="http://hadoop.apache.org/common/docs/stable/mapred_tutorial.html#DistributedCache">DistributedCache</ulink> is a Hadoop facility for distributing application-specific, large, read-only files (
-   	 text, archives, jars and so on) efficiently. Applications specify the files to be cached via urls (<literal>hdfs://</literal>) using <literal>DistributedCache</literal> and the framework will copy the necessary
-   	 files to the slave nodes before any tasks for the job are executed on that node. Its efficiency stems from the fact that the files are only copied once per job and the ability to cache archives which are 
-   	 un-archived on the slaves.
-   	 Note that <literal>DistributedCache</literal> assumes that the files to be cached (and specified via hdfs:// urls) are already present on the Hadoop <literal>FileSystem</literal>.</para>
-   	 
-   	 <para>SHDP provides first-class configuration for the distributed cache through its <literal>cache</literal> element (backed by <classname>DistributedCacheFactoryBean</classname> class), 
-   	 allowing files and archives to be easily distributed across nodes:</para>
-   	 
-  	 <programlisting language="xml"><![CDATA[<hdp:cache create-symlink="true">
-  <hdp:classpath value="/cp/some-library.jar#library.jar" />
-  <hdp:cache value="/cache/some-archive.tgz#main-archive" />
-  <hdp:cache value="/cache/some-resource.res" />
-  <hdp:local value="some-file.txt" />
-</hdp:cache>]]></programlisting>
-	
-	<para>The definition above registers several resources with the cache (adding them to the job cache or classpath) and creates symlinks for them. As described in the <literal>DistributedCache</literal>
-	<ulink url="http://hadoop.apache.org/common/docs/stable/mapred_tutorial.html#DistributedCache">documentation</ulink>, the declaration format is (<literal>absolute-path#link-name</literal>). 
-	The link name is determined by the URI fragment (the text following the # such as <emphasis>#library.jar</emphasis> or <emphasis>#main-archive</emphasis> above) - if no name is specified, 
-	the cache bean will infer one based on the resource file name. Note that one does not have to specify the <literal>hdfs://node:port</literal> prefix as these are automatically determined based on the 
-	configuration wired into the bean; this prevents environment settings from being hard-coded into the configuration which becomes portable.  
-	Additionally based on the resource extension, the definition differentiates between archives (<literal>.tgz</literal>, <literal>.tar.gz</literal>, <literal>.zip</literal> and <literal>.tar</literal>) which will be uncompressed, and regular
-	files that are copied as-is. As with the rest of the namespace declarations, the definition above relies on defaults - since it requires a Hadoop <literal>Configuration</literal> and <literal>FileSystem</literal>
-	objects and none are specified (through <literal>configuration-ref</literal> and <literal>file-system-ref</literal>) it falls back to the default naming and is wired with the bean named 
-	<emphasis>hadoop-configuration</emphasis>, creating the <literal>FileSystem</literal> automatically.</para>
    </section>
    
    <section id="hadoop:tasklet">
@@ -371,6 +348,15 @@
    property=value
 </hdp:tool-runner>]]></programlisting>
 
+    <para>The previous example assumes the <literal>Tool</literal> dependencies (such as its class) are available in the classpath. If that is not the case, <literal>tool-runner</literal> allows a jar
+    to be specified:</para>
+
+		<programlisting language="xml"><![CDATA[<hdp:tool-runner ... jar="myTool.jar">
+    ...
+</hdp:tool-runner>]]></programlisting>
+    <para>The jar is used to instantiate and start the tool - in fact all its dependencies are loaded from the jar meaning they no longer need to be part of the classpath. This mechanism provides proper
+    isolation between tools as each of them might depend on certain libraries with different versions; rather then adding them all into the same app (which might be impossible due to versioning conflicts
+    ), one can simply point to the different jars and be on her way.</para>
 		<para>Like the rest of the SHDP elements, <literal>tool-runner</literal> allows the passed Hadoop configuration (by default <literal>hadoop-configuration</literal> but specified in the example for clarity) to be
 		<link linkend="hadoop:config:properties">customized</link> accordingly; the snippet only highlights the property initialization for simplicity but more options are available. Since usually the <literal>Tool</literal>
 		implementation has a default argument, one can use the <literal>tool-class</literal> attribute however it is possible to refer to another <literal>Tool</literal> instance or declare a nested one: </para> 
@@ -391,4 +377,45 @@
 		
 		<programlisting language="xml"><![CDATA[<hdp:tool-tasklet id="tool-tasklet" tool-ref="some-tool" />]]></programlisting>
 	</section>
+	
+	<section id="hadoop:generic-options">
+	 <title>Map Reduce Generic Options</title>
+	 
+	 <para>The <literal>job</literal>, <literal>streaming</literal> and <literal>tool</literal> all support a subset of <ulink url="http://hadoop.apache.org/common/docs/stable/commands_manual.html#Generic+Options">generic options</ulink>,
+	 specifically <literal>archives</literal>, <literal>files</literal> and <literal>libs</literal>. <literal>libs</literal> is probably the most useful as it enriches a job classpath (typically with some jars) - however the 
+	 other two allow resources or archives to be copied through-out the cluster for the job to consume. Whenver faced with provisioning issues, revisit these options as they can help up significantly.
+	 Note that the <literal>fs</literal>, <literal>jt</literal> or <literal>conf</literal> options are not supported - these are designed for command-line usage, for bootstrapping the application. 
+	 This is no longer the case, as the SHDP offers first-class support for defining and customizing Hadoop <link linkend="hadoop:config">configuration</link>s.</para>
+	</section>
+	
+	<section id="hadoop:distributed-cache">
+   	 <title>Configuring the Hadoop <literal>DistributedCache</literal></title>
+   	 
+   	 <para><ulink url="http://hadoop.apache.org/common/docs/stable/mapred_tutorial.html#DistributedCache">DistributedCache</ulink> is a Hadoop facility for distributing application-specific, large, read-only files (
+   	 text, archives, jars and so on) efficiently. Applications specify the files to be cached via urls (<literal>hdfs://</literal>) using <literal>DistributedCache</literal> and the framework will copy the necessary
+   	 files to the slave nodes before any tasks for the job are executed on that node. Its efficiency stems from the fact that the files are only copied once per job and the ability to cache archives which are 
+   	 un-archived on the slaves.
+   	 Note that <literal>DistributedCache</literal> assumes that the files to be cached (and specified via hdfs:// urls) are already present on the Hadoop <literal>FileSystem</literal>.</para>
+   	 
+   	 <para>SHDP provides first-class configuration for the distributed cache through its <literal>cache</literal> element (backed by <classname>DistributedCacheFactoryBean</classname> class), 
+   	 allowing files and archives to be easily distributed across nodes:</para>
+   	 
+  	 <programlisting language="xml"><![CDATA[<hdp:cache create-symlink="true">
+  <hdp:classpath value="/cp/some-library.jar#library.jar" />
+  <hdp:cache value="/cache/some-archive.tgz#main-archive" />
+  <hdp:cache value="/cache/some-resource.res" />
+  <hdp:local value="some-file.txt" />
+</hdp:cache>]]></programlisting>
+	
+	<para>The definition above registers several resources with the cache (adding them to the job cache or classpath) and creates symlinks for them. As described in the <literal>DistributedCache</literal>
+	<ulink url="http://hadoop.apache.org/common/docs/stable/mapred_tutorial.html#DistributedCache">documentation</ulink>, the declaration format is (<literal>absolute-path#link-name</literal>). 
+	The link name is determined by the URI fragment (the text following the # such as <emphasis>#library.jar</emphasis> or <emphasis>#main-archive</emphasis> above) - if no name is specified, 
+	the cache bean will infer one based on the resource file name. Note that one does not have to specify the <literal>hdfs://node:port</literal> prefix as these are automatically determined based on the 
+	configuration wired into the bean; this prevents environment settings from being hard-coded into the configuration which becomes portable.  
+	Additionally based on the resource extension, the definition differentiates between archives (<literal>.tgz</literal>, <literal>.tar.gz</literal>, <literal>.zip</literal> and <literal>.tar</literal>) which will be uncompressed, and regular
+	files that are copied as-is. As with the rest of the namespace declarations, the definition above relies on defaults - since it requires a Hadoop <literal>Configuration</literal> and <literal>FileSystem</literal>
+	objects and none are specified (through <literal>configuration-ref</literal> and <literal>file-system-ref</literal>) it falls back to the default naming and is wired with the bean named 
+	<emphasis>hadoop-configuration</emphasis>, creating the <literal>FileSystem</literal> automatically.</para>
+   </section>
+
 </chapter>
