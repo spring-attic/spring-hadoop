@@ -20,8 +20,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.util.Calendar;
-import java.util.Formatter;
-import java.util.Locale;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -73,7 +71,6 @@ public class PathUtilsTestWithXml {
 
 		String path = ref.getPath();
 		Assert.assertNotNull(path);
-		Assert.assertTrue(path.startsWith("/home/test"));
 
 		Calendar cal = Calendar.getInstance();
 		int expectedYear = cal.get(Calendar.YEAR);
@@ -108,7 +105,6 @@ public class PathUtilsTestWithXml {
 
 		String path = ref.getPath();
 		Assert.assertNotNull(path);
-		Assert.assertTrue(path.startsWith("/home/test"));
 
 		Calendar cal = Calendar.getInstance();
 		int expectedYear = cal.get(Calendar.YEAR);
@@ -138,7 +134,6 @@ public class PathUtilsTestWithXml {
 
 		String path = ref.getPath();
 		Assert.assertNotNull(path);
-		Assert.assertTrue(path.startsWith("/home/test"));
 
 		Calendar cal = Calendar.getInstance();
 		int expectedYear = cal.get(Calendar.YEAR);
@@ -163,7 +158,6 @@ public class PathUtilsTestWithXml {
 
 		String path = ref.getPath();
 		Assert.assertNotNull(path);
-		Assert.assertTrue(path.startsWith("/home/test"));
 
 		Calendar cal = Calendar.getInstance();
 		int expectedYear = cal.get(Calendar.YEAR);
@@ -183,7 +177,6 @@ public class PathUtilsTestWithXml {
 
 		String path = ref.getPath();
 		Assert.assertNotNull(path);
-		Assert.assertTrue(path.startsWith("/home/test"));
 
 		Calendar cal = Calendar.getInstance();
 		int expectedYear = cal.get(Calendar.YEAR);
@@ -214,7 +207,6 @@ public class PathUtilsTestWithXml {
 
 		String path = ref.getPath();
 		Assert.assertNotNull(path);
-		Assert.assertTrue(path.startsWith("/home/test"));
 
 		Calendar cal = Calendar.getInstance();
 		int expectedYear = cal.get(Calendar.YEAR);
@@ -232,22 +224,13 @@ public class PathUtilsTestWithXml {
 		assertEquals("Month is incorrect", expectedMonth, actualMonth);
 		
 		appendedStr = appendedStr.substring(3);
-		assertTrue(appendedStr.startsWith("data/"));
+		assertTrue(appendedStr.startsWith("data"));
 		
 		appendedStr = appendedStr.substring(5);
 		log.info("appended str without month is:" + appendedStr);
 		int actualDay = Integer.parseInt(appendedStr.substring(0, appendedStr.indexOf(File.separator)));
 		assertEquals("Day is incorrect", expectedDay, actualDay);
 
-	}
-	
-	@Test
-	public void testParse() {
-		StringBuffer strBuffer = new StringBuffer();
-
-		Formatter formatter = new Formatter(strBuffer, Locale.US);
-		formatter.format("%1$tY/aaa/%1$td", Calendar.getInstance());
-		System.out.println("format is:" + strBuffer.toString());
 	}
 
 
