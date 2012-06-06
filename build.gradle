@@ -50,7 +50,8 @@ dependencies {
     // cascading
     compile("cascading:cascading-hadoop:$cascadingVersion", optional)
     
-    //testRuntime "commons-io:commons-io:$commonsioVersion"
+    // Missing dependency in Hadoop 1.0.3
+    testRuntime "commons-io:commons-io:$commonsioVersion"
     //testRuntime "org.codehaus.jackson:jackson-core-asl:$jacksonVersion"
     testRuntime "org.codehaus.jackson:jackson-mapper-asl:$jacksonVersion"
     testRuntime "cglib:cglib:$cglibVersion"
