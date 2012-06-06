@@ -34,34 +34,39 @@ import java.util.UUID;
  */
 public class PathUtils {
 
-	private String rootPath;
-
-	private String pathFormat = "yyyy/MM/dd/HH/mm/ss";
-
-	private boolean appendUUID;
-
-
 	/**
 	 * get file time based path in the format of {@link java.text.SimpleDateFormat}.
 	 * 
-	 * @return the file path appended with time.
+	 * @param rootPath Root path 
+	 * @param pathFormat Path format to be generated
+	 * @param appendUUID Whether append UUID to the generated path
+	 * 
+	 * @return Generated path "${rootPath}/${formattedPath}/${UUID}
 	 */
-	public String format() {
+	public static String format(String rootPath, String pathFormat, boolean appendUUID) {
 		if (rootPath == null || rootPath.length() == 0) {
 			return "";
 		}
+		if (pathFormat == null || pathFormat.length() == 0) {
+			return "";
+		}
+		pathFormat = pathFormat.replace('/', File.separatorChar);
 		StringBuffer strBuffer = new StringBuffer();
+
 		strBuffer.append(rootPath);
 		if (!rootPath.endsWith(File.separator)) {
 			strBuffer.append(File.separator);
 		}
-
+		
 		Date date = new Date();
 		SimpleDateFormat format = new SimpleDateFormat(pathFormat);
 		strBuffer.append(format.format(date));
-		strBuffer.append(File.separator);
-		
-		if (this.appendUUID) {
+
+		if (!pathFormat.endsWith("/")) {
+			strBuffer.append(File.separator);
+		}
+
+		if (appendUUID) {
 			strBuffer.append(UUID.randomUUID());
 			strBuffer.append(File.separator);
 		}
@@ -69,57 +74,5 @@ public class PathUtils {
 		return strBuffer.toString();
 	}
 
-
-	/**
-	 * get root path
-	 * @return root path
-	 */
-	public String getRootPath() {
-		return rootPath;
-	}
-
-
-	/**
-	 * set root path
-	 * @param rootPath root path name
-	 */
-	public void setRootPath(String rootPath) {
-		this.rootPath = rootPath;
-	}
-
-
-	/**
-	 * @return the pathFormat
-	 */
-	public String getPathFormat() {
-		return pathFormat;
-	}
-
-
-	/**
-	 * @param pathFormat the pathFormat to set
-	 */
-	public void setPathFormat(String pathFormat) {
-		this.pathFormat = pathFormat;
-	}
-
-
-	/**
-	 * @return the appendUUID
-	 */
-	public boolean isAppendUUID() {
-		return appendUUID;
-	}
-
-
-	/**
-	 * @param appendUUID the appendUUID to set
-	 */
-	public void setAppendUUID(boolean appendUUID) {
-		this.appendUUID = appendUUID;
-	}
 }
 
-enum PathSeparator {
-	year, month, day, hour, minute, second
-}
