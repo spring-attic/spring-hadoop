@@ -16,11 +16,12 @@
 package org.springframework.data.hadoop.util;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
+import java.util.Formatter;
+import java.util.Locale;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -44,11 +45,11 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class PathUtilsTestWithXml {
 
 	private static final Log log = LogFactory.getLog(PathUtilsTestWithXml.class);
-	
+
 	@Autowired
 	private ApplicationContext ctx;
 	private ReferenceClass ref;
-	
+
 	/**
 	 * @throws java.lang.Exception
 	 */
@@ -67,153 +68,190 @@ public class PathUtilsTestWithXml {
 	 * Test method for {@link org.springframework.data.haldoop.util.PathUtils#format()}.
 	 */
 	@Test
-	public void testFormat() {	
-		ref = ctx.getBean("test-ref",ReferenceClass.class);
+	public void testFormat() {
+		ref = ctx.getBean("test-ref", ReferenceClass.class);
 
 		String path = ref.getPath();
 		Assert.assertNotNull(path);
 		Assert.assertTrue(path.startsWith("/home/test"));
-		
+
 		Calendar cal = Calendar.getInstance();
 		int expectedYear = cal.get(Calendar.YEAR);
-		int expectedMonth = cal.get(Calendar.MONTH) +1;
+		int expectedMonth = cal.get(Calendar.MONTH) + 1;
 		int expectedDay = cal.get(Calendar.DAY_OF_MONTH);
 		int expectedHour = cal.get(Calendar.HOUR_OF_DAY);
 
-		String appendedStr = path.substring("/home/test".length()+1);
+		String appendedStr = path.substring("/home/test".length() + 1);
 		log.info("appended str is:" + appendedStr);
-		int actualYear = Integer.parseInt(appendedStr.substring(0,appendedStr.indexOf(File.separator)));		
-		assertEquals("Year is incorrect",expectedYear,actualYear);
+		int actualYear = Integer.parseInt(appendedStr.substring(0, appendedStr.indexOf(File.separator)));
+		assertEquals("Year is incorrect", expectedYear, actualYear);
 
 		appendedStr = appendedStr.substring(5);
 		log.info("appended str without year is:" + appendedStr);
-		int actualMonth = Integer.parseInt(appendedStr.substring(0,appendedStr.indexOf(File.separator)));
+		int actualMonth = Integer.parseInt(appendedStr.substring(0, appendedStr.indexOf(File.separator)));
 		assertEquals("Month is incorrect", expectedMonth, actualMonth);
 
 		appendedStr = appendedStr.substring(3);
 		log.info("appended str without month is:" + appendedStr);
-		int actualDay = Integer.parseInt(appendedStr.substring(0,appendedStr.indexOf(File.separator)));
+		int actualDay = Integer.parseInt(appendedStr.substring(0, appendedStr.indexOf(File.separator)));
 		assertEquals("Day is incorrect", expectedDay, actualDay);
 
 		appendedStr = appendedStr.substring(3);
 		log.info("appended str without day is:" + appendedStr);
-		int actualHour = Integer.parseInt(appendedStr.substring(0,appendedStr.indexOf(File.separator)));
-		assertEquals("Hour is incorrect",expectedHour,actualHour);
+		int actualHour = Integer.parseInt(appendedStr.substring(0, appendedStr.indexOf(File.separator)));
+		assertEquals("Hour is incorrect", expectedHour, actualHour);
 	}
-	
+
 	@Test
-	public void testFormat2() {	
-		ref = ctx.getBean("test-ref2",ReferenceClass.class);
+	public void testFormat2() {
+		ref = ctx.getBean("test-ref2", ReferenceClass.class);
 
 		String path = ref.getPath();
 		Assert.assertNotNull(path);
 		Assert.assertTrue(path.startsWith("/home/test"));
-		
+
 		Calendar cal = Calendar.getInstance();
 		int expectedYear = cal.get(Calendar.YEAR);
-		int expectedMonth = cal.get(Calendar.MONTH) +1;
+		int expectedMonth = cal.get(Calendar.MONTH) + 1;
 		int expectedDay = cal.get(Calendar.DAY_OF_MONTH);
 
-		String appendedStr = path.substring("/home/test".length()+1);
+		String appendedStr = path.substring("/home/test".length() + 1);
 		log.info("appended str is:" + appendedStr);
-		int actualYear = Integer.parseInt(appendedStr.substring(0,appendedStr.indexOf(File.separator)));		
-		assertEquals("Year is incorrect",expectedYear,actualYear);
+		int actualYear = Integer.parseInt(appendedStr.substring(0, appendedStr.indexOf(File.separator)));
+		assertEquals("Year is incorrect", expectedYear, actualYear);
 
 		appendedStr = appendedStr.substring(5);
 		log.info("appended str without year is:" + appendedStr);
-		int actualMonth = Integer.parseInt(appendedStr.substring(0,appendedStr.indexOf(File.separator)));
+		int actualMonth = Integer.parseInt(appendedStr.substring(0, appendedStr.indexOf(File.separator)));
 		assertEquals("Month is incorrect", expectedMonth, actualMonth);
 
 		appendedStr = appendedStr.substring(3);
 		log.info("appended str without month is:" + appendedStr);
-		int actualDay = Integer.parseInt(appendedStr.substring(0,appendedStr.indexOf(File.separator)));
+		int actualDay = Integer.parseInt(appendedStr.substring(0, appendedStr.indexOf(File.separator)));
+		assertEquals("Day is incorrect", expectedDay, actualDay);
+
+	}
+
+	@Test
+	public void testFormat3() {
+		ref = ctx.getBean("test-ref3", ReferenceClass.class);
+
+		String path = ref.getPath();
+		Assert.assertNotNull(path);
+		Assert.assertTrue(path.startsWith("/home/test"));
+
+		Calendar cal = Calendar.getInstance();
+		int expectedYear = cal.get(Calendar.YEAR);
+		int expectedMonth = cal.get(Calendar.MONTH) + 1;
+
+		String appendedStr = path.substring("/home/test".length() + 1);
+		log.info("appended str is:" + appendedStr);
+		int actualYear = Integer.parseInt(appendedStr.substring(0, appendedStr.indexOf(File.separator)));
+		assertEquals("Year is incorrect", expectedYear, actualYear);
+
+		appendedStr = appendedStr.substring(5);
+		log.info("appended str without year is:" + appendedStr);
+		int actualMonth = Integer.parseInt(appendedStr.substring(0, appendedStr.indexOf(File.separator)));
+		assertEquals("Month is incorrect", expectedMonth, actualMonth);
+
+
+	}
+
+	@Test
+	public void testFormat4() {
+		ref = ctx.getBean("test-ref4", ReferenceClass.class);
+
+		String path = ref.getPath();
+		Assert.assertNotNull(path);
+		Assert.assertTrue(path.startsWith("/home/test"));
+
+		Calendar cal = Calendar.getInstance();
+		int expectedYear = cal.get(Calendar.YEAR);
+
+		String appendedStr = path.substring("/home/test".length() + 1);
+		log.info("appended str is:" + appendedStr);
+		int actualYear = Integer.parseInt(appendedStr.substring(0, appendedStr.indexOf(File.separator)));
+		assertEquals("Year is incorrect", expectedYear, actualYear);
+
+
+	}
+
+
+	@Test
+	public void testFormat5() {
+		ref = ctx.getBean("test-ref5", ReferenceClass.class);
+
+		String path = ref.getPath();
+		Assert.assertNotNull(path);
+		Assert.assertTrue(path.startsWith("/home/test"));
+
+		Calendar cal = Calendar.getInstance();
+		int expectedYear = cal.get(Calendar.YEAR);
+		int expectedMonth = cal.get(Calendar.MONTH) + 1;
+		int expectedDay = cal.get(Calendar.DAY_OF_MONTH);
+
+		String appendedStr = path.substring("/home/test".length() + 1);
+		log.info("appended str is:" + appendedStr);
+
+		log.info("appended str without month is:" + appendedStr);
+		int actualDay = Integer.parseInt(appendedStr.substring(0, appendedStr.indexOf(File.separator)));
+		assertEquals("Day is incorrect", expectedDay, actualDay);
+
+		appendedStr = appendedStr.substring(3);
+		log.info("appended str without year is:" + appendedStr);
+		int actualMonth = Integer.parseInt(appendedStr.substring(0, appendedStr.indexOf(File.separator)));
+		assertEquals("Month is incorrect", expectedMonth, actualMonth);
+
+		appendedStr = appendedStr.substring(3);
+		int actualYear = Integer.parseInt(appendedStr.substring(0, appendedStr.indexOf(File.separator)));
+		assertEquals("Year is incorrect", expectedYear, actualYear);
+	}
+
+
+	@Test
+	public void testFormat6() {
+		ref = ctx.getBean("test-ref6", ReferenceClass.class);
+
+		String path = ref.getPath();
+		Assert.assertNotNull(path);
+		Assert.assertTrue(path.startsWith("/home/test"));
+
+		Calendar cal = Calendar.getInstance();
+		int expectedYear = cal.get(Calendar.YEAR);
+		int expectedMonth = cal.get(Calendar.MONTH) + 1;
+		int expectedDay = cal.get(Calendar.DAY_OF_MONTH);
+
+		String appendedStr = path.substring("/home/test".length() + 1);
+		log.info("appended str is:" + appendedStr);
+		int actualYear = Integer.parseInt(appendedStr.substring(0, appendedStr.indexOf(File.separator)));
+		assertEquals("Year is incorrect", expectedYear, actualYear);
+
+		appendedStr = appendedStr.substring(5);
+		log.info("appended str without year is:" + appendedStr);
+		int actualMonth = Integer.parseInt(appendedStr.substring(0, appendedStr.indexOf(File.separator)));
+		assertEquals("Month is incorrect", expectedMonth, actualMonth);
+		
+		appendedStr = appendedStr.substring(3);
+		assertTrue(appendedStr.startsWith("data/"));
+		
+		appendedStr = appendedStr.substring(5);
+		log.info("appended str without month is:" + appendedStr);
+		int actualDay = Integer.parseInt(appendedStr.substring(0, appendedStr.indexOf(File.separator)));
 		assertEquals("Day is incorrect", expectedDay, actualDay);
 
 	}
 	
 	@Test
-	public void testFormat3() {	
-		ref = ctx.getBean("test-ref3",ReferenceClass.class);
+	public void testParse() {
+		StringBuffer strBuffer = new StringBuffer();
 
-		String path = ref.getPath();
-		Assert.assertNotNull(path);
-		Assert.assertTrue(path.startsWith("/home/test"));
-		
-		Calendar cal = Calendar.getInstance();
-		int expectedYear = cal.get(Calendar.YEAR);
-		int expectedMonth = cal.get(Calendar.MONTH) +1;
-
-		String appendedStr = path.substring("/home/test".length()+1);
-		log.info("appended str is:" + appendedStr);
-		int actualYear = Integer.parseInt(appendedStr.substring(0,appendedStr.indexOf(File.separator)));		
-		assertEquals("Year is incorrect",expectedYear,actualYear);
-
-		appendedStr = appendedStr.substring(5);
-		log.info("appended str without year is:" + appendedStr);
-		int actualMonth = Integer.parseInt(appendedStr.substring(0,appendedStr.indexOf(File.separator)));
-		assertEquals("Month is incorrect", expectedMonth, actualMonth);
-
-
-	}
-	
-	@Test
-	public void testFormat4() {	
-		ref = ctx.getBean("test-ref4",ReferenceClass.class);
-
-		String path = ref.getPath();
-		Assert.assertNotNull(path);
-		Assert.assertTrue(path.startsWith("/home/test"));
-		
-		Calendar cal = Calendar.getInstance();
-		int expectedYear = cal.get(Calendar.YEAR);
-
-		String appendedStr = path.substring("/home/test".length()+1);
-		log.info("appended str is:" + appendedStr);
-		int actualYear = Integer.parseInt(appendedStr.substring(0,appendedStr.indexOf(File.separator)));		
-		assertEquals("Year is incorrect",expectedYear,actualYear);
-
-
-	}
-	
-	
-	@Test
-	public void testFormat5() {	
-		ref = ctx.getBean("test-ref5",ReferenceClass.class);
-
-		String path = ref.getPath();
-		Assert.assertNotNull(path);
-		Assert.assertTrue(path.startsWith("/home/test"));
-		
-		Calendar cal = Calendar.getInstance();
-		int expectedYear = cal.get(Calendar.YEAR);
-		int expectedMonth = cal.get(Calendar.MONTH) +1;
-		int expectedDay = cal.get(Calendar.DAY_OF_MONTH);
-
-		String appendedStr = path.substring("/home/test".length()+1);
-		log.info("appended str is:" + appendedStr);
-
-		log.info("appended str without month is:" + appendedStr);
-		int actualDay = Integer.parseInt(appendedStr.substring(0,appendedStr.indexOf(File.separator)));
-		assertEquals("Day is incorrect", expectedDay, actualDay);		
-
-		appendedStr = appendedStr.substring(3);
-		log.info("appended str without year is:" + appendedStr);
-		int actualMonth = Integer.parseInt(appendedStr.substring(0,appendedStr.indexOf(File.separator)));
-		assertEquals("Month is incorrect", expectedMonth, actualMonth);
-		
-		appendedStr = appendedStr.substring(3);
-		int actualYear = Integer.parseInt(appendedStr.substring(0,appendedStr.indexOf(File.separator)));		
-		assertEquals("Year is incorrect",expectedYear,actualYear);
+		Formatter formatter = new Formatter(strBuffer, Locale.US);
+		formatter.format("%1$tY/aaa/%1$td", Calendar.getInstance());
+		System.out.println("format is:" + strBuffer.toString());
 	}
 
-	@Test
-	public void testParse(){
-		Date date = new Date();
-		SimpleDateFormat format = new SimpleDateFormat("\'/home\'/yyyy/MM/dd/HH/mm/ss");
-		System.out.println("format is:" + format.format(date));
-	}
-	
-	public static class ReferenceClass{
+
+	public static class ReferenceClass {
 		private String path;
 
 		/**
@@ -229,7 +267,7 @@ public class PathUtilsTestWithXml {
 		public void setPath(String path) {
 			this.path = path;
 		}
-		
-		
+
+
 	}
 }

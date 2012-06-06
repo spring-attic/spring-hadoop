@@ -17,50 +17,44 @@
 package org.springframework.data.hadoop.util;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Formatter;
+import java.util.Locale;
 import java.util.UUID;
 
 
 /**
  * Utility class to generate new time based path. The "pathFormat" is used to specify path format in the 
- * {@link java.text.SimpleDateFormat} style.
+ * {@link java.util.Formatter} style.
  *  
  * For example, the return path will be "/user/hadoop/data/2012/2/22/17/20/10" 
- * if pathFormat is "yyyy/MM/dd/HH/mm/ss" and rootPath is "/user/hadoop/data".
+ * if pathFormat is "/user/hadoop/data/%1$tY/%1$tm/%1$td/%1$tH/%1$tM/%1$tS"
  * 
+ * @see java.util.Formatter
  * @author Jarred Li
  *
  */
 public class PathUtils {
 
 	/**
-	 * get file time based path in the format of {@link java.text.SimpleDateFormat}.
+	 * get file time based path in the format of {@link java.util.Formatter}.
 	 * 
-	 * @param rootPath Root path 
-	 * @param pathFormat Path format to be generated
+	 * @param pathFormat Formatted path, the variable in the path will be 
+	 * 					 replaced by {@link java.util.Date}. 
+	 * 					 http://docs.oracle.com/javase/6/docs/api/java/util/Formatter.html#dt 
 	 * @param appendUUID Whether append UUID to the generated path
 	 * 
-	 * @return Generated path "${rootPath}/${formattedPath}/${UUID}
+	 * @return Generated path 
 	 */
-	public static String format(String rootPath, String pathFormat, boolean appendUUID) {
-		if (rootPath == null || rootPath.length() == 0) {
-			return "";
-		}
+	public static String format(String pathFormat, boolean appendUUID) {
 		if (pathFormat == null || pathFormat.length() == 0) {
 			return "";
 		}
 		pathFormat = pathFormat.replace('/', File.separatorChar);
 		StringBuffer strBuffer = new StringBuffer();
 
-		strBuffer.append(rootPath);
-		if (!rootPath.endsWith(File.separator)) {
-			strBuffer.append(File.separator);
-		}
-		
-		Date date = new Date();
-		SimpleDateFormat format = new SimpleDateFormat(pathFormat);
-		strBuffer.append(format.format(date));
+		Formatter formatter = new Formatter(strBuffer, Locale.US);
+		formatter.format(pathFormat, new Date());
 
 		if (!pathFormat.endsWith("/")) {
 			strBuffer.append(File.separator);
@@ -74,5 +68,15 @@ public class PathUtils {
 		return strBuffer.toString();
 	}
 
-}
 
+	/**
+	 * override method without appending UUID to the generated path
+	 * 
+	 * @param pathFormat Formatted path, the variable in the path will be 
+	 * 					 replaced by {@link java.util.Date}.
+	 * @return Generated path without appending UUID
+	 */
+	public static String format(String pathFormat) {
+		return format(pathFormat, false);
+	}
+}

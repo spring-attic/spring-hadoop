@@ -10,23 +10,26 @@
 
 	<beans:bean id="test-ref"
 		class="org.springframework.data.hadoop.util.PathUtilsTestWithXml.ReferenceClass"
-		p:path="#{ T(org.springframework.data.hadoop.util.PathUtils).format('/home/test','yyyy/MM/dd/HH/mm/ss',true)}" />
+		p:path="#{ T(org.springframework.data.hadoop.util.PathUtils).format('/home/test/%1$tY/%1$tm/%1$td/%1$tH/%1$tM/%1$tS')}" />
 
 	<beans:bean id="test-ref2"
 		class="org.springframework.data.hadoop.util.PathUtilsTestWithXml.ReferenceClass"
-		p:path="#{ T(org.springframework.data.hadoop.util.PathUtils).format('/home/test','yyyy/MM/dd',true)}" />
+		p:path="#{ T(org.springframework.data.hadoop.util.PathUtils).format('/home/test/%1$tY/%1$tm/%1$td')}" />
 
 	<beans:bean id="test-ref3"
 		class="org.springframework.data.hadoop.util.PathUtilsTestWithXml.ReferenceClass"
-		p:path="#{ T(org.springframework.data.hadoop.util.PathUtils).format('/home/test','yyyy/MM',true)}" />
+		p:path="#{ T(org.springframework.data.hadoop.util.PathUtils).format('/home/test/%1$tY/%1$tm')}" />
 
 	<beans:bean id="test-ref4"
 		class="org.springframework.data.hadoop.util.PathUtilsTestWithXml.ReferenceClass"
-		p:path="#{ T(org.springframework.data.hadoop.util.PathUtils).format('/home/test','yyyy',true)}" />
+		p:path="#{ T(org.springframework.data.hadoop.util.PathUtils).format('/home/test/%1$tY')}" />
 
 	<beans:bean id="test-ref5"
 		class="org.springframework.data.hadoop.util.PathUtilsTestWithXml.ReferenceClass"
-		p:path="#{ T(org.springframework.data.hadoop.util.PathUtils).format('/home/test','dd/MM/yyyy',true)}" />
+		p:path="#{ T(org.springframework.data.hadoop.util.PathUtils).format('/home/test/%1$td/%1$tm/%1$tY',true)}" />
 
+	<beans:bean id="test-ref6"
+		class="org.springframework.data.hadoop.util.PathUtilsTestWithXml.ReferenceClass"
+		p:path="#{ T(org.springframework.data.hadoop.util.PathUtils).format('/home/test/%1$tY/%1$tm/data/%1$td')}" />
 
 </beans:beans>
