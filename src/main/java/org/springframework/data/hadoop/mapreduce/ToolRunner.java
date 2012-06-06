@@ -53,7 +53,8 @@ public class ToolRunner extends ToolExecutor implements FactoryBean<Integer>, In
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.isTrue(tool != null || StringUtils.hasText(toolClassName), "a Tool instance or class name is required");
+		Assert.isTrue(tool != null || StringUtils.hasText(toolClassName) || (jar != null && jar.exists()),
+				"a Tool instance or class name, or a Jar (with Main-Class) is required");
 
 		if (runAtStartup) {
 			getObject();

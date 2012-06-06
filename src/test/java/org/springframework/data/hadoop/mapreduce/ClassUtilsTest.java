@@ -69,6 +69,13 @@ public class ClassUtilsTest {
 		assertFalse(org.springframework.util.ClassUtils.isPresent(obj.getClass().getName(), getClass().getClassLoader()));
 	}
 
+	@Test
+	public void testMainClassDiscovery() throws Exception {
+		Resource jar = new DefaultResourceLoader().getResource("some-tool.jar");
+		String mainClass = ClassLoadingUtils.mainClass(jar);
+		assertEquals("test.SomeTool", mainClass);
+	}
+
 	private static Object loadFromJar(Resource jar, ClassLoader parentCL, String className) {
 		ClassLoader cl = ClassLoadingUtils.createParentLastClassLoader(jar, parentCL, null);
 		Class<?> clazz = ClassUtils.resolveClassName(className, cl);

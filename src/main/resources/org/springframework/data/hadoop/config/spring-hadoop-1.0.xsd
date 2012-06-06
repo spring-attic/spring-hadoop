@@ -567,7 +567,8 @@ Bean id.]]></xsd:documentation>
 				<xsd:annotation>
 					<xsd:documentation><![CDATA[
 Indicates the Tool class name. This is useful when referring to an external jar (not required
-in the classpath).
+in the classpath). If not specified, the Main-Class (specified in the MANIFEST.MF), if present,
+is used instead.
 					]]></xsd:documentation>
 					<xsd:appinfo>
 						<tool:annotation kind="direct">

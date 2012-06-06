@@ -50,7 +50,7 @@
 	</hdp:tool-tasklet>
 	
 	
-	<hdp:tool-runner id="tool-jar" tool-class="test.SomeTool" jar="some-tool.jar" files="some-tool.jar">
+	<hdp:tool-runner id="tool-jar" jar="some-tool.jar" files="some-tool.jar">
 		<hdp:arg value="13"/>
 	</hdp:tool-runner>
 </beans>

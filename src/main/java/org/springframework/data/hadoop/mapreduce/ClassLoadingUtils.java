@@ -24,11 +24,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
+import java.util.jar.Manifest;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.IOUtils;
 import org.springframework.core.io.Resource;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * Class-related utilities.
@@ -151,6 +153,22 @@ abstract class ClassLoadingUtils {
 					}
 				}
 			}
+		} finally {
+			IOUtils.closeStream(jis);
+		}
+	}
+
+	static String mainClass(Resource jar) throws IOException {
+		JarInputStream jis = new JarInputStream(jar.getInputStream());
+		try {
+			Manifest mf = jis.getManifest();
+			if (mf != null) {
+				String main = mf.getMainAttributes().getValue("Main-Class");
+				if (StringUtils.hasText(main)) {
+					return main.replace("/", ".");
+				}
+			}
+			return null;
 		} finally {
 			IOUtils.closeStream(jis);
 		}

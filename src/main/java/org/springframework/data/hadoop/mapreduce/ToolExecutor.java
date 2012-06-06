@@ -54,6 +54,16 @@ abstract class ToolExecutor extends JobGenericOptions implements BeanClassLoader
 		if (t == null) {
 			cl = ClassLoadingUtils.createParentLastClassLoader(jar, beanClassLoader, cfg);
 			cfg.setClassLoader(cl);
+
+			// fall-back to main
+			if (!StringUtils.hasText(toolClassName)) {
+				String mainClass = ClassLoadingUtils.mainClass(jar);
+				if (mainClass == null) {
+					throw new IllegalArgumentException("no Tool class specified and no Main-Class available");
+				}
+				toolClassName = mainClass;
+			}
+
 			t = loadTool(toolClassName, cl);
 		}
 
@@ -86,6 +96,7 @@ abstract class ToolExecutor extends JobGenericOptions implements BeanClassLoader
 
 	private Tool loadTool(String toolClassName, ClassLoader cl) {
 		Class<?> clazz = ClassUtils.resolveClassName(toolClassName, cl);
+		Assert.isAssignable(Tool.class, clazz, "Class [" + clazz + "] is not a Tool instance.");
 		return (Tool) BeanUtils.instantiateClass(clazz);
 	}
 

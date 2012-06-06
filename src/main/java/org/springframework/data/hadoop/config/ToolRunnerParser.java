@@ -53,7 +53,7 @@ class ToolRunnerParser extends AbstractPropertiesConfiguredBeanDefinitionParser 
 			}
 			else {
 				if (element.hasAttribute("tool-class") || element.hasAttribute("tool-ref")) {
-					parserContext.getReaderContext().error("Cannot define a nested and specify one through tool-class/tool-ref attributes - use only one", element);
+					parserContext.getReaderContext().error("Cannot define nested and top-level tool-class/tool-ref attributes - use only one", element);
 				}
 				
 				builder.addPropertyValue("tool", parserContext.getDelegate().parsePropertySubElement(child, builder.getRawBeanDefinition()));
