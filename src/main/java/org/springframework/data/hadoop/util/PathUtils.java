@@ -56,7 +56,7 @@ public class PathUtils {
 		Formatter formatter = new Formatter(strBuffer, Locale.US);
 		formatter.format(pathFormat, new Date());
 
-		if (!pathFormat.endsWith("/")) {
+		if (!pathFormat.endsWith(File.separator)) {
 			strBuffer.append(File.separator);
 		}
 
