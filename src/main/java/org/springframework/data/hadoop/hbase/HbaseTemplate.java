@@ -36,11 +36,10 @@ import org.springframework.util.Assert;
  * 
  * @author Costin Leau
  */
-public class HbaseTemplate implements InitializingBean {
+public class HbaseTemplate implements InitializingBean, HbaseOperations {
 
 	private Charset charset;
 	private String encoding;
-	private String defaultTable;
 	private boolean autoFlush = true;
 	private HTableInterfaceFactory tableFactory;
 	private Configuration configuration;
@@ -61,20 +60,7 @@ public class HbaseTemplate implements InitializingBean {
 		charset = HbaseUtils.getCharset(encoding);
 	}
 
-	public <T> T execute(TableCallback<T> action) {
-		return execute(defaultTable, action);
-	}
-
-	/**
-	 * Executes the given action against the specified table handling resource management.
-	 * <p/>
-	 * Application exceptions thrown by the action object get propagated to the caller (can only be unchecked). Allows for returning a 
-	 * result object (typically a domain object or collection of domain objects).
-	 * 
-	 * @param tableName
-	 * @param tableCallback
-	 * @return
-	 */
+	@Override
 	public <T> T execute(String tableName, TableCallback<T> action) {
 		Assert.notNull(action, "Callback object must not be null");
 		Assert.notNull(tableName, "No table specified");
@@ -125,19 +111,22 @@ public class HbaseTemplate implements InitializingBean {
 		return HbaseUtils.convertHbaseException(ex);
 	}
 
-	public <T> T execute(String tableName, String family, final ResultsExtractor<T> action) {
+	@Override
+	public <T> T find(String tableName, String family, final ResultsExtractor<T> action) {
 		Scan scan = new Scan();
 		scan.addFamily(family.getBytes(charset));
-		return execute(tableName, scan, action);
+		return find(tableName, scan, action);
 	}
 
-	public <T> T execute(String tableName, String family, String qualifier, final ResultsExtractor<T> action) {
+	@Override
+	public <T> T find(String tableName, String family, String qualifier, final ResultsExtractor<T> action) {
 		Scan scan = new Scan();
 		scan.addColumn(family.getBytes(charset), qualifier.getBytes(charset));
-		return execute(tableName, scan, action);
+		return find(tableName, scan, action);
 	}
 
-	public <T> T execute(String tableName, final Scan scan, final ResultsExtractor<T> action) {
+	@Override
+	public <T> T find(String tableName, final Scan scan, final ResultsExtractor<T> action) {
 		return execute(tableName, new TableCallback<T>() {
 			@Override
 			public T doInTable(HTable htable) throws Throwable {
@@ -151,30 +140,36 @@ public class HbaseTemplate implements InitializingBean {
 		});
 	}
 
+	@Override
 	public <T> List<T> find(String tableName, String family, final RowMapper<T> action) {
 		Scan scan = new Scan();
 		scan.addFamily(family.getBytes(charset));
 		return find(tableName, scan, action);
 	}
 
+	@Override
 	public <T> List<T> find(String tableName, String family, String qualifier, final RowMapper<T> action) {
 		Scan scan = new Scan();
 		scan.addColumn(family.getBytes(charset), qualifier.getBytes(charset));
 		return find(tableName, scan, action);
 	}
 
+	@Override
 	public <T> List<T> find(String tableName, final Scan scan, final RowMapper<T> action) {
-		return execute(tableName, scan, new RowMapperResultsExtractor<T>(action));
+		return find(tableName, scan, new RowMapperResultsExtractor<T>(action));
 	}
 
+	@Override
 	public <T> T get(String tableName, String rowName, final RowMapper<T> mapper) {
 		return get(tableName, rowName, null, null, mapper);
 	}
 
+	@Override
 	public <T> T get(String tableName, String rowName, String familyName, final RowMapper<T> mapper) {
 		return get(tableName, rowName, familyName, null, mapper);
 	}
 
+	@Override
 	public <T> T get(String tableName, final String rowName, final String familyName, final String qualifier, final RowMapper<T> mapper) {
 		return execute(tableName, new TableCallback<T>() {
 			@Override
@@ -197,14 +192,17 @@ public class HbaseTemplate implements InitializingBean {
 	}
 
 	/**
+	 * Sets the auto flush.
+	 *
 	 * @param autoFlush The autoFlush to set.
 	 */
 	public void setAutoFlush(boolean autoFlush) {
 		this.autoFlush = autoFlush;
 	}
 
-
 	/**
+	 * Sets the table factory.
+	 *
 	 * @param tableFactory The tableFactory to set.
 	 */
 	public void setTableFactory(HTableInterfaceFactory tableFactory) {
@@ -212,6 +210,8 @@ public class HbaseTemplate implements InitializingBean {
 	}
 
 	/**
+	 * Sets the encoding.
+	 *
 	 * @param encoding The encoding to set.
 	 */
 	public void setEncoding(String encoding) {
@@ -219,13 +219,8 @@ public class HbaseTemplate implements InitializingBean {
 	}
 
 	/**
-	 * @param defaultTable The defaultTable to set.
-	 */
-	public void setDefaultTable(String defaultTable) {
-		this.defaultTable = defaultTable;
-	}
-
-	/**
+	 * Sets the configuration.
+	 *
 	 * @param configuration The configuration to set.
 	 */
 	public void setConfiguration(Configuration configuration) {
