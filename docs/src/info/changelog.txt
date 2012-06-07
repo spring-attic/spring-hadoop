@@ -5,6 +5,36 @@ http://www.springsource.org/spring-data/hadoop
 Commit changelog: http://github.com/SpringSource/spring-hadoop/tree/[version]
 Issues changelog: http://jira.springsource.org/secure/ReleaseNote.jspa?projectId=10801
 
+Changes in version 1.0 M2 (2012-07-dd)
+--------------------------------------
+
+General
+* Introduced support for Hadoop Security
+* Enhanced namespace declaration
+* Added pig and hbase samples
+* Upgraded to Hadoop 1.0.3
+
+Package org.springframework.data.hadoop.cascading
+* Added local Taps for Spring Framework Resource
+* Added local Taps for Spring Integration MessageHandler and MessageSource
+
+Package org.springframework.data.hadoop.configuration
+* Refined creation of Configuration objects to be 'old' API aware
+
+Package org.springframework.data.hadoop.fs
+* Added support for hftp, hsftp and webhdfs
+
+Package org.springframework.data.hadoop.hbase
+* Introduced DAO support (Template & Callback) for HBase
+
+Package org.springframework.data.hadoop.mapreduce
+* Added jar-based class-loading support
+* Introduced support for Hadoop generic options
+* Improved diagnostics in JobRunner and JobTasklet
+* Introduced identify mapper/reducer as defaults
+* Improved propagation of the thread context classloader (tccl) for Tool execution
+
+
 Changes in version 1.0 M1 (2012-02-23)
 --------------------------------------
 
