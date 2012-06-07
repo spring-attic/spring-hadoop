@@ -17,10 +17,10 @@
 		each HDFS or <literal>FileSystem</literal> implementation can have slightly different semantics or implementation.</para>
 		
 		<para>SHDP obeys the HDFS permissions, using the identity of the current user (by default) for interacting with the file system. In particular, the <literal>HdfsResourceLoader</literal> considers when doing pattern matching,
-		only the files that its suppose to <empahsis>see</empahsis> and does not perform any privileged action. It is possible however to specify a different user, meaning the <literal>ResourceLoader</literal> interacts with HDFS 
+		only the files that its suppose to <emphasis>see</emphasis> and does not perform any privileged action. It is possible however to specify a different user, meaning the <literal>ResourceLoader</literal> interacts with HDFS 
 		using that user's rights - however this obeys the <link linkend="security:kerberos">user impersonation</link> rules. 
 		When using different users, it is recommended to create separate <literal>ResourceLoader</literal> instances (one per user) instead of assigning additional permissions or groups to one user - 
-		this makes it easier to manage and wire the different HDFS <empahsis>views</empahsis> without having to modify the ACLs. Note however that when using impersonation, the <literal>ResourceLoader</literal> might
+		this makes it easier to manage and wire the different HDFS <emphasis>views</emphasis> without having to modify the ACLs. Note however that when using impersonation, the <literal>ResourceLoader</literal> might
 		(and will typically) return <emphasis>restricted</emphasis> files that might not be consumed or seen by the callee.</para>
 	</section>
 
