@@ -356,7 +356,9 @@
 </hdp:tool-runner>]]></programlisting>
     <para>The jar is used to instantiate and start the tool - in fact all its dependencies are loaded from the jar meaning they no longer need to be part of the classpath. This mechanism provides proper
     isolation between tools as each of them might depend on certain libraries with different versions; rather then adding them all into the same app (which might be impossible due to versioning conflicts
-    ), one can simply point to the different jars and be on her way.</para>
+    ), one can simply point to the different jars and be on her way. Note that when using a jar, if the main class (as specified by the 
+    <ulink url="http://docs.oracle.com/javase/tutorial/deployment/jar/appman.html">Main-Class</ulink> entry) is the target <classname>Tool</classname>, one can skip specifying the tool as it will
+    picked up automatically.</para>
 	
 	<para>Like the rest of the SHDP elements, <literal>tool-runner</literal> allows the passed Hadoop configuration (by default <literal>hadoopConfiguration</literal> but specified in the example for clarity) to be
 		<link linkend="hadoop:config:properties">customized</link> accordingly; the snippet only highlights the property initialization for simplicity but more options are available. Since usually the <literal>Tool</literal>
@@ -383,17 +385,18 @@ hadoop jar job10.jar ...]]></programlisting>
 			
 			<para>The script can be fully ported to SHDP, through the <literal>tool</literal> element:</para>
 <programlisting language="xml"><![CDATA[<hdp:tool id="job1" tool-class="job1.Tool" jar="job1.jar" files="fullpath:props.properties" properties-location="config.properties"/>
-<hdp:tool id="job2" tool-class="job2.Tool" jar="job2.jar">
+<hdp:tool id="job2" jar="job2.jar">
 	<hdp:arg value="arg1"/>
 	<hdp:arg value="arg2"/>
 </hdp:tool>
-<hdp:tool id="job3" tool-class="job3.Tool" jar="job3.jar"/>
+<hdp:tool id="job3" jar="job3.jar"/>
 ...]]></programlisting>
 
 			<para>All the features have been explained in the previous sections but let us review what happens here. 
 			As mentioned before, each tool gets autowired with the <literal>hadoopConfiguration</literal>; <literal>job1</literal> goes beyond this and uses its own properties instead.
-			For each jar, the main <classname>Tool</classname> class needs to be specified to kickstart the actual job. When needed (such as with <literal>job1</literal>), 
-			additional files or libs are provisioned in the cluster. Same thing with the job arguments.</para>
+			For the first jar, the <classname>Tool</classname> class is specified, however the rest assume the jar <emphasis>main class</emphasis>es implement the 
+			<interfacename>Tool</interfacename> interface; the namespace will discover them automatically and use it accordingly.
+			When needed (such as with <literal>job1</literal>), additional files or libs are provisioned in the cluster. Same thing with the job arguments.</para>
 			
 			<para>However more things that go beyond scripting, can be applied to this configuration - each job can have multiple properties loaded or declared inlined - not just from the local file system, but also
 			from the classpath or any url for that matter. In fact, the whole configuration can be externalized and parameterized (through Spring's 
