@@ -34,6 +34,7 @@ import cascading.tuple.TupleEntrySchemeIterator;
  * 
  * @author Costin Leau
  */
+@SuppressWarnings("serial")
 public class ResourceTap extends SourceTap<Properties, Resource> {
 
 	private final Resource resource;
@@ -52,8 +53,8 @@ public class ResourceTap extends SourceTap<Properties, Resource> {
 	 * Constructs a new <code>ResourceTap</code> instance. Backed by multiple resources (
 	 * allowing for pattern matching to occur).
 	 *
-	 * @param scheme
-	 * @param resource
+	 * @param scheme scheme to use
+	 * @param resources Resources to read from
 	 */
 	public ResourceTap(Scheme<Properties, Resource, ?, ?, ?> scheme, Resource[] resources) {
 		super(scheme);
