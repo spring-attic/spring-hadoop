@@ -26,18 +26,42 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
+ * Helper class featuring methods for Hbase table handling and exception translation. 
+ * 
  * @author Costin Leau
  */
 public class HbaseUtils {
 
+	/**
+	 * Converts the given (Hbase) exception to an appropriate exception from <tt>org.springframework.dao</tt> hierarchy.
+	 * 
+	 * @param ex Hbase exception that occurred
+	 * @return the corresponding DataAccessException instance
+	 */
 	public static DataAccessException convertHbaseException(Exception ex) {
 		return new HbaseSystemException(ex);
 	}
 
+	/**
+	 * Retrieves an Hbase table instance identified by its name.
+	 * 
+	 * @param configuration Hbase configuration object
+	 * @param tableName table name
+	 * @return table instance
+	 */
 	public static HTable getHTable(Configuration configuration, String tableName) {
 		return getHTable(null, getCharset(null), configuration, tableName);
 	}
 
+	/**
+	 * Retrieves an Hbase table instance identified by its name and charset using the given table factory.
+	 * 
+	 * @param tableFactory table factory (may be null)
+	 * @param charset name charset (may be null)
+	 * @param configuration Hbase configuration object
+	 * @param tableName table name
+	 * @return table instance
+	 */
 	public static HTable getHTable(HTableInterfaceFactory tableFactory, Charset charset, Configuration configuration, String tableName) {
 		if (HbaseSynchronizationManager.hasResource(tableName)) {
 			return (HTable) HbaseSynchronizationManager.getResource(tableName);

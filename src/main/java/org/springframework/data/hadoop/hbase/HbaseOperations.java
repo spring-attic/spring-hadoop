@@ -33,7 +33,7 @@ public interface HbaseOperations {
 	 * Allows for returning a result object (typically a domain object or collection of domain objects).
 	 * 
 	 * @param tableName the target table
-	 * @param tableCallback callback object that specifies the action
+	 * @param action callback object that specifies the action
 	 * @return the result object of the callback action, or null
 	 */
 	<T> T execute(String tableName, TableCallback<T> action);

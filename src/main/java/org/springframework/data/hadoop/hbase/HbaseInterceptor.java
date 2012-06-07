@@ -26,10 +26,14 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.hbase.client.HTableInterface;
 
 /**
+ * AOP interceptor that binds a new Hbase table to the thread before a method call, closing and removing it afterwards in case of any method outcome.
+ * If there is already a pre-bound table (from a previous call or transaction), the interceptor simply participates in it.
+ * Typically used alongside {@link HbaseSynchronizationManager}.
+ * 
  * @author Costin Leau
  */
-public class HbaseTableTracker implements MethodInterceptor {
-	private static final Log log = LogFactory.getLog(HbaseTableTracker.class);
+public class HbaseInterceptor implements MethodInterceptor {
+	private static final Log log = LogFactory.getLog(HbaseInterceptor.class);
 
 	private boolean exceptionConversionEnabled = true;
 
