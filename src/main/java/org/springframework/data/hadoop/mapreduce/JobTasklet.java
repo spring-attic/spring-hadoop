@@ -85,7 +85,7 @@ public class JobTasklet implements InitializingBean, Tasklet, BeanFactoryAware {
 	 * method used by the hdp name space to allow lazy initialization and potential scoping
 	 * to kick in.
 	 * 
-	 * @param job The job to execute.
+	 * @param jobName The job to execute.
 	 */
 	public void setJobName(String jobName) {
 		this.jobName = jobName;

@@ -113,7 +113,7 @@ abstract class ToolExecutor extends JobGenericOptions implements BeanClassLoader
 	/**
 	 * Sets the tool class by name.
 	 *
-	 * @param toolClass the new tool class
+	 * @param toolClassName the new tool class
 	 */
 	public void setToolClass(String toolClassName) {
 		Assert.isNull(tool, "a Tool instance already set");
