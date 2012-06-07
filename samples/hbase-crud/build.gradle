@@ -14,7 +14,8 @@ repositories {
 //load version from the root folder
 def props = new Properties();
 new File("../gradle.properties").withInputStream { props.load(it) }
-props.each({ project.setProperty(it.key, it.value)} )
+props.each({ project.ext[it.key] = it.value } )
+version = project.ext.version
 
 dependencies {
     compile("org.springframework.data:spring-data-hadoop:$version") {
