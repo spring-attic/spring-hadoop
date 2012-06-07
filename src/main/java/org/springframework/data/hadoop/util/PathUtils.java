@@ -24,34 +24,70 @@ import java.util.UUID;
 
 
 /**
- * Utility class to generate new time based path. The "pathFormat" is used to specify path format in the 
- * {@link java.util.Formatter} style.
- *  
- * For example, the return path will be "/user/hadoop/data/2012/2/22/17/20/10" 
- * if pathFormat is "/user/hadoop/data/%1$tY/%1$tm/%1$td/%1$tH/%1$tM/%1$tS"
+ * Utility for generating date-based paths. 
+ * Relies on the {@link java.util.Formatter} style.
+ * <p/>
+ * For example, to generate the following path "/user/hadoop/data/2012/2/22/17/20/10" 
+ * the input format can be "/user/hadoop/data/%1$tY/%1$tm/%1$td/%1$tH/%1$tM/%1$tS"
  * 
  * @see java.util.Formatter
  * @author Jarred Li
- *
  */
-public class PathUtils {
+public abstract class PathUtils {
 
 	/**
-	 * get file time based path in the format of {@link java.util.Formatter}.
+	 * Generates a timed-based path, based on the current date, using the format of {@link java.util.Formatter}. 
 	 * 
 	 * @param pathFormat Formatted path, the variable in the path will be 
 	 * 					 replaced by {@link java.util.Date}. 
 	 * 					 http://docs.oracle.com/javase/6/docs/api/java/util/Formatter.html#dt 
-	 * @param appendUUID Whether append UUID to the generated path
-	 * 
-	 * @return Generated path 
+	 * @param appendUUID Whether a UUID is appended to the generated path
+	 * @return generated path 
 	 */
 	public static String format(String pathFormat, boolean appendUUID) {
+		return format(pathFormat, appendUUID, new Date());
+	}
+
+
+	/**
+	 * Generates a timed-based path, based on the current date, 
+	 * using the format of {@link java.util.Formatter}.
+	 * 
+	 * @param pathFormat Path format, the variable in the path will be 
+	 * 					 replaced by {@link java.util.Date}.
+	 * @return generated path
+	 */
+	public static String format(String pathFormat) {
+		return format(pathFormat, false);
+	}
+
+	/**
+	 * Generates a timed-based path, based on the given date, using the format of {@link java.util.Formatter}.
+	 *  
+	 * @param pathFormat Path format, the variable in the path will be 
+	 * 					 replaced by {@link java.util.Date}.
+	 * @return generated path
+	 */
+	public static String format(String pathFormat, Date date) {
+		return format(pathFormat, false, date);
+	}
+
+
+	/**
+	 * Generates a timed-based path, based on the given date, using the format of {@link java.util.Formatter}.
+	 * 
+	 * @param pathFormat Path format, the variable in the path will be 
+	 * 					 replaced by {@link java.util.Date}.
+	 * @param appendUUID whether or not to append a UUID at the end
+	 * @param date date to use 
+	 * @return generated path
+	 */
+	public static String format(String pathFormat, boolean appendUUID, Date date) {
 		if (pathFormat == null || pathFormat.length() == 0) {
 			return "";
 		}
 		pathFormat = pathFormat.replace('/', File.separatorChar);
-		StringBuffer strBuffer = new StringBuffer();
+		StringBuilder strBuffer = new StringBuilder();
 
 		Formatter formatter = new Formatter(strBuffer, Locale.US);
 		formatter.format(pathFormat, new Date());
@@ -66,17 +102,5 @@ public class PathUtils {
 		}
 
 		return strBuffer.toString();
-	}
-
-
-	/**
-	 * override method without appending UUID to the generated path
-	 * 
-	 * @param pathFormat Formatted path, the variable in the path will be 
-	 * 					 replaced by {@link java.util.Date}.
-	 * @return Generated path without appending UUID
-	 */
-	public static String format(String pathFormat) {
-		return format(pathFormat, false);
 	}
 }
