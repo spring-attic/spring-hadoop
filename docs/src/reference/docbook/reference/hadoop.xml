@@ -386,8 +386,8 @@ hadoop jar job10.jar ...]]></programlisting>
 			<para>The script can be fully ported to SHDP, through the <literal>tool</literal> element:</para>
 <programlisting language="xml"><![CDATA[<hdp:tool id="job1" tool-class="job1.Tool" jar="job1.jar" files="fullpath:props.properties" properties-location="config.properties"/>
 <hdp:tool id="job2" jar="job2.jar">
-	<hdp:arg value="arg1"/>
-	<hdp:arg value="arg2"/>
+   <hdp:arg value="arg1"/>
+   <hdp:arg value="arg2"/>
 </hdp:tool>
 <hdp:tool id="job3" jar="job3.jar"/>
 ...]]></programlisting>
@@ -439,10 +439,10 @@ hadoop jar job10.jar ...]]></programlisting>
    	 allowing files and archives to be easily distributed across nodes:</para>
    	 
   	 <programlisting language="xml"><![CDATA[<hdp:cache create-symlink="true">
-  <hdp:classpath value="/cp/some-library.jar#library.jar" />
-  <hdp:cache value="/cache/some-archive.tgz#main-archive" />
-  <hdp:cache value="/cache/some-resource.res" />
-  <hdp:local value="some-file.txt" />
+   <hdp:classpath value="/cp/some-library.jar#library.jar" />
+   <hdp:cache value="/cache/some-archive.tgz#main-archive" />
+   <hdp:cache value="/cache/some-resource.res" />
+   <hdp:local value="some-file.txt" />
 </hdp:cache>]]></programlisting>
 	
 	<para>The definition above registers several resources with the cache (adding them to the job cache or classpath) and creates symlinks for them. As described in the <literal>DistributedCache</literal>
