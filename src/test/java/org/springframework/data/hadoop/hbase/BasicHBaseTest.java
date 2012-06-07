@@ -58,11 +58,14 @@ public class BasicHBaseTest {
 	String qualifier = "someQualifier";
 	String value = "Some Value";
 
+	@Test
+	public void testConfigProperties() throws Exception {
+		Assert.notNull(config);
+		assertEquals("bucket", config.get("head"));
+	}
 
 	@Test
 	public void testHBaseConnection() throws Exception {
-		Assert.notNull(config);
-
 		HBaseAdmin admin = new HBaseAdmin(config);
 		if (admin.tableExists(tableName)) {
 			System.out.println("deleting table...");

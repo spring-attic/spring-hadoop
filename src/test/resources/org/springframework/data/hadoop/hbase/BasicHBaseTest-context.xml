@@ -18,6 +18,7 @@
 	 
 	<hdp:hbase-configuration configuration-ref="hadoopConfiguration">
 		#hbase.zookeeper.quorum=v-debian.lan
+		head=bucket
 	</hdp:hbase-configuration>
 	 
 	<context:property-placeholder location="test.properties"/>

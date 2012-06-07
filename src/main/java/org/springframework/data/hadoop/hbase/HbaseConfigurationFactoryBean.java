@@ -36,8 +36,8 @@ public class HbaseConfigurationFactoryBean implements InitializingBean, Disposab
 
 	private boolean deleteConnection = true;
 	private boolean stopProxy = true;
-	private Configuration config;
 	private Configuration configuration;
+	private Configuration hadoopConfig;
 	private Properties properties;
 
 	/**
@@ -64,7 +64,7 @@ public class HbaseConfigurationFactoryBean implements InitializingBean, Disposab
 	 * @param configuration The configuration to set.
 	 */
 	public void setConfiguration(Configuration configuration) {
-		this.configuration = configuration;
+		this.hadoopConfig = configuration;
 	}
 
 	public void destroy() {
@@ -83,16 +83,16 @@ public class HbaseConfigurationFactoryBean implements InitializingBean, Disposab
 	}
 
 	public void afterPropertiesSet() {
-		config = (configuration != null ? HBaseConfiguration.create(configuration) : HBaseConfiguration.create());
-		ConfigurationUtils.addProperties(config, properties);
+		configuration = (hadoopConfig != null ? HBaseConfiguration.create(hadoopConfig) : HBaseConfiguration.create());
+		ConfigurationUtils.addProperties(configuration, properties);
 	}
 
 	public Configuration getObject() {
-		return config;
+		return configuration;
 	}
 
 	public Class<? extends Configuration> getObjectType() {
-		return (config != null ? config.getClass() : Configuration.class);
+		return (configuration != null ? configuration.getClass() : Configuration.class);
 	}
 
 	public boolean isSingleton() {
