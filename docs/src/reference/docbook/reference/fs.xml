@@ -254,6 +254,9 @@ print Path(name).makeQualified(fs)]]></programlisting>
           	</tgroup>  
 		</table>
 		
+		<note>If no Hadoop <literal>Configuration</literal> can be detected (either by name <literal>hadoopConfiguration</literal> or type), several log warnings will be made and none of the Hadoop-based variables namely 
+		<literal>cfg</literal>, <literal>distcp</literal>, <literal>fs</literal>, <literal>fsh</literal>, <literal>distcp</literal> or <literal>hdfsRL</literal> bound.
+		</note>
 		<para>As mentioned in the <emphasis>Description</emphasis> column, the variables are first looked (either by name or by type) in the application context and, in case they are missing, created on the spot based on
 		the existing configuration. Note that it is possible to override or add new variables to the scripts through the <literal>property</literal> sub-element that can set values or references to other beans:</para>
 		
