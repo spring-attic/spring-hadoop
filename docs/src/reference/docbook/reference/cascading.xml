@@ -4,7 +4,8 @@
 	<title>Cascading integration</title>
 	
 	<para>SHDP provides basic support for <ulink url="http://www.cascading.org/">Cascading</ulink> library through the <literal>org.springframework.data.hadoop.cascading</literal> package - 
-	one can create <literal>Flow</literal>s or <literal>Cascade</literal>s, either through XML or/and Java and execute them, either in a simplistic manner or as part of a Spring Batch job.</para>
+	one can create <literal>Flow</literal>s or <literal>Cascade</literal>s, either through XML or/and Java and execute them, either in a simplistic manner or as part of a Spring Batch job.
+	In addition, dedicated <literal>Tap</literal>s for Spring environments are available.</para>
 	
 	<para>As Cascading is aimed at code configuration, typically one would configure the library programatically. This type of configuration is supported through Spring's <literal>@Configuration</literal>
 	and <literal>@Bean</literal> (see <ulink url="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/beans.html#beans-java">this chapter</ulink> for more information). In short
@@ -113,6 +114,75 @@ public class CascadingAnalysisConfig {
    <hdp:arg value="tutorial/Tutorial1"/>
    <hdp:arg value="--local"/>
 </hdp:tool-runner>]]></programlisting>
+	</section>
+	
+	<section id="cascading:tap:local">
+		<title>Spring-specific local <literal>Tap</literal>s</title>
+		
+		<sidebar>
+			<title>Why only local <literal>Tap</literal>?</title>
+			<para>Because Hadoop is designed a distributed file-system (HDFS) and splitable resources. Non-HDFS resources tend to not be cluster friendly: for example don't offer any notion of node locality, true chucking
+			or even scalability (as there are no copies, partial or not made). These being said, the team is pursuing certain approaches to see whether they are viable or not. Feedback is of course welcome.</para>
+		</sidebar>
+		
+		<para>Besides dedicated configuration support, SHDP also provides <emphasis>read-only</emphasis> <literal>Tap</literal> implementations useful inside Spring environments. Currently they are meant for 
+		<emphasis>local</emphasis> use only such as	testing or single-node Hadoop setups.</para> 
+		<para>The <literal>Tap</literal>s in <literal>org.springframework.data.hadoop.cascading.tap.local</literal> tap (pun intended) into the rich resource support from Spring Framework and Spring Integration
+		allowing data to flow easily in and out of a Cascading flow. </para>
+		<para> </para>
+		<para>Below is a list of the type of <literal>Tap</literal>s available and their backing support.</para>
+		
+		<table id="cascading:tap:local:table" pgwide="1" align="center">
+ 			<title>Local <literal>Tap</literal>s</title>
+ 			
+ 			<tgroup cols="4">
+ 			<colspec colname="c1" colwidth="1*"/>
+    		<colspec colname="c2" colwidth="1*"/>
+    		<colspec colname="c3" colwidth="1*"/>
+    		<colspec colname="c4" colwidth="2*"/>
+    		
+    		<thead>
+          	   <row>
+          	     <entry>Tap Name</entry>
+          	     <entry>Tap Type</entry>
+          	     <entry>Backing Resource</entry>
+          	     <entry>Resource Description</entry>
+          	   </row>
+       	    </thead>
+       	    <tbody>
+          	   <row>
+          	      <entry><literal>ResourceTap</literal></entry>
+          	      <entry>Source</entry>
+          	      <entry>Spring <literal><ulink url="http://static.springsource.org/spring/docs/3.0.x/javadoc-api/org/springframework/core/io/Resource.html">Resource</ulink></literal></entry>
+          	      <entry>classpath, file-system, URL-based or even in-memory content</entry>
+          	    </row>
+          	   <row>
+          	      <entry><literal>MessageSourceTap</literal></entry>
+          	      <entry>Source</entry>
+          	      <entry>Spring Integration <ulink url="http://static.springsource.org/spring-integration/api/org/springframework/integration/core/MessageSource.html">MessageSource</ulink></entry>
+          	      <entry>Inbound adapter for anything from arbitrary streams, FTP or JDBC to RSS/Atom and Twitter</entry>
+          	    </row>
+          	   <row>
+          	      <entry><literal>MessageHandlerTap</literal></entry>
+          	      <entry>Sink</entry>
+          	      <entry>Spring Integration <ulink url="http://static.springsource.org/spring-integration/api/index.html?org/springframework/integration/core/MessageSource.html">MessageHandler</ulink></entry>
+          	      <entry>The opposite of <literal>MessageSourceTap</literal>: Outbound adapter for Files, JMS, TCP, etc...</entry>
+          	    </row>
+          	</tbody>
+          	</tgroup>   
+ 		</table>
+		
+		<para>
+		Note the <literal>Tap</literal>s do not require any special configuration and are fully compatible with the existing Cascading local <literal>Scheme</literal>s. To wit:
+		</para>
+		
+		<programlisting language="xml"><![CDATA[<bean id="cp-txt-files" class="org.springframework.data.hadoop.cascading.tap.local.ResourceTap">
+	<constructor-arg><bean class="cascading.scheme.local.TextLine"/></constructor-arg>
+	<constructor-arg><value>classpath:/data/*.txt</value></constructor-arg>
+</bean>]]></programlisting>
+
+		<para>The <literal>Tap</literal> above, reads all the text files in the classpath, under <literal>data</literal> folder, through Cascading <literal>TextLine</literal>. Simply wire that to a Cascading flow 
+		(as described in the previous section) and you are good to go.</para>
 	</section>
 	
 </chapter>
