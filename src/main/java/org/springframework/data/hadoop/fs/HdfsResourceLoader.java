@@ -66,6 +66,8 @@ public class HdfsResourceLoader implements ResourcePatternResolver, PriorityOrde
 	 * @param user Hadoop user for accessing the file system.
 	 */
 	public HdfsResourceLoader(Configuration config, URI uri, String user) {
+		Assert.notNull(config, "a valid configuration is required");
+
 		internalFS = true;
 		FileSystem tempFS = null;
 

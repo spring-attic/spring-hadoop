@@ -26,6 +26,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.UrlResource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.data.hadoop.TestUtils;
@@ -68,7 +69,6 @@ public class ScriptingTest {
 	@Test
 	public void testRhinoHadoopScript() throws Exception {
 		UrlResource urlResource = new UrlResource(getClass().getResource("basic-script.js"));
-		System.out.println("Using resource " + urlResource);
 		ScriptSource script = new ResourceScriptSource(urlResource);
 
 		Jsr223ScriptEvaluator eval = new Jsr223ScriptEvaluator();
@@ -122,7 +122,19 @@ public class ScriptingTest {
 	@Test
 	public void testDistCp() throws Exception {
 		assertTrue(ctx.containsBean("distcp"));
-		System.out.println(TestUtils.writeToFS(config, "/distcp/source.txt").getURI());
 		ctx.getBean("distcp");
+	}
+
+	@Test
+	public void testNullCfg() throws Exception {
+		ScriptSource script = new StaticScriptSource("null");
+		
+		HdfsScriptFactoryBean hsfb = new HdfsScriptFactoryBean();
+		hsfb.setApplicationContext(new GenericApplicationContext());
+		hsfb.setScriptSource(script);
+		hsfb.setLanguage("javascript");
+		hsfb.afterPropertiesSet();
+		
+		assertNull(hsfb.getObject());
 	}
 }

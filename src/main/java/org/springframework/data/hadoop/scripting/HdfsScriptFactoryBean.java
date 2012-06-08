@@ -100,13 +100,25 @@ public class HdfsScriptFactoryBean extends Jsr223ScriptEvaluatorFactoryBean impl
 		name = "distcp";
 
 		if (!hasBinding(args, name, DistCp.class)) {
-			putIfAbsent(args, name, new DistCp(cfg));
+			if (cfg == null) {
+				log.warn(String.format(
+						"No Hadoop Configuration detected; not binding DistCp as variable '%s' to script", name));
+			}
+			else {
+				putIfAbsent(args, name, new DistCp(cfg));
+			}
 		}
 
 		name = "fsh";
 
 		if (!hasBinding(args, name, FsShell.class)) {
-			putIfAbsent(args, name, new FsShell(cfg, fs));
+			if (cfg == null) {
+				log.warn(String.format(
+						"No Hadoop Configuration detected; not binding FsShell as variable '%s' to script", name));
+			}
+			else {
+				putIfAbsent(args, name, new FsShell(cfg, fs));
+			}
 		}
 
 		putIfAbsent(args, "cl", ctx.getClassLoader());
@@ -132,11 +144,8 @@ public class HdfsScriptFactoryBean extends Jsr223ScriptEvaluatorFactoryBean impl
 			return ctx.getBean(names[0], defaultType);
 		}
 
-		if (log.isDebugEnabled()) {
-			log.debug(String.format(
-					"Cannot find bean '%s' or a unique bean of type '%s'; not binding variable '%s' to script",
-					defaultName, defaultType, variableName));
-		}
+		log.warn(String.format(
+				"No Hadoop Configuration detected; not binding Configuration as variable '%s' to script", variableName));
 		return null;
 	}
 
@@ -149,6 +158,14 @@ public class HdfsScriptFactoryBean extends Jsr223ScriptEvaluatorFactoryBean impl
 		String[] names = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(ctx, defaultType);
 		if (names != null && names.length == 1) {
 			return ctx.getBean(names[0], defaultType);
+		}
+
+		// sanity check
+		if (cfg == null) {
+			log.warn(String.format(
+					"No Hadoop Configuration or ResourceLoader detected; not binding variable '%s' to script",
+					variableName));
+			return null;
 		}
 
 		// create one instance
@@ -170,11 +187,19 @@ public class HdfsScriptFactoryBean extends Jsr223ScriptEvaluatorFactoryBean impl
 			return ctx.getBean(names[0], defaultType);
 		}
 
+		// sanity check
+		if (detectedCfg == null) {
+			log.warn(String.format(
+					"No Hadoop Configuration or FileSystem detected; not binding variable '%s' to script",
+					variableName));
+			return null;
+		}
+
 		try {
 			FileSystem fs = FileSystem.get(detectedCfg);
 			return (fs instanceof SimplerFileSystem ? fs : new SimplerFileSystem(fs));
 		} catch (IOException ex) {
-			log.warn(String.format("Cannot create HDFS file system'; not binding variable '%s' to script", 
+			log.warn(String.format("Cannot create HDFS file system'; not binding variable '%s' to script",
 					defaultName, defaultType, variableName), ex);
 		}
 
@@ -185,6 +210,13 @@ public class HdfsScriptFactoryBean extends Jsr223ScriptEvaluatorFactoryBean impl
 		if (value != null && !arguments.containsKey(key)) {
 			arguments.put(key, value);
 		}
+	}
+
+
+	@Override
+	public void afterPropertiesSet() {
+		super.afterPropertiesSet();
+		Assert.notNull(ctx, "an ApplicationContext is required");
 	}
 
 	@Override
