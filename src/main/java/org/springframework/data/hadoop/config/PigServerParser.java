@@ -71,10 +71,7 @@ class PigServerParser extends AbstractPropertiesConfiguredBeanDefinitionParser {
 			builder.addPropertyValue("scripts", scripts);
 		}
 
-		String attr = element.getAttribute("paths-to-skip");
-		if (StringUtils.hasText(attr)) {
-			builder.addPropertyValue("pathsToSkip", StringUtils.commaDelimitedListToStringArray(attr));
-		}
+		NamespaceUtils.setCSVProperty(element, builder, "paths-to-skip", "pathsToSkip");
 
 		// parse nested PigContext definition
 		BeanDefinitionBuilder contextBuilder = BeanDefinitionBuilder.genericBeanDefinition(PigContextFactoryBean.class);

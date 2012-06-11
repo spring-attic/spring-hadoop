@@ -29,7 +29,7 @@ import org.w3c.dom.Element;
  * 
  * @author Costin Leau
  */
-class ToolRunnerParser extends AbstractPropertiesConfiguredBeanDefinitionParser {
+class ToolRunnerParser extends AbstractGenericOptionsParser {
 
 	@Override
 	protected Class<?> getBeanClass(Element element) {

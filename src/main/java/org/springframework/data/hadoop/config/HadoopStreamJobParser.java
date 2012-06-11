@@ -27,7 +27,7 @@ import org.w3c.dom.Element;
  * 
  * @author Costin Leau
  */
-class HadoopStreamJobParser extends AbstractPropertiesConfiguredBeanDefinitionParser {
+class HadoopStreamJobParser extends AbstractGenericOptionsParser {
 
 	@Override
 	protected Class<?> getBeanClass(Element element) {

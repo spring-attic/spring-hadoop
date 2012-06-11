@@ -30,7 +30,7 @@
         mapper="${path.cat}" reducer="${path.wc}"
         properties-ref="props" 
 		properties-location="cfg-1.properties, cfg-2.properties"
-		files="cfg-1.properties"
+		files="cfg-1.properties, dummy-*.properties"
 		archives="cfg-2.properties"
 		libs="te*t.properties">
         <hdp:cmd-env>

@@ -52,7 +52,21 @@ abstract class NamespaceUtils {
 	}
 
 	static boolean setPropertyReference(Element element, BeanDefinitionBuilder builder, String attrName) {
-		return setPropertyReference(element, builder, attrName, 
-				Conventions.attributeNameToPropertyName(isReference(attrName)? attrName.substring(0, attrName.length() - 4) : attrName));
+		return setPropertyReference(element, builder, attrName,
+				Conventions.attributeNameToPropertyName(isReference(attrName) ? attrName.substring(0,
+						attrName.length() - 4) : attrName));
+	}
+
+	static boolean setCSVProperty(Element element, BeanDefinitionBuilder builder, String attrName, String propertyName) {
+		String attr = element.getAttribute(attrName);
+		if (StringUtils.hasText(attr)) {
+			builder.addPropertyValue(propertyName, StringUtils.commaDelimitedListToStringArray(attr));
+			return true;
+		}
+		return false;
+	}
+
+	static boolean setCSVProperty(Element element, BeanDefinitionBuilder builder, String attrName) {
+		return setCSVProperty(element, builder, attrName, attrName);
 	}
 }

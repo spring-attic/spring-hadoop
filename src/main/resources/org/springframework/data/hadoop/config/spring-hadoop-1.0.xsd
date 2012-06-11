@@ -247,20 +247,24 @@ The security user (ugi) to use for impersonation at runtime.
 	<xsd:complexType name="genericOptionsType">
 		<xsd:complexContent>
 		<xsd:extension base="propertiesConfigurableType">
-		<xsd:attribute name="files">
+		<xsd:attribute name="archives">
 		<xsd:annotation>
 			<xsd:appinfo>
+			<xsd:documentation source="java:org.springframework.core.io.Resource"><![CDATA[
+Archives to be unarchived to the cluster. Multiple resources can be specified, using comma (,) as a separator.]]></xsd:documentation>			
 				<tool:annotation kind="direct">
-					<tool:expected-type type="java:org.springframework.core.io.Resource" />
+					<tool:expected-type type="java:org.springframework.core.io.Resource[]" />
 				</tool:annotation>
 			</xsd:appinfo>
 	 	</xsd:annotation>			
 		</xsd:attribute>
-		<xsd:attribute name="archives">
+		<xsd:attribute name="files">
 		<xsd:annotation>
 			<xsd:appinfo>
+			<xsd:documentation source="java:org.springframework.core.io.Resource"><![CDATA[
+File resources to be copied to the cluster. Multiple resources can be specified, using comma (,) as a separator.]]></xsd:documentation>			
 				<tool:annotation kind="direct">
-					<tool:expected-type type="java:org.springframework.core.io.Resource" />
+					<tool:expected-type type="java:org.springframework.core.io.Resource[]" />
 				</tool:annotation>
 			</xsd:appinfo>
 	 	</xsd:annotation>			
@@ -268,8 +272,10 @@ The security user (ugi) to use for impersonation at runtime.
 		<xsd:attribute name="libs">
 		<xsd:annotation>
 			<xsd:appinfo>
+			<xsd:documentation source="java:org.springframework.core.io.Resource"><![CDATA[
+Jar resources to include in the classpath. Multiple resources can be specified, using comma (,) as a separator.]]></xsd:documentation>			
 				<tool:annotation kind="direct">
-					<tool:expected-type type="java:org.springframework.core.io.Resource" />
+					<tool:expected-type type="java:org.springframework.core.io.Resource[]" />
 				</tool:annotation>
 			</xsd:appinfo>
 	 	</xsd:annotation>			

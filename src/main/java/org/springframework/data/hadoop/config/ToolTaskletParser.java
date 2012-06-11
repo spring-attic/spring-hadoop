@@ -25,7 +25,7 @@ import org.w3c.dom.Element;
  * 
  * @author Costin Leau
  */
-class ToolTaskletParser extends AbstractPropertiesConfiguredBeanDefinitionParser {
+class ToolTaskletParser extends AbstractGenericOptionsParser {
 
 	@Override
 	protected Class<?> getBeanClass(Element element) {

@@ -55,11 +55,7 @@ abstract class AbstractPropertiesConfiguredBeanDefinitionParser extends Abstract
 			propsArray.add(new RuntimeBeanReference(attr));
 		}
 
-		attr = element.getAttribute("properties-location");
-		if (StringUtils.hasText(attr)) {
-			hasProperties = true;
-			b.addPropertyValue("locations", StringUtils.commaDelimitedListToStringArray(attr));
-		}
+		NamespaceUtils.setCSVProperty(element, b, "properties-location", "locations");
 
 		// parse nested properties
 		attr = DomUtils.getTextValue(element);
