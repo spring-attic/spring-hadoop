@@ -154,7 +154,7 @@ public class CascadingAnalysisConfig {
           	      <entry><literal>ResourceTap</literal></entry>
           	      <entry>Source</entry>
           	      <entry>Spring <literal><ulink url="http://static.springsource.org/spring/docs/3.0.x/javadoc-api/org/springframework/core/io/Resource.html">Resource</ulink></literal></entry>
-          	      <entry>classpath, file-system, URL-based or even in-memory content</entry>
+          	      <entry>classpath, file-system, URL-based or even in-memory <ulink url="http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/resources.html#resources-implementations">content</ulink></entry>
           	    </row>
           	   <row>
           	      <entry><literal>MessageSourceTap</literal></entry>
