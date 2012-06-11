@@ -11,6 +11,7 @@ Changes in version 1.0 M2 (2012-07-dd)
 General
 * Introduced support for Hadoop Security
 * Enhanced namespace declaration
+* Introduced DAO support (Template & Callback) for HBase
 * Added pig and hbase samples
 * Upgraded to Hadoop 1.0.3
 
@@ -24,15 +25,15 @@ Package org.springframework.data.hadoop.configuration
 Package org.springframework.data.hadoop.fs
 * Added support for hftp, hsftp and webhdfs
 
-Package org.springframework.data.hadoop.hbase
-* Introduced DAO support (Template & Callback) for HBase
-
 Package org.springframework.data.hadoop.mapreduce
 * Added jar-based class-loading support
 * Introduced support for Hadoop generic options
 * Improved diagnostics in JobRunner and JobTasklet
 * Introduced identify mapper/reducer as defaults
 * Improved propagation of the thread context classloader (tccl) for Tool execution
+
+Package org.springframework.data.hadoop.scripting
+* Extended HdfsScriptFactory to allow direct wiring of Hadoop Configuration
 
 
 Changes in version 1.0 M1 (2012-02-23)
