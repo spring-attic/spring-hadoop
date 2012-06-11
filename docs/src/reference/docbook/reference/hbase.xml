@@ -14,8 +14,8 @@
 	
 	<programlisting language="xml"><![CDATA[<!-- delete associated connections but do not stop the proxies -->
 <hdp:hbase-configuration stop-proxy="false" delete-connection="true">
-    foo=bar
-    property=value
+  foo=bar
+  property=value
 </hdp:hbase-configuration>]]></programlisting>
 
 	<para>Notice that like with the other elements, one can specify additional properties specific to this configuration. In fact <literal>hbase-configuration</literal> provides the same properties
@@ -53,21 +53,21 @@
 		
 		<programlisting language="java"><![CDATA[// writing to 'MyTable'
 template.execute("MyTable", new TableCallback<Object>() {
-	@Override
-	public Object doInTable(HTable table) throws Throwable {
-		Put p = new Put(Bytes.toBytes("SomeRow"));
-		p.add(Bytes.toBytes("SomeColumn"), Bytes.toBytes("SomeQualifier"), Bytes.toBytes("AValue"));
-		table.put(p);
-		return null;
-	}
-});	]]></programlisting>
+  @Override
+  public Object doInTable(HTable table) throws Throwable {
+    Put p = new Put(Bytes.toBytes("SomeRow"));
+    p.add(Bytes.toBytes("SomeColumn"), Bytes.toBytes("SomeQualifier"), Bytes.toBytes("AValue"));
+    table.put(p);
+    return null;
+  }
+});]]></programlisting>
 
 	   <programlisting language="java"><![CDATA[// read each row from 'MyTable'
 List<String> rows = template.find("MyTable", "SomeColumn", new RowMapper<String>() {
-	@Override
-	public String mapRow(Result result, int rowNum) throws Exception {
-		return result.toString();
-	}
+  @Override
+  public String mapRow(Result result, int rowNum) throws Exception {
+    return result.toString();
+  }
 }));]]></programlisting>
 
 		<para>The first snippet show-cases the generic <literal>TableCallback</literal> - the most generic of the callbacks, it does the table lookup and resource cleanup so that the user code does not have to. 

@@ -130,7 +130,7 @@
 
     name = UUID.randomUUID().toString()
     scriptName = "src/test/resources/test.properties"
-    ]]>// <emphasis role="strong">fs</emphasis> - FileSystem instance based on 'hadoop-configuration' bean
+    ]]>// <emphasis role="strong">fs</emphasis> - FileSystem instance based on 'hadoopConfiguration' bean
     // call FileSystem#copyFromLocal(Path, Path)  
     <emphasis role="strong">fs</emphasis>.copyFromLocalFile(scriptName, name)
     // return the file length 
@@ -213,7 +213,7 @@ print Path(name).makeQualified(fs)]]></programlisting>
           	    <row>
           	      <entry>cfg</entry>
           	      <entry><literal>org.apache.hadoop.conf.Configuration</literal></entry>
-          	      <entry>Hadoop Configuration (relies on <emphasis>hadoop-configuration</emphasis> bean or singleton type match)</entry>
+          	      <entry>Hadoop Configuration (relies on <emphasis>hadoopConfiguration</emphasis> bean or singleton type match)</entry>
           	    </row>
           	    <row>
           	      <entry>cl</entry>

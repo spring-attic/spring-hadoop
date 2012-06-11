@@ -61,10 +61,10 @@ public class CascadingAnalysisConfig {
 <!-- Tap created through XML rather then code (using Spring's 3.1 c: namespace)-->
 <bean id="tap" class="cascading.tap.hadoop.Hfs" c:fields-ref="fields" c:string-path-value="${cascade.input}"/>
 
-<bean id="cascade" class="org.springframework.data.hadoop.cascading.CascadeFactoryBean" p:configuration-ref="hadoop-configuration">
+<bean id="cascade" class="org.springframework.data.hadoop.cascading.CascadeFactoryBean" p:configuration-ref="hadoopConfiguration">
   <property name="flows"><list>
     <bean class="org.springframework.data.hadoop.cascading.HadoopFlowFactoryBean"
-      p:configuration-ref="hadoop-configuration" p:source-ref="tap" p:sinks-ref="sinks">
+      p:configuration-ref="hadoopConfiguration" p:source-ref="tap" p:sinks-ref="sinks">
      <property name="tails"><list>
          <ref bean="tsCountPipe"/>
          <ref bean="tmCountPipe"/>
@@ -109,7 +109,7 @@ public class CascadingAnalysisConfig {
 		<para>which compiles Tutorial1, creates a bundled jar and runs it on a local Hadoop instance. When using the <literal>Tool</literal> support, the compilation and the library provisioning are external tasks 
 		(just as in the case of typical Hadoop jobs). The SHDP configuration to run the tutorial looks as follows:</para>
 		
-		<programlisting language="xml"><![CDATA[<!-- the tool automatically is injected with 'hadoop-configuration' -->
+		<programlisting language="xml"><![CDATA[<!-- the tool automatically is injected with 'hadoopConfiguration' -->
 <hdp:tool-runner id="scalding" tool-class="com.twitter.scalding.Tool">
    <hdp:arg value="tutorial/Tutorial1"/>
    <hdp:arg value="--local"/>

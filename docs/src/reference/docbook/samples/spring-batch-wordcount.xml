@@ -149,7 +149,7 @@
     shared across many jobs. It is defined in the file
     <literal>hadoop-context.xml</literal> and is shown below</para>
 
-    <programlisting language="xml">&lt;!--  default id is 'hadoop-configuration' --&gt;
+    <programlisting language="xml">&lt;!--  default id is 'hadoopConfiguration' --&gt;
 &lt;hdp:configuration register-url-handler="false"&gt;
   fs.default.name=${hd.fs}
 &lt;/hdp:configuration&gt;</programlisting>

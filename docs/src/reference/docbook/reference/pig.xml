@@ -12,7 +12,7 @@
 	executing scripts in <literal>MapReduce</literal> mode. In typical scenarios however, one might want to connect to a remote Hadoop tracker and register some scripts automatically so let us take a look of how the
 	configuration might look like:</para>
 	
-	<programlisting language="xml"><![CDATA[<pig exec-type="LOCAL" job-name="pig-script" configuration-ref="hadoop-configuration" properties-location="pig-dev.properties" 
+	<programlisting language="xml"><![CDATA[<pig exec-type="LOCAL" job-name="pig-script" configuration-ref="hadoopConfiguration" properties-location="pig-dev.properties" 
    xmlns="http://www.springframework.org/schema/hadoop">
      source=${pig.script.src}
    <script location="org/company/pig/script.pig">
