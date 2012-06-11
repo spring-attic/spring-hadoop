@@ -11,6 +11,14 @@
       	http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
 
 	<import resource="../hadoop-ctx.xml"/>
+	
+		<hdp:script id="script" language="javascript" run-at-startup="true">
+	if (fsh.test("/tmp/hbase/out")) { fsh.rmr("/tmp/hbase/out") }
+	if (fsh.test("/tmp/hbase/in")) { fsh.rmr("/tmp/hbase/in") }
+	
+	fsh.put("src/test/resources/input/word", "/tmp/hbase/in")			
+	</hdp:script>
+	
 	 
 	<hdp:hbase-configuration configuration-ref="hadoopConfiguration">
 		#hbase.zookeeper.quorum=v-debian.lan
@@ -19,5 +27,10 @@
 	 
 	<context:property-placeholder location="test.properties"/>
 	
-	<bean id="template" class="org.springframework.data.hadoop.hbase.HbaseTemplate" p:configuration-ref="hbaseConfiguration"/>
+	<hdp:job id="hjob" configuration-ref="hbaseConfiguration"
+	  mapper="org.springframework.data.hadoop.hbase.Mapper"
+	  reducer="org.springframework.data.hadoop.hbase.Reducer"
+	  input-path="/tmp/hbase/in"
+	  output-path="/tmp/hbase/out"/>
+	
 </beans>
