@@ -24,7 +24,7 @@
 
 	<bean id="tasklet" class="org.springframework.batch.core.step.tasklet.MethodInvokingTaskletAdapter" p:target-object-ref="script" p:target-method="toString"/>
 
-	<hdp:script id="script" language="javascript">
+	<hdp:script id="script" language="javascript" configuration-ref="hadoopConfiguration">
 importPackage(java.util);
 importPackage(org.apache.hadoop.fs);
 

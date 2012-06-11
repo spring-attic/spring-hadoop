@@ -22,7 +22,6 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.beans.factory.support.ManagedMap;
-import org.springframework.beans.factory.xml.AbstractSimpleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.data.hadoop.scripting.HdfsScriptFactoryBean;
@@ -37,7 +36,7 @@ import org.w3c.dom.Element;
  * 
  * @author Costin Leau
  */
-class ScriptParser extends AbstractSimpleBeanDefinitionParser {
+class ScriptParser extends AbstractImprovedSimpleBeanDefinitionParser {
 
 
 	@Override

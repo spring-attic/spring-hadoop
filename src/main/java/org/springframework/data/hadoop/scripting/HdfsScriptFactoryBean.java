@@ -68,6 +68,8 @@ public class HdfsScriptFactoryBean extends Jsr223ScriptEvaluatorFactoryBean impl
 	private static final Log log = LogFactory.getLog(HdfsScriptFactoryBean.class);
 
 	private ApplicationContext ctx;
+	private Configuration configuration;
+
 
 	@Override
 	protected void postProcess(Map<String, Object> args) {
@@ -134,6 +136,10 @@ public class HdfsScriptFactoryBean extends Jsr223ScriptEvaluatorFactoryBean impl
 	}
 
 	private Configuration detectCfg(String variableName) {
+		if (configuration != null) {
+			return configuration;
+		}
+
 		String defaultName = "hadoopConfiguration";
 		Class<Configuration> defaultType = Configuration.class;
 
@@ -222,5 +228,15 @@ public class HdfsScriptFactoryBean extends Jsr223ScriptEvaluatorFactoryBean impl
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.ctx = applicationContext;
+	}
+
+
+	/**
+	 * Sets the Hadoop configuration to use.
+	 * 
+	 * @param configuration The configuration to set.
+	 */
+	public void setConfiguration(Configuration configuration) {
+		this.configuration = configuration;
 	}
 }

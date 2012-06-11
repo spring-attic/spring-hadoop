@@ -1081,7 +1081,6 @@ Bean id (if no value is given, a name will be generated).
 						]]></xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
-
 				<xsd:attribute name="run-at-startup" type="xsd:boolean" default="false">
 					<xsd:annotation>
 						<xsd:documentation><![CDATA[
@@ -1089,7 +1088,18 @@ Whether the script is evaluated automatically once the application context initi
 						]]></xsd:documentation>
 		         	</xsd:annotation>
 		       	</xsd:attribute>
-				<xsd:attribute name="scope" type="xsd:string" use="optional" />			       	
+				<xsd:attribute name="scope" type="xsd:string" use="optional" />
+				<xsd:attribute name="configuration-ref" default="hadoopConfiguration">
+				<xsd:annotation>
+					<xsd:documentation source="java:org.apache.hadoop.conf.Configuration"><![CDATA[
+Reference to the Hadoop Configuration. Defaults to 'hadoopConfiguration'.]]></xsd:documentation>
+					<xsd:appinfo>
+						<tool:annotation kind="ref">
+							<tool:expected-type type="org.apache.hadoop.conf.Configuration" />
+						</tool:annotation>
+					</xsd:appinfo>
+			 	</xsd:annotation>			
+				</xsd:attribute>
 				</xsd:extension>
 			</xsd:complexContent>
 		</xsd:complexType>
