@@ -60,7 +60,7 @@ public abstract class ConfigurationUtils {
 			cfg = (original instanceof JobConf ? new JobConf(original) : new Configuration(original));
 		}
 		else {
-			cfg = new JobConf(original);
+			cfg = new JobConf();
 		}
 		addProperties(cfg, properties);
 		return cfg;

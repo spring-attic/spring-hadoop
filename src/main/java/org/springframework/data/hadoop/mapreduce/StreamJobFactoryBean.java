@@ -79,7 +79,7 @@ public class StreamJobFactoryBean extends JobGenericOptions implements Initializ
 		Assert.isTrue(!ObjectUtils.isEmpty(input), "at least one input required");
 		Assert.hasText(output, "the output is required");
 
-		final Configuration cfg = (properties != null ? ConfigurationUtils.createFrom(configuration, properties) : (configuration != null ? configuration : new Configuration()));
+		final Configuration cfg = ConfigurationUtils.createFrom(configuration, properties);
 
 		buildGenericOptions(cfg);
 

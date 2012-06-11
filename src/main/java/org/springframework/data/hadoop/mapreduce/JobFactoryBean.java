@@ -120,7 +120,7 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 
 	@SuppressWarnings("rawtypes")
 	public void afterPropertiesSet() throws Exception {
-		final Configuration cfg = (properties != null ? ConfigurationUtils.createFrom(configuration, properties) : (configuration != null ? configuration : new Configuration()));
+		final Configuration cfg = ConfigurationUtils.createFrom(configuration, properties);
 
 		buildGenericOptions(cfg);
 
