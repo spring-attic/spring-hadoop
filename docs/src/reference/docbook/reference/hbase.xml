@@ -6,8 +6,8 @@
 	<para>SHDP provides basic configuration for <ulink url="http://hbase.apache.org">HBase</ulink> through the <literal>hbase-configuration</literal> namespace element (or its backing 
 	<classname>HbaseConfigurationFactoryBean</classname>).</para>
 	
-	<programlisting language="xml"><![CDATA[<!-- default bean id is 'hbase-configuration' that uses the existing 'hadoop-configuration' object -->
-<hdp:hbase-configuration configuration-ref="hadoop-configuration" />]]></programlisting>
+	<programlisting language="xml"><![CDATA[<!-- default bean id is 'hbaseConfiguration' that uses the existing 'hadoopCconfiguration' object -->
+<hdp:hbase-configuration configuration-ref="hadoopCconfiguration" />]]></programlisting>
 	
 	<para>The above declaration does more than easily create an HBase configuration object; it will also manage the backing HBase connections: when the application
 	context shuts down, so will any HBase connections opened - this behavior can be adjusted through the <literal>stop-proxy</literal> and <literal>delete-connection</literal> attributes:</para>
@@ -23,4 +23,62 @@
 	
 	<programlisting language="xml"><![CDATA[<hdp:hbase-configuration properties-ref="some-props-bean" properties-location="classpath:/conf/testing/hbase.properties"/>]]></programlisting>	
 	
+	<section id="hbase:dao">
+		<title>Data Access Object (DAO) Support</title>
+		
+		<para>One of the most popular and powerful feature in Spring Framework is the Data Access Object (or DAO) 
+		<ulink url="http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/dao.html">support</ulink>. It makes dealing with data access technologies easy and consistent allowing easy switch
+		or interconnection of the aforementioned persistent stores with minimal friction (no worrying about catching exceptions, writing boiler-plate code or handling resource acquisition and disposal). Rather then reiterating
+		here the value proposal of the DAO support, we recommend the DAO <ulink url="http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/jdbc.html">section</ulink> in the Spring Framework reference documentation </para>
+		
+		<para>SHDP provides the same functionality for Apache HBase through its <literal>org.springframework.data.hadoop.hbase</literal> package: an <literal>HbaseTemplate</literal> along with several callbacks
+		such as <literal>TableCallback</literal>, <literal>RowMapper</literal> and <literal>ResultsExtractor</literal> that remove the low-level, tedious details for finding the HBase table, run the query, prepare the scanner,
+		analyze the results then clean everything up, letting the developer focus on her actual job (users familiar with Spring should find the class/method names quite familiar).
+		</para>
+		
+		<para>At the core of the DAO support lies <literal>HbaseTemplate</literal> - a high-level abstraction for interacting with HBase. The template requires an HBase <link linkend="hbase">configuration</link>, once it's
+		set, the template is thread-safe and can be reused across multiple instances at the same time:</para>
+		
+		<programlisting language="xml"><![CDATA[// default HBase configuration
+<hdp:hbase-configuration/>
+
+// wire hbase configuration (using default name 'hbaseConfiguration') into the template 
+<bean id="htemplate" class="org.springframework.data.hadoop.hbase.HbaseTemplate" p:configuration-ref="hbaseConfiguration"/>]]></programlisting>
+		
+		<para>The template provides generic callbacks, for executing logic against the tables or doing result or row extraction, but also
+		utility methods (the so-called <emphasis>one-liner</emphasis>s) for common operations.
+		
+		Below are some examples of how the template usage looks like:
+		</para>
+		
+		<programlisting language="java"><![CDATA[// writing to 'MyTable'
+template.execute("MyTable", new TableCallback<Object>() {
+	@Override
+	public Object doInTable(HTable table) throws Throwable {
+		Put p = new Put(Bytes.toBytes("SomeRow"));
+		p.add(Bytes.toBytes("SomeColumn"), Bytes.toBytes("SomeQualifier"), Bytes.toBytes("AValue"));
+		table.put(p);
+		return null;
+	}
+});	]]></programlisting>
+
+	   <programlisting language="java"><![CDATA[// read each row from 'MyTable'
+List<String> rows = template.find("MyTable", "SomeColumn", new RowMapper<String>() {
+	@Override
+	public String mapRow(Result result, int rowNum) throws Exception {
+		return result.toString();
+	}
+}));]]></programlisting>
+
+		<para>The first snippet show-cases the generic <literal>TableCallback</literal> - the most generic of the callbacks, it does the table lookup and resource cleanup so that the user code does not have to. 
+		Notice the callback signature - any exception thrown by the HBase API is automatically caught, converted to Spring's 
+		<ulink url="http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/dao.html#dao-exceptions">DAO exceptions</ulink> and resource clean-up applied transparently.
+		The second example, displays the dedicated lookup methods - in this case <literal>find</literal> which, as the name implies, finds all the rows matching the given criteria and allows user code to be executed against each
+		of them (typically for doing some sort of type conversion of mapping). If the entire result is required, then one can use <literal>ResultsExtractor</literal> instead of <literal>RowMapper</literal>.</para>
+		
+		<para>Besides the template, the package offers support for automatically binding HBase table to the current thread through <literal>HbaseInterceptor</literal> and <literal>HbaseSynchronizationManager</literal>.
+		That is, each class that performs DAO operations on HBase can be <ulink url="http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/aop.html#aop-schema-advisors"><emphasis>wrapped</emphasis></ulink> 
+		by <literal>HbaseInterceptor</literal> so that each table in use, once found, is bound to the thread so any subsequent call to it avoids the lookup. Once the call ends, the table is automatically closed so there is
+		no leakage between requests. Please refer to the Javadocs for more information.</para>
+	</section>
 </chapter>
