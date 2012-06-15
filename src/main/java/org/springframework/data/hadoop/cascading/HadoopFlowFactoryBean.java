@@ -78,8 +78,10 @@ public class HadoopFlowFactoryBean extends FlowFactoryBean<HadoopFlow> implement
 
 		Set<Pipe> heads = new LinkedHashSet<Pipe>();
 
-		for (Pipe pipe : tails) {
-			Collections.addAll(heads, pipe.getHeads());
+		if (tails != null) {
+			for (Pipe pipe : tails) {
+				Collections.addAll(heads, pipe.getHeads());
+			}
 		}
 
 		Pipe pipe = null;
@@ -88,27 +90,34 @@ public class HadoopFlowFactoryBean extends FlowFactoryBean<HadoopFlow> implement
 			pipe = heads.iterator().next();
 		}
 
-		if (sources.size() == 1) {
+		if (sources != null && sources.size() == 1) {
 			Tap tap = sources.remove(MARKER);
 			if (tap != null) {
 				sources.put(pipe.getName(), tap);
 			}
 		}
 
-		if (sinks.size() == 1) {
+		if (sinks != null && sinks.size() == 1) {
 			Tap tap = sinks.remove(MARKER);
 			if (tap != null) {
 				sinks.put(pipe.getName(), tap);
 			}
 		}
 
-		def.addSources(sources).addSinks(sinks).addTraps(traps).addTails(tails);
+		def.addSources(sources).addSinks(sinks).addTraps(traps);
 
-		if (!StringUtils.hasText(def.getName())) {
-			def.setName(beanName);
+		if (tails != null) {
+			def.addTails(tails);
 		}
 
-		def.addTag(beanName);
+		if (StringUtils.hasText(beanName)) {
+			def.addTag(beanName);
+
+			if (!StringUtils.hasText(def.getName())) {
+				def.setName(beanName);
+			}
+		}
+
 
 		Properties props = ConfigurationUtils.asProperties(ConfigurationUtils.createFrom(configuration, properties));
 

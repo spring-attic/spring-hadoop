@@ -130,7 +130,7 @@ abstract class FlowFactoryBean<T extends Flow<?>> implements InitializingBean, F
 	/**
 	 * Sets the write steps dot.
 	 *
-	 * @param writeStepDOT the new write steps dot
+	 * @param writeStepsDOT the new write steps dot
 	 */
 	public void setWriteStepsDOT(String writeStepsDOT) {
 		this.writeStepsDOT = writeStepsDOT;
