@@ -26,16 +26,12 @@ import java.util.Set;
 
 import org.apache.hadoop.conf.Configuration;
 import org.springframework.beans.factory.BeanNameAware;
-import org.springframework.beans.factory.FactoryBean;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.data.hadoop.configuration.ConfigurationUtils;
+import org.springframework.util.StringUtils;
 
 import cascading.cascade.Cascade;
-import cascading.flow.Flow;
-import cascading.flow.FlowListener;
+import cascading.flow.FlowDef;
 import cascading.flow.FlowProps;
-import cascading.flow.FlowSkipStrategy;
-import cascading.flow.FlowStepStrategy;
 import cascading.flow.hadoop.HadoopFlow;
 import cascading.flow.hadoop.HadoopFlowConnector;
 import cascading.pipe.Pipe;
@@ -49,19 +45,14 @@ import cascading.tap.Tap;
  * 
  * @author Costin Leau
  */
-public class HadoopFlowFactoryBean implements InitializingBean, BeanNameAware, FactoryBean<HadoopFlow> {
+public class HadoopFlowFactoryBean extends FlowFactoryBean<HadoopFlow> implements BeanNameAware {
 
 	private static String MARKER = HadoopFlowFactoryBean.class.getName() + "#SINGLE";
 
 	private Configuration configuration;
 	private Properties properties;
 
-	private HadoopFlow flow;
 	private String beanName;
-
-	private FlowSkipStrategy skipStrategy;
-	private FlowStepStrategy stepStrategy;
-	private Collection<FlowListener> listeners;
 
 	private Integer maxConcurrentSteps;
 	private Long jobPoolingInterval;
@@ -71,24 +62,19 @@ public class HadoopFlowFactoryBean implements InitializingBean, BeanNameAware, F
 	private Map<String, Tap> traps;
 	private Collection<Pipe> tails;
 
+	private FlowDef flowDef;
 
 	@Override
-	public HadoopFlow getObject() {
-		return flow;
-	}
+	HadoopFlow createFlow() {
+		// copy flowDef
+		FlowDef def = FlowDef.flowDef();
 
-	@Override
-	public Class<?> getObjectType() {
-		return (flow != null ? flow.getClass() : Flow.class);
-	}
-
-	@Override
-	public boolean isSingleton() {
-		return true;
-	}
-
-	@Override
-	public void afterPropertiesSet() throws Exception {
+		if (flowDef != null) {
+			def.addSinks(flowDef.getSinksCopy()).addSources(flowDef.getSourcesCopy()).addTraps(flowDef.getTrapsCopy()).addTails(
+					flowDef.getTailsArray()).setAssertionLevel(flowDef.getAssertionLevel()).setDebugLevel(
+					flowDef.getDebugLevel()).addCheckpoints(flowDef.getCheckpointsCopy()).addTags(flowDef.getTags()).setName(
+					flowDef.getName());
+		}
 
 		Set<Pipe> heads = new LinkedHashSet<Pipe>();
 
@@ -116,6 +102,14 @@ public class HadoopFlowFactoryBean implements InitializingBean, BeanNameAware, F
 			}
 		}
 
+		def.addSources(sources).addSinks(sinks).addTraps(traps).addTails(tails);
+
+		if (!StringUtils.hasText(def.getName())) {
+			def.setName(beanName);
+		}
+
+		def.addTag(beanName);
+
 		Properties props = ConfigurationUtils.asProperties(ConfigurationUtils.createFrom(configuration, properties));
 
 		if (jobPoolingInterval != null) {
@@ -126,21 +120,9 @@ public class HadoopFlowFactoryBean implements InitializingBean, BeanNameAware, F
 			FlowProps.setMaxConcurrentSteps(props, maxConcurrentSteps);
 		}
 
-		flow = (HadoopFlow) new HadoopFlowConnector(props).connect(beanName, sources, sinks, traps, tails.toArray(new Pipe[tails.size()]));
+		HadoopFlow flow = (HadoopFlow) new HadoopFlowConnector(props).connect(def);
 
-		if (skipStrategy != null) {
-			flow.setFlowSkipStrategy(skipStrategy);
-		}
-
-		if (stepStrategy != null) {
-			flow.setFlowStepStrategy(stepStrategy);
-		}
-
-		if (listeners != null) {
-			for (FlowListener listener : listeners) {
-				flow.addListener(listener);
-			}
-		}
+		return flow;
 	}
 
 	@Override
@@ -148,14 +130,6 @@ public class HadoopFlowFactoryBean implements InitializingBean, BeanNameAware, F
 		this.beanName = name;
 	}
 
-	/**
-	 * Sets the skip strategy.
-	 *
-	 * @param skipStrategy The skipStrategy to set.
-	 */
-	public void setSkipStrategy(FlowSkipStrategy skipStrategy) {
-		this.skipStrategy = skipStrategy;
-	}
 
 	/**
 	 * Sets the configuration.
@@ -193,23 +167,6 @@ public class HadoopFlowFactoryBean implements InitializingBean, BeanNameAware, F
 		this.jobPoolingInterval = jobPoolingInterval;
 	}
 
-	/**
-	 * Sets the step strategy.
-	 *
-	 * @param stepStrategy The stepStrategy to set.
-	 */
-	public void setStepStrategy(FlowStepStrategy stepStrategy) {
-		this.stepStrategy = stepStrategy;
-	}
-
-	/**
-	 * Sets the listeners.
-	 *
-	 * @param listeners The listeners to set.
-	 */
-	public void setListeners(Collection<FlowListener> listeners) {
-		this.listeners = listeners;
-	}
 
 	/**
 	 * Sets the sources.
@@ -267,5 +224,15 @@ public class HadoopFlowFactoryBean implements InitializingBean, BeanNameAware, F
 	public void setTail(Pipe tail) {
 		this.tails = new ArrayList<Pipe>(1);
 		tails.add(tail);
+	}
+
+	/**
+	 * Sets the flow definition. Useful for programatically setting up the flow
+	 * and then letting Spring do the configuration wiring.
+	 * 
+	 * @param flowDef
+	 */
+	public void setFlowDef(FlowDef flowDef) {
+		this.flowDef = flowDef;
 	}
 }

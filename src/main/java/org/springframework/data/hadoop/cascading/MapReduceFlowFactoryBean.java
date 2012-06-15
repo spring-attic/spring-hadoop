@@ -21,8 +21,6 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapreduce.Job;
 import org.springframework.beans.factory.BeanNameAware;
-import org.springframework.beans.factory.FactoryBean;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.data.hadoop.configuration.ConfigurationUtils;
 
 import cascading.cascade.Cascade;
@@ -34,33 +32,14 @@ import cascading.flow.hadoop.MapReduceFlow;
  * Note the flow is not started.
  * @author Costin Leau
  */
-public class MapReduceFlowFactoryBean implements InitializingBean, BeanNameAware, FactoryBean<MapReduceFlow> {
+public class MapReduceFlowFactoryBean extends FlowFactoryBean<MapReduceFlow> implements BeanNameAware {
 
 	private Configuration configuration;
 	private Properties properties;
 	private Job job;
 
-	private MapReduceFlow flow;
 	private String beanName;
 	private boolean deleteSinkOnInit = false;
-
-
-	@Override
-	public MapReduceFlow getObject() {
-		return flow;
-	}
-
-
-	@Override
-	public Class<?> getObjectType() {
-		return MapReduceFlow.class;
-	}
-
-
-	@Override
-	public boolean isSingleton() {
-		return true;
-	}
 
 
 	@Override
@@ -70,7 +49,7 @@ public class MapReduceFlowFactoryBean implements InitializingBean, BeanNameAware
 
 
 	@Override
-	public void afterPropertiesSet() throws Exception {
+	MapReduceFlow createFlow() {
 		Configuration c = configuration;
 		if (job != null) {
 			c = ConfigurationUtils.merge(configuration, job.getConfiguration());
@@ -78,7 +57,7 @@ public class MapReduceFlowFactoryBean implements InitializingBean, BeanNameAware
 
 		Configuration conf = ConfigurationUtils.createFrom(c, properties);
 		JobConf jobConf = new JobConf(conf);
-		flow = new MapReduceFlow(beanName, jobConf, deleteSinkOnInit, false);
+		return new MapReduceFlow(beanName, jobConf, deleteSinkOnInit, false);
 	}
 
 	/**
@@ -108,7 +87,6 @@ public class MapReduceFlowFactoryBean implements InitializingBean, BeanNameAware
 	public void setProperties(Properties properties) {
 		this.properties = properties;
 	}
-
 
 	/**
 	 * Sets the delete sink on init.
