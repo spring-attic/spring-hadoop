@@ -15,6 +15,7 @@
  */
 package org.springframework.data.hadoop.config;
 
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.PropertiesFactoryBean;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -45,6 +46,7 @@ abstract class AbstractPropertiesConfiguredBeanDefinitionParser extends Abstract
 		boolean hasProperties = false;
 
 		BeanDefinitionBuilder b = BeanDefinitionBuilder.genericBeanDefinition(PropertiesFactoryBean.class);
+		b.setScope(builder.getRawBeanDefinition().getScope());
 		b.addPropertyValue("localOverride", true);
 		ManagedList<Object> propsArray = new ManagedList<Object>(2);
 		b.addPropertyValue("propertiesArray", propsArray);
@@ -55,7 +57,7 @@ abstract class AbstractPropertiesConfiguredBeanDefinitionParser extends Abstract
 			propsArray.add(new RuntimeBeanReference(attr));
 		}
 
-		NamespaceUtils.setCSVProperty(element, b, "properties-location", "locations");
+		hasProperties |= NamespaceUtils.setCSVProperty(element, b, "properties-location", "locations");
 
 		// parse nested properties
 		attr = DomUtils.getTextValue(element);
@@ -65,6 +67,7 @@ abstract class AbstractPropertiesConfiguredBeanDefinitionParser extends Abstract
 		}
 
 		if (hasProperties) {
+			b.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 			builder.addPropertyValue("properties", b.getBeanDefinition());
 		}
 	}

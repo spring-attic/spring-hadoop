@@ -45,9 +45,10 @@
 		mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
 		reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"
 		validate-paths="false"
+		properties-location="#{jobParameters['properties-file']}"
 		scope="step"
 	/>
-	
+
 	<hdp:script-tasklet id="ref-script-tasklet" scope="step" script-ref="script"/>
 	
 	<hdp:script language="javascript" id="script" scope="step">
@@ -76,7 +77,7 @@ fsh.put("src/test/resources/input/word/input.txt", input)
 	<hdp:tasklet id="hadoop-stream" job-ref="ns-stream-job"/>
 	
 	<hdp:streaming id="ns-stream-job"
-		input-path="#{jobParameters['mr.input']}" output-path="#{jobParameters['mr.output']+'stream'}"
+		input-path="#{jobParameters['mr.input']}" output-path="#{jobParameters['mr.output']+'stream'}" properties-location="#{jobParameters['properties-file']}"
         mapper="${path.cat}" reducer="${path.wc}" scope="step">
     </hdp:streaming>
 </beans>

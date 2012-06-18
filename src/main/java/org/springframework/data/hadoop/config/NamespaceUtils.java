@@ -14,6 +14,7 @@
 package org.springframework.data.hadoop.config;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.core.Conventions;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
@@ -60,7 +61,12 @@ abstract class NamespaceUtils {
 	static boolean setCSVProperty(Element element, BeanDefinitionBuilder builder, String attrName, String propertyName) {
 		String attr = element.getAttribute(attrName);
 		if (StringUtils.hasText(attr)) {
-			builder.addPropertyValue(propertyName, StringUtils.commaDelimitedListToStringArray(attr));
+			String[] strs = StringUtils.commaDelimitedListToStringArray(attr);
+			ManagedList<String> list = new ManagedList<String>(strs.length);
+			for (int i = 0; i < strs.length; i++) {
+				list.add(strs[i]);
+			}
+			builder.addPropertyValue(propertyName, list);
 			return true;
 		}
 		return false;

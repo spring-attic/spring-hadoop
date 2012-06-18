@@ -15,6 +15,7 @@
  */
 package org.springframework.data.hadoop.mapreduce;
 
+import org.apache.hadoop.mapred.RunningJob;
 import org.apache.hadoop.mapreduce.Job;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
@@ -66,8 +67,9 @@ public class JobTasklet implements InitializingBean, Tasklet, BeanFactoryAware {
 		} catch (Exception ex) {
 			exc = ex;
 		}
+		RunningJob rj = JobUtils.getRunningJob(job);
 		String message = "Job [" + j.getJobID() + "|" + j.getJobName() + " ] failed - "
-				+ JobUtils.getRunningJob(job).cleanupProgress();
+				+ (rj != null ? rj.getFailureInfo() : "N/A");
 		throw (exc != null ? new HadoopException(message, exc) : new HadoopException(message));
 	}
 

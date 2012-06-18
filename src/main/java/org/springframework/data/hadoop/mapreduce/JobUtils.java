@@ -29,6 +29,9 @@ import org.springframework.util.ReflectionUtils;
 abstract class JobUtils {
 
 	static RunningJob getRunningJob(Job job) {
+		if (job == null) {
+			return null;
+		}
 		Field f = ReflectionUtils.findField(Job.class, "info");
 		ReflectionUtils.makeAccessible(f);
 

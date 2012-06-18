@@ -80,7 +80,7 @@ public class JobRunner implements FactoryBean<Object>, InitializingBean, Disposa
 					if (!ignoreFailures && !succesful) {
 						RunningJob rj = JobUtils.getRunningJob(job);
 						throw new IllegalStateException("Job [" + job.getJobName() + "] failed - "
-								+ rj.getFailureInfo());
+								+ (rj != null ? rj.getFailureInfo() : "N/A"));
 					}
 				}
 			}
