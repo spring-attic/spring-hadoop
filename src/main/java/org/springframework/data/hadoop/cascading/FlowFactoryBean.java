@@ -59,7 +59,7 @@ abstract class FlowFactoryBean<T extends Flow<?>> implements InitializingBean, F
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Flow<?> flow = createFlow();
+		flow = createFlow();
 
 		if (skipStrategy != null) {
 			flow.setFlowSkipStrategy(skipStrategy);
