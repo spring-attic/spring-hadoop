@@ -8,12 +8,15 @@
 
 	<import resource="../hadoop-ctx.xml"/>
 	
-	<bean id="ir" class="org.springframework.data.hadoop.batch.HdfsItemReader" p:location="/batch/test.properties" depends-on="script">
-		<constructor-arg ref="hadoopConfiguration" />
+	<bean id="customRL" class="org.springframework.data.hadoop.fs.CustomResourceLoaderRegistrar" p:loader-ref="hadoopResourceLoader" />
+	
+	<bean id="ir" class="org.springframework.batch.item.file.FlatFileItemReader" p:resource="/batch/test.properties" depends-on="script">
 		<property name="lineMapper">
 			<bean class="org.springframework.batch.item.file.mapping.PassThroughLineMapper"/>
 		</property>
 	</bean>
+	
+	<bean id="mrir" class="org.springframework.batch.item.file.MultiResourceItemReader" p:resources="output/token/part-*" p:delegate-ref="ir"/>
 	
 	<hdp:script id="script" language="javascript">
 dir = "/batch/"

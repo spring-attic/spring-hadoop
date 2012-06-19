@@ -18,6 +18,8 @@ package org.springframework.data.hadoop.batch;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.file.MultiResourceItemReader;
+import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
@@ -35,13 +37,26 @@ public class HdfsItemReaderTest {
 	@Autowired
 	ApplicationContext ctx;
 	@Autowired
-	HdfsItemReader reader;
+	ResourceAwareItemReaderItemStream reader;
+	@Autowired
+	MultiResourceItemReader multiReader;
 
 	@Test
-	public void testReader() throws Exception {
+	public void testSingleReader() throws Exception {
 		try {
 			reader.open(new ExecutionContext());
 			assertNotNull(reader.read());
+		} finally {
+			reader.close();
+		}
+	}
+
+	@Test
+	public void testMultiReader() throws Exception {
+		assertNotNull(multiReader);
+		try {
+			multiReader.open(new ExecutionContext());
+			assertNotNull(multiReader.read());
 		} finally {
 			reader.close();
 		}

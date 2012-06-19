@@ -31,7 +31,6 @@ import org.springframework.core.Ordered;
 import org.springframework.core.PriorityOrdered;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.util.Assert;
 
@@ -47,8 +46,7 @@ class ChainedResourceLoader implements ApplicationContextAware, InitializingBean
 
 	private ResourcePatternResolver fallback;
 	private Map<String, ResourceLoader> resourceLoaders = new ConcurrentHashMap<String, ResourceLoader>(4);
-	private Map<String, ResourcePatternResolver> patternLoaders = new ConcurrentHashMap<String, ResourcePatternResolver>(
-			4);
+	private Map<String, ResourcePatternResolver> patternLoaders = new ConcurrentHashMap<String, ResourcePatternResolver>(4);
 	private Map<String, ? extends ResourceLoader> loaders = Collections.emptyMap();
 
 	public void setLoaders(Map<String, ? extends ResourceLoader> loaders) {
@@ -83,7 +81,9 @@ class ChainedResourceLoader implements ApplicationContextAware, InitializingBean
 	}
 
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-		fallback = new PathMatchingResourcePatternResolver(applicationContext.getClassLoader());
+		if (fallback == null) {
+			fallback = applicationContext;
+		}
 
 		if (applicationContext instanceof GenericApplicationContext) {
 			((GenericApplicationContext) applicationContext).setResourceLoader(this);
@@ -113,5 +113,9 @@ class ChainedResourceLoader implements ApplicationContextAware, InitializingBean
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
 		Assert.notNull(fallback);
 		// no-op - simply added to be sure we're triggered early on
+	}
+
+	public void setFallback(ResourcePatternResolver fallback) {
+		this.fallback = fallback;
 	}
 }
