@@ -16,7 +16,7 @@
 		</property>
 	</bean>
 	
-	<bean id="mrir" class="org.springframework.batch.item.file.MultiResourceItemReader" p:resources="output/token/part-*" p:delegate-ref="ir"/>
+	<bean id="mrir" class="org.springframework.batch.item.file.MultiResourceItemReader" p:resources="/batch/*" p:delegate-ref="ir"/>
 	
 	<hdp:script id="script" language="javascript">
 dir = "/batch/"
