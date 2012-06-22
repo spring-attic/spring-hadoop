@@ -56,8 +56,7 @@ public class ReadWriteHdfsTest {
 
 		fs.delete(new Path(resource.getURI().toString()), true);
 
-		JobsTrigger tj = new JobsTrigger();
-		tj.startJobs(ctx);
+		JobsTrigger.startJobs(ctx);
 
 		Path p = new Path("/ide-test/output/word/");
 		Job job = (Job) ctx.getBean("mr-job");
@@ -80,8 +79,7 @@ public class ReadWriteHdfsTest {
 
 		assertTrue(ctx.isPrototype("hadoop-tasklet"));
 
-		JobsTrigger tj = new JobsTrigger();
-		tj.startJobs(ctx);
+		JobsTrigger.startJobs(ctx);
 	}
 
 }

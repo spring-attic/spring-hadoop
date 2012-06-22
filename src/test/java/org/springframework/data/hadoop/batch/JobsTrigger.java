@@ -23,7 +23,6 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.event.ContextRefreshedEvent;
 
 /**
  * Trigger bean used for executing jobs after a context has been initialized.
@@ -32,10 +31,6 @@ import org.springframework.context.event.ContextRefreshedEvent;
  */
 public class JobsTrigger
 {
-
-	public static void onApplicationEvent(ContextRefreshedEvent event) {
-		startJobs(event.getApplicationContext());
-	}
 
 	public static void startJobs(ApplicationContext ctx) {
 		startJobs(ctx, new JobParameters());
