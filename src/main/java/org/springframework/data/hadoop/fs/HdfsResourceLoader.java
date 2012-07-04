@@ -26,6 +26,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.compress.CompressionCodecFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.core.PriorityOrdered;
 import org.springframework.core.io.Resource;
@@ -48,6 +49,8 @@ public class HdfsResourceLoader implements ResourcePatternResolver, PriorityOrde
 	private final FileSystem fs;
 	private final PathMatcher pathMatcher = new AntPathMatcher();
 	private final boolean internalFS;
+	private volatile boolean useCodecs = true;
+	private volatile CompressionCodecFactory codecsFactory;
 
 	/**
 	 * Constructs a new <code>HdfsResourceLoader</code> instance.
@@ -70,6 +73,7 @@ public class HdfsResourceLoader implements ResourcePatternResolver, PriorityOrde
 
 		internalFS = true;
 		FileSystem tempFS = null;
+		codecsFactory = new CompressionCodecFactory(config);
 
 		try {
 			if (uri == null) {
@@ -103,6 +107,7 @@ public class HdfsResourceLoader implements ResourcePatternResolver, PriorityOrde
 		Assert.notNull(fs, "a non-null file-system required");
 		this.fs = fs;
 		internalFS = false;
+		codecsFactory = new CompressionCodecFactory(fs.getConf());
 	}
 
 	/**
@@ -119,7 +124,11 @@ public class HdfsResourceLoader implements ResourcePatternResolver, PriorityOrde
 	}
 
 	public Resource getResource(String location) {
-		return new HdfsResource(location, fs);
+		return new HdfsResource(location, fs, codecs());
+	}
+
+	private CompressionCodecFactory codecs() {
+		return (useCodecs ? codecsFactory : null);
 	}
 
 	public Resource[] getResources(String locationPattern) throws IOException {
@@ -209,7 +218,7 @@ public class HdfsResourceLoader implements ResourcePatternResolver, PriorityOrde
 					}
 
 					else if (pathMatcher.match(subPattern, location)) {
-						results.add(new HdfsResource(p, fs));
+						results.add(new HdfsResource(p, fs, codecs()));
 					}
 				}
 			}
@@ -217,7 +226,7 @@ public class HdfsResourceLoader implements ResourcePatternResolver, PriorityOrde
 
 		// Remove "if" to allow folders to be added as well
 		else if (pathMatcher.match(subPattern, stripPrefix(rootDir.toUri().getPath()))) {
-			results.add(new HdfsResource(rootDir, fs));
+			results.add(new HdfsResource(rootDir, fs, codecs()));
 		}
 	}
 
@@ -240,5 +249,16 @@ public class HdfsResourceLoader implements ResourcePatternResolver, PriorityOrde
 		if (fs != null & internalFS) {
 			fs.close();
 		}
+	}
+
+	/**
+	 * Indicates whether to use (or not) the codecs found inside the Hadoop configuration.
+	 * This affects the content of the streams backing this resource - whether the raw content is delivered as is
+	 * or decompressed on the fly (if the configuration allows it so). The latter is the default.
+	 * 
+	 * @param useCodecs whether to use any codecs defined in the Hadoop configuration
+	 */
+	public void setUseCodecs(boolean useCodecs) {
+		this.useCodecs = useCodecs;
 	}
 }

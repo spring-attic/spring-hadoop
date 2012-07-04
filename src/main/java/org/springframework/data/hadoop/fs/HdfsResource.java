@@ -27,6 +27,10 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.LocalFileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.RawLocalFileSystem;
+import org.apache.hadoop.io.compress.CodecPool;
+import org.apache.hadoop.io.compress.CompressionCodec;
+import org.apache.hadoop.io.compress.CompressionCodecFactory;
+import org.apache.hadoop.io.compress.Decompressor;
 import org.springframework.core.io.ContextResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
@@ -45,16 +49,17 @@ class HdfsResource implements ContextResource {
 	private final FileSystem fs;
 	private boolean exists;
 	private final FileStatus status;
+	private final CompressionCodecFactory codecsFactory;
 
-	HdfsResource(String location, FileSystem fs) {
-		this(location, null, fs);
+	HdfsResource(String location, FileSystem fs, CompressionCodecFactory codecsFactory) {
+		this(location, null, fs, codecsFactory);
 	}
 
-	HdfsResource(String parent, String child, FileSystem fs) {
-		this(StringUtils.hasText(child) ? new Path(new Path(URI.create(parent)), new Path(URI.create(child))) : new Path(URI.create(parent)), fs);
+	HdfsResource(String parent, String child, FileSystem fs, CompressionCodecFactory codecsFactory) {
+		this(StringUtils.hasText(child) ? new Path(new Path(URI.create(parent)), new Path(URI.create(child))) : new Path(URI.create(parent)), fs, codecsFactory);
 	}
 
-	HdfsResource(Path path, FileSystem fs) {
+	HdfsResource(Path path, FileSystem fs, CompressionCodecFactory codecsFactory) {
 		Assert.notNull(path, "a valid path is required");
 		Assert.notNull(fs, "non null file system required");
 
@@ -76,6 +81,7 @@ class HdfsResource implements ContextResource {
 		} catch (Exception ex) {
 		}
 		this.status = status;
+		this.codecsFactory = codecsFactory;
 	}
 
 
@@ -89,7 +95,7 @@ class HdfsResource implements ContextResource {
 	}
 
 	public Resource createRelative(String relativePath) throws IOException {
-		return new HdfsResource(location, relativePath, fs);
+		return new HdfsResource(location, relativePath, fs, codecsFactory);
 	}
 
 	public boolean exists() {
@@ -142,7 +148,22 @@ class HdfsResource implements ContextResource {
 
 	public InputStream getInputStream() throws IOException {
 		if (exists) {
-			return fs.open(path);
+			InputStream stream = fs.open(path);
+
+			if (codecsFactory != null) {
+				CompressionCodec codec = codecsFactory.getCodec(path);
+				if (codec != null) {
+					// the pool is not used since the returned inputstream needs to be decorated to return the decompressor on close
+					// which can mask the actual stream
+					// it's also unclear whether the pool is actually useful or not
+					// Decompressor decompressor = CodecPool.getDecompressor(codec);
+					// stream = (decompressor != null ? codec.createInputStream(stream, decompressor) : codec.createInputStream(stream));
+					
+					stream = codec.createInputStream(stream);
+				}
+			}
+
+			return stream;
 		}
 		throw new IOException("Cannot open stream for " + getDescription());
 	}

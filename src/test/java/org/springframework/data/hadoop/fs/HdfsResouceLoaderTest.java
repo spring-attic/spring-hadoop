@@ -15,7 +15,9 @@
  */
 package org.springframework.data.hadoop.fs;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
 import java.util.Arrays;
@@ -26,6 +28,8 @@ import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FsUrlStreamHandlerFactory;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.compress.DecompressorStream;
+import org.apache.hadoop.io.compress.DefaultCodec;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.junit.After;
 import org.junit.Before;
@@ -228,6 +232,48 @@ public class HdfsResouceLoaderTest {
 			assertTrue(resources.length >= 3);
 		} finally {
 			fs.delete(new Path("local/"), true);
+		}
+	}
+
+	@Test
+	public void testDecompressedStream() throws Exception {
+		DefaultCodec codec = new DefaultCodec();
+		codec.setConf(fs.getConf());
+		String name = "local/" + UUID.randomUUID() + codec.getDefaultExtension();
+		OutputStream outputStream = codec.createOutputStream(fs.create(new Path(name)));
+		byte[] content = name.getBytes();
+		outputStream.write(content);
+		outputStream.close();
+
+		Resource resource = loader.getResource(name);
+		assertNotNull(resource);
+		InputStream inputStream = resource.getInputStream();
+		assertEquals(DecompressorStream.class, inputStream.getClass());
+		assertTrue(TestUtils.compareStreams(new ByteArrayInputStream(content), inputStream));
+	}
+
+	@Test
+	public void testCompressedStream() throws Exception {
+
+		DefaultCodec codec = new DefaultCodec();
+		codec.setConf(fs.getConf());
+		String name = "local/" + UUID.randomUUID() + codec.getDefaultExtension();
+		OutputStream outputStream = codec.createOutputStream(fs.create(new Path(name)));
+		byte[] content = name.getBytes();
+		outputStream.write(content);
+		outputStream.close();
+
+		loader.setUseCodecs(false);
+
+		try {
+			Resource resource = loader.getResource(name);
+			assertNotNull(resource);
+			InputStream inputStream = resource.getInputStream();
+			System.out.println(inputStream.getClass());
+			assertFalse(DecompressorStream.class.equals(inputStream.getClass()));
+			assertFalse(TestUtils.compareStreams(new ByteArrayInputStream(content), inputStream));
+		} finally {
+			loader.setUseCodecs(true);
 		}
 	}
 }
