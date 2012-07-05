@@ -25,6 +25,8 @@ import org.springframework.util.StringUtils;
  * Wrapper around {@link org.apache.hadoop.util.ToolRunner} allowing for an easier configuration and execution
  * of {@link Tool}  instances inside Spring.
  * Optionally returns the execution result (as an int per {@link Tool#run(String[])}).
+ * <p/>This class is a factory bean - if {@link #setRunAtStartup(boolean)} is set to false, then the action (namely the execution of the Tool) is postponed by the call
+ * to {@link #getObject()}.
  * 
  * @author Costin Leau
  */

@@ -30,7 +30,9 @@ import org.springframework.util.Assert;
  * Simple runner for submitting Hadoop jobs sequentially. By default, the runner waits for the jobs to finish and returns a boolean indicating
  * whether all the jobs succeeded or not (when there's no waiting, the status cannot be determined and null is returned).
  * <p/>
- * For more control over the job execution and outcome consider querying the {@link Job}s or using Spring Batch (see the reference documentation for more info). 
+ * For more control over the job execution and outcome consider querying the {@link Job}s or using Spring Batch (see the reference documentation for more info).
+ * <p/>This class is a factory bean - if {@link #setRunAtStartup(boolean)} is set to false, then the action (namely the execution of the job) is postponed by the call
+ * to {@link #getObject()}.
  * 
  * @author Costin Leau
  */
