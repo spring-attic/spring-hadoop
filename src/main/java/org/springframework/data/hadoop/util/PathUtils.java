@@ -90,7 +90,7 @@ public abstract class PathUtils {
 		StringBuilder strBuffer = new StringBuilder();
 
 		Formatter formatter = new Formatter(strBuffer, Locale.US);
-		formatter.format(pathFormat, new Date());
+		formatter.format(pathFormat, date);
 
 		if (!pathFormat.endsWith(File.separator)) {
 			strBuffer.append(File.separator);
