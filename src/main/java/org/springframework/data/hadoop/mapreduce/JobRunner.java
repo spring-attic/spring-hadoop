@@ -34,7 +34,7 @@ import org.springframework.util.Assert;
  * 
  * @author Costin Leau
  */
-public class JobRunner implements FactoryBean<Object>, InitializingBean, DisposableBean {
+public class JobRunner implements FactoryBean<Boolean>, InitializingBean, DisposableBean {
 
 	private static final Log log = LogFactory.getLog(JobRunner.class);
 
@@ -68,7 +68,7 @@ public class JobRunner implements FactoryBean<Object>, InitializingBean, Disposa
 	}
 
 	@Override
-	public Object getObject() throws Exception {
+	public Boolean getObject() throws Exception {
 		if (!executed) {
 			executed = true;
 			for (Job job : jobs) {
