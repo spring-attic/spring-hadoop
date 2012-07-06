@@ -59,6 +59,11 @@ class HadoopResourceLoaderParser extends AbstractImprovedSimpleBeanDefinitionPar
 			}
 		}
 
+		String useCodecs = element.getAttribute("use-codecs");
+		if (StringUtils.hasText(useCodecs)) {
+			builder.addPropertyValue("useCodecs", useCodecs);
+		}
+
 		postProcess(builder, element);
 	}
 }

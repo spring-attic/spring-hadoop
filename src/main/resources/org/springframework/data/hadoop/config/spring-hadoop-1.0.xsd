@@ -7,7 +7,7 @@
 	targetNamespace="http://www.springframework.org/schema/hadoop"
 	elementFormDefault="qualified"
 	attributeFormDefault="unqualified"
-	version="1.0.0.M2">
+	version="1.0.0.M3">
 
 	<xsd:import namespace="http://www.springframework.org/schema/beans" />
 	<xsd:import namespace="http://www.springframework.org/schema/tool" />
@@ -236,6 +236,15 @@ Reference to the Hadoop FileSystem. Overrides the 'uri' or 'configuration-ref' p
 			<xsd:annotation>
 			<xsd:documentation><![CDATA[
 The security user (ugi) to use for impersonation at runtime.				
+				]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="use-codecs" type="xsd:boolean" default="true">
+			<xsd:annotation>
+			<xsd:documentation><![CDATA[
+Indicates whether to use (or not) the codecs found inside the Hadoop configuration when accessing the resource input stream.
+By default, the codecs are used meaning the content of the stream backing the resource is decompressed on the fly (if a 
+suitable decompressor is found).
 				]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>

@@ -24,7 +24,7 @@
 	<!--  automatically picks the hadoopConfiguration reference -->
 	<bean id="hadoopFs" class="org.springframework.data.hadoop.fs.FileSystemFactoryBean" p:configuration-ref="hadoopConfiguration"/>
 	
-	<hdp:resource-loader file-system-ref="hadoopFs"/>	
+	<hdp:resource-loader file-system-ref="hadoopFs" use-codecs="true"/>	
 	
 	<!--  default id is 'hadoopConfiguration' -->
 	<hdp:configuration register-url-handler="false">
