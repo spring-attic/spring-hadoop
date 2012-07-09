@@ -41,6 +41,7 @@ public class JobTasklet implements InitializingBean, Tasklet, BeanFactoryAware {
 	private String jobName;
 	private boolean waitForJob = true;
 	private BeanFactory beanFactory;
+	private boolean verbose = true;
 
 	public void afterPropertiesSet() {
 		Assert.isTrue(job != null || StringUtils.hasText(jobName), "A Hadoop job or its name is required");
@@ -61,7 +62,7 @@ public class JobTasklet implements InitializingBean, Tasklet, BeanFactoryAware {
 				j.submit();
 			}
 			else {
-				j.waitForCompletion(false);
+				j.waitForCompletion(verbose);
 			}
 			return RepeatStatus.FINISHED;
 		} catch (Exception ex) {
@@ -101,6 +102,15 @@ public class JobTasklet implements InitializingBean, Tasklet, BeanFactoryAware {
 	 */
 	public void setWaitForJob(boolean waitForJob) {
 		this.waitForJob = waitForJob;
+	}
+
+	/**
+	 * Indicates whether the job execution is verbose (the default) or not.
+	 * 
+	 * @param verbosity whether the job execution is verbose or not.
+	 */
+	public void setVerbose(boolean verbose) {
+		this.verbose = verbose;
 	}
 
 	@Override
