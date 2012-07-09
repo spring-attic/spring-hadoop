@@ -69,8 +69,8 @@ abstract class ToolExecutor extends JobGenericOptions implements BeanClassLoader
 				}
 				toolClassName = mainClass;
 
-				if (log.isTraceEnabled()) {
-					log.trace("Discovered MainClass as Tool [" + mainClass + "]");
+				if (log.isDebugEnabled()) {
+					log.debug("Discovered MainClass as Tool [" + mainClass + "]");
 				}
 			}
 
@@ -82,9 +82,8 @@ abstract class ToolExecutor extends JobGenericOptions implements BeanClassLoader
 
 		final Tool ft = t;
 
-		if (log.isDebugEnabled()) {
-			log.debug("Invoking tool [" + t + "] with args " + Arrays.toString(arguments));
-		}
+		log.info("Invoking tool [" + t + "] " + (jar != null ? " from jar " + jar.getURI() : "") + " with args "
+					+ Arrays.toString(arguments));
 
 		try {
 			th.setContextClassLoader(cl);
