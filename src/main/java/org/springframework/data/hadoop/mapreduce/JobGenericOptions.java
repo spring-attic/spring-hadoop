@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.util.GenericOptionsParser;
 import org.springframework.core.io.Resource;
@@ -30,6 +32,8 @@ import org.springframework.util.ObjectUtils;
  * @author Costin Leau
  */
 abstract class JobGenericOptions {
+
+	final Log log = LogFactory.getLog(getClass());
 
 	Resource[] files, libJars, archives;
 	String user;
@@ -85,7 +89,7 @@ abstract class JobGenericOptions {
 		}
 	}
 
-	static void addResource(Resource[] args, String name, List<String> list) throws IOException {
+	void addResource(Resource[] args, String name, List<String> list) throws IOException {
 		if (!ObjectUtils.isEmpty(args)) {
 			int count = args.length;
 			list.add(name);
@@ -98,6 +102,10 @@ abstract class JobGenericOptions {
 				}
 			}
 			list.add(sb.toString());
+
+			if (log.isTraceEnabled()) {
+				log.trace("Adding to generic option arg [" + name + "], resources " + sb.toString());
+			}
 		}
 	}
 

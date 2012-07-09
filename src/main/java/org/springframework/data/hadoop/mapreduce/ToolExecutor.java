@@ -16,6 +16,7 @@
 package org.springframework.data.hadoop.mapreduce;
 
 import java.security.PrivilegedExceptionAction;
+import java.util.Arrays;
 import java.util.Properties;
 
 import org.apache.hadoop.conf.Configuration;
@@ -53,6 +54,11 @@ abstract class ToolExecutor extends JobGenericOptions implements BeanClassLoader
 
 		if (t == null) {
 			cl = ClassLoadingUtils.createParentLastClassLoader(jar, beanClassLoader, cfg);
+
+			if (log.isTraceEnabled()) {
+				log.trace("Creating Tool custom classloader " + cl);
+			}
+
 			cfg.setClassLoader(cl);
 
 			// fall-back to main
@@ -62,6 +68,10 @@ abstract class ToolExecutor extends JobGenericOptions implements BeanClassLoader
 					throw new IllegalArgumentException("no Tool class specified and no Main-Class available");
 				}
 				toolClassName = mainClass;
+
+				if (log.isTraceEnabled()) {
+					log.trace("Discovered MainClass as Tool [" + mainClass + "]");
+				}
 			}
 
 			t = loadTool(toolClassName, cl);
@@ -71,6 +81,10 @@ abstract class ToolExecutor extends JobGenericOptions implements BeanClassLoader
 		ClassLoader oldTccl = th.getContextClassLoader();
 
 		final Tool ft = t;
+
+		if (log.isDebugEnabled()) {
+			log.debug("Invoking tool [" + t + "] with args " + Arrays.toString(arguments));
+		}
 
 		try {
 			th.setContextClassLoader(cl);

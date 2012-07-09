@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
@@ -103,4 +104,16 @@ class ParentLastURLClassLoader extends URLClassLoader {
 
 		return Collections.enumeration(urls);
 	}
+	
+    @Override
+    public String toString() {
+		StringBuilder sb = new StringBuilder("ParentLastURLCL\r\nURLs: ");
+		sb.append(Arrays.asList(getURLs()));
+		sb.append("\nParent CL: ");
+		sb.append(getParent());
+		sb.append("\nSystem CL: ");
+		sb.append(system);
+		sb.append("\n");
+        return (sb.toString());
+    }
 }
