@@ -31,8 +31,8 @@
 		</step>
 	</job>
 	
-	<hdp:tasklet id="hadoop-mr" job-ref="mr-job" wait-for-job="true"/>
-	<hdp:tasklet id="hadoop-streaming" job-ref="stream-job" wait-for-job="true"/>
+	<hdp:job-tasklet id="hadoop-mr" job-ref="mr-job" wait-for-job="true"/>
+	<hdp:job-tasklet id="hadoop-streaming" job-ref="stream-job" wait-for-job="true"/>
 	
 	<hdp:job id="mr-job" 
 	    input-path="${log.input}/logs" output-path="${log.output}"

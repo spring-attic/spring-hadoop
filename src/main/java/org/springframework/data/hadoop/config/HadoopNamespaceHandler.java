@@ -24,7 +24,7 @@ import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
  */
 class HadoopNamespaceHandler extends NamespaceHandlerSupport {
 	public void init() {
-		registerBeanDefinitionParser("tasklet", new HadoopTaskletParser());
+		registerBeanDefinitionParser("job-tasklet", new HadoopTaskletParser());
 		registerBeanDefinitionParser("job", new HadoopJobParser());
 		registerBeanDefinitionParser("streaming", new HadoopStreamJobParser());
 		registerBeanDefinitionParser("configuration", new HadoopConfigParser());

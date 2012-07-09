@@ -185,7 +185,8 @@ public class PigServerFactoryBean implements FactoryBean<PigServer>, BeanNameAwa
 	}
 
 	/**
-	 * Indicates whether each statement should be validated or not.
+	 * Indicates whether each statement should be validated or not. By default it is unset,
+	 * relying on the Pig defaults.
 	 * 
 	 * @param validateEachStatement whether to validate each statement or not.
 	 */

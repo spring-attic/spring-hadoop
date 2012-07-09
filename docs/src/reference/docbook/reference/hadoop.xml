@@ -322,7 +322,7 @@
 
 		<para>For Spring Batch environments, SHDP provides a dedicated tasklet to execute Hadoop jobs as a step in a Spring Batch workflow. An example declaration is shown below:</para>
 		
-		<programlisting language="xml"><![CDATA[<hdp:tasklet id="hadoop-tasklet" job-ref="mr-job" wait-for-job="true" />]]></programlisting>
+		<programlisting language="xml"><![CDATA[<hdp:job-tasklet id="hadoop-tasklet" job-ref="mr-job" wait-for-job="true" />]]></programlisting>
 
 		<para>The tasklet above references a Hadoop job definition named "mr-job".  By default, wait-for-job is true so that the tasklet will wait for the job to complete when it executes.  Setting wait-for-job to false will submit the job to the Hadoop cluster but not wait for it to complete.</para>	
 	</section>

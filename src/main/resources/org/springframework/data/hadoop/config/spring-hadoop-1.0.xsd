@@ -18,7 +18,7 @@ Defines the configuration elements for Spring Data Hadoop.
 		]]></xsd:documentation>
 	</xsd:annotation>
 
-	<xsd:element name="tasklet">
+	<xsd:element name="job-tasklet">
 		<xsd:annotation>
 		   <xsd:documentation><![CDATA[
 Defines a Spring Batch tasklet for Hadoop Jobs.
@@ -52,6 +52,7 @@ Whether to synchronously wait for the job to finish (the default) or not.
 		</xsd:attribute>
 		<xsd:attribute name="id" type="xsd:ID" use="required" />
 		<xsd:attribute name="scope" type="xsd:string" use="optional" />
+		<xsd:attribute name="verbose" type="xsd:string" use="optional" default="true"/>
 	</xsd:complexType>
 	</xsd:element>
 	
@@ -239,7 +240,7 @@ The security user (ugi) to use for impersonation at runtime.
 				]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
-		<xsd:attribute name="use-codecs" type="xsd:boolean" default="true">
+		<xsd:attribute name="use-codecs" type="xsd:string" use="optional" default="true">
 			<xsd:annotation>
 			<xsd:documentation><![CDATA[
 Indicates whether to use (or not) the codecs found inside the Hadoop configuration when accessing the resource input stream.
@@ -638,7 +639,7 @@ Executes a Hadoop Tool.]]></xsd:documentation>
 		<xsd:complexType>
 		<xsd:complexContent mixed="true">
 		<xsd:extension base="toolRunnerType">
-			<xsd:attribute name="run-at-startup" type="xsd:boolean" default="false">
+			<xsd:attribute name="run-at-startup" type="xsd:string" default="false">
 				<xsd:annotation>
 					<xsd:documentation><![CDATA[
 Whether the Tool runs at startup or not (default).
@@ -695,7 +696,7 @@ Bean id (default is "hadoopCache").
 				]]></xsd:documentation>
 			</xsd:annotation>
 			</xsd:attribute>
-			<xsd:attribute name="create-symlink" type="xsd:boolean"/>
+			<xsd:attribute name="create-symlink" type="xsd:string" default="false"/>
 			<xsd:attribute name="configuration-ref" default="hadoopConfiguration">
 			<xsd:annotation>
 					<xsd:documentation source="java:org.apache.hadoop.conf.Configuration"><![CDATA[
@@ -789,7 +790,7 @@ The path to be skipped while automatically shipping binaries for streaming. Mult
 			 	</xsd:annotation>			
 			</xsd:attribute>
 			<xsd:attribute name="parallelism" type="xsd:integer"/>
-			<xsd:attribute name="validate-each-statement" type="xsd:boolean"/>
+			<xsd:attribute name="validate-each-statement" type="xsd:string"/>
 			<xsd:attribute name="job-priority" type="xsd:string"/>
 			<xsd:attribute name="job-name" type="xsd:string"/>
 			<xsd:attribute name="job-tracker" type="xsd:string"/>
@@ -888,8 +889,8 @@ Bean id (default is "hbaseConfiguration").
 				]]></xsd:documentation>
 			</xsd:annotation>
 			</xsd:attribute>
-			<xsd:attribute name="stop-proxy" type="xsd:boolean" default="true"/>
-			<xsd:attribute name="delete-connection" type="xsd:boolean" default="true"/>
+			<xsd:attribute name="stop-proxy" type="xsd:string" default="true"/>
+			<xsd:attribute name="delete-connection" type="xsd:string" default="true"/>
 			<xsd:attribute name="configuration-ref">
 			<xsd:annotation>
 					<xsd:documentation source="java:org.apache.hadoop.conf.Configuration"><![CDATA[
@@ -936,7 +937,7 @@ Bean id (default is "hiveClient").
 			</xsd:attribute>
 			<xsd:attribute name="host" type="xsd:string" default="localhost"/>
 			<xsd:attribute name="port" type="xsd:string" default="10000"/>
-			<xsd:attribute name="auto-startup" type="xsd:boolean" default="true"/>
+			<xsd:attribute name="auto-startup" type="xsd:string" default="true"/>
 		</xsd:complexType>
 	</xsd:element>
 	
@@ -964,7 +965,7 @@ Bean id (default is "hiveServer").
 			<xsd:attribute name="port" type="xsd:string" default="10000"/>
 			<xsd:attribute name="min-threads" type="xsd:string" default="5"/>
 			<xsd:attribute name="max-threads" type="xsd:string" default="100"/>
-			<xsd:attribute name="auto-startup" type="xsd:boolean" default="true"/>
+			<xsd:attribute name="auto-startup" type="xsd:string" default="true"/>
 			<xsd:attribute name="configuration-ref">
 			<xsd:annotation>
 					<xsd:documentation source="java:org.apache.hadoop.conf.Configuration"><![CDATA[
@@ -1090,7 +1091,7 @@ Bean id (if no value is given, a name will be generated).
 						]]></xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="run-at-startup" type="xsd:boolean" default="false">
+				<xsd:attribute name="run-at-startup" type="xsd:string" default="false">
 					<xsd:annotation>
 						<xsd:documentation><![CDATA[
 Whether the script is evaluated automatically once the application context initializes or only when in use (the default).
