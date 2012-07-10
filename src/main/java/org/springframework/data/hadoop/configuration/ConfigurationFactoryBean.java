@@ -149,7 +149,7 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 
 	/**
 	 * Indicates whether the configuration object should be initialized (true) or not.
-	 * This option should normally be set to true as it causes the jars, streams and resources
+	 * This option should normally be set to true (the default) as it causes the jars, streams and resources
 	 * set to be loaded - postponing the initializing might cause these to become unreadable.
 	 * 
 	 * @param initialize whether to initialize or not.
