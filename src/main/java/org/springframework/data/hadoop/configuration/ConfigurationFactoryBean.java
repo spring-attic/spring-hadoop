@@ -23,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FsUrlStreamHandlerFactory;
+import org.apache.hadoop.security.UserGroupInformation;
 import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -67,6 +68,8 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 
 		if (registerJvmUrl) {
 			try {
+				// force UGI init to prevent infinite loop - see SHDP-92
+				UserGroupInformation.setConfiguration(internalConfig);
 				URL.setURLStreamHandlerFactory(new FsUrlStreamHandlerFactory(getObject()));
 				log.info("Registered HDFS URL stream handler");
 			} catch (Error err) {
