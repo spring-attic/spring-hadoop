@@ -32,6 +32,7 @@
 		properties-location="cfg-1.properties, cfg-2.properties"
 		files="cfg-1.properties, dummy-*.properties"
 		archives="cfg-2.properties"
+		number-reducers="1"
 		libs="te*t.properties">
         <hdp:cmd-env>
         	EXAMPLE_DIR=/home/example/dictionaries/

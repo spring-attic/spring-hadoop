@@ -277,7 +277,7 @@ public class StreamJobFactoryBean extends JobGenericOptions implements Initializ
 	 * 
 	 * @param numReduceTasks The numReduceTasks to set.
 	 */
-	public void setNumReduceTasks(Integer numReduceTasks) {
+	public void setNumberReducers(Integer numReduceTasks) {
 		this.numReduceTasks = numReduceTasks;
 	}
 

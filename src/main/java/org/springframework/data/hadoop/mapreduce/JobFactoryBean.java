@@ -429,7 +429,7 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 	 *  
 	 * @param numReduceTasks The numReduceTasks to set.
 	 */
-	public void setNumReduceTasks(Integer numReduceTasks) {
+	public void setNumberReducers(Integer numReduceTasks) {
 		this.numReduceTasks = numReduceTasks;
 	}
 

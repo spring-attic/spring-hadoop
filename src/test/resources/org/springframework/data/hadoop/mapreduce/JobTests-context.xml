@@ -68,6 +68,11 @@
 		validate-paths="false"
 		properties-ref="props" 
 		properties-location="cfg-1.properties, cfg-2.properties"
+		number-reducers="1"
+		working-dir="."
+		codec="org.apache.hadoop.io.compress.DefaultCodec"
+		compress-output="false"
+		
 		scope="singleton" >
 
 		star=chasing
