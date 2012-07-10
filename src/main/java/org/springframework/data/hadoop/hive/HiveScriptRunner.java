@@ -100,6 +100,7 @@ abstract class HiveScriptRunner {
 				hive.clean();
 			} catch (Exception exc) {
 			}
+			throw ex;
 		} finally {
 			IOUtils.closeStream(reader);
 		}
