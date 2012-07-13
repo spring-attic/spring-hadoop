@@ -146,7 +146,12 @@ public class HdfsResouceLoaderTest {
 	@Test
 	public void testResolve() throws Exception {
 		Resource resource = loader.getResource("/test");
-		URL.setURLStreamHandlerFactory(new FsUrlStreamHandlerFactory(fs.getConf()));
+		try {
+			URL.setURLStreamHandlerFactory(new FsUrlStreamHandlerFactory(fs.getConf()));
+		} catch (Error err) {
+			//somebody already registered an URL handler...
+			// get out
+		}
 
 		System.out.println(((HdfsResource) resource).getPath().makeQualified(fs));
 		System.out.println(resource.getURI());
