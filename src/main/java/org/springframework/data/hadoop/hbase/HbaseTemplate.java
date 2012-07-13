@@ -16,17 +16,14 @@
 package org.springframework.data.hadoop.hbase;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.List;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.HTable;
-import org.apache.hadoop.hbase.client.HTableInterfaceFactory;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.DataAccessException;
 import org.springframework.util.Assert;
 
@@ -36,28 +33,16 @@ import org.springframework.util.Assert;
  * 
  * @author Costin Leau
  */
-public class HbaseTemplate implements InitializingBean, HbaseOperations {
+public class HbaseTemplate extends HbaseAccessor implements HbaseOperations {
 
-	private Charset charset;
-	private String encoding;
 	private boolean autoFlush = true;
-	private HTableInterfaceFactory tableFactory;
-	private Configuration configuration;
 
 	public HbaseTemplate() {
 	}
 
 	public HbaseTemplate(Configuration configuration) {
-		this.configuration = configuration;
+		setConfiguration(configuration);
 		afterPropertiesSet();
-	}
-
-	@Override
-	public void afterPropertiesSet() {
-		Assert.notNull(configuration, "configuration is required");
-
-		// detect charset
-		charset = HbaseUtils.getCharset(encoding);
 	}
 
 	@Override
@@ -81,16 +66,16 @@ public class HbaseTemplate implements InitializingBean, HbaseOperations {
 			}
 			throw convertHbaseAccessException((Exception) th);
 		} finally {
-			try {
-				table.close();
-			} catch (IOException ex) {
-				throw convertHbaseAccessException(ex);
-			}
+			releaseTable(tableName, table);
 		}
 	}
 
 	private HTable getTable(String tableName) {
-		return HbaseUtils.getHTable(tableFactory, charset, configuration, tableName);
+		return HbaseUtils.getHTable(getTableFactory(), getCharset(), getConfiguration(), tableName);
+	}
+
+	private void releaseTable(String tableName, HTable table) {
+		HbaseUtils.releaseTable(tableName, table);
 	}
 
 	private boolean applyFlushSetting(HTable table) {
@@ -114,14 +99,14 @@ public class HbaseTemplate implements InitializingBean, HbaseOperations {
 	@Override
 	public <T> T find(String tableName, String family, final ResultsExtractor<T> action) {
 		Scan scan = new Scan();
-		scan.addFamily(family.getBytes(charset));
+		scan.addFamily(family.getBytes(getCharset()));
 		return find(tableName, scan, action);
 	}
 
 	@Override
 	public <T> T find(String tableName, String family, String qualifier, final ResultsExtractor<T> action) {
 		Scan scan = new Scan();
-		scan.addColumn(family.getBytes(charset), qualifier.getBytes(charset));
+		scan.addColumn(family.getBytes(getCharset()), qualifier.getBytes(getCharset()));
 		return find(tableName, scan, action);
 	}
 
@@ -143,14 +128,14 @@ public class HbaseTemplate implements InitializingBean, HbaseOperations {
 	@Override
 	public <T> List<T> find(String tableName, String family, final RowMapper<T> action) {
 		Scan scan = new Scan();
-		scan.addFamily(family.getBytes(charset));
+		scan.addFamily(family.getBytes(getCharset()));
 		return find(tableName, scan, action);
 	}
 
 	@Override
 	public <T> List<T> find(String tableName, String family, String qualifier, final RowMapper<T> action) {
 		Scan scan = new Scan();
-		scan.addColumn(family.getBytes(charset), qualifier.getBytes(charset));
+		scan.addColumn(family.getBytes(getCharset()), qualifier.getBytes(getCharset()));
 		return find(tableName, scan, action);
 	}
 
@@ -174,12 +159,12 @@ public class HbaseTemplate implements InitializingBean, HbaseOperations {
 		return execute(tableName, new TableCallback<T>() {
 			@Override
 			public T doInTable(HTable htable) throws Throwable {
-				Get get = new Get(rowName.getBytes(charset));
+				Get get = new Get(rowName.getBytes(getCharset()));
 				if (familyName != null) {
-					byte[] family = familyName.getBytes(charset);
+					byte[] family = familyName.getBytes(getCharset());
 
 					if (qualifier != null) {
-						get.addColumn(family, qualifier.getBytes(charset));
+						get.addColumn(family, qualifier.getBytes(getCharset()));
 					}
 					else {
 						get.addFamily(family);
@@ -200,30 +185,4 @@ public class HbaseTemplate implements InitializingBean, HbaseOperations {
 		this.autoFlush = autoFlush;
 	}
 
-	/**
-	 * Sets the table factory.
-	 *
-	 * @param tableFactory The tableFactory to set.
-	 */
-	public void setTableFactory(HTableInterfaceFactory tableFactory) {
-		this.tableFactory = tableFactory;
-	}
-
-	/**
-	 * Sets the encoding.
-	 *
-	 * @param encoding The encoding to set.
-	 */
-	public void setEncoding(String encoding) {
-		this.encoding = encoding;
-	}
-
-	/**
-	 * Sets the configuration.
-	 *
-	 * @param configuration The configuration to set.
-	 */
-	public void setConfiguration(Configuration configuration) {
-		this.configuration = configuration;
-	}
 }

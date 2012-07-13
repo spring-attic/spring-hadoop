@@ -15,6 +15,7 @@
  */
 package org.springframework.data.hadoop.hbase;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 
 import org.apache.hadoop.conf.Configuration;
@@ -77,7 +78,6 @@ public class HbaseUtils {
 			else {
 				t = new HTable(configuration, tableName.getBytes(charset));
 			}
-			HbaseSynchronizationManager.bindResource(tableName, t);
 
 			return t;
 
@@ -88,5 +88,33 @@ public class HbaseUtils {
 
 	static Charset getCharset(String encoding) {
 		return (StringUtils.hasText(encoding) ? Charset.forName(encoding) : Charset.forName("UTF-8"));
+	}
+
+	/**
+	 * Releases (and closes) the given table, created via the given configuration if it is not managed externally.
+	 * 
+	 * @param tableName
+	 * @param table
+	 */
+	public static void releaseTable(String tableName, HTableInterface table) {
+		try {
+			doReleaseTable(tableName, table);
+		} catch (IOException ex) {
+			throw HbaseUtils.convertHbaseException(ex);
+		}
+	}
+
+	private static void doReleaseTable(String tableName, HTableInterface table) throws IOException {
+		if (table == null) {
+			return;
+		}
+
+		if (!isBoundToThread(tableName)) {
+			table.close();
+		}
+	}
+
+	private static boolean isBoundToThread(String tableName) {
+		return HbaseSynchronizationManager.hasResource(tableName);
 	}
 }

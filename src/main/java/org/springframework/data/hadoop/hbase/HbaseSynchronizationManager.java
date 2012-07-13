@@ -38,8 +38,7 @@ public abstract class HbaseSynchronizationManager {
 
 	private static final Log logger = LogFactory.getLog(HbaseSynchronizationManager.class);
 
-	private static final ThreadLocal<Map<String, HTableInterface>> resources = new NamedThreadLocal<Map<String, HTableInterface>>(
-			"Bound resources");
+	private static final ThreadLocal<Map<String, HTableInterface>> resources = new NamedThreadLocal<Map<String, HTableInterface>>("Bound resources");
 
 	private static final boolean aopAvailable = ClassUtils.isPresent("org.springframework.aop.scope.ScopedObject",
 			HbaseSynchronizationManager.class.getClassLoader());

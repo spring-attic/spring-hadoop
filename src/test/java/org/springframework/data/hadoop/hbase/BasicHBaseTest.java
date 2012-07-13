@@ -31,11 +31,6 @@ import org.apache.hadoop.hbase.util.Bytes;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.hadoop.hbase.HbaseSynchronizationManager;
-import org.springframework.data.hadoop.hbase.HbaseTemplate;
-import org.springframework.data.hadoop.hbase.HbaseUtils;
-import org.springframework.data.hadoop.hbase.RowMapper;
-import org.springframework.data.hadoop.hbase.TableCallback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -147,7 +142,7 @@ public class BasicHBaseTest {
 			}
 		}));
 
-		HbaseSynchronizationManager.unbindResource(tableName).close();
+		HbaseUtils.releaseTable(tableName, t);
 		assertTrue(HbaseSynchronizationManager.getTableNames().isEmpty());
 	}
 }
