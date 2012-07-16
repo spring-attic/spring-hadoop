@@ -32,7 +32,7 @@
 
 	<hdp:hive-client host="${hive.host}" port="${hive.port}">
 		<hdp:script>
-			DROP TABLE IF EXITS testHiveBatchTable; 
+			DROP TABLE IF EXISTS testHiveBatchTable; 
 			CREATE TABLE testHiveBatchTable (key int, value string);
 			DESCRIBE testHiveBatchTable;
 		</hdp:script>
@@ -41,7 +41,7 @@
 	
 	<hdp:hive-tasklet id="hive-script" scope="prototype">
 		<hdp:script>
-			DROP TABLE IF EXITS testHiveBatchTable; 
+			DROP TABLE IF EXISTS testHiveBatchTable; 
 			CREATE TABLE testHiveBatchTable (key int, value string);
 			DESCRIBE testHiveBatchTable;
 		</hdp:script>

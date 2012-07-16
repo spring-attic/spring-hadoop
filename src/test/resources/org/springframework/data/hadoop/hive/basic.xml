@@ -39,7 +39,7 @@
 	</bean>
 	
 	<bean id="template" class="org.springframework.jdbc.core.JdbcTemplate">
-		<constructor-arg ref="hive-ds"/>
+		<constructor-arg ref="hiveDs"/>
 	</bean>		
 	
 </beans>

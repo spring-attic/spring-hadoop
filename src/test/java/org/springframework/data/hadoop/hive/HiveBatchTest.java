@@ -43,12 +43,12 @@ public class HiveBatchTest {
 
 	@Test
 	public void testHiveClient() throws Exception {
-		ctx.getBean("hive-client", HiveClient.class);
+		ctx.getBean("hiveClient", HiveClient.class);
 	}
 
 	@Test
 	public void testServerNamespace() throws Exception {
-		assertTrue(ctx.isPrototype("hive-tasklet"));
+		assertTrue(ctx.isPrototype("hive-script"));
 		JobsTrigger tj = new JobsTrigger();
 		tj.startJobs(ctx);
 	}
