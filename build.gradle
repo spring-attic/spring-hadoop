@@ -58,9 +58,6 @@ dependencies {
 
     // Hive
     compile("org.apache.hive:hive-metastore:$hiveVersion", optional) 
-    //{ dep ->
-         //exclude group: 'javax.jdo', module: 'jdo2-api'
-    //}
     compile("org.apache.hive:hive-service:$hiveVersion", optional)
 
     testRuntime "org.apache.hive:hive-common:$hiveVersion"
@@ -80,8 +77,8 @@ dependencies {
     }
 
     // Libs dependencies (specified to cope with incompatibilities between them)
-    testRuntime "org.antlr:antlr:$antlrVersion"
-    testRuntime "org.antlr:antlr-runtime:$antlrVersion"
+    // testRuntime "org.antlr:antlr:$antlrVersion"
+    // testRuntime "org.antlr:antlr-runtime:$antlrVersion"
 
     
     // Testing
@@ -97,21 +94,11 @@ dependencies {
     testRuntime "org.jruby:jruby:$jrubyVersion"
     testRuntime "org.python:jython-standalone:$jythonVersion"
     testRuntime "org.apache.hive:hive-builtins:$hiveVersion"
+
     // specify a version of antlr that works with both hive and pig
     testRuntime "org.antlr:antlr-runtime:$antlrVersion"
-    // hive optional dependencies
-    //testCompile "org.datanucleus:datanucleus-connectionpool:$dataNucleusVersion"
-    //testCompile "org.datanucleus:datanucleus-core:$dataNucleusVersion"
-    //testCompile "org.datanucleus:datanucleus-enhancer:$dataNucleusVersion"
-    //testCompile "org.datanucleus:datanucleus-rdbms:$dataNucleusVersion"
-    //testCompile "javax.jdo:jdo2-api:$jdoVersion"
-    
     testCompile "cascading:cascading-local:$cascadingVersion"
     
-}
-// config to exclude missing jdo-2.3-ec from hive
-configurations.all {
-    resolutionStrategy.force 'javax.jdo:jdo2-api:2.3-eb'
 }
 
 sourceCompatibility = 1.6
