@@ -15,63 +15,35 @@
  */
 package org.springframework.data.hadoop.mapreduce;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 
 import org.apache.hadoop.conf.Configuration;
-import org.springframework.util.FileCopyUtils;
 
 /**
- * Dedicated class-loader for running Hadoop jars in-process.
- * The purpose of the class is two-fold:
- * 
- * a. to prevent malicious calls (such as System.exit()) - does that through on-the-fly byte-code rewriting.
- * b. to wire in a custom Configuration (through {@link Configuration#addDefaultResource(String)}. Note that other configurations might
+ * Dedicated class-loader for running Hadoop jars in-process. It mainly handles the wiring of a custom Configuration class 
+ * (through {@link Configuration#addDefaultResource(String)}. Note that other configurations might
  * be created at the same time and the class-loader acts as a filter validating only the configurations loaded through it  
  * 
  * @author Costin Leau
  */
 class HadoopJarClassLoader extends ParentLastURLClassLoader {
 
-	HadoopJarClassLoader(URL[] classpath, ClassLoader parent) {
+	private final String configName;
+	private final URL configURL;
+
+
+	HadoopJarClassLoader(URL[] classpath, ClassLoader parent, String configName, URL configURL) {
 		super(classpath, parent);
+		this.configName = configName;
+		this.configURL = configURL;
 	}
 
 	@Override
 	public URL getResource(String name) {
-		// check for custom resource
-
-
+		// check for custom config name
+		if (this.configName.equals(name)) {
+			return configURL;
+		}
 		return super.getResource(name);
-	}
-
-	@Override
-	protected Class<?> findClass(String name) throws ClassNotFoundException {
-		InputStream is = getResourceAsStream(name.replace('.', '/') + ".class");
-		if (is == null) {
-			throw new ClassNotFoundException(name);
-		}
-
-		byte[] bytes = null;
-		try {
-			// Load the raw bytes.
-			bytes = FileCopyUtils.copyToByteArray(is);
-			// Transform if necessary and use the potentially transformed bytes.
-			bytes = transformIfNecessary(name, bytes);
-		} catch (IOException ex) {
-			throw new ClassNotFoundException("Cannot load resource for class [" + name + "]", ex);
-		}
-
-		if (bytes != null) {
-			return defineClass(name, bytes, 0, bytes.length);
-		}
-
-		throw new ClassNotFoundException(name);
-	}
-
-	private byte[] transformIfNecessary(String name, byte[] bytes) {
-		// replace System.exit
-		return bytes;
 	}
 }

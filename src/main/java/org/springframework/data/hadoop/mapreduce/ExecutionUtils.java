@@ -33,15 +33,48 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Class-related utilities.
+ * Code execution utilities.
  * 
  * @author Costin Leau
+ * @author Jarred Li
  */
 // NOTE: jars with nested /classes/ are supported as well but this functionality is disabled
 // as it seems to have not been used in hadoop.
-abstract class ClassLoadingUtils {
+abstract class ExecutionUtils {
 
-	public static ClassLoader createParentLastClassLoader(Resource jar, ClassLoader parentClassLoader, Configuration cfg) {
+	static class ExitTrapped extends Error {
+
+		private int exitCode;
+
+		public ExitTrapped(int statusCode) {
+			this.exitCode = statusCode;
+		}
+
+		public int getExitCode() {
+			return exitCode;
+		}
+	}
+
+	private static SecurityManager oldSM = null;
+
+	static void forbidSystemExitCall() {
+		final SecurityManager securityManager = new SecurityManager() {
+			@Override
+			public void checkExit(int status) {
+				throw new ExitTrapped(status);
+			}
+		};
+
+		oldSM = System.getSecurityManager();
+		System.setSecurityManager(securityManager);
+	}
+
+
+	static void enableSystemExitCall() {
+		System.setSecurityManager(oldSM);
+	}
+
+	static ClassLoader createParentLastClassLoader(Resource jar, ClassLoader parentClassLoader, Configuration cfg) {
 		ClassLoader cl = null;
 
 		// sanity check

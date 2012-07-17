@@ -144,7 +144,7 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 		if (jar != null) {
 			JobConf conf = (JobConf) job.getConfiguration();
 			conf.setJar(jar.getURI().toString());
-			loader = ClassLoadingUtils.createParentLastClassLoader(jar, beanClassLoader, cfg);
+			loader = ExecutionUtils.createParentLastClassLoader(jar, beanClassLoader, cfg);
 			conf.setClassLoader(loader);
 		}
 		

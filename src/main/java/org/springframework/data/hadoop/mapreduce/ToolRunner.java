@@ -18,8 +18,6 @@ package org.springframework.data.hadoop.mapreduce;
 import org.apache.hadoop.util.Tool;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 
 /**
  * Wrapper around {@link org.apache.hadoop.util.ToolRunner} allowing for an easier configuration and execution
@@ -39,7 +37,7 @@ public class ToolRunner extends ToolExecutor implements FactoryBean<Integer>, In
 	@Override
 	public Integer getObject() throws Exception {
 		if (result == null) {
-			result = runTool();
+			result = runCode();
 		}
 		return result;
 	}
@@ -56,8 +54,7 @@ public class ToolRunner extends ToolExecutor implements FactoryBean<Integer>, In
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.isTrue(tool != null || StringUtils.hasText(toolClassName) || (jar != null && jar.exists()),
-				"a Tool instance or class name, or a Jar (with Main-Class) is required");
+		super.afterPropertiesSet();
 
 		if (runAtStartup) {
 			getObject();

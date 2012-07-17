@@ -30,7 +30,7 @@ public class ToolTasklet extends ToolExecutor implements Tasklet {
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		runTool();
+		runCode();
 		return RepeatStatus.FINISHED;
 	}
 }
