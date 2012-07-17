@@ -23,13 +23,15 @@
 	<hdp:tool-runner id="ref-start" tool-ref="test-tool" run-at-startup="true" user="costin"/>
 	
 	<hdp:tool-runner id="nested">
-		<bean class="org.springframework.data.hadoop.mapreduce.ToolTests$TestTool">
-			<constructor-arg ref="hadoopConfiguration" />
-		</bean>
 		<hdp:arg value="--local"/>
 		<hdp:arg value="data/in.txt"/>
 		<hdp:arg value="data/out.txt"/>
 		cookies=for santa
+		
+		<bean class="org.springframework.data.hadoop.mapreduce.ToolTests$TestTool">
+			<constructor-arg ref="hadoopConfiguration" />
+		</bean>
+		
 	</hdp:tool-runner>
 	
 	<job id="mainJob" xmlns="http://www.springframework.org/schema/batch">

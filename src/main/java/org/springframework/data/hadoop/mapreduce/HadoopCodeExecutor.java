@@ -65,7 +65,8 @@ abstract class HadoopCodeExecutor<T> extends JobGenericOptions implements Initia
 		Thread th = Thread.currentThread();
 		ClassLoader oldTccl = th.getContextClassLoader();
 
-		log.info("Invoking [" + target + "] " + (jar != null ? "from jar [" + jar.getURI() + "]" : "")
+		log.info("Invoking [" + (target != null ? target : type) + "] "
+				+ (jar != null ? "from jar [" + jar.getURI() + "]" : "")
 				+ " with args [" + Arrays.toString(arguments) + "]");
 
 		try {

@@ -47,8 +47,10 @@ abstract class ExecutionUtils {
 
 		private int exitCode;
 
-		public ExitTrapped(int statusCode) {
-			this.exitCode = statusCode;
+		ExitTrapped(String permissionName) {
+			// handle non-Sun JDKs 
+			int hasDot = permissionName.indexOf(".");
+			this.exitCode = Integer.valueOf((hasDot > 0 ? permissionName.substring(hasDot + 1) : permissionName.substring(7)));
 		}
 
 		public int getExitCode() {
@@ -63,8 +65,9 @@ abstract class ExecutionUtils {
 			
 			@Override
 			public void checkPermission(Permission permission) {
-				if (permission.getName().startsWith("exitVM")) {
-					throw new ExitTrapped(Integer.valueOf(permission.getName().substring(7)));
+				String name = permission.getName();
+				if (name.startsWith("exitVM")) {
+					throw new ExitTrapped(name);
 				}
 			}
 		};

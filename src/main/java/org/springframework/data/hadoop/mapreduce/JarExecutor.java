@@ -68,7 +68,7 @@ abstract class JarExecutor extends HadoopCodeExecutor<Object> {
 	protected Object invokeTargetObject(Configuration cfg, Object target, Class<Object> targetClass, String[] args)
 			throws Exception {
 		Method main = ReflectionUtils.findMethod(targetClass, "main", String[].class);
-		return ReflectionUtils.invokeMethod(main, null, (Object[]) args);
+		return ReflectionUtils.invokeMethod(main, null, new Object[] { args });
 	}
 
 	// inject the config
@@ -77,9 +77,11 @@ abstract class JarExecutor extends HadoopCodeExecutor<Object> {
 		// generate a name
 		configName = "Custom-cfg-for- " + jar + "-" + UUID.randomUUID();
 		try {
-			savedConfiguration = File.createTempFile("SHDP-jar-cfg", null);
+			savedConfiguration = File.createTempFile("SHDP-jar-cfg-", null);
 			cfg.writeXml(new FileOutputStream(savedConfiguration));
-			Configuration.addDefaultResource(configName);
+			// don't use addDefaultResource because it has side-effects
+			//Configuration.addDefaultResource(configName);
+			defaultResources().add(configName);
 		} catch (IOException ex) {
 			throw new IllegalArgumentException("Cannot set custom configuration", ex);
 		}
@@ -88,16 +90,20 @@ abstract class JarExecutor extends HadoopCodeExecutor<Object> {
 	// do configuration clean-up
 	@Override
 	protected void postExecution(Configuration cfg) {
-		// reflection hack to remove default resource
-		Field f = ReflectionUtils.findField(Configuration.class, "defaultResources");
-		ReflectionUtils.makeAccessible(f);
-		List<String> defaultResources = (List<String>) ReflectionUtils.getField(f, null);
-		defaultResources.remove(configName);
+		defaultResources().remove(configName);
 
 		// delete the file
 		savedConfiguration.delete();
 		savedConfiguration = null;
 		configName = null;
+	}
+
+	@SuppressWarnings("unchecked")
+	private List<String> defaultResources(){
+		// reflection hack to remove default resource
+		Field f = ReflectionUtils.findField(Configuration.class, "defaultResources");
+		ReflectionUtils.makeAccessible(f);
+		return (List<String>) ReflectionUtils.getField(f, null);
 	}
 
 	@Override
@@ -110,7 +116,7 @@ abstract class JarExecutor extends HadoopCodeExecutor<Object> {
 	 *
 	 * @param className the target class name
 	 */
-	public void setClassName(String className) {
+	public void setMainClass(String className) {
 		setTargetClassName(className);
 	}
 }

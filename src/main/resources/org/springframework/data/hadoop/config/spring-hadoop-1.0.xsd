@@ -582,11 +582,10 @@ Defines a Hadoop Streaming Job.
 	
 	<!-- common attributes shared by properties based configurations 
 		 NOT meant for extensibility - do NOT rely on this type as it might be removed in the future -->
-	<xsd:complexType name="toolRunnerType">
+	<xsd:complexType name="hadoopRunnerType">
 		<xsd:complexContent mixed="true">
 		<xsd:extension base="genericOptionsType">
 			<xsd:sequence>
-				<xsd:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="1"/>
 				<xsd:element name="arg" minOccurs="0" maxOccurs="unbounded">
 					<xsd:annotation>
 					<xsd:documentation><![CDATA[
@@ -603,6 +602,110 @@ Tool argument.]]></xsd:documentation>
 Bean id.]]></xsd:documentation>
 				</xsd:annotation>
 			</xsd:attribute>
+			<xsd:attribute name="configuration-ref" default="hadoopConfiguration">
+			<xsd:annotation>
+				<xsd:documentation source="java:org.apache.hadoop.conf.Configuration"><![CDATA[
+Reference to the Hadoop Configuration. Defaults to 'hadoopConfiguration'.]]></xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref">
+						<tool:expected-type type="org.apache.hadoop.conf.Configuration" />
+					</tool:annotation>
+				</xsd:appinfo>
+		 	</xsd:annotation>			
+			</xsd:attribute>
+		</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	
+	<!-- common attributes shared by properties based configurations 
+		 NOT meant for extensibility - do NOT rely on this type as it might be removed in the future -->
+	<xsd:complexType name="jarRunnerType">
+		<xsd:complexContent mixed="true">
+		<xsd:extension base="hadoopRunnerType">
+	       	<xsd:attribute name="jar" type="xsd:string" use="required">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+Indicates the jar (not required to be in the classpath).
+					]]></xsd:documentation>
+					<xsd:appinfo>
+						<tool:annotation>
+							<tool:expected-type type="org.springframework.core.io.Resource" />
+						</tool:annotation>
+					</xsd:appinfo>
+			 	</xsd:annotation>
+	       	</xsd:attribute>
+	       	<xsd:attribute name="main-class" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+Indicates the Jar entry/main class name. If not specified, the Main-Class (specified in the MANIFEST.MF), if present,
+is used instead.
+					]]></xsd:documentation>
+					<xsd:appinfo>
+						<tool:annotation kind="direct">
+							<tool:expected-type type="java.lang.Class" />
+						</tool:annotation>
+					</xsd:appinfo>
+			 	</xsd:annotation>
+	       	</xsd:attribute>
+		</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	
+	<xsd:element name="jar-runner">
+		<xsd:annotation>
+		   <xsd:documentation><![CDATA[
+Executes a Hadoop Jar.]]></xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+		<xsd:complexContent mixed="true">
+		<xsd:extension base="jarRunnerType">
+			<xsd:attribute name="run-at-startup" type="xsd:string" default="false">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+Whether the Jar runs at startup or not (default).
+					]]></xsd:documentation>
+	         	</xsd:annotation>
+	       	</xsd:attribute>
+		</xsd:extension>
+		</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="jar-tasklet">
+		<xsd:annotation>
+		   <xsd:documentation><![CDATA[
+Defines a Hadoop Jar Tasklet.]]></xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="jarRunnerType">
+					<xsd:attribute name="scope" type="xsd:string" use="optional" />
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	
+	
+	<!-- common attributes shared by properties based configurations 
+		 NOT meant for extensibility - do NOT rely on this type as it might be removed in the future -->
+	<xsd:complexType name="toolRunnerType">
+		<xsd:complexContent mixed="true">
+		<xsd:extension base="hadoopRunnerType">
+			<xsd:sequence>
+				<xsd:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="1"/>
+			</xsd:sequence>
+	       	<xsd:attribute name="jar" type="xsd:string" use="optional">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+Indicates the jar (not required to be in the classpath) providing the Tool (and its dependencies).
+					]]></xsd:documentation>
+					<xsd:appinfo>
+						<tool:annotation>
+							<tool:expected-type type="org.springframework.core.io.Resource" />
+						</tool:annotation>
+					</xsd:appinfo>
+			 	</xsd:annotation>
+	       	</xsd:attribute>
 	       	<xsd:attribute name="tool-class" type="xsd:string">
 				<xsd:annotation>
 					<xsd:documentation><![CDATA[
@@ -613,18 +716,6 @@ is used instead.
 					<xsd:appinfo>
 						<tool:annotation kind="direct">
 							<tool:expected-type type="java.lang.Class" />
-						</tool:annotation>
-					</xsd:appinfo>
-			 	</xsd:annotation>
-	       	</xsd:attribute>
-	       	<xsd:attribute name="jar" type="xsd:string">
-				<xsd:annotation>
-					<xsd:documentation><![CDATA[
-Indicates the jar (not required to be in the classpath) providing the Tool (and its dependencies).
-					]]></xsd:documentation>
-					<xsd:appinfo>
-						<tool:annotation>
-							<tool:expected-type type="org.springframework.core.io.Resource" />
 						</tool:annotation>
 					</xsd:appinfo>
 			 	</xsd:annotation>
@@ -640,17 +731,6 @@ Reference to a Hadoop Tool instance.]]></xsd:documentation>
 					</xsd:appinfo>
 		 	</xsd:annotation>
 		 	</xsd:attribute>
-			<xsd:attribute name="configuration-ref" default="hadoopConfiguration">
-			<xsd:annotation>
-				<xsd:documentation source="java:org.apache.hadoop.conf.Configuration"><![CDATA[
-Reference to the Hadoop Configuration. Defaults to 'hadoopConfiguration'.]]></xsd:documentation>
-				<xsd:appinfo>
-					<tool:annotation kind="ref">
-						<tool:expected-type type="org.apache.hadoop.conf.Configuration" />
-					</tool:annotation>
-				</xsd:appinfo>
-		 	</xsd:annotation>			
-			</xsd:attribute>
 		</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
@@ -688,7 +768,6 @@ Defines a Hadoop Tool Tasklet.]]></xsd:documentation>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-
 
 	<xsd:complexType name="entryType">
 		<xsd:attribute name="value" type="xsd:string" use="required"/>

@@ -35,6 +35,9 @@ class HadoopNamespaceHandler extends NamespaceHandlerSupport {
 		registerBeanDefinitionParser("tool-runner", new ToolRunnerParser());
 		registerBeanDefinitionParser("tool-tasklet", new ToolTaskletParser());
 
+		registerBeanDefinitionParser("jar-runner", new JarRunnerParser());
+		registerBeanDefinitionParser("jar-tasklet", new JarTaskletParser());
+
 		registerBeanDefinitionParser("script", new ScriptParser());
 		registerBeanDefinitionParser("script-tasklet", new ScriptTaskletParser());
 
