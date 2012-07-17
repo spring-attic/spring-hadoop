@@ -32,7 +32,7 @@ abstract class ToolExecutor extends HadoopCodeExecutor<Tool> {
 	}
 
 	protected Class<Tool> loadClass(String className, ClassLoader cl) {
-		Class<Tool> clazz = super.loadClass(targetClassName, cl);
+		Class<Tool> clazz = super.loadClass(className, cl);
 		Assert.isAssignable(Tool.class, clazz, "Class [" + clazz + "] is not a Tool instance.");
 		return clazz;
 	}

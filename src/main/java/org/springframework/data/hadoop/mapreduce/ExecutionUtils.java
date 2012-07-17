@@ -20,6 +20,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
+import java.security.Permission;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.jar.JarEntry;
@@ -57,18 +58,20 @@ abstract class ExecutionUtils {
 
 	private static SecurityManager oldSM = null;
 
-	static void forbidSystemExitCall() {
+	static void disableSystemExitCall() {
 		final SecurityManager securityManager = new SecurityManager() {
+			
 			@Override
-			public void checkExit(int status) {
-				throw new ExitTrapped(status);
+			public void checkPermission(Permission permission) {
+				if (permission.getName().startsWith("exitVM")) {
+					throw new ExitTrapped(Integer.valueOf(permission.getName().substring(7)));
+				}
 			}
 		};
 
 		oldSM = System.getSecurityManager();
 		System.setSecurityManager(securityManager);
 	}
-
 
 	static void enableSystemExitCall() {
 		System.setSecurityManager(oldSM);

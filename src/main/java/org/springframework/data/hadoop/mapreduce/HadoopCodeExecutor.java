@@ -65,12 +65,12 @@ abstract class HadoopCodeExecutor<T> extends JobGenericOptions implements Initia
 		Thread th = Thread.currentThread();
 		ClassLoader oldTccl = th.getContextClassLoader();
 
-		log.info("Invoking object [" + target + "] " + (jar != null ? " from jar " + jar.getURI() : "") + " with args "
-				+ Arrays.toString(arguments));
+		log.info("Invoking [" + target + "] " + (jar != null ? "from jar [" + jar.getURI() + "]" : "")
+				+ " with args [" + Arrays.toString(arguments) + "]");
 
 		try {
-			th.setContextClassLoader(configuration.getClassLoader());
-			ExecutionUtils.forbidSystemExitCall();
+			th.setContextClassLoader(cfg.getClassLoader());
+			ExecutionUtils.disableSystemExitCall();
 
 			if (StringUtils.hasText(user)) {
 				UserGroupInformation ugi = UserGroupInformation.createProxyUser(user,
@@ -87,7 +87,6 @@ abstract class HadoopCodeExecutor<T> extends JobGenericOptions implements Initia
 				return invokeTarget(cfg, target, type, arguments);
 			}
 		} finally {
-			// Unlikely we ever want to enable this but alas...
 			ExecutionUtils.enableSystemExitCall();
 			th.setContextClassLoader(oldTccl);
 		}
@@ -140,7 +139,7 @@ abstract class HadoopCodeExecutor<T> extends JobGenericOptions implements Initia
 	}
 
 	protected ClassLoader createClassLoaderForJar(Resource jar, ClassLoader parentCL, Configuration cfg) {
-		return ExecutionUtils.createParentLastClassLoader(jar, beanClassLoader, cfg);
+		return ExecutionUtils.createParentLastClassLoader(jar, parentCL, cfg);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -149,6 +148,7 @@ abstract class HadoopCodeExecutor<T> extends JobGenericOptions implements Initia
 	}
 
 	private Integer invokeTarget(Configuration cfg, T target, Class<T> targetClass, String[] args) throws Exception {
+		preExecution(cfg);
 		try {
 			Object result = invokeTargetObject(cfg, target, targetClass, args);
 			if (result instanceof Integer) {
@@ -159,7 +159,17 @@ abstract class HadoopCodeExecutor<T> extends JobGenericOptions implements Initia
 		} catch (ExitTrapped trap) {
 			log.debug("Code exited");
 			return trap.getExitCode();
+		} finally {
+			postExecution(cfg);
 		}
+	}
+
+	protected void preExecution(Configuration cfg) {
+		// no-op
+	}
+
+	protected void postExecution(Configuration cfg) {
+		// no-op
 	}
 
 	protected abstract Object invokeTargetObject(Configuration cfg, T target, Class<T> targetClass, String[] args)
