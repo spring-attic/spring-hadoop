@@ -71,9 +71,9 @@ dependencies {
     compile("org.apache.pig:pig:$pigVersion", optional)
     
     // HBase
-    compile("org.apache.hbase:hbase:$hbaseVersion") {
+    compile("org.apache.hbase:hbase:$hbaseVersion") { dep ->
+        optional dep
         exclude module: "thrift"
-        ext.optional = true
     }
 
     // Libs dependencies (specified to cope with incompatibilities between them)
