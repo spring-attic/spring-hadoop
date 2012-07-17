@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:hdp="http://www.springframework.org/schema/hadoop"
+	xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+		http://www.springframework.org/schema/batch	http://www.springframework.org/schema/batch/spring-batch-2.1.xsd">
+
+	<import resource="../hadoop-ctx.xml"/>
+	<import resource="../batch-common.xml"/>
+
+	<hdp:jar-runner id="bad-main-class" jar="some-jar.jar" files="some-jar.jar" run-at-startup="true">
+		<hdp:arg value="bad"/>
+		web=war
+	</hdp:jar-runner>
+	
+	<hdp:jar-runner id="other-class" jar="some-jar.jar" main-class="test.OtherMainClass" files="some-jar.jar" run-at-startup="true">
+		<hdp:arg value="42"/>
+		land=buckethead
+	</hdp:jar-runner>
+
+	<job id="mainJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="ns">
+			<tasklet ref="tasklet-ns"/>
+		</step>
+	</job>
+	
+	<hdp:jar-tasklet id="tasklet-ns" scope="prototype" files="some-tool.jar" jar="some-jar.jar"/>
+</beans>
