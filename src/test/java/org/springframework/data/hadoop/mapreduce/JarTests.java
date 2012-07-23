@@ -27,6 +27,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.data.hadoop.TestUtils;
 import org.springframework.data.hadoop.batch.JobsTrigger;
 import org.springframework.data.hadoop.mapreduce.ExecutionUtils.ExitTrapped;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.ClassUtils;
@@ -38,6 +40,7 @@ import static org.junit.Assert.*;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration
+@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 public class JarTests {
 
 	{
@@ -66,19 +69,18 @@ public class JarTests {
 	}
 
 	@Test
-	public void testClassVisibility() throws Exception {
-		ClassLoader loader = ctx.getClassLoader();
-		assertFalse(ClassUtils.isPresent("test.MainClass", loader));
-		assertFalse(ClassUtils.isPresent("test.OtherMainClass", loader));
+	public void testTasklet() throws Exception {
+		JobsTrigger.startJobs(ctx);
+	}
+
+	@Test
+	public void testTaskletScope() throws Exception {
+		assertTrue(ctx.isPrototype("tasklet-ns"));
 	}
 
 	@Test
 	public void testBadMainClassLoaded() throws Exception {
 		assertNotNull(System.getProperties().getProperty("org.springframework.data.jar.init"));
-	}
-
-	public void testBadMainClassReturnCode() throws Exception {
-		assertEquals(Integer.valueOf(1), ctx.getBean("bad-main-class"));
 	}
 
 	@Test
@@ -104,6 +106,19 @@ public class JarTests {
 		assertNull(freshConfig.get("land"));
 	}
 
+
+	@Test
+	public void testClassVisibility() throws Exception {
+		ClassLoader loader = ctx.getClassLoader();
+		assertFalse(ClassUtils.isPresent("test.MainClass", loader));
+		assertFalse(ClassUtils.isPresent("test.OtherMainClass", loader));
+	}
+
+
+	public void testBadMainClassReturnCode() throws Exception {
+		assertEquals(Integer.valueOf(1), ctx.getBean("bad-main-class"));
+	}
+
 	@Test
 	public void testBadMainClassArgs() throws Exception {
 		String args[] = (String[]) System.getProperties().get("org.springframework.data.hadoop.jar.args");
@@ -123,16 +138,6 @@ public class JarTests {
 		assertNotNull(trap);
 		assertEquals(ExitTrapped.class, trap.getClass());
 		assertEquals(1, ((ExitTrapped) trap).getExitCode());
-	}
-
-	@Test
-	public void testTaskletScope() throws Exception {
-		assertTrue(ctx.isPrototype("tasklet-ns"));
-	}
-
-	@Test
-	public void testTasklet() throws Exception {
-		JobsTrigger.startJobs(ctx);
 	}
 
 	@Test

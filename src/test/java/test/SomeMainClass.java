@@ -15,7 +15,6 @@
  */
 package test;
 
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
@@ -37,7 +36,6 @@ public class SomeMainClass {
 
 		System.out.println("*** New Config is ***" + dumpConfiguration(cfg).toString());
 		System.getProperties().put("org.springframework.data.hadoop.jar.cfg", cfg);
-		System.out.println("*** Received args ***" + Arrays.toString(args));
 		System.getProperties().put("org.springframework.data.hadoop.jar.args", args);
 		System.setProperty("org.springframework.data.jar.exit.pre", "true");
 		try {
@@ -48,7 +46,9 @@ public class SomeMainClass {
 	}
 
 	private static String dumpConfiguration(Configuration configuration) {
-		StringBuilder sb = new StringBuilder(configuration.toString());
+		StringBuilder sb = new StringBuilder("Config@" + configuration.hashCode());
+		sb.append("\n");
+		sb.append(configuration.toString());
 		sb.append("\n");
 
 		Properties props = new Properties();
