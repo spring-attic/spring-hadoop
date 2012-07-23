@@ -57,7 +57,9 @@ public class JarTests {
 
 		while (props.hasMoreElements()) {
 			Object key = props.nextElement();
-			if (!properties.get(key).getClass().equals(String.class)) {
+			Object value = properties.get(key);
+			if (!value.getClass().equals(String.class)) {
+				System.out.println("Removing incorrect key [" + key + "] w/ value " + value);
 				properties.remove(key);
 			}
 		}

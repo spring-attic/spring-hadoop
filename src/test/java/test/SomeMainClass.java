@@ -15,6 +15,9 @@
  */
 package test;
 
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Properties;
 import java.util.UUID;
 
 import org.apache.hadoop.conf.Configuration;
@@ -31,7 +34,10 @@ public class SomeMainClass {
 	public static void main(String[] args) throws Exception {
 		Configuration cfg = new Configuration();
 		cfg.size();
+
+		System.out.println("*** New Config is ***" + dumpConfiguration(cfg).toString());
 		System.getProperties().put("org.springframework.data.hadoop.jar.cfg", cfg);
+		System.out.println("*** Received args ***" + Arrays.toString(args));
 		System.getProperties().put("org.springframework.data.hadoop.jar.args", args);
 		System.setProperty("org.springframework.data.jar.exit.pre", "true");
 		try {
@@ -39,5 +45,19 @@ public class SomeMainClass {
 		} catch (Throwable th) {
 			System.getProperties().put("org.springframework.data.jar.exit.exception", th);
 		}
+	}
+
+	private static String dumpConfiguration(Configuration configuration) {
+		StringBuilder sb = new StringBuilder(configuration.toString());
+		sb.append("\n");
+
+		Properties props = new Properties();
+		if (configuration != null) {
+			for (Map.Entry<String, String> entry : configuration) {
+				props.setProperty(entry.getKey(), entry.getValue());
+			}
+		}
+
+		return sb.append(props.toString()).toString();
 	}
 }
