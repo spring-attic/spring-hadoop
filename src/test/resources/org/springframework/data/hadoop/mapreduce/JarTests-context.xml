@@ -23,10 +23,24 @@
 	</hdp:jar-runner>
 
 	<job id="mainJob" xmlns="http://www.springframework.org/schema/batch">
-		<step id="ns">
+		<step id="cleanup" next="wordcount">
+			<tasklet ref="script-tasklet"/>
+		</step>
+		<step id="wordcount">
 			<tasklet ref="tasklet-ns"/>
 		</step>
 	</job>
 	
-	<hdp:jar-tasklet id="tasklet-ns" scope="prototype" files="some-tool.jar" jar="some-jar.jar"/>
+	<hdp:jar-tasklet id="tasklet-ns" scope="prototype" jar="mini-hadoop-examples.jar">
+		<hdp:arg value="wordcount"/>
+		<hdp:arg value="/ide-test/input/word"/>
+		<hdp:arg value="/ide-test/output/wc"/>
+	</hdp:jar-tasklet>
+	
+	<hdp:script-tasklet id="script-tasklet">
+		<hdp:script language="javascript">
+if (fsh.test("/ide-test/output/wc")) fsh.rmr("/ide-test/output/wc")
+		</hdp:script>
+	</hdp:script-tasklet>
+	
 </beans>

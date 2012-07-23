@@ -10,7 +10,6 @@
 
 
 	<context:property-placeholder location="test.properties"/>
-
 	<!-- 
 	<bean id="chainedResourceLoader" class="org.springframework.data.hadoop.fs.ChainedResourceLoader">
 		<property name="loaders">

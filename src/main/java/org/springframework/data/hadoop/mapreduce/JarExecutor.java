@@ -108,7 +108,7 @@ abstract class JarExecutor extends HadoopCodeExecutor<Object> {
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.isTrue(jar != null && jar.exists(), "the target jar is required");
+		Assert.isTrue(jar != null && jar.exists(), "jar location [" + jar + "] not found");
 	}
 
 	/**

@@ -91,6 +91,7 @@ public class JarTests {
 
 		// check inherited props
 		assertEquals("main", hadoopConfiguration.get("cfg"));
+
 		assertEquals("main", cfg.get("cfg"));
 		// check nested props
 		assertEquals("war", cfg.get("web"));

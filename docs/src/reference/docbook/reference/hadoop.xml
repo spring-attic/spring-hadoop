@@ -416,6 +416,73 @@ hadoop jar job10.jar ...]]></programlisting>
 		<programlisting language="xml"><![CDATA[<hdp:tool-tasklet id="tool-tasklet" tool-ref="some-tool" />]]></programlisting>
 	</section>
 	
+	<section id="hadoop:jar-runner">
+		<title>Running a Hadoop Jar</title>
+	
+		<para>SHDP also provides support for executing vanilla Hadoop jars. Thus the famous 
+		<ulink url="http://hadoop.apache.org/common/docs/r1.0.3/mapred_tutorial.html#Example%3A+WordCount+v1.0">WordCount</ulink> example:</para>
+		
+		<programlisting><![CDATA[bin/hadoop jar hadoop-examples.jar wordcount /wordcount/input /wordcount/output]]></programlisting>
+		
+		<para>becomes</para>
+		
+		<programlisting language="xml"><![CDATA[<hdp:jar-runner id="wordcount" jar="hadoop-examples.jar">
+    <hdp:arg value="wordcount"/>
+    <hdp:arg value="/wordcount/input"/>
+    <hdp:arg value="/wordcount/output"/>
+</hdp:jar-tasklet>]]></programlisting>
+
+		<note>Just like the <literal>hadoop jar</literal> command, by default the jar support reads the jar's <literal>Main-Class</literal> if none is specified. This can be customized through the <literal>main-class</literal> attribute.</note>
+		
+		
+		<para>The <literal>jar support</literal> provides a nice and easy migration path from jar invocations from the command-line to SHDP (note that Hadoop <link linkend="hadoop:generic-options">generic options</link>
+		are also supported). Especially since SHDP enables Hadoop <literal>Configuration</literal> objects created during the jar execution, to automatically inherit the context Hadoop configuration. In fact, just
+		like other SHDP elements, the <literal>jar</literal> element allows <link linkend="hadoop:config:properties">configurations properties</link> to be declared locally, just for the jar run. So for example,
+		if one would use the following declaration:</para>
+		
+		<programlisting language="xml"><![CDATA[<hdp:jar-runner id="wordcount" jar="hadoop-examples.jar">
+    <hdp:arg value="wordcount"/>
+    ...
+    speed=fast
+</hdp:jar-tasklet>]]></programlisting>
+
+		<para>inside the jar code, one could do the following:</para>
+		
+	<programlisting language="java"><![CDATA[assert "fast".equals(new Configuration().get("speed"));]]></programlisting>
+	
+	<para>This enabled basic Hadoop jars to use, without changes, the enclosing application Hadoop configuration.</para>
+	
+	<para>And while we think it is a useful feature (that is why we added it in the first place), we strongly recommend using the tool support instead or migrate to it; there are several reasons for this mainly because there
+	are <emphasis>no contracts</emphasis> to use, leading to very poor embeddability caused by:
+	
+	<itemizedlist>
+		<listitem>
+			<para>No standard <literal>Configuration</literal> injection</para>
+			<para>While SHDP does a best effort to pass the Hadoop configuration to the jar, there is no guarantee the jar itself does not use a special initialization mechanism, ignoring the passed properties.
+			After all, a vanilla <literal>Configuration</literal> is not very useful so applications tend to provide custom code to address this.</para>
+		</listitem>
+		<listitem>
+			<para><literal>System.exit()</literal> calls</para>
+			<para>Most jar examples out there (including <literal>WordCount</literal>) assume they are started from the command line and among other things, call <literal>System.exit</literal>, to shut down the JVM,
+			whether the code is succesful or not. SHDP prevents this from happening (otherwise the entire application context would shutdown abruptly) but it is a clear sign of poor
+			code collaboration.</para>
+		</listitem>
+	</itemizedlist>
+
+	SHDP tries to use sensible defaults to provide the best integration experience possible but at the end of the day, without any contract in place, there are no guarantees. Hence why using the <literal>Tool</literal>
+	interface, is a much better alternative.
+	</para>		
+	</section>
+	
+	<section id="hadoop:jar-tasklet">
+		<title>Using the Hadoop Jar tasklet</title>
+
+		<para>Like for the rest of its tasks, for Spring Batch environments, SHDP provides a dedicated tasklet to execute Hadoop jars as a step in a Spring Batch workflow. 
+		The tasklet element supports the same configuration options as <link linkend="hadoop:jar-runner">jar-runner</link> except for <literal>run-at-startup</literal> (which does not apply for a workflow):</para>
+		
+		<programlisting language="xml"><![CDATA[<hdp:jar-tasklet id="jar-tasklet" jar="some-jar.jar" />]]></programlisting>
+	</section>
+	
 	<section id="hadoop:generic-options">
 	 <title>Map Reduce Generic Options</title>
 	 
