@@ -18,13 +18,17 @@ package org.springframework.data.hadoop;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.filecache.TrackerDistributedCacheManager;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.mapreduce.JobSubmissionFiles;
 import org.springframework.core.io.Resource;
 import org.springframework.data.hadoop.fs.HdfsResourceLoader;
+import org.springframework.util.ReflectionUtils;
 
 /**
  * @author Costin Leau
@@ -35,8 +39,14 @@ public class TestUtils {
 		// do the assignment only on Windows systems
 		if (System.getProperty("os.name").startsWith("Windows")) {
 			// 0655 = -rwxr-xr-x
-			JobSubmissionFiles.JOB_DIR_PERMISSION.fromShort((short) 0655);
-			JobSubmissionFiles.JOB_FILE_PERMISSION.fromShort((short) 0655);
+			JobSubmissionFiles.JOB_DIR_PERMISSION.fromShort((short) 0650);
+			JobSubmissionFiles.JOB_FILE_PERMISSION.fromShort((short) 0650);
+
+			// handle jar permissions as well 
+			Field field = ReflectionUtils.findField(TrackerDistributedCacheManager.class, "PUBLIC_CACHE_OBJECT_PERM");
+			ReflectionUtils.makeAccessible(field);
+			FsPermission perm = (FsPermission) ReflectionUtils.getField(field, null);
+			perm.fromShort((short) 0650);
 		}
 	}
 
