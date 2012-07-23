@@ -207,7 +207,7 @@ javadoc {
      links = [
         "http://static.springframework.org/spring/docs/3.0.x/javadoc-api",
         "http://download.oracle.com/javase/6/docs/api",
-        "http://logging.apache.org/log4j/docs/api/",
+        "http://logging.apache.org/log4j/1.2/apidocs/",
         "http://hadoop.apache.org/common/docs/current/api/",
         "http://hbase.apache.org/apidocs/",
         "http://pig.apache.org/docs/r0.9.2/api/",
@@ -216,7 +216,7 @@ javadoc {
         "http://static.springsource.org/spring-integration/api/",
         "https://builds.apache.org/job/Thrift/javadoc/",
         "http://jakarta.apache.org/commons/logging/apidocs/",
-        "http://www.cascading.org/1.2/javadoc/"
+        "http://docs.cascading.org/cascading/2.0/javadoc/"
      ]
      
      exclude "org/springframework/data/hadoop/config/**"
