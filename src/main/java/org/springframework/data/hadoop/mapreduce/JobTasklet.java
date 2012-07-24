@@ -107,7 +107,7 @@ public class JobTasklet implements InitializingBean, Tasklet, BeanFactoryAware {
 	/**
 	 * Indicates whether the job execution is verbose (the default) or not.
 	 * 
-	 * @param verbosity whether the job execution is verbose or not.
+	 * @param verbose whether the job execution is verbose or not.
 	 */
 	public void setVerbose(boolean verbose) {
 		this.verbose = verbose;
