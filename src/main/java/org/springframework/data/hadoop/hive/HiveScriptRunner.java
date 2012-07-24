@@ -18,6 +18,7 @@ package org.springframework.data.hadoop.hive;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.hadoop.hive.service.HiveClient;
@@ -34,7 +35,7 @@ import org.springframework.util.StringUtils;
  * 
  * @author Costin Leau
  */
-abstract class HiveScriptRunner {
+public abstract class HiveScriptRunner {
 
 
 	/**
@@ -42,32 +43,58 @@ abstract class HiveScriptRunner {
 	 *
 	 * @param hive Hive client
 	 * @param scripts scripts to execute
+	 * @return the scripts results
 	 * @throws Exception
 	 */
-	public static void run(HiveClient hive, Iterable<Resource> scripts) throws Exception {
-		run(hive, scripts, "UTF-8");
+	public static List<List<String>> run(HiveClient hive, Iterable<Resource> scripts) throws Exception {
+		return run(hive, scripts, "UTF-8");
 	}
 
 	/**
 	 * Runs (or executes) all the given scripts using the specified encoding.
 	 * 
 	 * @param scripts
+	 * @return the scripts results
 	 * @throws Exception
 	 */
-	public static void run(HiveClient hive, Iterable<Resource> scripts, String encoding) throws Exception {
+	public static List<List<String>> run(HiveClient hive, Iterable<Resource> scripts, String encoding) throws Exception {
 		Assert.notNull(hive, "a valid Hive instance is required");
+		List<List<String>> results = new ArrayList<List<String>>();
 		if (scripts != null) {
 			for (Resource resource : scripts) {
-				runScript(hive, resource, encoding);
+				results.add(runScript(hive, resource, encoding));
 			}
 		}
+		return results;
 	}
 
-	private static void runScript(HiveClient hive, Resource resource, String encoding) throws Exception {
-		InputStream stream = resource.getInputStream();
+	/**
+	 * Runs (or executes) the given script (using "UTF-8" as the script encoding).
+	 * 
+	 * @param hive hive client
+	 * @param script script to run 
+	 * @return the script results
+	 * @throws Exception
+	 */
+	public static List<String> run(HiveClient hive, Resource script) throws Exception {
+		return runScript(hive, script, "UTF-8");
+	}
+
+	/**
+	 * Runs (or executes) the given script (using "UTF-8" as the script encoding).
+	 * 
+	 * @param hive hive client
+	 * @param script script to run
+	 * @param encoding script encoding
+	 * @return the script results
+	 * @throws Exception
+	 */
+	public static List<String> runScript(HiveClient hive, Resource script, String encoding) throws Exception {
+		InputStream stream = script.getInputStream();
 		BufferedReader reader = new BufferedReader((StringUtils.hasText(encoding) ? 
 				new InputStreamReader(stream, encoding) : new InputStreamReader(stream)));
 
+		List<String> results = new ArrayList<String>();
 		String line = null;
 		try {
 			String command = "";
@@ -90,7 +117,7 @@ abstract class HiveScriptRunner {
 							command = token;
 						}
 
-						runCommand(hive, command);
+						results.addAll(runCommand(hive, command));
 						command = "";
 					}
 				}
@@ -104,14 +131,12 @@ abstract class HiveScriptRunner {
 		} finally {
 			IOUtils.closeStream(reader);
 		}
+		
+		return results;
 	}
 
-	private static void runCommand(HiveClient hive, String command) throws HiveServerException, TException {
-		int batchSize = 80;
+	private static List<String> runCommand(HiveClient hive, String command) throws HiveServerException, TException {
 		hive.execute(command);
-		List<String> results;
-		do {
-			results = hive.fetchN(batchSize);
-		} while (results.size() == batchSize);
+		return hive.fetchAll();
 	}
 }
