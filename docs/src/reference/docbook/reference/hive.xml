@@ -16,7 +16,7 @@
 <hdp:hive-server host="some-other-host" port="10001" />]]></programlisting>
 		
 		<para>If needed the Hadoop configuration can be passed in or additional properties specified. In fact <literal>hiver-server</literal> provides the same properties configuration <literal>knobs</literal> 
-		as <link linkend="hadoop:config:properties">hadoop configuration</link>:</para>:
+		as <link linkend="hadoop:config:properties">hadoop configuration</link>:</para>
 
 	    <programlisting language="xml"><![CDATA[<hdp:hive-server host="some-other-host" port="10001" properties-location="classpath:hive-dev.properties" configuration-ref="hadoopConfiguration">
   someproperty=somevalue
