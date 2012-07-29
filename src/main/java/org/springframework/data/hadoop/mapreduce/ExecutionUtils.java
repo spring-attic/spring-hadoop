@@ -23,15 +23,19 @@ import java.net.URL;
 import java.security.Permission;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.IOUtils;
 import org.springframework.core.io.Resource;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
+
 
 /**
  * Code execution utilities.
@@ -42,6 +46,8 @@ import org.springframework.util.StringUtils;
 // NOTE: jars with nested /classes/ are supported as well but this functionality is disabled
 // as it seems to have not been used in hadoop.
 abstract class ExecutionUtils {
+
+	private static final Log log = LogFactory.getLog(ExecutionUtils.class);
 
 	static class ExitTrapped extends Error {
 
@@ -210,6 +216,26 @@ abstract class ExecutionUtils {
 			return null;
 		} finally {
 			IOUtils.closeStream(jis);
+		}
+	}
+
+	/**
+	 * Leak-preventing method analyzing the threads started by the JVM which hold a reference
+	 * to a classloader that should be reclaimed. 
+	 * 
+	 * @param leakedClassLoader
+	 * @param replacementClassLoader
+	 */
+	static void replaceLeakedClassLoader(ClassLoader leakedClassLoader, ClassLoader replacementClassLoader) {
+		Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
+
+		for (Thread thread : threadSet) {
+			ClassLoader cl = thread.getContextClassLoader();
+			// do identity check to prevent expensive (and potentially dangerous) equals()
+			if (leakedClassLoader == cl) {
+				log.warn("Trying to patch leaked cl [" + leakedClassLoader + "] in thread " + thread);
+				thread.setContextClassLoader(replacementClassLoader);
+			}
 		}
 	}
 }
