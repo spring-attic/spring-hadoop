@@ -46,6 +46,11 @@ abstract class HadoopCodeExecutor<T> extends JobGenericOptions implements Initia
 	Resource jar;
 	private ClassLoader beanClassLoader;
 
+	// do the JRE leak prevention, once per class-loader
+	static {
+		ExecutionUtils.preventJreTcclLeaks();
+	}
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.isTrue(target != null || StringUtils.hasText(targetClassName) || (jar != null && jar.exists()),

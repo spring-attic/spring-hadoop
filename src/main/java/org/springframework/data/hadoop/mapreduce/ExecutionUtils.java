@@ -19,10 +19,15 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.security.Permission;
+import java.sql.DriverManager;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
@@ -34,6 +39,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.IOUtils;
 import org.springframework.core.io.Resource;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
 
@@ -64,11 +70,32 @@ abstract class ExecutionUtils {
 		}
 	}
 
+	private static Field CLASS_CACHE;
+	private static Method UTILS_CONSTRUCTOR_CACHE;
+
+	static {
+		CLASS_CACHE = ReflectionUtils.findField(Configuration.class, "CACHE_CLASS");
+		if (CLASS_CACHE != null) {
+			ReflectionUtils.makeAccessible(CLASS_CACHE);
+		}
+
+		UTILS_CONSTRUCTOR_CACHE = ReflectionUtils.findMethod(org.apache.hadoop.util.ReflectionUtils.class, "clearCache");
+		ReflectionUtils.makeAccessible(UTILS_CONSTRUCTOR_CACHE);
+	}
+
+	private static final Set<String> JVM_THREAD_NAMES = new HashSet<String>();
+
+	static {
+		JVM_THREAD_NAMES.add("system");
+		JVM_THREAD_NAMES.add("RMI Runtime");
+	}
+
+
 	private static SecurityManager oldSM = null;
 
 	static void disableSystemExitCall() {
 		final SecurityManager securityManager = new SecurityManager() {
-			
+
 			@Override
 			public void checkPermission(Permission permission) {
 				String name = permission.getName();
@@ -220,6 +247,37 @@ abstract class ExecutionUtils {
 	}
 
 	/**
+	 * Utility method used before invoking custom code for preventing custom classloader, set as the Thread
+	 * context class-loader, to leak (typically through JDK classes).
+	 */
+	static void preventJreTcclLeaks() {
+		// get the root CL to be used instead
+		ClassLoader sysLoader = ClassLoader.getSystemClassLoader();
+
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		try {
+			// set the sysCL as the TCCL
+			Thread.currentThread().setContextClassLoader(sysLoader);
+
+			//
+			// Handle security
+			//
+
+			// Policy holds the TCCL as static
+			ClassUtils.resolveClassName("javax.security.auth.Policy", sysLoader);
+			// Configuration holds the TCCL as static
+			ClassUtils.resolveClassName("javax.security.auth.login.Configuration", sysLoader);
+			java.security.Security.getProviders();
+
+			// load the JDBC drivers (used by Hive and co)
+			DriverManager.getDrivers();
+
+		} finally {
+			Thread.currentThread().setContextClassLoader(cl);
+		}
+	}
+
+	/**
 	 * Leak-preventing method analyzing the threads started by the JVM which hold a reference
 	 * to a classloader that should be reclaimed. 
 	 * 
@@ -227,15 +285,79 @@ abstract class ExecutionUtils {
 	 * @param replacementClassLoader
 	 */
 	static void replaceLeakedClassLoader(ClassLoader leakedClassLoader, ClassLoader replacementClassLoader) {
-		Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
+		replaceTccl(leakedClassLoader, replacementClassLoader);
 
-		for (Thread thread : threadSet) {
-			ClassLoader cl = thread.getContextClassLoader();
-			// do identity check to prevent expensive (and potentially dangerous) equals()
-			if (leakedClassLoader == cl) {
-				log.warn("Trying to patch leaked cl [" + leakedClassLoader + "] in thread " + thread);
-				thread.setContextClassLoader(replacementClassLoader);
+		fixHadoopReflectionUtilsLeak(leakedClassLoader);
+		fixHadoopConfigurationLeak();
+	}
+
+	private static void fixHadoopReflectionUtilsLeak(ClassLoader leakedClassLoader) {
+		// replace Configuration#CLASS_CACHE in Hadoop 2.0 which prevents CL from being recycled
+		// this is a best-effort really as the leak can occur again - see HADOOP-8632
+
+		// only available on Hadoop-2.0
+		if (CLASS_CACHE == null) {
+			return;
+		}
+
+		Map<?, ?> cache = (Map<?, ?>) ReflectionUtils.getField(CLASS_CACHE, null);
+		cache.remove(leakedClassLoader);
+	}
+
+	private static void fixHadoopConfigurationLeak() {
+		// org.apache.hadoop.util.ReflectionUtils.clearCache();
+		ReflectionUtils.invokeMethod(UTILS_CONSTRUCTOR_CACHE, null);
+	}
+
+
+	private static void replaceTccl(ClassLoader leakedClassLoader, ClassLoader replacementClassLoader) {
+		for (Thread thread : threads()) {
+			if (thread != null) {
+				ClassLoader cl = thread.getContextClassLoader();
+				// do identity check to prevent expensive (and potentially dangerous) equals()
+				if (leakedClassLoader == cl) {
+					log.warn("Trying to patch leaked cl [" + leakedClassLoader + "] in thread " + thread);
+					ThreadGroup tg = thread.getThreadGroup();
+					// it's a JVM thread so use the System ClassLoader always
+					if (tg != null && JVM_THREAD_NAMES.contains(tg.getName())) {
+						thread.setContextClassLoader(ClassLoader.getSystemClassLoader());
+					}
+					else {
+						thread.setContextClassLoader(replacementClassLoader);
+					}
+				}
 			}
 		}
+	}
+
+	/**
+	 * Returns the threads running inside the current JVM.
+	 * 
+	 * @return running threads
+	 */
+	static Thread[] threads() {
+		// Could have used the code below but it tends to be somewhat ineffective and slow 
+		// Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
+
+		// Get the current thread group 
+		ThreadGroup tg = Thread.currentThread().getThreadGroup();
+		// Find the root thread group
+		while (tg.getParent() != null) {
+			tg = tg.getParent();
+		}
+
+		int threadCountGuess = tg.activeCount() + 50;
+		Thread[] threads = new Thread[threadCountGuess];
+		int threadCountActual = tg.enumerate(threads);
+		// Make sure we don't miss any threads
+		while (threadCountActual == threadCountGuess) {
+			threadCountGuess *= 2;
+			threads = new Thread[threadCountGuess];
+			// Note tg.enumerate(Thread[]) silently ignores any threads that
+			// can't fit into the array 
+			threadCountActual = tg.enumerate(threads);
+		}
+
+		return threads;
 	}
 }
