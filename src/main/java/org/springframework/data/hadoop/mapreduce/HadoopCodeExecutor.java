@@ -97,7 +97,7 @@ abstract class HadoopCodeExecutor<T> extends JobGenericOptions implements Initia
 			th.setContextClassLoader(oldTccl);
 			ClassLoader execCL = cfg.getClassLoader();
 			if (execCL instanceof ParentLastURLClassLoader){
-				ExecutionUtils.replaceLeakedClassLoader(execCL, oldTccl);
+				ExecutionUtils.patchLeakedClassLoader(execCL, oldTccl);
 			}
 		}
 	}

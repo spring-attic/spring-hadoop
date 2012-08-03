@@ -33,6 +33,8 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
 
+import javax.imageio.ImageIO;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -271,6 +273,9 @@ abstract class ExecutionUtils {
 
 			// load the JDBC drivers (used by Hive and co)
 			DriverManager.getDrivers();
+			// Initialize
+			// sun.awt.AppContext.getAppContext()
+			ImageIO.getCacheDirectory();
 
 		} finally {
 			Thread.currentThread().setContextClassLoader(cl);
@@ -284,7 +289,7 @@ abstract class ExecutionUtils {
 	 * @param leakedClassLoader
 	 * @param replacementClassLoader
 	 */
-	static void replaceLeakedClassLoader(ClassLoader leakedClassLoader, ClassLoader replacementClassLoader) {
+	static void patchLeakedClassLoader(ClassLoader leakedClassLoader, ClassLoader replacementClassLoader) {
 		replaceTccl(leakedClassLoader, replacementClassLoader);
 
 		fixHadoopReflectionUtilsLeak(leakedClassLoader);
@@ -316,14 +321,21 @@ abstract class ExecutionUtils {
 				ClassLoader cl = thread.getContextClassLoader();
 				// do identity check to prevent expensive (and potentially dangerous) equals()
 				if (leakedClassLoader == cl) {
-					log.warn("Trying to patch leaked cl [" + leakedClassLoader + "] in thread " + thread);
+					log.warn("Trying to patch leaked cl [" + leakedClassLoader + "] in thread [" + thread + "]");
 					ThreadGroup tg = thread.getThreadGroup();
 					// it's a JVM thread so use the System ClassLoader always
+					boolean debug = log.isDebugEnabled();
 					if (tg != null && JVM_THREAD_NAMES.contains(tg.getName())) {
 						thread.setContextClassLoader(ClassLoader.getSystemClassLoader());
+						if (debug) {
+							log.debug("Replaced leaked cl in thread [" + thread + "] with system classloader");
+						}
 					}
 					else {
 						thread.setContextClassLoader(replacementClassLoader);
+						if (debug) {
+							log.debug("Replaced leaked cl in thread [" + thread + "] with " + replacementClassLoader);
+						}
 					}
 				}
 			}
