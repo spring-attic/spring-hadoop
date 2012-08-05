@@ -954,7 +954,7 @@ public class FsShell implements Closeable, DisposableBean {
 				FileSystem srcFs = getFS(srcPat);
 
 				for (Path src : FileUtil.stat2Paths(srcFs.globStatus(srcPat), srcPat)) {
-					Assert.isTrue(!srcFs.isFile(src), "Source must be a file");
+					Assert.isTrue(srcFs.isFile(src), "Source must be a file");
 					i = srcFs.open(src);
 					switch (i.readShort()) {
 					case 0x1f8b: // RFC 1952
@@ -967,8 +967,11 @@ public class FsShell implements Closeable, DisposableBean {
 							in = new TextRecordInputStream(src, srcFs, configuration);
 						}
 						break;
-					}
-					i.seek(0);
+					default:
+						in = i;
+						break;						
+					}					
+					i.seek(0);					
 					texts.add(getContent(in));
 				}
 			} catch (IOException ex) {

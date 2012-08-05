@@ -18,6 +18,7 @@ package org.springframework.data.hadoop.fs;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.util.Collection;
 import java.util.UUID;
 
 import org.apache.hadoop.fs.Path;
@@ -41,7 +42,7 @@ public abstract class AbstractFsShellTest extends AbstractROFsShellTest {
 	}
 
 	@Test
-	public void testCopyFromLocal() throws Exception {
+	public void testCopyFromLocalAndText() throws Exception {
 		String name1 = UUID.randomUUID() + ".txt";
 		String dst = "local/" + name1;
 		File f = new File(name1);
@@ -51,7 +52,9 @@ public abstract class AbstractFsShellTest extends AbstractROFsShellTest {
 		try {
 			shell.copyFromLocal(name1, dst);
 			assertTrue(shell.test(dst));
-			assertEquals(name1, shell.cat(dst).toString());
+			assertEquals(name1, shell.cat(dst).toString());		
+			Collection<String> contents =  shell.text(dst);
+			assertEquals(name1, contents.iterator().next().toString());
 		} finally {
 			f.delete();
 		}
@@ -319,7 +322,7 @@ public abstract class AbstractFsShellTest extends AbstractROFsShellTest {
 
 	@Test
 	public void testPut() throws Exception {
-		testCopyFromLocal();
+		testCopyFromLocalAndText();
 	}
 
 	@Test
