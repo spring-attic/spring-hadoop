@@ -74,9 +74,17 @@ abstract class HadoopCodeExecutor<T> extends JobGenericOptions implements Initia
 				+ (jar != null ? "from jar [" + jar.getURI() + "]" : "")
 				+ " with args [" + Arrays.toString(arguments) + "]");
 
+		ClassLoader newCL = cfg.getClassLoader();
+		boolean isJarCL = newCL instanceof ParentLastURLClassLoader;
 		try {
-			th.setContextClassLoader(cfg.getClassLoader());
 			ExecutionUtils.disableSystemExitCall();
+			if (isJarCL) {
+				ExecutionUtils.preventHadoopLeaks(beanClassLoader);
+			}
+
+			//ExecutionUtils.earlyLeaseDaemonInit(cfg);
+
+			th.setContextClassLoader(newCL);
 
 			if (StringUtils.hasText(user)) {
 				UserGroupInformation ugi = UserGroupInformation.createProxyUser(user,
@@ -95,9 +103,10 @@ abstract class HadoopCodeExecutor<T> extends JobGenericOptions implements Initia
 		} finally {
 			ExecutionUtils.enableSystemExitCall();
 			th.setContextClassLoader(oldTccl);
-			ClassLoader execCL = cfg.getClassLoader();
-			if (execCL instanceof ParentLastURLClassLoader){
-				ExecutionUtils.patchLeakedClassLoader(execCL, oldTccl);
+
+			if (isJarCL) {
+				ExecutionUtils.shutdownFileSystem(cfg);
+				ExecutionUtils.patchLeakedClassLoader(newCL, oldTccl);
 			}
 		}
 	}

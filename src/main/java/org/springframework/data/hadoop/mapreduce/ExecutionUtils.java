@@ -23,12 +23,14 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.security.Permission;
+import java.security.Policy;
 import java.sql.DriverManager;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
@@ -38,7 +40,11 @@ import javax.imageio.ImageIO;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.LocalDirAllocator;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IOUtils;
+import org.apache.hadoop.mapred.Counters;
 import org.springframework.core.io.Resource;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
@@ -253,6 +259,10 @@ abstract class ExecutionUtils {
 	 * context class-loader, to leak (typically through JDK classes).
 	 */
 	static void preventJreTcclLeaks() {
+		if (log.isDebugEnabled()) {
+			log.debug("Preventing JRE TCCL leaks");
+		}
+
 		// get the root CL to be used instead
 		ClassLoader sysLoader = ClassLoader.getSystemClassLoader();
 
@@ -267,8 +277,12 @@ abstract class ExecutionUtils {
 
 			// Policy holds the TCCL as static
 			ClassUtils.resolveClassName("javax.security.auth.Policy", sysLoader);
+			// since the class init may be lazy, call the method directly
+			Policy.getPolicy();
 			// Configuration holds the TCCL as static
 			ClassUtils.resolveClassName("javax.security.auth.login.Configuration", sysLoader);
+			// seems to cause side-effects/exceptions
+			// javax.security.auth.login.Configuration.getConfiguration();
 			java.security.Security.getProviders();
 
 			// load the JDBC drivers (used by Hive and co)
@@ -283,6 +297,24 @@ abstract class ExecutionUtils {
 	}
 
 	/**
+	 * Utility for doing static init for preventing Hadoop leaks during initialization (mainly based on TCCL).
+	 */
+	static void preventHadoopLeaks(ClassLoader hadoopCL) {
+
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		try {
+			// set the sysCL as the TCCL
+			Thread.currentThread().setContextClassLoader(ClassLoader.getSystemClassLoader());
+
+			// fix org.apache.hadoop.mapred.Counters#MAX_COUNTER_LIMIT
+			// calling constructor since class loading is lazy
+			new Counters();
+		} finally {
+			Thread.currentThread().setContextClassLoader(cl);
+		}
+	}
+
+	/**
 	 * Leak-preventing method analyzing the threads started by the JVM which hold a reference
 	 * to a classloader that should be reclaimed. 
 	 * 
@@ -290,17 +322,34 @@ abstract class ExecutionUtils {
 	 * @param replacementClassLoader
 	 */
 	static void patchLeakedClassLoader(ClassLoader leakedClassLoader, ClassLoader replacementClassLoader) {
+		if (log.isDebugEnabled()) {
+			log.debug("Patching TCCL leaks");
+		}
+
 		replaceTccl(leakedClassLoader, replacementClassLoader);
 
 		fixHadoopReflectionUtilsLeak(leakedClassLoader);
-		fixHadoopConfigurationLeak();
+		fixHadoopReflectionUtilsLeak();
+		cleanHadoopLocalDirAllocator();
+	}
+
+	/**
+	 * Clean the LocalDirAllocator#contexts
+	 */
+	private static void cleanHadoopLocalDirAllocator() {
+		Field field = ReflectionUtils.findField(LocalDirAllocator.class, "contexts");
+		ReflectionUtils.makeAccessible(field);
+		Map contexts = (Map) ReflectionUtils.getField(field, null);
+		if (contexts != null) {
+			contexts.clear();
+		}
 	}
 
 	private static void fixHadoopReflectionUtilsLeak(ClassLoader leakedClassLoader) {
 		// replace Configuration#CLASS_CACHE in Hadoop 2.0 which prevents CL from being recycled
 		// this is a best-effort really as the leak can occur again - see HADOOP-8632
 
-		// only available on Hadoop-2.0
+		// only available on Hadoop-2.0/CDH4
 		if (CLASS_CACHE == null) {
 			return;
 		}
@@ -309,7 +358,7 @@ abstract class ExecutionUtils {
 		cache.remove(leakedClassLoader);
 	}
 
-	private static void fixHadoopConfigurationLeak() {
+	private static void fixHadoopReflectionUtilsLeak() {
 		// org.apache.hadoop.util.ReflectionUtils.clearCache();
 		ReflectionUtils.invokeMethod(UTILS_CONSTRUCTOR_CACHE, null);
 	}
@@ -343,6 +392,29 @@ abstract class ExecutionUtils {
 	}
 
 	/**
+	 * Most jars don't close the file system.
+	 * 
+	 * @param cfg
+	 */
+	static void shutdownFileSystem(Configuration cfg) {
+		FileSystem fs;
+		try {
+			fs = FileSystem.get(cfg);
+			if (fs != null) {
+				fs.close();
+			}
+		} catch (Exception ex) {
+		}
+		try {
+			fs = FileSystem.getLocal(cfg);
+			if (fs != null) {
+				fs.close();
+			}
+		} catch (Exception ex) {
+		}
+	}
+
+	/**
 	 * Returns the threads running inside the current JVM.
 	 * 
 	 * @return running threads
@@ -371,5 +443,21 @@ abstract class ExecutionUtils {
 		}
 
 		return threads;
+	}
+
+	static void earlyLeaseDaemonInit(Configuration config) throws IOException {
+		ClassLoader cl = config.getClassLoader();
+		if (cl instanceof ParentLastURLClassLoader) {
+			if (log.isDebugEnabled()) {
+				log.debug("Preventing DFS LeaseDaemon TCCL leak");
+			}
+
+			FileSystem fs = FileSystem.get(config);
+			Thread.currentThread().setContextClassLoader(ClassLoader.getSystemClassLoader());
+			Path p = new Path("/tmp/shdp-lease-early-init-" + UUID.randomUUID().toString());
+			// create/delete
+			fs.create(p).close();
+			fs.delete(p, false);
+		}
 	}
 }

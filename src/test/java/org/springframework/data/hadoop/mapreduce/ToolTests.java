@@ -15,6 +15,8 @@
  */
 package org.springframework.data.hadoop.mapreduce;
 
+import java.net.URL;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.util.Tool;
 import org.junit.Test;
@@ -123,5 +125,20 @@ public class ToolTests {
 		assertNotNull(System.getProperty("org.springframework.data.tool.init"));
 		assertEquals(Integer.valueOf(13), bean);
 		assertFalse(org.springframework.util.ClassUtils.isPresent("test.SomeTool", loader));
+
+		ParentLastURLClassLoader cl = new ParentLastURLClassLoader(
+				new URL[] { ctx.getResource("some-tool.jar").getURL() }, loader);
+
+		System.out.println("Loading classes ...");
+		cl.loadClass("test.inner.InnerToolClass");
+		cl = null;
+
+//		System.out.println("****************** Forcing GC **************************");
+		System.gc();
+		System.gc();
+		Thread.sleep(1 * 1000);
+		System.gc();
+		Thread.sleep(1 * 1000);
+//		System.in.read();
 	}
 }
