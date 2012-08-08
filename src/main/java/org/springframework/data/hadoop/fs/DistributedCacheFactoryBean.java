@@ -124,9 +124,9 @@ public class DistributedCacheFactoryBean implements InitializingBean, FactoryBea
 					case CP:
 						Path p = res.getPath();
 
-						if (!StringUtils.hasText(p.toUri().getFragment())) {
-							p = new Path(URI.create(p.toString() + "#" + defaultLink));
-						}
+						//						if (!StringUtils.hasText(p.toUri().getFragment())) {
+						//							p = new Path(URI.create(p.toString() + "#" + defaultLink));
+						//						}
 
 						if (isArchive) {
 							DistributedCache.addArchiveToClassPath(p, conf, fs);
