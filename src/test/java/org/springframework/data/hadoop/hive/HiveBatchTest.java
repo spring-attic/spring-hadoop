@@ -37,6 +37,9 @@ public class HiveBatchTest {
 	@Autowired
 	private ApplicationContext ctx;
 
+	@Autowired
+	private HiveClient client;
+
 	{
 		TestUtils.hackHadoopStagingOnWin();
 	}
@@ -58,5 +61,13 @@ public class HiveBatchTest {
 		HiveTasklet pt = ctx.getBean("tasklet", HiveTasklet.class);
 		pt.execute(null, null);
 	}
-}
 
+	@Test
+	public void testScriptRunner() throws Exception {
+		try {
+			HiveScriptRunner.run(client, ctx.getResource("org/springframework/data/hadoop/hive/hive-failing-script.q"));
+		} catch (Exception ex) {
+			System.out.println(ex);
+		}
+	}
+}

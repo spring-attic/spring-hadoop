@@ -62,7 +62,7 @@ public abstract class HiveScriptRunner {
 		List<List<String>> results = new ArrayList<List<String>>();
 		if (scripts != null) {
 			for (Resource resource : scripts) {
-				results.add(runScript(hive, resource, encoding));
+				results.add(run(hive, resource, encoding));
 			}
 		}
 		return results;
@@ -77,7 +77,7 @@ public abstract class HiveScriptRunner {
 	 * @throws Exception
 	 */
 	public static List<String> run(HiveClient hive, Resource script) throws Exception {
-		return runScript(hive, script, "UTF-8");
+		return run(hive, script, "UTF-8");
 	}
 
 	/**
@@ -89,7 +89,7 @@ public abstract class HiveScriptRunner {
 	 * @return the script results
 	 * @throws Exception
 	 */
-	public static List<String> runScript(HiveClient hive, Resource script, String encoding) throws Exception {
+	public static List<String> run(HiveClient hive, Resource script, String encoding) throws Exception {
 		InputStream stream = script.getInputStream();
 		BufferedReader reader = new BufferedReader((StringUtils.hasText(encoding) ? 
 				new InputStreamReader(stream, encoding) : new InputStreamReader(stream)));
