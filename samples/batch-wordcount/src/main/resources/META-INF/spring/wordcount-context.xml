@@ -16,7 +16,7 @@
 		</batch:step>
 	</batch:job>
 
-	<tasklet id="wordcount-tasklet" job-ref="wordcount-job"/>
+	<job-tasklet id="wordcount-tasklet" job-ref="wordcount-job"/>
 
 	<job id="wordcount-job" input-path="${wordcount.input.path:/user/gutenberg/input/word/}"
 		output-path="${wordcount.output.path:/user/gutenberg/output/word/}" 
