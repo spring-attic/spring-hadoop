@@ -280,7 +280,12 @@ abstract class ExecutionUtils {
 			// since the class init may be lazy, call the method directly
 			Policy.getPolicy();
 			// Configuration holds the TCCL as static
-			ClassUtils.resolveClassName("javax.security.auth.login.Configuration", sysLoader);
+			// call method with minimal side-effects (since just doing class loading doesn't seem to trigger the static init)
+			try {
+				javax.security.auth.login.Configuration.getInstance(null, null, (String) null);
+			} catch (Exception ex) {
+				// ignore
+			}
 			// seems to cause side-effects/exceptions
 			// javax.security.auth.login.Configuration.getConfiguration();
 			java.security.Security.getProviders();
