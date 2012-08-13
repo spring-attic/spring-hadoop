@@ -228,10 +228,9 @@ javadoc {
 jar {
     manifest.attributes['Implementation-Title'] = 'spring-data-hadoop'
     manifest.attributes['Implementation-Version'] = project.version
-    manifest.attributes['Repository-Revision'] = "" + System.properties['repository.revision.number']
-    manifest.attributes['Repository-Revision-2'] = "" + System.properties['bamboo.repository.revision.number']
-    manifest.attributes['Repository-Revision-3'] = "" + System.properties['bamboo.vcs.revision']
-    manifest.attributes['Repository-Revision-4'] = "" + System.properties['vcs.revision']
+    manifest.attributes['Repository-Revision'] = "" + System.properties['VCSREV1']
+    manifest.attributes['Repository-Revision-2'] = "" + System.properties['VCSREV2']
+    manifest.attributes['Repository-Revision-3'] = "" + System.properties['VCSREV3']
 
     from("$rootDir/docs/src/info") {
         include "license.txt"
