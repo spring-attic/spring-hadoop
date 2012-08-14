@@ -181,6 +181,14 @@ The security user (ugi) to use for impersonation at runtime.
 				]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
+		<xsd:attribute name="close-all" type="xsd:string" default="false">
+			<xsd:annotation>
+			<xsd:documentation><![CDATA[
+Whether or not to close all file-system instances inside a JVM at shutdown or not. Useful
+as a leak prevention when the app drives all of Hadoop.				
+				]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
 		</xsd:complexType>		
 	</xsd:element>
 	

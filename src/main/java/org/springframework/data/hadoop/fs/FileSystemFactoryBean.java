@@ -37,6 +37,7 @@ public class FileSystemFactoryBean implements InitializingBean, DisposableBean, 
 	private Configuration configuration;
 	private URI uri;
 	private String user;
+	private boolean closeAll = false;
 
 	public void afterPropertiesSet() throws Exception {
 		Configuration cfg = (configuration != null ? configuration : new Configuration(true));
@@ -56,6 +57,11 @@ public class FileSystemFactoryBean implements InitializingBean, DisposableBean, 
 			fs.close();
 		}
 		fs = null;
+
+		if (closeAll) {
+			// TODO: potentially call close all just for the current user
+			FileSystem.closeAll();
+		}
 	}
 
 
@@ -97,5 +103,17 @@ public class FileSystemFactoryBean implements InitializingBean, DisposableBean, 
 	 */
 	public void setUser(String user) {
 		this.user = user;
+	}
+
+	/**
+	 * Indicates whether all the Hadoop file systems should be closed once this factory is destroyed.
+	 * False by default - should be turned on as a safety measure when the app controls the entire lifecycle of Hadoop inside
+	 * a JVM.
+	 *
+	 * @param closeAll the close all
+	 * @see FileSystem#closeAll()
+	 */
+	public void setCloseAll(boolean closeAll) {
+		this.closeAll = closeAll;
 	}
 }
