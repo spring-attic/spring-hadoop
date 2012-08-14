@@ -24,6 +24,8 @@ dependencies {
     // update the version that comes with Batch
     compile "org.springframework:spring-tx:$springVersion"
     compile "org.apache.pig:pig:$pigVersion"
+    runtime "jline:jline:0.9.94"
+    runtime "log4j:log4j:1.2.16"
     runtime "org.antlr:antlr-runtime:$antlrVersion"
     
     testCompile "junit:junit:$junitVersion"
