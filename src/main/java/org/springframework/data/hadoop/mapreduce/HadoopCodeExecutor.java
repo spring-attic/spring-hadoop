@@ -45,6 +45,7 @@ abstract class HadoopCodeExecutor<T> extends JobGenericOptions implements Initia
 	Properties properties;
 	Resource jar;
 	private ClassLoader beanClassLoader;
+	private boolean closeFs = true;
 
 	// do the JRE leak prevention, once per class-loader
 	static {
@@ -105,7 +106,9 @@ abstract class HadoopCodeExecutor<T> extends JobGenericOptions implements Initia
 			th.setContextClassLoader(oldTccl);
 
 			if (isJarCL) {
-				ExecutionUtils.shutdownFileSystem(cfg);
+				if (closeFs) {
+					ExecutionUtils.shutdownFileSystem(cfg);
+				}
 				ExecutionUtils.patchLeakedClassLoader(newCL, oldTccl);
 			}
 		}
@@ -234,6 +237,18 @@ abstract class HadoopCodeExecutor<T> extends JobGenericOptions implements Initia
 	@Override
 	public void setBeanClassLoader(ClassLoader classLoader) {
 		this.beanClassLoader = classLoader;
+	}
+
+	/**
+	 * Indicates whether or not to close the Hadoop file-systems
+	 * resulting from the custom code execution.
+	 * Default is true. Turn this to false if the code reuses the same
+	 * file-system used by the rest of the application.
+	 *
+	 * @param closeFs the new close fs
+	 */
+	public void setCloseFs(boolean closeFs) {
+		this.closeFs = closeFs;
 	}
 
 	/**

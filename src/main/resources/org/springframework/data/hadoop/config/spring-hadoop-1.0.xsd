@@ -655,6 +655,14 @@ is used instead.
 					</xsd:appinfo>
 			 	</xsd:annotation>
 	       	</xsd:attribute>
+	       	<xsd:attribute name="close-fs" type="xsd:string" default="true">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+Wherther to close or not, any file-systems created by the Jar execution.
+Default is true. Turn this off, if the jar uses the same file-system as the rest of the application. 
+					]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
 		</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
@@ -739,6 +747,14 @@ Reference to a Hadoop Tool instance.]]></xsd:documentation>
 					</xsd:appinfo>
 		 	</xsd:annotation>
 		 	</xsd:attribute>
+	       	<xsd:attribute name="close-fs" type="xsd:string" default="true">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+Wherther to close or not, any file-systems created by the Tool execution.
+Default is true. Turn this off, if the jar uses the same file-system as the rest of the application. 
+					]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
 		</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
