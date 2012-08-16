@@ -18,7 +18,10 @@ package org.springframework.data.hadoop.mapreduce;
 import javax.annotation.Resource;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.mapred.JobConf;
+import org.apache.hadoop.mapred.RunningJob;
 import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.JobID;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,10 +41,35 @@ import static org.junit.Assert.*;
 @ContextConfiguration
 public class JobTests {
 
+	public static class JobInfo {
+		public JobID jobId;
+		public org.apache.hadoop.mapred.JobID oldJobId;
+		public RunningJob runningJob;
+		public JobConf jobConf;
+
+		public void setJobId(JobID jobId) {
+			this.jobId = jobId;
+		}
+
+		public void setOldJobId(org.apache.hadoop.mapred.JobID oldJobId) {
+			this.oldJobId = oldJobId;
+		}
+
+		public void setRunningJob(RunningJob runningJob) {
+			this.runningJob = runningJob;
+		}
+
+		public void setJobConf(JobConf jobConf) {
+			this.jobConf = jobConf;
+		}
+	}
+
 	@Autowired
 	private ApplicationContext ctx;
 	@Resource(name = "ns-job")
 	private Job job;
+	@Autowired
+	private JobInfo jobInfo;
 
 	{
 		TestUtils.hackHadoopStagingOnWin();
@@ -92,5 +120,14 @@ public class JobTests {
 		assertEquals("eo", cfg.get("captain"));
 
 		assertEquals("true", job.getConfiguration().get("mapred.used.genericoptionsparser"));
+	}
+
+	@Test
+	public void testPropertyEditors() throws Exception {
+		assertNotNull(jobInfo);
+		assertNotNull(jobInfo.jobConf);
+		assertNotNull(jobInfo.jobId);
+		assertNotNull(jobInfo.oldJobId);
+		assertNotNull(jobInfo.runningJob);
 	}
 }

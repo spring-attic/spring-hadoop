@@ -16,6 +16,7 @@
 package org.springframework.data.hadoop.config;
 
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.CustomEditorConfigurer;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
@@ -69,7 +70,11 @@ class HadoopNamespaceHandler extends NamespaceHandlerSupport {
 	private void registerImplicitBeans(ParserContext parserContext) {
 		BeanDefinitionRegistry registry = parserContext.getRegistry();
 		if (!registry.containsBeanDefinition(DEFAULT_CONVERTER)) {
-			BeanDefinition def = BeanDefinitionBuilder.genericBeanDefinition(MapReducePropertyEditorRegistrar.class).setRole(BeanDefinition.ROLE_INFRASTRUCTURE).getBeanDefinition();
+			BeanDefinition def = BeanDefinitionBuilder.genericBeanDefinition(CustomEditorConfigurer.class).setRole(
+					BeanDefinition.ROLE_INFRASTRUCTURE).addPropertyValue(
+					"propertyEditorRegistrars",
+					BeanDefinitionBuilder.genericBeanDefinition(MapReducePropertyEditorRegistrar.class).
+						setRole(BeanDefinition.ROLE_INFRASTRUCTURE).getBeanDefinition()).getBeanDefinition();
 			registry.registerBeanDefinition(DEFAULT_CONVERTER, def);
 		}
 	}
