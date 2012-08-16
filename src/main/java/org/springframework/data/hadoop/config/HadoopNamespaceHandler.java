@@ -15,7 +15,13 @@
  */
 package org.springframework.data.hadoop.config;
 
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
+import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.data.hadoop.mapreduce.MapReducePropertyEditorRegistrar;
+import org.w3c.dom.Element;
 
 /**
  * Core Spring Hadoop namespace handler
@@ -23,6 +29,9 @@ import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
  * @author Costin Leau
  */
 class HadoopNamespaceHandler extends NamespaceHandlerSupport {
+
+	private static String DEFAULT_CONVERTER = MapReducePropertyEditorRegistrar.class.getName() + ".ns.registration";
+
 	public void init() {
 		registerBeanDefinitionParser("job-tasklet", new HadoopTaskletParser());
 		registerBeanDefinitionParser("job", new HadoopJobParser());
@@ -50,5 +59,18 @@ class HadoopNamespaceHandler extends NamespaceHandlerSupport {
 
 		registerBeanDefinitionParser("hbase-configuration", new HbaseConfigurationParser());
 	}
-}
 
+	@Override
+	public BeanDefinition parse(Element element, ParserContext parserContext) {
+		registerImplicitBeans(parserContext);
+		return super.parse(element, parserContext);
+	}
+
+	private void registerImplicitBeans(ParserContext parserContext) {
+		BeanDefinitionRegistry registry = parserContext.getRegistry();
+		if (!registry.containsBeanDefinition(DEFAULT_CONVERTER)) {
+			BeanDefinition def = BeanDefinitionBuilder.genericBeanDefinition(MapReducePropertyEditorRegistrar.class).setRole(BeanDefinition.ROLE_INFRASTRUCTURE).getBeanDefinition();
+			registry.registerBeanDefinition(DEFAULT_CONVERTER, def);
+		}
+	}
+}
