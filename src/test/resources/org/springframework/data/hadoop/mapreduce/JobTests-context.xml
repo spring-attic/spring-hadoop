@@ -87,4 +87,9 @@
 	<task:scheduled-tasks scheduler="myScheduler">
  		<task:scheduled ref="&amp;runner" method="getObject" fixed-rate="60000"/>
  	</task:scheduled-tasks>
+ 	
+ 	
+ 	<bean id="jobInfo" class="org.springframework.data.hadoop.mapreduce.JobTests$JobInfo"
+ 		p:jobId-ref="ns-job" p:oldJobId-ref="ns-job" p:runningJob-ref="ns-job" p:jobConf-ref="ns-job"/>
+ 	
 </beans>

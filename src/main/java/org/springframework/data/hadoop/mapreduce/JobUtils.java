@@ -17,24 +17,65 @@ package org.springframework.data.hadoop.mapreduce;
 
 import java.lang.reflect.Field;
 
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.RunningJob;
 import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.JobID;
+import org.springframework.data.hadoop.configuration.ConfigurationUtils;
 import org.springframework.util.ReflectionUtils;
 
 /**
- * Utils around Hadoop {@link Job}s.
+ * Utilities around Hadoop {@link Job}s.
+ * Mainly used for converting a Job instance to different types.
  * 
  * @author Costin Leau
  */
-abstract class JobUtils {
+public abstract class JobUtils {
 
-	static RunningJob getRunningJob(Job job) {
+	static Field JOB_INFO;
+
+	static {
+		JOB_INFO = ReflectionUtils.findField(Job.class, "info");
+		ReflectionUtils.makeAccessible(JOB_INFO);
+	}
+
+	public static RunningJob getRunningJob(Job job) {
 		if (job == null) {
 			return null;
 		}
-		Field f = ReflectionUtils.findField(Job.class, "info");
-		ReflectionUtils.makeAccessible(f);
 
-		return (RunningJob) ReflectionUtils.getField(f, job);
+		return (RunningJob) ReflectionUtils.getField(JOB_INFO, job);
+	}
+
+	public static JobID getJobId(Job job) {
+		if (job == null) {
+			return null;
+		}
+
+		return job.getJobID();
+	}
+
+	public static org.apache.hadoop.mapred.JobID getOldJobId(Job job) {
+		JobID id = getJobId(job);
+		if (id != null) {
+			return org.apache.hadoop.mapred.JobID.downgrade(id);
+		}
+		return null;
+	}
+
+	public static JobConf getJobConf(Job job) {
+		if (job == null) {
+			return null;
+		}
+
+		// we know internally the configuration is a JobConf
+		Configuration configuration = job.getConfiguration();
+
+		if (configuration instanceof JobConf) {
+			return (JobConf) configuration;
+		}
+
+		return (JobConf) ConfigurationUtils.createFrom(configuration, null);
 	}
 }
