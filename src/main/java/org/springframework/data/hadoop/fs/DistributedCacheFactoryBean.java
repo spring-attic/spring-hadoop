@@ -15,7 +15,9 @@
  */
 package org.springframework.data.hadoop.fs;
 
+import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collection;
 
 import org.apache.hadoop.conf.Configuration;
@@ -25,6 +27,7 @@ import org.apache.hadoop.fs.Path;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
+import org.springframework.data.hadoop.fs.DistributedCacheFactoryBean.CacheEntry.EntryType;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
@@ -95,6 +98,7 @@ public class DistributedCacheFactoryBean implements InitializingBean, FactoryBea
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(conf, "A Hadoop configuration is required");
+		Assert.notEmpty(entries, "No entries specified");
 
 		// fall back to system discovery
 		if (fs == null) {
@@ -179,6 +183,52 @@ public class DistributedCacheFactoryBean implements InitializingBean, FactoryBea
 	 */
 	public void setEntries(Collection<CacheEntry> entries) {
 		this.entries = entries;
+	}
+
+	/**
+	 * Sets the local entries to be added to the distributed cache.
+	 * 
+	 * @param entries The entries to set.
+	 */
+
+	public void setLocalEntries(Collection<Resource> resources) {
+		setEntries(EntryType.LOCAL, resources);
+	}
+
+	/**
+	 * Sets the cache entries to be added to the distributed cache.
+	 * 
+	 * @param entries The entries to set.
+	 */
+	public void setCacheEntries(Collection<Resource> resources) {
+		setEntries(EntryType.CACHE, resources);
+	}
+
+	/**
+	 * Sets the class-path entries to be added to the distributed cache.
+	 * 
+	 * @param entries The entries to set.
+	 */
+	public void setClassPathEntries(Collection<Resource> resources) {
+		setEntries(EntryType.CP, resources);
+	}
+
+	private void setEntries(EntryType cp, Collection<Resource> resources) {
+		if (resources == null) {
+			setEntries(null);
+		}
+
+		else {
+			Collection<CacheEntry> entries = new ArrayList<CacheEntry>(resources.size());
+			for (Resource resource : resources) {
+				try {
+					entries.add(new CacheEntry(cp, resource.getURI().toString()));
+				} catch (IOException ex) {
+					throw new IllegalArgumentException("Cannot resolve resource " + resource, ex);
+				}
+			}
+			setEntries(entries);
+		}
 	}
 
 	/**
