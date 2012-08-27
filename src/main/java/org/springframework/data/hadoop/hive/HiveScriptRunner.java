@@ -101,6 +101,7 @@ public abstract class HiveScriptRunner {
 			while ((line = reader.readLine()) != null) {
 				// strip whitespace
 				line = line.trim();
+				int nrCmds = StringUtils.countOccurrencesOf(line, ";");
 				// ignore comments
 				if (!line.startsWith("--")) {
 					for (String token : line.split(";")) {
@@ -109,16 +110,15 @@ public abstract class HiveScriptRunner {
 						if (!StringUtils.hasText(token)) {
 							continue;
 						}
-						if (token.endsWith("\\")) {
-							command.concat(token);
-							continue;
-						}
 						else {
-							command = token;
+							command.concat(token);
 						}
 
-						results.addAll(runCommand(hive, command));
-						command = "";
+						if (nrCmds > 0) {
+							results.addAll(runCommand(hive, command));
+							nrCmds--;
+							command = "";
+						}
 					}
 				}
 			}
@@ -131,7 +131,7 @@ public abstract class HiveScriptRunner {
 		} finally {
 			IOUtils.closeStream(reader);
 		}
-		
+
 		return results;
 	}
 
