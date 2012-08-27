@@ -15,11 +15,17 @@
  */
 package org.springframework.data.hadoop.hive;
 
+import java.util.List;
+import java.util.Properties;
+
 import org.apache.hadoop.hive.service.HiveClient;
+import org.apache.hadoop.hive.service.HiveServerException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.data.hadoop.TestUtils;
 import org.springframework.data.hadoop.batch.JobsTrigger;
 import org.springframework.test.context.ContextConfiguration;
@@ -62,12 +68,20 @@ public class HiveBatchTest {
 		pt.execute(null, null);
 	}
 
-	@Test
+	@Test(expected = HiveServerException.class)
 	public void testScriptRunner() throws Exception {
-		try {
-			HiveScriptRunner.run(client, ctx.getResource("org/springframework/data/hadoop/hive/hive-failing-script.q"));
-		} catch (Exception ex) {
-			System.out.println(ex);
-		}
+		HiveScriptRunner.run(client, ctx.getResource("org/springframework/data/hadoop/hive/hive-failing-script.q"));
+	}
+
+	@Test
+	public void testScriptParams() throws Exception {
+		Resource res = new ByteArrayResource("set zzz;set hiveconf:yyy;".getBytes());
+		Properties params = new Properties();
+		params.put("zzz", "onions");
+		params.put("yyy", "unleashed");
+
+		List<String> run = HiveScriptRunner.run(client, res, params);
+		assertEquals("zzz=onions", run.get(0));
+		assertEquals("hiveconf:yyy=unleashed", run.get(1));
 	}
 }

@@ -88,17 +88,21 @@ public class HiveClientFactoryBean implements SmartLifecycle, FactoryBean<HiveCl
 
 	public void start() {
 		if (!isRunning()) {
+			Resource lastScript = null;
 			try {
 				transport.open();
 
 				if (!CollectionUtils.isEmpty(scripts)) {
-					HiveScriptRunner.run(hive, scripts);
+					for (Resource script : scripts) {
+						lastScript = script;
+						HiveScriptRunner.run(hive, script);
+					}
 				}
 
 			} catch (TTransportException ex) {
 				throw new BeanCreationException("Cannot start transport", ex);
 			} catch (Exception ex) {
-				throw new HadoopException("Cannot execute Hive script(s)", ex);
+				throw new HadoopException("Cannot execute Hive script [" + lastScript.getDescription(), ex);
 			}
 		}
 	}

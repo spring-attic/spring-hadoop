@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import org.apache.hadoop.hive.service.HiveClient;
 import org.apache.hadoop.hive.service.HiveServerException;
@@ -77,11 +78,25 @@ public abstract class HiveScriptRunner {
 	 * @throws Exception
 	 */
 	public static List<String> run(HiveClient hive, Resource script) throws Exception {
-		return run(hive, script, "UTF-8");
+		return run(hive, script, "UTF-8", null);
 	}
+
 
 	/**
 	 * Runs (or executes) the given script (using "UTF-8" as the script encoding).
+	 * 
+	 * @param hive hive client
+	 * @param script script to run 
+	 * @return the script results
+	 * @param params script parameters
+	 * @throws Exception
+	 */
+	public static List<String> run(HiveClient hive, Resource script, Properties params) throws Exception {
+		return run(hive, script, "UTF-8", params);
+	}
+
+	/**
+	 * Runs (or executes) the given script.
 	 * 
 	 * @param hive hive client
 	 * @param script script to run
@@ -90,34 +105,58 @@ public abstract class HiveScriptRunner {
 	 * @throws Exception
 	 */
 	public static List<String> run(HiveClient hive, Resource script, String encoding) throws Exception {
+		return run(hive, script, encoding, null);
+	}
+
+	/**
+	 * Runs (or executes) the given script with the given parameters. Note that in order to support the given
+	 * parameters, the utility will execute extra commands (hence the returned result will reflect that). 
+	 * As these are client variables, they are bound to the hiveconf namespace. That means other scripts do not see them
+	 * and they need to be accessed using the ${hiveconf:XXX} syntax.
+	 * 
+	 * 
+	 * @param hive hive client
+	 * @param script script to run
+	 * @param encoding script encoding
+	 * @param params script parameters
+	 * @return the script results
+	 * @throws Exception
+	 */
+	public static List<String> run(HiveClient hive, Resource script, String encoding, Properties params)
+			throws Exception {
 		InputStream stream = script.getInputStream();
-		BufferedReader reader = new BufferedReader((StringUtils.hasText(encoding) ? 
-				new InputStreamReader(stream, encoding) : new InputStreamReader(stream)));
+		BufferedReader reader = new BufferedReader((StringUtils.hasText(encoding) ? new InputStreamReader(stream, encoding) : 
+			new InputStreamReader(stream)));
 
 		List<String> results = new ArrayList<String>();
+
+		// process params first
+		if (params != null) {
+			for (String param : params.stringPropertyNames()) {
+				String value = params.getProperty(param);
+				results.addAll(runCommand(hive, "SET hiveconf:" + param + "=" + value));
+			}
+		}
+
 		String line = null;
 		try {
 			String command = "";
 			while ((line = reader.readLine()) != null) {
 				// strip whitespace
 				line = line.trim();
-				int nrCmds = StringUtils.countOccurrencesOf(line, ";");
 				// ignore comments
 				if (!line.startsWith("--")) {
+					int nrCmds = StringUtils.countOccurrencesOf(line, ";");
 					for (String token : line.split(";")) {
 						token = token.trim();
 						// skip empty lines 
-						if (!StringUtils.hasText(token)) {
-							continue;
-						}
-						else {
-							command.concat(token);
-						}
-
-						if (nrCmds > 0) {
-							results.addAll(runCommand(hive, command));
-							nrCmds--;
-							command = "";
+						if (StringUtils.hasText(token)) {
+							command += token.concat(" ");
+							if (nrCmds > 0) {
+								results.addAll(runCommand(hive, command));
+								nrCmds--;
+								command = "";
+							}
 						}
 					}
 				}
