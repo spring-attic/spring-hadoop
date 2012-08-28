@@ -1048,7 +1048,7 @@ Defines a Hive client for connecting to a Hive server through the Thrift protoco
 		      </xsd:appinfo>
 			</xsd:annotation>
 			<xsd:sequence>
-				<xsd:element name="script" type="scriptType" minOccurs="0" maxOccurs="unbounded">
+				<xsd:element name="script" type="scriptWithArgumentsType" minOccurs="0" maxOccurs="unbounded">
 					<xsd:annotation>
 					<xsd:documentation><![CDATA[
 Hive script to be executed during start-up.]]></xsd:documentation>
@@ -1122,7 +1122,7 @@ Defines a HiveTasklet.
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:sequence>
-				<xsd:element name="script" type="scriptType" minOccurs="1" maxOccurs="unbounded">
+				<xsd:element name="script" type="scriptWithArgumentsType" minOccurs="1" maxOccurs="unbounded">
 					<xsd:annotation>
 					<xsd:documentation><![CDATA[
 Hive script.]]></xsd:documentation>

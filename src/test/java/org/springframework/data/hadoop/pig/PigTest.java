@@ -15,6 +15,10 @@
  */
 package org.springframework.data.hadoop.pig;
 
+import java.lang.reflect.Field;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.annotation.Resource;
@@ -29,6 +33,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.data.hadoop.TestUtils;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.util.ReflectionUtils;
 
 import static org.junit.Assert.*;
 
@@ -82,5 +87,21 @@ public class PigTest {
 		assertEquals("the dream", props.get("dancing"));
 		assertEquals("in the mirror", props.get("tears"));
 		assertEquals("eo", props.get("captain"));
+	}
+
+	@Test
+	public void testPigScriptOrdering() throws Exception {
+		PigServerFactoryBean psfb = (PigServerFactoryBean) ctx.getBean("&pig");
+		Field findField = ReflectionUtils.findField(PigServerFactoryBean.class, "scripts");
+		ReflectionUtils.makeAccessible(findField);
+		
+		Collection<PigScript> scripts = (Collection<PigScript>) ReflectionUtils.getField(findField, psfb);
+		assertEquals(3, scripts.size());
+		PigScript firstScript = scripts.iterator().next();
+		Map<String, String> args = firstScript.getArguments();
+		Iterator<String> keys = args.keySet().iterator();
+		assertEquals("war", keys.next());
+		assertEquals("blue", keys.next());
+		assertEquals("white", keys.next());
 	}
 }

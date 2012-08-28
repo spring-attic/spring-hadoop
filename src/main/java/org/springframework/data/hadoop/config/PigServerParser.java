@@ -129,7 +129,6 @@ class PigServerParser extends AbstractPropertiesConfiguredBeanDefinitionParser {
 						bytes = inline.getBytes();
 					}
 					
-					
 					resource = new ByteArrayResource(bytes, "resource for inlined script");
 				}
 
@@ -138,7 +137,8 @@ class PigServerParser extends AbstractPropertiesConfiguredBeanDefinitionParser {
 				String args = DomUtils.getChildElementValueByTagName(child, "arguments");
 
 				if (args != null) {
-					def.getConstructorArgumentValues().addIndexedArgumentValue(1, args);
+					// create linked properties
+					def.getConstructorArgumentValues().addIndexedArgumentValue(1, new LinkedProperties(args));
 				}
 				defs.add(def);
 			}

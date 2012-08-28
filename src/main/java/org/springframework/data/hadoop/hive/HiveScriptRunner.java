@@ -19,15 +19,17 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import org.apache.hadoop.hive.service.HiveClient;
 import org.apache.hadoop.hive.service.HiveServerException;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.thrift.TException;
 import org.springframework.core.io.Resource;
-import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
@@ -40,36 +42,6 @@ public abstract class HiveScriptRunner {
 
 
 	/**
-	 * Runs (or executes) all the given scripts (using "UTF-8" as the script encoding).
-	 *
-	 * @param hive Hive client
-	 * @param scripts scripts to execute
-	 * @return the scripts results
-	 * @throws Exception
-	 */
-	public static List<List<String>> run(HiveClient hive, Iterable<Resource> scripts) throws Exception {
-		return run(hive, scripts, "UTF-8");
-	}
-
-	/**
-	 * Runs (or executes) all the given scripts using the specified encoding.
-	 * 
-	 * @param scripts
-	 * @return the scripts results
-	 * @throws Exception
-	 */
-	public static List<List<String>> run(HiveClient hive, Iterable<Resource> scripts, String encoding) throws Exception {
-		Assert.notNull(hive, "a valid Hive instance is required");
-		List<List<String>> results = new ArrayList<List<String>>();
-		if (scripts != null) {
-			for (Resource resource : scripts) {
-				results.add(run(hive, resource, encoding));
-			}
-		}
-		return results;
-	}
-
-	/**
 	 * Runs (or executes) the given script (using "UTF-8" as the script encoding).
 	 * 
 	 * @param hive hive client
@@ -78,7 +50,7 @@ public abstract class HiveScriptRunner {
 	 * @throws Exception
 	 */
 	public static List<String> run(HiveClient hive, Resource script) throws Exception {
-		return run(hive, script, "UTF-8", null);
+		return run(hive, script, "UTF-8", (Map) null);
 	}
 
 
@@ -105,7 +77,21 @@ public abstract class HiveScriptRunner {
 	 * @throws Exception
 	 */
 	public static List<String> run(HiveClient hive, Resource script, String encoding) throws Exception {
-		return run(hive, script, encoding, null);
+		return run(hive, script, encoding, (Map) null);
+	}
+
+	public static List<String> run(HiveClient hive, Resource script, String encoding, Properties params)
+			throws Exception {
+		Map<String, String> p = null;
+		if (params != null) {
+			Set<String> props = params.stringPropertyNames();
+			p = new LinkedHashMap<String, String>(props.size());
+			for (String prop : props) {
+				p.put(prop, params.getProperty(prop));
+			}
+		}
+
+		return run(hive, script, encoding, p);
 	}
 
 	/**
@@ -114,7 +100,6 @@ public abstract class HiveScriptRunner {
 	 * As these are client variables, they are bound to the hiveconf namespace. That means other scripts do not see them
 	 * and they need to be accessed using the ${hiveconf:XXX} syntax.
 	 * 
-	 * 
 	 * @param hive hive client
 	 * @param script script to run
 	 * @param encoding script encoding
@@ -122,7 +107,7 @@ public abstract class HiveScriptRunner {
 	 * @return the script results
 	 * @throws Exception
 	 */
-	public static List<String> run(HiveClient hive, Resource script, String encoding, Properties params)
+	public static List<String> run(HiveClient hive, Resource script, String encoding, Map<String, String> params)
 			throws Exception {
 		InputStream stream = script.getInputStream();
 		BufferedReader reader = new BufferedReader((StringUtils.hasText(encoding) ? new InputStreamReader(stream, encoding) : 
@@ -132,9 +117,8 @@ public abstract class HiveScriptRunner {
 
 		// process params first
 		if (params != null) {
-			for (String param : params.stringPropertyNames()) {
-				String value = params.getProperty(param);
-				results.addAll(runCommand(hive, "SET hiveconf:" + param + "=" + value));
+			for (Map.Entry<String, String> entry : params.entrySet()) {
+				results.addAll(runCommand(hive, "SET hiveconf:" + entry.getKey() + "=" + entry.getValue()));
 			}
 		}
 

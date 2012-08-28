@@ -23,6 +23,8 @@
 		<script location="org/springframework/data/hadoop/pig/script.pig">
 			<arguments>
 				war=web
+				blue=water
+				white=wash
 			</arguments>
 		</script>
 		<script location="org/springframework/data/hadoop/pig/script.pig" />

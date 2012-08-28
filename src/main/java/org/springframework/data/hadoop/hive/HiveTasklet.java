@@ -23,7 +23,6 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.core.io.Resource;
 import org.springframework.data.hadoop.HadoopException;
 import org.springframework.util.Assert;
 
@@ -35,7 +34,7 @@ import org.springframework.util.Assert;
 public class HiveTasklet implements InitializingBean, Tasklet {
 
 	private HiveClient hive;
-	private Collection<Resource> scripts;
+	private Collection<HiveScript> scripts;
 
 	@Override
 	public void afterPropertiesSet() {
@@ -47,7 +46,9 @@ public class HiveTasklet implements InitializingBean, Tasklet {
 		Exception exc = null;
 
 		try {
-			HiveScriptRunner.run(hive, scripts);
+			for (HiveScript script : scripts) {
+				HiveScriptRunner.run(hive, script.getResource(), script.getArguments());
+			}
 			return RepeatStatus.FINISHED;
 		} catch (Exception ex) {
 			exc = ex;
@@ -61,7 +62,7 @@ public class HiveTasklet implements InitializingBean, Tasklet {
 	 * 
 	 * @param scripts The scripts to set.
 	 */
-	public void setScripts(Collection<Resource> scripts) {
+	public void setScripts(Collection<HiveScript> scripts) {
 		this.scripts = scripts;
 	}
 

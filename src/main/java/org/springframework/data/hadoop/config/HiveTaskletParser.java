@@ -20,9 +20,12 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.data.hadoop.hive.HiveScript;
 import org.springframework.data.hadoop.hive.HiveTasklet;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -65,11 +68,17 @@ class HiveTaskletParser extends AbstractImprovedSimpleBeanDefinitionParser {
 				String inline = DomUtils.getTextValue(child);
 				boolean hasScriptInlined = StringUtils.hasText(inline);
 
+				GenericBeanDefinition def = new GenericBeanDefinition();
+				def.setSource(child);
+				def.setBeanClass(HiveScript.class);
+
+				Object resource = null;
+
 				if (StringUtils.hasText(location)) {
 					if (hasScriptInlined) {
 						context.getReaderContext().error("cannot specify both 'location' and a nested script; use only one", element);
 					}
-					defs.add(location);
+					resource = location;
 				}
 				else {
 					if (!hasScriptInlined) {
@@ -85,8 +94,17 @@ class HiveTaskletParser extends AbstractImprovedSimpleBeanDefinitionParser {
 					}
 					
 					
-					defs.add(new ByteArrayResource(bytes, "resource for inlined script"));
+					resource = new ByteArrayResource(bytes, "resource for inlined script");
 				}
+
+				def.getConstructorArgumentValues().addIndexedArgumentValue(0, resource, Resource.class.getName());
+				String args = DomUtils.getChildElementValueByTagName(child, "arguments");
+
+				if (args != null) {
+					def.getConstructorArgumentValues().addIndexedArgumentValue(1, new LinkedProperties(args));
+				}
+				defs.add(def);
+
 			}
 
 			return defs;

@@ -13,52 +13,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.hadoop.pig;
+package org.springframework.data.hadoop.hive;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Properties;
 
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 
 /**
- * Holder class for a pig script.
+ * Holder class for a Hive script.
  *
  * @author Costin Leau
  */
-public class PigScript {
+public class HiveScript {
 
 	private Resource resource;
-	private Map<String, String> arguments;
+	private Properties arguments;
 
 	/**
-	 * Constructs a new <code>PigScript</code> instance from the given
+	 * Constructs a new <code>HiveScript</code> instance from the given
 	 * resource.
 	 *
 	 * @param resource script resource.
 	 */
-	public PigScript(Resource resource) {
+	public HiveScript(Resource resource) {
 		this(resource, null);
 	}
 
 	/**
-	 * Constructs a new <code>PigScript</code> instance. Both the script
+	 * Constructs a new <code>HiveScript</code> instance. Both the script
 	 * content and its parameters are supplied.
 	 *
 	 * @param resource script content.
 	 * @param args script arguments.
 	 */
-	public PigScript(Resource resource, Properties args) {
+	public HiveScript(Resource resource, Properties args) {
 		Assert.notNull(resource, "a valid resource is required");
 		this.resource = resource;
-		this.arguments = new LinkedHashMap<String, String>();
-
-		if (args != null) {
-			for (String key : args.stringPropertyNames()) {
-				arguments.put(key, args.getProperty(key));
-			}
-		}
+		this.arguments = args;
 	}
 
 	/**
@@ -75,7 +67,7 @@ public class PigScript {
 	 *
 	 * @return Returns the arguments for this script.
 	 */
-	public Map<String, String> getArguments() {
+	public Properties getArguments() {
 		return arguments;
 	}
 

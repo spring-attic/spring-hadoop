@@ -40,7 +40,7 @@ import org.springframework.util.CollectionUtils;
  */
 public class HiveClientFactoryBean implements SmartLifecycle, FactoryBean<HiveClient>, InitializingBean, DisposableBean {
 
-	private Collection<Resource> scripts;
+	private Collection<HiveScript> scripts;
 
 	private HiveClient hive;
 	private String host = "localhost";
@@ -93,9 +93,9 @@ public class HiveClientFactoryBean implements SmartLifecycle, FactoryBean<HiveCl
 				transport.open();
 
 				if (!CollectionUtils.isEmpty(scripts)) {
-					for (Resource script : scripts) {
-						lastScript = script;
-						HiveScriptRunner.run(hive, script);
+					for (HiveScript script : scripts) {
+						lastScript = script.getResource();
+						HiveScriptRunner.run(hive, script.getResource(), script.getArguments());
 					}
 				}
 
@@ -190,7 +190,7 @@ public class HiveClientFactoryBean implements SmartLifecycle, FactoryBean<HiveCl
 	 * 
 	 * @param scripts The scripts to set.
 	 */
-	public void setScripts(Collection<Resource> scripts) {
+	public void setScripts(Collection<HiveScript> scripts) {
 		this.scripts = scripts;
 	}
 }

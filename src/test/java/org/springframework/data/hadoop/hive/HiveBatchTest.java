@@ -15,6 +15,9 @@
  */
 package org.springframework.data.hadoop.hive;
 
+import java.lang.reflect.Field;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
@@ -30,6 +33,7 @@ import org.springframework.data.hadoop.TestUtils;
 import org.springframework.data.hadoop.batch.JobsTrigger;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.util.ReflectionUtils;
 
 import static org.junit.Assert.*;
 
@@ -65,6 +69,24 @@ public class HiveBatchTest {
 	@Test
 	public void testTasklet() throws Exception {
 		HiveTasklet pt = ctx.getBean("tasklet", HiveTasklet.class);
+		pt.execute(null, null);
+	}
+
+	@Test
+	public void testScriptNSParams() throws Exception {
+		HiveTasklet pt = ctx.getBean("hive-script", HiveTasklet.class);
+
+		Field findField = ReflectionUtils.findField(HiveTasklet.class, "scripts");
+		ReflectionUtils.makeAccessible(findField);
+
+		Iterator<HiveScript> scripts = ((Collection<HiveScript>) ReflectionUtils.getField(findField, pt)).iterator();
+		scripts.next();
+
+		Iterator<String> keys = scripts.next().getArguments().stringPropertyNames().iterator();
+		assertEquals("war", keys.next());
+		assertEquals("blue", keys.next());
+		assertEquals("white", keys.next());
+
 		pt.execute(null, null);
 	}
 
