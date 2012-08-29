@@ -27,56 +27,75 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.data.hadoop.HadoopException;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 /**
  * Pig tasklet. Note the same {@link PigServer} is shared between invocations. 
  * 
  * @author Costin Leau
  */
-public class PigTasklet implements InitializingBean, Tasklet {
+public class PigTasklet implements InitializingBean, BeanFactoryAware, Tasklet {
 
 	private PigServer pig;
 	private Collection<PigScript> scripts;
+	private BeanFactory beanFactory;
+	private String pigName;
+
 
 	@Override
 	public void afterPropertiesSet() {
-		Assert.notNull(pig, "A PigServer instance is required");
+		Assert.isTrue(pig != null || StringUtils.hasText(pigName), "A Pig instance or bean name is required");
+
 		Assert.notEmpty(scripts, "At least one script needs to be specified");
+		if (StringUtils.hasText(pigName)) {
+			Assert.notNull(beanFactory, "a bean factory is required if the job is specified by name");
+			Assert.isTrue(beanFactory.containsBean(pigName), "beanFactory does not contain any bean named [" + pigName
+					+ "]");
+		}
 	}
 
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		Exception exc = null;
 
-		pig.setBatchOn();
-		pig.getPigContext().connect();
+		PigServer p = (pig != null ? pig : beanFactory.getBean(pigName, PigServer.class));
+
+		p.setBatchOn();
+		p.getPigContext().connect();
 
 		try {
-			execute();
+			execute(p);
 			return RepeatStatus.FINISHED;
 		} catch (Exception ex) {
 			exc = ex;
+		} finally {
+			if (pig == null) {
+				p.shutdown();
+			}
 		}
 
 		throw new HadoopException("Cannot execute Pig script(s)", exc);
 	}
 
-	private List<ExecJob> execute() throws IOException {
+	private List<ExecJob> execute(PigServer p) throws IOException {
 
 		// register scripts
 		for (PigScript script : scripts) {
 			InputStream in = null;
 			try {
 				in = script.getResource().getInputStream();
-				pig.registerScript(in, script.getArguments());
+				p.registerScript(in, script.getArguments());
 			} finally {
 				IOUtils.closeStream(in);
 			}
 		}
 
-		return pig.executeBatch();
+		return p.executeBatch();
 	}
 
 	/**
@@ -95,5 +114,21 @@ public class PigTasklet implements InitializingBean, Tasklet {
 	 */
 	public void setPigServer(PigServer pig) {
 		this.pig = pig;
+	}
+
+	/**
+	 * Sets the PigServer to use, by (bean) name. This is the default
+	 * method used by the hdp name space to allow lazy initialization and potential scoping
+	 * to kick in.
+	 * 
+	 * @param pigName The pigName to use.
+	 */
+	public void setPigServerName(String pigName) {
+		this.pigName = pigName;
+	}
+
+	@Override
+	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+		this.beanFactory = beanFactory;
 	}
 }
