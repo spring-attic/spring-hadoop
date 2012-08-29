@@ -22,113 +22,67 @@ import org.apache.hadoop.hive.service.HiveClient;
 import org.apache.hadoop.hive.service.ThriftHive;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.transport.TSocket;
-import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportException;
 import org.springframework.beans.factory.BeanCreationException;
-import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.context.SmartLifecycle;
 import org.springframework.core.io.Resource;
 import org.springframework.data.hadoop.HadoopException;
 import org.springframework.util.CollectionUtils;
 
 /**
  * FactoryBean for easy declaration and creation of a {@link HiveClient} using {@link ThriftHive}.
+ * Since Thrift clients are not thread-safe, neither is HiveClient. Thus this factory bean creates a
+ * new instance on each call which needs to be disposed by the using code, specifically calling
+ * {@link HiveClient#shutdown()}
  * 
  * @author Costin Leau
  */
-public class HiveClientFactoryBean implements SmartLifecycle, FactoryBean<HiveClient>, InitializingBean, DisposableBean {
+public class HiveClientFactoryBean implements FactoryBean<HiveClient> {
 
 	private Collection<HiveScript> scripts;
 
-	private HiveClient hive;
 	private String host = "localhost";
 	private int port = 10000;
 	private int timeout = 0;
-	private boolean autoStartup = true;
-
-	private TTransport transport;
-
-	public void afterPropertiesSet() {
-		transport = new TSocket(host, port, timeout);
-		hive = new HiveClient(new TBinaryProtocol(transport));
-	}
-
-	public void destroy() {
-		stop();
-		hive = null;
-		transport = null;
-	}
 
 	public HiveClient getObject() {
-		return hive;
+		return createHiveClient();
 	}
 
 	public Class<?> getObjectType() {
-		return (hive != null ? hive.getClass() : HiveClient.class);
+		return HiveClient.class;
 	}
 
 	public boolean isSingleton() {
-		return true;
+		return false;
 	}
 
-	public boolean isAutoStartup() {
-		return autoStartup;
-	}
+	protected HiveClient createHiveClient() {
+		TSocket transport = new TSocket(host, port, timeout);
+		HiveClient hive = new HiveClient(new TBinaryProtocol(transport));
 
-	public void stop(Runnable callback) {
-		stop();
-		callback.run();
-	}
+		Resource lastScript = null;
+		try {
+			transport.open();
 
-	public boolean isRunning() {
-		return (transport != null && transport.isOpen());
-	}
-
-	public void start() {
-		if (!isRunning()) {
-			Resource lastScript = null;
-			try {
-				transport.open();
-
-				if (!CollectionUtils.isEmpty(scripts)) {
-					for (HiveScript script : scripts) {
-						lastScript = script.getResource();
-						HiveScriptRunner.run(hive, script.getResource(), script.getArguments());
-					}
+			if (!CollectionUtils.isEmpty(scripts)) {
+				for (HiveScript script : scripts) {
+					lastScript = script.getResource();
+					HiveScriptRunner.run(hive, script.getResource(), script.getArguments());
 				}
-
-			} catch (TTransportException ex) {
-				throw new BeanCreationException("Cannot start transport", ex);
-			} catch (Exception ex) {
-				throw new HadoopException("Cannot execute Hive script [" + lastScript.getDescription(), ex);
 			}
-		}
-	}
 
-	public void stop() {
-		if (isRunning()) {
-			try {
-				transport.flush();
-			} catch (TTransportException ex) {
-				// ignore
-			}
-			transport.close();
+		} catch (TTransportException ex) {
+			throw new BeanCreationException("Cannot start transport", ex);
+		} catch (Exception ex) {
+			throw new HadoopException("Cannot execute Hive script [" + lastScript.getDescription(), ex);
 		}
+
+		return hive;
 	}
 
 	public int getPhase() {
 		return Integer.MIN_VALUE;
-	}
-
-	/**
-	 * Indicates whether the Hive client should start automatically (default) or not.
-	 * 
-	 * @param autoStart whether to automatically start or not
-	 */
-	public void setAutoStartup(boolean autoStart) {
-		this.autoStartup = autoStart;
 	}
 
 	/**

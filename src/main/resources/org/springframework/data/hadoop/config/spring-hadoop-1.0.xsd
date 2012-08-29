@@ -1064,7 +1064,6 @@ Bean id (default is "hiveClient").
 			</xsd:attribute>
 			<xsd:attribute name="host" type="xsd:string" default="localhost"/>
 			<xsd:attribute name="port" type="xsd:string" default="10000"/>
-			<xsd:attribute name="auto-startup" type="xsd:string" default="true"/>
 		</xsd:complexType>
 	</xsd:element>
 	

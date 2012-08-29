@@ -44,7 +44,4 @@ class HadoopTaskletParser extends AbstractImprovedSimpleBeanDefinitionParser {
 
 		builder.addPropertyValue("jobName", element.getAttribute("job-ref"));
 	}
-
-
-
 }

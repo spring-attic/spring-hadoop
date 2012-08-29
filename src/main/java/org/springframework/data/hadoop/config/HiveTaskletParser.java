@@ -44,10 +44,18 @@ class HiveTaskletParser extends AbstractImprovedSimpleBeanDefinitionParser {
 		return HiveTasklet.class;
 	}
 
+
+	@Override
+	protected boolean isEligibleAttribute(String attributeName) {
+		return (!"hive-client-ref".equals(attributeName)) && super.isEligibleAttribute(attributeName);
+	}
+
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 		// parse attributes using conventions
 		super.doParse(element, parserContext, builder);
+
+		builder.addPropertyValue("hiveClientName", element.getAttribute("hive-client-ref"));
 
 		// parse scripts
 		Collection<Object> scripts = parseScripts(parserContext, element);
@@ -55,7 +63,7 @@ class HiveTaskletParser extends AbstractImprovedSimpleBeanDefinitionParser {
 			builder.addPropertyValue("scripts", scripts);
 		}
 	}
-	
+
 	static Collection<Object> parseScripts(ParserContext context, Element element) {
 		Collection<Element> children = DomUtils.getChildElementsByTagName(element, "script");
 
