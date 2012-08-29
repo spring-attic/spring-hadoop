@@ -16,6 +16,7 @@
 package org.springframework.data.hadoop.hive;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -30,6 +31,7 @@ import org.apache.hadoop.hive.service.HiveServerException;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.thrift.TException;
 import org.springframework.core.io.Resource;
+import org.springframework.dao.DataAccessException;
 import org.springframework.util.StringUtils;
 
 /**
@@ -49,7 +51,7 @@ public abstract class HiveScriptRunner {
 	 * @return the script results
 	 * @throws Exception
 	 */
-	public static List<String> run(HiveClient hive, Resource script) throws Exception {
+	public static List<String> run(HiveClient hive, Resource script) throws DataAccessException {
 		return run(hive, script, "UTF-8", (Map) null);
 	}
 
@@ -63,7 +65,7 @@ public abstract class HiveScriptRunner {
 	 * @param params script parameters
 	 * @throws Exception
 	 */
-	public static List<String> run(HiveClient hive, Resource script, Properties params) throws Exception {
+	public static List<String> run(HiveClient hive, Resource script, Properties params) throws DataAccessException {
 		return run(hive, script, "UTF-8", params);
 	}
 
@@ -76,12 +78,12 @@ public abstract class HiveScriptRunner {
 	 * @return the script results
 	 * @throws Exception
 	 */
-	public static List<String> run(HiveClient hive, Resource script, String encoding) throws Exception {
+	public static List<String> run(HiveClient hive, Resource script, String encoding) throws DataAccessException {
 		return run(hive, script, encoding, (Map) null);
 	}
 
 	public static List<String> run(HiveClient hive, Resource script, String encoding, Properties params)
-			throws Exception {
+			throws DataAccessException {
 		Map<String, String> p = null;
 		if (params != null) {
 			Set<String> props = params.stringPropertyNames();
@@ -108,10 +110,17 @@ public abstract class HiveScriptRunner {
 	 * @throws Exception
 	 */
 	public static List<String> run(HiveClient hive, Resource script, String encoding, Map<String, String> params)
-			throws Exception {
-		InputStream stream = script.getInputStream();
-		BufferedReader reader = new BufferedReader((StringUtils.hasText(encoding) ? new InputStreamReader(stream, encoding) : 
-			new InputStreamReader(stream)));
+			throws DataAccessException {
+		BufferedReader reader;
+		InputStream stream;
+		try {
+			stream = script.getInputStream();
+			reader = new BufferedReader(
+					(StringUtils.hasText(encoding) ? new InputStreamReader(stream, encoding) : new InputStreamReader(
+							stream)));
+		} catch (Exception ex) {
+			throw new IllegalArgumentException("Cannot open scripts", ex);
+		}
 
 		List<String> results = new ArrayList<String>();
 
@@ -145,12 +154,8 @@ public abstract class HiveScriptRunner {
 					}
 				}
 			}
-		} catch (Exception ex) {
-			try {
-				hive.clean();
-			} catch (Exception exc) {
-			}
-			throw ex;
+		} catch (IOException ex) {
+			throw new IllegalArgumentException("Cannot read scripts", ex);
 		} finally {
 			IOUtils.closeStream(reader);
 		}
@@ -158,8 +163,19 @@ public abstract class HiveScriptRunner {
 		return results;
 	}
 
-	private static List<String> runCommand(HiveClient hive, String command) throws HiveServerException, TException {
-		hive.execute(command);
-		return hive.fetchAll();
+	private static List<String> runCommand(HiveClient hive, String command) throws DataAccessException {
+		try {
+			hive.execute(command);
+			return hive.fetchAll();
+		} catch (Exception ex) {
+			try {
+				hive.clean();
+			} catch (Exception exc) {
+			}
+			if (ex instanceof HiveServerException) {
+				throw HiveExceptionTranslation.convert((HiveServerException) ex);
+			}
+			throw HiveExceptionTranslation.convert((TException) ex);
+		}
 	}
 }

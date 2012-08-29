@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.hadoop.hive.service.HiveClient;
-import org.apache.hadoop.hive.service.HiveServerException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,7 +89,7 @@ public class HiveBatchTest {
 		pt.execute(null, null);
 	}
 
-	@Test(expected = HiveServerException.class)
+	@Test(expected = Exception.class)
 	public void testScriptRunner() throws Exception {
 		HiveScriptRunner.run(client, ctx.getResource("org/springframework/data/hadoop/hive/hive-failing-script.q"));
 	}

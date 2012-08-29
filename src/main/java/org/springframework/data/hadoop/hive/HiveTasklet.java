@@ -26,7 +26,6 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.data.hadoop.HadoopException;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -57,8 +56,6 @@ public class HiveTasklet implements InitializingBean, BeanFactoryAware, Tasklet 
 	}
 
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		Exception exc = null;
-
 		HiveClient h = (hive != null ? hive : beanFactory.getBean(hiveClientName, HiveClient.class));
 
 		try {
@@ -66,15 +63,11 @@ public class HiveTasklet implements InitializingBean, BeanFactoryAware, Tasklet 
 				HiveScriptRunner.run(h, script.getResource(), script.getArguments());
 			}
 			return RepeatStatus.FINISHED;
-		} catch (Exception ex) {
-			exc = ex;
 		} finally {
 			if (hive == null) {
 				h.shutdown();
 			}
 		}
-
-		throw new HadoopException("Cannot execute Hive script(s)", exc);
 	}
 
 	/**

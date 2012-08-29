@@ -44,7 +44,6 @@ class HiveTaskletParser extends AbstractImprovedSimpleBeanDefinitionParser {
 		return HiveTasklet.class;
 	}
 
-
 	@Override
 	protected boolean isEligibleAttribute(String attributeName) {
 		return (!"hive-client-ref".equals(attributeName)) && super.isEligibleAttribute(attributeName);
