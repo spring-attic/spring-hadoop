@@ -181,6 +181,14 @@ The security user (ugi) to use for impersonation at runtime.
 				]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
+		<xsd:attribute name="close" type="xsd:string" default="true">
+			<xsd:annotation>
+			<xsd:documentation><![CDATA[
+Whether or not the Hadoop file systems should be closed once this factory is destroyed.
+True by default - should be turned off when running 'embedded' or if long running operations outlive the application context.
+				]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
 		<xsd:attribute name="close-all" type="xsd:string" default="false">
 			<xsd:annotation>
 			<xsd:documentation><![CDATA[
