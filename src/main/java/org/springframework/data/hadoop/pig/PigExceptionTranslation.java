@@ -18,7 +18,17 @@ package org.springframework.data.hadoop.pig;
 import java.io.IOException;
 
 import org.apache.pig.PigException;
+import org.apache.pig.backend.BackendException;
+import org.apache.pig.backend.hadoop.executionengine.mapReduceLayer.JobCreationException;
+import org.apache.pig.impl.logicalLayer.FrontendException;
+import org.apache.pig.impl.logicalLayer.schema.SchemaMergeException;
+import org.apache.pig.impl.plan.PlanException;
+import org.apache.pig.impl.plan.VisitorException;
+import org.apache.pig.parser.ParserException;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataAccessResourceFailureException;
+import org.springframework.dao.InvalidDataAccessResourceUsageException;
+import org.springframework.dao.NonTransientDataAccessResourceException;
 
 /**
  * Utility class converting Hive exceptions to DataAccessExceptions.
@@ -28,10 +38,33 @@ import org.springframework.dao.DataAccessException;
 abstract class PigExceptionTranslation {
 
 	static DataAccessException convert(PigException ex) {
-		throw new UnsupportedOperationException();
+		if (ex instanceof BackendException) {
+			return new DataAccessResourceFailureException("Backend Pig exception", ex);
+		}
+
+		if (ex instanceof VisitorException || ex instanceof PlanException || ex instanceof SchemaMergeException) {
+			return new InvalidDataAccessResourceUsageException("Plan failed", ex);
+		}
+
+		if (ex instanceof FrontendException) {
+			if (ex instanceof JobCreationException) {
+				return new InvalidDataAccessResourceUsageException("Map Reduce error", ex);
+			}
+
+			if (ex instanceof ParserException) {
+				return new InvalidDataAccessResourceUsageException("Syntax error", ex);
+			}
+		}
+
+		return new NonTransientDataAccessResourceException("Unknown Pig error", ex);
 	}
 
 	static DataAccessException convert(IOException ex) {
-		throw new UnsupportedOperationException();
+		Throwable cause = ex.getCause();
+		if (cause instanceof PigException) {
+			return convert((PigException) ex);
+		}
+
+		return new NonTransientDataAccessResourceException("Unknown Pig error", ex);
 	}
 }
