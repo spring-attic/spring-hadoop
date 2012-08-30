@@ -60,7 +60,7 @@ public class HiveTasklet implements InitializingBean, BeanFactoryAware, Tasklet 
 
 		try {
 			for (HiveScript script : scripts) {
-				HiveScriptRunner.run(h, script.getResource(), script.getArguments());
+				HiveScriptRunner.run(h, script);
 			}
 			return RepeatStatus.FINISHED;
 		} finally {

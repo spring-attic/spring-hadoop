@@ -57,6 +57,18 @@ public abstract class HiveScriptRunner {
 
 
 	/**
+	 * Runs (or executes) the given script.
+	 * 
+	 * @param hive hive client
+	 * @param script script to run
+	 * @return the script results
+	 * @throws DataAccessException
+	 */
+	public static List<String> run(HiveClient hive, HiveScript script) throws DataAccessException {
+		return run(hive, script.getResource(), "UTF-8", script.getArguments());
+	}
+
+	/**
 	 * Runs (or executes) the given script (using "UTF-8" as the script encoding).
 	 * 
 	 * @param hive hive client
@@ -67,19 +79,6 @@ public abstract class HiveScriptRunner {
 	 */
 	public static List<String> run(HiveClient hive, Resource script, Properties params) throws DataAccessException {
 		return run(hive, script, "UTF-8", params);
-	}
-
-	/**
-	 * Runs (or executes) the given script.
-	 * 
-	 * @param hive hive client
-	 * @param script script to run
-	 * @param encoding script encoding
-	 * @return the script results
-	 * @throws Exception
-	 */
-	public static List<String> run(HiveClient hive, Resource script, String encoding) throws DataAccessException {
-		return run(hive, script, encoding, (Map) null);
 	}
 
 	public static List<String> run(HiveClient hive, Resource script, String encoding, Properties params)

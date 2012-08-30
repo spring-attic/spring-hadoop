@@ -68,7 +68,7 @@ public class HiveClientFactoryBean implements FactoryBean<HiveClient> {
 			if (!CollectionUtils.isEmpty(scripts)) {
 				for (HiveScript script : scripts) {
 					lastScript = script.getResource();
-					HiveScriptRunner.run(hive, script.getResource(), script.getArguments());
+					HiveScriptRunner.run(hive, script);
 				}
 			}
 
