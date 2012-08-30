@@ -15,16 +15,12 @@
  */
 package org.springframework.data.hadoop.pig;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.security.PrivilegedExceptionAction;
 import java.util.Collection;
 
-import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.pig.PigServer;
 import org.apache.pig.impl.PigContext;
-import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.util.CollectionUtils;
@@ -110,17 +106,7 @@ public class PigServerFactoryBean implements FactoryBean<PigServer>, BeanNameAwa
 
 
 		if (!CollectionUtils.isEmpty(scripts)) {
-			for (PigScript script : scripts) {
-				InputStream in = null;
-				try {
-					in = script.getResource().getInputStream();
-					pigServer.registerScript(in, script.getArguments());
-				} catch (IOException ex) {
-					throw new BeanInitializationException("Cannot register script " + script, ex);
-				} finally {
-					IOUtils.closeStream(in);
-				}
-			}
+			PigScriptRunner.run(pigServer, scripts, true, false);
 		}
 
 		return pigServer;

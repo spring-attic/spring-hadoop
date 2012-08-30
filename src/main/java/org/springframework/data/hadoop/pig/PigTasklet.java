@@ -15,14 +15,9 @@
  */
 package org.springframework.data.hadoop.pig;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Collection;
-import java.util.List;
 
-import org.apache.hadoop.io.IOUtils;
 import org.apache.pig.PigServer;
-import org.apache.pig.backend.executionengine.ExecJob;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -31,7 +26,6 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.data.hadoop.HadoopException;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -61,41 +55,10 @@ public class PigTasklet implements InitializingBean, BeanFactoryAware, Tasklet {
 	}
 
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		Exception exc = null;
-
 		PigServer p = (pig != null ? pig : beanFactory.getBean(pigName, PigServer.class));
 
-		p.setBatchOn();
-		p.getPigContext().connect();
-
-		try {
-			execute(p);
-			return RepeatStatus.FINISHED;
-		} catch (Exception ex) {
-			exc = ex;
-		} finally {
-			if (pig == null) {
-				p.shutdown();
-			}
-		}
-
-		throw new HadoopException("Cannot execute Pig script(s)", exc);
-	}
-
-	private List<ExecJob> execute(PigServer p) throws IOException {
-
-		// register scripts
-		for (PigScript script : scripts) {
-			InputStream in = null;
-			try {
-				in = script.getResource().getInputStream();
-				p.registerScript(in, script.getArguments());
-			} finally {
-				IOUtils.closeStream(in);
-			}
-		}
-
-		return p.executeBatch();
+		PigScriptRunner.run(p, scripts, pig == null, pig == null);
+		return RepeatStatus.FINISHED;
 	}
 
 	/**
