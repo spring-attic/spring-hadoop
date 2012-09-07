@@ -430,7 +430,7 @@ hadoop jar job10.jar ...]]></programlisting>
     <hdp:arg value="wordcount"/>
     <hdp:arg value="/wordcount/input"/>
     <hdp:arg value="/wordcount/output"/>
-</hdp:jar-tasklet>]]></programlisting>
+</hdp:jar-runner>]]></programlisting>
 
 		<note>Just like the <literal>hadoop jar</literal> command, by default the jar support reads the jar's <literal>Main-Class</literal> if none is specified. This can be customized through the <literal>main-class</literal> attribute.</note>
 		
@@ -444,7 +444,7 @@ hadoop jar job10.jar ...]]></programlisting>
     <hdp:arg value="wordcount"/>
     ...
     speed=fast
-</hdp:jar-tasklet>]]></programlisting>
+</hdp:jar-runner>]]></programlisting>
 
 		<para>inside the jar code, one could do the following:</para>
 		

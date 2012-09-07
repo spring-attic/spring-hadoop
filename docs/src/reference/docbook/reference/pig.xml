@@ -32,8 +32,7 @@
 	relevant to the script, is passed (notice the use of property placeholder) but also an inlined script, declared as part of the definition, without any arguments.</para>
 	
 	<para>As you can tell, the <literal>pig</literal> namespace offers several options pertaining to Pig configuration. 
-	And, as with the other Hadoop-related integration, the underlying <interfacename>PigServer</interfacename> is bound to the enclosing application context life-cycle; that is, it will automatically start and stop along-side
-	the application so one does not have to worry about its management.</para>
+	Note that because <interfacename>PigServer</interfacename> is not thread-safe, a new instance is created on each request.</para>
 	
 	<section id="pig:tasklet">
 		<title>Using the Pig tasklet</title>
