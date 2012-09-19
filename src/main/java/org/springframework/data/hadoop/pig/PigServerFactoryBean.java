@@ -20,20 +20,28 @@ import java.util.Collection;
 
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.pig.PigServer;
+import org.apache.pig.backend.executionengine.ExecException;
 import org.apache.pig.impl.PigContext;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Factory for creating a {@link PigServer} instance. Note that since PigServer is not thread-safe, this factory will
- * create a new instance for every {@link #getObject()} invocation. The caller needs to handle the object clean-up, 
- * specifically calling {@link PigServer#shutdown()}.
+ * Factory for creating a {@link PigServer} instance. Note that since PigServer is not thread-safe and the Pig API does not
+ * provide some type of factory, the factory bean returns an instance of {@link ObjectFactory} (which handles the creation of {@link PigServer} instances) 
+ * instead of the raw {@link PigServer} object which cannot be reused. 
+ * 
+ * Note that the caller needs to handle the object clean-up,  specifically calling {@link PigServer#shutdown()}. 
+ * 
+ * In general, to avoid leaks it is recommended to use the {@link PigTemplate}.
  * 
  * @author Costin Leau
  */
-public class PigServerFactoryBean implements FactoryBean<PigServer>, BeanNameAware {
+public class PigServerFactoryBean implements FactoryBean<ObjectFactory<PigServer>>, BeanNameAware {
 
 	private PigContext pigContext;
 	private Collection<String> pathToSkip;
@@ -46,16 +54,25 @@ public class PigServerFactoryBean implements FactoryBean<PigServer>, BeanNameAwa
 
 	private String user;
 
-	public PigServer getObject() throws Exception {
-		return createPigInstance();
+	public ObjectFactory<PigServer> getObject() throws Exception {
+		return new ObjectFactory<PigServer>() {
+			@Override
+			public PigServer getObject() throws BeansException {
+				try {
+					return createPigInstance();
+				} catch (Exception ex) {
+					throw new BeanCreationException("Cannot create PigServer instance", ex);
+				}
+			}
+		};
 	}
 
 	public Class<?> getObjectType() {
-		return PigServer.class;
+		return ObjectFactory.class;
 	}
 
 	public boolean isSingleton() {
-		return false;
+		return true;
 	}
 
 	protected PigServer createPigInstance() throws Exception {
@@ -64,18 +81,24 @@ public class PigServerFactoryBean implements FactoryBean<PigServer>, BeanNameAwa
 		// apparently if not connected, pig can cause all kind of errors
 		PigServer pigServer = null;
 
-		if (StringUtils.hasText(user)) {
-			UserGroupInformation ugi = UserGroupInformation.createProxyUser(user, UserGroupInformation.getLoginUser());
-			pigServer = ugi.doAs(new PrivilegedExceptionAction<PigServer>() {
-				@Override
-				public PigServer run() throws Exception {
-					return new PigServer(ctx, true);
-				}
-			});
+		try {
+			if (StringUtils.hasText(user)) {
+				UserGroupInformation ugi = UserGroupInformation.createProxyUser(user,
+						UserGroupInformation.getLoginUser());
+				pigServer = ugi.doAs(new PrivilegedExceptionAction<PigServer>() {
+					@Override
+					public PigServer run() throws Exception {
+						return new PigServer(ctx, true);
+					}
+				});
+			}
+			else {
+				pigServer = new PigServer(ctx, true);
+			}
+		} catch (ExecException ex) {
+			throw PigUtils.convert(ex);
 		}
-		else {
-			pigServer = new PigServer(ctx, true);
-		}
+
 
 		if (!CollectionUtils.isEmpty(pathToSkip)) {
 			for (String path : pathToSkip) {
@@ -106,7 +129,7 @@ public class PigServerFactoryBean implements FactoryBean<PigServer>, BeanNameAwa
 
 
 		if (!CollectionUtils.isEmpty(scripts)) {
-			PigScriptRunner.run(pigServer, scripts, true, false);
+			PigUtils.run(pigServer, scripts);
 		}
 
 		return pigServer;

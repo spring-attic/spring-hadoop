@@ -22,42 +22,33 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
+import org.springframework.beans.factory.ObjectFactory;
 
 /**
  * Pig tasklet. Note the same {@link PigServer} is shared between invocations. 
  * 
  * @author Costin Leau
  */
-public class PigTasklet implements InitializingBean, BeanFactoryAware, Tasklet {
+public class PigTasklet implements InitializingBean, Tasklet {
 
-	private PigServer pig;
+	private ObjectFactory<PigServer> pigFactory;
+	private PigTemplate pigTemplate;
 	private Collection<PigScript> scripts;
-	private BeanFactory beanFactory;
-	private String pigName;
-
 
 	@Override
 	public void afterPropertiesSet() {
-		Assert.isTrue(pig != null || StringUtils.hasText(pigName), "A Pig instance or bean name is required");
+		if (pigFactory == null && pigTemplate == null) {
+			throw new IllegalArgumentException("a PigServer factory or a PigTemplate is required");
+		}
 
-		Assert.notEmpty(scripts, "At least one script needs to be specified");
-		if (StringUtils.hasText(pigName)) {
-			Assert.notNull(beanFactory, "a bean factory is required if the job is specified by name");
-			Assert.isTrue(beanFactory.containsBean(pigName), "beanFactory does not contain any bean named [" + pigName
-					+ "]");
+		if (pigTemplate == null) {
+			pigTemplate = new PigTemplate(pigFactory);
 		}
 	}
 
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		PigServer p = (pig != null ? pig : beanFactory.getBean(pigName, PigServer.class));
-
-		PigScriptRunner.run(p, scripts, pig == null, pig == null);
+		pigTemplate.execute(scripts);
 		return RepeatStatus.FINISHED;
 	}
 
@@ -73,25 +64,17 @@ public class PigTasklet implements InitializingBean, BeanFactoryAware, Tasklet {
 	/**
 	 * Sets the pig server instance used by this tasklet.
 	 * 
-	 * @param pig The pig to set.
+	 * @param pigFactory The pigFactory to set.
 	 */
-	public void setPigServer(PigServer pig) {
-		this.pig = pig;
+	public void setPigServer(ObjectFactory<PigServer> pigFactory) {
+		this.pigFactory = pigFactory;
 	}
 
 	/**
-	 * Sets the PigServer to use, by (bean) name. This is the default
-	 * method used by the hdp name space to allow lazy initialization and potential scoping
-	 * to kick in.
-	 * 
-	 * @param pigName The pigName to use.
+	 * Sets the pig template used by this tasklet.
+	 * @param pigTemplate
 	 */
-	public void setPigServerName(String pigName) {
-		this.pigName = pigName;
-	}
-
-	@Override
-	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
-		this.beanFactory = beanFactory;
+	public void setPigTemplate(PigTemplate pigTemplate) {
+		this.pigTemplate = pigTemplate;
 	}
 }

@@ -16,9 +16,15 @@
 package org.springframework.data.hadoop.pig;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
 
+import org.apache.hadoop.io.IOUtils;
 import org.apache.pig.PigException;
+import org.apache.pig.PigServer;
 import org.apache.pig.backend.BackendException;
+import org.apache.pig.backend.executionengine.ExecException;
+import org.apache.pig.backend.executionengine.ExecJob;
 import org.apache.pig.backend.hadoop.executionengine.mapReduceLayer.JobCreationException;
 import org.apache.pig.impl.logicalLayer.FrontendException;
 import org.apache.pig.impl.logicalLayer.schema.SchemaMergeException;
@@ -31,11 +37,11 @@ import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.dao.NonTransientDataAccessResourceException;
 
 /**
- * Utility class converting Hive exceptions to DataAccessExceptions.
+ * Internal utility class executing Pig scripts and converting Pig exceptions to DataAccessExceptions. 
  * 
  * @author Costin Leau
  */
-abstract class PigExceptionTranslation {
+abstract class PigUtils {
 
 	static DataAccessException convert(PigException ex) {
 		if (ex instanceof BackendException) {
@@ -66,5 +72,36 @@ abstract class PigExceptionTranslation {
 		}
 
 		return new NonTransientDataAccessResourceException("Unknown Pig error", ex);
+	}
+
+	static List<ExecJob> run(PigServer pig, Iterable<PigScript> scripts) {
+		if (!pig.isBatchOn()) {
+			pig.setBatchOn();
+		}
+
+		try {
+			pig.getPigContext().connect();
+
+			InputStream in = null;
+			try {
+				for (PigScript script : scripts) {
+					try {
+						in = script.getResource().getInputStream();
+					} catch (IOException ex) {
+						throw new IllegalArgumentException("Cannot open script [" + script.getResource() + "]", ex);
+					}
+					pig.registerScript(in, script.getArguments());
+				}
+			} finally {
+				IOUtils.closeStream(in);
+			}
+			return pig.executeBatch();
+		} catch (ExecException ex) {
+			throw convert(ex);
+		} catch (IOException ex) {
+			throw convert(ex);
+		} finally {
+			pig.shutdown();
+		}
 	}
 }
