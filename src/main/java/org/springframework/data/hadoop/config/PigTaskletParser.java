@@ -37,17 +37,9 @@ class PigTaskletParser extends AbstractImprovedSimpleBeanDefinitionParser {
 	}
 
 	@Override
-	protected boolean isEligibleAttribute(String attributeName) {
-		return (!"pig-server-ref".equals(attributeName)) && super.isEligibleAttribute(attributeName);
-	}
-
-	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 		// parse attributes using conventions
 		super.doParse(element, parserContext, builder);
-
-		builder.addPropertyValue("pigServerName", element.getAttribute("pig-server-ref"));
-
 		// parse scripts
 		Collection<BeanDefinition> scripts = PigServerParser.parseScripts(parserContext, element);
 		if (!CollectionUtils.isEmpty(scripts)) {

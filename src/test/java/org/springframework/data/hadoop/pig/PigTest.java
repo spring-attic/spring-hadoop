@@ -26,8 +26,10 @@ import javax.annotation.Resource;
 import org.apache.pig.ExecType;
 import org.apache.pig.PigServer;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.hadoop.TestUtils;
@@ -45,6 +47,7 @@ import static org.junit.Assert.*;
 public class PigTest {
 
 	@Resource(name = "pig-raw")
+	private ObjectFactory<PigServer> pigFactory;
 	private PigServer pig;
 
 	@Autowired
@@ -52,6 +55,11 @@ public class PigTest {
 
 	{
 		TestUtils.hackHadoopStagingOnWin();
+	}
+
+	@Before
+	public void init() {
+		pig = pigFactory.getObject();
 	}
 
 	@After
@@ -69,7 +77,7 @@ public class PigTest {
 	public void testServerNamespace() throws Exception {
 		String defaultName = "pig";
 		assertTrue(ctx.containsBean(defaultName));
-		PigServer server = ctx.getBean(defaultName, PigServer.class);
+		PigServer server = (PigServer) (ctx.getBean(defaultName, ObjectFactory.class)).getObject();
 		Properties props = server.getPigContext().getProperties();
 		assertEquals("blue", props.get("ivy"));
 		assertEquals(ExecType.LOCAL, server.getPigContext().getExecType());
@@ -77,7 +85,7 @@ public class PigTest {
 
 	@Test
 	public void testPigProperties() throws Exception {
-		PigServer pig = ctx.getBean("pig", PigServer.class);
+		PigServer pig = (PigServer) (ctx.getBean("pig", ObjectFactory.class)).getObject();
 		Properties props = pig.getPigContext().getProperties();
 		assertEquals("blue", props.get("ivy"));
 
