@@ -76,6 +76,9 @@
     Toolsuite</link> is a free Eclipse-powered development environment which
     provides a nice visualization and authoring help for Spring Batch
     workflows as shown below.<mediaobject>
+        <imageobject role="fo">
+          <imagedata fileref="../images/batch-wordcount-ide.jpg" format="JPG"/>
+        </imageobject>
         <imageobject role="html">
           <imagedata fileref="images/batch-wordcount-ide.jpg" format="JPG"/>
         </imageobject>
