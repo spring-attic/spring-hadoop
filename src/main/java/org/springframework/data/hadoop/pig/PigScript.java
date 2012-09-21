@@ -39,7 +39,7 @@ public class PigScript {
 	 * @param resource script resource.
 	 */
 	public PigScript(Resource resource) {
-		this(resource, null);
+		this(resource, (Properties) null);
 	}
 
 	/**
@@ -52,13 +52,25 @@ public class PigScript {
 	public PigScript(Resource resource, Properties args) {
 		Assert.notNull(resource, "a valid resource is required");
 		this.resource = resource;
-		this.arguments = new LinkedHashMap<String, String>();
 
 		if (args != null) {
+			arguments = new LinkedHashMap<String, String>();
 			for (String key : args.stringPropertyNames()) {
 				arguments.put(key, args.getProperty(key));
 			}
 		}
+	}
+
+	/**
+	 * Constructs a new <code>PigScript</code> instance.
+	 *
+	 * @param resource
+	 * @param args
+	 */
+	public PigScript(Resource resource, Map<String, String> args) {
+		Assert.notNull(resource, "a valid resource is required");
+		this.resource = resource;
+		this.arguments = args;
 	}
 
 	/**

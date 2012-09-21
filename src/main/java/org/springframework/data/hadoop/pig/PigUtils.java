@@ -74,7 +74,7 @@ abstract class PigUtils {
 		return new NonTransientDataAccessResourceException("Unknown Pig error", ex);
 	}
 
-	static List<ExecJob> run(PigServer pig, Iterable<PigScript> scripts) {
+	static List<ExecJob> run(PigServer pig, Iterable<PigScript> scripts, boolean closePig) {
 		if (!pig.isBatchOn()) {
 			pig.setBatchOn();
 		}
@@ -101,7 +101,9 @@ abstract class PigUtils {
 		} catch (IOException ex) {
 			throw convert(ex);
 		} finally {
-			pig.shutdown();
+			if (closePig) {
+				pig.shutdown();
+			}
 		}
 	}
 }

@@ -17,11 +17,13 @@ package org.springframework.data.hadoop.pig;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.pig.PigServer;
 import org.apache.pig.backend.executionengine.ExecJob;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.ObjectFactory;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessException;
 import org.springframework.util.Assert;
@@ -36,18 +38,34 @@ public class PigTemplate implements InitializingBean {
 
 	private ObjectFactory<PigServer> pigServerFactory;
 
+	/**
+	 * Constructs a new <code>PigTemplate</code> instance.
+	 * Expects {@link #setPigServer(ObjectFactory)} to be called before using it.
+	 */
 	public PigTemplate() {
 	}
 
+	/**
+	 * Constructs a new <code>PigTemplate</code> instance.
+	 *
+	 * @param pigFactory pig factory
+	 */
 	public PigTemplate(ObjectFactory<PigServer> pigFactory) {
 		this.pigServerFactory = pigFactory;
 		afterPropertiesSet();
 	}
 
-
 	@Override
 	public void afterPropertiesSet() {
 		Assert.notNull(pigServerFactory, "non-null pig server factory required");
+	}
+
+	public List<ExecJob> execute(String script) throws DataAccessException {
+		return execute(script, null);
+	}
+
+	public List<ExecJob> execute(String script, Map<String, String> arguments) throws DataAccessException {
+		return execute(new PigScript(new ByteArrayResource(script.getBytes()), arguments));
 	}
 
 	public List<ExecJob> execute(Resource script) throws DataAccessException {
@@ -59,7 +77,7 @@ public class PigTemplate implements InitializingBean {
 	}
 
 	public List<ExecJob> execute(Iterable<PigScript> scripts) throws DataAccessException {
-		return PigUtils.run(createPigServer(), scripts);
+		return PigUtils.run(createPigServer(), scripts, true);
 	}
 
 	protected PigServer createPigServer() {

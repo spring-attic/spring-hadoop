@@ -24,6 +24,7 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.ObjectFactory;
+import org.springframework.util.Assert;
 
 /**
  * Pig tasklet. Note the same {@link PigServer} is shared between invocations. 
@@ -45,6 +46,8 @@ public class PigTasklet implements InitializingBean, Tasklet {
 		if (pigTemplate == null) {
 			pigTemplate = new PigTemplate(pigFactory);
 		}
+
+		Assert.notEmpty(scripts, "no scripts specified");
 	}
 
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
