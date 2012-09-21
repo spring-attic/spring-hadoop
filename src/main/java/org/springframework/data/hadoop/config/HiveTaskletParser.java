@@ -45,16 +45,9 @@ class HiveTaskletParser extends AbstractImprovedSimpleBeanDefinitionParser {
 	}
 
 	@Override
-	protected boolean isEligibleAttribute(String attributeName) {
-		return (!"hive-client-ref".equals(attributeName)) && super.isEligibleAttribute(attributeName);
-	}
-
-	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 		// parse attributes using conventions
 		super.doParse(element, parserContext, builder);
-
-		builder.addPropertyValue("hiveClientName", element.getAttribute("hive-client-ref"));
 
 		// parse scripts
 		Collection<Object> scripts = parseScripts(parserContext, element);

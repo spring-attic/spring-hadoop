@@ -22,52 +22,37 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 
 /**
  * Hive tasklet running Hive scripts on demand, against a {@link HiveClient}.
  * 
  * @author Costin Leau
  */
-public class HiveTasklet implements InitializingBean, BeanFactoryAware, Tasklet {
+public class HiveTasklet implements InitializingBean, Tasklet {
 
-	private HiveClient hive;
+	private ObjectFactory<HiveClient> hiveClientFactory;
+	private HiveTemplate hiveTemplate;
 	private Collection<HiveScript> scripts;
-	private BeanFactory beanFactory;
-	private String hiveClientName;
 
 	@Override
 	public void afterPropertiesSet() {
-		Assert.isTrue(hive != null || StringUtils.hasText(hiveClientName),
-				"A HiveClient instance or bean name is required");
-
-		Assert.notEmpty(scripts, "At least one script needs to be specified");
-
-		if (StringUtils.hasText(hiveClientName)) {
-			Assert.notNull(beanFactory, "a bean factory is required if the job is specified by name");
-			Assert.isTrue(beanFactory.containsBean(hiveClientName), "beanFactory does not contain any bean named ["
-					+ hiveClientName + "]");
+		if (hiveClientFactory == null && hiveTemplate == null) {
+			throw new IllegalArgumentException("a HiveClient factory or a HiveTemplate is required");
 		}
+
+		if (hiveTemplate == null) {
+			hiveTemplate = new HiveTemplate(hiveClientFactory);
+		}
+
+		Assert.notEmpty(scripts, "no scripts specified");
 	}
 
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		HiveClient h = (hive != null ? hive : beanFactory.getBean(hiveClientName, HiveClient.class));
-
-		try {
-			for (HiveScript script : scripts) {
-				HiveScriptRunner.run(h, script);
-			}
-			return RepeatStatus.FINISHED;
-		} finally {
-			if (hive == null) {
-				h.shutdown();
-			}
-		}
+		hiveTemplate.execute(scripts);
+		return RepeatStatus.FINISHED;
 	}
 
 	/**
@@ -84,22 +69,16 @@ public class HiveTasklet implements InitializingBean, BeanFactoryAware, Tasklet 
 	 *  
 	 * @param hive HiveClient to set
 	 */
-	public void setHiveClient(HiveClient hive) {
-		this.hive = hive;
-	}
-
-	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
-		this.beanFactory = beanFactory;
+	public void setHiveClient(ObjectFactory<HiveClient> hiveFactory) {
+		this.hiveClientFactory = hiveFactory;
 	}
 
 	/**
-	 * Sets the HiveClient to use, by (bean) name. This is the default
-	 * method used by the hdp name space to allow lazy initialization and potential scoping
-	 * to kick in.
-	 * 
-	 * @param hiveClientName The HiveClient to use.
+	 * Sets the hive template.
+	 *
+	 * @param hiveTemplate the new hive template
 	 */
-	public void setHiveClientName(String hiveClientName) {
-		this.hiveClientName = hiveClientName;
+	public void setHiveTemplate(HiveTemplate hiveTemplate) {
+		this.hiveTemplate = hiveTemplate;
 	}
 }

@@ -15,7 +15,10 @@
  */
 package org.springframework.data.hadoop.hive;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
@@ -28,7 +31,7 @@ import org.springframework.util.Assert;
 public class HiveScript {
 
 	private Resource resource;
-	private Properties arguments;
+	private Map<String, String> arguments;
 
 	/**
 	 * Constructs a new <code>HiveScript</code> instance from the given
@@ -37,7 +40,13 @@ public class HiveScript {
 	 * @param resource script resource.
 	 */
 	public HiveScript(Resource resource) {
-		this(resource, null);
+		this(resource, (Map<String, String>) null);
+	}
+
+	public HiveScript(Resource resource, Map<String, String> args) {
+		Assert.notNull(resource, "a valid resource is required");
+		this.resource = resource;
+		this.arguments = args;
 	}
 
 	/**
@@ -50,7 +59,13 @@ public class HiveScript {
 	public HiveScript(Resource resource, Properties args) {
 		Assert.notNull(resource, "a valid resource is required");
 		this.resource = resource;
-		this.arguments = args;
+		if (args != null) {
+			Set<String> props = args.stringPropertyNames();
+			arguments = new LinkedHashMap<String, String>();
+			for (String prop : props) {
+				arguments.put(prop, args.getProperty(prop));
+			}
+		}
 	}
 
 	/**
@@ -67,7 +82,7 @@ public class HiveScript {
 	 *
 	 * @return Returns the arguments for this script.
 	 */
-	public Properties getArguments() {
+	public Map<String, String> getArguments() {
 		return arguments;
 	}
 

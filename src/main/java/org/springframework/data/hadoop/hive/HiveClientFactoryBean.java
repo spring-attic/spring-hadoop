@@ -23,21 +23,25 @@ import org.apache.hadoop.hive.service.ThriftHive;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransportException;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.FactoryBean;
-import org.springframework.core.io.Resource;
-import org.springframework.data.hadoop.HadoopException;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.util.CollectionUtils;
 
 /**
  * FactoryBean for easy declaration and creation of a {@link HiveClient} using {@link ThriftHive}.
- * Since Thrift clients are not thread-safe, neither is HiveClient. Thus this factory bean creates a
- * new instance on each call which needs to be disposed by the using code, specifically calling
- * {@link HiveClient#shutdown()}
+ * Since Thrift clients are not thread-safe, neither is HiveClient. And since the Hive API does not provide
+ * some type of factory, the factory bean returns an instance of {@link ObjectFactory} (that handles the creation
+ * of {@link HiveClient} instances) instead of the raw {@link HiveClient} instance. 
+ * 
+ * Note that the caller needs to handle the object clean-up,  specifically calling {@link HiveClient#shutdown()}. 
+ * 
+ * In general, to avoid leaks it is recommended to use the {@link HiveTemplate}.
  * 
  * @author Costin Leau
  */
-public class HiveClientFactoryBean implements FactoryBean<HiveClient> {
+public class HiveClientFactoryBean implements FactoryBean<ObjectFactory<HiveClient>> {
 
 	private Collection<HiveScript> scripts;
 
@@ -45,8 +49,18 @@ public class HiveClientFactoryBean implements FactoryBean<HiveClient> {
 	private int port = 10000;
 	private int timeout = 0;
 
-	public HiveClient getObject() {
-		return createHiveClient();
+	public ObjectFactory<HiveClient> getObject() {
+		return new ObjectFactory<HiveClient>() {
+
+			@Override
+			public HiveClient getObject() throws BeansException {
+				try {
+					return createHiveClient();
+				} catch (Exception ex) {
+					throw new BeanCreationException("Cannot create HiveClient instance", ex);
+				}
+			}
+		};
 	}
 
 	public Class<?> getObjectType() {
@@ -54,28 +68,21 @@ public class HiveClientFactoryBean implements FactoryBean<HiveClient> {
 	}
 
 	public boolean isSingleton() {
-		return false;
+		return true;
 	}
 
 	protected HiveClient createHiveClient() {
 		TSocket transport = new TSocket(host, port, timeout);
 		HiveClient hive = new HiveClient(new TBinaryProtocol(transport));
 
-		Resource lastScript = null;
 		try {
 			transport.open();
 
 			if (!CollectionUtils.isEmpty(scripts)) {
-				for (HiveScript script : scripts) {
-					lastScript = script.getResource();
-					HiveScriptRunner.run(hive, script);
-				}
+				HiveUtils.run(hive, scripts, false);
 			}
-
 		} catch (TTransportException ex) {
-			throw new BeanCreationException("Cannot start transport", ex);
-		} catch (Exception ex) {
-			throw new HadoopException("Cannot execute Hive script [" + lastScript.getDescription(), ex);
+			throw HiveUtils.convert(ex);
 		}
 
 		return hive;

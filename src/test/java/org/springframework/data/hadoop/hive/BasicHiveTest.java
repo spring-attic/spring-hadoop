@@ -18,7 +18,6 @@ package org.springframework.data.hadoop.hive;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.apache.hadoop.hive.service.HiveClient;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +44,7 @@ public class BasicHiveTest {
 	@Autowired
 	private ApplicationContext ctx;
 	@Autowired
-	private HiveClient client;
+	private HiveTemplate hiveTemplate;
 
 	{
 		System.setProperty("java.io.tmpdir", "");
@@ -75,9 +74,7 @@ public class BasicHiveTest {
 	@Test
 	public void testHiveClient() throws Exception {
 		String tableName = "testHiveDriverTable";
-		client.execute("select count(1) as cnt from " + tableName);
-		assertNotNull(client.fetchOne());
-
+		assertNotNull(hiveTemplate.execute("select count(1) as cnt from " + tableName));
 	}
 
 	//@Test

@@ -24,6 +24,7 @@ import java.util.Properties;
 import org.apache.hadoop.hive.service.HiveClient;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.ByteArrayResource;
@@ -47,15 +48,17 @@ public class HiveBatchTest {
 	private ApplicationContext ctx;
 
 	@Autowired
-	private HiveClient client;
+	private ObjectFactory<HiveClient> factory;
+	@Autowired
+	private HiveTemplate template;
 
 	{
 		TestUtils.hackHadoopStagingOnWin();
 	}
-
+	
 	@Test
 	public void testHiveClient() throws Exception {
-		ctx.getBean("hiveClient", HiveClient.class);
+		ctx.getBean("hiveClient", ObjectFactory.class);
 	}
 
 	@Test
@@ -81,7 +84,7 @@ public class HiveBatchTest {
 		Iterator<HiveScript> scripts = ((Collection<HiveScript>) ReflectionUtils.getField(findField, pt)).iterator();
 		scripts.next();
 
-		Iterator<String> keys = scripts.next().getArguments().stringPropertyNames().iterator();
+		Iterator<String> keys = scripts.next().getArguments().keySet().iterator();
 		assertEquals("war", keys.next());
 		assertEquals("blue", keys.next());
 		assertEquals("white", keys.next());
@@ -91,7 +94,7 @@ public class HiveBatchTest {
 
 	@Test(expected = Exception.class)
 	public void testScriptRunner() throws Exception {
-		HiveScriptRunner.run(client, ctx.getResource("org/springframework/data/hadoop/hive/hive-failing-script.q"));
+		template.execute(ctx.getResource("org/springframework/data/hadoop/hive/hive-failing-script.q"));
 	}
 
 	@Test
@@ -101,7 +104,7 @@ public class HiveBatchTest {
 		params.put("zzz", "onions");
 		params.put("yyy", "unleashed");
 
-		List<String> run = HiveScriptRunner.run(client, res, params);
+		List<String> run = template.execute(new HiveScript(res, params));
 		assertEquals("zzz=onions", run.get(0));
 		assertEquals("hiveconf:yyy=unleashed", run.get(1));
 	}

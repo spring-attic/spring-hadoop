@@ -47,6 +47,8 @@
 		<hdp:script location="org/springframework/data/hadoop/hive/script.q" />
 	</hdp:hive-client> 
 	
+	<bean class="org.springframework.data.hadoop.hive.HiveTemplate" p:hive-client-ref="hiveClient"/>
+	
 	<hdp:hive-tasklet id="hive-script" scope="prototype">
 		<hdp:script>
 			DROP TABLE IF EXISTS testHiveBatchTable; 
