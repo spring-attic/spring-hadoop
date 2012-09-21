@@ -12,6 +12,9 @@
  	
 	<bean id="pig-ctx" class="org.springframework.data.hadoop.pig.PigContextFactoryBean" p:exec-type="LOCAL" p:configuration-ref="hadoopConfiguration"/>
 	<bean id="pig-raw" class="org.springframework.data.hadoop.pig.PigServerFactoryBean" p:pig-context-ref="pig-ctx"/>
+
+	<hdp:pig-template />
+	<hdp:pig-template id="foo" pig-server-ref="pig-raw"/>
 	
 	<pig exec-type="LOCAL" job-name="pig-script" configuration-ref="hadoopConfiguration" xmlns="http://www.springframework.org/schema/hadoop" 
 		properties-ref="props" properties-location="cfg-1.properties, cfg-2.properties" user="costin">

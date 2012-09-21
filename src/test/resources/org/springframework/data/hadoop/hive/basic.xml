@@ -31,7 +31,10 @@
 	<util:properties id="props" location="props.properties"/>
 	
 	<hdp:hive-client host="${hive.host}" port="${hive.port}"/>
-	<bean id="hiveTemplate" class="org.springframework.data.hadoop.hive.HiveTemplate" p:hive-client-ref="hiveClient" />
+	
+	<hdp:hive-template />
+	
+	<hdp:hive-template id="foo" hive-client-ref="hiveClient"/>
 
 	<bean id="hiveDriver" class="org.apache.hadoop.hive.jdbc.HiveDriver"/>
 	<bean id="hiveDs" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">

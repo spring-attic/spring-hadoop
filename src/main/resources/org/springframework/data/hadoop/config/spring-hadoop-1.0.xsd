@@ -989,11 +989,11 @@ Bean id.]]></xsd:documentation>
 			<xsd:attribute name="pig-server-ref" type="xsd:string" use="optional" default="pig">
 				<xsd:annotation>
 				<xsd:documentation source="java:org.apache.pig.PigServer"><![CDATA[
-Reference to a PigServer instance. Defaults to 'pig'.
+Reference to a PigServer factory. Defaults to 'pig'.
 				]]></xsd:documentation>
 					<xsd:appinfo>
 						<tool:annotation kind="ref">
-							<tool:expected-type type="org.apache.pig.PigServer" />
+							<tool:expected-type type="org.springframework.beans.factory.ObjectFactory" />
 						</tool:annotation>
 					</xsd:appinfo>
 				</xsd:annotation>
@@ -1001,6 +1001,40 @@ Reference to a PigServer instance. Defaults to 'pig'.
 			<xsd:attribute name="scope" type="xsd:string" use="optional" />
 		</xsd:complexType>
 	</xsd:element>
+	
+	<xsd:element name="pig-template">
+			<xsd:annotation>
+			   <xsd:documentation><![CDATA[
+Creates a PigTemplate.
+					]]></xsd:documentation>
+		      <xsd:appinfo>
+		        <tool:annotation>
+		          <tool:exports type="org.springframework.data.hadoop.pig.PigTemplate"/>
+		        </tool:annotation>
+		      </xsd:appinfo>
+			</xsd:annotation>
+		<xsd:complexType>
+			<xsd:attribute name="id" type="xsd:ID" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+Bean id (default is "pigTemplate").
+				]]></xsd:documentation>
+			</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="pig-server-ref" type="xsd:string" use="optional" default="pig">
+				<xsd:annotation>
+				<xsd:documentation source="java:org.apache.pig.PigServer"><![CDATA[
+Reference to a PigServer factory. Defaults to 'pig'.
+				]]></xsd:documentation>
+					<xsd:appinfo>
+						<tool:annotation kind="ref">
+							<tool:expected-type type="org.springframework.beans.factory.ObjectFactory" />
+						</tool:annotation>
+					</xsd:appinfo>
+				</xsd:annotation>
+			</xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>	
 	
 	<!-- HBase -->
 	<xsd:element name="hbase-configuration">
@@ -1157,6 +1191,39 @@ Reference to a HiveClient instance. Defaults to 'hiveClient'.
 			<xsd:attribute name="scope" type="xsd:string" use="optional" />			
 		</xsd:complexType>
 	</xsd:element>
+	
+	<xsd:element name="hive-template">
+			<xsd:annotation>
+			   <xsd:documentation><![CDATA[
+Creates a HiveTemplate.
+					]]></xsd:documentation>
+		      <xsd:appinfo>
+		        <tool:annotation>
+		          <tool:exports type="org.springframework.data.hadoop.hive.HiveTemplate"/>
+		        </tool:annotation>
+		      </xsd:appinfo>
+			</xsd:annotation>
+		<xsd:complexType>
+			<xsd:attribute name="id" type="xsd:ID" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+Bean id (default is "hiveTemplate").
+				]]></xsd:documentation>
+			</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="hive-client-ref" default="hiveClient">
+			<xsd:annotation>
+					<xsd:documentation source="java:org.apache.hadoop.hive.service.HiveClient"><![CDATA[
+Reference to HiveClient factory. Defaults to 'hiveClient'.]]></xsd:documentation>
+					<xsd:appinfo>
+						<tool:annotation kind="ref">
+							<tool:expected-type type="org.springframework.beans.factory.ObjectFactory" />
+						</tool:annotation>
+					</xsd:appinfo>
+		 	</xsd:annotation>
+		 	</xsd:attribute>			
+		</xsd:complexType>
+	</xsd:element>	
 
 	<!-- Script type - NOT mean to be reused outside this schema -->
 	<xsd:complexType name="scriptingType" abstract="true" mixed="true">

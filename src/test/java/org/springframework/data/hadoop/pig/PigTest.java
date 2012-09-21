@@ -21,12 +21,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.annotation.Resource;
-
 import org.apache.pig.ExecType;
 import org.apache.pig.PigServer;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.ObjectFactory;
@@ -46,9 +42,8 @@ import static org.junit.Assert.*;
 @ContextConfiguration("/org/springframework/data/hadoop/pig/basic.xml")
 public class PigTest {
 
-	@Resource(name = "pig-raw")
-	private ObjectFactory<PigServer> pigFactory;
-	private PigServer pig;
+	@Autowired
+	private PigTemplate pigTemplate;
 
 	@Autowired
 	private ApplicationContext ctx;
@@ -57,20 +52,9 @@ public class PigTest {
 		TestUtils.hackHadoopStagingOnWin();
 	}
 
-	@Before
-	public void init() {
-		pig = pigFactory.getObject();
-	}
-
-	@After
-	public void cleanup() throws Exception {
-		pig.shutdown();
-	}
-
 	@Test
 	public void testPig() throws Exception {
-		pig.registerQuery("A = LOAD 'foo.txt' AS (key, value);");
-		assertFalse(pig.isBatchOn());
+		pigTemplate.execute("A = LOAD 'foo.txt' AS (key, value);");
 	}
 
 	@Test
