@@ -108,4 +108,10 @@ public class HiveBatchTest {
 		assertEquals("zzz=onions", run.get(0));
 		assertEquals("hiveconf:yyy=unleashed", run.get(1));
 	}
+
+	@Test
+	public void testHiveRunner() throws Exception {
+		List<String> results = ctx.getBean("hive-scripts", List.class);
+		System.out.println(results.size());
+	}
 }

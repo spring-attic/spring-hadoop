@@ -35,7 +35,7 @@
 	<hdp:hive-template />
 	
 	<hdp:hive-template id="foo" hive-client-ref="hiveClient"/>
-
+	
 	<bean id="hiveDriver" class="org.apache.hadoop.hive.jdbc.HiveDriver"/>
 	<bean id="hiveDs" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
 		<constructor-arg name="driver" ref="hiveDriver"/>

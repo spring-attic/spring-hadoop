@@ -43,8 +43,7 @@
 				blue=water
 				white=wash
 			</hdp:arguments>
-		</hdp:script>
-		<hdp:script location="org/springframework/data/hadoop/hive/script.q" />
+		</hdp:script>	
 	</hdp:hive-client> 
 	
 	<bean class="org.springframework.data.hadoop.hive.HiveTemplate" p:hive-client-ref="hiveClient"/>
@@ -62,5 +61,20 @@
 				white=wash
 			</hdp:arguments>
 		</hdp:script>
-	</hdp:hive-tasklet> 
+	</hdp:hive-tasklet>
+	
+	<hdp:hive-runner id="hive-scripts">
+		<hdp:script>
+			DROP TABLE IF EXISTS testHiveBatchTable; 
+			CREATE TABLE testHiveBatchTable (key int, value string);
+			DESCRIBE testHiveBatchTable;
+			
+			<hdp:arguments>
+				war=web
+				blue=water
+				white=wash
+			</hdp:arguments>
+		</hdp:script>
+		<hdp:script location="org/springframework/data/hadoop/hive/script.q" />
+	</hdp:hive-runner>	
 </beans>
