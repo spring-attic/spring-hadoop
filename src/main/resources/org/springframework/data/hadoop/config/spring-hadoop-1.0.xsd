@@ -7,7 +7,7 @@
 	targetNamespace="http://www.springframework.org/schema/hadoop"
 	elementFormDefault="qualified"
 	attributeFormDefault="unqualified"
-	version="1.0.0.M3">
+	version="1.0.0.RC1">
 
 	<xsd:import namespace="http://www.springframework.org/schema/beans" />
 	<xsd:import namespace="http://www.springframework.org/schema/tool" />
@@ -960,6 +960,47 @@ The security user (ugi) to use for impersonation at runtime.
 		</xsd:complexType>
 	</xsd:element>
 	
+	<xsd:complexType name="pigRunnerType">
+		<xsd:sequence>
+			<xsd:element name="script" type="scriptWithArgumentsType" minOccurs="1" maxOccurs="unbounded">
+				<xsd:annotation>
+				<xsd:documentation><![CDATA[
+Pig script.]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="id" type="xsd:ID" use="required">
+			<xsd:annotation>
+			<xsd:documentation><![CDATA[
+Bean id.]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="pig-server-ref" type="xsd:string" use="optional" default="pig">
+			<xsd:annotation>
+			<xsd:documentation source="java:org.apache.pig.PigServer"><![CDATA[
+Reference to a PigServer factory. Defaults to 'pig'.
+				]]></xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref">
+						<tool:expected-type type="org.springframework.beans.factory.ObjectFactory" />
+					</tool:annotation>
+				</xsd:appinfo>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="pig-template-ref" type="xsd:string" use="optional">
+			<xsd:annotation>
+			<xsd:documentation source="java:org.springframework.data.hadoop.pig.PigTemplate"><![CDATA[
+Reference to a PigTemplate. Alternative to 'pig-server-ref' attribute.
+				]]></xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref">
+						<tool:expected-type type="org.springframework.data.hadoop.pig.PigTemplate" />
+					</tool:annotation>
+				</xsd:appinfo>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+
 	<xsd:element name="pig-tasklet">
 		<xsd:annotation>
 		   <xsd:documentation><![CDATA[
@@ -967,41 +1008,45 @@ Defines a PigTasklet.
 				]]></xsd:documentation>
 	      <xsd:appinfo>
 	        <tool:annotation>
-	          <tool:exports type="org.springframework.data.hadoop.batch.PigTasket"/>
+	          <tool:exports type="org.springframework.data.hadoop.pig.PigTasket"/>
 	        </tool:annotation>
 	      </xsd:appinfo>
 		</xsd:annotation>
 		<xsd:complexType>
-			<xsd:sequence>
-				<xsd:element name="script" type="scriptWithArgumentsType" minOccurs="1" maxOccurs="unbounded">
-					<xsd:annotation>
-					<xsd:documentation><![CDATA[
-Pig script.]]></xsd:documentation>
-					</xsd:annotation>
-				</xsd:element>
-			</xsd:sequence>
-			<xsd:attribute name="id" type="xsd:ID" use="required">
-				<xsd:annotation>
-				<xsd:documentation><![CDATA[
-Bean id.]]></xsd:documentation>
-				</xsd:annotation>
-			</xsd:attribute>
-			<xsd:attribute name="pig-server-ref" type="xsd:string" use="optional" default="pig">
-				<xsd:annotation>
-				<xsd:documentation source="java:org.apache.pig.PigServer"><![CDATA[
-Reference to a PigServer factory. Defaults to 'pig'.
-				]]></xsd:documentation>
-					<xsd:appinfo>
-						<tool:annotation kind="ref">
-							<tool:expected-type type="org.springframework.beans.factory.ObjectFactory" />
-						</tool:annotation>
-					</xsd:appinfo>
-				</xsd:annotation>
-			</xsd:attribute>
-			<xsd:attribute name="scope" type="xsd:string" use="optional" />
+			<xsd:complexContent>
+				<xsd:extension base="pigRunnerType">
+					<xsd:attribute name="scope" type="xsd:string" use="optional" />
+				</xsd:extension>
+			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
 	
+	<xsd:element name="pig-runner">
+		<xsd:annotation>
+		   <xsd:documentation><![CDATA[
+Runs Pig scripts.
+				]]></xsd:documentation>
+	      <xsd:appinfo>
+	        <tool:annotation>
+	          <tool:exports type="org.springframework.data.hadoop.pig.PigRunner"/>
+	        </tool:annotation>
+	      </xsd:appinfo>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="pigRunnerType">
+					<xsd:attribute name="run-at-startup" type="xsd:string" default="false">
+						<xsd:annotation>
+							<xsd:documentation><![CDATA[
+Whether the Pig script runs at startup or not (default).
+							]]></xsd:documentation>
+			         	</xsd:annotation>
+			       	</xsd:attribute>
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+
 	<xsd:element name="pig-template">
 			<xsd:annotation>
 			   <xsd:documentation><![CDATA[
@@ -1150,6 +1195,47 @@ Reference to the Hadoop configuration.]]></xsd:documentation>
 		</xsd:complexType>
 	</xsd:element>
 
+	<xsd:complexType name="hiveRunnerType">
+		<xsd:sequence>
+			<xsd:element name="script" type="scriptWithArgumentsType" minOccurs="1" maxOccurs="unbounded">
+				<xsd:annotation>
+				<xsd:documentation><![CDATA[
+Hive script.]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="id" type="xsd:ID" use="required">
+			<xsd:annotation>
+			<xsd:documentation><![CDATA[
+Bean id.]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="hive-client-ref" type="xsd:string" use="optional" default="hiveClient">
+			<xsd:annotation>
+			<xsd:documentation source="java:org.apache.hadoop.hive.service.HiveClient"><![CDATA[
+Reference to a HiveClient instance.
+				]]></xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref">
+						<tool:expected-type type="org.apache.hadoop.hive.service.HiveClient" />
+					</tool:annotation>
+				</xsd:appinfo>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="hive-template-ref" type="xsd:string" use="optional">
+			<xsd:annotation>
+			<xsd:documentation source="java:org.springframework.data.hadoop.hive.HiveTemplate"><![CDATA[
+Reference to a HiveTemplate instance.   Alternative to 'hive-client-ref' attribute..
+				]]></xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref">
+						<tool:expected-type type="org.springframework.data.hadoop.hive.HiveTemplate" />
+					</tool:annotation>
+				</xsd:appinfo>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+	
 	<xsd:element name="hive-tasklet">
 		<xsd:annotation>
 		   <xsd:documentation><![CDATA[
@@ -1157,38 +1243,42 @@ Defines a HiveTasklet.
 				]]></xsd:documentation>
 	      <xsd:appinfo>
 	        <tool:annotation>
-	          <tool:exports type="org.springframework.data.hadoop.batch.HiveTasket"/>
+	          <tool:exports type="org.springframework.data.hadoop.hive.HiveTasket"/>
 	        </tool:annotation>
 	      </xsd:appinfo>
 		</xsd:annotation>
 		<xsd:complexType>
-			<xsd:sequence>
-				<xsd:element name="script" type="scriptWithArgumentsType" minOccurs="1" maxOccurs="unbounded">
-					<xsd:annotation>
-					<xsd:documentation><![CDATA[
-Hive script.]]></xsd:documentation>
-					</xsd:annotation>
-				</xsd:element>
-			</xsd:sequence>
-			<xsd:attribute name="id" type="xsd:ID" use="required">
-				<xsd:annotation>
-				<xsd:documentation><![CDATA[
-Bean id.]]></xsd:documentation>
-				</xsd:annotation>
-			</xsd:attribute>
-			<xsd:attribute name="hive-client-ref" type="xsd:string" use="optional" default="hiveClient">
-				<xsd:annotation>
-				<xsd:documentation source="java:org.apache.hadoop.hive.service.HiveClient"><![CDATA[
-Reference to a HiveClient instance. Defaults to 'hiveClient'.
+			<xsd:complexContent>
+				<xsd:extension base="hiveRunnerType">
+				<xsd:attribute name="scope" type="xsd:string" use="optional" />
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="hive-runner">
+		<xsd:annotation>
+		   <xsd:documentation><![CDATA[
+Runs Hive scripts.
 				]]></xsd:documentation>
-					<xsd:appinfo>
-						<tool:annotation kind="ref">
-							<tool:expected-type type="org.apache.hadoop.hive.service.HiveClient" />
-						</tool:annotation>
-					</xsd:appinfo>
-				</xsd:annotation>
-			</xsd:attribute>
-			<xsd:attribute name="scope" type="xsd:string" use="optional" />			
+	      <xsd:appinfo>
+	        <tool:annotation>
+	          <tool:exports type="org.springframework.data.hadoop.hive.HiveRunner"/>
+	        </tool:annotation>
+	      </xsd:appinfo>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="hiveRunnerType">
+					<xsd:attribute name="run-at-startup" type="xsd:string" default="false">
+						<xsd:annotation>
+							<xsd:documentation><![CDATA[
+Whether the Hive script runs at startup or not (default).
+							]]></xsd:documentation>
+			         	</xsd:annotation>
+			       	</xsd:attribute>
+				</xsd:extension>
+			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
 	
