@@ -17,6 +17,7 @@ package org.springframework.data.hadoop.pig;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.hadoop.io.IOUtils;
@@ -79,6 +80,8 @@ abstract class PigUtils {
 			pig.setBatchOn();
 		}
 
+		List<ExecJob> jobs = new ArrayList<ExecJob>();
+
 		try {
 			pig.getPigContext().connect();
 
@@ -91,11 +94,12 @@ abstract class PigUtils {
 						throw new IllegalArgumentException("Cannot open script [" + script.getResource() + "]", ex);
 					}
 					pig.registerScript(in, script.getArguments());
+					jobs.addAll(pig.executeBatch());
 				}
 			} finally {
 				IOUtils.closeStream(in);
 			}
-			return pig.executeBatch();
+			return jobs;
 		} catch (ExecException ex) {
 			throw convert(ex);
 		} catch (IOException ex) {

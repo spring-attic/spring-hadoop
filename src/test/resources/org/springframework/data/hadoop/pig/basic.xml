@@ -30,7 +30,10 @@
 				white=wash
 			</arguments>
 		</script>
-		<script location="org/springframework/data/hadoop/pig/script.pig" />
+	</pig>
+	
+	<pig-runner id="pig-scripts" xmlns="http://www.springframework.org/schema/hadoop">
+		<script location="org/springframework/data/hadoop/pig/script.pig"  />
 		<script>
 			<arguments>
 				war=web
@@ -39,7 +42,7 @@
 			B = FOREACH A GENERATE name;
 			DUMP B;
 		</script>
-	</pig>
+	</pig-runner>
 	
 	<util:properties id="props" location="props.properties"/>
 </beans>

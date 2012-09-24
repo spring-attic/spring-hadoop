@@ -18,11 +18,13 @@ package org.springframework.data.hadoop.pig;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
 import org.apache.pig.ExecType;
 import org.apache.pig.PigServer;
+import org.apache.pig.backend.executionengine.ExecJob;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.ObjectFactory;
@@ -88,12 +90,18 @@ public class PigTest {
 		ReflectionUtils.makeAccessible(findField);
 		
 		Collection<PigScript> scripts = (Collection<PigScript>) ReflectionUtils.getField(findField, psfb);
-		assertEquals(3, scripts.size());
+		assertEquals(1, scripts.size());
 		PigScript firstScript = scripts.iterator().next();
 		Map<String, String> args = firstScript.getArguments();
 		Iterator<String> keys = args.keySet().iterator();
 		assertEquals("war", keys.next());
 		assertEquals("blue", keys.next());
 		assertEquals("white", keys.next());
+	}
+
+	@Test
+	public void testPigRunner() throws Exception {
+		List<ExecJob> jobs = ctx.getBean("pig-scripts", List.class);
+		System.out.println(jobs.size());
 	}
 }

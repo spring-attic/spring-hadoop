@@ -15,69 +15,21 @@
  */
 package org.springframework.data.hadoop.pig;
 
-import java.util.Collection;
-
 import org.apache.pig.PigServer;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.ObjectFactory;
-import org.springframework.util.Assert;
 
 /**
  * Pig tasklet. Note the same {@link PigServer} is shared between invocations. 
  * 
  * @author Costin Leau
  */
-public class PigTasklet implements InitializingBean, Tasklet {
-
-	private ObjectFactory<PigServer> pigFactory;
-	private PigTemplate pigTemplate;
-	private Collection<PigScript> scripts;
-
-	@Override
-	public void afterPropertiesSet() {
-		if (pigFactory == null && pigTemplate == null) {
-			throw new IllegalArgumentException("a PigServer factory or a PigTemplate is required");
-		}
-
-		if (pigTemplate == null) {
-			pigTemplate = new PigTemplate(pigFactory);
-		}
-
-		Assert.notEmpty(scripts, "no scripts specified");
-	}
+public class PigTasklet extends PigExecutor implements Tasklet {
 
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		pigTemplate.execute(scripts);
+		executePigScripts();
 		return RepeatStatus.FINISHED;
-	}
-
-	/**
-	 * Sets the pig scripts to be executed by this tasklet.
-	 * 
-	 * @param scripts The scripts to set.
-	 */
-	public void setScripts(Collection<PigScript> scripts) {
-		this.scripts = scripts;
-	}
-
-	/**
-	 * Sets the pig server instance used by this tasklet.
-	 * 
-	 * @param pigFactory The pigFactory to set.
-	 */
-	public void setPigServer(ObjectFactory<PigServer> pigFactory) {
-		this.pigFactory = pigFactory;
-	}
-
-	/**
-	 * Sets the pig template used by this tasklet.
-	 * @param pigTemplate
-	 */
-	public void setPigTemplate(PigTemplate pigTemplate) {
-		this.pigTemplate = pigTemplate;
 	}
 }
