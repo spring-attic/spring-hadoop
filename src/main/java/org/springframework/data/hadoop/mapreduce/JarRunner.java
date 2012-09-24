@@ -24,9 +24,9 @@ import org.springframework.beans.factory.InitializingBean;
  * See the reference documentation for more details.
  * Using the {@link Tool} interface is highly recommended in all cases.
  * 
- * <p/>Note by default, the runner is configured to execute at startup. One can customize this behaviour through {@link #setRunAtStartup(boolean)}/
- * <p/>This class is a factory bean - if {@link #setRunAtStartup(boolean)} is set to false, then the action (namely the execution of the Tool) is postponed by the call
- * to {@link #getObject()}.
+ * <p/>Note by default, the runner is configured to execute at startup. One can customize this behaviour through {@link #setRunAtStartup(boolean)}.
+ * <p/>This class is a factory bean - if {@link #setRunAtStartup(boolean)} is set to false, then the action (namely the execution of the Tool) is postponed until
+ * {@link #getObject()} is called.
  * 
  * @author Costin Leau
  */
@@ -63,7 +63,7 @@ public class JarRunner extends JarExecutor implements FactoryBean<Integer>, Init
 	}
 
 	/**
-	 * Indicates whether the jar should run at container startup (the default) or not.
+	 * Indicates whether the jar should run at container startup or not (the default).
 	 *
 	 * @param runAtStartup The runAtStartup to set.
 	 */
