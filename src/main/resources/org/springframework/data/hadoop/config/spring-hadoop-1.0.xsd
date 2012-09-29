@@ -716,7 +716,13 @@ Defines a Hadoop Jar Tasklet.]]></xsd:documentation>
 		<xsd:complexContent mixed="true">
 		<xsd:extension base="hadoopRunnerType">
 			<xsd:sequence>
-				<xsd:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="1"/>
+				<xsd:element name="tool" minOccurs="0" maxOccurs="1">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:any namespace="##any" processContents="lax" minOccurs="1" maxOccurs="1"/>
+						</xsd:sequence>
+					</xsd:complexType>	
+				</xsd:element>
 			</xsd:sequence>
 	       	<xsd:attribute name="jar" type="xsd:string" use="optional">
 				<xsd:annotation>

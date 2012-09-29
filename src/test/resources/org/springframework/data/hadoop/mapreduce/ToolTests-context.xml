@@ -28,10 +28,11 @@
 		<hdp:arg value="data/out.txt"/>
 		cookies=for santa
 		
+		<hdp:tool>
 		<bean class="org.springframework.data.hadoop.mapreduce.ToolTests$TestTool">
 			<constructor-arg ref="hadoopConfiguration" />
 		</bean>
-		
+		</hdp:tool>
 	</hdp:tool-runner>
 	
 	<job id="mainJob" xmlns="http://www.springframework.org/schema/batch">
@@ -46,9 +47,11 @@
 	<bean id="tasklet" class="org.springframework.data.hadoop.mapreduce.ToolTasklet" p:tool-ref="test-tool" p:configuration-ref="hadoopConfiguration" />
 	
 	<hdp:tool-tasklet id="tasklet-ns" scope="prototype" files="some-tool.jar">
+		<hdp:tool>
 		<bean class="org.springframework.data.hadoop.mapreduce.ToolTests$TestTool">
 			<constructor-arg ref="hadoopConfiguration" />
 		</bean>
+		</hdp:tool>
 	</hdp:tool-tasklet>
 	
 	

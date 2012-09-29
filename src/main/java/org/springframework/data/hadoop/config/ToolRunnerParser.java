@@ -48,15 +48,18 @@ class ToolRunnerParser extends AbstractGenericOptionsParser {
 		ManagedList<Object> args = new ManagedList<Object>();
 
 		for (Element child : list) {
-			if ("arg".equals(child.getLocalName())) {
+			String localName = child.getLocalName();
+			if ("arg".equals(localName)) {
 				args.add(child.getAttribute("value").trim());
 			}
-			else {
+			if ("tool".equals(localName)) {
 				if (element.hasAttribute("tool-class") || element.hasAttribute("tool-ref")) {
 					parserContext.getReaderContext().error("Cannot define nested and top-level tool-class/tool-ref attributes - use only one", element);
 				}
 				
-				builder.addPropertyValue("tool", parserContext.getDelegate().parsePropertySubElement(child, builder.getRawBeanDefinition()));
+				builder.addPropertyValue("tool",
+						parserContext.getDelegate().parsePropertySubElement(DomUtils.getChildElements(child).get(0),
+								builder.getRawBeanDefinition()));
 			}
 		}
 		
