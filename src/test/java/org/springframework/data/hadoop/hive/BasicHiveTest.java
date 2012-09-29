@@ -19,6 +19,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.apache.hadoop.hive.service.HiveClient;
+import org.apache.thrift.server.TServer;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,9 +99,11 @@ public class BasicHiveTest {
 		}));
 	}
 
-	//@Test
+	@Test
 	// disabled due to antlr incompatibility between Pig (which requires antlr 3.4) and Hive (3.0.x) 
 	public void testHiveServer() throws Exception {
-		assertNotNull(ctx.getBean("hive-server"));
+		TServer server = ctx.getBean("hive-server", TServer.class);
+		assertNotNull(server);
+		assertTrue(server.isServing());
 	}
 }
