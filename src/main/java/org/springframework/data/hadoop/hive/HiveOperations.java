@@ -18,6 +18,7 @@ package org.springframework.data.hadoop.hive;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.hadoop.hive.service.HiveClient;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessException;
 
@@ -31,6 +32,13 @@ import org.springframework.dao.DataAccessException;
  */
 public interface HiveOperations {
 
+	/**
+	 * Executes the action specified by the given callback object within an active {@link HiveClient}. 
+	 * 
+	 * @param action callback object taht specifies the Hive action
+	 * @return the action result object
+	 * @throws DataAccessException
+	 */
 	<T> T execute(HiveClientCallback<T> action) throws DataAccessException;
 
 	/**

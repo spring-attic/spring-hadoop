@@ -64,6 +64,13 @@ public class HiveTemplate implements InitializingBean, HiveOperations {
 		Assert.notNull(hiveClientFactory, "non-null hive client factory required");
 	}
 
+	/**
+	 * Executes the action specified by the given callback object within an active {@link HiveClient}. 
+	 * 
+	 * @param action callback object taht specifies the Hive action
+	 * @return the action result object
+	 * @throws DataAccessException
+	 */
 	@Override
 	public <T> T execute(HiveClientCallback<T> action) throws DataAccessException {
 		Assert.notNull(action, "a valid callback is required");
