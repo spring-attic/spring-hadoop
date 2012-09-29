@@ -365,16 +365,18 @@
 		implementation has a default argument, one can use the <literal>tool-class</literal> attribute however it is possible to refer to another <literal>Tool</literal> instance or declare a nested one: </para> 
 
 		<programlisting language="xml"><![CDATA[<hdp:tool-runner id="someTool" run-at-startup="true">
-   <bean class="org.foo.AnotherTool" p:input="data/in.txt" p:output="data/out.txt"/>
+   <hdp:tool>
+      <bean class="org.foo.AnotherTool" p:input="data/in.txt" p:output="data/out.txt"/>
+   </hdp:tool>
 </hdp:tool-runner>]]></programlisting>
 
 		<para>This is quite convenient if the <literal>Tool</literal> class provides setters or richer constructors. Note that by default the <literal>tool-runner</literal> does not executes the <literal>Tool</literal>until
 		its definition is actually called - this behavior can be changed through the <literal>run-at-startup</literal> attribute above.</para>
 		
 		<section id="hadoop:tool-scripts">
-			<title>Replacing Hadoop shell invocations with <literal>tool</literal></title>
+			<title>Replacing Hadoop shell invocations with <literal>tool-runner</literal></title>
 		
-			<para><literal>tool</literal> is a nice way for migrating series or shell invocations or scripts into fully wired, managed Java objects. Consider the following shell script:</para>
+			<para><literal>tool-runner</literal> is a nice way for migrating series or shell invocations or scripts into fully wired, managed Java objects. Consider the following shell script:</para>
 <programlisting><![CDATA[hadoop jar job1.jar -files fullpath:props.properties -Dconfig=config.properties ...
 hadoop jar job2.jar arg1 arg2...
 ...
@@ -383,13 +385,13 @@ hadoop jar job10.jar ...]]></programlisting>
 			<para>Each job is fully contained in the specified jar, including all the dependencies (which might conflict with the ones from other jobs). Additionally each invocation might provide some generic
 			options or arguments but for the most part all will share the same configuration (as they will execute against the same cluster).</para>
 			
-			<para>The script can be fully ported to SHDP, through the <literal>tool</literal> element:</para>
-<programlisting language="xml"><![CDATA[<hdp:tool id="job1" tool-class="job1.Tool" jar="job1.jar" files="fullpath:props.properties" properties-location="config.properties"/>
-<hdp:tool id="job2" jar="job2.jar">
+			<para>The script can be fully ported to SHDP, through the <literal>tool-runner</literal> element:</para>
+<programlisting language="xml"><![CDATA[<hdp:tool-runner id="job1" tool-class="job1.Tool" jar="job1.jar" files="fullpath:props.properties" properties-location="config.properties"/>
+<hdp:tool-runner id="job2" jar="job2.jar">
    <hdp:arg value="arg1"/>
    <hdp:arg value="arg2"/>
-</hdp:tool>
-<hdp:tool id="job3" jar="job3.jar"/>
+</hdp:tool-runner>
+<hdp:tool-runner id="job3" jar="job3.jar"/>
 ...]]></programlisting>
 
 			<para>All the features have been explained in the previous sections but let us review what happens here. 
