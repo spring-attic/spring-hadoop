@@ -44,7 +44,7 @@ public class BasicHiveTest {
 	@Autowired
 	private ApplicationContext ctx;
 	@Autowired
-	private HiveTemplate hiveTemplate;
+	private HiveOperations hiveTemplate;
 
 	{
 		System.setProperty("java.io.tmpdir", "");
@@ -72,9 +72,15 @@ public class BasicHiveTest {
 	}
 
 	@Test
-	public void testHiveClient() throws Exception {
+	public void testQueryForInt() throws Exception {
 		String tableName = "testHiveDriverTable";
-		assertNotNull(hiveTemplate.execute("select count(1) as cnt from " + tableName));
+		assertEquals(Integer.valueOf(1), hiveTemplate.queryForInt("select count(1) as cnt from " + tableName));
+	}
+
+	@Test
+	public void testQueryForLong() throws Exception {
+		String tableName = "testHiveDriverTable";
+		assertEquals(Long.valueOf(1), hiveTemplate.queryForLong("select count(1) as cnt from " + tableName));
 	}
 
 	//@Test

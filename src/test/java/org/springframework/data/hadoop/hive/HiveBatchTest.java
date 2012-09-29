@@ -50,7 +50,7 @@ public class HiveBatchTest {
 	@Autowired
 	private ObjectFactory<HiveClient> factory;
 	@Autowired
-	private HiveTemplate template;
+	private HiveOperations template;
 
 	{
 		TestUtils.hackHadoopStagingOnWin();
@@ -94,7 +94,7 @@ public class HiveBatchTest {
 
 	@Test(expected = Exception.class)
 	public void testScriptRunner() throws Exception {
-		template.execute(ctx.getResource("org/springframework/data/hadoop/hive/hive-failing-script.q"));
+		template.executeScript(ctx.getResource("org/springframework/data/hadoop/hive/hive-failing-script.q"));
 	}
 
 	@Test
@@ -104,7 +104,7 @@ public class HiveBatchTest {
 		params.put("zzz", "onions");
 		params.put("yyy", "unleashed");
 
-		List<String> run = template.execute(new HiveScript(res, params));
+		List<String> run = template.executeScript(new HiveScript(res, params));
 		assertEquals("zzz=onions", run.get(0));
 		assertEquals("hiveconf:yyy=unleashed", run.get(1));
 	}

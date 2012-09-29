@@ -32,7 +32,7 @@ import org.springframework.util.Assert;
 abstract class HiveExecutor implements InitializingBean {
 
 	private ObjectFactory<HiveClient> hiveClientFactory;
-	private HiveTemplate hiveTemplate;
+	private HiveOperations hiveTemplate;
 	private Collection<HiveScript> scripts;
 
 	@Override
@@ -49,7 +49,7 @@ abstract class HiveExecutor implements InitializingBean {
 	}
 
 	protected List<String> executeHiveScripts() {
-		return hiveTemplate.execute(scripts);
+		return hiveTemplate.executeScript(scripts);
 	}
 
 	/**
@@ -75,7 +75,7 @@ abstract class HiveExecutor implements InitializingBean {
 	 *
 	 * @param hiveTemplate the new hive template
 	 */
-	public void setHiveTemplate(HiveTemplate hiveTemplate) {
+	public void setHiveTemplate(HiveOperations hiveTemplate) {
 		this.hiveTemplate = hiveTemplate;
 	}
 }
