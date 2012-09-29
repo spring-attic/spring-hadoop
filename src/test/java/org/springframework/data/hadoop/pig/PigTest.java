@@ -15,6 +15,7 @@
  */
 package org.springframework.data.hadoop.pig;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Iterator;
@@ -24,6 +25,7 @@ import java.util.Properties;
 
 import org.apache.pig.ExecType;
 import org.apache.pig.PigServer;
+import org.apache.pig.backend.executionengine.ExecException;
 import org.apache.pig.backend.executionengine.ExecJob;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,7 +47,7 @@ import static org.junit.Assert.*;
 public class PigTest {
 
 	@Autowired
-	private PigTemplate pigTemplate;
+	private PigOperations pigTemplate;
 
 	@Autowired
 	private ApplicationContext ctx;
@@ -56,7 +58,7 @@ public class PigTest {
 
 	@Test
 	public void testPig() throws Exception {
-		pigTemplate.execute("A = LOAD 'foo.txt' AS (key, value);");
+		pigTemplate.executeQuery("A = LOAD 'foo.txt' AS (key, value);");
 	}
 
 	@Test
@@ -88,7 +90,7 @@ public class PigTest {
 		PigServerFactoryBean psfb = (PigServerFactoryBean) ctx.getBean("&pig");
 		Field findField = ReflectionUtils.findField(PigServerFactoryBean.class, "scripts");
 		ReflectionUtils.makeAccessible(findField);
-		
+
 		Collection<PigScript> scripts = (Collection<PigScript>) ReflectionUtils.getField(findField, psfb);
 		assertEquals(1, scripts.size());
 		PigScript firstScript = scripts.iterator().next();
@@ -103,5 +105,15 @@ public class PigTest {
 	public void testPigRunner() throws Exception {
 		List<ExecJob> jobs = ctx.getBean("pig-scripts", List.class);
 		System.out.println(jobs.size());
+	}
+
+	@Test
+	public void testPigTemplate() throws Exception {
+		System.out.println(pigTemplate.execute(new PigCallback<Object>() {
+			@Override
+			public Object doInPig(PigServer pig) throws ExecException, IOException {
+				return pig.getAliasKeySet();
+			}
+		}));
 	}
 }

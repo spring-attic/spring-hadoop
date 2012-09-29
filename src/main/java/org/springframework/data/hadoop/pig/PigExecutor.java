@@ -33,7 +33,7 @@ import org.springframework.util.Assert;
 abstract class PigExecutor implements InitializingBean {
 
 	private ObjectFactory<PigServer> pigFactory;
-	private PigTemplate pigTemplate;
+	private PigOperations pigTemplate;
 	private Collection<PigScript> scripts;
 
 
@@ -51,7 +51,7 @@ abstract class PigExecutor implements InitializingBean {
 	}
 
 	protected List<ExecJob> executePigScripts() {
-		return pigTemplate.execute(scripts);
+		return pigTemplate.executeScript(scripts);
 	}
 
 	/**
@@ -76,7 +76,7 @@ abstract class PigExecutor implements InitializingBean {
 	 * Sets the pig template used by this class.
 	 * @param pigTemplate
 	 */
-	public void setPigTemplate(PigTemplate pigTemplate) {
+	public void setPigTemplate(PigOperations pigTemplate) {
 		this.pigTemplate = pigTemplate;
 	}
 }

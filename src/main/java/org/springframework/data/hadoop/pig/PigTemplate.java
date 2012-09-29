@@ -15,11 +15,13 @@
  */
 package org.springframework.data.hadoop.pig;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.pig.PigServer;
+import org.apache.pig.backend.executionengine.ExecException;
 import org.apache.pig.backend.executionengine.ExecJob;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.ObjectFactory;
@@ -34,7 +36,7 @@ import org.springframework.util.Assert;
  *  
  * @author Costin Leau
  */
-public class PigTemplate implements InitializingBean {
+public class PigTemplate implements InitializingBean, PigOperations {
 
 	private ObjectFactory<PigServer> pigServerFactory;
 
@@ -60,23 +62,110 @@ public class PigTemplate implements InitializingBean {
 		Assert.notNull(pigServerFactory, "non-null pig server factory required");
 	}
 
-	public List<ExecJob> execute(String script) throws DataAccessException {
-		return execute(script, null);
+	/**
+	 * Executes the action specified by the given callback object within an active {@link PigServer}. 
+	 * 
+	 * @param action callback object that specifies the Hive action
+	 * @return the action result object
+	 * @throws DataAccessException
+	 */
+	@Override
+	public <T> T execute(PigCallback<T> action) throws DataAccessException {
+		Assert.notNull(action, "a valid callback is required");
+		PigServer pig = createPigServer();
+
+		try {
+			// make sure pig is connected
+			pig.getPigContext().connect();
+			return action.doInPig(pig);
+
+		} catch (ExecException ex) {
+			throw convertPigAccessException(ex);
+		} catch (IOException ex) {
+			throw convertPigAccessException(ex);
+		} finally {
+			pig.shutdown();
+		}
 	}
 
-	public List<ExecJob> execute(String script, Map<String, String> arguments) throws DataAccessException {
-		return execute(new PigScript(new ByteArrayResource(script.getBytes()), arguments));
+	/**
+	 * Converts the given Pig exception to an appropriate exception from the <tt>org.springframework.dao</tt> hierarchy.
+	 * 
+	 * @param ex Pig exception
+	 * @return a corresponding DataAccessException
+	 */
+	protected DataAccessException convertPigAccessException(IOException ex) {
+		return PigUtils.convert(ex);
 	}
 
-	public List<ExecJob> execute(Resource script) throws DataAccessException {
-		return execute(new PigScript(script));
+	/**
+	 * Converts the given Pig exception to an appropriate exception from the <tt>org.springframework.dao</tt> hierarchy.
+	 * 
+	 * @param ex Pig exception
+	 * @return a corresponding DataAccessException
+	 */
+	protected DataAccessException convertPigAccessException(ExecException ex) {
+		return PigUtils.convert(ex);
 	}
 
-	public List<ExecJob> execute(PigScript script) throws DataAccessException {
-		return execute(Collections.singleton(script));
+	/**
+	 * Executes the given Pig Latin that results in a list of job executions.
+	 *  
+	 * @param script pig latin
+	 * @return list of job executions
+	 * @throws DataAccessException
+	 */
+	@Override
+	public List<ExecJob> executeQuery(String script) throws DataAccessException {
+		return executeQuery(script, null);
 	}
 
-	public List<ExecJob> execute(Iterable<PigScript> scripts) throws DataAccessException {
+	/**
+	 * Executes the given Pig Latin with arguments that results in a list of job executions.
+	 * 
+	 * @param script pig latin
+	 * @param arguments script arguments
+	 * @return list of job executions
+	 * @throws DataAccessException
+	 */
+	@Override
+	public List<ExecJob> executeQuery(String script, Map<String, String> arguments) throws DataAccessException {
+		return executeScript(new PigScript(new ByteArrayResource(script.getBytes()), arguments));
+	}
+
+	/**
+	 * Executes the given script that results in a list of job executions.
+	 * 
+	 * @param script script resource
+	 * @return list of job executions
+	 * @throws DataAccessException
+	 */
+	@Override
+	public List<ExecJob> executeScript(Resource script) throws DataAccessException {
+		return executeScript(new PigScript(script));
+	}
+
+	/**
+	 * Executes the given script identified by location and arguments that results in a list of job executions.
+	 * 
+	 * @param script script location and arguments
+	 * @return list of job executions
+	 * @throws DataAccessException
+	 */
+	@Override
+	public List<ExecJob> executeScript(PigScript script) throws DataAccessException {
+		return executeScript(Collections.singleton(script));
+	}
+
+	/**
+	 * Executes multiple scripts that result in a list of job executions.
+	 * 
+	 * @param scripts scripts location and arguments
+	 * @return list of job executions
+	 * @throws DataAccessException
+	 */
+	@Override
+	public List<ExecJob> executeScript(Iterable<PigScript> scripts) throws DataAccessException {
 		return PigUtils.run(createPigServer(), scripts, true);
 	}
 
