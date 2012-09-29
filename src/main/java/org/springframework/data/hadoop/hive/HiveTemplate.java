@@ -20,8 +20,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.hadoop.hive.service.HiveClient;
-import org.apache.hadoop.hive.service.HiveServerException;
-import org.apache.thrift.TException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.core.io.ByteArrayResource;
@@ -67,7 +65,7 @@ public class HiveTemplate implements InitializingBean, HiveOperations {
 	/**
 	 * Executes the action specified by the given callback object within an active {@link HiveClient}. 
 	 * 
-	 * @param action callback object taht specifies the Hive action
+	 * @param action callback object that specifies the Hive action
 	 * @return the action result object
 	 * @throws DataAccessException
 	 */
@@ -77,9 +75,7 @@ public class HiveTemplate implements InitializingBean, HiveOperations {
 		HiveClient hiveClient = createHiveClient();
 		try {
 			return action.doInHive(hiveClient);
-		} catch (HiveServerException ex) {
-			throw convertHiveAccessException(ex);
-		} catch (TException ex) {
+		} catch (Exception ex) {
 			throw convertHiveAccessException(ex);
 		} finally {
 			try {
@@ -96,17 +92,7 @@ public class HiveTemplate implements InitializingBean, HiveOperations {
 	 * @param ex hive exception
 	 * @return a corresponding DataAccessException
 	 */
-	protected DataAccessException convertHiveAccessException(TException ex) {
-		return HiveUtils.convert(ex);
-	}
-
-	/**
-	 * Converts the given Hive exception to an appropriate exception from the <tt>org.springframework.dao</tt> hierarchy.
-	 * 
-	 * @param ex hive exception
-	 * @return a corresponding DataAccessException
-	 */
-	protected DataAccessException convertHiveAccessException(HiveServerException ex) {
+	protected DataAccessException convertHiveAccessException(Exception ex) {
 		return HiveUtils.convert(ex);
 	}
 
@@ -253,7 +239,7 @@ public class HiveTemplate implements InitializingBean, HiveOperations {
 	/**
 	 * Executes multiple Hive scripts.
 	 * 
-	 * @param scripts script resources and arguments
+	 * @param scripts scripts resources and arguments
 	 * @return scripts results
 	 * @throws DataAccessException
 	 */

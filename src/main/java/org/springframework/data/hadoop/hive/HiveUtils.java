@@ -24,15 +24,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.hadoop.hive.metastore.api.AlreadyExistsException;
+import org.apache.hadoop.hive.metastore.api.ConfigValSecurityException;
+import org.apache.hadoop.hive.metastore.api.IndexAlreadyExistsException;
 import org.apache.hadoop.hive.service.HiveClient;
 import org.apache.hadoop.hive.service.HiveServerException;
 import org.apache.hadoop.io.IOUtils;
+import org.apache.thrift.TBase;
 import org.apache.thrift.TException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataAccessResourceFailureException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.dao.NonTransientDataAccessResourceException;
+import org.springframework.dao.PermissionDeniedDataAccessException;
 import org.springframework.dao.TransientDataAccessResourceException;
 import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.util.StringUtils;
@@ -45,11 +51,40 @@ import org.springframework.util.StringUtils;
  */
 abstract class HiveUtils {
 
-	static DataAccessException convert(HiveServerException ex) {
+	static DataAccessException convert(Exception ex) {
 		if (ex == null) {
 			return null;
 		}
 
+		if (ex instanceof RuntimeException) {
+			throw (RuntimeException) ex;
+		}
+
+		// Thrift client exception
+		if (ex instanceof HiveServerException) {
+			return convert((HiveServerException) ex);
+		}
+		if (ex instanceof TException) {
+			return new DataAccessResourceFailureException(ex.getMessage(), ex);
+		}
+
+		// HiveClient MetaStore Thrift API exceptions
+		if (ex instanceof TBase) {
+			// meta exceptions
+			if (ex instanceof AlreadyExistsException || ex instanceof IndexAlreadyExistsException) {
+				return new DataIntegrityViolationException(ex.toString(), ex);
+			}
+			if (ex instanceof ConfigValSecurityException) {
+				return new PermissionDeniedDataAccessException(ex.toString(), ex);
+			}
+			// fallback
+			return new InvalidDataAccessResourceUsageException(ex.toString(), ex);
+		}
+		// unknown
+		return new NonTransientDataAccessResourceException("Unknown exception", ex);
+	}
+
+	private static DataAccessException convert(HiveServerException ex) {
 		int err = ex.getErrorCode();
 		String sqlState = ex.getSQLState();
 		String cause = (ex.getCause() != null ? ex.getCause().getMessage() : ex.getMessage());
@@ -116,15 +151,8 @@ abstract class HiveUtils {
 		return new NonTransientDataAccessResourceException(cause, ex);
 	}
 
-	static DataAccessException convert(TException ex) {
-		if (ex == null) {
-			return null;
-		}
-
-		return new DataAccessResourceFailureException(ex.getMessage(), ex);
-	}
-
-	static List<String> run(HiveClient hive, Iterable<HiveScript> scripts, boolean closeHive) throws DataAccessException {
+	static List<String> run(HiveClient hive, Iterable<HiveScript> scripts, boolean closeHive)
+			throws DataAccessException {
 		List<String> results = new ArrayList<String>();
 		try {
 			for (HiveScript hiveScript : scripts) {

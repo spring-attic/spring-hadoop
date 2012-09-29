@@ -24,8 +24,7 @@ import org.springframework.dao.DataAccessException;
 
 
 /**
- * Interface specifying a basic set of Hive operations.
- * Implemented by {@link HiveTemplate}.
+ * Interface specifying a basic set of Hive operations. Implemented by {@link HiveTemplate}.
  * Not often used directly, but a useful option to enhance testability, as it can easily be mocked or stubbed. 
  * 
  * @author Costin Leau
