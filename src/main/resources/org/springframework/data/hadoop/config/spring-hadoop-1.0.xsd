@@ -627,7 +627,7 @@ Reference to the Hadoop Configuration. Defaults to 'hadoopConfiguration'.]]></xs
 						<tool:expected-type type="org.apache.hadoop.conf.Configuration" />
 					</tool:annotation>
 				</xsd:appinfo>
-		 	</xsd:annotation>			
+		 	</xsd:annotation>
 			</xsd:attribute>
 		</xsd:extension>
 		</xsd:complexContent>
@@ -690,6 +690,18 @@ Whether the Jar runs at startup or not (default).
 					]]></xsd:documentation>
 	         	</xsd:annotation>
 	       	</xsd:attribute>
+			<xsd:attribute name="pre-action" type="xsd:string" default="">
+				<xsd:annotation>
+				<xsd:documentation><![CDATA[
+Pre actions/beans to be called before running the action. Multiple bean names can be specified using comma-separated list.]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>			
+			<xsd:attribute name="post-action" type="xsd:string" default="">
+				<xsd:annotation>
+				<xsd:documentation><![CDATA[
+Post actions/beans to be called before running the action. Multiple bean names can be specified using comma-separated list.]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>			
 		</xsd:extension>
 		</xsd:complexContent>
 		</xsd:complexType>
@@ -788,6 +800,18 @@ Whether the Tool runs at startup or not (default).
 					]]></xsd:documentation>
 	         	</xsd:annotation>
 	       	</xsd:attribute>
+			<xsd:attribute name="pre-action" type="xsd:string" default="">
+				<xsd:annotation>
+				<xsd:documentation><![CDATA[
+Pre actions/beans to be called before running the action. Multiple bean names can be specified using comma-separated list.]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>			
+			<xsd:attribute name="post-action" type="xsd:string" default="">
+				<xsd:annotation>
+				<xsd:documentation><![CDATA[
+Post actions/beans to be called before running the action. Multiple bean names can be specified using comma-separated list.]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>			
 		</xsd:extension>
 		</xsd:complexContent>
 		</xsd:complexType>
@@ -1048,6 +1072,18 @@ Whether the Pig script runs at startup or not (default).
 							]]></xsd:documentation>
 			         	</xsd:annotation>
 			       	</xsd:attribute>
+					<xsd:attribute name="pre-action" type="xsd:string" default="">
+						<xsd:annotation>
+						<xsd:documentation><![CDATA[
+Pre actions/beans to be called before running the action. Multiple bean names can be specified using comma-separated list.]]></xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>			
+					<xsd:attribute name="post-action" type="xsd:string" default="">
+						<xsd:annotation>
+						<xsd:documentation><![CDATA[
+Post actions/beans to be called before running the action. Multiple bean names can be specified using comma-separated list.]]></xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>			
 				</xsd:extension>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -1283,6 +1319,18 @@ Whether the Hive script runs at startup or not (default).
 							]]></xsd:documentation>
 			         	</xsd:annotation>
 			       	</xsd:attribute>
+					<xsd:attribute name="pre-action" type="xsd:string" default="">
+						<xsd:annotation>
+						<xsd:documentation><![CDATA[
+Pre actions/beans to be called before running the action. Multiple bean names can be specified using comma-separated list.]]></xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>			
+					<xsd:attribute name="post-action" type="xsd:string" default="">
+						<xsd:annotation>
+						<xsd:documentation><![CDATA[
+Post actions/beans to be called before running the action. Multiple bean names can be specified using comma-separated list.]]></xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>			
 				</xsd:extension>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -1407,6 +1455,18 @@ Reference to the Hadoop Configuration. Defaults to 'hadoopConfiguration'.]]></xs
 					</xsd:appinfo>
 			 	</xsd:annotation>			
 				</xsd:attribute>
+				<xsd:attribute name="pre-action" type="xsd:string" default="">
+					<xsd:annotation>
+					<xsd:documentation><![CDATA[
+Pre actions/beans to be called before running the action. Multiple bean names can be specified using comma-separated list.]]></xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>			
+				<xsd:attribute name="post-action" type="xsd:string" default="">
+					<xsd:annotation>
+					<xsd:documentation><![CDATA[
+Post actions/beans to be called before running the action. Multiple bean names can be specified using comma-separated list.]]></xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>			
 				</xsd:extension>
 			</xsd:complexContent>
 		</xsd:complexType>

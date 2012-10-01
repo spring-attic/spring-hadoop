@@ -34,9 +34,18 @@ class HiveRunnerParser extends AbstractImprovedSimpleBeanDefinitionParser {
 	}
 
 	@Override
+	protected boolean isEligibleAttribute(String attributeName) {
+		return !("pre-action".equals(attributeName) || "post-action".equals(attributeName))
+				&& super.isEligibleAttribute(attributeName);
+	}
+
+	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 		// parse attributes using conventions
 		super.doParse(element, parserContext, builder);
+
+		NamespaceUtils.setCSVProperty(element, builder, "pre-action", "preAction");
+		NamespaceUtils.setCSVProperty(element, builder, "post-action", "postAction");
 
 		// parse scripts
 		Collection<Object> scripts = HiveTaskletParser.parseScripts(parserContext, element);

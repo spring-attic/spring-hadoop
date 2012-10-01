@@ -15,9 +15,15 @@
  */
 package org.springframework.data.hadoop.mapreduce;
 
+import java.util.List;
+
 import org.apache.hadoop.util.Tool;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Factory bean for executing Hadoop jars. Tries a best-effort in passing the configuration to the jar and preventing malicious behaviour (such as System.exit()).
@@ -30,15 +36,22 @@ import org.springframework.beans.factory.InitializingBean;
  * 
  * @author Costin Leau
  */
-public class JarRunner extends JarExecutor implements FactoryBean<Integer>, InitializingBean {
+public class JarRunner extends JarExecutor implements FactoryBean<Integer>, InitializingBean, BeanFactoryAware {
 
 	private volatile Integer result = null;
 	private boolean runAtStartup = false;
 
+	private List<String> preActions;
+	private List<String> postActions;
+	private BeanFactory beanFactory;
+
+
 	@Override
 	public Integer getObject() throws Exception {
 		if (result == null) {
+			invoke(preActions);
 			result = runCode();
+			invoke(postActions);
 		}
 		return result;
 	}
@@ -69,5 +82,41 @@ public class JarRunner extends JarExecutor implements FactoryBean<Integer>, Init
 	 */
 	public void setRunAtStartup(boolean runAtStartup) {
 		this.runAtStartup = runAtStartup;
+	}
+
+	/**
+	 * Beans to be invoked before running the action.
+	 * 
+	 * @param beans
+	 */
+	public void setPreAction(String... beans) {
+		this.preActions = CollectionUtils.arrayToList(beans);
+	}
+
+	/**
+	 * Beans to be invoked after running the action.
+	 * 
+	 * @param beans
+	 */
+	public void setPostAction(String... beans) {
+		this.postActions = CollectionUtils.arrayToList(beans);
+	}
+
+	private void invoke(List<String> beans) {
+		if (beanFactory != null) {
+			if (!CollectionUtils.isEmpty(beans)) {
+				for (String bean : beans) {
+					beanFactory.getBean(bean);
+				}
+			}
+		}
+		else {
+			log.warn("No beanFactory set - cannot invoke pre/post actions [" + beans + "]");
+		}
+	}
+
+	@Override
+	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+		this.beanFactory = beanFactory;
 	}
 }

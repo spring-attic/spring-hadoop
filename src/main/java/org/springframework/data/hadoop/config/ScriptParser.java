@@ -41,13 +41,17 @@ class ScriptParser extends AbstractImprovedSimpleBeanDefinitionParser {
 
 	@Override
 	protected boolean isEligibleAttribute(String attributeName) {
-		return !("location".equals(attributeName)) && super.isEligibleAttribute(attributeName);
+		return !("location".equals(attributeName) || "pre-action".equals(attributeName) || "post-action".equals(attributeName))
+				&& super.isEligibleAttribute(attributeName);
 	}
 
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 		// parse attributes using conventions
 		super.doParse(element, parserContext, builder);
+
+		NamespaceUtils.setCSVProperty(element, builder, "pre-action", "preAction");
+		NamespaceUtils.setCSVProperty(element, builder, "post-action", "postAction");
 
 		// set scope
 		String scope = element.getAttribute(BeanDefinitionParserDelegate.SCOPE_ATTRIBUTE);

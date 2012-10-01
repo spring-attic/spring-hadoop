@@ -18,7 +18,7 @@
 		<constructor-arg ref="hadoopConfiguration" />
 	</bean>
 	
-	<hdp:tool-runner id="ref" tool-ref="test-tool"/>
+	<hdp:tool-runner id="ref" tool-ref="test-tool" post-action="ref-start"/>
 	
 	<hdp:tool-runner id="ref-start" tool-ref="test-tool" run-at-startup="true" user="costin"/>
 	

@@ -63,7 +63,7 @@
 		</hdp:script>
 	</hdp:hive-tasklet>
 	
-	<hdp:hive-runner id="hive-scripts">
+	<hdp:hive-runner id="hive-scripts" pre-action="hive-script">
 		<hdp:script>
 			DROP TABLE IF EXISTS testHiveBatchTable; 
 			CREATE TABLE testHiveBatchTable (key int, value string);

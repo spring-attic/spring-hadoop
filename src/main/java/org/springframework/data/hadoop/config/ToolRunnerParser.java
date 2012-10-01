@@ -37,9 +37,19 @@ class ToolRunnerParser extends AbstractGenericOptionsParser {
 	}
 
 	@Override
+	protected boolean isEligibleAttribute(String attributeName) {
+		return !("pre-action".equals(attributeName) || "post-action".equals(attributeName))
+				&& super.isEligibleAttribute(attributeName);
+	}
+
+
+	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 		super.doParse(element, parserContext, builder);
 		parseToolDefinition(element, parserContext, builder);
+
+		NamespaceUtils.setCSVProperty(element, builder, "pre-action", "preAction");
+		NamespaceUtils.setCSVProperty(element, builder, "post-action", "postAction");
 	}
 
 	static void parseToolDefinition(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {

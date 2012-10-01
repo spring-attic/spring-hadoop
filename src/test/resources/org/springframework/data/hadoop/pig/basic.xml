@@ -32,7 +32,7 @@
 		</script>
 	</pig>
 	
-	<pig-runner id="pig-scripts" xmlns="http://www.springframework.org/schema/hadoop">
+	<pig-runner id="pig-scripts" xmlns="http://www.springframework.org/schema/hadoop" post-action="foo">
 		<script location="org/springframework/data/hadoop/pig/script.pig"  />
 		<script>
 			<arguments>
