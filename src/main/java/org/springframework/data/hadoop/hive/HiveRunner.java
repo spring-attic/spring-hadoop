@@ -17,7 +17,13 @@ package org.springframework.data.hadoop.hive;
 
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Basic runner for Hive scripts inside a Spring environment. For more advanced functionality, consider using Spring Batch and the {@link HiveTasklet}.
@@ -29,10 +35,17 @@ import org.springframework.beans.factory.FactoryBean;
  * 
  * @author Costin Leau
  */
-public class HiveRunner extends HiveExecutor implements FactoryBean<List<String>> {
+public class HiveRunner extends HiveExecutor implements FactoryBean<List<String>>, BeanFactoryAware {
+
+	private static final Log log = LogFactory.getLog(HiveRunner.class);
 
 	private boolean runAtStartup = false;
 	private volatile List<String> result = null;
+
+	private List<String> preActions;
+	private List<String> postActions;
+	private BeanFactory beanFactory;
+
 
 	@Override
 	public void afterPropertiesSet() {
@@ -46,7 +59,9 @@ public class HiveRunner extends HiveExecutor implements FactoryBean<List<String>
 	@Override
 	public List<String> getObject() {
 		if (result == null) {
+			invoke(preActions);
 			result = executeHiveScripts();
+			invoke(postActions);
 		}
 		return result;
 	}
@@ -68,5 +83,41 @@ public class HiveRunner extends HiveExecutor implements FactoryBean<List<String>
 	 */
 	public void setRunAtStartup(boolean runAtStartup) {
 		this.runAtStartup = runAtStartup;
+	}
+
+	/**
+	 * Beans to be invoked before running the action.
+	 * 
+	 * @param beans
+	 */
+	public void setPreAction(String... beans) {
+		this.preActions = CollectionUtils.arrayToList(beans);
+	}
+
+	/**
+	 * Beans to be invoked after running the action.
+	 * 
+	 * @param beans
+	 */
+	public void setPostAction(String... beans) {
+		this.postActions = CollectionUtils.arrayToList(beans);
+	}
+
+	private void invoke(List<String> beans) {
+		if (beanFactory != null) {
+			if (!CollectionUtils.isEmpty(beans)) {
+				for (String bean : beans) {
+					beanFactory.getBean(bean);
+				}
+			}
+		}
+		else {
+			log.warn("No beanFactory set - cannot invoke pre/post actions [" + beans + "]");
+		}
+	}
+
+	@Override
+	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+		this.beanFactory = beanFactory;
 	}
 }
