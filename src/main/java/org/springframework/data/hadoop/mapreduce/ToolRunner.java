@@ -16,12 +16,12 @@
 package org.springframework.data.hadoop.mapreduce;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.apache.hadoop.util.Tool;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.CollectionUtils;
 
@@ -35,9 +35,8 @@ import org.springframework.util.CollectionUtils;
  * 
  * @author Costin Leau
  */
-public class ToolRunner extends ToolExecutor implements FactoryBean<Integer>, InitializingBean, BeanFactoryAware {
+public class ToolRunner extends ToolExecutor implements Callable<Integer>, InitializingBean, BeanFactoryAware {
 
-	private volatile Integer result = null;
 	private boolean runAtStartup = false;
 
 	private List<String> preActions;
@@ -45,23 +44,11 @@ public class ToolRunner extends ToolExecutor implements FactoryBean<Integer>, In
 	private BeanFactory beanFactory;
 
 	@Override
-	public Integer getObject() throws Exception {
-		if (result == null) {
-			invoke(preActions);
-			result = runCode();
-			invoke(postActions);
-		}
+	public Integer call() throws Exception {
+		invoke(preActions);
+		Integer result = runCode();
+		invoke(postActions);
 		return result;
-	}
-
-	@Override
-	public Class<?> getObjectType() {
-		return int.class;
-	}
-
-	@Override
-	public boolean isSingleton() {
-		return true;
 	}
 
 	@Override
@@ -69,7 +56,7 @@ public class ToolRunner extends ToolExecutor implements FactoryBean<Integer>, In
 		super.afterPropertiesSet();
 
 		if (runAtStartup) {
-			getObject();
+			call();
 		}
 	}
 

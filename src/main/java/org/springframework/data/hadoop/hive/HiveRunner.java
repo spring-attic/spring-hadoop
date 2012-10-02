@@ -16,13 +16,13 @@
 package org.springframework.data.hadoop.hive;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.beans.factory.FactoryBean;
 import org.springframework.util.CollectionUtils;
 
 /**
@@ -35,12 +35,11 @@ import org.springframework.util.CollectionUtils;
  * 
  * @author Costin Leau
  */
-public class HiveRunner extends HiveExecutor implements FactoryBean<List<String>>, BeanFactoryAware {
+public class HiveRunner extends HiveExecutor implements Callable<List<String>>, BeanFactoryAware {
 
 	private static final Log log = LogFactory.getLog(HiveRunner.class);
 
 	private boolean runAtStartup = false;
-	private volatile List<String> result = null;
 
 	private List<String> preActions;
 	private List<String> postActions;
@@ -52,28 +51,16 @@ public class HiveRunner extends HiveExecutor implements FactoryBean<List<String>
 		super.afterPropertiesSet();
 
 		if (runAtStartup) {
-			getObject();
+			call();
 		}
 	}
 
 	@Override
-	public List<String> getObject() {
-		if (result == null) {
-			invoke(preActions);
-			result = executeHiveScripts();
-			invoke(postActions);
-		}
+	public List<String> call() {
+		invoke(preActions);
+		List<String> result = executeHiveScripts();
+		invoke(postActions);
 		return result;
-	}
-
-	@Override
-	public Class<?> getObjectType() {
-		return List.class;
-	}
-
-	@Override
-	public boolean isSingleton() {
-		return true;
 	}
 
 	/**

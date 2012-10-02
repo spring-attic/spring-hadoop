@@ -16,12 +16,12 @@
 package org.springframework.data.hadoop.mapreduce;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.apache.hadoop.util.Tool;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.CollectionUtils;
 
@@ -31,39 +31,23 @@ import org.springframework.util.CollectionUtils;
  * Using the {@link Tool} interface is highly recommended in all cases.
  * 
  * <p/>Note by default, the runner is configured to execute at startup. One can customize this behaviour through {@link #setRunAtStartup(boolean)}.
- * <p/>This class is a factory bean - if {@link #setRunAtStartup(boolean)} is set to false, then the action (namely the execution of the Tool) is postponed until
- * {@link #getObject()} is called.
  * 
  * @author Costin Leau
  */
-public class JarRunner extends JarExecutor implements FactoryBean<Integer>, InitializingBean, BeanFactoryAware {
+public class JarRunner extends JarExecutor implements Callable<Integer>, InitializingBean, BeanFactoryAware {
 
-	private volatile Integer result = null;
 	private boolean runAtStartup = false;
 
 	private List<String> preActions;
 	private List<String> postActions;
 	private BeanFactory beanFactory;
 
-
 	@Override
-	public Integer getObject() throws Exception {
-		if (result == null) {
-			invoke(preActions);
-			result = runCode();
-			invoke(postActions);
-		}
+	public Integer call() throws Exception {
+		invoke(preActions);
+		Integer result = runCode();
+		invoke(postActions);
 		return result;
-	}
-
-	@Override
-	public Class<?> getObjectType() {
-		return int.class;
-	}
-
-	@Override
-	public boolean isSingleton() {
-		return true;
 	}
 
 	@Override
@@ -71,7 +55,7 @@ public class JarRunner extends JarExecutor implements FactoryBean<Integer>, Init
 		super.afterPropertiesSet();
 
 		if (runAtStartup) {
-			getObject();
+			call();
 		}
 	}
 

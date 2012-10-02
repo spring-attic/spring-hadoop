@@ -17,6 +17,7 @@ package org.springframework.data.hadoop.mapreduce;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,8 +26,6 @@ import org.apache.hadoop.mapreduce.Job;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -38,20 +37,16 @@ import org.springframework.util.CollectionUtils;
  * <p/>
  * For more control over the job execution and outcome consider querying the {@link Job}s or using Spring Batch (see the reference documentation for more info).
  * <p/>Note by default, the runner is configured to execute at startup. One can customize this behaviour through {@link #setRunAtStartup(boolean)}/
- * <p/>This class is a factory bean - if {@link #setRunAtStartup(boolean)} is set to false, then the action (namely the execution of the job) is postponed by the call
- * to {@link #getObject()}.
  * 
  * @author Costin Leau
  */
-public class JobRunner implements FactoryBean<Boolean>, InitializingBean, DisposableBean, BeanFactoryAware {
+public class JobRunner implements InitializingBean, BeanFactoryAware, Callable<Boolean> {
 
 	private static final Log log = LogFactory.getLog(JobRunner.class);
 
 	private boolean runAtStartup = true;
 	private boolean waitForJobs = true;
 	private Collection<Job> jobs;
-	private boolean executed = false;
-	private boolean succesful = true;
 	private boolean ignoreFailures = false;
 
 	private List<String> preActions;
@@ -63,62 +58,35 @@ public class JobRunner implements FactoryBean<Boolean>, InitializingBean, Dispos
 		Assert.notEmpty(jobs, "at least one job needs to be specified");
 
 		if (runAtStartup) {
-			getObject();
+			call();
 		}
 	}
 
 	@Override
-	public void destroy() throws Exception {
-		if (!waitForJobs) {
-			for (Job job : jobs) {
-				try {
-					job.killJob();
-				} catch (Exception ex) {
-					log.warn("Cannot kill job [" + job.getJobID() + "|" + job.getJobName() + " ] failed", ex);
+	public Boolean call() throws Exception {
+		// pre action
+		invoke(preActions);
+
+		Boolean succesful = Boolean.TRUE;
+
+		for (Job job : jobs) {
+			if (!waitForJobs) {
+				job.submit();
+			}
+			else {
+				succesful &= job.waitForCompletion(true);
+				if (!ignoreFailures && !succesful) {
+					RunningJob rj = JobUtils.getRunningJob(job);
+					throw new IllegalStateException("Job [" + job.getJobName() + "] failed - "
+							+ (rj != null ? rj.getFailureInfo() : "N/A"));
 				}
 			}
 		}
-	}
 
-	@Override
-	public Boolean getObject() throws Exception {
-		if (!executed) {
-			executed = true;
-
-			// pre action
-			invoke(preActions);
-
-			for (Job job : jobs) {
-				if (!waitForJobs) {
-					job.submit();
-				}
-				else {
-					succesful &= job.waitForCompletion(true);
-					if (!ignoreFailures && !succesful) {
-						RunningJob rj = JobUtils.getRunningJob(job);
-						throw new IllegalStateException("Job [" + job.getJobName() + "] failed - "
-								+ (rj != null ? rj.getFailureInfo() : "N/A"));
-					}
-				}
-			}
-
-			// post action
-			invoke(postActions);
-		}
-
+		// post action
+		invoke(postActions);
 		return (waitForJobs ? succesful : null);
 	}
-
-	@Override
-	public Class<?> getObjectType() {
-		return Boolean.class;
-	}
-
-	@Override
-	public boolean isSingleton() {
-		return true;
-	}
-
 
 	/**
 	 * Indicates whether the jobs should be submitted at startup (default) or not.

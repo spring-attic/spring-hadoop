@@ -16,6 +16,7 @@
 package org.springframework.data.hadoop.pig;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -23,7 +24,6 @@ import org.apache.pig.backend.executionengine.ExecJob;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.beans.factory.FactoryBean;
 import org.springframework.util.CollectionUtils;
 
 /**
@@ -36,12 +36,11 @@ import org.springframework.util.CollectionUtils;
  *
  * @author Costin Leau
  */
-public class PigRunner extends PigExecutor implements FactoryBean<List<ExecJob>>, BeanFactoryAware {
+public class PigRunner extends PigExecutor implements Callable<List<ExecJob>>, BeanFactoryAware {
 
 	private static final Log log = LogFactory.getLog(PigRunner.class);
 
 	private boolean runAtStartup = false;
-	private volatile List<ExecJob> result = null;
 
 	private List<String> preActions;
 	private List<String> postActions;
@@ -53,28 +52,16 @@ public class PigRunner extends PigExecutor implements FactoryBean<List<ExecJob>>
 		super.afterPropertiesSet();
 
 		if (runAtStartup) {
-			getObject();
+			call();
 		}
 	}
 
 	@Override
-	public List<ExecJob> getObject() {
-		if (result == null) {
-			invoke(preActions);
-			result = executePigScripts();
-			invoke(postActions);
-		}
+	public List<ExecJob> call() {
+		invoke(preActions);
+		List<ExecJob> result = executePigScripts();
+		invoke(postActions);
 		return result;
-	}
-
-	@Override
-	public Class<?> getObjectType() {
-		return List.class;
-	}
-
-	@Override
-	public boolean isSingleton() {
-		return true;
 	}
 
 	/**

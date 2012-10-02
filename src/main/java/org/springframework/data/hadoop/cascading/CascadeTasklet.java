@@ -21,12 +21,11 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 
 import cascading.cascade.Cascade;
-import cascading.flow.Flow;
 import cascading.management.UnitOfWork;
 import cascading.stats.CascadingStats;
 
 /**
- * Batch tasklet for executing a {@link Cascade} or a {@link Flow} as part of a job.
+ * Batch tasklet for executing a {@link Cascade} as part of a job.
  * 
  * @author Costin Leau
  */
@@ -42,11 +41,11 @@ public class CascadeTasklet implements Tasklet {
 	}
 
 	/**
-	 * Sets the unit of work. Can be of type {@link Flow} or {@link Cascade}.
+	 * Sets the unit of work or a {@link Cascade}.
 	 *
 	 * @param unitOfWork the new cascade
 	 */
-	public void setUnitOfWork(UnitOfWork<CascadingStats> unitOfWork) {
+	public void setUnitOfWork(Cascade cascade) {
 		this.unitOfWork = unitOfWork;
 	}
 }

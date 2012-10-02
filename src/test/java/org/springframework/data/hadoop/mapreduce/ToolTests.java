@@ -16,6 +16,7 @@
 package org.springframework.data.hadoop.mapreduce;
 
 import java.net.URL;
+import java.util.concurrent.Callable;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.util.Tool;
@@ -77,21 +78,22 @@ public class ToolTests {
 
 	@Test
 	public void testToolClass() throws Exception {
-		assertEquals(0, ctx.getBean("simple"));
+		ctx.getBean("simple");
 		assertNotNull(TestTool.conf);
 		assertEquals(0, TestTool.args.length);
 	}
 
 	@Test
 	public void testToolConfiguration() throws Exception {
-		assertEquals(0, ctx.getBean("ref"));
+		ctx.getBean("ref");
 		assertNotNull(TestTool.conf);
 		assertEquals(0, TestTool.args.length);
 	}
 
 	@Test
 	public void testToolArgs() throws Exception {
-		assertEquals(0, ctx.getBean("nested"));
+		Callable runner = ctx.getBean("nested", Callable.class);
+		runner.call();
 		assertNotNull(TestTool.conf);
 		Configuration conf = TestTool.conf;
 		assertFalse(ctx.getBean("hadoopConfiguration").equals(conf));
@@ -120,10 +122,11 @@ public class ToolTests {
 	@Test
 	public void testToolJarLoading() throws Exception {
 		ClassLoader loader = getClass().getClassLoader();
-		Object bean = ctx.getBean("tool-jar");
+		Callable runner = ctx.getBean("tool-jar", Callable.class);
+		Object result = runner.call();
 		
 		assertNotNull(System.getProperty("org.springframework.data.tool.init"));
-		assertEquals(Integer.valueOf(13), bean);
+		assertEquals(Integer.valueOf(13), result);
 		assertFalse(org.springframework.util.ClassUtils.isPresent("test.SomeTool", loader));
 
 		ParentLastURLClassLoader cl = new ParentLastURLClassLoader(

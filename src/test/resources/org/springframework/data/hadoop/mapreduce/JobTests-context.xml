@@ -85,7 +85,7 @@
  	<task:scheduler id="myScheduler" pool-size="10"/>
  
 	<task:scheduled-tasks scheduler="myScheduler">
- 		<task:scheduled ref="&amp;runner" method="getObject" fixed-rate="60000"/>
+ 		<task:scheduled ref="runner" method="call" fixed-rate="60000"/>
  	</task:scheduled-tasks>
  	
  	
