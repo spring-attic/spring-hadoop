@@ -52,6 +52,7 @@
 	<hdp:script-tasklet id="ref-script-tasklet" scope="step" script-ref="script"/>
 	
 	<hdp:script language="javascript" id="script" scope="step">
+println("Staged resources 2")
 if (fsh.test(input)) fsh.rmr(input)
 if (fsh.test(output)) fsh.rmr(output)
 fsh.mkdir(input);
@@ -62,6 +63,7 @@ fsh.put("src/test/resources/input/word", input)
 	
 	<hdp:script-tasklet id="nested-script-tasklet" scope="step">
 	<hdp:script language="javascript">
+println("Staged resources 1")
 if (fsh.test(input)) fsh.rmr(input)
 if (fsh.test(output)) fsh.rmr(output)
 streamoutput = output + "stream"
