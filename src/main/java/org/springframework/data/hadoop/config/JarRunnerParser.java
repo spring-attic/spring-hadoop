@@ -61,7 +61,7 @@ class JarRunnerParser extends AbstractGenericOptionsParser {
 		
 		builder.addPropertyValue("arguments", args);
 
-		NamespaceUtils.setCSVProperty(element, builder, "pre-action", "preAction");
-		NamespaceUtils.setCSVProperty(element, builder, "post-action", "postAction");
+		NamespaceUtils.setCSVReferenceProperty(element, builder, "pre-action", "preAction");
+		NamespaceUtils.setCSVReferenceProperty(element, builder, "post-action", "postAction");
 	}
 }

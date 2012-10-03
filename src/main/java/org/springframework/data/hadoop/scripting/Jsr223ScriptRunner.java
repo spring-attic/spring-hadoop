@@ -41,8 +41,16 @@ class Jsr223ScriptRunner implements InitializingBean, BeanClassLoaderAware, Call
 	private Object result = null;
 	private boolean runAtStartup = true;
 
+	private Iterable<Callable<?>> preActions;
+	private Iterable<Callable<?>> postActions;
+
+
 	@Override
-	public Object call() {
+	public Object call() throws Exception {
+		invoke(preActions);
+
+		Object res;
+
 		switch (evaluation) {
 		case ONCE:
 			if (!evaluated) {
@@ -53,20 +61,25 @@ class Jsr223ScriptRunner implements InitializingBean, BeanClassLoaderAware, Call
 					}
 				}
 			}
-			return result;
+			res = result;
+			break;
 		case IF_MODIFIED:
 			// isModified is synchronized so only one thread will see the update
 			if (script.isModified()) {
 				result = evaluator.evaluate(script, arguments);
 			}
-			return result;
+			res = result;
+			break;
 		default:
-			return evaluator.evaluate(script, arguments);
+			res = evaluator.evaluate(script, arguments);
 		}
+
+		invoke(postActions);
+		return res;
 	}
 
 	@Override
-	public void afterPropertiesSet() {
+	public void afterPropertiesSet() throws Exception {
 		evaluator = new Jsr223ScriptEvaluator(classLoader);
 		evaluator.setLanguage(language);
 		evaluator.setExtension(extension);
@@ -156,5 +169,32 @@ class Jsr223ScriptRunner implements InitializingBean, BeanClassLoaderAware, Call
 	 */
 	public void setRunAtStartup(boolean runAtStartup) {
 		this.runAtStartup = runAtStartup;
+	}
+
+
+	/**
+	 * Actions to be invoked before running the action.
+	 * 
+	 * @param beans
+	 */
+	public void setPreAction(Iterable<Callable<?>> actions) {
+		this.preActions = actions;
+	}
+
+	/**
+	 * Actions to be invoked after running the action.
+	 * 
+	 * @param beans
+	 */
+	public void setPostAction(Iterable<Callable<?>> actions) {
+		this.postActions = actions;
+	}
+
+	private void invoke(Iterable<Callable<?>> actions) throws Exception {
+		if (actions != null) {
+			for (Callable<?> action : actions) {
+				action.call();
+			}
+		}
 	}
 }

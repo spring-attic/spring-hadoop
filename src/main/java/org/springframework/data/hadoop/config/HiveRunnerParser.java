@@ -44,8 +44,8 @@ class HiveRunnerParser extends AbstractImprovedSimpleBeanDefinitionParser {
 		// parse attributes using conventions
 		super.doParse(element, parserContext, builder);
 
-		NamespaceUtils.setCSVProperty(element, builder, "pre-action", "preAction");
-		NamespaceUtils.setCSVProperty(element, builder, "post-action", "postAction");
+		NamespaceUtils.setCSVReferenceProperty(element, builder, "pre-action", "preAction");
+		NamespaceUtils.setCSVReferenceProperty(element, builder, "post-action", "postAction");
 
 		// parse scripts
 		Collection<Object> scripts = HiveTaskletParser.parseScripts(parserContext, element);

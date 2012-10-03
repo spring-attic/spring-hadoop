@@ -48,8 +48,8 @@ class ToolRunnerParser extends AbstractGenericOptionsParser {
 		super.doParse(element, parserContext, builder);
 		parseToolDefinition(element, parserContext, builder);
 
-		NamespaceUtils.setCSVProperty(element, builder, "pre-action", "preAction");
-		NamespaceUtils.setCSVProperty(element, builder, "post-action", "postAction");
+		NamespaceUtils.setCSVReferenceProperty(element, builder, "pre-action", "preAction");
+		NamespaceUtils.setCSVReferenceProperty(element, builder, "post-action", "postAction");
 	}
 
 	static void parseToolDefinition(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {

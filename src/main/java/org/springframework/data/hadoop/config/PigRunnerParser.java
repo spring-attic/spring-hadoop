@@ -46,8 +46,8 @@ class PigRunnerParser extends AbstractImprovedSimpleBeanDefinitionParser {
 		// parse attributes using conventions
 		super.doParse(element, parserContext, builder);
 
-		NamespaceUtils.setCSVProperty(element, builder, "pre-action", "preAction");
-		NamespaceUtils.setCSVProperty(element, builder, "post-action", "postAction");
+		NamespaceUtils.setCSVReferenceProperty(element, builder, "pre-action", "preAction");
+		NamespaceUtils.setCSVReferenceProperty(element, builder, "post-action", "postAction");
 
 		// parse scripts
 		Collection<BeanDefinition> scripts = PigServerParser.parseScripts(parserContext, element);

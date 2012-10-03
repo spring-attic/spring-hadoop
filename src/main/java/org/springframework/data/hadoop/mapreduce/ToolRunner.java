@@ -15,15 +15,10 @@
  */
 package org.springframework.data.hadoop.mapreduce;
 
-import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.apache.hadoop.util.Tool;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.util.CollectionUtils;
 
 /**
  * Wrapper around {@link org.apache.hadoop.util.ToolRunner} allowing for an easier configuration and execution
@@ -35,13 +30,12 @@ import org.springframework.util.CollectionUtils;
  * 
  * @author Costin Leau
  */
-public class ToolRunner extends ToolExecutor implements Callable<Integer>, InitializingBean, BeanFactoryAware {
+public class ToolRunner extends ToolExecutor implements Callable<Integer>, InitializingBean {
 
 	private boolean runAtStartup = false;
 
-	private List<String> preActions;
-	private List<String> postActions;
-	private BeanFactory beanFactory;
+	private Iterable<Callable<?>> preActions;
+	private Iterable<Callable<?>> postActions;
 
 	@Override
 	public Integer call() throws Exception {
@@ -70,38 +64,28 @@ public class ToolRunner extends ToolExecutor implements Callable<Integer>, Initi
 	}
 
 	/**
-	 * Beans to be invoked before running the action.
+	 * Actions to be invoked before running the action.
 	 * 
 	 * @param beans
 	 */
-	public void setPreAction(String... beans) {
-		this.preActions = CollectionUtils.arrayToList(beans);
+	public void setPreAction(Iterable<Callable<?>> actions) {
+		this.preActions = actions;
 	}
 
 	/**
-	 * Beans to be invoked after running the action.
+	 * Actions to be invoked after running the action.
 	 * 
 	 * @param beans
 	 */
-	public void setPostAction(String... beans) {
-		this.postActions = CollectionUtils.arrayToList(beans);
+	public void setPostAction(Iterable<Callable<?>> actions) {
+		this.postActions = actions;
 	}
 
-	private void invoke(List<String> beans) {
-		if (beanFactory != null) {
-			if (!CollectionUtils.isEmpty(beans)) {
-				for (String bean : beans) {
-					beanFactory.getBean(bean);
-				}
+	private void invoke(Iterable<Callable<?>> actions) throws Exception {
+		if (actions != null) {
+			for (Callable<?> action : actions) {
+				action.call();
 			}
 		}
-		else {
-			log.warn("No beanFactory set - cannot invoke pre/post actions [" + beans + "]");
-		}
-	}
-
-	@Override
-	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
-		this.beanFactory = beanFactory;
 	}
 }

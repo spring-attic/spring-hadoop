@@ -18,37 +18,25 @@ package org.springframework.data.hadoop.pig;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.pig.backend.executionengine.ExecJob;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.util.CollectionUtils;
 
 /**
  * Basic runner of Pig scripts inside a Spring environment. For more advanced functionality, consider using Spring Batch and the {@link PigTasklet}.
  * 
  * <p/>Note by default, the runner is configured to execute at startup. One can customize this behaviour through {@link #setRunAtStartup(boolean)}.
  * 
- * <p/>This class is a factory bean - if {@link #setRunAtStartup(boolean)} is set to false, then the action (namely the execution of the Pig scripts) is postponed until
- * {@link #getObject()} is called.
- *
  * @author Costin Leau
  */
-public class PigRunner extends PigExecutor implements Callable<List<ExecJob>>, BeanFactoryAware {
-
-	private static final Log log = LogFactory.getLog(PigRunner.class);
+public class PigRunner extends PigExecutor implements Callable<List<ExecJob>> {
 
 	private boolean runAtStartup = false;
 
-	private List<String> preActions;
-	private List<String> postActions;
-	private BeanFactory beanFactory;
+	private Iterable<Callable<?>> preActions;
+	private Iterable<Callable<?>> postActions;
 
 
 	@Override
-	public void afterPropertiesSet() {
+	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
 
 		if (runAtStartup) {
@@ -57,7 +45,7 @@ public class PigRunner extends PigExecutor implements Callable<List<ExecJob>>, B
 	}
 
 	@Override
-	public List<ExecJob> call() {
+	public List<ExecJob> call() throws Exception {
 		invoke(preActions);
 		List<ExecJob> result = executePigScripts();
 		invoke(postActions);
@@ -74,38 +62,28 @@ public class PigRunner extends PigExecutor implements Callable<List<ExecJob>>, B
 	}
 
 	/**
-	 * Beans to be invoked before running the action.
+	 * Actions to be invoked before running the action.
 	 * 
 	 * @param beans
 	 */
-	public void setPreAction(String... beans) {
-		this.preActions = CollectionUtils.arrayToList(beans);
+	public void setPreAction(Iterable<Callable<?>> actions) {
+		this.preActions = actions;
 	}
 
 	/**
-	 * Beans to be invoked after running the action.
+	 * Actions to be invoked after running the action.
 	 * 
 	 * @param beans
 	 */
-	public void setPostAction(String... beans) {
-		this.postActions = CollectionUtils.arrayToList(beans);
+	public void setPostAction(Iterable<Callable<?>> actions) {
+		this.postActions = actions;
 	}
 
-	private void invoke(List<String> beans) {
-		if (beanFactory != null) {
-			if (!CollectionUtils.isEmpty(beans)) {
-				for (String bean : beans) {
-					beanFactory.getBean(bean);
-				}
+	private void invoke(Iterable<Callable<?>> actions) throws Exception {
+		if (actions != null) {
+			for (Callable<?> action : actions) {
+				action.call();
 			}
 		}
-		else {
-			log.warn("No beanFactory set - cannot invoke pre/post actions [" + beans + "]");
-		}
-	}
-
-	@Override
-	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
-		this.beanFactory = beanFactory;
 	}
 }

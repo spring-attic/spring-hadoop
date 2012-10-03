@@ -13,6 +13,7 @@
 
 package org.springframework.data.hadoop.config;
 
+import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.core.Conventions;
@@ -65,6 +66,20 @@ abstract class NamespaceUtils {
 			ManagedList<String> list = new ManagedList<String>(strs.length);
 			for (int i = 0; i < strs.length; i++) {
 				list.add(strs[i]);
+			}
+			builder.addPropertyValue(propertyName, list);
+			return true;
+		}
+		return false;
+	}
+
+	static boolean setCSVReferenceProperty(Element element, BeanDefinitionBuilder builder, String attrName, String propertyName) {
+		String attr = element.getAttribute(attrName);
+		if (StringUtils.hasText(attr)) {
+			String[] strs = StringUtils.commaDelimitedListToStringArray(attr);
+			ManagedList<RuntimeBeanReference> list = new ManagedList<RuntimeBeanReference>(strs.length);
+			for (int i = 0; i < strs.length; i++) {
+				list.add(new RuntimeBeanReference(strs[i]));
 			}
 			builder.addPropertyValue(propertyName, list);
 			return true;

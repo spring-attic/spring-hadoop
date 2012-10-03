@@ -37,7 +37,7 @@ abstract class PigExecutor implements InitializingBean {
 
 
 	@Override
-	public void afterPropertiesSet() {
+	public void afterPropertiesSet() throws Exception {
 		if (pigFactory == null && pigTemplate == null) {
 			throw new IllegalArgumentException("a PigServer factory or a PigTemplate is required");
 		}

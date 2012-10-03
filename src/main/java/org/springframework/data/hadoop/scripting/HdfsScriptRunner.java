@@ -71,7 +71,6 @@ public class HdfsScriptRunner extends Jsr223ScriptRunner implements ApplicationC
 	private ApplicationContext ctx;
 	private Configuration configuration;
 
-
 	@Override
 	protected void postProcess(Map<String, Object> args) {
 		// rather ugly initialization
@@ -221,7 +220,7 @@ public class HdfsScriptRunner extends Jsr223ScriptRunner implements ApplicationC
 
 
 	@Override
-	public void afterPropertiesSet() {
+	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
 		Assert.notNull(ctx, "an ApplicationContext is required");
 	}
@@ -240,4 +239,5 @@ public class HdfsScriptRunner extends Jsr223ScriptRunner implements ApplicationC
 	public void setConfiguration(Configuration configuration) {
 		this.configuration = configuration;
 	}
+
 }

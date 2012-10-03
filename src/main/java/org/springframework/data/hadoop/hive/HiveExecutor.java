@@ -35,7 +35,7 @@ abstract class HiveExecutor implements InitializingBean {
 	private Collection<HiveScript> scripts;
 
 	@Override
-	public void afterPropertiesSet() {
+	public void afterPropertiesSet() throws Exception {
 		if (hiveClientFactory == null && hiveTemplate == null) {
 			throw new IllegalArgumentException("a HiveClient factory or a HiveTemplate is required");
 		}

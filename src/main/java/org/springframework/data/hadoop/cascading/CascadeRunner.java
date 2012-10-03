@@ -15,17 +15,10 @@
  */
 package org.springframework.data.hadoop.cascading;
 
-import java.util.List;
 import java.util.concurrent.Callable;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.util.CollectionUtils;
 
 import cascading.cascade.Cascade;
 import cascading.flow.Flow;
@@ -37,20 +30,17 @@ import cascading.stats.CascadingStats;
  * 
  * @author Costin Leau
  */
-public class CascadeRunner implements InitializingBean, DisposableBean, Callable<CascadingStats>, BeanFactoryAware {
-
-	private static final Log log = LogFactory.getLog(CascadeRunner.class);
+public class CascadeRunner implements InitializingBean, DisposableBean, Callable<CascadingStats> {
 
 	private boolean waitToComplete = true;
 	private boolean runAtStartup = true;
 	private UnitOfWork<CascadingStats> uow;
 
-	private List<String> preActions;
-	private List<String> postActions;
-	private BeanFactory beanFactory;
+	private Iterable<Callable<?>> preActions;
+	private Iterable<Callable<?>> postActions;
 
 	@Override
-	public void afterPropertiesSet() {
+	public void afterPropertiesSet() throws Exception {
 		if (runAtStartup) {
 			call();
 		}
@@ -64,7 +54,7 @@ public class CascadeRunner implements InitializingBean, DisposableBean, Callable
 	}
 
 	@Override
-	public CascadingStats call() {
+	public CascadingStats call() throws Exception {
 		invoke(preActions);
 		CascadingStats stats = Runner.run(uow, waitToComplete);
 		invoke(postActions);
@@ -91,38 +81,28 @@ public class CascadeRunner implements InitializingBean, DisposableBean, Callable
 	}
 
 	/**
-	 * Beans to be invoked before running the action.
+	 * Actions to be invoked before running the action.
 	 * 
 	 * @param beans
 	 */
-	public void setPreAction(String... beans) {
-		this.preActions = CollectionUtils.arrayToList(beans);
+	public void setPreAction(Iterable<Callable<?>> actions) {
+		this.preActions = actions;
 	}
 
 	/**
-	 * Beans to be invoked after running the action.
+	 * Actions to be invoked after running the action.
 	 * 
 	 * @param beans
 	 */
-	public void setPostAction(String... beans) {
-		this.postActions = CollectionUtils.arrayToList(beans);
+	public void setPostAction(Iterable<Callable<?>> actions) {
+		this.postActions = actions;
 	}
 
-	private void invoke(List<String> beans) {
-		if (beanFactory != null) {
-			if (!CollectionUtils.isEmpty(beans)) {
-				for (String bean : beans) {
-					beanFactory.getBean(bean);
-				}
+	private void invoke(Iterable<Callable<?>> actions) throws Exception {
+		if (actions != null) {
+			for (Callable<?> action : actions) {
+				action.call();
 			}
 		}
-		else {
-			log.warn("No beanFactory set - cannot invoke pre/post actions [" + beans + "]");
-		}
-	}
-
-	@Override
-	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
-		this.beanFactory = beanFactory;
 	}
 }
