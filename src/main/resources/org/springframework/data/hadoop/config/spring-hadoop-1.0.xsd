@@ -959,10 +959,10 @@ The path to be skipped while automatically shipping binaries for streaming. Mult
 			<xsd:attribute name="job-priority" type="xsd:string"/>
 			<xsd:attribute name="job-name" type="xsd:string"/>
 			<xsd:attribute name="job-tracker" type="xsd:string"/>
-			<xsd:attribute name="configuration-ref">
+			<xsd:attribute name="configuration-ref" default="hadoopConfiguration">
 				<xsd:annotation>
 					<xsd:documentation source="java:org.apache.hadoop.conf.Configuration"><![CDATA[
-Reference to the Hadoop Configuration. Can be tweaked through the 'configuration' element or the other attributes.]]></xsd:documentation>
+Reference to the Hadoop Configuration. Defaults to 'hadoopConfiguration'. Can be tweaked through the 'configuration' element or the other attributes.]]></xsd:documentation>
 					<xsd:appinfo>
 						<tool:annotation kind="ref">
 							<tool:expected-type type="org.apache.hadoop.conf.Configuration" />
@@ -1147,10 +1147,10 @@ Bean id (default is "hbaseConfiguration").
 			</xsd:attribute>
 			<xsd:attribute name="stop-proxy" type="xsd:string" default="true"/>
 			<xsd:attribute name="delete-connection" type="xsd:string" default="true"/>
-			<xsd:attribute name="configuration-ref">
+			<xsd:attribute name="configuration-ref" default="hadoopConfiguration">
 			<xsd:annotation>
 					<xsd:documentation source="java:org.apache.hadoop.conf.Configuration"><![CDATA[
-Reference to the Hadoop configuration.]]></xsd:documentation>
+Reference to the Hadoop configuration. Defaults to 'hadoopConfiguration'.]]></xsd:documentation>
 					<xsd:appinfo>
 						<tool:annotation kind="ref">
 							<tool:expected-type type="org.apache.hadoop.conf.Configuration" />
@@ -1221,10 +1221,10 @@ Bean id (default is "hiveServer").
 			<xsd:attribute name="min-threads" type="xsd:string" default="5"/>
 			<xsd:attribute name="max-threads" type="xsd:string" default="100"/>
 			<xsd:attribute name="auto-startup" type="xsd:string" default="true"/>
-			<xsd:attribute name="configuration-ref">
+			<xsd:attribute name="configuration-ref" default="hadoopConfiguration">
 			<xsd:annotation>
 					<xsd:documentation source="java:org.apache.hadoop.conf.Configuration"><![CDATA[
-Reference to the Hadoop configuration.]]></xsd:documentation>
+Reference to the Hadoop configuration. Defaults to 'hadoopConfiguration'.]]></xsd:documentation>
 					<xsd:appinfo>
 						<tool:annotation kind="ref">
 							<tool:expected-type type="org.apache.hadoop.conf.Configuration" />
