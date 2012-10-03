@@ -22,12 +22,15 @@ import java.util.Map;
 import org.apache.hadoop.hive.service.HiveClient;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.ObjectFactory;
+import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.TypeMismatchDataAccessException;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.util.Assert;
+import org.springframework.util.ResourceUtils;
 
 /**
  * Helper class that simplifies Hive data access code. Automatically handles the creation of a {@link HiveClient} (which is non-thread-safe) 
@@ -35,9 +38,10 @@ import org.springframework.util.Assert;
  *
  * @author Costin Leau
  */
-public class HiveTemplate implements InitializingBean, HiveOperations {
+public class HiveTemplate implements InitializingBean, HiveOperations, ResourceLoaderAware {
 
 	private ObjectFactory<HiveClient> hiveClientFactory;
+	private ResourceLoader resourceLoader;
 
 
 	/**
@@ -98,6 +102,7 @@ public class HiveTemplate implements InitializingBean, HiveOperations {
 
 	/**
 	 * Executes the given HiveQL that results in a list of objects.
+	 * The script is interpreted as a URL or if that fails, as a HiveQL statement.
 	 *  
 	 * @param query HiveQL
 	 * @return list of values returned by the query
@@ -110,6 +115,7 @@ public class HiveTemplate implements InitializingBean, HiveOperations {
 
 	/**
 	 * Executes the given HiveQL using the list of arguments, expecting a list of objects.
+	 * The script is interpreted as a URL or if that fails, as a HiveQL statement.
 	 * 
 	 * @param query HiveQL
 	 * @param arguments query arguments
@@ -117,12 +123,13 @@ public class HiveTemplate implements InitializingBean, HiveOperations {
 	 * @throws DataAccessException
 	 */
 	@Override
-	public List<String> query(String query, Map<String, String> arguments) throws DataAccessException {
+	public List<String> query(String query, Map<?, ?> arguments) throws DataAccessException {
 		return executeScript(new HiveScript(new ByteArrayResource(query.getBytes()), arguments));
 	}
 
 	/**
 	 * Executes the given HiveQL that results in a single object.
+	 * The script is interpreted as a URL or if that fails, as a HiveQL statement.
 	 * 
 	 * @param query HiveQL
 	 * @return query result
@@ -135,6 +142,7 @@ public class HiveTemplate implements InitializingBean, HiveOperations {
 
 	/**
 	 * Executes the given HiveQL using the list of arguments, that results in a single object.
+	 * The script is interpreted as a URL or if that fails, as a HiveQL statement.
 	 * 
 	 * @param query HiveQL
 	 * @param arguments query arguments
@@ -142,12 +150,26 @@ public class HiveTemplate implements InitializingBean, HiveOperations {
 	 * @throws DataAccessException
 	 */
 	@Override
-	public String queryForString(String query, Map<String, String> arguments) throws DataAccessException {
-		return DataAccessUtils.singleResult(executeScript(new HiveScript(new ByteArrayResource(query.getBytes()), arguments)));
+	public String queryForString(String query, Map<?, ?> arguments) throws DataAccessException {
+		Assert.hasText(query, "a script is required");
+
+		Resource res = null;
+
+		if (ResourceUtils.isUrl(query)) {
+			if (resourceLoader != null) {
+				res = resourceLoader.getResource(query);
+			}
+		}
+		else {
+			res = new ByteArrayResource(query.getBytes());
+		}
+
+		return DataAccessUtils.singleResult(executeScript(new HiveScript(res, arguments)));
 	}
 
 	/**
 	 * Executes the given HiveQL that results in a single int value.
+	 * The script is interpreted as a URL or if that fails, as a HiveQL statement.
 	 * 
 	 * @param query HiveQL
 	 * @return query int result
@@ -160,6 +182,7 @@ public class HiveTemplate implements InitializingBean, HiveOperations {
 
 	/**
 	 * Executes the given HiveQL using the list of arguments, that results in a single int value.
+	 * The script is interpreted as a URL or if that fails, as a HiveQL statement.
 	 * 
 	 * @param query HiveQL
 	 * @param arguments query arguments
@@ -167,7 +190,7 @@ public class HiveTemplate implements InitializingBean, HiveOperations {
 	 * @throws DataAccessException
 	 */
 	@Override
-	public Integer queryForInt(String query, Map<String, String> arguments) throws DataAccessException {
+	public Integer queryForInt(String query, Map<?, ?> arguments) throws DataAccessException {
 		String result = queryForString(query, arguments);
 		if (result != null) {
 			try {
@@ -181,6 +204,7 @@ public class HiveTemplate implements InitializingBean, HiveOperations {
 
 	/**
 	 * Executes the given HiveQL that results in a single long value.
+	 * The script is interpreted as a URL or if that fails, as a HiveQL statement.
 	 * 
 	 * @param query HiveQL
 	 * @return query long result
@@ -193,6 +217,7 @@ public class HiveTemplate implements InitializingBean, HiveOperations {
 
 	/**
 	 * Executes the given HiveQL using the list of arguments, that results in a single long value.
+	 * The script is interpreted as a URL or if that fails, as a HiveQL statement.
 	 * 
 	 * @param query HiveQL
 	 * @param arguments query arguments
@@ -200,7 +225,7 @@ public class HiveTemplate implements InitializingBean, HiveOperations {
 	 * @throws DataAccessException
 	 */
 	@Override
-	public Long queryForLong(String query, Map<String, String> arguments) throws DataAccessException {
+	public Long queryForLong(String query, Map<?, ?> arguments) throws DataAccessException {
 		String result = queryForString(query, arguments);
 		if (result != null) {
 			try {
@@ -212,17 +237,6 @@ public class HiveTemplate implements InitializingBean, HiveOperations {
 		return null;
 	}
 
-	/**
-	 * Executes a Hive script.
-	 * 
-	 * @param script script resource
-	 * @return script result
-	 * @throws DataAccessException
-	 */
-	@Override
-	public List<String> executeScript(Resource script) throws DataAccessException {
-		return executeScript(new HiveScript(script));
-	}
 
 	/**
 	 * Executes a Hive script.
@@ -259,5 +273,10 @@ public class HiveTemplate implements InitializingBean, HiveOperations {
 	 */
 	public void setHiveClient(ObjectFactory<HiveClient> hiveClientFactory) {
 		this.hiveClientFactory = hiveClientFactory;
+	}
+
+	@Override
+	public void setResourceLoader(ResourceLoader resourceLoader) {
+		this.resourceLoader = resourceLoader;
 	}
 }

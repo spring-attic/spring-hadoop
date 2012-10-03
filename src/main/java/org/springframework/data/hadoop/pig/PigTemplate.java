@@ -25,10 +25,13 @@ import org.apache.pig.backend.executionengine.ExecException;
 import org.apache.pig.backend.executionengine.ExecJob;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.ObjectFactory;
+import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.dao.DataAccessException;
 import org.springframework.util.Assert;
+import org.springframework.util.ResourceUtils;
 
 /**
  * Helper class that simplifies Pig data access code. Automatically handles the creation of a PigServer (which is non-thread-safe) 
@@ -36,9 +39,10 @@ import org.springframework.util.Assert;
  *  
  * @author Costin Leau
  */
-public class PigTemplate implements InitializingBean, PigOperations {
+public class PigTemplate implements InitializingBean, PigOperations, ResourceLoaderAware {
 
 	private ObjectFactory<PigServer> pigServerFactory;
+	private ResourceLoader resourceLoader;
 
 	/**
 	 * Constructs a new <code>PigTemplate</code> instance.
@@ -110,39 +114,42 @@ public class PigTemplate implements InitializingBean, PigOperations {
 
 	/**
 	 * Executes the given Pig Latin that results in a list of job executions.
+	 * The script is interpreted as a URL or if that fails, as a Pig Latin statement.
 	 *  
-	 * @param script pig latin
+	 * @param script script URL or pig latin statement
 	 * @return list of job executions
 	 * @throws DataAccessException
 	 */
 	@Override
-	public List<ExecJob> executeQuery(String script) throws DataAccessException {
-		return executeQuery(script, null);
+	public List<ExecJob> executeScript(String script) throws DataAccessException {
+		return executeScript(script, null);
 	}
 
 	/**
 	 * Executes the given Pig Latin with arguments that results in a list of job executions.
+	 * The script is interpreted as a URL or if that fails, as a Pig Latin statement.
 	 * 
-	 * @param script pig latin
+	 * @param script script URL or pig latin statement
 	 * @param arguments script arguments
 	 * @return list of job executions
 	 * @throws DataAccessException
 	 */
 	@Override
-	public List<ExecJob> executeQuery(String script, Map<String, String> arguments) throws DataAccessException {
-		return executeScript(new PigScript(new ByteArrayResource(script.getBytes()), arguments));
-	}
+	public List<ExecJob> executeScript(String script, Map<?, ?> arguments) throws DataAccessException {
+		Assert.hasText(script, "a script is required");
 
-	/**
-	 * Executes the given script that results in a list of job executions.
-	 * 
-	 * @param script script resource
-	 * @return list of job executions
-	 * @throws DataAccessException
-	 */
-	@Override
-	public List<ExecJob> executeScript(Resource script) throws DataAccessException {
-		return executeScript(new PigScript(script));
+		Resource res = null;
+
+		if (ResourceUtils.isUrl(script)) {
+			if (resourceLoader != null) {
+				res = resourceLoader.getResource(script);
+			}
+		}
+		else {
+			res = new ByteArrayResource(script.getBytes());
+		}
+
+		return executeScript(new PigScript(res, arguments));
 	}
 
 	/**
@@ -180,5 +187,10 @@ public class PigTemplate implements InitializingBean, PigOperations {
 	 */
 	public void setPigServer(ObjectFactory<PigServer> pigServerFactory) {
 		this.pigServerFactory = pigServerFactory;
+	}
+
+	@Override
+	public void setResourceLoader(ResourceLoader resourceLoader) {
+		this.resourceLoader = resourceLoader;
 	}
 }

@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.hadoop.hive.service.HiveClient;
-import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessException;
 
 
@@ -42,6 +41,7 @@ public interface HiveOperations {
 
 	/**
 	 * Executes the given HiveQL that results in a list of objects.
+	 * The script is interpreted as a URL or if that fails, as a HiveQL statement.
 	 *  
 	 * @param query HiveQL
 	 * @return list of values returned by the query
@@ -51,16 +51,18 @@ public interface HiveOperations {
 
 	/**
 	 * Executes the given HiveQL using the list of arguments, expecting a list of objects.
+	 * The script is interpreted as a URL or if that fails, as a HiveQL statement.
 	 * 
 	 * @param query HiveQL
 	 * @param arguments query arguments
 	 * @return list of values returned by the query
 	 * @throws DataAccessException
 	 */
-	List<String> query(String query, Map<String, String> arguments) throws DataAccessException;
+	List<String> query(String query, Map<?, ?> arguments) throws DataAccessException;
 
 	/**
 	 * Executes the given HiveQL that results in a single object.
+	 * The script is interpreted as a URL or if that fails, as a HiveQL statement.
 	 * 
 	 * @param query HiveQL
 	 * @return query result
@@ -70,16 +72,18 @@ public interface HiveOperations {
 
 	/**
 	 * Executes the given HiveQL using the list of arguments, that results in a single object.
+	 * The script is interpreted as a URL or if that fails, as a HiveQL statement.
 	 * 
 	 * @param query HiveQL
 	 * @param arguments query arguments
 	 * @return query result
 	 * @throws DataAccessException
 	 */
-	String queryForString(String query, Map<String, String> arguments) throws DataAccessException;
+	String queryForString(String query, Map<?, ?> arguments) throws DataAccessException;
 
 	/**
 	 * Executes the given HiveQL that results in a single int value.
+	 * The script is interpreted as a URL or if that fails, as a HiveQL statement.
 	 * 
 	 * @param query HiveQL
 	 * @return query int result
@@ -89,16 +93,18 @@ public interface HiveOperations {
 
 	/**
 	 * Executes the given HiveQL using the list of arguments, that results in a single int value.
+	 * The script is interpreted as a URL or if that fails, as a HiveQL statement.
 	 * 
 	 * @param query HiveQL
 	 * @param arguments query arguments
 	 * @return query int result
 	 * @throws DataAccessException
 	 */
-	Integer queryForInt(String query, Map<String, String> arguments) throws DataAccessException;
+	Integer queryForInt(String query, Map<?, ?> arguments) throws DataAccessException;
 
 	/**
 	 * Executes the given HiveQL that results in a single long value.
+	 * The script is interpreted as a URL or if that fails, as a HiveQL statement.
 	 * 
 	 * @param query HiveQL
 	 * @return query long result
@@ -108,22 +114,14 @@ public interface HiveOperations {
 
 	/**
 	 * Executes the given HiveQL using the list of arguments, that results in a single long value.
+	 * The script is interpreted as a URL or if that fails, as a HiveQL statement.
 	 * 
 	 * @param query HiveQL
 	 * @param arguments query arguments
 	 * @return query long result
 	 * @throws DataAccessException
 	 */
-	Long queryForLong(String query, Map<String, String> arguments) throws DataAccessException;
-
-	/**
-	 * Executes a Hive script.
-	 * 
-	 * @param script script resource
-	 * @return script result
-	 * @throws DataAccessException
-	 */
-	List<String> executeScript(Resource script) throws DataAccessException;
+	Long queryForLong(String query, Map<?, ?> arguments) throws DataAccessException;
 
 	/**
 	 * Executes a Hive script.

@@ -43,10 +43,15 @@ public class HiveScript {
 		this(resource, (Map<String, String>) null);
 	}
 
-	public HiveScript(Resource resource, Map<String, String> args) {
+	public HiveScript(Resource resource, Map<?, ?> args) {
 		Assert.notNull(resource, "a valid resource is required");
 		this.resource = resource;
-		this.arguments = args;
+		if (args != null) {
+			arguments = new LinkedHashMap<String, String>();
+			for (Map.Entry<?, ?> entry : args.entrySet()) {
+				arguments.put(entry.getKey().toString(), entry.getValue().toString());
+			}
+		}
 	}
 
 	/**

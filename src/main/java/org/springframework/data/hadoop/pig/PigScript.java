@@ -54,10 +54,11 @@ public class PigScript {
 		this.resource = resource;
 
 		if (args != null) {
-			arguments = new LinkedHashMap<String, String>();
+			Map<String, String> arguments = new LinkedHashMap<String, String>();
 			for (String key : args.stringPropertyNames()) {
 				arguments.put(key, args.getProperty(key));
 			}
+			this.arguments = arguments;
 		}
 	}
 
@@ -67,10 +68,16 @@ public class PigScript {
 	 * @param resource
 	 * @param args
 	 */
-	public PigScript(Resource resource, Map<String, String> args) {
+	public PigScript(Resource resource, Map<?, ?> args) {
 		Assert.notNull(resource, "a valid resource is required");
 		this.resource = resource;
-		this.arguments = args;
+
+		if (args != null) {
+			arguments = new LinkedHashMap<String, String>();
+			for (Map.Entry<?, ?> entry : args.entrySet()) {
+				arguments.put(entry.getKey().toString(), entry.getValue().toString());
+			}
+		}
 	}
 
 	/**

@@ -20,7 +20,6 @@ import java.util.Map;
 
 import org.apache.pig.PigServer;
 import org.apache.pig.backend.executionengine.ExecJob;
-import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessException;
 
 /**
@@ -42,31 +41,24 @@ public interface PigOperations {
 
 	/**
 	 * Executes the given Pig Latin that results in a list of job executions.
+	 * The script is interpreted as a URL or if that fails, as a Pig Latin statement.
 	 *  
-	 * @param script pig latin
+	 * @param script script URL or pig latin statement
 	 * @return list of job executions
 	 * @throws DataAccessException
 	 */
-	List<ExecJob> executeQuery(String script) throws DataAccessException;
+	List<ExecJob> executeScript(String script) throws DataAccessException;
 
 	/**
 	 * Executes the given Pig Latin with arguments that results in a list of job executions.
+	 * The script is interpreted as a URL or if that fails, as a Pig Latin statement.
 	 * 
-	 * @param script pig latin
+	 * @param script script URL or pig latin statement
 	 * @param arguments script arguments
 	 * @return list of job executions
 	 * @throws DataAccessException
 	 */
-	List<ExecJob> executeQuery(String script, Map<String, String> arguments) throws DataAccessException;
-
-	/**
-	 * Executes the given script that results in a list of job executions.
-	 * 
-	 * @param script script resource
-	 * @return list of job executions
-	 * @throws DataAccessException
-	 */
-	List<ExecJob> executeScript(Resource script) throws DataAccessException;
+	List<ExecJob> executeScript(String script, Map<?, ?> arguments) throws DataAccessException;
 
 	/**
 	 * Executes the given script identified by location and arguments that results in a list of job executions.

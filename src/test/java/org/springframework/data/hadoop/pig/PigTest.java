@@ -58,7 +58,7 @@ public class PigTest {
 
 	@Test
 	public void testPig() throws Exception {
-		pigTemplate.executeQuery("A = LOAD 'foo.txt' AS (key, value);");
+		pigTemplate.executeScript("A = LOAD 'foo.txt' AS (key, value);");
 	}
 
 	@Test

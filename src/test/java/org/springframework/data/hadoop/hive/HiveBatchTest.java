@@ -94,7 +94,7 @@ public class HiveBatchTest {
 
 	@Test(expected = Exception.class)
 	public void testScriptRunner() throws Exception {
-		template.executeScript(ctx.getResource("org/springframework/data/hadoop/hive/hive-failing-script.q"));
+		template.query("org/springframework/data/hadoop/hive/hive-failing-script.q");
 	}
 
 	@Test
