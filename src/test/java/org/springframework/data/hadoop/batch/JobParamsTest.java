@@ -52,7 +52,7 @@ public class JobParamsTest {
 	public void setup() {
 		Map<String, JobParameter> p = new LinkedHashMap<String, JobParameter>();
 		p.put("mr.input", new JobParameter("/batch-param-test/input/"));
-		p.put("mr.output", new JobParameter("/batch-param-test/output"));
+		p.put("mr.output", new JobParameter("/batch-param-test/output/"));
 		p.put("properties-file", new JobParameter("dummy-1.properties"));
 		params = new JobParameters(p);
 	}

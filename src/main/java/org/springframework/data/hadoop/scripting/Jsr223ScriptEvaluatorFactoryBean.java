@@ -17,18 +17,18 @@ package org.springframework.data.hadoop.scripting;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import org.springframework.beans.factory.BeanClassLoaderAware;
-import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.scripting.ScriptSource;
 
 /**
- * FactoryBean for easy declarative use of JSR-223 based {@link ScriptEvaluator}.
+ * Runner for easy declarative use of JSR-223 based {@link ScriptEvaluator}.
  * 
  * @author Costin Leau
  */
-class Jsr223ScriptEvaluatorFactoryBean implements InitializingBean, BeanClassLoaderAware, FactoryBean<Object> {
+class Jsr223ScriptRunner implements InitializingBean, BeanClassLoaderAware, Callable<Object> {
 
 	private ClassLoader classLoader;
 	private ScriptSource script;
@@ -42,7 +42,7 @@ class Jsr223ScriptEvaluatorFactoryBean implements InitializingBean, BeanClassLoa
 	private boolean runAtStartup = true;
 
 	@Override
-	public Object getObject() {
+	public Object call() {
 		switch (evaluation) {
 		case ONCE:
 			if (!evaluated) {
@@ -77,7 +77,7 @@ class Jsr223ScriptEvaluatorFactoryBean implements InitializingBean, BeanClassLoa
 		postProcess(arguments);
 
 		if (runAtStartup) {
-			getObject();
+			call();
 		}
 	}
 
@@ -88,16 +88,6 @@ class Jsr223ScriptEvaluatorFactoryBean implements InitializingBean, BeanClassLoa
 	 * @param arguments
 	 */
 	protected void postProcess(Map<String, Object> arguments) {
-	}
-
-	@Override
-	public Class<Object> getObjectType() {
-		return Object.class;
-	}
-
-	@Override
-	public boolean isSingleton() {
-		return EvaluationPolicy.ONCE.equals(evaluation);
 	}
 
 	@Override

@@ -129,12 +129,12 @@ public class ScriptingTest {
 	public void testNullCfg() throws Exception {
 		ScriptSource script = new StaticScriptSource("null");
 		
-		HdfsScriptFactoryBean hsfb = new HdfsScriptFactoryBean();
+		HdfsScriptRunner hsfb = new HdfsScriptRunner();
 		hsfb.setApplicationContext(new GenericApplicationContext());
 		hsfb.setScriptSource(script);
 		hsfb.setLanguage("javascript");
 		hsfb.afterPropertiesSet();
 		
-		assertNull(hsfb.getObject());
+		assertNull(hsfb.call());
 	}
 }

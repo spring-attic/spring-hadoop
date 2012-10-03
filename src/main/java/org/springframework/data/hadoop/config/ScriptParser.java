@@ -24,7 +24,7 @@ import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.data.hadoop.scripting.HdfsScriptFactoryBean;
+import org.springframework.data.hadoop.scripting.HdfsScriptRunner;
 import org.springframework.scripting.support.ResourceScriptSource;
 import org.springframework.scripting.support.StaticScriptSource;
 import org.springframework.util.StringUtils;
@@ -114,7 +114,7 @@ class ScriptParser extends AbstractImprovedSimpleBeanDefinitionParser {
 
 	@Override
 	protected Class<?> getBeanClass(Element element) {
-		return HdfsScriptFactoryBean.class;
+		return HdfsScriptRunner.class;
 	}
 
 	@Override

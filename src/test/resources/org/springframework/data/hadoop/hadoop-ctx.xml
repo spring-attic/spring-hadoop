@@ -26,7 +26,7 @@
 	<hdp:resource-loader file-system-ref="hadoopFs" use-codecs="true"/>	
 	
 	<!--  default id is 'hadoopConfiguration' -->
-	<hdp:configuration register-url-handler="false">
+	<hdp:configuration register-url-handler="false" properties-location="s3.properties">
 		fs.default.name=${hd.fs}
 		cfg=main
 	</hdp:configuration>

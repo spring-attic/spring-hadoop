@@ -33,7 +33,8 @@ import org.springframework.data.hadoop.fs.SimplerFileSystem;
 import org.springframework.util.Assert;
 
 /**
- * Hadoop-customized factory that exposes Hadoop specific variables to scripting languages.
+ * Hadoop-customized runner that exposes Hadoop specific variables to scripting languages.
+ * 
  * The instances exposes are reused from the enclosing context (using naming conventions or autowiring strategies)
  * or created on demand (in case of lightweight objects).
  * <p/>
@@ -63,9 +64,9 @@ import org.springframework.util.Assert;
  * @see ApplicationContext
  * @author Costin Leau
  */
-public class HdfsScriptFactoryBean extends Jsr223ScriptEvaluatorFactoryBean implements ApplicationContextAware {
+public class HdfsScriptRunner extends Jsr223ScriptRunner implements ApplicationContextAware {
 
-	private static final Log log = LogFactory.getLog(HdfsScriptFactoryBean.class);
+	private static final Log log = LogFactory.getLog(HdfsScriptRunner.class);
 
 	private ApplicationContext ctx;
 	private Configuration configuration;

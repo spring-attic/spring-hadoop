@@ -15,18 +15,12 @@
  */
 package org.springframework.data.hadoop.config;
 
-import java.util.concurrent.Callable;
-
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractSimpleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.data.hadoop.scripting.HdfsScriptFactoryBean;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
@@ -38,51 +32,6 @@ import org.w3c.dom.Element;
  */
 class ScriptTaskletParser extends AbstractSimpleBeanDefinitionParser {
 
-
-	/**
-	 * Internal class used for wrapping a Hdfs script FB into a callable class to postpone the actual script evaluation.
-	 * Useful for nesting scripts as nested bean while preventing the FactoryBean from being evaluated.
-	 * 
-	 * @author Costin Leau
-	 */
-	private static class ScriptFactoryBeanCallable extends HdfsScriptFactoryBean {
-
-
-		private Object accessibleGetObject() {
-			return super.getObject();
-		}
-
-		@Override
-		public Object getObject() {
-			return new Callable<Object>() {
-				@Override
-				public Object call() throws Exception {
-					return accessibleGetObject();
-				}
-			};
-		}
-	}
-
-	private static class ScriptBeanReference implements Callable<Object>, ApplicationContextAware {
-
-		private String beanName;
-		private ApplicationContext ctx;
-
-
-		@Override
-		public Object call() throws Exception {
-			return ctx.getBean(beanName);
-		}
-
-		@Override
-		public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-			this.ctx = applicationContext;
-		}
-
-		public void setBeanName(String beanName) {
-			this.beanName = beanName;
-		}
-	}
 
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
@@ -98,24 +47,24 @@ class ScriptTaskletParser extends AbstractSimpleBeanDefinitionParser {
 
 		Element nestedScript = DomUtils.getChildElementByTagName(element, "script");
 		if (StringUtils.hasText(attribute) && nestedScript != null) {
-			parserContext.getReaderContext().error("Cannot use define both 'script-ref' and a nested script; use only one", element);
+			parserContext.getReaderContext().error(
+					"Cannot use define both 'script-ref' and a nested script; use only one", element);
 		}
 
+		Object script = null;
 		if (nestedScript != null) {
 			// parse the script definition
-			BeanDefinition parse = new ScriptParser().parse(nestedScript, parserContext);
-			// ugly but we know the type (as the class is private and under our control)
-			((AbstractBeanDefinition) parse).setBeanClass(ScriptFactoryBeanCallable.class);
+			BeanDefinition nested = new ScriptParser().parse(nestedScript, parserContext);
 			if (StringUtils.hasText(scope)) {
-				parse.setScope(scope);
+				nested.setScope(scope);
 			}
-			builder.addPropertyValue("scriptCallback", parse);
+			script = nested;
 		}
 		else {
-			BeanDefinitionBuilder nBuilder = BeanDefinitionBuilder.genericBeanDefinition(ScriptBeanReference.class);
-			nBuilder.addPropertyValue("beanName", attribute);
-			builder.addPropertyValue("scriptCallback", nBuilder.getBeanDefinition());
+			script = new RuntimeBeanReference(attribute);
 		}
+
+		builder.addPropertyValue("scriptCallback", script);
 	}
 
 
