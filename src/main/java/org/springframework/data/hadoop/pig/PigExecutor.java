@@ -22,7 +22,6 @@ import org.apache.pig.PigServer;
 import org.apache.pig.backend.executionengine.ExecJob;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.ObjectFactory;
-import org.springframework.util.Assert;
 
 /**
  * Common class for configuring and executing pig scripts.
@@ -46,8 +45,6 @@ abstract class PigExecutor implements InitializingBean {
 		if (pigTemplate == null) {
 			pigTemplate = new PigTemplate(pigFactory);
 		}
-
-		Assert.notEmpty(scripts, "no scripts specified");
 	}
 
 	protected List<ExecJob> executePigScripts() {

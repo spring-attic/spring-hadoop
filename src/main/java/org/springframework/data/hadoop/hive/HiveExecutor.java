@@ -21,7 +21,6 @@ import java.util.List;
 import org.apache.hadoop.hive.service.HiveClient;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.ObjectFactory;
-import org.springframework.util.Assert;
 
 /**
  * Common class for configuring and executing Hive scripts.
@@ -44,8 +43,6 @@ abstract class HiveExecutor implements InitializingBean {
 		if (hiveTemplate == null) {
 			hiveTemplate = new HiveTemplate(hiveClientFactory);
 		}
-
-		Assert.notEmpty(scripts, "no scripts specified");
 	}
 
 	protected List<String> executeHiveScripts() {
