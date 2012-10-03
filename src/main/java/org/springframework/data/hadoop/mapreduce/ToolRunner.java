@@ -25,8 +25,6 @@ import org.springframework.beans.factory.InitializingBean;
  * of {@link Tool}  instances inside Spring.
  * Optionally returns the execution result (as an int per {@link Tool#run(String[])}).
  * <p/>Note by default, the runner is configured to execute at startup. One can customize this behaviour through {@link #setRunAtStartup(boolean)}/
- * <p/>This class is a factory bean - if {@link #setRunAtStartup(boolean)} is set to false, then the action (namely the execution of the Tool) is postponed by the call
- * to {@link #getObject()}.
  * 
  * @author Costin Leau
  */

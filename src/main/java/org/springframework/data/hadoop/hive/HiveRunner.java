@@ -18,22 +18,14 @@ package org.springframework.data.hadoop.hive;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * Basic runner for Hive scripts inside a Spring environment. For more advanced functionality, consider using Spring Batch and the {@link HiveTasklet}.
  * 
  * <p/>Note by default, the runner is configured to execute at startup. One can customize this behaviour through {@link #setRunAtStartup(boolean)}.
  * 
- * <p/>This class is a factory bean - if {@link #setRunAtStartup(boolean)} is set to false, then the action (namely the execution of the Hive scripts) is postponed until 
- * {@link #getObject()} is called.
- * 
  * @author Costin Leau
  */
 public class HiveRunner extends HiveExecutor implements Callable<List<String>> {
-
-	private static final Log log = LogFactory.getLog(HiveRunner.class);
 
 	private boolean runAtStartup = false;
 
