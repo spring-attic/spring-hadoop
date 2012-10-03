@@ -992,7 +992,7 @@ The security user (ugi) to use for impersonation at runtime.
 	
 	<xsd:complexType name="pigRunnerType">
 		<xsd:sequence>
-			<xsd:element name="script" type="scriptWithArgumentsType" minOccurs="1" maxOccurs="unbounded">
+			<xsd:element name="script" type="scriptWithArgumentsType" minOccurs="0" maxOccurs="unbounded">
 				<xsd:annotation>
 				<xsd:documentation><![CDATA[
 Pig script.]]></xsd:documentation>
@@ -1239,7 +1239,7 @@ Reference to the Hadoop configuration. Defaults to 'hadoopConfiguration'.]]></xs
 
 	<xsd:complexType name="hiveRunnerType">
 		<xsd:sequence>
-			<xsd:element name="script" type="scriptWithArgumentsType" minOccurs="1" maxOccurs="unbounded">
+			<xsd:element name="script" type="scriptWithArgumentsType" minOccurs="0" maxOccurs="unbounded">
 				<xsd:annotation>
 				<xsd:documentation><![CDATA[
 Hive script.]]></xsd:documentation>
