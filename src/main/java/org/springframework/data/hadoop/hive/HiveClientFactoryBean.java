@@ -49,18 +49,19 @@ public class HiveClientFactoryBean implements FactoryBean<ObjectFactory<HiveClie
 	private int port = 10000;
 	private int timeout = 0;
 
-	public ObjectFactory<HiveClient> getObject() {
-		return new ObjectFactory<HiveClient>() {
-
-			@Override
-			public HiveClient getObject() throws BeansException {
-				try {
-					return createHiveClient();
-				} catch (Exception ex) {
-					throw new BeanCreationException("Cannot create HiveClient instance", ex);
-				}
+	private class HiveClientObjectFactory implements ObjectFactory<HiveClient> {
+		@Override
+		public HiveClient getObject() throws BeansException {
+			try {
+				return createHiveClient();
+			} catch (Exception ex) {
+				throw new BeanCreationException("Cannot create HiveClient instance", ex);
 			}
-		};
+		}
+	}
+
+	public ObjectFactory<HiveClient> getObject() {
+		return new HiveClientObjectFactory();
 	}
 
 	public Class<?> getObjectType() {

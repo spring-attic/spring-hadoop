@@ -54,17 +54,19 @@ public class PigServerFactoryBean implements FactoryBean<ObjectFactory<PigServer
 
 	private String user;
 
-	public ObjectFactory<PigServer> getObject() throws Exception {
-		return new ObjectFactory<PigServer>() {
-			@Override
-			public PigServer getObject() throws BeansException {
-				try {
-					return createPigInstance();
-				} catch (Exception ex) {
-					throw new BeanCreationException("Cannot create PigServer instance", ex);
-				}
+	private class PigServerObjectFactory implements ObjectFactory<PigServer> {
+		@Override
+		public PigServer getObject() throws BeansException {
+			try {
+				return createPigInstance();
+			} catch (Exception ex) {
+				throw new BeanCreationException("Cannot create PigServer instance", ex);
 			}
-		};
+		}
+	};
+
+	public ObjectFactory<PigServer> getObject() throws Exception {
+		return new PigServerObjectFactory();
 	}
 
 	public Class<?> getObjectType() {
