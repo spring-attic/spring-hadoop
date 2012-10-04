@@ -16,10 +16,12 @@
 package org.springframework.data.hadoop.pig;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.pig.backend.executionengine.ExecJob;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Common class for configuring and executing pig scripts.
@@ -46,6 +48,9 @@ abstract class PigExecutor implements InitializingBean {
 	}
 
 	protected List<ExecJob> executePigScripts() {
+		if (CollectionUtils.isEmpty(scripts)) {
+			return Collections.emptyList();
+		}
 		return pigTemplate.executeScript(scripts);
 	}
 

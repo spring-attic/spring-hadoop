@@ -36,6 +36,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.dao.NonTransientDataAccessResourceException;
+import org.springframework.util.Assert;
 
 /**
  * Internal utility class executing Pig scripts and converting Pig exceptions to DataAccessExceptions. 
@@ -76,6 +77,8 @@ abstract class PigUtils {
 	}
 
 	static List<ExecJob> run(PigServer pig, Iterable<PigScript> scripts) throws ExecException, IOException {
+		Assert.notNull(scripts, "at least one script is required");
+
 		if (!pig.isBatchOn()) {
 			pig.setBatchOn();
 		}

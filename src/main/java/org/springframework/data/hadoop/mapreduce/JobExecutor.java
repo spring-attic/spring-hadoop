@@ -17,6 +17,7 @@ package org.springframework.data.hadoop.mapreduce;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -27,6 +28,7 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -36,7 +38,7 @@ import org.springframework.util.StringUtils;
  */
 abstract class JobExecutor implements InitializingBean, BeanFactoryAware {
 
-	private Iterable<Job> jobs;
+	private Collection<Job> jobs;
 	private Iterable<String> jobNames;
 	private boolean waitForJobs = true;
 	private BeanFactory beanFactory;
@@ -59,7 +61,11 @@ abstract class JobExecutor implements InitializingBean, BeanFactoryAware {
 	protected void executeJobs() throws Exception {
 		Boolean succesful = Boolean.TRUE;
 
-		Iterable<Job> jbs = findJobs();
+		Collection<Job> jbs = findJobs();
+
+		if (CollectionUtils.isEmpty(jbs)) {
+			return;
+		}
 
 		for (Job job : jbs) {
 			if (!waitForJobs) {
@@ -76,7 +82,7 @@ abstract class JobExecutor implements InitializingBean, BeanFactoryAware {
 		}
 	}
 
-	private Iterable<Job> findJobs() {
+	private Collection<Job> findJobs() {
 		if (jobs != null) {
 			return jobs;
 		}
@@ -101,7 +107,7 @@ abstract class JobExecutor implements InitializingBean, BeanFactoryAware {
 	 * 
 	 * @param jobs The job to execute.
 	 */
-	public void setJobs(Iterable<Job> jobs) {
+	public void setJobs(Collection<Job> jobs) {
 		this.jobs = jobs;
 	}
 

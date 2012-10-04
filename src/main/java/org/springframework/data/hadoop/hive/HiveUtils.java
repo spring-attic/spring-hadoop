@@ -41,6 +41,7 @@ import org.springframework.dao.NonTransientDataAccessResourceException;
 import org.springframework.dao.PermissionDeniedDataAccessException;
 import org.springframework.dao.TransientDataAccessResourceException;
 import org.springframework.jdbc.BadSqlGrammarException;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
@@ -152,6 +153,8 @@ abstract class HiveUtils {
 	}
 
 	static List<String> run(HiveClient hive, Iterable<HiveScript> scripts) throws Exception {
+		Assert.notNull(scripts, "at least one script is required");
+
 		List<String> results = new ArrayList<String>();
 		for (HiveScript hiveScript : scripts) {
 			results.addAll(run(hive, hiveScript));

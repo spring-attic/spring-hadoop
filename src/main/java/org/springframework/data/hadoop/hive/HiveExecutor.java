@@ -16,9 +16,11 @@
 package org.springframework.data.hadoop.hive;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Common class for configuring and executing Hive scripts.
@@ -44,6 +46,10 @@ abstract class HiveExecutor implements InitializingBean {
 	}
 
 	protected List<String> executeHiveScripts() {
+		if (CollectionUtils.isEmpty(scripts)) {
+			return Collections.emptyList();
+		}
+
 		return hiveTemplate.executeScript(scripts);
 	}
 
