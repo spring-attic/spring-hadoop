@@ -28,12 +28,14 @@ import cascading.stats.CascadingStats;
 /**
  * Simple runner for executing {@link Cascade}s or {@link Flow}s. By default, the runner waits for the jobs to finish and returns its status.
  * 
+ * To make the runner execute at startup, use {@link #setRunAtStartup(boolean)}.
+ * 
  * @author Costin Leau
  */
 public class CascadeRunner implements InitializingBean, DisposableBean, Callable<CascadingStats> {
 
 	private boolean waitToComplete = true;
-	private boolean runAtStartup = true;
+	private boolean runAtStartup = false;
 	private UnitOfWork<CascadingStats> uow;
 
 	private Iterable<Callable<?>> preActions;

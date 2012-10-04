@@ -39,7 +39,7 @@ class Jsr223ScriptRunner implements InitializingBean, BeanClassLoaderAware, Call
 	private final Object monitor = new Object();
 	private volatile boolean evaluated;
 	private Object result = null;
-	private boolean runAtStartup = true;
+	private boolean runAtStartup = false;
 
 	private Iterable<Callable<?>> preActions;
 	private Iterable<Callable<?>> postActions;

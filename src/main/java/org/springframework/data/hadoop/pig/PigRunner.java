@@ -23,7 +23,7 @@ import org.apache.pig.backend.executionengine.ExecJob;
 /**
  * Basic runner of Pig scripts inside a Spring environment. For more advanced functionality, consider using Spring Batch and the {@link PigTasklet}.
  * 
- * <p/>Note by default, the runner is configured to execute at startup. One can customize this behaviour through {@link #setRunAtStartup(boolean)}.
+ * <p/>To make the runner execute at startup, use {@link #setRunAtStartup(boolean)}.
  * 
  * @author Costin Leau
  */

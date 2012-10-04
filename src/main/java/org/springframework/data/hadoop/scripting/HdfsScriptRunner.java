@@ -58,6 +58,7 @@ import org.springframework.util.Assert;
  * 
  * <p/>
  * Note that the above variables are added only if found (have a non-null value) and the keys are not bound already.
+ * To make the runner execute at startup, use {@link #setRunAtStartup(boolean)}.
  * 
  * @see HdfsResourceLoader
  * @see FsShell

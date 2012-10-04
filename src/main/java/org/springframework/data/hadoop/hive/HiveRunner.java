@@ -21,7 +21,7 @@ import java.util.concurrent.Callable;
 /**
  * Basic runner for Hive scripts inside a Spring environment. For more advanced functionality, consider using Spring Batch and the {@link HiveTasklet}.
  * 
- * <p/>Note by default, the runner is configured to execute at startup. One can customize this behaviour through {@link #setRunAtStartup(boolean)}.
+ * To make the runner execute at startup, use {@link #setRunAtStartup(boolean)}.
  * 
  * @author Costin Leau
  */

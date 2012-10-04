@@ -25,13 +25,13 @@ import org.apache.hadoop.mapreduce.Job;
  * 
  * <p/>
  * For more control over the job execution and outcome consider querying the {@link Job}s or using Spring Batch (see the reference documentation for more info).
- * <p/>Note by default, the runner is configured to execute at startup. One can customize this behaviour through {@link #setRunAtStartup(boolean)}.
+ * <p/>To make the runner execute at startup, use {@link #setRunAtStartup(boolean)}.
  * 
  * @author Costin Leau
  */
 public class JobRunner extends JobExecutor implements Callable<Void> {
 
-	private boolean runAtStartup = true;
+	private boolean runAtStartup = false;
 	private Iterable<Callable<?>> preActions;
 	private Iterable<Callable<?>> postActions;
 

@@ -25,7 +25,7 @@ import org.springframework.beans.factory.InitializingBean;
  * See the reference documentation for more details.
  * Using the {@link Tool} interface is highly recommended in all cases.
  * 
- * <p/>Note by default, the runner is configured to execute at startup. One can customize this behaviour through {@link #setRunAtStartup(boolean)}.
+ * <p/>To make the runner execute at startup, use {@link #setRunAtStartup(boolean)}.
  * 
  * @author Costin Leau
  */
