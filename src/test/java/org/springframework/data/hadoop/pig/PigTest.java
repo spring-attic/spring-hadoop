@@ -29,7 +29,6 @@ import org.apache.pig.backend.executionengine.ExecException;
 import org.apache.pig.backend.executionengine.ExecJob;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.hadoop.TestUtils;
@@ -65,7 +64,7 @@ public class PigTest {
 	public void testServerNamespace() throws Exception {
 		String defaultName = "pig";
 		assertTrue(ctx.containsBean(defaultName));
-		PigServer server = (PigServer) (ctx.getBean(defaultName, ObjectFactory.class)).getObject();
+		PigServer server = (ctx.getBean(defaultName, PigServerFactory.class)).getPigServer();
 		Properties props = server.getPigContext().getProperties();
 		assertEquals("blue", props.get("ivy"));
 		assertEquals(ExecType.LOCAL, server.getPigContext().getExecType());
@@ -73,7 +72,7 @@ public class PigTest {
 
 	@Test
 	public void testPigProperties() throws Exception {
-		PigServer pig = (PigServer) (ctx.getBean("pig", ObjectFactory.class)).getObject();
+		PigServer pig = (ctx.getBean("pig", PigServerFactory.class)).getPigServer();
 		Properties props = pig.getPigContext().getProperties();
 		assertEquals("blue", props.get("ivy"));
 
