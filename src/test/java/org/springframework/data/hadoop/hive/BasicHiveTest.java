@@ -78,7 +78,7 @@ public class BasicHiveTest {
 		String tableName = "testHiveDriverTable";
 		hiveTemplate.query("create table if not exists " + tableName + " (key int, value string)");
 		System.out.println(hiveTemplate.query("show tables"));
-		assertEquals(Long.valueOf(0), hiveTemplate.queryForInt("select count(1) as cnt from " + tableName));
+		assertEquals(Integer.valueOf(0), hiveTemplate.queryForInt("select count(1) as cnt from " + tableName));
 	}
 
 	@Test
