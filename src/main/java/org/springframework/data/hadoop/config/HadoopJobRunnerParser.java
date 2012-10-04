@@ -34,7 +34,7 @@ class HadoopJobRunnerParser extends AbstractImprovedSimpleBeanDefinitionParser {
 
 	@Override
 	protected boolean isEligibleAttribute(String attributeName) {
-		return !("jobs".equals(attributeName) || "pre-action".equals(attributeName) || "post-action".equals(attributeName))
+		return !("job".equals(attributeName) || "pre-action".equals(attributeName) || "post-action".equals(attributeName))
 				&& super.isEligibleAttribute(attributeName);
 	}
 
@@ -43,7 +43,7 @@ class HadoopJobRunnerParser extends AbstractImprovedSimpleBeanDefinitionParser {
 		// parse attributes using conventions
 		super.doParse(element, parserContext, builder);
 
-		NamespaceUtils.setCSVProperty(element, builder, "jobs", "jobNames");
+		NamespaceUtils.setCSVProperty(element, builder, "job", "jobNames");
 
 		NamespaceUtils.setCSVReferenceProperty(element, builder, "pre-action", "preAction");
 		NamespaceUtils.setCSVReferenceProperty(element, builder, "post-action", "postAction");

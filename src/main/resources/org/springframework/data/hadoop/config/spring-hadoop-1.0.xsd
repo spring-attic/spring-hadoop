@@ -28,10 +28,10 @@ Bean id.]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
 		<!-- the job reference -->
-		<xsd:attribute name="jobs">
+		<xsd:attribute name="job">
 			<xsd:annotation>
 				<xsd:documentation source="java:org.apache.hadoop.mapreduce.Job"><![CDATA[
-Hadoop Job]]></xsd:documentation>
+Hadoop Job. Multiple names can be specified using comma (,) as a separator.]]></xsd:documentation>
 				<xsd:appinfo>
 					<tool:annotation kind="ref">
 						<tool:expected-type type="org.apache.hadoop.mapreduce.Job" />

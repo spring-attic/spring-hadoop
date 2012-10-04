@@ -34,7 +34,7 @@ class HadoopJobTaskletParser extends AbstractImprovedSimpleBeanDefinitionParser 
 
 	@Override
 	protected boolean isEligibleAttribute(String attributeName) {
-		return (!"jobs".equals(attributeName)) && super.isEligibleAttribute(attributeName);
+		return (!"job".equals(attributeName)) && super.isEligibleAttribute(attributeName);
 	}
 
 	@Override
@@ -42,6 +42,6 @@ class HadoopJobTaskletParser extends AbstractImprovedSimpleBeanDefinitionParser 
 		// parse attributes using conventions
 		super.doParse(element, parserContext, builder);
 
-		NamespaceUtils.setCSVProperty(element, builder, "jobs", "jobNames");
+		NamespaceUtils.setCSVProperty(element, builder, "job", "jobNames");
 	}
 }
