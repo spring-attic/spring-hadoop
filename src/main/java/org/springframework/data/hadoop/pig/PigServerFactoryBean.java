@@ -131,7 +131,7 @@ public class PigServerFactoryBean implements FactoryBean<ObjectFactory<PigServer
 
 
 		if (!CollectionUtils.isEmpty(scripts)) {
-			PigUtils.run(pigServer, scripts, false);
+			PigUtils.runWithConversion(pigServer, scripts, false);
 		}
 
 		return pigServer;

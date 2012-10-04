@@ -75,31 +75,36 @@ abstract class PigUtils {
 		return new NonTransientDataAccessResourceException("Unknown Pig error", ex);
 	}
 
-	static List<ExecJob> run(PigServer pig, Iterable<PigScript> scripts, boolean closePig) {
+	static List<ExecJob> run(PigServer pig, Iterable<PigScript> scripts) throws ExecException, IOException {
 		if (!pig.isBatchOn()) {
 			pig.setBatchOn();
 		}
 
 		List<ExecJob> jobs = new ArrayList<ExecJob>();
 
-		try {
-			pig.getPigContext().connect();
+		pig.getPigContext().connect();
 
-			InputStream in = null;
-			try {
-				for (PigScript script : scripts) {
-					try {
-						in = script.getResource().getInputStream();
-					} catch (IOException ex) {
-						throw new IllegalArgumentException("Cannot open script [" + script.getResource() + "]", ex);
-					}
-					pig.registerScript(in, script.getArguments());
-					jobs.addAll(pig.executeBatch());
+		InputStream in = null;
+		try {
+			for (PigScript script : scripts) {
+				try {
+					in = script.getResource().getInputStream();
+				} catch (IOException ex) {
+					throw new IllegalArgumentException("Cannot open script [" + script.getResource() + "]", ex);
 				}
-			} finally {
-				IOUtils.closeStream(in);
+				pig.registerScript(in, script.getArguments());
+				jobs.addAll(pig.executeBatch());
 			}
-			return jobs;
+		} finally {
+			IOUtils.closeStream(in);
+		}
+		return jobs;
+	}
+
+	static List<ExecJob> runWithConversion(PigServer pig, Iterable<PigScript> scripts, boolean closePig)
+			throws DataAccessException {
+		try {
+			return run(pig, scripts);
 		} catch (ExecException ex) {
 			throw convert(ex);
 		} catch (IOException ex) {

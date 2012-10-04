@@ -172,8 +172,13 @@ public class PigTemplate implements InitializingBean, PigOperations, ResourceLoa
 	 * @throws DataAccessException
 	 */
 	@Override
-	public List<ExecJob> executeScript(Iterable<PigScript> scripts) throws DataAccessException {
-		return PigUtils.run(createPigServer(), scripts, true);
+	public List<ExecJob> executeScript(final Iterable<PigScript> scripts) throws DataAccessException {
+		return execute(new PigCallback<List<ExecJob>>() {
+			@Override
+			public List<ExecJob> doInPig(PigServer pig) throws ExecException, IOException {
+				return PigUtils.run(createPigServer(), scripts);
+			}
+		});
 	}
 
 	protected PigServer createPigServer() {
