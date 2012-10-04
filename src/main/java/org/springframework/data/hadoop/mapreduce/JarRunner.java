@@ -67,7 +67,7 @@ public class JarRunner extends JarExecutor implements Callable<Integer>, Initial
 	 * 
 	 * @param beans
 	 */
-	public void setPreAction(Iterable<Callable<?>> actions) {
+	public void setPreAction(Collection<Callable<?>> actions) {
 		this.preActions = actions;
 	}
 
@@ -76,7 +76,7 @@ public class JarRunner extends JarExecutor implements Callable<Integer>, Initial
 	 * 
 	 * @param beans
 	 */
-	public void setPostAction(Iterable<Callable<?>> actions) {
+	public void setPostAction(Collection<Callable<?>> actions) {
 		this.postActions = actions;
 	}
 

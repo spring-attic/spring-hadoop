@@ -15,6 +15,7 @@
  */
 package org.springframework.data.hadoop.pig;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -66,7 +67,7 @@ public class PigRunner extends PigExecutor implements Callable<List<ExecJob>> {
 	 * 
 	 * @param beans
 	 */
-	public void setPreAction(Iterable<Callable<?>> actions) {
+	public void setPreAction(Collection<Callable<?>> actions) {
 		this.preActions = actions;
 	}
 
@@ -75,7 +76,7 @@ public class PigRunner extends PigExecutor implements Callable<List<ExecJob>> {
 	 * 
 	 * @param beans
 	 */
-	public void setPostAction(Iterable<Callable<?>> actions) {
+	public void setPostAction(Collection<Callable<?>> actions) {
 		this.postActions = actions;
 	}
 

@@ -15,6 +15,7 @@
  */
 package org.springframework.data.hadoop.cascading;
 
+import java.util.Collection;
 import java.util.concurrent.Callable;
 
 import org.springframework.beans.factory.DisposableBean;
@@ -87,7 +88,7 @@ public class CascadeRunner implements InitializingBean, DisposableBean, Callable
 	 * 
 	 * @param beans
 	 */
-	public void setPreAction(Iterable<Callable<?>> actions) {
+	public void setPreAction(Collection<Callable<?>> actions) {
 		this.preActions = actions;
 	}
 
@@ -96,7 +97,7 @@ public class CascadeRunner implements InitializingBean, DisposableBean, Callable
 	 * 
 	 * @param beans
 	 */
-	public void setPostAction(Iterable<Callable<?>> actions) {
+	public void setPostAction(Collection<Callable<?>> actions) {
 		this.postActions = actions;
 	}
 

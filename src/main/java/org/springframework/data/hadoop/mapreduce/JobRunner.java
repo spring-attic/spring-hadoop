@@ -15,6 +15,7 @@
  */
 package org.springframework.data.hadoop.mapreduce;
 
+import java.util.Collection;
 import java.util.concurrent.Callable;
 
 import org.apache.hadoop.mapreduce.Job;
@@ -68,7 +69,7 @@ public class JobRunner extends JobExecutor implements Callable<Void> {
 	 * 
 	 * @param beans
 	 */
-	public void setPreAction(Iterable<Callable<?>> actions) {
+	public void setPreAction(Collection<Callable<?>> actions) {
 		this.preActions = actions;
 	}
 
@@ -77,7 +78,7 @@ public class JobRunner extends JobExecutor implements Callable<Void> {
 	 * 
 	 * @param beans
 	 */
-	public void setPostAction(Iterable<Callable<?>> actions) {
+	public void setPostAction(Collection<Callable<?>> actions) {
 		this.postActions = actions;
 	}
 

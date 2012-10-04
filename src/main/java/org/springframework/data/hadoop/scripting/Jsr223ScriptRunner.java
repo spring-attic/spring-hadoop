@@ -15,6 +15,7 @@
  */
 package org.springframework.data.hadoop.scripting;
 
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -177,7 +178,7 @@ class Jsr223ScriptRunner implements InitializingBean, BeanClassLoaderAware, Call
 	 * 
 	 * @param beans
 	 */
-	public void setPreAction(Iterable<Callable<?>> actions) {
+	public void setPreAction(Collection<Callable<?>> actions) {
 		this.preActions = actions;
 	}
 
@@ -186,7 +187,7 @@ class Jsr223ScriptRunner implements InitializingBean, BeanClassLoaderAware, Call
 	 * 
 	 * @param beans
 	 */
-	public void setPostAction(Iterable<Callable<?>> actions) {
+	public void setPostAction(Collection<Callable<?>> actions) {
 		this.postActions = actions;
 	}
 

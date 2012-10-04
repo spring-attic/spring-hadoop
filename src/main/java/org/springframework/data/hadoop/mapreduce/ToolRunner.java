@@ -15,6 +15,7 @@
  */
 package org.springframework.data.hadoop.mapreduce;
 
+import java.util.Collection;
 import java.util.concurrent.Callable;
 
 import org.apache.hadoop.util.Tool;
@@ -67,7 +68,7 @@ public class ToolRunner extends ToolExecutor implements Callable<Integer>, Initi
 	 * 
 	 * @param beans
 	 */
-	public void setPreAction(Iterable<Callable<?>> actions) {
+	public void setPreAction(Collection<Callable<?>> actions) {
 		this.preActions = actions;
 	}
 
@@ -76,7 +77,7 @@ public class ToolRunner extends ToolExecutor implements Callable<Integer>, Initi
 	 * 
 	 * @param beans
 	 */
-	public void setPostAction(Iterable<Callable<?>> actions) {
+	public void setPostAction(Collection<Callable<?>> actions) {
 		this.postActions = actions;
 	}
 
