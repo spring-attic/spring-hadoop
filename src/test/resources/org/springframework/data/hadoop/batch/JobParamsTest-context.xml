@@ -21,13 +21,13 @@
 		<step id="import-2" next="do">
 			<tasklet ref="ref-script-tasklet"/>
 		</step>
-		<step id="do" next="do-stream">
+		<step id="do">
 			<tasklet ref="hadoop-tasklet"/>
 		</step>
+		<!-- 
 		<step id="do-stream">
 			<tasklet ref="hadoop-stream"/>
 		</step>
-		<!-- 
 		<step id="export">
 			<tasklet>
 				<chunk reader="hdfs-reader" writer="file-writer" commit-interval="10"/>
