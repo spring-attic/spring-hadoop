@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.Callable;
 
 import org.apache.hadoop.hive.service.HiveClient;
 import org.junit.Test;
@@ -98,6 +99,19 @@ public class HiveBatchTest {
 	}
 
 	@Test
+	public void testTemplateWithScript() throws Exception {
+		//Integer in = template.queryForInt("classpath:org/springframework/data/hadoop/hive/script.q");
+		assertTrue(!template.query("classpath:org/springframework/data/hadoop/hive/script.q").isEmpty());
+	}
+
+	@Test
+	public void testQueryForInt() throws Exception {
+		assertEquals(Integer.valueOf(0), template.queryForInt("DROP TABLE IF EXISTS testHiveBatchTable; " +
+				"create table testHiveBatchTable (key int, value string);" +
+				"select count(1) from testHiveBatchTable;"));
+	}
+
+	@Test
 	public void testScriptParams() throws Exception {
 		Resource res = new ByteArrayResource("set zzz;set hiveconf:yyy;".getBytes());
 		Properties params = new Properties();
@@ -111,7 +125,7 @@ public class HiveBatchTest {
 
 	@Test
 	public void testHiveRunner() throws Exception {
-		List<String> results = ctx.getBean("hive-scripts", List.class);
-		System.out.println(results.size());
+		Callable runner = ctx.getBean("hive-scripts", Callable.class);
+		System.out.println(runner.call());
 	}
 }

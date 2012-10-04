@@ -78,15 +78,13 @@ public class BasicHiveTest {
 		String tableName = "testHiveDriverTable";
 		hiveTemplate.query("create table if not exists " + tableName + " (key int, value string)");
 		System.out.println(hiveTemplate.query("show tables"));
-		hiveTemplate.queryForInt("select count(1) as cnt from " + tableName);
+		assertEquals(Long.valueOf(0), hiveTemplate.queryForInt("select count(1) as cnt from " + tableName));
 	}
 
 	@Test
 	public void testQueryForLong() throws Exception {
 		String tableName = "testHiveDriverTable";
-		//assertEquals(Long.valueOf(1), 
-		hiveTemplate.queryForLong("select count(1) as cnt from " + tableName);
-		//);
+		assertEquals(Long.valueOf(0), hiveTemplate.queryForLong("select count(1) as cnt from " + tableName + ";"));
 	}
 
 	@Test

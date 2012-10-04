@@ -151,12 +151,19 @@ abstract class HiveUtils {
 		return new NonTransientDataAccessResourceException(cause, ex);
 	}
 
-	static List<String> run(HiveClient hive, Iterable<HiveScript> scripts, boolean closeHive)
-			throws DataAccessException {
+	static List<String> run(HiveClient hive, Iterable<HiveScript> scripts) throws Exception {
+		List<String> results = new ArrayList<String>();
+		for (HiveScript hiveScript : scripts) {
+			results.addAll(run(hive, hiveScript));
+		}
+		return results;
+	}
+
+	static List<String> runWithConversion(HiveClient hive, Iterable<HiveScript> scripts, boolean closeHive) throws DataAccessException {
 		List<String> results = new ArrayList<String>();
 		try {
 			for (HiveScript hiveScript : scripts) {
-				results.addAll(run(hive, hiveScript));
+				results.addAll(runWithConversion(hive, hiveScript));
 			}
 		} finally {
 			try {
@@ -168,6 +175,15 @@ abstract class HiveUtils {
 		}
 		return results;
 	}
+
+	private static List<String> runWithConversion(HiveClient hive, HiveScript script) throws DataAccessException {
+		try {
+			return run(hive, script);
+		} catch (Exception ex) {
+			throw convert(ex);
+		}
+	}
+
 
 	/**
 	 * Runs (or executes) the given script with the given parameters. Note that in order to support the given
@@ -182,7 +198,7 @@ abstract class HiveUtils {
 	 * @return the script results
 	 * @throws Exception
 	 */
-	private static List<String> run(HiveClient hive, HiveScript script) throws DataAccessException {
+	private static List<String> run(HiveClient hive, HiveScript script) throws Exception {
 		BufferedReader reader;
 		InputStream stream;
 		try {
@@ -225,6 +241,10 @@ abstract class HiveUtils {
 					}
 				}
 			}
+			// make sure to flush any command left (w/o ;)
+			if (StringUtils.hasText(command)) {
+				results.addAll(runCommand(hive, command));
+			}
 		} catch (IOException ex) {
 			throw new IllegalArgumentException("Cannot read scripts", ex);
 		} finally {
@@ -234,7 +254,7 @@ abstract class HiveUtils {
 		return results;
 	}
 
-	private static List<String> runCommand(HiveClient hive, String command) throws DataAccessException {
+	private static List<String> runCommand(HiveClient hive, String command) throws Exception {
 		try {
 			hive.execute(command);
 			return hive.fetchAll();
@@ -243,10 +263,7 @@ abstract class HiveUtils {
 				hive.clean();
 			} catch (Exception exc) {
 			}
-			if (ex instanceof HiveServerException) {
-				throw convert((HiveServerException) ex);
-			}
-			throw convert((TException) ex);
+			throw ex;
 		}
 	}
 }

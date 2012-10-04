@@ -80,7 +80,7 @@ public class HiveClientFactoryBean implements FactoryBean<ObjectFactory<HiveClie
 			transport.open();
 
 			if (!CollectionUtils.isEmpty(scripts)) {
-				HiveUtils.run(hive, scripts, false);
+				HiveUtils.runWithConversion(hive, scripts, false);
 			}
 		} catch (TTransportException ex) {
 			throw HiveUtils.convert(ex);

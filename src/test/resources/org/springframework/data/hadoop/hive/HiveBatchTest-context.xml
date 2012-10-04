@@ -31,7 +31,6 @@
 			</list>
 		</property>
 	</bean>
-
 	<hdp:hive-client host="${hive.host}" port="${hive.port}">
 		<hdp:script>
 			DROP TABLE IF EXISTS testHiveBatchTable; 
@@ -43,7 +42,7 @@
 				blue=water
 				white=wash
 			</hdp:arguments>
-		</hdp:script>	
+		</hdp:script>
 	</hdp:hive-client> 
 	
 	<bean class="org.springframework.data.hadoop.hive.HiveTemplate" p:hive-client-ref="hiveClient"/>
@@ -63,6 +62,7 @@
 		</hdp:script>
 	</hdp:hive-tasklet>
 	
+ 
 	<hdp:hive-runner id="hive-scripts" pre-action="hive-script">
 		<hdp:script>
 			DROP TABLE IF EXISTS testHiveBatchTable; 

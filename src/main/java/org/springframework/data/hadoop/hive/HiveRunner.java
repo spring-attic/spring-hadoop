@@ -15,6 +15,7 @@
  */
 package org.springframework.data.hadoop.hive;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -64,7 +65,7 @@ public class HiveRunner extends HiveExecutor implements Callable<List<String>> {
 	 * 
 	 * @param beans
 	 */
-	public void setPreAction(Iterable<Callable<?>> actions) {
+	public void setPreAction(Collection<Callable<?>> actions) {
 		this.preActions = actions;
 	}
 
@@ -73,7 +74,7 @@ public class HiveRunner extends HiveExecutor implements Callable<List<String>> {
 	 * 
 	 * @param beans
 	 */
-	public void setPostAction(Iterable<Callable<?>> actions) {
+	public void setPostAction(Collection<Callable<?>> actions) {
 		this.postActions = actions;
 	}
 

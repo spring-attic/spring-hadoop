@@ -124,7 +124,20 @@ public class HiveTemplate implements InitializingBean, HiveOperations, ResourceL
 	 */
 	@Override
 	public List<String> query(String query, Map<?, ?> arguments) throws DataAccessException {
-		return executeScript(new HiveScript(new ByteArrayResource(query.getBytes()), arguments));
+		Assert.hasText(query, "a script is required");
+
+		Resource res = null;
+
+		if (ResourceUtils.isUrl(query)) {
+			if (resourceLoader != null) {
+				res = resourceLoader.getResource(query);
+			}
+		}
+		else {
+			res = new ByteArrayResource(query.getBytes());
+		}
+
+		return executeScript(new HiveScript(res, arguments));
 	}
 
 	/**
@@ -151,20 +164,7 @@ public class HiveTemplate implements InitializingBean, HiveOperations, ResourceL
 	 */
 	@Override
 	public String queryForString(String query, Map<?, ?> arguments) throws DataAccessException {
-		Assert.hasText(query, "a script is required");
-
-		Resource res = null;
-
-		if (ResourceUtils.isUrl(query)) {
-			if (resourceLoader != null) {
-				res = resourceLoader.getResource(query);
-			}
-		}
-		else {
-			res = new ByteArrayResource(query.getBytes());
-		}
-
-		return DataAccessUtils.singleResult(executeScript(new HiveScript(res, arguments)));
+		return DataAccessUtils.singleResult(query(query, arguments));
 	}
 
 	/**
@@ -258,8 +258,13 @@ public class HiveTemplate implements InitializingBean, HiveOperations, ResourceL
 	 * @throws DataAccessException
 	 */
 	@Override
-	public List<String> executeScript(Iterable<HiveScript> scripts) throws DataAccessException {
-		return HiveUtils.run(createHiveClient(), scripts, true);
+	public List<String> executeScript(final Iterable<HiveScript> scripts) throws DataAccessException {
+		return execute(new HiveClientCallback<List<String>>() {
+			@Override
+			public List<String> doInHive(HiveClient hiveClient) throws Exception {
+				return HiveUtils.run(hiveClient, scripts);
+			}
+		});
 	}
 
 	protected HiveClient createHiveClient() {
