@@ -41,7 +41,7 @@ import org.springframework.util.ResourceUtils;
  */
 public class PigTemplate implements InitializingBean, PigOperations, ResourceLoaderAware {
 
-	private ObjectFactory<PigServer> pigServerFactory;
+	private PigServerFactory pigServerFactory;
 	private ResourceLoader resourceLoader;
 
 	/**
@@ -56,7 +56,7 @@ public class PigTemplate implements InitializingBean, PigOperations, ResourceLoa
 	 *
 	 * @param pigFactory pig factory
 	 */
-	public PigTemplate(ObjectFactory<PigServer> pigFactory) {
+	public PigTemplate(PigServerFactory pigFactory) {
 		this.pigServerFactory = pigFactory;
 		afterPropertiesSet();
 	}
@@ -182,7 +182,7 @@ public class PigTemplate implements InitializingBean, PigOperations, ResourceLoa
 	}
 
 	protected PigServer createPigServer() {
-		return pigServerFactory.getObject();
+		return pigServerFactory.getPigServer();
 	}
 
 	/**
@@ -190,7 +190,7 @@ public class PigTemplate implements InitializingBean, PigOperations, ResourceLoa
 	 * 
 	 * @param pigServerFactory
 	 */
-	public void setPigServer(ObjectFactory<PigServer> pigServerFactory) {
+	public void setPigServer(PigServerFactory pigServerFactory) {
 		this.pigServerFactory = pigServerFactory;
 	}
 

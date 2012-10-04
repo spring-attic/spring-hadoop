@@ -40,7 +40,7 @@ import org.springframework.util.ResourceUtils;
  */
 public class HiveTemplate implements InitializingBean, HiveOperations, ResourceLoaderAware {
 
-	private ObjectFactory<HiveClient> hiveClientFactory;
+	private HiveClientFactory hiveClientFactory;
 	private ResourceLoader resourceLoader;
 
 
@@ -56,7 +56,7 @@ public class HiveTemplate implements InitializingBean, HiveOperations, ResourceL
 	 *
 	 * @param pigFactory pig factory
 	 */
-	public HiveTemplate(ObjectFactory<HiveClient> hiveClientFactory) {
+	public HiveTemplate(HiveClientFactory hiveClientFactory) {
 		this.hiveClientFactory = hiveClientFactory;
 		afterPropertiesSet();
 	}
@@ -268,7 +268,7 @@ public class HiveTemplate implements InitializingBean, HiveOperations, ResourceL
 	}
 
 	protected HiveClient createHiveClient() {
-		return hiveClientFactory.getObject();
+		return hiveClientFactory.getHiveClient();
 	}
 
 	/**
@@ -276,7 +276,7 @@ public class HiveTemplate implements InitializingBean, HiveOperations, ResourceL
 	 * 
 	 * @param hiveClientFactory
 	 */
-	public void setHiveClient(ObjectFactory<HiveClient> hiveClientFactory) {
+	public void setHiveClient(HiveClientFactory hiveClientFactory) {
 		this.hiveClientFactory = hiveClientFactory;
 	}
 

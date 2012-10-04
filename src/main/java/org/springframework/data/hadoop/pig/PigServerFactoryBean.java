@@ -22,7 +22,6 @@ import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.pig.PigServer;
 import org.apache.pig.backend.executionengine.ExecException;
 import org.apache.pig.impl.PigContext;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
@@ -41,7 +40,7 @@ import org.springframework.util.StringUtils;
  * 
  * @author Costin Leau
  */
-public class PigServerFactoryBean implements FactoryBean<ObjectFactory<PigServer>>, BeanNameAware {
+public class PigServerFactoryBean implements FactoryBean<PigServerFactory>, BeanNameAware {
 
 	private PigContext pigContext;
 	private Collection<String> pathToSkip;
@@ -54,9 +53,9 @@ public class PigServerFactoryBean implements FactoryBean<ObjectFactory<PigServer
 
 	private String user;
 
-	private class PigServerObjectFactory implements ObjectFactory<PigServer> {
+	private class DefaultPigServerFactory implements PigServerFactory {
 		@Override
-		public PigServer getObject() throws BeansException {
+		public PigServer getPigServer() {
 			try {
 				return createPigInstance();
 			} catch (Exception ex) {
@@ -65,8 +64,9 @@ public class PigServerFactoryBean implements FactoryBean<ObjectFactory<PigServer
 		}
 	};
 
-	public ObjectFactory<PigServer> getObject() throws Exception {
-		return new PigServerObjectFactory();
+
+	public PigServerFactory getObject() throws Exception {
+		return new DefaultPigServerFactory();
 	}
 
 	public Class<?> getObjectType() {

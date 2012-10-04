@@ -18,9 +18,7 @@ package org.springframework.data.hadoop.hive;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.hadoop.hive.service.HiveClient;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.ObjectFactory;
 
 /**
  * Common class for configuring and executing Hive scripts.
@@ -30,7 +28,7 @@ import org.springframework.beans.factory.ObjectFactory;
  */
 abstract class HiveExecutor implements InitializingBean {
 
-	private ObjectFactory<HiveClient> hiveClientFactory;
+	private HiveClientFactory hiveClientFactory;
 	private HiveOperations hiveTemplate;
 	private Collection<HiveScript> scripts;
 
@@ -63,7 +61,7 @@ abstract class HiveExecutor implements InitializingBean {
 	 *  
 	 * @param hive HiveClient to set
 	 */
-	public void setHiveClient(ObjectFactory<HiveClient> hiveFactory) {
+	public void setHiveClient(HiveClientFactory hiveFactory) {
 		this.hiveClientFactory = hiveFactory;
 	}
 

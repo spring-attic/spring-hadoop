@@ -41,7 +41,7 @@ import org.springframework.util.CollectionUtils;
  * 
  * @author Costin Leau
  */
-public class HiveClientFactoryBean implements FactoryBean<ObjectFactory<HiveClient>> {
+public class HiveClientFactoryBean implements FactoryBean<HiveClientFactory> {
 
 	private Collection<HiveScript> scripts;
 
@@ -49,9 +49,9 @@ public class HiveClientFactoryBean implements FactoryBean<ObjectFactory<HiveClie
 	private int port = 10000;
 	private int timeout = 0;
 
-	private class HiveClientObjectFactory implements ObjectFactory<HiveClient> {
+	private class DefaultHiveClientFactory implements HiveClientFactory {
 		@Override
-		public HiveClient getObject() throws BeansException {
+		public HiveClient getHiveClient() throws BeansException {
 			try {
 				return createHiveClient();
 			} catch (Exception ex) {
@@ -60,8 +60,8 @@ public class HiveClientFactoryBean implements FactoryBean<ObjectFactory<HiveClie
 		}
 	}
 
-	public ObjectFactory<HiveClient> getObject() {
-		return new HiveClientObjectFactory();
+	public HiveClientFactory getObject() {
+		return new DefaultHiveClientFactory();
 	}
 
 	public Class<?> getObjectType() {

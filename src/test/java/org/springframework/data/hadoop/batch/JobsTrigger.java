@@ -29,8 +29,7 @@ import org.springframework.context.ApplicationContext;
  * 
  * @author Costin Leau
  */
-public class JobsTrigger
-{
+public class JobsTrigger {
 
 	public static void startJobs(ApplicationContext ctx) {
 		startJobs(ctx, new JobParameters());
@@ -41,12 +40,16 @@ public class JobsTrigger
 		Map<String, Job> jobs = ctx.getBeansOfType(Job.class);
 
 		for (Map.Entry<String, Job> entry : jobs.entrySet()) {
+			RuntimeException e = null;
 			try {
 				if (launcher.run(entry.getValue(), params).getStatus().equals(BatchStatus.FAILED)) {
-					throw new BeanInitializationException("Failed executing job " + entry.getKey());
+					e = new BeanInitializationException("Failed executing job " + entry.getKey());
 				}
 			} catch (Exception ex) {
 				throw new BeanInitializationException("Cannot execute job " + entry.getKey(), ex);
+			}
+			if (e != null) {
+				throw e;
 			}
 		}
 	}

@@ -18,10 +18,8 @@ package org.springframework.data.hadoop.pig;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.pig.PigServer;
 import org.apache.pig.backend.executionengine.ExecJob;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.ObjectFactory;
 
 /**
  * Common class for configuring and executing pig scripts.
@@ -31,7 +29,7 @@ import org.springframework.beans.factory.ObjectFactory;
  */
 abstract class PigExecutor implements InitializingBean {
 
-	private ObjectFactory<PigServer> pigFactory;
+	private PigServerFactory pigFactory;
 	private PigOperations pigTemplate;
 	private Collection<PigScript> scripts;
 
@@ -65,7 +63,7 @@ abstract class PigExecutor implements InitializingBean {
 	 * 
 	 * @param pigFactory The pigFactory to set.
 	 */
-	public void setPigServer(ObjectFactory<PigServer> pigFactory) {
+	public void setPigServer(PigServerFactory pigFactory) {
 		this.pigFactory = pigFactory;
 	}
 
