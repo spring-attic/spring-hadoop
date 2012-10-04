@@ -15,6 +15,7 @@
  */
 package org.springframework.data.hadoop.mapreduce;
 
+import java.util.Collection;
 import java.util.concurrent.Callable;
 
 import org.apache.hadoop.util.Tool;
