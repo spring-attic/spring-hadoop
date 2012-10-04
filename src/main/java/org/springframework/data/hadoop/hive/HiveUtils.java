@@ -160,11 +160,10 @@ abstract class HiveUtils {
 	}
 
 	static List<String> runWithConversion(HiveClient hive, Iterable<HiveScript> scripts, boolean closeHive) throws DataAccessException {
-		List<String> results = new ArrayList<String>();
 		try {
-			for (HiveScript hiveScript : scripts) {
-				results.addAll(runWithConversion(hive, hiveScript));
-			}
+			return run(hive, scripts);
+		} catch (Exception ex) {
+			throw convert(ex);
 		} finally {
 			try {
 				if (closeHive) {
@@ -173,17 +172,7 @@ abstract class HiveUtils {
 			} catch (Exception ex) {
 			}
 		}
-		return results;
 	}
-
-	private static List<String> runWithConversion(HiveClient hive, HiveScript script) throws DataAccessException {
-		try {
-			return run(hive, script);
-		} catch (Exception ex) {
-			throw convert(ex);
-		}
-	}
-
 
 	/**
 	 * Runs (or executes) the given script with the given parameters. Note that in order to support the given
