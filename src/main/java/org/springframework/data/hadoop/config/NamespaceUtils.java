@@ -65,7 +65,7 @@ abstract class NamespaceUtils {
 			String[] strs = StringUtils.commaDelimitedListToStringArray(attr);
 			ManagedList<String> list = new ManagedList<String>(strs.length);
 			for (int i = 0; i < strs.length; i++) {
-				list.add(strs[i]);
+				list.add(strs[i].trim());
 			}
 			builder.addPropertyValue(propertyName, list);
 			return true;
@@ -79,7 +79,7 @@ abstract class NamespaceUtils {
 			String[] strs = StringUtils.commaDelimitedListToStringArray(attr);
 			ManagedList<RuntimeBeanReference> list = new ManagedList<RuntimeBeanReference>(strs.length);
 			for (int i = 0; i < strs.length; i++) {
-				list.add(new RuntimeBeanReference(strs[i]));
+				list.add(new RuntimeBeanReference(strs[i].trim()));
 			}
 			builder.addPropertyValue(propertyName, list);
 			return true;

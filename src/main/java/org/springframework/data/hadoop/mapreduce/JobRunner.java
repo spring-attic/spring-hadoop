@@ -15,15 +15,9 @@
  */
 package org.springframework.data.hadoop.mapreduce;
 
-import java.util.Collection;
 import java.util.concurrent.Callable;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.hadoop.mapred.RunningJob;
 import org.apache.hadoop.mapreduce.Job;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.util.Assert;
 
 /**
  * Simple runner for submitting Hadoop jobs sequentially. By default, the runner waits for the jobs to finish and returns a boolean indicating
@@ -31,25 +25,19 @@ import org.springframework.util.Assert;
  * 
  * <p/>
  * For more control over the job execution and outcome consider querying the {@link Job}s or using Spring Batch (see the reference documentation for more info).
- * <p/>Note by default, the runner is configured to execute at startup. One can customize this behaviour through {@link #setRunAtStartup(boolean)}/
+ * <p/>Note by default, the runner is configured to execute at startup. One can customize this behaviour through {@link #setRunAtStartup(boolean)}.
  * 
  * @author Costin Leau
  */
-public class JobRunner implements InitializingBean, Callable<Boolean> {
-
-	private static final Log log = LogFactory.getLog(JobRunner.class);
+public class JobRunner extends JobExecutor implements Callable<Void> {
 
 	private boolean runAtStartup = true;
-	private boolean waitForJobs = true;
-	private Collection<Job> jobs;
-	private boolean ignoreFailures = false;
-
 	private Iterable<Callable<?>> preActions;
 	private Iterable<Callable<?>> postActions;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.notEmpty(jobs, "at least one job needs to be specified");
+		super.afterPropertiesSet();
 
 		if (runAtStartup) {
 			call();
@@ -57,29 +45,13 @@ public class JobRunner implements InitializingBean, Callable<Boolean> {
 	}
 
 	@Override
-	public Boolean call() throws Exception {
+	public Void call() throws Exception {
 		// pre action
 		invoke(preActions);
-
-		Boolean succesful = Boolean.TRUE;
-
-		for (Job job : jobs) {
-			if (!waitForJobs) {
-				job.submit();
-			}
-			else {
-				succesful &= job.waitForCompletion(true);
-				if (!ignoreFailures && !succesful) {
-					RunningJob rj = JobUtils.getRunningJob(job);
-					throw new IllegalStateException("Job [" + job.getJobName() + "] failed - "
-							+ (rj != null ? rj.getFailureInfo() : "N/A"));
-				}
-			}
-		}
-
+		executeJobs();
 		// post action
 		invoke(postActions);
-		return (waitForJobs ? succesful : null);
+		return null;
 	}
 
 	/**
@@ -89,37 +61,6 @@ public class JobRunner implements InitializingBean, Callable<Boolean> {
 	 */
 	public void setRunAtStartup(boolean runAtStartup) {
 		this.runAtStartup = runAtStartup;
-	}
-
-
-	/**
-	 * Indicates whether the runner should wait for the jobs to finish (the default) or not.
-	 * 
-	 * @param waitForJobs The waitForJobs to set.
-	 */
-	public void setWaitForJobs(boolean waitForJobs) {
-		this.waitForJobs = waitForJobs;
-	}
-
-	/**
-	 * Sets the Jobs to run.
-	 * 
-	 * @param jobs The jobs to run.
-	 */
-	public void setJobs(Collection<Job> jobs) {
-		this.jobs = jobs;
-	}
-
-	/**
-	 * Indicates whether job failures are ignored (simply logged) or not (default), meaning
-	 * the runner propagates the error further down the stack.
-	 * Note this setting applies only if the runner monitors/waits for the jobs.
-	 *
-	 * @see #setWaitForJobs(boolean)
-	 * @param ignoreFailures the new ignore failures
-	 */
-	public void setIgnoreFailures(boolean ignoreFailures) {
-		this.ignoreFailures = ignoreFailures;
 	}
 
 	/**

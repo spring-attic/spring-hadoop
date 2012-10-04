@@ -30,7 +30,7 @@ import org.springframework.beans.PropertyEditorRegistry;
  * 
  * @author Costin Leau
  */
-public class MapReducePropertyEditorRegistrar implements PropertyEditorRegistrar {
+class MapReducePropertyEditorRegistrar implements PropertyEditorRegistrar {
 
 	private abstract static class BaseJobEditor extends PropertyEditorSupport {
 		/**

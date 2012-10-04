@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 the original author or authors.
+ * Copyright 2011-2012 the original author or authors.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,24 +17,25 @@ package org.springframework.data.hadoop.config;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.data.hadoop.mapreduce.JobTasklet;
+import org.springframework.data.hadoop.mapreduce.JobRunner;
 import org.w3c.dom.Element;
 
 /**
- * Hadoop Tasklet Parser.
+ * Parser for job-runner.
  * 
  * @author Costin Leau
  */
-class HadoopTaskletParser extends AbstractImprovedSimpleBeanDefinitionParser {
+class HadoopJobRunnerParser extends AbstractImprovedSimpleBeanDefinitionParser {
 
 	@Override
 	protected Class<?> getBeanClass(Element element) {
-		return JobTasklet.class;
+		return JobRunner.class;
 	}
 
 	@Override
 	protected boolean isEligibleAttribute(String attributeName) {
-		return (!"job-ref".equals(attributeName)) && super.isEligibleAttribute(attributeName);
+		return !("jobs".equals(attributeName) || "pre-action".equals(attributeName) || "post-action".equals(attributeName))
+				&& super.isEligibleAttribute(attributeName);
 	}
 
 	@Override
@@ -42,6 +43,9 @@ class HadoopTaskletParser extends AbstractImprovedSimpleBeanDefinitionParser {
 		// parse attributes using conventions
 		super.doParse(element, parserContext, builder);
 
-		builder.addPropertyValue("jobName", element.getAttribute("job-ref"));
+		NamespaceUtils.setCSVProperty(element, builder, "jobs", "jobNames");
+
+		NamespaceUtils.setCSVReferenceProperty(element, builder, "pre-action", "preAction");
+		NamespaceUtils.setCSVReferenceProperty(element, builder, "post-action", "postAction");
 	}
 }

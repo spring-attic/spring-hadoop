@@ -21,6 +21,10 @@
 	fsh.put("src/test/resources/input/word", "/ide-test/input/word")			
 	</hdp:script>
 
+	<hdp:script id="nop-script" language="javascript">
+	println("Called script")
+	</hdp:script>
+
 	<bean id="jar-job-runner" class="org.springframework.data.hadoop.mapreduce.JobRunner" depends-on="script" >
 		<property name="jobs">
 			<list>
@@ -31,7 +35,7 @@
 	</bean>
 
 
-	<bean id="runner" class="org.springframework.data.hadoop.mapreduce.JobRunner" depends-on="script" p:jobs-ref="ns-job"/>
+	<hdp:job-runner id="ns-runner" pre-action="nop-script" jobs="ns-job, ns-job" run-at-startup="false"/>
 	
 	<bean id="no-wait" class="org.springframework.data.hadoop.mapreduce.JobRunner" depends-on="script">
 		<property name="jobs">
@@ -85,11 +89,11 @@
  	<task:scheduler id="myScheduler" pool-size="10"/>
  
 	<task:scheduled-tasks scheduler="myScheduler">
- 		<task:scheduled ref="runner" method="call" fixed-rate="60000"/>
+ 		<task:scheduled ref="ns-runner" method="call" fixed-rate="60000"/>
  	</task:scheduled-tasks>
  	
- 	
+ 	<!-- PE tests - currently disabled
  	<bean id="jobInfo" class="org.springframework.data.hadoop.mapreduce.JobTests$JobInfo"
  		p:jobId-ref="ns-job" p:oldJobId-ref="ns-job" p:runningJob-ref="ns-job" p:jobConf-ref="ns-job"/>
- 	
+ 	-->
 </beans>

@@ -68,7 +68,7 @@ public class JobTests {
 	private ApplicationContext ctx;
 	@Resource(name = "ns-job")
 	private Job job;
-	@Autowired
+
 	private JobInfo jobInfo;
 
 	{
@@ -122,7 +122,6 @@ public class JobTests {
 		assertEquals("true", job.getConfiguration().get("mapred.used.genericoptionsparser"));
 	}
 
-	@Test
 	public void testPropertyEditors() throws Exception {
 		assertNotNull(jobInfo);
 		assertNotNull(jobInfo.jobConf);

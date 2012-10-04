@@ -18,21 +18,17 @@ Defines the configuration elements for Spring Data Hadoop.
 		]]></xsd:documentation>
 	</xsd:annotation>
 
-	<xsd:element name="job-tasklet">
-		<xsd:annotation>
-		   <xsd:documentation><![CDATA[
-Defines a Spring Batch tasklet for Hadoop Jobs.
-				]]>
-          </xsd:documentation>
-	      <xsd:appinfo>
-	        <tool:annotation>
-	          <tool:exports type="org.springframework.data.hadoop.mapreduce.HadoopTasklet"/>
-	        </tool:annotation>
-	      </xsd:appinfo>
-		</xsd:annotation>
-		<xsd:complexType>
+	<!-- common attributes shared by Job executors 
+		 NOT meant for extensibility - do NOT rely on this type as it might be removed in the future -->
+	<xsd:complexType name="jobRunnerType">
+		<xsd:attribute name="id" type="xsd:ID" use="required">
+			<xsd:annotation>
+			<xsd:documentation><![CDATA[
+Bean id.]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
 		<!-- the job reference -->
-		<xsd:attribute name="job-ref">
+		<xsd:attribute name="jobs">
 			<xsd:annotation>
 				<xsd:documentation source="java:org.apache.hadoop.mapreduce.Job"><![CDATA[
 Hadoop Job]]></xsd:documentation>
@@ -50,10 +46,67 @@ Whether to synchronously wait for the job to finish (the default) or not.
 				]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
-		<xsd:attribute name="id" type="xsd:ID" use="required" />
-		<xsd:attribute name="scope" type="xsd:string" use="optional" />
 		<xsd:attribute name="verbose" type="xsd:string" use="optional" default="true"/>
 	</xsd:complexType>
+
+	<xsd:element name="job-tasklet">
+		<xsd:annotation>
+		   <xsd:documentation><![CDATA[
+Defines a Spring Batch tasklet for Hadoop Jobs.
+				]]>
+          </xsd:documentation>
+	      <xsd:appinfo>
+	        <tool:annotation>
+	          <tool:exports type="org.springframework.data.hadoop.mapreduce.JobTasklet"/>
+	        </tool:annotation>
+	      </xsd:appinfo>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="jobRunnerType">
+					<xsd:attribute name="scope" type="xsd:string" use="optional" />
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="job-runner">
+		<xsd:annotation>
+		   <xsd:documentation><![CDATA[
+Defines a runner for Hadoop jobs.
+				]]>
+          </xsd:documentation>
+	      <xsd:appinfo>
+	        <tool:annotation>
+	          <tool:exports type="org.springframework.data.hadoop.mapreduce.JobRunner"/>
+	        </tool:annotation>
+	      </xsd:appinfo>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="jobRunnerType">
+					<xsd:attribute name="run-at-startup" type="xsd:string" default="false">
+						<xsd:annotation>
+							<xsd:documentation><![CDATA[
+Whether the Jar runs at startup or not (default).
+							]]></xsd:documentation>
+			         	</xsd:annotation>
+			       	</xsd:attribute>
+					<xsd:attribute name="pre-action" type="xsd:string" default="">
+						<xsd:annotation>
+						<xsd:documentation><![CDATA[
+Pre actions/beans to be called before running the action. Multiple bean names can be specified using comma-separated list.]]></xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>			
+					<xsd:attribute name="post-action" type="xsd:string" default="">
+						<xsd:annotation>
+						<xsd:documentation><![CDATA[
+Post actions/beans to be called before running the action. Multiple bean names can be specified using comma-separated list.]]></xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>		
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
 	</xsd:element>
 	
 	<!-- common attributes shared by properties based configurations 
@@ -989,7 +1042,9 @@ The security user (ugi) to use for impersonation at runtime.
 		</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	
+
+	<!-- common attributes shared by Pig executors 
+		 NOT meant for extensibility - do NOT rely on this type as it might be removed in the future -->
 	<xsd:complexType name="pigRunnerType">
 		<xsd:sequence>
 			<xsd:element name="script" type="scriptWithArgumentsType" minOccurs="0" maxOccurs="unbounded">

@@ -38,7 +38,7 @@
 	 
 	<bean id="file-reader" class="org.springframework.batch.item.file.ResourcesItemReader" p:resources="classpath:input/word/*.txt"/>
 
-	<hdp:job-tasklet id="hadoop-tasklet" job-ref="mr-job" wait-for-job="true" />
+	<hdp:job-tasklet id="hadoop-tasklet" jobs="mr-job" wait-for-job="true" />
 	
  	<hdp:job id="mr-job" 
 	    input-path="#{jobParameters['mr.input']}" output-path="#{jobParameters['mr.output']}"
@@ -72,7 +72,7 @@ println("Staged resources 1")
 	</hdp:script>
 	</hdp:script-tasklet>
 	
-	<hdp:job-tasklet id="hadoop-stream" job-ref="ns-stream-job"/>
+	<hdp:job-tasklet id="hadoop-stream" jobs="ns-stream-job"/>
 	
 	<hdp:streaming id="ns-stream-job"
 		input-path="#{jobParameters['mr.input']}" output-path="#{jobParameters['mr.output']+'stream'}" properties-location="#{jobParameters['properties-file']}"

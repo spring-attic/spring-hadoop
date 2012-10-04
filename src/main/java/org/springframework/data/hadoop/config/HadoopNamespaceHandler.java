@@ -21,7 +21,6 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.data.hadoop.mapreduce.MapReducePropertyEditorRegistrar;
 import org.w3c.dom.Element;
 
 /**
@@ -31,10 +30,11 @@ import org.w3c.dom.Element;
  */
 class HadoopNamespaceHandler extends NamespaceHandlerSupport {
 
-	private static String DEFAULT_CONVERTER = MapReducePropertyEditorRegistrar.class.getName() + ".ns.registration";
+	private static String DEFAULT_CONVERTER = "org.springframework.data.hadoop.mapreduce.MapReducePropertyEditorRegistrar.ns.registration";
 
 	public void init() {
-		registerBeanDefinitionParser("job-tasklet", new HadoopTaskletParser());
+		registerBeanDefinitionParser("job-tasklet", new HadoopJobTaskletParser());
+		registerBeanDefinitionParser("job-runner", new HadoopJobRunnerParser());
 		registerBeanDefinitionParser("job", new HadoopJobParser());
 		registerBeanDefinitionParser("streaming", new HadoopStreamJobParser());
 		registerBeanDefinitionParser("configuration", new HadoopConfigParser());
@@ -67,7 +67,8 @@ class HadoopNamespaceHandler extends NamespaceHandlerSupport {
 
 	@Override
 	public BeanDefinition parse(Element element, ParserContext parserContext) {
-		registerImplicitBeans(parserContext);
+		// disable type conversion
+		//registerImplicitBeans(parserContext);
 		return super.parse(element, parserContext);
 	}
 
@@ -77,7 +78,8 @@ class HadoopNamespaceHandler extends NamespaceHandlerSupport {
 			BeanDefinition def = BeanDefinitionBuilder.genericBeanDefinition(CustomEditorConfigurer.class).setRole(
 					BeanDefinition.ROLE_INFRASTRUCTURE).addPropertyValue(
 					"propertyEditorRegistrars",
-					BeanDefinitionBuilder.genericBeanDefinition(MapReducePropertyEditorRegistrar.class).
+					BeanDefinitionBuilder.genericBeanDefinition(
+							"org.springframework.data.hadoop.mapreduce.MapReducePropertyEditorRegistrar").
 						setRole(BeanDefinition.ROLE_INFRASTRUCTURE).getBeanDefinition()).getBeanDefinition();
 			registry.registerBeanDefinition(DEFAULT_CONVERTER, def);
 		}
