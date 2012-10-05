@@ -68,7 +68,7 @@
    	 
    	 <itemizedlist>
    	 	<listitem>
-   	 	 <para>declaration does <strong>not</strong> imply execution</para>
+   	 	 <para>declaration does <emphasis role="strong">not</emphasis> imply execution</para>
    	 	 
    	 	 <para>The runner allows a script, a job, a cascade to run but the execution can be triggered either programmatically or by the container at start-up.</para>
    	 	</listitem>

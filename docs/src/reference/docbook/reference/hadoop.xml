@@ -436,6 +436,11 @@ hadoop jar job10.jar ...]]></programlisting>
 
 		<note>Just like the <literal>hadoop jar</literal> command, by default the jar support reads the jar's <literal>Main-Class</literal> if none is specified. This can be customized through the <literal>main-class</literal> attribute.</note>
 		
+
+	<para>Additionally the runner (just like the job runner) allows one or multiple <literal>pre</literal> and <literal>post</literal> actions to be specified to be executed before and after each run. 
+		Typically other runners (such as other jobs or scripts) can be specified but any JDK <literal>Callable</literal> can be 
+		passed in. Do note that the runner will not run unless triggered manually or if <literal>run-at-startup</literal> is set to <literal>true</literal>.  
+		For more information on runners, see the <link linkend="runners">dedicated</link> chapter.</para>
 		
 		<para>The <literal>jar support</literal> provides a nice and easy migration path from jar invocations from the command-line to SHDP (note that Hadoop <link linkend="hadoop:generic-options">generic options</link>
 		are also supported). Especially since SHDP enables Hadoop <literal>Configuration</literal> objects created during the jar execution, to automatically inherit the context Hadoop configuration. In fact, just
@@ -451,13 +456,9 @@ hadoop jar job10.jar ...]]></programlisting>
 		<para>inside the jar code, one could do the following:</para>
 		
 	<programlisting language="java"><![CDATA[assert "fast".equals(new Configuration().get("speed"));]]></programlisting>
+
 	
 	<para>This enabled basic Hadoop jars to use, without changes, the enclosing application Hadoop configuration.</para>
-	
-	<para>Additionally the runner (just like the job runner) allows one or multiple <literal>pre</literal> and <literal>post</literal> actions to be specified to be executed before and after each run. 
-		Typically other runners (such as other jobs or scripts) can be specified but any JDK <literal>Callable</literal> can be 
-		passed in. Do note that the runner will not run unless triggered manually or if <literal>run-at-startup</literal> is set to <literal>true</literal>.  
-		For more information on runners, see the <link linkend="runners">dedicated</link> chapter.</para>
 	
 	<para>And while we think it is a useful feature (that is why we added it in the first place), we strongly recommend using the tool support instead or migrate to it; there are several reasons for this mainly because there
 	are <emphasis>no contracts</emphasis> to use, leading to very poor embeddability caused by:

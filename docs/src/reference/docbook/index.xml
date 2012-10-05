@@ -44,6 +44,7 @@
       <xi:include href="reference/hive.xml"/>
       <xi:include href="reference/pig.xml"/>
       <xi:include href="reference/cascading.xml"/>
+      <xi:include href="reference/runners.xml"/>
       <xi:include href="reference/security.xml"/>
   </part>
   <part id="dev">
@@ -72,6 +73,7 @@
   </part>
   <part id="appendices">
       <title>Appendices</title>
+      <xi:include href="appendix/appendix-amazon-emr.xml"/>
       <xi:include href="appendix/appendix-schema.xml"/>
   </part>
 </book>
