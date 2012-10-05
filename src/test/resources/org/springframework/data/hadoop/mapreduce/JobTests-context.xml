@@ -63,6 +63,7 @@
 		validate-paths="false"
 		jar="some-tool.jar"
 		libs="some-tool.jar"
+		number-reducers="1"
 		scope="prototype" /> 
 	
 	<hdp:job id="ns-job" 
@@ -72,7 +73,6 @@
 		validate-paths="false"
 		properties-ref="props" 
 		properties-location="cfg-1.properties, cfg-2.properties"
-		number-reducers="1"
 		working-dir="."
 		codec="org.apache.hadoop.io.compress.DefaultCodec"
 		compress-output="false"
@@ -82,6 +82,8 @@
 		star=chasing
 		return=captain eo
 		train=last
+		mapred.reduce.tasks=8
+		mapred.map.tasks=4
 	</hdp:job>
 
 	<util:properties id="props" location="props.properties"/>

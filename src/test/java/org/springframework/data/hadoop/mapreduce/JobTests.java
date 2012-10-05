@@ -15,6 +15,8 @@
  */
 package org.springframework.data.hadoop.mapreduce;
 
+import java.io.StringWriter;
+
 import javax.annotation.Resource;
 
 import org.apache.hadoop.conf.Configuration;
@@ -112,12 +114,20 @@ public class JobTests {
 		Configuration cfg = job.getConfiguration();
 		assertNotNull(cfg);
 
+		StringWriter sw = new StringWriter();
+		//cfg.dumpConfiguration(cfg, sw);
+
+		//System.out.println(sw.toString());
+
 		assertEquals("chasing", cfg.get("star"));
 		assertEquals("captain eo", cfg.get("return"));
 		assertEquals("last", cfg.get("train"));
 		assertEquals("the dream", cfg.get("dancing"));
 		assertEquals("in the mirror", cfg.get("tears"));
 		assertEquals("eo", cfg.get("captain"));
+		assertEquals("8", cfg.get("mapred.reduce.tasks"));
+		// will always be 1 when local
+		//assertEquals("4", cfg.get("mapred.map.tasks"));
 
 		assertEquals("true", job.getConfiguration().get("mapred.used.genericoptionsparser"));
 	}
