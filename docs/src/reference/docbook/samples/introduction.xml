@@ -1,10 +1,6 @@
 <partintro>
    <title>Document structure</title>
 
-   <para>This part of the reference documentation covers the sample applications included with Spring for Apache Hadoop that demonstrate features in a code centric manner. </para>
-
-   <para><xref linkend="wordcount"/> describes a standard Spring application that executes the wordcount map-reduce job</para>
-
-   <para><xref linkend="batch-wordcount"/> describes a Batch application that executes the wordcount map-reduce job</para>
+   <para>The sample applications have been moved into their own repository so they can be developed independently of the Spring for Apache Hadoop release cycle.  They can be found on github <ulink url="https://github.com/SpringSource/spring-hadoop-samples">https://github.com/SpringSource/spring-hadoop-samples</ulink>.</para>
 
 </partintro>
