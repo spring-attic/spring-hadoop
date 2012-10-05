@@ -11,3 +11,4 @@ build
 metastore_db
 /samples/pig-scripting/src/main/resources/ml-100k.zip
 /samples/pig-scripting/src/main/resources/ml-100k/u.data
+/src/test/resources/s3.properties

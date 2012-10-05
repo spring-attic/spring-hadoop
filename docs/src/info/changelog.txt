@@ -66,6 +66,7 @@ Package o.s.data.hadoop.pig
 
 Package o.s.data.hadoop.scripting
 * Refactored HdfsScriptFactoryBean into HdfsScriptRunner
+* Script definitions no longer cause execution on container lookup
 
 
 Changes in version 1.0 M2 (2012-06-13)
