@@ -130,6 +130,7 @@ public class JobTests {
 		//assertEquals("4", cfg.get("mapred.map.tasks"));
 
 		assertEquals("true", job.getConfiguration().get("mapred.used.genericoptionsparser"));
+		//System.in.read();
 	}
 
 	public void testPropertyEditors() throws Exception {
