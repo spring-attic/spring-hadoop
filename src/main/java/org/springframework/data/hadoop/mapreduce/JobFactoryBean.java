@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.RawComparator;
 import org.apache.hadoop.io.compress.CompressionCodec;
@@ -45,7 +44,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.data.hadoop.configuration.ConfigurationUtils;
-import org.springframework.data.hadoop.fs.HdfsResourceLoader;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
@@ -61,7 +59,8 @@ import org.springframework.util.StringUtils;
  * @author Costin Leau
  */
 // TODO: extract input/output format configs
-public class JobFactoryBean extends JobGenericOptions implements InitializingBean, FactoryBean<Job>, BeanNameAware, BeanClassLoaderAware {
+public class JobFactoryBean extends JobGenericOptions implements InitializingBean, FactoryBean<Job>, BeanNameAware,
+		BeanClassLoaderAware {
 
 	private Job job;
 	private Configuration configuration;
@@ -83,7 +82,7 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 	private String partitioner;
 	private String sortComparator;
 	private String groupingComparator;
-	
+
 	private String workingDir;
 	private Integer numReduceTasks;
 
@@ -94,14 +93,13 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 	private String outputPath;
 	private Boolean compressOutput;
 	private String codecClass;
-	private Boolean validatePaths = Boolean.TRUE;
 	private ClassLoader beanClassLoader;
 
 	@Override
 	public void setBeanClassLoader(ClassLoader classLoader) {
 		this.beanClassLoader = classLoader;
 	}
-	
+
 	public void setBeanName(String name) {
 		this.name = name;
 	}
@@ -140,14 +138,14 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 		}
 
 		ClassLoader loader = (beanClassLoader != null ? beanClassLoader : org.springframework.util.ClassUtils.getDefaultClassLoader());
-				
+
 		if (jar != null) {
 			JobConf conf = (JobConf) job.getConfiguration();
 			conf.setJar(jar.getURI().toString());
 			loader = ExecutionUtils.createParentLastClassLoader(jar, beanClassLoader, cfg);
 			conf.setClassLoader(loader);
 		}
-		
+
 
 		// set first to enable auto-detection of K/V to skip the key/value types to be specified
 		if (mapper != null) {
@@ -205,16 +203,14 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 			job.setJarByClass(jarClass);
 		}
 
-		ResourcePatternResolver rl = new HdfsResourceLoader(FileSystem.get(job.getConfiguration()));
-
 		if (!CollectionUtils.isEmpty(inputPaths)) {
 			for (String path : inputPaths) {
-				FileInputFormat.addInputPath(job, validatePaths(path, rl, true));
+				FileInputFormat.addInputPath(job, new Path(path));
 			}
 		}
 
 		if (StringUtils.hasText(outputPath)) {
-			FileOutputFormat.setOutputPath(job, validatePaths(outputPath, rl, false));
+			FileOutputFormat.setOutputPath(job, new Path(outputPath));
 		}
 
 		if (compressOutput != null) {
@@ -269,20 +265,16 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 		// don't do anything yet
 	}
 
-	private Path validatePaths(String path, ResourcePatternResolver resourceLoader, boolean shouldExist)
+	private void validatePaths(String path, ResourcePatternResolver resourceLoader, boolean shouldExist)
 			throws IOException {
-		if (Boolean.TRUE.equals(validatePaths)) {
-			Resource res = resourceLoader.getResource(path);
+		Resource res = resourceLoader.getResource(path);
 
-			if (shouldExist) {
-				Assert.isTrue(res.exists(), "The input path [" + path + "] does not exist");
-			}
-			else {
-				Assert.isTrue(!res.exists(), "The output path [" + path + "] already exists");
-			}
+		if (shouldExist) {
+			Assert.isTrue(res.exists(), "The input path [" + path + "] does not exist");
 		}
-
-		return new Path(path);
+		else {
+			Assert.isTrue(!res.exists(), "The output path [" + path + "] already exists");
+		}
 	}
 
 	protected void processJob(Job job) throws Exception {
@@ -489,16 +481,6 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 	 */
 	public void setCodec(String codecClass) {
 		this.codecClass = codecClass;
-	}
-
-	/**
-	 * Indicates whether the job input/output paths should be validated
-	 * (default) before the job is submitted.
-	 * 
-	 * @param validatePaths The validatePaths to set.
-	 */
-	public void setValidatePaths(Boolean validatePaths) {
-		this.validatePaths = validatePaths;
 	}
 
 	/**

@@ -39,7 +39,6 @@
 		mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
 		reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"
 		codec="org.apache.hadoop.io.compress.GzipCodec"
-		validate-paths="false"
 	/>
 
 	<hdp:streaming id="stream-job" 

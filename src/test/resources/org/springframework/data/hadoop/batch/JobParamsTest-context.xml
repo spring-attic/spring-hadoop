@@ -44,7 +44,6 @@
 	    input-path="#{jobParameters['mr.input']}" output-path="#{jobParameters['mr.output']}"
 		mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
 		reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"
-		validate-paths="false"
 		properties-location="#{jobParameters['properties-file']}"
 		scope="step"
 	/>

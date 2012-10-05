@@ -44,8 +44,7 @@
 				<hdp:job id="nested-job" 
 	   	input-path="/ide-test/input/word/" output-path="/ide-test/runner/output-2/"
 		mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
-		reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"
-		validate-paths="false"/>
+		reducer="org.apache.hadoop.examples.WordCount.IntSumReducer" />
 			</list>
 		</property>
 	</bean>
@@ -54,13 +53,12 @@
 	   	input-path="/ide-test/input/word/" output-path="/ide-test/runner/output-3/"
 		mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
 		reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"
-		validate-paths="false" jar-by-class="org.apache.hadoop.examples.WordCount"
+		jar-by-class="org.apache.hadoop.examples.WordCount"
 		scope="prototype" /> 
 
 	<hdp:job id="custom-jar-job" 
 	   	input-path="/ide-test/input/word/" output-path="/ide-test/runner/output-4/"
 		mapper="test.SomeTool$CustomMapper"
-		validate-paths="false"
 		jar="some-tool.jar"
 		libs="some-tool.jar"
 		number-reducers="1"
@@ -70,7 +68,6 @@
 	   	input-path="/ide-test/input/word/" output-path="/ide-test/runner/output/"
 		mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
 		reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"
-		validate-paths="false"
 		properties-ref="props" 
 		properties-location="cfg-1.properties, cfg-2.properties"
 		working-dir="."

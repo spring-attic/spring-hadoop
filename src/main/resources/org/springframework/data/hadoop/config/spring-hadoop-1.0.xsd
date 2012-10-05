@@ -609,15 +609,6 @@ Indicates whether the job output should be compressed or not. By default it is n
 			</xsd:appinfo>
 	 	</xsd:annotation>
 		</xsd:attribute>
-		<xsd:attribute name="validate-paths" default="true">
-		<xsd:annotation>
-		   <xsd:documentation><![CDATA[
-Indicates whether the job input/output paths are validated before submitting. This
-saves time as the validation is done locally without having to interact with the job
-tracker. The validation checks whether the input path exists and the output does not.
-				]]></xsd:documentation>
-		</xsd:annotation>		
-		</xsd:attribute>
 		</xsd:extension>
 		</xsd:complexContent>
 		</xsd:complexType>

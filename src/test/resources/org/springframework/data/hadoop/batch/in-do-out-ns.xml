@@ -37,7 +37,6 @@
 		mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
 		reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"
 		configuration-ref="hadoopConfiguration"
-		validate-paths="false"
 	/>
 	
 	<hdp:script-tasklet id="script-tasklet">
