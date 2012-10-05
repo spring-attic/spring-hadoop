@@ -54,6 +54,12 @@
           	      <entry>Runner for executing Pig scripts.</entry>
          	    </row>
           	   <row>
+          	      <entry>Cascading <literal>Cascade</literal>s</entry>
+          	      <entry><literal>CascadeRunner</literal></entry>
+          	      <entry><literal>-</literal></entry>
+          	      <entry>Runner for executing Cascading <literal>Cascade</literal>s.</entry>
+         	    </row>
+          	   <row>
           	      <entry>JSR-223/JVM scripts</entry>
           	      <entry><literal>HdfsScriptRunner</literal></entry>
           	      <entry><literal>script</literal></entry>
