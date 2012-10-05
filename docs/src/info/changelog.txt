@@ -5,8 +5,65 @@ http://www.springsource.org/spring-data/hadoop
 Commit changelog: http://github.com/SpringSource/spring-hadoop/tree/v[version]
 Issues changelog: http://jira.springsource.org/secure/ReleaseNote.jspa?projectId=10801
 
-Changes in version 1.0 M3 (2012-mm-dd)
---------------------------------------
+Changes in version 1.0 RC1 (2012-10-07)
+---------------------------------------
+
+General
+* Introduced Hive, Pig runner for declarative script execution
+* Refactored all (Cascading, M/R, Hive, Pig) runners as Callables instead of FactoryBeans
+* Introduced embedded execution of Hadoop jars
+* Improved spring-hadoop.xsd namespace
+* Improved artifacts pom
+* Upgraded to Spring Batch 2.1.9
+* Upgraded to Hive 0.9.0
+* Upgraded to Pig 0.10.0
+* Upgraded to Gradle 1.2
+
+Package o.s.data.hadoop.cascading
+* Introduced FlowFactoryBean
+
+Package o.s.data.hadoop.configuration
+* Fixed potential cycle with FileSystem url registration
+
+Package o.s.data.hadoop.fs
+* Added codecs support to hdfs resources
+* Refined DistributedCache fragment creation for CDH4/Hadoop 0.23 distros
+* Introduced options for closing the FileSystem
+* Fine-tuned the DistributedCache API for setting cache entries
+
+Package o.s.data.hadoop.hbase
+* Refined resource management of HBase tables
+
+Package o.s.data.hadoop.hive
+* Addressed swallowed exception occuring script execution
+* Improved HiveQL parsing for multi-line statements
+* Introduced variable binding and substitution per Hive script
+* Refined namespace to preserve parameter ordering
+* Introduced HiveClient factory (to deal with thread-safety issues)
+* Introduced HiveTemplate & callback
+* Introduced extended exception conversion to DataAccessException
+* Introduced HiveRunner
+
+Package o.s.data.hadoop.mapreduce
+* Introduced scope attribute for job definitions
+* Introduced verbose flag to job tasklet
+* Introduced more options for job and streaming namespace
+* Introduced jar executor
+* Refined Tool and Jar execution to prevent class loading leaks
+* Refactored JobRunner FactoryBean into a Callable
+* Introduced namespace for job-runner
+* Removed path validation from JobFactoryBean
+
+Package o.s.data.hadoop.pig
+* Refined namespace to preserve parameter ordering
+* Introduced PigServer factory (to deal with thread-safety issues)
+* Introduced PigTemplate & callback
+* Introduced extended exception conversion to DataAccessException
+* Refined execution of Pig scripts
+* Introduced PigRunner
+
+Package o.s.data.hadoop.scripting
+* Refactored HdfsScriptFactoryBean into HdfsScriptRunner
 
 
 Changes in version 1.0 M2 (2012-06-13)
