@@ -151,12 +151,12 @@ private HiveTemplate template;
 public void setHiveTemplate(HiveTemplate template) { this.template = template; }
 
 public List<String> getDbs() {
-   return hiveTemplate.execute(new HiveClientCallback<List<String>>() {
-        @Override
-        public List<String> doInHive(HiveClient hiveClient) throws Exception {
-            return hiveClient.get_all_databases();
-		}
-   }));
+    return hiveTemplate.execute(new HiveClientCallback<List<String>>() {
+       @Override
+       public List<String> doInHive(HiveClient hiveClient) throws Exception {
+          return hiveClient.get_all_databases();
+       }
+    }));
 }}]]></programlisting>
 
 		<para>The example above shows a basic container configuration wiring a <literal>HiveTemplate</literal> into a user class which uses it to interact with the <literal>HiveClient</literal> Thrift API. Notice that the 

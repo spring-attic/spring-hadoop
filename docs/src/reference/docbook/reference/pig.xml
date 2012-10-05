@@ -35,7 +35,7 @@
 	
 	<para>As you can tell, the <literal>pig</literal> namespace offers several options pertaining to Pig configuration.</para>
 	
-	<section id="hive:runner">
+	<section id="pig:runner">
 	    <title>Running a Pig script</title>
 	
 		<para>Like the rest of the Spring Hadoop components, a runner is provided out of the box for executing PIg scripts, either inlined or from various locations through <literal>pig-runner</literal> element:</para>    
@@ -87,11 +87,11 @@
 private PigTemplate template;
 
 public Set<String> getDbs() {
-	return pigTemplate.execute(new PigCallback<Set<String>() {
-          @Override
-          public Set<String> doInPig(PigServer pig) throws ExecException, IOException {
-               return pig.getAliasKeySet();
-          }
+    return pigTemplate.execute(new PigCallback<Set<String>() {
+       @Override
+       public Set<String> doInPig(PigServer pig) throws ExecException, IOException {
+          return pig.getAliasKeySet();
+       }
     }));
 }}]]></programlisting>
 
