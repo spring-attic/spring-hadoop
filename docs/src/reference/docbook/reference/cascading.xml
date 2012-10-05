@@ -76,7 +76,14 @@ public class CascadingAnalysisConfig {
 <bean id="cascade-runner" class="org.springframework.data.hadoop.cascading.CascadeRunner" p:unit-of-work-ref="cascade" p:run-at-startup="true" />]]></programlisting>
 
 	<para>The XML above, whose main purpose is to illustrate possible ways of configuring, uses SHDP classes to create a <literal>Cascade</literal> with one nested <literal>Flow</literal> using the taps and sinks
-	configured by the code class. Additionally it also shows how the cascade is ran (through <literal>CascadeRunner</literal>).</para>
+	configured by the code class. Additionally it also shows how the cascade is ran (through <literal>CascadeRunner</literal>).
+	The runner will trigger the execution during the application start-up (notice 
+	the <literal>run-at-startup</literal> flag which is by default <literal>false</literal>). Do note that the runner will not run unless triggered manually or if <literal>run-at-startup</literal> is set to <literal>true</literal>.
+	Additionally the runner (as in fact do all <link linkend="runners">runners</link> in SHDP) allows one or
+	multiple <literal>pre</literal> and <literal>post</literal> actions to be specified to be executed before and after each run. Typically other runners (such as other jobs or scripts) can be specified but any JDK <literal>Callable</literal> can be 
+	passed in. For more information on runners, see the <link linkend="runners">dedicated</link> chapter.
+	</para>
+	
 	
 	<para>Whether XML or Java config is better is up to the user and is usually based on the type of the configuration required. Java config suits Cascading better but note that the <literal>FactoryBean</literal>s
 	above handle the life-cycle and some default configuration for both the <literal>Flow</literal> and <literal>Cascade</literal> object. Either way, whatever option is used, SHDP fully supports it.</para>
