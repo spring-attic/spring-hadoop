@@ -14,9 +14,17 @@
    <para><xref linkend="hbase"/> describes the Spring support for HBase.
    </para>
 
-   <para><xref linkend="hive"/> describes the Spring support for Hive.
+   <para><xref linkend="hive"/> describes the Hive integration in SHDP.
    </para>
    
-   <para><xref linkend="pig"/> describes the Spring support for Pig.
+   <para><xref linkend="pig"/> describes the Pig support in Spring for Apache Hadoop.
    </para>
+   
+   <para><xref linkend="cascading"/> describes the Cascading integration in Spring for Apache Hadoop.
+   </para>
+
+   <para><xref linkend="security"/> describes how to configure and interact with Hadoop
+   in a secure environment.
+   </para>
+
 </partintro>

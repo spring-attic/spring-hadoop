@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0"  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" xml:id="runners">
+
+   	 <title>Using the <emphasis>runner</emphasis> classes</title>
+   	 
+   	 <para>Spring for Apache Hadoop provides for each Hadoop interaction type, whether it is vanilla Map/Reduce, Cascading, Hive or Pig, a <emphasis>runner</emphasis>, a dedicated class used for declarative (or programmatic) interaction. The list below illustrates the existing <emphasis>runner</emphasis> classes for each type, its name and namespace element</para>
+   	 
+		<table id="runners:type:table" pgwide="1" align="center">
+ 			<title>Available <emphasis>Runner</emphasis>s</title>
+ 			
+ 			<tgroup cols="4">
+ 			<colspec colname="c1" colwidth="1*"/>
+    		<colspec colname="c2" colwidth="1*"/>
+    		<colspec colname="c3" colwidth="1*"/>
+    		<colspec colname="c4" colwidth="3*"/>
+    		
+    		<thead>
+          	   <row>
+          	     <entry>Type</entry>
+           	     <entry>Name</entry>
+          	     <entry>Namespace element</entry>
+          	     <entry>Description</entry>
+          	   </row>
+       	    </thead>
+       	    <tbody>
+          	   <row>
+          	      <entry>Map/Reduce <literal>Job</literal></entry>
+          	      <entry><literal>JobRunner</literal></entry>
+          	      <entry><literal>job-runner</literal></entry>
+          	      <entry>Runner for Map/Reduce jobs, whether vanilla M/R or streaming</entry>
+         	    </row>
+          	   <row>
+          	      <entry>Hadoop <literal>Tool</literal></entry>
+          	      <entry><literal>ToolRunner</literal></entry>
+          	      <entry><literal>tool-runner</literal></entry>
+          	      <entry>Runner for Hadoop <literal>Tool</literal>s (whether stand-alone or as jars).</entry>
+         	    </row>
+          	   <row>
+          	      <entry>Hadoop <literal>jar</literal>s</entry>
+          	      <entry><literal>JarRunner</literal></entry>
+          	      <entry><literal>jar-runner</literal></entry>
+          	      <entry>Runner for Hadoop jars.</entry>
+         	    </row>
+          	   <row>
+          	      <entry>Hive queries and scripts</entry>
+          	      <entry><literal>HiveRunner</literal></entry>
+          	      <entry><literal>hive-runner</literal></entry>
+          	      <entry>Runner for executing Hive queries or scripts.</entry>
+         	    </row>
+          	   <row>
+          	      <entry>Pig queries and scripts</entry>
+          	      <entry><literal>PigRunner</literal></entry>
+          	      <entry><literal>pig-runner</literal></entry>
+          	      <entry>Runner for executing Pig scripts.</entry>
+         	    </row>
+          	   <row>
+          	      <entry>JSR-223/JVM scripts</entry>
+          	      <entry><literal>HdfsScriptRunner</literal></entry>
+          	      <entry><literal>script</literal></entry>
+          	      <entry>Runner for executing JVM 'scripting' languages (implementing the JSR-223 API).</entry>
+         	    </row>
+          	</tbody>
+          	</tgroup>   
+ 		</table>
+   	 
+   	 <para>
+   	 While most of the configuration depends on the underlying type, the runners share common attributes and behaviour so one can use them in a predictive, consistent way. Below is a list of common features:
+   	 
+   	 <itemizedlist>
+   	 	<listitem>
+   	 	 <para>declaration does <strong>not</strong> imply execution</para>
+   	 	 
+   	 	 <para>The runner allows a script, a job, a cascade to run but the execution can be triggered either programmatically or by the container at start-up.</para>
+   	 	</listitem>
+   	 	
+   	 	<listitem>
+   	 	<para><literal>run-at-startup</literal></para>
+   	 	<para>Each runner can execute its action at start-up. By default, this flag is set to <literal>false</literal>. For multiple or on demand execution (such as scheduling) use the <interfacename>Callable</interfacename> contract (see below).</para>
+   	 	</listitem>
+   	 	
+   	 	<listitem>
+   	 	 <para>JDK <interfacename>Callable</interfacename> interface</para>
+   	 	 
+   	 	 <para>Each runner implements the JDK <interfacename>Callable</interfacename> interface. Thus one can inject the runner into other beans or its own classes to trigger the execution 
+   	 	 (as many or as little times as she wants).</para>
+   	 	</listitem>
+   	 	<listitem>
+   	 		<para><literal>pre</literal> and <literal>post</literal> actions</para>
+   	 		<para>Each runner allows one or multiple, pre or/and post actions to be specified (to chain them together such as executing a job after another or perfoming clean up). Typically other runners can be used but <emphasis>any</emphasis> <literal>Callable</literal> can be specified. The actions will be executed
+   	 		before and after the main action, in the declaration order. The runner uses a <emphasis>fail-safe</emphasis> behaviour meaning, any exception will interrupt the run and will propagated immediately to the caller.</para>
+   	 	</listitem>
+
+   	 	<listitem>
+   	 	 <para>consider Spring Batch</para>
+   	 	 
+   	 	 <para>The runners are meant as a way to execute basic tasks. When multiple executions need to be coordinated and the flow becomes non-trivial, we strongly recommend using Spring Batch which provides
+   	 	 all the features of the runners and more (a complete, mature framework for batch execution).</para>
+   	 	</listitem>
+   	 	
+   	 </itemizedlist>
+   	 </para>   
+</chapter>

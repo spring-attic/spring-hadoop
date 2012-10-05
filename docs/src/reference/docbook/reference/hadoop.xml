@@ -251,11 +251,6 @@
     electric=sea
 </hdp:job>]]></programlisting>
    	 
-   	 <note>
-   	 	<para>The job definition can validate the existance of the input and output paths before submitting the actual job (which is slow), to prevent its failure. 
-   	 	Take a look at <emphasis>validate-paths</emphasis> attribute avoid these errors early on without having to touch the job tracker only to get an exception.</para>
-   	 </note>
-
    <para><literal>job</literal> provides additional properties, such as the <link linkend="hadoop:generic-options">generic options</link>, however one that is worth mentioning is <literal>jar</literal> which
    allows a job (and its dependencies) to be loaded form entirely from a specified jar. This is useful for isolating jobs and avoiding classpath and versioning collisions. Note that provisioning of the jar 
    into the cluster, still depends on the target environment - see the aforementioned <link linkend="hadoop:generic-options">section</link> for more info (such as <literal>libs</literal>).
@@ -288,45 +283,45 @@
 		
 		<para>Just like <literal>job</literal>, <literal>streaming</literal> supports the <link linkend="hadoop:generic-options">generic options</link>; follow the link for more information.</para>	 	
 	 </section>
+   </section>
 	 
-	 <section id="hadoop:job:runner">
+   <section id="hadoop:job-runner">
 	    <title>Running a Hadoop Job</title>
 	 
 	 	<para>The jobs, after being created and configured, need to be submitted for execution to a Hadoop cluster. For non-trivial cases, a coordinating, workflow solution such as Spring Batch is recommended <!--(see 
-	 	<xref linkend="dev-guidance"/> for more information)-->. However for basic job submission SHDP provides <classname>JobRunner</classname> class which submits several jobs sequentially (and waits by default for their
+	 	<xref linkend="dev-guidance"/> for more information)-->. However for basic job submission SHDP provides the <literal>job-runner</literal> element 
+	 	(backed by <classname>JobRunner</classname> class) which submits several jobs sequentially (and waits by default for their
 	 	completion): </para>
 	 	
-	 	<programlisting language="xml"><![CDATA[<bean id="runner" class="org.springframework.data.hadoop.mapreduce.JobRunner" p:jobs-ref="job"/>
+	 	<programlisting language="xml"><![CDATA[<hdp:job-runner id="myjob-runner" pre-action="cleanup-script" post-action="export-results" job="myjob" run-at-startup="true"/>
 
-<hdp:job id="job"  input-path="/input/" output-path="/output/"
+<hdp:job id="myjob"  input-path="/input/" output-path="/output/"
 	mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
 	reducer="org.apache.hadoop.examples.WordCount.IntSumReducer" />]]></programlisting>
 
 		<para>Multiple jobs can be specified and even nested if they are not used outside the runner:</para>
 		
-	 	<programlisting language="xml"><![CDATA[<bean id="runner" class="org.springframework.data.hadoop.mapreduce.JobRunner">
-   <property name="jobs"><list>
-     <!-- reference to another job named 'job' -->
-     <ref bean="streaming-job"/>
-     <!-- nested bean definition -->
-     <hdp:job id="nested-job" .... /> 
-   </list></property>
-</bean>
+	 	<programlisting language="xml"><![CDATA[<hdp:job-runner id="myjobs-runner" pre-action="cleanup-script" job="myjob1, myjob2" run-at-startup="true"/>
  	
-<hdp:job id="job"  ... />]]></programlisting>
-	 </section>   	 
-   </section>
-   
-   <section id="hadoop:tasklet">
-		<title>Using the Hadoop Job tasklet</title>
+<hdp:job id="myjob1"  ... />
+<hdp:streaming id="myjob2"  ... />]]></programlisting>
 
-		<para>For Spring Batch environments, SHDP provides a dedicated tasklet to execute Hadoop jobs as a step in a Spring Batch workflow. An example declaration is shown below:</para>
-		
-		<programlisting language="xml"><![CDATA[<hdp:job-tasklet id="hadoop-tasklet" job-ref="mr-job" wait-for-job="true" />]]></programlisting>
+		<para>One or multiple Map-Reduce jobs can be specified through the <literal>job</literal> attribute in the order of the execution. The runner will trigger the execution during the application start-up (notice 
+		the <literal>run-at-startup</literal> flag which is by default <literal>false</literal>). Do note that the runner will not run unless triggered manually or if <literal>run-at-startup</literal> is set to <literal>true</literal>.
+		Additionally the runner (as in fact do all <link linkend="runners">runners</link> in SHDP) allows one or
+		multiple <literal>pre</literal> and <literal>post</literal> actions to be specified to be executed before and after each run. Typically other runners (such as other jobs or scripts) can be specified but any JDK <literal>Callable</literal> can be 
+		passed in. For more information on runners, see the <link linkend="runners">dedicated</link> chapter.</para>
 
-		<para>The tasklet above references a Hadoop job definition named "mr-job".  By default, wait-for-job is true so that the tasklet will wait for the job to complete when it executes.  Setting wait-for-job to false will submit the job to the Hadoop cluster but not wait for it to complete.</para>	
-	</section>
+	   <section id="hadoop:tasklet">
+			<title>Using the Hadoop Job tasklet</title>
 	
+			<para>For Spring Batch environments, SHDP provides a dedicated tasklet to execute Hadoop jobs as a step in a Spring Batch workflow. An example declaration is shown below:</para>
+			
+			<programlisting language="xml"><![CDATA[<hdp:job-tasklet id="hadoop-tasklet" job="mr-job" wait-for-job="true" />]]></programlisting>
+			<para>The tasklet above references a Hadoop job definition named "mr-job".  By default, <literal>wait-for-job</literal> is true so that the tasklet will wait for the job to complete when it executes.  Setting wait-for-job to false will submit the job to the Hadoop cluster but not wait for it to complete.</para>	
+		</section>
+	 </section>   	 
+   
 	<section id="hadoop:tool-runner">
 		<title>Running a Hadoop Tool</title>
 		
@@ -341,12 +336,17 @@
 		per application. Through <literal>tool-runner</literal> element (and its backing <literal>ToolRunner</literal> class) one typically just needs to specify the <literal>Tool</literal> implementation and its arguments:
 		</para>
 		
-		<programlisting language="xml"><![CDATA[<hdp:tool-runner id="someTool" tool-class="org.foo.SomeTool" configuration-ref="hadoopConfiguration">
+		<programlisting language="xml"><![CDATA[<hdp:tool-runner id="someTool" tool-class="org.foo.SomeTool" run-at-startup="true">
    <hdp:arg value="data/in.txt"/>
    <hdp:arg value="data/out.txt"/>
    
    property=value
 </hdp:tool-runner>]]></programlisting>
+
+		<para>Additionally the runner (just like the job runner) allows one or multiple <literal>pre</literal> and <literal>post</literal> actions to be specified to be executed before and after each run. 
+		Typically other runners (such as other jobs or scripts) can be specified but any JDK <literal>Callable</literal> can be 
+		passed in. Do note that the runner will not run unless triggered manually or if <literal>run-at-startup</literal> is set to <literal>true</literal>.  
+		For more information on runners, see the <link linkend="runners">dedicated</link> chapter.</para>
 
     <para>The previous example assumes the <literal>Tool</literal> dependencies (such as its class) are available in the classpath. If that is not the case, <literal>tool-runner</literal> allows a jar
     to be specified:</para>
@@ -407,17 +407,17 @@ hadoop jar job10.jar ...]]></programlisting>
 			Moreover, each job can be ran by itself (through the <classname>JobRunner</classname>) or as part of a workflow - either through Spring's 
 			<literal>depends-on</literal> or the much more powerful Spring Batch and <literal>tool-tasklet</literal>.</para>
 		</section>
-	</section>
 
-	<section id="hadoop:tool-tasklet">
-		<title>Using the Hadoop Tool tasklet</title>
-
-		<para>For Spring Batch environments, SHDP provides a dedicated tasklet to execute Hadoop tasks as a step in a Spring Batch workflow. The tasklet element supports the same configuration options as 
-		<link linkend="hadoop:tool-runner">tool-runner</link> except for <literal>run-at-startup</literal> (which does not apply for a workflow):</para>
-		
-		<programlisting language="xml"><![CDATA[<hdp:tool-tasklet id="tool-tasklet" tool-ref="some-tool" />]]></programlisting>
-	</section>
+		<section id="hadoop:tool-tasklet">
+			<title>Using the Hadoop Tool tasklet</title>
 	
+			<para>For Spring Batch environments, SHDP provides a dedicated tasklet to execute Hadoop tasks as a step in a Spring Batch workflow. The tasklet element supports the same configuration options as 
+			<link linkend="hadoop:tool-runner">tool-runner</link> except for <literal>run-at-startup</literal> (which does not apply for a workflow):</para>
+			
+			<programlisting language="xml"><![CDATA[<hdp:tool-tasklet id="tool-tasklet" tool-ref="some-tool" />]]></programlisting>
+		</section>
+	</section>
+
 	<section id="hadoop:jar-runner">
 		<title>Running a Hadoop Jar</title>
 	
@@ -428,7 +428,7 @@ hadoop jar job10.jar ...]]></programlisting>
 		
 		<para>becomes</para>
 		
-		<programlisting language="xml"><![CDATA[<hdp:jar-runner id="wordcount" jar="hadoop-examples.jar">
+		<programlisting language="xml"><![CDATA[<hdp:jar-runner id="wordcount" jar="hadoop-examples.jar" run-at-startup="true">
     <hdp:arg value="wordcount"/>
     <hdp:arg value="/wordcount/input"/>
     <hdp:arg value="/wordcount/output"/>
@@ -442,7 +442,7 @@ hadoop jar job10.jar ...]]></programlisting>
 		like other SHDP elements, the <literal>jar</literal> element allows <link linkend="hadoop:config:properties">configurations properties</link> to be declared locally, just for the jar run. So for example,
 		if one would use the following declaration:</para>
 		
-		<programlisting language="xml"><![CDATA[<hdp:jar-runner id="wordcount" jar="hadoop-examples.jar">
+		<programlisting language="xml"><![CDATA[<hdp:jar-runner id="wordcount" jar="hadoop-examples.jar" run-at-startup="true">
     <hdp:arg value="wordcount"/>
     ...
     speed=fast
@@ -453,6 +453,11 @@ hadoop jar job10.jar ...]]></programlisting>
 	<programlisting language="java"><![CDATA[assert "fast".equals(new Configuration().get("speed"));]]></programlisting>
 	
 	<para>This enabled basic Hadoop jars to use, without changes, the enclosing application Hadoop configuration.</para>
+	
+	<para>Additionally the runner (just like the job runner) allows one or multiple <literal>pre</literal> and <literal>post</literal> actions to be specified to be executed before and after each run. 
+		Typically other runners (such as other jobs or scripts) can be specified but any JDK <literal>Callable</literal> can be 
+		passed in. Do note that the runner will not run unless triggered manually or if <literal>run-at-startup</literal> is set to <literal>true</literal>.  
+		For more information on runners, see the <link linkend="runners">dedicated</link> chapter.</para>
 	
 	<para>And while we think it is a useful feature (that is why we added it in the first place), we strongly recommend using the tool support instead or migrate to it; there are several reasons for this mainly because there
 	are <emphasis>no contracts</emphasis> to use, leading to very poor embeddability caused by:
@@ -473,27 +478,18 @@ hadoop jar job10.jar ...]]></programlisting>
 
 	SHDP tries to use sensible defaults to provide the best integration experience possible but at the end of the day, without any contract in place, there are no guarantees. Hence why using the <literal>Tool</literal>
 	interface, is a much better alternative.
-	</para>		
-	</section>
-	
-	<section id="hadoop:jar-tasklet">
-		<title>Using the Hadoop Jar tasklet</title>
+	</para>
 
-		<para>Like for the rest of its tasks, for Spring Batch environments, SHDP provides a dedicated tasklet to execute Hadoop jars as a step in a Spring Batch workflow. 
-		The tasklet element supports the same configuration options as <link linkend="hadoop:jar-runner">jar-runner</link> except for <literal>run-at-startup</literal> (which does not apply for a workflow):</para>
-		
-		<programlisting language="xml"><![CDATA[<hdp:jar-tasklet id="jar-tasklet" jar="some-jar.jar" />]]></programlisting>
+		<section id="hadoop:jar-tasklet">
+			<title>Using the Hadoop Jar tasklet</title>
+	
+			<para>Like for the rest of its tasks, for Spring Batch environments, SHDP provides a dedicated tasklet to execute Hadoop jars as a step in a Spring Batch workflow. 
+			The tasklet element supports the same configuration options as <link linkend="hadoop:jar-runner">jar-runner</link> except for <literal>run-at-startup</literal> (which does not apply for a workflow):</para>
+			
+			<programlisting language="xml"><![CDATA[<hdp:jar-tasklet id="jar-tasklet" jar="some-jar.jar" />]]></programlisting>
+		</section>
 	</section>
 	
-	<section id="hadoop:generic-options">
-	 <title>Map Reduce Generic Options</title>
-	 
-	 <para>The <literal>job</literal>, <literal>streaming</literal> and <literal>tool</literal> all support a subset of <ulink url="http://hadoop.apache.org/common/docs/stable/commands_manual.html#Generic+Options">generic options</ulink>,
-	 specifically <literal>archives</literal>, <literal>files</literal> and <literal>libs</literal>. <literal>libs</literal> is probably the most useful as it enriches a job classpath (typically with some jars) - however the 
-	 other two allow resources or archives to be copied through-out the cluster for the job to consume. Whenver faced with provisioning issues, revisit these options as they can help up significantly.
-	 Note that the <literal>fs</literal>, <literal>jt</literal> or <literal>conf</literal> options are not supported - these are designed for command-line usage, for bootstrapping the application. 
-	 This is no longer the case, as the SHDP offers first-class support for defining and customizing Hadoop <link linkend="hadoop:config">configuration</link>s.</para>
-	</section>
 	
 	<section id="hadoop:distributed-cache">
    	 <title>Configuring the Hadoop <literal>DistributedCache</literal></title>
@@ -525,4 +521,14 @@ hadoop jar job10.jar ...]]></programlisting>
 	<emphasis>hadoopConfiguration</emphasis>, creating the <literal>FileSystem</literal> automatically.</para>
    </section>
 
+	<section id="hadoop:generic-options">
+	 <title>Map Reduce Generic Options</title>
+	 
+	 <para>The <literal>job</literal>, <literal>streaming</literal> and <literal>tool</literal> all support a subset of <ulink url="http://hadoop.apache.org/common/docs/stable/commands_manual.html#Generic+Options">generic options</ulink>,
+	 specifically <literal>archives</literal>, <literal>files</literal> and <literal>libs</literal>. <literal>libs</literal> is probably the most useful as it enriches a job classpath (typically with some jars) - however the 
+	 other two allow resources or archives to be copied through-out the cluster for the job to consume. Whenver faced with provisioning issues, revisit these options as they can help up significantly.
+	 Note that the <literal>fs</literal>, <literal>jt</literal> or <literal>conf</literal> options are not supported - these are designed for command-line usage, for bootstrapping the application. 
+	 This is no longer the case, as the SHDP offers first-class support for defining and customizing Hadoop <link linkend="hadoop:config">configuration</link>s.</para>
+	</section>
+   
 </chapter>

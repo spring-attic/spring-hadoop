@@ -11,8 +11,10 @@ Changes in version 1.0 RC1 (2012-10-07)
 General
 * Introduced Hive, Pig runner for declarative script execution
 * Refactored all (Cascading, M/R, Hive, Pig) runners as Callables instead of FactoryBeans
+* Introduced pre and post actions to all (Cascading, M/R, Hive, Pig) runners
 * Introduced embedded execution of Hadoop jars
 * Improved spring-hadoop.xsd namespace
+* Improved, refined and extended reference documentation
 * Improved artifacts pom
 * Upgraded to Spring Batch 2.1.9
 * Upgraded to Hive 0.9.0
