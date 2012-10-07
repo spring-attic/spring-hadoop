@@ -31,13 +31,13 @@
 	
 	<util:properties id="props" location="props.properties"/>
 	
-	<hdp:hive-client host="${hive.host}" port="${hive.port}"/>
+	<hdp:hive-client-factory host="${hive.host}" port="${hive.port}"/>
 	
 	<hdp:hive-template />
 	
-	<hdp:hive-template id="foo" hive-client-ref="hiveClient"/>
+	<hdp:hive-template id="foo" hive-client-factory-ref="hiveClientFactory"/>
 	
-	<hdp:hive-runner id="hiveRunner" hive-client-ref="hiveClient" run-at-startup="false">
+	<hdp:hive-runner id="hiveRunner" hive-client-factory-ref="hiveClientFactory" run-at-startup="false">
 		<hdp:script location="org/springframework/data/hadoop/hive/drop-script.q"/>
 	</hdp:hive-runner>
 	

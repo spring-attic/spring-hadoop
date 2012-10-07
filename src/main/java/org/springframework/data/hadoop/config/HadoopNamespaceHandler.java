@@ -51,12 +51,12 @@ class HadoopNamespaceHandler extends NamespaceHandlerSupport {
 		registerBeanDefinitionParser("script", new ScriptParser());
 		registerBeanDefinitionParser("script-tasklet", new ScriptTaskletParser());
 
-		registerBeanDefinitionParser("pig", new PigServerParser());
+		registerBeanDefinitionParser("pig-factory", new PigServerParser());
 		registerBeanDefinitionParser("pig-tasklet", new PigTaskletParser());
 		registerBeanDefinitionParser("pig-template", new PigTemplateParser());
 		registerBeanDefinitionParser("pig-runner", new PigRunnerParser());
 
-		registerBeanDefinitionParser("hive-client", new HiveClientParser());
+		registerBeanDefinitionParser("hive-client-factory", new HiveClientParser());
 		registerBeanDefinitionParser("hive-server", new HiveServerParser());
 		registerBeanDefinitionParser("hive-tasklet", new HiveTaskletParser());
 		registerBeanDefinitionParser("hive-template", new HiveTemplateParser());

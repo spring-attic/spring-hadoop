@@ -65,7 +65,7 @@ public class HiveClientFactoryBean implements FactoryBean<HiveClientFactory> {
 	}
 
 	public Class<?> getObjectType() {
-		return HiveClient.class;
+		return HiveClientFactory.class;
 	}
 
 	public boolean isSingleton() {

@@ -22,7 +22,7 @@
 		</step>
 	</job>
 
-	<bean id="tasklet" class="org.springframework.data.hadoop.hive.HiveTasklet" p:hive-client-ref="hiveClient">
+	<bean id="tasklet" class="org.springframework.data.hadoop.hive.HiveTasklet" p:hive-client-factory-ref="hiveClientFactory">
 		<property name="scripts">
 			<list>
 				<bean class="org.springframework.data.hadoop.hive.HiveScript">
@@ -31,7 +31,7 @@
 			</list>
 		</property>
 	</bean>
-	<hdp:hive-client host="${hive.host}" port="${hive.port}">
+	<hdp:hive-client-factory host="${hive.host}" port="${hive.port}">
 		<hdp:script>
 			DROP TABLE IF EXISTS testHiveBatchTable; 
 			CREATE TABLE testHiveBatchTable (key int, value string);
@@ -43,9 +43,9 @@
 				white=wash
 			</hdp:arguments>
 		</hdp:script>
-	</hdp:hive-client> 
+	</hdp:hive-client-factory> 
 	
-	<bean class="org.springframework.data.hadoop.hive.HiveTemplate" p:hive-client-ref="hiveClient"/>
+	<bean class="org.springframework.data.hadoop.hive.HiveTemplate" p:hive-client-factory-ref="hiveClientFactory"/>
 	
 	<hdp:hive-tasklet id="hive-script" scope="prototype">
 		<hdp:script>

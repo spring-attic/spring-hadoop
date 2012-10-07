@@ -46,7 +46,7 @@ public class PigTemplate implements InitializingBean, PigOperations, ResourceLoa
 
 	/**
 	 * Constructs a new <code>PigTemplate</code> instance.
-	 * Expects {@link #setPigServer(ObjectFactory)} to be called before using it.
+	 * Expects {@link #setPigFactory(ObjectFactory)} to be called before using it.
 	 */
 	public PigTemplate() {
 	}
@@ -190,7 +190,7 @@ public class PigTemplate implements InitializingBean, PigOperations, ResourceLoa
 	 * 
 	 * @param pigServerFactory
 	 */
-	public void setPigServer(PigServerFactory pigServerFactory) {
+	public void setPigFactory(PigServerFactory pigServerFactory) {
 		this.pigServerFactory = pigServerFactory;
 	}
 

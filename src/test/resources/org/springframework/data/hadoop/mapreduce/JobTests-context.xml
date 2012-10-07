@@ -35,7 +35,7 @@
 	</bean>
 
 
-	<hdp:job-runner id="ns-runner" pre-action="nop-script" job="ns-job, ns-job" run-at-startup="false"/>
+	<hdp:job-runner id="ns-runner" pre-action="nop-script" job-ref="ns-job, ns-job" run-at-startup="false"/>
 	
 	<bean id="no-wait" class="org.springframework.data.hadoop.mapreduce.JobRunner" depends-on="script">
 		<property name="jobs">

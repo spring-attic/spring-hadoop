@@ -46,7 +46,7 @@ public class HiveTemplate implements InitializingBean, HiveOperations, ResourceL
 
 	/**
 	 * Constructs a new <code>HiveClient</code> instance.
-	 * Expects {@link #setHiveClient(ObjectFactory)} to be called before using it.
+	 * Expects {@link #setHiveClientFactory(ObjectFactory)} to be called before using it.
 	 */
 	public HiveTemplate() {
 	}
@@ -276,7 +276,7 @@ public class HiveTemplate implements InitializingBean, HiveOperations, ResourceL
 	 * 
 	 * @param hiveClientFactory
 	 */
-	public void setHiveClient(HiveClientFactory hiveClientFactory) {
+	public void setHiveClientFactory(HiveClientFactory hiveClientFactory) {
 		this.hiveClientFactory = hiveClientFactory;
 	}
 

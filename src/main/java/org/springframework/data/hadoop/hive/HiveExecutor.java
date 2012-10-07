@@ -67,7 +67,7 @@ abstract class HiveExecutor implements InitializingBean {
 	 *  
 	 * @param hive HiveClient to set
 	 */
-	public void setHiveClient(HiveClientFactory hiveFactory) {
+	public void setHiveClientFactory(HiveClientFactory hiveFactory) {
 		this.hiveClientFactory = hiveFactory;
 	}
 

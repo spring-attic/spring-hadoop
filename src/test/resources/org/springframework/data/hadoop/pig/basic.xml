@@ -14,9 +14,9 @@
 	<bean id="pig-raw" class="org.springframework.data.hadoop.pig.PigServerFactoryBean" p:pig-context-ref="pig-ctx"/>
 
 	<hdp:pig-template />
-	<hdp:pig-template id="foo" pig-server-ref="pig-raw"/>
+	<hdp:pig-template id="foo" pig-factory-ref="pig-raw"/>
 	
-	<pig exec-type="LOCAL" job-name="pig-script" configuration-ref="hadoopConfiguration" xmlns="http://www.springframework.org/schema/hadoop" 
+	<pig-factory exec-type="LOCAL" job-name="pig-script" configuration-ref="hadoopConfiguration" xmlns="http://www.springframework.org/schema/hadoop" 
 		properties-ref="props" properties-location="cfg-1.properties, cfg-2.properties" user="costin">
 		ivy=blue
 
@@ -30,7 +30,7 @@
 				white=wash
 			</arguments>
 		</script>
-	</pig>
+	</pig-factory>
 	
 	<hdp:script id="nop-script" language="javascript">
 	println("Called script")

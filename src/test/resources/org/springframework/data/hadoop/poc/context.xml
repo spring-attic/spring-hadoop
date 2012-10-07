@@ -31,8 +31,8 @@
 		</step>
 	</job>
 	
-	<hdp:job-tasklet id="hadoop-mr" job="mr-job" wait-for-job="true"/>
-	<hdp:job-tasklet id="hadoop-streaming" job="stream-job" wait-for-job="true"/>
+	<hdp:job-tasklet id="hadoop-mr" job-ref="mr-job" wait-for-job="true"/>
+	<hdp:job-tasklet id="hadoop-streaming" job-ref="stream-job" wait-for-job="true"/>
 	
 	<hdp:job id="mr-job" 
 	    input-path="${log.input}/logs" output-path="${log.output}"
@@ -55,7 +55,7 @@
 		</property>
 	</bean>
 	-->
-	<hdp:pig exec-type="LOCAL" />
+	<hdp:pig-factory exec-type="LOCAL" />
 	
 	<hdp:pig-tasklet id="pig-script">
 		<hdp:script location="org/springframework/data/hadoop/pig/script.pig" />

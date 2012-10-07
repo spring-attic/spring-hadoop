@@ -68,7 +68,7 @@ abstract class PigExecutor implements InitializingBean {
 	 * 
 	 * @param pigFactory The pigFactory to set.
 	 */
-	public void setPigServer(PigServerFactory pigFactory) {
+	public void setPigFactory(PigServerFactory pigFactory) {
 		this.pigFactory = pigFactory;
 	}
 

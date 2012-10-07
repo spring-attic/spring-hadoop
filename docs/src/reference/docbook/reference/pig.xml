@@ -8,13 +8,13 @@
 	
 	<programlisting language="xml"><![CDATA[<hdp:pig />]]></programlisting>
 	
-	<para>This will create a <interfacename>org.springframework.data.hadoop.pig.PigServerFactory</interfacename> instance, named <literal>pig</literal>, a factory that creates <literal>PigServer</literal> instances on demand 
+	<para>This will create a <interfacename>org.springframework.data.hadoop.pig.PigServerFactory</interfacename> instance, named <literal>pigFactory</literal>, a factory that creates <literal>PigServer</literal> instances on demand 
 	configured with a default <interfacename>PigContext</interfacename>,  executing scripts in <literal>MapReduce</literal> mode. The factory is needed since <literal>PigServer</literal> is not thread-safe and thus cannot
 	be used by multiple objects at the same time.
 	
 	In typical scenarios however, one might want to connect to a remote Hadoop tracker and register some scripts automatically so let us take a look of how the configuration might look like:</para>
 	
-	<programlisting language="xml"><![CDATA[<pig exec-type="LOCAL" job-name="pig-script" configuration-ref="hadoopConfiguration" properties-location="pig-dev.properties" 
+	<programlisting language="xml"><![CDATA[<pig-factory exec-type="LOCAL" job-name="pig-script" configuration-ref="hadoopConfiguration" properties-location="pig-dev.properties" 
    xmlns="http://www.springframework.org/schema/hadoop">
      source=${pig.script.src}
    <script location="org/company/pig/script.pig">
@@ -25,20 +25,20 @@
      B = FOREACH A GENERATE name;
      DUMP B;
    </script>
-</pig> />]]></programlisting>
+</pig-factory> />]]></programlisting>
 	
 	<para>The example exposes quite a few options so let us review them one by one. First the top-level pig definition configures the pig instance: the execution type, the Hadoop configuration used and the job name. Notice that
-	additional properties can be specified (either by declaring them inlined or/and loading them from an external file) - in fact, <literal><![CDATA[<hdp:pig/>]]></literal> just like the rest of the libraries configuration
+	additional properties can be specified (either by declaring them inlined or/and loading them from an external file) - in fact, <literal><![CDATA[<hdp:pig-factory/>]]></literal> just like the rest of the libraries configuration
 	elements, supports common properties attributes as described in the <link linkend="hadoop:config:properties">hadoop configuration</link> section.</para>
 	<para>The definition contains also two scripts: <literal>script.pig</literal> (read from the classpath) to which one pair of arguments, 
 	relevant to the script, is passed (notice the use of property placeholder) but also an inlined script, declared as part of the definition, without any arguments.</para>
 	
-	<para>As you can tell, the <literal>pig</literal> namespace offers several options pertaining to Pig configuration.</para>
+	<para>As you can tell, the <literal>pig-factory</literal> namespace offers several options pertaining to Pig configuration.</para>
 	
 	<section id="pig:runner">
 	    <title>Running a Pig script</title>
 	
-		<para>Like the rest of the Spring Hadoop components, a runner is provided out of the box for executing PIg scripts, either inlined or from various locations through <literal>pig-runner</literal> element:</para>    
+		<para>Like the rest of the Spring Hadoop components, a runner is provided out of the box for executing Pig scripts, either inlined or from various locations through <literal>pig-runner</literal> element:</para>    
 	    
 	    <programlisting language="xml"><![CDATA[<hdp:pig-runner id="pigRunner" run-at-startup="true">
    <hdp:script>
@@ -75,8 +75,8 @@
 		executing the scripts, catching any exceptions and performing clean-up. One can programmatically execute scripts but also interact with the Hive API through the <literal>PigServerCallback</literal>.
 		For example:</para>
 		
-		<programlisting language="xml"><![CDATA[<hdp:pig ... />
-<!-- Pig template wires automatically to 'pig'-->
+		<programlisting language="xml"><![CDATA[<hdp:pig-factory ... />
+<!-- Pig template wires automatically to 'pigFactory'-->
 <hdp:pig-template />
 	
 <!-- use component scanning-->

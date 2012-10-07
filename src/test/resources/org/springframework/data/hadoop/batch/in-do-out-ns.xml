@@ -30,7 +30,7 @@
 	
 	<bean id="file-reader" class="org.springframework.batch.item.file.ResourcesItemReader" p:resources="classpath:input/word/*.txt"/>
 
-	<hdp:job-tasklet id="hadoop-tasklet" job="mr-job" wait-for-job="true" scope="prototype"/>
+	<hdp:job-tasklet id="hadoop-tasklet" job-ref="mr-job" wait-for-job="true" scope="prototype"/>
 	
  	<hdp:job id="mr-job" 
 	    input-path="/ide-test/input/word/" output-path="/ide-test/output/word/"

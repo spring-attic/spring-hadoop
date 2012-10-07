@@ -32,13 +32,13 @@
 	    <para>Similar to the server, SHDP provides a dedicated namespace element for configuring a Hive client (that is Hive accessing a server node through the Thrift). Likewise, simply specify the host, the port 
 	    (the defaults are <literal>localhost</literal> and <literal>10000</literal> respectively) and you're done:</para>
 	    
-	    <programlisting language="xml"><![CDATA[<!-- by default, the definition name is 'hive-client' -->
-<hdp:hive-client host="some-other-host" port="10001" />]]></programlisting>
-		<para>Note that since Thrift clients are not thread-safe, <literal>hive-client</literal> returns a factory (named <literal>org.springframework.data.hadoop.hive.HiveClientFactory</literal>) 
+	    <programlisting language="xml"><![CDATA[<!-- by default, the definition name is 'hiveClientFactory' -->
+<hdp:hive-client-factory host="some-other-host" port="10001" />]]></programlisting>
+		<para>Note that since Thrift clients are not thread-safe, <literal>hive-client-factory</literal> returns a factory (named <literal>org.springframework.data.hadoop.hive.HiveClientFactory</literal>) 
 		for creating <literal>HiveClient</literal> new instances for each invocation. Further more, the client definition
 		also allows Hive scripts (either declared inlined or externally) to be executed during initialization, once the client connects; this quite useful for doing Hive specific initialization:</para>
 		
-		<programlisting language="xml"><![CDATA[<hive-client host="some-host" port="some-port" xmlns="http://www.springframework.org/schema/hadoop">
+		<programlisting language="xml"><![CDATA[<hive-client-factory host="some-host" port="some-port" xmlns="http://www.springframework.org/schema/hadoop">
    <hdp:script>
      DROP TABLE IF EXITS testHiveBatchTable; 
      CREATE TABLE testHiveBatchTable (key int, value string);
@@ -46,7 +46,7 @@
    <hdp:script location="classpath:org/company/hive/script.q">
        <arguments>ignore-case=true</arguments>
    </hdp:script>
-</hive-client>]]></programlisting>
+</hive-client-factory>]]></programlisting>
 		
 		<para>In the example above, two scripts are executed each time a new Hive client is created (if the scripts need to be executed only once considering using a tasklet) by the factory.
 		The first executed a script defined inlined while the second read the script from the classpath and passed one parameter
@@ -137,8 +137,8 @@
 		catching any exceptions and performing clean-up. One can programmatically execute queries (and get the raw results or convert them to longs or ints) or scripts but also interact with the Hive API through the <literal>HiveClientCallback</literal>.
 		For example:</para>
 		
-		<programlisting language="xml"><![CDATA[<hdp:hive-client ... />
-<!-- Hive template wires automatically to 'hiveClient'-->
+		<programlisting language="xml"><![CDATA[<hdp:hive-client-factory ... />
+<!-- Hive template wires automatically to 'hiveClientFactory'-->
 <hdp:hive-template />
 	
 <!-- wire hive template into a bean -->

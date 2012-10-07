@@ -15,10 +15,8 @@
  */
 package org.springframework.data.hadoop.pig;
 
-import org.apache.pig.PigServer;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.hadoop.TestUtils;
@@ -36,7 +34,7 @@ import static org.junit.Assert.*;
 public class PigBatchTest {
 
 	@Autowired
-	private ObjectFactory<PigServer> pig;
+	private PigServerFactory pig;
 	@Autowired
 	private ApplicationContext ctx;
 

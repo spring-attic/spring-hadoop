@@ -22,10 +22,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.Callable;
 
-import org.apache.hadoop.hive.service.HiveClient;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.ByteArrayResource;
@@ -49,7 +47,7 @@ public class HiveBatchTest {
 	private ApplicationContext ctx;
 
 	@Autowired
-	private ObjectFactory<HiveClient> factory;
+	private HiveClientFactory factory;
 	@Autowired
 	private HiveOperations template;
 
@@ -59,7 +57,7 @@ public class HiveBatchTest {
 	
 	@Test
 	public void testHiveClient() throws Exception {
-		ctx.getBean("hiveClient", ObjectFactory.class);
+		ctx.getBean("hiveClientFactory", HiveClientFactory.class);
 	}
 
 	@Test

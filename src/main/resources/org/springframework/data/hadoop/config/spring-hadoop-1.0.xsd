@@ -28,7 +28,7 @@ Bean id.]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
 		<!-- the job reference -->
-		<xsd:attribute name="job">
+		<xsd:attribute name="job-ref">
 			<xsd:annotation>
 				<xsd:documentation source="java:org.apache.hadoop.mapreduce.Job"><![CDATA[
 Hadoop Job. Multiple names can be specified using comma (,) as a separator.]]></xsd:documentation>
@@ -961,15 +961,15 @@ Argument(s) to pass to this script. Defined in Properties format (key=value).
 		</xsd:complexContent>
 	</xsd:complexType>
 	
-	<xsd:element name="pig">
+	<xsd:element name="pig-factory">
 		<xsd:annotation>
 		   <xsd:documentation><![CDATA[
-Defines a PigServer 'template' (note that since PigServer is not thread-safe, each bean invocation will create a new PigServer instance).
+Defines a Pig (Server) factory. The factory is thread-safe and allows creation of PigServer instances (which are not thread-safe).
 				]]>
           </xsd:documentation>
 	      <xsd:appinfo>
 	        <tool:annotation>
-	          <tool:exports type="org.apache.pig.PigServer"/>
+	          <tool:exports type="org.springframework.data.hadoop.pig.PigServerFactory"/>
 	        </tool:annotation>
 	      </xsd:appinfo>
 		</xsd:annotation>
@@ -987,7 +987,7 @@ Pig script.]]></xsd:documentation>
 			<xsd:attribute name="id" type="xsd:ID" use="optional">
 				<xsd:annotation>
 				<xsd:documentation><![CDATA[
-Bean id (default is "pig").
+Bean id (default is "pigFactory").
 				]]></xsd:documentation>
 				</xsd:annotation>
 			</xsd:attribute>
@@ -1051,10 +1051,10 @@ Pig script.]]></xsd:documentation>
 Bean id.]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
-		<xsd:attribute name="pig-server-ref" type="xsd:string" use="optional" default="pig">
+		<xsd:attribute name="pig-factory-ref" type="xsd:string" use="optional" default="pigFactory">
 			<xsd:annotation>
-			<xsd:documentation source="java:org.apache.pig.PigServer"><![CDATA[
-Reference to a PigServer factory. Defaults to 'pig'.
+			<xsd:documentation source="java:org.springframework.data.hadoop.pig.PigServerFactory"><![CDATA[
+Reference to a PigServer factory. Defaults to 'pigFactory'.
 				]]></xsd:documentation>
 				<xsd:appinfo>
 					<tool:annotation kind="ref">
@@ -1154,10 +1154,10 @@ Bean id (default is "pigTemplate").
 				]]></xsd:documentation>
 			</xsd:annotation>
 			</xsd:attribute>
-			<xsd:attribute name="pig-server-ref" type="xsd:string" use="optional" default="pig">
+			<xsd:attribute name="pig-factory-ref" type="xsd:string" use="optional" default="pigFactory">
 				<xsd:annotation>
-				<xsd:documentation source="java:org.apache.pig.PigServer"><![CDATA[
-Reference to a PigServer factory. Defaults to 'pig'.
+				<xsd:documentation source="java:org.springframework.data.hadoop.pig.PigServerFactory"><![CDATA[
+Reference to a PigServer factory. Defaults to 'pigFactory'.
 				]]></xsd:documentation>
 					<xsd:appinfo>
 						<tool:annotation kind="ref">
@@ -1210,15 +1210,16 @@ Reference to the Hadoop configuration. Defaults to 'hadoopConfiguration'.]]></xs
 	</xsd:element>
 	
 	<!-- Hive -->
-	<xsd:element name="hive-client">
+	<xsd:element name="hive-client-factory">
 		<xsd:complexType>
 			<xsd:annotation>
 			   <xsd:documentation><![CDATA[
-Defines a Hive client for connecting to a Hive server through the Thrift protocol.
+Defines a HiveClient factory for connecting to a Hive server through the Thrift protocol. The factory is thread-safe and allows
+creation of HiveClient instances (which are not thread-safe).
 					]]></xsd:documentation>
 		      <xsd:appinfo>
 		        <tool:annotation>
-		          <tool:exports type="org.apache.hadoop.hive.service.HiveClient"/>
+		          <tool:exports type="org.springframework.data.hadoop.hive.HiveClientFactory"/>
 		        </tool:annotation>
 		      </xsd:appinfo>
 			</xsd:annotation>
@@ -1233,7 +1234,7 @@ Hive script to be executed during start-up.]]></xsd:documentation>
 			<xsd:attribute name="id" type="xsd:ID" use="optional">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[
-Bean id (default is "hiveClient").
+Bean id (default is "hiveClientFactory").
 				]]></xsd:documentation>
 			</xsd:annotation>
 			</xsd:attribute>
@@ -1298,14 +1299,14 @@ Hive script.]]></xsd:documentation>
 Bean id.]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
-		<xsd:attribute name="hive-client-ref" type="xsd:string" use="optional" default="hiveClient">
+		<xsd:attribute name="hive-client-factory-ref" type="xsd:string" use="optional" default="hiveClientFactory">
 			<xsd:annotation>
-			<xsd:documentation source="java:org.apache.hadoop.hive.service.HiveClient"><![CDATA[
-Reference to a HiveClient instance.
+			<xsd:documentation source="java:org.springframework.data.hadoop.hive.HiveClientFactory"><![CDATA[
+Reference to a HiveClient factory instance. Defaults to 'hiveClientFactory'.
 				]]></xsd:documentation>
 				<xsd:appinfo>
 					<tool:annotation kind="ref">
-						<tool:expected-type type="org.apache.hadoop.hive.service.HiveClient" />
+						<tool:expected-type type="org.springframework.data.hadoop.hive.HiveClientFactory" />
 					</tool:annotation>
 				</xsd:appinfo>
 			</xsd:annotation>
@@ -1313,7 +1314,7 @@ Reference to a HiveClient instance.
 		<xsd:attribute name="hive-template-ref" type="xsd:string" use="optional">
 			<xsd:annotation>
 			<xsd:documentation source="java:org.springframework.data.hadoop.hive.HiveTemplate"><![CDATA[
-Reference to a HiveTemplate instance.   Alternative to 'hive-client-ref' attribute..
+Reference to a HiveTemplate instance.   Alternative to 'hive-client-factory-ref' attribute..
 				]]></xsd:documentation>
 				<xsd:appinfo>
 					<tool:annotation kind="ref">
@@ -1401,10 +1402,10 @@ Bean id (default is "hiveTemplate").
 				]]></xsd:documentation>
 			</xsd:annotation>
 			</xsd:attribute>
-			<xsd:attribute name="hive-client-ref" default="hiveClient">
+			<xsd:attribute name="hive-client-factory-ref" default="hiveClientFactory">
 			<xsd:annotation>
-					<xsd:documentation source="java:org.apache.hadoop.hive.service.HiveClient"><![CDATA[
-Reference to HiveClient factory. Defaults to 'hiveClient'.]]></xsd:documentation>
+					<xsd:documentation source="java:org.springframework.data.hadoop.hive.HiveClientFactory"><![CDATA[
+Reference to HiveClient factory. Defaults to 'hiveClientFactory'.]]></xsd:documentation>
 					<xsd:appinfo>
 						<tool:annotation kind="ref">
 							<tool:expected-type type="org.springframework.data.hadoop.hive.HiveClientFactory" />

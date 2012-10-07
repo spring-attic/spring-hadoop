@@ -70,7 +70,7 @@ public class PigServerFactoryBean implements FactoryBean<PigServerFactory>, Bean
 	}
 
 	public Class<?> getObjectType() {
-		return ObjectFactory.class;
+		return PigServerFactory.class;
 	}
 
 	public boolean isSingleton() {

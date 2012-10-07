@@ -62,7 +62,7 @@ public class PigTest {
 
 	@Test
 	public void testServerNamespace() throws Exception {
-		String defaultName = "pig";
+		String defaultName = "pigFactory";
 		assertTrue(ctx.containsBean(defaultName));
 		PigServer server = (ctx.getBean(defaultName, PigServerFactory.class)).getPigServer();
 		Properties props = server.getPigContext().getProperties();
@@ -72,7 +72,7 @@ public class PigTest {
 
 	@Test
 	public void testPigProperties() throws Exception {
-		PigServer pig = (ctx.getBean("pig", PigServerFactory.class)).getPigServer();
+		PigServer pig = (ctx.getBean("pigFactory", PigServerFactory.class)).getPigServer();
 		Properties props = pig.getPigContext().getProperties();
 		assertEquals("blue", props.get("ivy"));
 
@@ -86,7 +86,7 @@ public class PigTest {
 
 	@Test
 	public void testPigScriptOrdering() throws Exception {
-		PigServerFactoryBean psfb = (PigServerFactoryBean) ctx.getBean("&pig");
+		PigServerFactoryBean psfb = (PigServerFactoryBean) ctx.getBean("&pigFactory");
 		Field findField = ReflectionUtils.findField(PigServerFactoryBean.class, "scripts");
 		ReflectionUtils.makeAccessible(findField);
 

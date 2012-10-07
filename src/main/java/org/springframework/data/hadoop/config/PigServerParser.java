@@ -57,7 +57,7 @@ class PigServerParser extends AbstractPropertiesConfiguredBeanDefinitionParser {
 
 	@Override
 	protected String defaultId(ParserContext context, Element element) {
-		return "pig";
+		return "pigFactory";
 	}
 
 	@Override
