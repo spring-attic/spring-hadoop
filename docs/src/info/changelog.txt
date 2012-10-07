@@ -11,6 +11,8 @@ Changes in version 1.0 RC1 (2012-10-07)
 General
 * Introduced Hive, Pig runner for declarative script execution
 * Refactored all (Cascading, M/R, Hive, Pig) runners as Callables instead of FactoryBeans
+* Renamed 'pig' to 'pig-factory' and 'pig-ref' to 'pig-factory-ref'
+* Renamed 'hive-client' to 'hive-client-factory' and 'hive-client-ref' to 'hive-client-factory-ref'
 * Introduced pre and post actions to all (Cascading, M/R, Hive, Pig) runners
 * Introduced embedded execution of Hadoop jars
 * Improved spring-hadoop.xsd namespace
