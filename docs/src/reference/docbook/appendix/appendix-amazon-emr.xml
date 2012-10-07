@@ -2,6 +2,193 @@
 <appendix xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="appendix-amazon-emr" xmlns:xi="http://www.w3.org/2001/XInclude">
     <title>Using Spring for Apache Hadoop with Amazon EMR</title>
 
-	<para>TODO</para>	
+	<para>A popular option for creating on-demand Hadoop cluster is Amazon Elastic Map Reduce or <ulink url="http://aws.amazon.com/elasticmapreduce/">Amazon EMR service</ulink>. The user
+	can through the command-line, API or a web UI configure, start, stop and manage a Hadoop cluster in the <emphasis>cloud</emphasis> without having to worry about the actual set-up or
+	hardware resources used by the cluster. However, as the setup is different then a <emphasis>locally</emphasis> available cluster, so does the interaction between the application that want
+	to use it and the target cluster. This section provides information on how to setup Amazon EMR with Spring for Apache Hadoop so the changes between a using a local, pseudo-distributed or owned cluster
+	and EMR are minimal.
+	</para>
+	
+	<important>This chapter assumes the user is familiar with Amazon EMR and the <ulink url="http://aws.amazon.com/elasticmapreduce/pricing/">cost</ulink> associated with it and its related services - we strongly recommend getting familiar with the official EMR 
+	<ulink url="http://aws.amazon.com/documentation/elasticmapreduce/">documentation</ulink>.</important>	
 
+	<para>One of the big differences when using Amazon EMR versus a local cluster is the lack of access of the file system server and the job tracker. This means submitting jobs or reading and writing to the file-system
+	isn't available out of the box - which is understandable for security reasons. If the cluster would be open, if could be easily abused while charging its rightful owner. However, it is fairly straight-forward 
+	to get access to both the file system and the job tracker so the deployment flow does not have to change.</para>
+	
+	<para>Amazon EMR allows clusters to be created through the management console, through the API or the command-line. This documentation will focus on the 
+	<ulink url="http://docs.amazonwebservices.com/ElasticMapReduce/latest/GettingStartedGuide/SignUp.html#emr-gsg-install-cli">command-line</ulink> but the setup is not limited to it - feel free
+	to adjust it according to your needs or preference. Make sure to properly setup the <ulink url="http://docs.amazonwebservices.com/ElasticMapReduce/latest/GettingStartedGuide/SignUp.html#ConfigCredentials">credentials</ulink>
+	 so that the S3 file-system can be properly accessed.</para>
+	
+	<section id="emr:startup">
+		<title>Start up the cluster</title>
+	
+	<para>A nice feature of Amazon EMR is starting a cluster for an indefinite period. That is rather then submitting a job and creating the cluster until it finished, one can create a cluster (along side a job) but request
+	to be kept <emphasis>alive</emphasis> even if there is no work for it. This is <ulink url="http://docs.amazonwebservices.com/ElasticMapReduce/latest/GettingStartedGuide/Essentials.html#emr-gsg-creating-a-job-flow">easily done</ulink>
+	 through the <literal>--create --alive</literal> parameters:</para>
+	 
+	<programlisting><![CDATA[./elastic-mapreduce --create --alive]]></programlisting>
+	
+	The output will be similar to this:
+	
+	<programlisting><![CDATA[Created job flow]]><emphasis>JobFlowID</emphasis></programlisting>
+	
+	<para>One can verify the results in the console through the <literal>list</literal> command or through the web management console. Depending on the cluster setup and the user account, the Hadoop cluster initialization should
+	be complete anywhere between 1 to 5 minutes. The cluster is ready once its state changes from <literal>STARTING/PROVISIONING</literal> to <literal>WAITING</literal>.</para>
+	
+		<note>By default, each newly created cluster has a new public IP that is not typically reused. To simplify the setup, one can use 
+		<ulink url="http://docs.amazonwebservices.com/AWSEC2/latest/UserGuide/using-instance-addressing.html">Amazon Elastic IP</ulink>, that is a static, predefined IP, 
+		so that she knows before-hand the cluster address. Refer to 
+		<ulink url="http://docs.amazonwebservices.com/ElasticMapReduce/latest/DeveloperGuide/environmentconfig_eip.html">this</ulink> section inside the EMR documentation for more information.</note>
+	</section>
+
+	<section id="emr:jt">
+		<title>Accessing the Job Tracker</title>
+		
+		<para>Once started, the cluster job tracker is available inside the newly EMR cluster, being bound to an internal IP. The easiest way to get access to it from outside is to open a SSH tunnel to it.
+		The <emphasis role="bold">remote</emphasis> job tracker is available on the default port <emphasis role="bold"><literal>9001</literal></emphasis>. 
+		One can bind it to the same local port <literal>9001</literal> or a different one such as <literal>20001</literal>. 
+		The SSH tunnel provides a secure
+		connection between your machine on the cluster preventing any snooping or man-in-the-middle attacks. Further more it is quite easy to automate and be executed along side the cluster creation, programmatically or through
+		some script. The Amazon EMR docs have dedicated sections on <ulink url="http://docs.amazonwebservices.com/ElasticMapReduce/latest/GettingStartedGuide/SignUp.html#emr-gsg-ssh-setup-config">
+		SSH Setup and Configuration</ulink> and on opening a <ulink url="http://docs.amazonwebservices.com/ElasticMapReduce/latest/DeveloperGuide/emr-ssh-tunnel.html">SSH Tunnel to the master node</ulink> so please refer
+		to them. One advantage of the SSH tunnel is that it <emphasis>encapsulates</emphasis> the connection setup to the remote cluster - no matter the cluster IP (whether static or not), the local port is entirely up to the user;
+		one can chose to bind the cluster always to the same port - whether that is connected to a local cluster or a remote one, created on-demand is transparent to the using application.</para>
+	</section>
+	
+	<section id="emr:s3">
+		<title>Accessing the file-system</title>
+		
+		<para>Amazon EMR offers Simple Storage Service, also known as <ulink url="http://aws.amazon.com/s3/">S3</ulink> service, as means for durable read-write storage for EMR. While the cluster is active, one can write
+		additional data to HDFS but unless S3 is used, the data will be lost once the cluster shuts down. Note that when using an S3 location for the first time, the proper 
+		<ulink url="http://docs.amazonwebservices.com/ElasticMapReduce/latest/DeveloperGuide/emr-s3-acls.html">access permissions</ulink> needs to be setup.
+		
+		Accessing S3 is easier then the job tracker - in fact the Hadoop distribution provides not one but two
+		file-system <ulink url="http://docs.amazonwebservices.com/ElasticMapReduce/latest/DeveloperGuide/FileSystemConfig.html">implementations for S3</ulink>:
+				
+		<table id="emr:s3:fs" pgwide="1" align="center">
+ 			<title>Hadoop S3 File Systems</title>
+ 			
+ 			<tgroup cols="4">
+ 			<colspec colname="c1" colwidth="1*"/>
+    		<colspec colname="c2" colwidth="1*"/>
+    		<colspec colname="c3" colwidth="1*"/>
+    		<colspec colname="c4" colwidth="2*"/>
+    		
+    		<thead>
+          	   <row>
+          	     <entry>Name</entry>
+          	     <entry>URI Prefix</entry>
+          	     <entry>Access Method</entry>
+          	     <entry>Description</entry>
+          	   </row>
+       	    </thead>
+       	    <tbody>
+          	   <row>
+          	      <entry>S3 Native FS</entry>
+          	      <entry><literal>s3n://</literal></entry>
+          	      <entry>S3 Native</entry>
+          	      <entry>Native access to S3. The recommended file-system as the data is read/written in its native format and can be used not just by Hadoop but also other systems without any translation. 
+          	      The down-side is that it does not support large files (5GB) out of the box (though there is a work-around through the 
+          	      <ulink url="http://docs.amazonwebservices.com/ElasticMapReduce/latest/DeveloperGuide/Config_Multipart.html#Config_Multipart.title">multipart</ulink> upload feature).</entry>
+          	    </row>
+          	   <row>
+          	      <entry>S3 Block FS</entry>
+          	      <entry><literal>s3://</literal></entry>
+          	      <entry>Block Based</entry>
+          	      <entry>The files are stored as blocks (similar to the underlying structure in HDFS). This is somewhat more efficient in terms of renames and file sizes but requires a dedicated bucket and is not 
+          	      inter-operable with other S3 tools.</entry>
+          	    </row>
+          	</tbody>
+          	</tgroup>   
+ 		</table>
+ 		</para>
+ 		
+ 		<para>To access the data in S3 one can either use an HDFS file-system on top of it, which requires no extra setup, or copy the data from S3 to the HDFS cluster using manual tools, 
+ 		<ulink url="http://wiki.apache.org/hadoop/AmazonS3#Running_bulk_copies_in_and_out_of_S3">distcp with S3</ulink>, its dedicated version 
+ 		<ulink url="http://docs.amazonwebservices.com/ElasticMapReduce/latest/DeveloperGuide/UsingEMR_s3distcp.html">s3distcp</ulink>, Hadoop 
+ 		<ulink url="http://docs.amazonwebservices.com/ElasticMapReduce/latest/DeveloperGuide/DistributedCache.html">DistributedCache</ulink> (which SHDP <link linkend="hadoop:distributed-cache">supports</link> as well) 
+ 		or third-party tools such as <ulink url="http://s3tools.org/s3cmd">s3cmd</ulink>.</para>
+ 		
+ 		<para>For newbies and development we recommend accessing the S3 directly through the File-System abstraction as in most cases, its performance is close to that of the data inside the native HDFS. 
+ 		When dealing with data that	is read multiple times, copying the data from S3 locally inside the cluster might improve performance but we advice running some performance tests first.</para>
+	</section>
+	
+	<section id="emr:shutdown">
+		<title>Shutting down the cluster</title>
+		
+		<para>Once the cluster is no longer needed for a longer period of time, one can shut it down fairly 
+		<ulink url="http://docs.amazonwebservices.com/ElasticMapReduce/latest/GettingStartedGuide/CleanUp.html">straight forward</ulink>:</para>
+		
+		<programlisting><![CDATA[./elastic-mapreduce --terminate ]]><emphasis>JobFlowID</emphasis></programlisting>
+		
+		<para>Note that the EMR cluster is billed by the hour and since the time is rounded upwards, starting and shutting down the cluster repeateadly might end up being more expensive then just keeping it alive. Consult
+		the <ulink url="http://aws.amazon.com/elasticmapreduce/faqs/#billing-2">documentation</ulink> for more information.</para>
+	</section>
+	
+	<section id="emr:configuration">
+		<title>Example configuration</title>
+		
+		<para>To put it all together, to use Amazon EMR one can use the following work-flow with SHDP:
+		
+		<itemizedlist>
+			<listitem><para>Start an <emphasis>alive</emphasis> cluster and create a SSH tunnel to the Job Tracker</para>
+			
+			Start the cluster for an indefinite period. Once the server is up, create an SSH tunnel to the remote job tracker node. The remote port is <literal>9001</literal> and let us assume the local tunnelled port
+			is <literal>20001</literal>.  This step does not have to be repeated unless the cluster is terminated - one can (and should) submit multiple jobs to it. 
+			</listitem>
+			
+			<listitem><para>Configure SHDP</para></listitem>
+			<listitem>Once the cluster is up and the SSH tunnel is in place, point SHDP to the new configuration. The example below shows how the configuration can look like:
+			
+			<para>hadoop-context.xml</para>
+			
+			<programlisting language="xml"><![CDATA[<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:hdp="http://www.springframework.org/schema/hadoop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
+
+<!-- property placeholder backed by hadoop.properties -->		
+<context:property-placeholder location="hadoop.properties"/>
+
+<!-- Hadoop FileSystem using a placeholder and s3.properties -->
+<hdp:configuration register-url-handler="false" properties-location="s3.properties">
+	fs.default.name=${hd.fs}
+</hdp:configuration>]]></programlisting>
+			
+			<para>hadoop.properties</para>
+			<programlisting><![CDATA[# Amazon EMR
+# S3 bucked backing the HDFS S3 fs
+hd.fs=s3n://work-emr/tmp/
+# job tracker pointing to the local SSH tunnelled port
+mapred.job.tracker=localhost:20001]]></programlisting>
+
+			<para>s3.properties</para>
+			<programlisting><![CDATA[# S3 credentials
+# for s3:// uri
+fs.s3.awsAccessKeyId=XXXXXXXXXXXXXXXXXXXX
+fs.s3.awsSecretAccessKey=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+# for s3n:// uri
+fs.s3n.awsAccessKeyId=XXXXXXXXXXXXXXXXXXXX
+fs.s3n.awsSecretAccessKey=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+]]></programlisting>
+			Spring Hadoop is now ready to talk to your Amazon EMR cluster. Try it out!		
+
+		</listitem>
+		
+		<listitem>
+		<para>Shutdown the tunnel and the cluster</para>
+		
+		<para>Once the jobs submitted are completed, unless new jobs are shortly scheduled, one can shutdown the cluster. Just like the first step, this is optional. Again, make sure you understand the billing process first.</para>
+		
+		</listitem>
+		</itemizedlist>
+		</para>
+	</section>
+	
 </appendix>
