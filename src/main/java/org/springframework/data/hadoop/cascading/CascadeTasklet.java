@@ -43,7 +43,7 @@ public class CascadeTasklet implements Tasklet {
 	/**
 	 * Sets the unit of work or a {@link Cascade}.
 	 *
-	 * @param unitOfWork the new cascade
+	 * @param cascade the new cascade
 	 */
 	public void setUnitOfWork(Cascade cascade) {
 		this.unitOfWork = unitOfWork;

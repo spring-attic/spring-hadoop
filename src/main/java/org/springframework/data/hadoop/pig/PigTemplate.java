@@ -24,7 +24,6 @@ import org.apache.pig.PigServer;
 import org.apache.pig.backend.executionengine.ExecException;
 import org.apache.pig.backend.executionengine.ExecJob;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -46,7 +45,7 @@ public class PigTemplate implements InitializingBean, PigOperations, ResourceLoa
 
 	/**
 	 * Constructs a new <code>PigTemplate</code> instance.
-	 * Expects {@link #setPigFactory(ObjectFactory)} to be called before using it.
+	 * Expects {@link #setPigFactory(PigServerFactory)} to be called before using it.
 	 */
 	public PigTemplate() {
 	}

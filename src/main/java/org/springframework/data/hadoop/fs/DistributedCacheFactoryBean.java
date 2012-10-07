@@ -188,7 +188,7 @@ public class DistributedCacheFactoryBean implements InitializingBean, FactoryBea
 	/**
 	 * Sets the local entries to be added to the distributed cache.
 	 * 
-	 * @param entries The entries to set.
+	 * @param resources The entries to set.
 	 */
 
 	public void setLocalEntries(Collection<Resource> resources) {
@@ -198,7 +198,7 @@ public class DistributedCacheFactoryBean implements InitializingBean, FactoryBea
 	/**
 	 * Sets the cache entries to be added to the distributed cache.
 	 * 
-	 * @param entries The entries to set.
+	 * @param resources The entries to set.
 	 */
 	public void setCacheEntries(Collection<Resource> resources) {
 		setEntries(EntryType.CACHE, resources);
@@ -207,7 +207,7 @@ public class DistributedCacheFactoryBean implements InitializingBean, FactoryBea
 	/**
 	 * Sets the class-path entries to be added to the distributed cache.
 	 * 
-	 * @param entries The entries to set.
+	 * @param resources The entries to set.
 	 */
 	public void setClassPathEntries(Collection<Resource> resources) {
 		setEntries(EntryType.CP, resources);

@@ -176,7 +176,7 @@ class Jsr223ScriptRunner implements InitializingBean, BeanClassLoaderAware, Call
 	/**
 	 * Actions to be invoked before running the action.
 	 * 
-	 * @param beans
+	 * @param actions
 	 */
 	public void setPreAction(Collection<Callable<?>> actions) {
 		this.preActions = actions;
@@ -185,7 +185,7 @@ class Jsr223ScriptRunner implements InitializingBean, BeanClassLoaderAware, Call
 	/**
 	 * Actions to be invoked after running the action.
 	 * 
-	 * @param beans
+	 * @param actions
 	 */
 	public void setPostAction(Collection<Callable<?>> actions) {
 		this.postActions = actions;

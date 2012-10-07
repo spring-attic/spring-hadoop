@@ -15,7 +15,6 @@
  */
 package org.springframework.data.hadoop.hive;
 
-import org.apache.hadoop.hive.metastore.api.ThriftHiveMetastore;
 import org.apache.hadoop.hive.service.HiveClient;
 
 /**
@@ -28,7 +27,7 @@ public interface HiveClientCallback<T> {
 	/**
 	 * Gets called by {@link HiveTemplate#execute(HiveClientCallback)} with an active {@link HiveClient}. Does not need to care about activating or closing the {@link HiveClient}, or handling exceptions. 
 	 * 
-	 * Due to the big number of exceptions thrown by {@link HiveClient} (in particular {@link ThriftHiveMetastore.Client}) which do not share any common base class, the callback signature uses a generic declaration.
+	 * Due to the big number of exceptions thrown by {@link HiveClient} (in particular {@link org.apache.hadoop.hive.metastore.api.ThriftHiveMetastore$Client}) which do not share any common base class, the callback signature uses a generic declaration.
 	 * For user specific error, consider runtime exceptions which are not translated.
 	 * 
 	 * @param hiveClient active hive client

@@ -21,7 +21,6 @@ import java.util.Map;
 
 import org.apache.hadoop.hive.service.HiveClient;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -46,7 +45,7 @@ public class HiveTemplate implements InitializingBean, HiveOperations, ResourceL
 
 	/**
 	 * Constructs a new <code>HiveClient</code> instance.
-	 * Expects {@link #setHiveClientFactory(ObjectFactory)} to be called before using it.
+	 * Expects {@link #setHiveClientFactory(HiveClientFactory)} to be called before using it.
 	 */
 	public HiveTemplate() {
 	}
@@ -54,7 +53,7 @@ public class HiveTemplate implements InitializingBean, HiveOperations, ResourceL
 	/**
 	 * Constructs a new <code>HiveTemplate</code> instance.
 	 *
-	 * @param pigFactory pig factory
+	 * @param hiveClientFactory HiveClient factory
 	 */
 	public HiveTemplate(HiveClientFactory hiveClientFactory) {
 		this.hiveClientFactory = hiveClientFactory;
@@ -274,7 +273,7 @@ public class HiveTemplate implements InitializingBean, HiveOperations, ResourceL
 	/**
 	 * Sets the {@link HiveClient} factory.
 	 * 
-	 * @param hiveClientFactory
+	 * @param hiveClientFactory hive client factory to set
 	 */
 	public void setHiveClientFactory(HiveClientFactory hiveClientFactory) {
 		this.hiveClientFactory = hiveClientFactory;
