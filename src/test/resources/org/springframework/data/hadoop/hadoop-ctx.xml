@@ -25,7 +25,8 @@
 	
 	<hdp:resource-loader file-system-ref="hadoopFs" use-codecs="true"/>	
 	
-	<!--  default id is 'hadoopConfiguration'  properties-location="s3.properties"-->
+	<!--  default id is 'hadoopConfiguration' / properties-location="s3.properties"  -->
+	<!--  mapred.job.tracker=${jt}  -->
 	<hdp:configuration register-url-handler="false">
 		fs.default.name=${hd.fs}
 		cfg=main

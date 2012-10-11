@@ -40,7 +40,7 @@
 	<hdp:hive-runner id="hiveRunner" hive-client-factory-ref="hiveClientFactory" run-at-startup="false">
 		<hdp:script location="org/springframework/data/hadoop/hive/drop-script.q"/>
 	</hdp:hive-runner>
-	
+
 	<bean id="hiveDriver" class="org.apache.hadoop.hive.jdbc.HiveDriver"/>
 	<bean id="hiveDs" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
 		<constructor-arg name="driver" ref="hiveDriver"/>
