@@ -34,7 +34,6 @@ import org.apache.hadoop.security.UserGroupInformation;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.data.hadoop.TestUtils;
@@ -59,7 +58,7 @@ public class HdfsResouceLoaderTest {
 
 		Properties props = new Properties();
 		props.setProperty("fs.default.name", prop.getProperty("hd.fs"));
-//		PropertiesLoaderUtils.fillProperties(props, new ClassPathResource("s3.properties"));
+		//PropertiesLoaderUtils.fillProperties(props, new ClassPathResource("s3.properties"));
 
 		ConfigurationFactoryBean cfb = new ConfigurationFactoryBean();
 		cfb.setBeanClassLoader(getClass().getClassLoader());
@@ -81,7 +80,9 @@ public class HdfsResouceLoaderTest {
 
 	@After
 	public void after() throws Exception {
-		fs.close();
+		if (fs != null) {
+			fs.close();
+		}
 	}
 
 	@Test

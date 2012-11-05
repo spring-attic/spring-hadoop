@@ -16,7 +16,7 @@
 	<hdp:pig-template />
 	<hdp:pig-template id="foo" pig-factory-ref="pig-raw"/>
 	
-	<pig-factory exec-type="LOCAL" job-name="pig-script" configuration-ref="hadoopConfiguration" xmlns="http://www.springframework.org/schema/hadoop" 
+	<pig-factory exec-type="MAPREDUCE" job-name="pig-script" configuration-ref="hadoopConfiguration" xmlns="http://www.springframework.org/schema/hadoop" 
 		properties-ref="props" properties-location="cfg-1.properties, cfg-2.properties" user="costin">
 		ivy=blue
 

@@ -24,14 +24,23 @@
 	<bean id="hadoopFs" class="org.springframework.data.hadoop.fs.FileSystemFactoryBean" p:configuration-ref="hadoopConfiguration"/>
 	
 	<hdp:resource-loader file-system-ref="hadoopFs" use-codecs="true"/>	
+
+	<!-- For Window users -->
+	<!-- if mapred.job.tracker is specified (non-local), Hadoop won't execute locally -->
+	<!-- however the permissions are checked locally by the client        -->
+	<!-- which can conflict with the TestUtils.hackHadoopStagingOnWin     -->
 	
-	<!--  default id is 'hadoopConfiguration' / properties-location="s3.properties"  -->
-	<!--  mapred.job.tracker=${jt}  -->
-	<hdp:configuration register-url-handler="false">
+	<!--  default id is 'hadoopConfiguration' /   -->
+	<!--  properties-location="s3.properties" -->
+	<!--  -->
+	<hdp:configuration register-url-handler="false" >
 		fs.default.name=${hd.fs}
+		mapred.job.tracker=local
 		cfg=main
 	</hdp:configuration>
 
+	<hdp:file-system user="hadoop" />
+	
 	<!-- 
 	<bean id="fs-config" class="org.springframework.data.hadoop.configuration.ConfigurationFactoryBean">
 	 <property name="properties">

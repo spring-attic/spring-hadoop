@@ -18,7 +18,7 @@
 	
 	<bean id="mrir" class="org.springframework.batch.item.file.MultiResourceItemReader" p:resources="/batch/*" p:delegate-ref="ir"/>
 	
-	<hdp:script id="script" language="javascript">
+	<hdp:script id="script" language="javascript" run-at-startup="true">
 dir = "/batch/"
 source = "src/test/resources/test.properties"
 

@@ -110,6 +110,39 @@ public class HiveBatchTest {
 	}
 
 	@Test
+	public void testTemplateExecute() throws Exception {
+		String location = "classpath:org/springframework/data/hadoop/hive/script.q";
+		Resource res = ctx.getResource(location);
+		assertTrue(res.exists());
+		assertTrue(!template.executeScript(new HiveScript(res)).isEmpty());
+	}
+
+	@Test
+	public void testScriptParamExecute() throws Exception {
+		Resource data = ctx.getResource("classpath:data/apache-short.txt");
+		assertTrue(data.exists());
+		String uri = data.getURI().toString();
+		System.out.println(uri);
+
+		String script = "DROP TABLE IF EXISTS ${hiveconf:xxx};set zzz;set hiveconf:yyy;"
+				+ "create table ${hiveconf:xxx} (key int, value string);"
+				+ "LOAD DATA LOCAL INPATH ${hiveconf:data} INTO TABLE ${hiveconf:xxx};"
+				+ "select count(1) from ${hiveconf:xxx};";
+		Resource res = new ByteArrayResource(script.getBytes());
+		Properties params = new Properties();
+		params.put("xxx", "nonExisting");
+		params.put("data", uri);
+		params.put("zzz", "onions");
+		params.put("yyy", "unleashed");
+
+		List<String> run = template.executeScript(new HiveScript(res, params));
+		System.out.println(run);
+		assertEquals("zzz=onions", run.get(0));
+		assertEquals("hiveconf:yyy=unleashed", run.get(1));
+		assertEquals("0", run.get(1));
+	}
+
+	@Test
 	public void testScriptParams() throws Exception {
 		Resource res = new ByteArrayResource("set zzz;set hiveconf:yyy;".getBytes());
 		Properties params = new Properties();

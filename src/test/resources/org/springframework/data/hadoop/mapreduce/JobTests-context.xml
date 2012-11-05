@@ -10,7 +10,6 @@
 		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
 
 	<import resource="../hadoop-ctx.xml"/>
-
 	<hdp:script id="script" language="javascript" run-at-startup="true">
 	if (fsh.test("/ide-test/input/word")) { fsh.rmr("/ide-test/input/word") }
 	if (fsh.test("/ide-test/runner/output")) { fsh.rmr("/ide-test/runner/output") }
@@ -24,7 +23,7 @@
 	<hdp:script id="nop-script" language="javascript">
 	println("Called script")
 	</hdp:script>
-
+ 
 	<bean id="jar-job-runner" class="org.springframework.data.hadoop.mapreduce.JobRunner" depends-on="script" >
 		<property name="jobs">
 			<list>
@@ -35,7 +34,7 @@
 	</bean>
 
 
-	<hdp:job-runner id="ns-runner" pre-action="nop-script" job-ref="ns-job, ns-job" run-at-startup="false"/>
+	<hdp:job-runner id="ns-runner" pre-action="nop-script" job-ref="jar-job, ns-job" run-at-startup="true"/>
 	
 	<bean id="no-wait" class="org.springframework.data.hadoop.mapreduce.JobRunner" depends-on="script">
 		<property name="jobs">
@@ -54,7 +53,8 @@
 		mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
 		reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"
 		jar-by-class="org.apache.hadoop.examples.WordCount"
-		scope="prototype" /> 
+		scope="prototype"
+		/> 
 
 	<hdp:job id="custom-jar-job" 
 	   	input-path="/ide-test/input/word/" output-path="/ide-test/runner/output-4/"
@@ -73,8 +73,8 @@
 		working-dir="."
 		codec="org.apache.hadoop.io.compress.DefaultCodec"
 		compress-output="false"
-		
-		scope="singleton" >
+		scope="singleton"
+		libs="classpath:mini-hadoop-examples.jar" >
 
 		star=chasing
 		return=captain eo
