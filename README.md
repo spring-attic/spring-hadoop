@@ -65,8 +65,8 @@ from the project root folder. This will compile the sources, run the tests and c
 
 # Testing
 
-For its testing, Spring for Apache Hadoop expects a Hadoop instalation available on the `localhost` at the default ports (`9000` and `9001`). 
-These settings can be customized through the `test.properties` file under `src/test/resources` folder 
+For its testing, Spring for Apache Hadoop expects a pseudo-distributed/local Hadoop instalation available on the `localhost` at the default ports (`9000` and `9001`). The local Hadoop setup allows
+the project classpath to be automatically used by the Hadoop job tracker. These settings can be customized through the `test.properties` file under `src/test/resources` folder 
 (further tweaks can be applied through `hadoop-ctx.xml` file under `src/test/resources/org/springframework/data/hadoop`).
 Note that by default, only the vanilla Hadoop tests are running - you can enable additional tests (such as Hive or Pig) by adding the tasks `enableHBaseTests`, `enableHiveTests`, `enablePigTests` and `webHdfsTests` (or `enableAllTests` in short). Use the `test.properties` file for customizing the default location for these services as well.
 You can disable all tests by skipping the `test` task:
