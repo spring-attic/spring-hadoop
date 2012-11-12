@@ -33,13 +33,13 @@
 	<!--  default id is 'hadoopConfiguration' /   -->
 	<!--  properties-location="s3.properties" -->
 	<!--  -->
-	<hdp:configuration register-url-handler="false" >
+	<hdp:configuration register-url-handler="false">
 		fs.default.name=${hd.fs}
-		mapred.job.tracker=local
+		mapred.job.tracker=${jt}
 		cfg=main
 	</hdp:configuration>
 
-	<hdp:file-system user="hadoop" />
+	<hdp:file-system />
 	
 	<!-- 
 	<bean id="fs-config" class="org.springframework.data.hadoop.configuration.ConfigurationFactoryBean">

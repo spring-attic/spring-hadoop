@@ -53,7 +53,7 @@ public class HbaseInterceptor extends HbaseAccessor implements MethodInterceptor
 		for (String tableName : tableNames) {
 			if (!HbaseSynchronizationManager.hasResource(tableName)) {
 				boundTables.add(tableName);
-				HTable table = HbaseUtils.getHTable(getTableFactory(), getCharset(), getConfiguration(), tableName);
+				HTableInterface table = HbaseUtils.getHTable(getTableFactory(), getCharset(), getConfiguration(), tableName);
 				HbaseSynchronizationManager.bindResource(tableName, table);
 			}
 		}

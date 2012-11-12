@@ -23,6 +23,7 @@ import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.apache.hadoop.hbase.client.HTable;
+import org.apache.hadoop.hbase.client.HTableInterface;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
@@ -111,11 +112,11 @@ public class BasicHBaseTest {
 	public void testTemplate() throws Exception {
 		assertTrue(HbaseSynchronizationManager.getTableNames().isEmpty());
 
-		final HTable t = HbaseUtils.getHTable(config, tableName);
+		final HTableInterface t = HbaseUtils.getHTable(config, tableName);
 
 		template.execute(tableName, new TableCallback<Object>() {
 			@Override
-			public Object doInTable(HTable table) throws Throwable {
+			public Object doInTable(HTableInterface table) throws Throwable {
 				assertSame(t, table);
 				Put p = new Put(Bytes.toBytes(rowName));
 				p.add(Bytes.toBytes(columnName), Bytes.toBytes(qualifier), Bytes.toBytes(value));

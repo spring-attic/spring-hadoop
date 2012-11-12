@@ -21,6 +21,7 @@ import java.util.List;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.HTable;
+import org.apache.hadoop.hbase.client.HTableInterface;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
@@ -50,7 +51,7 @@ public class HbaseTemplate extends HbaseAccessor implements HbaseOperations {
 		Assert.notNull(action, "Callback object must not be null");
 		Assert.notNull(tableName, "No table specified");
 
-		HTable table = getTable(tableName);
+		HTableInterface table = getTable(tableName);
 
 		try {
 			boolean previousFlushSetting = applyFlushSetting(table);
@@ -70,26 +71,34 @@ public class HbaseTemplate extends HbaseAccessor implements HbaseOperations {
 		}
 	}
 
-	private HTable getTable(String tableName) {
+	private HTableInterface getTable(String tableName) {
 		return HbaseUtils.getHTable(getTableFactory(), getCharset(), getConfiguration(), tableName);
 	}
 
-	private void releaseTable(String tableName, HTable table) {
+	private void releaseTable(String tableName, HTableInterface table) {
 		HbaseUtils.releaseTable(tableName, table);
 	}
 
-	private boolean applyFlushSetting(HTable table) {
+	private boolean applyFlushSetting(HTableInterface table) {
 		boolean autoFlush = table.isAutoFlush();
-		table.setAutoFlush(this.autoFlush);
+		if (table instanceof HTable) {
+			((HTable) table).setAutoFlush(this.autoFlush);
+		}
 		return autoFlush;
 	}
 
-	private void flushIfNecessary(HTable table, boolean oldFlush) throws IOException {
+	private void restoreFlushSettings(HTableInterface table, boolean oldFlush) {
+		if (table instanceof HTable) {
+			if (table.isAutoFlush() != oldFlush) {
+				((HTable) table).setAutoFlush(oldFlush);
+			}
+		}
+	}
+
+	private void flushIfNecessary(HTableInterface table, boolean oldFlush) throws IOException {
 		// TODO: check whether we can consider or not a table scope
 		table.flushCommits();
-		if (table.isAutoFlush() != oldFlush) {
-			table.setAutoFlush(oldFlush);
-		}
+		restoreFlushSettings(table, oldFlush);
 	}
 
 	public DataAccessException convertHbaseAccessException(Exception ex) {
@@ -114,7 +123,7 @@ public class HbaseTemplate extends HbaseAccessor implements HbaseOperations {
 	public <T> T find(String tableName, final Scan scan, final ResultsExtractor<T> action) {
 		return execute(tableName, new TableCallback<T>() {
 			@Override
-			public T doInTable(HTable htable) throws Throwable {
+			public T doInTable(HTableInterface htable) throws Throwable {
 				ResultScanner scanner = htable.getScanner(scan);
 				try {
 					return action.extractData(scanner);
@@ -158,7 +167,7 @@ public class HbaseTemplate extends HbaseAccessor implements HbaseOperations {
 	public <T> T get(String tableName, final String rowName, final String familyName, final String qualifier, final RowMapper<T> mapper) {
 		return execute(tableName, new TableCallback<T>() {
 			@Override
-			public T doInTable(HTable htable) throws Throwable {
+			public T doInTable(HTableInterface htable) throws Throwable {
 				Get get = new Get(rowName.getBytes(getCharset()));
 				if (familyName != null) {
 					byte[] family = familyName.getBytes(getCharset());
@@ -184,5 +193,4 @@ public class HbaseTemplate extends HbaseAccessor implements HbaseOperations {
 	public void setAutoFlush(boolean autoFlush) {
 		this.autoFlush = autoFlush;
 	}
-
 }

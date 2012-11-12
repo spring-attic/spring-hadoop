@@ -23,7 +23,6 @@ import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.HTableInterface;
 import org.apache.hadoop.hbase.client.HTableInterfaceFactory;
 import org.springframework.dao.DataAccessException;
-import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
@@ -50,7 +49,7 @@ public class HbaseUtils {
 	 * @param tableName table name
 	 * @return table instance
 	 */
-	public static HTable getHTable(Configuration configuration, String tableName) {
+	public static HTableInterface getHTable(Configuration configuration, String tableName) {
 		return getHTable(null, getCharset(null), configuration, tableName);
 	}
 
@@ -63,17 +62,15 @@ public class HbaseUtils {
 	 * @param tableName table name
 	 * @return table instance
 	 */
-	public static HTable getHTable(HTableInterfaceFactory tableFactory, Charset charset, Configuration configuration, String tableName) {
+	public static HTableInterface getHTable(HTableInterfaceFactory tableFactory, Charset charset, Configuration configuration, String tableName) {
 		if (HbaseSynchronizationManager.hasResource(tableName)) {
 			return (HTable) HbaseSynchronizationManager.getResource(tableName);
 		}
 
-		HTable t = null;
+		HTableInterface t = null;
 		try {
 			if (tableFactory != null) {
-				HTableInterface table = tableFactory.createHTableInterface(configuration, tableName.getBytes(charset));
-				Assert.isInstanceOf(HTable.class, table, "The table factory needs to create HTable instances");
-				t = (HTable) table;
+				t = tableFactory.createHTableInterface(configuration, tableName.getBytes(charset));
 			}
 			else {
 				t = new HTable(configuration, tableName.getBytes(charset));
