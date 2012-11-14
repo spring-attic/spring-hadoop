@@ -73,7 +73,7 @@ public class HdfsResouceLoaderTest {
 
 		System.out.println("Current user is " + UserGroupInformation.getCurrentUser());
 		System.out.println("Home dir is " + fs.getHomeDirectory().toString());
-//		System.out.println("Root folder is " + fs.exists(new Path("/")));
+		//		System.out.println("Root folder is " + fs.exists(new Path("/")));
 
 		loader = new HdfsResourceLoader(cfb.getObject(), null);
 	}
@@ -284,5 +284,17 @@ public class HdfsResouceLoaderTest {
 		} finally {
 			loader.setUseCodecs(true);
 		}
+	}
+
+	@Test
+	public void testURLCycle() throws Exception {
+		ConfigurationFactoryBean cfactory;
+		cfactory = new ConfigurationFactoryBean();
+		cfactory.setRegisterUrlHandler(true);
+		cfactory.afterPropertiesSet();
+
+		/* create hdfs resource loader */
+		HdfsResourceLoader ldr = new HdfsResourceLoader(cfactory.getObject(), null, null);
+		assertNotNull(ldr);
 	}
 }

@@ -72,11 +72,11 @@ public class HbaseTemplate extends HbaseAccessor implements HbaseOperations {
 	}
 
 	private HTableInterface getTable(String tableName) {
-		return HbaseUtils.getHTable(getTableFactory(), getCharset(), getConfiguration(), tableName);
+		return HbaseUtils.getHTable(tableName, getConfiguration(), getCharset(), getTableFactory());
 	}
 
 	private void releaseTable(String tableName, HTableInterface table) {
-		HbaseUtils.releaseTable(tableName, table);
+		HbaseUtils.releaseTable(tableName, table, getTableFactory());
 	}
 
 	private boolean applyFlushSetting(HTableInterface table) {

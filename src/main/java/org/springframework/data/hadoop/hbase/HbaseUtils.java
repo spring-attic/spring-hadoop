@@ -49,20 +49,20 @@ public class HbaseUtils {
 	 * @param tableName table name
 	 * @return table instance
 	 */
-	public static HTableInterface getHTable(Configuration configuration, String tableName) {
-		return getHTable(null, getCharset(null), configuration, tableName);
+	public static HTableInterface getHTable(String tableName, Configuration configuration) {
+		return getHTable(tableName, configuration, getCharset(null), null);
 	}
 
 	/**
 	 * Retrieves an Hbase table instance identified by its name and charset using the given table factory.
 	 * 
-	 * @param tableFactory table factory (may be null)
-	 * @param charset name charset (may be null)
-	 * @param configuration Hbase configuration object
 	 * @param tableName table name
+	 * @param configuration Hbase configuration object
+	 * @param charset name charset (may be null)
+	 * @param tableFactory table factory (may be null)
 	 * @return table instance
 	 */
-	public static HTableInterface getHTable(HTableInterfaceFactory tableFactory, Charset charset, Configuration configuration, String tableName) {
+	public static HTableInterface getHTable(String tableName, Configuration configuration, Charset charset, HTableInterfaceFactory tableFactory) {
 		if (HbaseSynchronizationManager.hasResource(tableName)) {
 			return (HTable) HbaseSynchronizationManager.getResource(tableName);
 		}
@@ -94,20 +94,37 @@ public class HbaseUtils {
 	 * @param table
 	 */
 	public static void releaseTable(String tableName, HTableInterface table) {
+		releaseTable(tableName, table, null);
+	}
+
+	/**
+	 * Releases (and closes) the given table, created via the given configuration if it is not managed externally.
+	 * 
+	 * @param tableName
+	 * @param table
+	 * @param tableFactory
+	 */
+	public static void releaseTable(String tableName, HTableInterface table, HTableInterfaceFactory tableFactory) {
 		try {
-			doReleaseTable(tableName, table);
+			doReleaseTable(tableName, table, tableFactory);
 		} catch (IOException ex) {
 			throw HbaseUtils.convertHbaseException(ex);
 		}
 	}
 
-	private static void doReleaseTable(String tableName, HTableInterface table) throws IOException {
+	private static void doReleaseTable(String tableName, HTableInterface table, HTableInterfaceFactory tableFactory)
+			throws IOException {
 		if (table == null) {
 			return;
 		}
 
 		if (!isBoundToThread(tableName)) {
-			table.close();
+			if (tableFactory != null) {
+				tableFactory.releaseHTableInterface(table);
+			}
+			else {
+				table.close();
+			}
 		}
 	}
 

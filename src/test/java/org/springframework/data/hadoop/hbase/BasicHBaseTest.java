@@ -112,7 +112,7 @@ public class BasicHBaseTest {
 	public void testTemplate() throws Exception {
 		assertTrue(HbaseSynchronizationManager.getTableNames().isEmpty());
 
-		final HTableInterface t = HbaseUtils.getHTable(config, tableName);
+		final HTableInterface t = HbaseUtils.getHTable(tableName, config);
 
 		template.execute(tableName, new TableCallback<Object>() {
 			@Override
