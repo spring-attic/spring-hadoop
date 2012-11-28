@@ -63,15 +63,35 @@ Spring for Apache Hadoop uses Gradle as its build system. To build the system si
 
 from the project root folder. This will compile the sources, run the tests and create the artifacts.
 
+## Supported distros
+
+By default Spring for Apache Hadoop compiles against Apache Hadoop 1.0.x. Apache Hadoop 1.1.x (hadoop11) and Cloudera CDH3 (cdh3) and CDH4 (cdh4) are also supported; to compile against them pass the `-P<label>` attribute:
+
+    gradlew -Pcdh3 build
+    
+In this case, the specified Hadoop attributes are used to compile and create the project binaries. This option is useful when testing against dedicated Hadoop instances.
+
 # Testing
 
 For its testing, Spring for Apache Hadoop expects a pseudo-distributed/local Hadoop instalation available on the `localhost` at the default ports (`9000` and `9001`). The local Hadoop setup allows
-the project classpath to be automatically used by the Hadoop job tracker. These settings can be customized through the `test.properties` file under `src/test/resources` folder 
-(further tweaks can be applied through `hadoop-ctx.xml` file under `src/test/resources/org/springframework/data/hadoop`).
-Note that by default, only the vanilla Hadoop tests are running - you can enable additional tests (such as Hive or Pig) by adding the tasks `enableHBaseTests`, `enableHiveTests`, `enablePigTests` and `webHdfsTests` (or `enableAllTests` in short). Use the `test.properties` file for customizing the default location for these services as well.
+the project classpath to be automatically used by the Hadoop job tracker. These settings can be customized in two ways:
+* Build properties
+
+From the command-line, use `hd.fs` for the file-system, `hd.jt` for the jobtracker and 'hd.hive` for the Hive host/port information, to override the defaults. For example to run against HDFS at `dumbo:8020` one would use:
+
+    gradlew -Phd.fs=dumbo:8020 build
+
+* Properties file
+Through the `test.properties` file under `src/test/resources` folder (further tweaks can be applied through `hadoop-ctx.xml` file under `src/test/resources/org/springframework/data/hadoop`).
+
+## Enabling Hbase/Hive/Pig/WebHdfs Tests
+Note that by default, only the vanilla Hadoop tests are running - you can enable additional tests (such as Hive or Pig) by adding the tasks `enableHBaseTests`, `enableHiveTests`, `enablePigTests` and `webHdfsTests` (or `enableAllTests` in short). Use `test.properties` file for customizing the default location for these services as well.
+
+## Disabling test execution
 You can disable all tests by skipping the `test` task:
 
     gradlew -x test
+
 
 # Contributing
 
