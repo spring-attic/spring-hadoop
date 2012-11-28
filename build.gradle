@@ -3,7 +3,7 @@ buildscript {
         maven { url 'http://repo.springsource.org/plugins-release' }
     }
     dependencies {
-        classpath 'org.springframework.build.gradle:docbook-reference-plugin:0.1.5'
+        classpath 'org.springframework.build.gradle:docbook-reference-plugin:0.1.6'
     }
 }
 
@@ -251,6 +251,7 @@ task javadocJar(type: Jar) {
 
 reference {
     sourceDir = file('docs/src/reference/docbook')
+    //pdfFileName = 'spring-data-hadoop-reference.pdf'
 }
 
 
