@@ -24,7 +24,6 @@ apply plugin: 'docbook-reference'
 // 
 //  Select the Hadoop distribution used for building the binaries
 // 
-
 def List hadoop = []
 def hadoopDistro = project.hasProperty("distro") ? project.getProperty("distro") : "hadoop10"
 def hadoopVersion = hadoop10Version
@@ -36,9 +35,12 @@ switch (hadoopDistro) {
   case "cdh3":
     hadoopVersion = cdh3Version
     println "Using Cloudera CDH3 [$hadoopVersion]"
+    
+    dependencies {
+        compile ("org.apache.hadoop:hadoop-streaming:$hadoopVersion", optional) 
+        compile ("org.apache.hadoop:hadoop-tools:$hadoopVersion", optional)
+    }
 
-    hadoop = ["org.apache.hadoop:hadoop-streaming:$hadoopVersion",
-              "org.apache.hadoop:hadoop-tools:$hadoopVersion"]
   break;    
 
   // Cloudera CDH4
@@ -46,9 +48,12 @@ switch (hadoopDistro) {
     hadoopVersion = cdh4MR1Version
     println "Using Cloudera CDH4 [$hadoopVersion]"
 
-    hadoop = ["org.apache.hadoop:hadoop-streaming:$hadoopVersion",
-              "org.apache.hadoop:hadoop-tools:$hadoopVersion",
-              "org.apache.hadoop:hadoop-hdfs:$cdh4Version"]
+    dependencies {
+        compile ("org.apache.hadoop:hadoop-streaming:$hadoopVersion", optional) 
+        compile ("org.apache.hadoop:hadoop-tools:$hadoopVersion", optional)
+        compile ("org.apache.hadoop:hadoop-hdfs:$cdh4Version", optional)
+    }
+
   break;    
 
   // Hadoop 1.1.x
@@ -149,9 +154,9 @@ dependencies {
     
 }
 
-// exclude poms from the classpath
+// exclude poms from the classpath (pulled in by Cloudera)
 eclipse.classpath.file {
-    beforeMerged { classpath ->
+    whenMerged { classpath ->
         classpath.entries.removeAll { entry -> entry.toString().contains(".pom") }
     }
 }
