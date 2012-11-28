@@ -17,7 +17,6 @@ package org.springframework.data.hadoop.scripting;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.annotation.Resource;
 
@@ -28,7 +27,6 @@ import org.junit.runner.RunWith;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.UrlResource;
-import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.data.hadoop.TestUtils;
 import org.springframework.data.hadoop.fs.FsShell;
 import org.springframework.data.hadoop.fs.SimplerFileSystem;
@@ -73,11 +71,6 @@ public class ScriptingTest {
 
 		Jsr223ScriptEvaluator eval = new Jsr223ScriptEvaluator();
 		eval.setLanguage("javascript");
-
-		Properties prop = PropertiesLoaderUtils.loadAllProperties("test.properties");
-
-		Configuration config = new Configuration();
-		config.set("fs.default.name", prop.getProperty("hd.fs"));
 
 		Map<String, Object> args = new LinkedHashMap<String, Object>();
 		FileSystem fs = FileSystem.get(config);
