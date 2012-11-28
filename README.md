@@ -65,11 +65,15 @@ from the project root folder. This will compile the sources, run the tests and c
 
 ## Supported distros
 
-By default Spring for Apache Hadoop compiles against Apache Hadoop 1.0.x. Apache Hadoop 1.1.x (hadoop11) and Cloudera CDH3 (cdh3) and CDH4 (cdh4) are also supported; to compile against them pass the `-P<label>` attribute:
+By default Spring for Apache Hadoop compiles against Apache Hadoop 1.0.x. Apache Hadoop 1.1.x (hadoop11) and Cloudera CDH3 (cdh3) and CDH4 (cdh4) are also supported; to compile against them pass the `-Pdistro=<label>` project property, like so:
 
-    gradlew -Pcdh3 build
+    gradlew -Pdistro=hadoop11 build
     
-In this case, the specified Hadoop attributes are used to compile and create the project binaries. This option is useful when testing against dedicated Hadoop instances.
+Note that the chosen distro is displayed on the screen:
+
+    Using Apache Hadoop 1.1.x [1.1.0]
+
+In this case, the specified Hadoop distribution (above Apache Hadoop 1.1.x) is used to create the project binaries. This option is useful when testing against Hadoop clusters incompatible with the Hadoop stable line.
 
 # Testing
 
