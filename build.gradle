@@ -21,13 +21,61 @@ apply from: "$rootDir/maven.gradle"
 apply plugin: 'docbook-reference'
 
 
+// 
+//  Select the Hadoop distribution used for building the binaries
+// 
+
+def List hadoop = []
+def hadoopDistro = project.hasProperty("distro") ? project.getProperty("distro") : "hadoop10"
+def hadoopVersion = hadoop10Version
+
+// default is Hadoop 1.0.x
+switch (hadoopDistro) {
+
+  // Cloudera CDH3
+  case "cdh3":
+    hadoopVersion = cdh3Version
+    println "Using Cloudera CDH3 [$hadoopVersion]"
+
+    hadoop = ["org.apache.hadoop:hadoop-streaming:$hadoopVersion",
+              "org.apache.hadoop:hadoop-tools:$hadoopVersion"]
+  break;    
+
+  // Cloudera CDH4
+  case "cdh4":
+    hadoopVersion = cdh4MR1Version
+    println "Using Cloudera CDH4 [$hadoopVersion]"
+
+    hadoop = ["org.apache.hadoop:hadoop-streaming:$hadoopVersion",
+              "org.apache.hadoop:hadoop-tools:$hadoopVersion",
+              "org.apache.hadoop:hadoop-hdfs:$cdh4Version"]
+  break;    
+
+  // Hadoop 1.1.x
+  case "hadoop11":
+    hadoopVersion = hadoop11Version
+    
+    println "Using Apache Hadoop 1.1.x [$hadoopVersion]"
+    
+    hadoop = ["org.apache.hadoop:hadoop-streaming:$hadoopVersion",
+              "org.apache.hadoop:hadoop-tools:$hadoopVersion"]
+  break;
+
+  default:
+    println "Using Apache Hadoop 1.0.x [$hadoopVersion]"
+    hadoopVersion = hadoop10Version
+    hadoop = ["org.apache.hadoop:hadoop-streaming:$hadoopVersion",
+              "org.apache.hadoop:hadoop-tools:$hadoopVersion"]
+}
+
+// make Hadoop dependencies optional
+//hadoop = hadoop.collect { it.concat(", optional") }
+
+
 // Common dependencies
 dependencies {
-    // Hadoop
-    compile("org.apache.hadoop:hadoop-core:$hadoopVersion", optional)
-    compile("org.apache.hadoop:hadoop-streaming:$hadoopVersion", optional)
-    compile("org.apache.hadoop:hadoop-tools:$hadoopVersion", optional)
-
+    compile hadoop
+    
     // Logging
     compile "org.slf4j:slf4j-api:$slf4jVersion"
     compile ("org.slf4j:jcl-over-slf4j:$slf4jVersion", optional)
@@ -101,9 +149,15 @@ dependencies {
     
 }
 
+// exclude poms from the classpath
+eclipse.classpath.file {
+    beforeMerged { classpath ->
+        classpath.entries.removeAll { entry -> entry.toString().contains(".pom") }
+    }
+}
+
 sourceCompatibility = 1.6
 targetCompatibility = 1.6 
-
 
 ext.skipPig = true
 ext.skipHive = true
