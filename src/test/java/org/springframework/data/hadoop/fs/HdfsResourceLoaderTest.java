@@ -21,9 +21,9 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Properties;
 import java.util.UUID;
 
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FsUrlStreamHandlerFactory;
@@ -34,10 +34,13 @@ import org.apache.hadoop.security.UserGroupInformation;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.data.hadoop.TestUtils;
 import org.springframework.data.hadoop.configuration.ConfigurationFactoryBean;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.junit.Assert.*;
 
@@ -46,36 +49,27 @@ import static org.junit.Assert.*;
  * 
  * @author Costin Leau
  */
-public class HdfsResouceLoaderTest {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration("/org/springframework/data/hadoop/hadoop-ctx.xml")
+public class HdfsResourceLoaderTest {
 
+	@Autowired
+	private Configuration cfg;
 	private FileSystem fs;
 	private HdfsResourceLoader loader;
 
 	@Before
 	public void before() throws Exception {
-
-		Properties prop = PropertiesLoaderUtils.loadAllProperties("test.properties");
-
-		Properties props = new Properties();
-		props.setProperty("fs.default.name", prop.getProperty("hd.fs"));
-		//PropertiesLoaderUtils.fillProperties(props, new ClassPathResource("s3.properties"));
-
-		ConfigurationFactoryBean cfb = new ConfigurationFactoryBean();
-		cfb.setBeanClassLoader(getClass().getClassLoader());
-		cfb.setProperties(props);
-		cfb.afterPropertiesSet();
-
 		FileSystemFactoryBean fsf = new FileSystemFactoryBean();
-		fsf.setConfiguration(cfb.getObject());
+		fsf.setConfiguration(cfg);
 		fsf.afterPropertiesSet();
 
 		fs = fsf.getObject();
 
 		System.out.println("Current user is " + UserGroupInformation.getCurrentUser());
 		System.out.println("Home dir is " + fs.getHomeDirectory().toString());
-		//		System.out.println("Root folder is " + fs.exists(new Path("/")));
 
-		loader = new HdfsResourceLoader(cfb.getObject(), null);
+		loader = new HdfsResourceLoader(cfg, null);
 	}
 
 	@After

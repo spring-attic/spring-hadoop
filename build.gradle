@@ -248,6 +248,13 @@ test {
         
         if (!msg.isEmpty())
             println "Skipping [$msg] Tests";
+            
+        // due to GRADLE-2475, set the system properties manually
+        project.properties.each { k,v ->
+             if (k.toString().startsWith("hd.")) {
+                systemProperties[k] = project[k]
+             }
+        }
     }
 }
 

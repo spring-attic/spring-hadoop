@@ -9,7 +9,8 @@
 		http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
 
 
-	<context:property-placeholder location="test.properties"/>
+	<context:property-placeholder location="test.properties" system-properties-mode="OVERRIDE"/>
+	
 	<!-- 
 	<bean id="chainedResourceLoader" class="org.springframework.data.hadoop.fs.ChainedResourceLoader">
 		<property name="loaders">
@@ -21,7 +22,7 @@
  	-->
  
 	<!--  automatically picks the hadoopConfiguration reference -->
-	<bean id="hadoopFs" class="org.springframework.data.hadoop.fs.FileSystemFactoryBean" p:configuration-ref="hadoopConfiguration"/>
+	<hdp:file-system />
 	
 	<hdp:resource-loader file-system-ref="hadoopFs" use-codecs="true"/>	
 
@@ -35,12 +36,10 @@
 	<!--  -->
 	<hdp:configuration register-url-handler="false">
 		fs.default.name=${hd.fs}
-		mapred.job.tracker=${jt}
+		mapred.job.tracker=${hd.jt}
 		cfg=main
 	</hdp:configuration>
 
-	<hdp:file-system />
-	
 	<!-- 
 	<bean id="fs-config" class="org.springframework.data.hadoop.configuration.ConfigurationFactoryBean">
 	 <property name="properties">
