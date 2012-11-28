@@ -51,6 +51,7 @@ switch (hadoopDistro) {
     dependencies {
         compile ("org.apache.hadoop:hadoop-streaming:$hadoopVersion", optional) 
         compile ("org.apache.hadoop:hadoop-tools:$hadoopVersion", optional)
+        compile ("org.apache.hadoop:hadoop-common:$cdh4Version", optional)
         compile ("org.apache.hadoop:hadoop-hdfs:$cdh4Version", optional)
     }
 
