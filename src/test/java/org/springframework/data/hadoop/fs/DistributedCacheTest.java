@@ -45,6 +45,8 @@ public class DistributedCacheTest {
 
 	@Autowired
 	Configuration cfg;
+	@Autowired
+	FileSystem fs;
 
 	@Autowired
 	ApplicationContext ctx;
@@ -66,18 +68,27 @@ public class DistributedCacheTest {
 		fs.delete(new Path("local/"), true);
 	}
 
+	// we do extra parsing since the classpath url behaves different on cloudera then Apache Vanilla
 	@Test
 	public void testClassPathArchives() throws Exception {
 		Path[] archives = DistributedCache.getArchiveClassPaths(cfg);
 		assertEquals(1, archives.length);
-		assertEquals(new Path("/cp/some-zip.zip"), archives[0]);
+		assertEquals(new Path("/cp/some-zip.zip").makeQualified(fs), archives[0].makeQualified(fs));
 	}
 
+	// we do extra parsing since the classpath url behaves different on cloudera  then Apache Vanilla
 	@Test
 	public void testClassPathFiles() throws Exception {
 		Path[] files = DistributedCache.getFileClassPaths(cfg);
 		assertEquals(1, files.length);
-		assertEquals(new Path("/cp/some-library.jar"), files[0]);
+		Path path = files[0].makeQualified(fs);
+		String p = path.toUri().getPath();
+		// remove fragment
+		int index = p.indexOf("#");
+		if (index >= 0) {
+			p = p.substring(0, index);
+		}
+		assertEquals("/cp/some-library.jar", p);
 	}
 
 	@Test
