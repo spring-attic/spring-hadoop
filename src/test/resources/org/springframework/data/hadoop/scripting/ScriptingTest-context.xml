@@ -20,7 +20,7 @@
 importPackage(java.util);
 importPackage(org.apache.hadoop.fs);
 
-println("${hd.fs}")
+println("${hadoop.fs}")
 println(foo)
 name = UUID.randomUUID().toString()
 scriptName = "src/test/resources/test.properties"
