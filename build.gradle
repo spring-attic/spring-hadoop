@@ -224,6 +224,7 @@ test {
     systemProperties['output.path'] = 'build/classes/test/output'
     includes = ["**/*.class"]
 
+
     doFirst() {
         ext.msg = ""
         
@@ -248,11 +249,22 @@ test {
         
         if (!msg.isEmpty())
             println "Skipping [$msg] Tests";
+        
+        // check prefix for hd.fs
+        // first copy the properties since we can't change them
+        ext.projProps = project.properties
+        
+        if (projProps.containsKey("hd.fs")) {
+            String hdfs = projProps["hd.fs"].toString()
+            if (!hdfs.contains("://")) {
+                projProps.put("hd.fs", "hdfs://" + hdfs)
+            }
+        }
             
         // due to GRADLE-2475, set the system properties manually
-        project.properties.each { k,v ->
+        projProps.each { k,v ->
              if (k.toString().startsWith("hd.")) {
-                systemProperties[k] = project[k]
+                systemProperties[k] = projProps[k]
              }
         }
     }

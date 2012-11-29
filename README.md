@@ -81,9 +81,9 @@ For its testing, Spring for Apache Hadoop expects a pseudo-distributed/local Had
 the project classpath to be automatically used by the Hadoop job tracker. These settings can be customized in two ways:
 * Build properties
 
-From the command-line, use `hd.fs` for the file-system, `hd.jt` for the jobtracker and `hd.hive` for the Hive host/port information, to override the defaults. For example to run against HDFS at `dumbo:8020` one would use:
+From the command-line, use `hd.fs` for the file-system (to avoid confusion, specify the protocol such as 'hdfs://', 's3://', etc - if none is specified, `hdfs://` will be used), `hd.jt` for the jobtracker and `hd.hive` for the Hive host/port information, to override the defaults. For example to run against HDFS at `dumbo:8020` one would use:
 
-    gradlew -Phd.fs=dumbo:8020 build
+    gradlew -Phd.fs=hdfs://dumbo:8020 build
 
 * Properties file
 
