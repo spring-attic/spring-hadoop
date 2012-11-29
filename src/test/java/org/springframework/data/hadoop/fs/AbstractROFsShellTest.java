@@ -198,11 +198,12 @@ public abstract class AbstractROFsShellTest {
 	@Test
 	public void testLSR() throws Exception {
 		String fName1 = UUID.randomUUID() + ".txt";
-		String name1 = "local/merge/" + fName1;
+		String name1 = "local/lsr/" + fName1;
 		Resource res1 = TestUtils.writeToFS(cfg, name1);
 		name1 = res1.getURI().getPath();
-	
-		Collection<FileStatus> lsr = shell.lsr(".");
+		String dir = name1.substring(0, name1.length() - fName1.length());
+
+		Collection<FileStatus> lsr = shell.lsr(dir);
 		assertTrue(lsr.size() > 1);
 		String output = lsr.toString();
 		assertTrue(output.contains(name1));
@@ -216,8 +217,9 @@ public abstract class AbstractROFsShellTest {
 		name1 = res1.getURI().getPath();
 	
 		String dir = name1.substring(0, name1.length() - fName1.length());
+		String parentDir = dir.substring(dir.lastIndexOf("/"));
 
-		Collection<FileStatus> ls = shell.ls(".");
+		Collection<FileStatus> ls = shell.ls(parentDir);
 		assertTrue(ls.size() >= 1);
 		assertTrue(ls.toString().contains("drwx"));
 		assertFalse(ls.toString().contains(name1));

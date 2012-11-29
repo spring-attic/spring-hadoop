@@ -5,8 +5,11 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd" default-lazy-init="true">
 
-	<hdp:file-system uri="hftp://localhost/"/>
-	 
+	<hdp:file-system uri="#{'hftp://' + T(java.net.URI).create('${hadoop.fs}').getHost() }"/>
+	
+	<!--  
+	<hdp:file-system uri="hftp://10.23.32.151"/>
+	-->
 	<!--  default id is 'hadoopConfiguration'
 	
 	alternative configuration
