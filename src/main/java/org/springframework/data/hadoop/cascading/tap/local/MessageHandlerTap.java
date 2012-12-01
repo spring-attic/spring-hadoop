@@ -40,7 +40,6 @@ import cascading.tuple.TupleEntrySchemeCollector;
 public class MessageHandlerTap extends SinkTap<Properties, OutputStream> {
 
 	private final MessageHandlerOutputStream handler;
-	private long modifiedTime = -1;
 
 	public MessageHandlerTap(Scheme<Properties, ?, OutputStream, ?, ?> scheme, MessageHandler handler) {
 		super(scheme);
@@ -86,6 +85,6 @@ public class MessageHandlerTap extends SinkTap<Properties, OutputStream> {
 
 	@Override
 	public long getModifiedTime(Properties conf) throws IOException {
-		return modifiedTime;
+		return 0;
 	}
 }

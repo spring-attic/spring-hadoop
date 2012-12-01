@@ -78,6 +78,6 @@ public class MessageSourceTap extends SourceTap<Properties, InputStream> {
 
 	@Override
 	public long getModifiedTime(Properties conf) throws IOException {
-		return -1;
+		return 0;
 	}
 }
