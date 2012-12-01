@@ -85,6 +85,6 @@ public class MessageHandlerTap extends SinkTap<Properties, OutputStream> {
 
 	@Override
 	public long getModifiedTime(Properties conf) throws IOException {
-		return 0;
+		return -1;
 	}
 }
