@@ -16,6 +16,7 @@
 package org.springframework.data.hadoop.config;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.data.hadoop.fs.HdfsResourceLoader;
 import org.springframework.util.StringUtils;
@@ -38,6 +39,12 @@ class HadoopResourceLoaderParser extends AbstractImprovedSimpleBeanDefinitionPar
 
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
+		// set depends-on
+		String depends = element.getAttribute(BeanDefinitionParserDelegate.DEPENDS_ON_ATTRIBUTE);
+		if (StringUtils.hasText(depends)) {
+			builder.getRawBeanDefinition().setDependsOn(StringUtils.tokenizeToStringArray(depends, BeanDefinitionParserDelegate.BEAN_NAME_DELIMITERS));
+		}
+
 		String fs = element.getAttribute("file-system-ref");
 		// get configuration
 		String config = element.getAttribute("configuration-ref");

@@ -44,14 +44,19 @@ abstract class AbstractImprovedSimpleBeanDefinitionParser extends AbstractSimple
 			builder.setScope(scope);
 		}
 
+		// set depends-on
+		String depends = element.getAttribute(BeanDefinitionParserDelegate.DEPENDS_ON_ATTRIBUTE);
+		if (StringUtils.hasText(depends)) {
+			builder.getRawBeanDefinition().setDependsOn(StringUtils.tokenizeToStringArray(depends, BeanDefinitionParserDelegate.BEAN_NAME_DELIMITERS));
+		}
+
 		NamedNodeMap attributes = element.getAttributes();
 		for (int x = 0; x < attributes.getLength(); x++) {
 			Attr attribute = (Attr) attributes.item(x);
 			if (isEligibleAttribute(attribute, parserContext)) {
 				String attributeName = attribute.getLocalName();
 				boolean isReference = NamespaceUtils.isReference(attributeName);
-				String propertyName = extractPropertyName((isReference ? attributeName.substring(0,
-						attributeName.length() - 4) : attributeName));
+				String propertyName = extractPropertyName((isReference ? attributeName.substring(0, attributeName.length() - 4) : attributeName));
 				Assert.state(StringUtils.hasText(propertyName),
 						"Illegal property name returned from 'extractPropertyName(String)': cannot be null or empty.");
 
@@ -84,7 +89,8 @@ abstract class AbstractImprovedSimpleBeanDefinitionParser extends AbstractSimple
 
 	protected boolean isEligibleAttribute(String attributeName) {
 		return super.isEligibleAttribute(attributeName)
-				&& !BeanDefinitionParserDelegate.SCOPE_ATTRIBUTE.equals(attributeName);
+				&& !BeanDefinitionParserDelegate.SCOPE_ATTRIBUTE.equals(attributeName)
+				&& !BeanDefinitionParserDelegate.DEPENDS_ON_ATTRIBUTE.equals(attributeName);
 	}
 
 

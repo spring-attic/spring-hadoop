@@ -184,6 +184,11 @@ in a given JVM hence the default is false.
 				]]></xsd:documentation>
 				</xsd:annotation>
 				</xsd:attribute>
+				<xsd:attribute name="depends-on" use="optional"><xsd:annotation><xsd:documentation>
+	The names of the beans that this bean depends on being initialized. Typically used to guarantee
+	the initialization of certain beans before the Hadoop cluster gets configured and started (directly
+	or not through the use of its configuration and file-system).
+				</xsd:documentation></xsd:annotation></xsd:attribute>				
 		</xsd:extension>
 		</xsd:complexContent>
 		</xsd:complexType>
@@ -250,6 +255,11 @@ as a leak prevention when the app drives all of Hadoop.
 				]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
+		<xsd:attribute name="depends-on" use="optional"><xsd:annotation><xsd:documentation>
+	The names of the beans that this bean depends on being initialized. Typically used to guarantee
+	the initialization of certain beans before the Hadoop cluster gets configured and started (directly
+	or not through the use of its configuration and file-system).
+		</xsd:documentation></xsd:annotation></xsd:attribute>				
 		</xsd:complexType>		
 	</xsd:element>
 	
@@ -318,6 +328,11 @@ suitable decompressor is found).
 				]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
+		<xsd:attribute name="depends-on" use="optional"><xsd:annotation><xsd:documentation>
+	The names of the beans that this bean depends on being initialized. Typically used to guarantee
+	the initialization of certain beans before the Hadoop cluster gets configured and started (directly
+	or not through the use of its configuration and file-system).
+		</xsd:documentation></xsd:annotation></xsd:attribute>				
 		</xsd:complexType>
 	</xsd:element>
 	

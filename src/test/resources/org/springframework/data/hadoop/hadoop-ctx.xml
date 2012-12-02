@@ -21,9 +21,9 @@
  	-->
  
 	<!--  automatically picks the hadoopConfiguration reference -->
-	<hdp:file-system />
+	<hdp:file-system depends-on="fs-init"/>
 	
-	<hdp:resource-loader file-system-ref="hadoopFs" use-codecs="true"/>	
+	<hdp:resource-loader file-system-ref="hadoopFs" use-codecs="true" depends-on="rl-init"/>	
 
 	<!-- For Window users -->
 	<!-- if mapred.job.tracker is specified (non-local), Hadoop won't execute locally -->
@@ -33,11 +33,16 @@
 	<!--  default id is 'hadoopConfiguration' /   -->
 	<!--  properties-location="s3.properties" -->
 	<!--  -->
-	<hdp:configuration register-url-handler="false">
+	<hdp:configuration register-url-handler="false" depends-on="cfg-init">
 		fs.default.name=${hadoop.fs}
 		mapred.job.tracker=${hadoop.jt}
 		cfg=main
 	</hdp:configuration>
+	
+	<bean id="cfg-init" class="org.springframework.data.hadoop.InitBeforeHadoop" lazy-init="true" />
+	<bean id="fs-init" class="org.springframework.data.hadoop.InitBeforeHadoop" lazy-init="true" />
+	<bean id="rl-init" class="org.springframework.data.hadoop.InitBeforeHadoop" lazy-init="true" />
+	
 
 	<!-- 
 	<bean id="fs-config" class="org.springframework.data.hadoop.configuration.ConfigurationFactoryBean">
