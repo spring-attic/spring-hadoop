@@ -72,8 +72,8 @@ abstract class HadoopCodeExecutor<T> extends JobGenericOptions implements Initia
 		ClassLoader oldTccl = th.getContextClassLoader();
 
 		log.info("Invoking [" + (target != null ? target : type) + "] "
-				+ (jar != null ? "from jar [" + jar.getURI() + "]" : "")
-				+ " with args [" + Arrays.toString(arguments) + "]");
+				+ (jar != null ? "from jar [" + jar.getURI() + "]" : "") + " with args [" + Arrays.toString(arguments)
+				+ "]");
 
 		ClassLoader newCL = cfg.getClassLoader();
 		boolean isJarCL = newCL instanceof ParentLastURLClassLoader;
@@ -115,8 +115,18 @@ abstract class HadoopCodeExecutor<T> extends JobGenericOptions implements Initia
 	}
 
 
-	protected Configuration resolveConfiguration() {
+	protected Configuration resolveConfiguration() throws Exception {
 		Configuration cfg = ConfigurationUtils.createFrom(configuration, properties);
+		// add the jar if present
+		if (jar != null) {
+			String jarUrl = jar.getURL().toString();
+			if (log.isTraceEnabled()) {
+				log.trace("Setting Configuration Jar URL to [" +jarUrl+"]");
+			}
+
+			cfg.set("mapred.jar", jarUrl);
+		}
+
 		buildGenericOptions(cfg);
 		return cfg;
 	}
