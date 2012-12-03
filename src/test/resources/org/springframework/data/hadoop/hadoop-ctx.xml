@@ -42,8 +42,11 @@
 	<bean id="cfg-init" class="org.springframework.data.hadoop.InitBeforeHadoop" lazy-init="true" />
 	<bean id="fs-init" class="org.springframework.data.hadoop.InitBeforeHadoop" lazy-init="true" />
 	<bean id="rl-init" class="org.springframework.data.hadoop.InitBeforeHadoop" lazy-init="true" />
-	
 
+	<hdp:script language="javascript" run-at-startup="true">
+		if (fsh.test(".staging"))
+			fsh.rmr(".staging")
+	</hdp:script>	
 	<!-- 
 	<bean id="fs-config" class="org.springframework.data.hadoop.configuration.ConfigurationFactoryBean">
 	 <property name="properties">
