@@ -36,6 +36,7 @@
 	    input-path="/ide-test/input/word/" output-path="/ide-test/output/word/"
 		mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
 		reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"
+		jar="mini-hadoop-examples.jar"
 		configuration-ref="hadoopConfiguration"
 	/>
 	

@@ -13,8 +13,6 @@
 
 	<import resource="../hadoop-ctx.xml"/>
 	 
-	<context:property-placeholder location="test.properties"/>
-	
 	<bean id="vanilla-stream-job" class="org.springframework.data.hadoop.mapreduce.StreamJobFactoryBean"
 		p:configuration-ref="hadoopConfiguration"
 		p:input-path="test"

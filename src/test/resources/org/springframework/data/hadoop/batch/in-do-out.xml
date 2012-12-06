@@ -30,6 +30,7 @@
 		p:output-path="/ide-test/output/word/"
 		p:mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
 		p:reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"
+		p:jar="mini-hadoop-examples.jar"
 	/>
 
 	<hdp:script-tasklet id="script-tasklet" scope="prototype">
