@@ -83,6 +83,9 @@ abstract class JobGenericOptions {
 			addResource(libJars, "-libjars", args);
 			addResource(archives, "-archives", args);
 
+			// set the GenericOptions properties manual to avoid the changes between Hadoop 1.x and 2.x
+			cfg.setBoolean("mapred.used.genericoptionsparser", true);
+
 			new GenericOptionsParser(cfg, args.toArray(new String[args.size()]));
 		} catch (IOException ex) {
 			throw new IllegalStateException(ex);
