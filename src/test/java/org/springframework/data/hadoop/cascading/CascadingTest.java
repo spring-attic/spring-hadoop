@@ -66,7 +66,8 @@ public class CascadingTest {
 		System.out.println(flows);
 	}
 
-	@Test
+	//@Test
+	// disable this for now
 	public void testManualCascade() throws Exception {
 		ctx.getBean("script");
 
@@ -81,11 +82,23 @@ public class CascadingTest {
 		//assembly = new Each(assembly, DebugLevel.VERBOSE, new Debug());
 
 		// wire the existing Hadoop config into HadoopFlow
-		Properties properties = ConfigurationUtils.asProperties(hadoopConfiguration);
+		Configuration cfg = ConfigurationUtils.createFrom(hadoopConfiguration, null);
+		//Resource cascadeCore = ResourceUtils.findContainingJar(Cascade.class);
+		// find cascade-hadoop
+		// Resource cascadeHadoop = ResourceUtils.findContainingJar(HadoopFlow.class);
 
-		FlowConnector flowConnector = new HadoopFlowConnector(properties);
+		//ConfigurationUtils.addLibs(cfg, cascadeHadoop);
+		//ConfigurationUtils.addArchives(cfg, cascadeHadoop);
+		// ConfigurationUtils.addFiles(cfg, cascadeHadoop);
 
-		FlowConnectorProps.setDebugLevel(properties, DebugLevel.VERBOSE);
+		//cfg.set("mapred.jar", cascadeHadoop.getURL().toString());
+
+		Properties props = ConfigurationUtils.asProperties(cfg);
+		System.out.println(props);
+
+		FlowConnector flowConnector = new HadoopFlowConnector(props);
+
+		FlowConnectorProps.setDebugLevel(props, DebugLevel.VERBOSE);
 		Flow flow = flowConnector.connect("flipflow", source, sink, assembly);
 		flow.complete();
 	}
