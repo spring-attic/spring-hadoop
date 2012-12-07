@@ -115,7 +115,7 @@ public class DistributedCacheFactoryBean implements InitializingBean, FactoryBea
 		HdfsResourceLoader loader = new HdfsResourceLoader(conf);
 
 		boolean shouldFixCpEntry = fixWinPathSeparator && System.getProperty("os.name").toLowerCase().startsWith("win");
-		
+
 		try {
 			for (CacheEntry entry : entries) {
 				Resource[] resources = loader.getResources(entry.value);
@@ -135,17 +135,25 @@ public class DistributedCacheFactoryBean implements InitializingBean, FactoryBea
 							// Path does not handle fragments so use the URI instead
 							Path p = new Path(URI.create(path));
 
-							if (shouldFixCpEntry) {
-								System.setProperty("path.separator", ":");
+							try {
+								if (shouldFixCpEntry) {
+									System.setProperty("path.separator", ":");
+								}
+
 								if (isArchive) {
 									DistributedCache.addArchiveToClassPath(p, conf, fs);
 								}
 								else {
 									DistributedCache.addFileToClassPath(p, conf, fs);
 								}
-								System.setProperty("path.separator", ";");
+
+							} finally {
+								if (shouldFixCpEntry) {
+									System.setProperty("path.separator", ";");
+								}
 							}
-							
+
+
 							break;
 
 						case LOCAL:
