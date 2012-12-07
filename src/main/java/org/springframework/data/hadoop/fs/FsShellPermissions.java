@@ -18,9 +18,11 @@ package org.springframework.data.hadoop.fs;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
+import org.apache.hadoop.conf.Configurable;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FsShell;
+import org.springframework.beans.BeanUtils;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.ReflectionUtils;
@@ -33,12 +35,15 @@ import org.springframework.util.ReflectionUtils;
  */
 abstract class FsShellPermissions {
 
+	private static boolean IS_HADOOP_20X = ClassUtils.isPresent("org.apache.hadoop.fs.shell.Command",
+			FsShellPermissions.class.getClassLoader());
+
 	enum Op {
 		CHOWN("-chown"), CHMOD("-chmod"), CHGRP("-chgrp");
 
 		private final String cmd;
-		
-		Op(String cmd){
+
+		Op(String cmd) {
 			this.cmd = cmd;
 		}
 
@@ -69,14 +74,25 @@ abstract class FsShellPermissions {
 		if (recursive) {
 			ObjectUtils.addObjectToArray(argvs, "-R");
 		}
-
 		argvs = concatAll(argvs, new String[] { group }, uris);
 
-		Object[] args = new Object[] { fs, op.getCmd(), argvs, 0, new FsShell(config) };
+		// Hadoop 1.0.x
+		if (!IS_HADOOP_20X) {
+			Class<?> cls = ClassUtils.resolveClassName("org.apache.hadoop.fs.FsShellPermissions", config.getClass().getClassLoader());
+			Object[] args = new Object[] { fs, op.getCmd(), argvs, 0, new FsShell(config) };
 
-		Class<?> cls = ClassUtils.resolveClassName("org.apache.hadoop.fs.FsShellPermissions", config.getClass().getClassLoader());
-		Method m = ReflectionUtils.findMethod(cls, "changePermissions", FileSystem.class, String.class, String[].class, int.class, FsShell.class);
-		ReflectionUtils.makeAccessible(m);
-		ReflectionUtils.invokeMethod(m, null, args);
+			Method m = ReflectionUtils.findMethod(cls, "changePermissions", FileSystem.class, String.class, String[].class, int.class, FsShell.class);
+			ReflectionUtils.makeAccessible(m);
+			ReflectionUtils.invokeMethod(m, null, args);
+		}
+		// Hadoop 2.x
+		else {
+			Class<?> cmd = ClassUtils.resolveClassName("org.apache.hadoop.fs.shell.Command", config.getClass().getClassLoader());
+			Class<?> targetClz = ClassUtils.resolveClassName("org.apache.hadoop.fs.FsShellPermissions$Chmod", config.getClass().getClassLoader());
+			Configurable target = (Configurable) BeanUtils.instantiate(targetClz);
+			target.setConf(config);
+			Method m = ReflectionUtils.findMethod(cmd, "run", String[].class);
+			ReflectionUtils.invokeMethod(m, target, (Object) argvs);
+		}
 	}
 }

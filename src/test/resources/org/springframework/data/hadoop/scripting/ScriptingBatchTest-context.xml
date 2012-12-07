@@ -37,8 +37,9 @@ println("Created file " + name)
 // use the shell
 dir = "script-dir"
 if (!fsh.test(dir)) {
-   fsh.mkdir(dir); 
-   fs.copyFromLocalFile(scriptName, dir+"/"+name); fsh.chmodr(700, dir)
+   fsh.mkdir(dir)
+   fs.copyFromLocalFile(scriptName, dir+"/"+name) 
+   fsh.chmodr(700, dir)
    println("File content is " + fsh.cat(dir +"/"+ name))
 }
 println(fsh.ls(dir))
