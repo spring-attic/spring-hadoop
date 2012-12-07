@@ -15,16 +15,11 @@
  */
 package org.springframework.data.hadoop.mapreduce;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.util.GenericOptionsParser;
 import org.springframework.core.io.Resource;
-import org.springframework.util.ObjectUtils;
+import org.springframework.data.hadoop.configuration.ConfigurationUtils;
 
 /**
  * Base class exposing setters and handling the so-called Hadoop Generic options (files/libjars/archives) properties. 
@@ -74,41 +69,10 @@ abstract class JobGenericOptions {
 
 
 	void buildGenericOptions(Configuration cfg) {
-		List<String> args = new ArrayList<String>();
-
-		// populate config object
-		try {
-			// add known arguments first
-			addResource(files, "-files", args);
-			addResource(libJars, "-libjars", args);
-			addResource(archives, "-archives", args);
-
-			new GenericOptionsParser(cfg, args.toArray(new String[args.size()]));
-		} catch (IOException ex) {
-			throw new IllegalStateException(ex);
-		}
+		ConfigurationUtils.addFiles(cfg, files);
+		ConfigurationUtils.addLibs(cfg, libJars);
+		ConfigurationUtils.addArchives(cfg, archives);
 	}
-
-	void addResource(Resource[] args, String name, List<String> list) throws IOException {
-		if (!ObjectUtils.isEmpty(args)) {
-			int count = args.length;
-			list.add(name);
-
-			StringBuilder sb = new StringBuilder();
-			for (Resource res : args) {
-				sb.append(res.getURI().toString());
-				if (--count > 0) {
-					sb.append(",");
-				}
-			}
-			list.add(sb.toString());
-
-			if (log.isTraceEnabled()) {
-				log.trace("Adding to generic option arg [" + name + "], resources " + sb.toString());
-			}
-		}
-	}
-
 
 	/**
 	 * Sets the user impersonation (optional) for running this job.

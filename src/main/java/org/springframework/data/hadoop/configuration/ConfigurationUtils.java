@@ -15,13 +15,19 @@
  */
 package org.springframework.data.hadoop.configuration;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapred.JobConf;
+import org.apache.hadoop.util.GenericOptionsParser;
+import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
+import org.springframework.util.ObjectUtils;
 
 /**
  * Reusable utility class for common {@link Configuration} operations. 
@@ -123,5 +129,43 @@ public abstract class ConfigurationUtils {
 		}
 
 		return c;
+	}
+
+	public static void addLibs(Configuration configuration, Resource... libs) {
+		addResource(configuration, libs, "-libjars");
+	}
+
+	public static void addFiles(Configuration configuration, Resource... files) {
+		addResource(configuration, files, "-files");
+	}
+
+	public static void addArchives(Configuration configuration, Resource... archives) {
+		addResource(configuration, archives, "-archives");
+	}
+
+	private static void addResource(Configuration cfg, Resource[] args, String name) {
+		Assert.notNull(cfg, "a non-null configuration is required");
+
+		List<String> list = new ArrayList<String>();
+
+		try {
+			if (!ObjectUtils.isEmpty(args)) {
+				int count = args.length;
+				list.add(name);
+
+				StringBuilder sb = new StringBuilder();
+				for (Resource res : args) {
+					sb.append(res.getURI().toString());
+					if (--count > 0) {
+						sb.append(",");
+					}
+				}
+				list.add(sb.toString());
+			}
+
+			new GenericOptionsParser(cfg, list.toArray(new String[list.size()]));
+		} catch (IOException ex) {
+			throw new IllegalStateException(ex);
+		}
 	}
 }

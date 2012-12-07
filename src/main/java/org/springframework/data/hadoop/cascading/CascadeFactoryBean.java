@@ -19,23 +19,27 @@ import java.util.Collection;
 import java.util.Properties;
 
 import org.apache.hadoop.conf.Configuration;
+import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.core.io.Resource;
 import org.springframework.data.hadoop.configuration.ConfigurationUtils;
+import org.springframework.data.hadoop.util.ResourceUtils;
 
 import cascading.cascade.Cascade;
 import cascading.cascade.CascadeConnector;
 import cascading.cascade.CascadeProps;
 import cascading.flow.Flow;
 import cascading.flow.FlowSkipStrategy;
+import cascading.property.AppProps;
 
 /**
  * Factory for declarative {@link Cascade} creation. The cascade is initialized but not started. 
  * 
  * @author Costin Leau
  */
-public class CascadeFactoryBean implements InitializingBean, BeanNameAware, FactoryBean<Cascade> {
+public class CascadeFactoryBean implements InitializingBean, BeanNameAware, BeanClassLoaderAware, FactoryBean<Cascade> {
 
 	private Configuration configuration;
 	private Properties properties;
@@ -44,7 +48,13 @@ public class CascadeFactoryBean implements InitializingBean, BeanNameAware, Fact
 	private int concurrentFlows = 0;
 	private String beanName;
 
+	private Class<?> jarClass;
+	private Resource jar;
+
 	private Cascade cascade;
+	private boolean jarSetup = true;
+
+	private ClassLoader classLoader;
 
 	@Override
 	public Cascade getObject() throws Exception {
@@ -66,6 +76,25 @@ public class CascadeFactoryBean implements InitializingBean, BeanNameAware, Fact
 		Properties props = ConfigurationUtils.asProperties(ConfigurationUtils.createFrom(configuration, properties));
 
 		CascadeProps.setMaxConcurrentFlows(props, concurrentFlows);
+
+		if (jarSetup) {
+			if (jar != null) {
+				AppProps.setApplicationJarPath(props, jar.getURI().toString());
+			}
+			else if (jarClass != null) {
+				AppProps.setApplicationJarClass(props, jarClass);
+			}
+			else {
+				// auto-detection based on the classpath
+				// find cascading-core
+				Resource cascadingCore = ResourceUtils.findContainingJar(Cascade.class);
+				// find cascading-hadoop
+				Resource cascadingHadoop = ResourceUtils.findContainingJar(classLoader,
+						"cascading.flow.hadoop.HadoopFlow");
+
+				ConfigurationUtils.addLibs(configuration, cascadingCore, cascadingHadoop);
+			}
+		}
 
 		cascade = new CascadeConnector(properties).connect(beanName, flows);
 		if (skipStrategy != null) {
@@ -103,5 +132,43 @@ public class CascadeFactoryBean implements InitializingBean, BeanNameAware, Fact
 	 */
 	public void setFlows(Collection<Flow> flows) {
 		this.flows = flows;
+	}
+
+	/**
+	 * Determines the job jar (available on the classpath) based on the given class.
+	 * 
+	 * @param jarClass The jarClass to set.
+	 */
+	public void setJarByClass(Class<?> jarClass) {
+		this.jarClass = jarClass;
+	}
+
+	/**
+	 * Sets the job jar (which might not be on the classpath).
+	 * 
+	 * @param jar The jar to set.
+	 */
+	public void setJar(Resource jar) {
+		this.jar = jar;
+	}
+
+	/**
+	 * Indicates whether the Cascading jar should be set for the cascade.
+	 * By default it is true, meaning the factory will use the user provided settings
+	 * ({@link #setJar(Resource)} and {@link #setJarByClass(Class)} or falling back
+	 * to its own discovery mechanism if the above are not setup. 
+	 * 
+	 * When running against a cluster where cascading is already present, turn this to false
+	 * to avoid shipping the library jar with the job.
+	 * 
+	 * @param jarSetup
+	 */
+	public void setJarSetup(boolean jarSetup) {
+		this.jarSetup = jarSetup;
+	}
+
+	@Override
+	public void setBeanClassLoader(ClassLoader classLoader) {
+		this.classLoader = classLoader;
 	}
 }
