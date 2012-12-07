@@ -73,17 +73,20 @@ public class DistributedCacheTest {
 	// we do extra parsing since the classpath url behaves different on cloudera then Apache Vanilla
 	@Test
 	public void testClassPathArchives() throws Exception {
+		if (System.getProperty("os.name").toLowerCase().startsWith("win")) {
+			System.setProperty("path.separator", ":");
+		}
 		Path[] archives = DistributedCache.getArchiveClassPaths(cfg);
-		assertTrue(archives.length >= 1);
-		assertEquals(new Path("/cp/some-zip.zip").makeQualified(fs), archives[0].makeQualified(fs));
+		assertEquals(2, archives.length);
+		assertEquals(new Path("/cp/some-zip.zip"), archives[0]);
 	}
 
 	// we do extra parsing since the classpath url behaves different on cloudera  then Apache Vanilla
 	@Test
 	public void testClassPathFiles() throws Exception {
 		Path[] files = DistributedCache.getFileClassPaths(cfg);
-		assertTrue(files.length >= 1);
-		Path path = files[0].makeQualified(fs);
+		assertEquals(1, files.length);
+		Path path = files[0];
 		String p = path.toUri().getPath();
 		// remove fragment
 		int index = p.indexOf("#");
@@ -97,10 +100,11 @@ public class DistributedCacheTest {
 	public void testCacheArchives() throws Exception {
 		URI[] archives = DistributedCache.getCacheArchives(cfg);
 		System.out.println(Arrays.toString(archives));
-		assertEquals(2, archives.length);
+		assertEquals(3, archives.length);
 		assertEquals("/cp/some-zip.zip", archives[0].getPath());
 		//assertEquals("some-zip.zip", archives[0].getFragment());
-		assertEquals("/cache/some-archive.tgz", archives[1].getPath());
+		assertEquals("/cp/some-extra-zip.zip", archives[1].getPath());
+		assertEquals("/cache/some-archive.tgz", archives[2].getPath());
 		//assertEquals("main-archive", archives[1].getFragment());
 	}
 

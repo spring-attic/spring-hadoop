@@ -277,7 +277,10 @@ public class DistributedCacheFactoryBean implements InitializingBean, FactoryBea
 	/**
 	 * Work-around for HADOOP-9123. Turned on by default, this flag checks
 	 * whether the client platform is Windows-based and if so, uses the *nix
-	 * path separator to properly construct the classpath on the server. 
+	 * path separator to properly construct the classpath on the server.
+	 * 
+	 * Note that accessing DistributedCache from Windows will yield incorrect results - for
+	 * such cases disable this option.
 	 * 
 	 * @param fixWinPathSeparator
 	 */
