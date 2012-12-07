@@ -30,6 +30,7 @@
 	<hdp:job id="hjob" configuration-ref="hbaseConfiguration"
 	  mapper="org.springframework.data.hadoop.hbase.Mapper"
 	  reducer="org.springframework.data.hadoop.hbase.Reducer"
+	  jar="hbase-mini-mr.jar"
 	  input-path="/tmp/hbase/in"
 	  output-path="/tmp/hbase/out"/>
 	
