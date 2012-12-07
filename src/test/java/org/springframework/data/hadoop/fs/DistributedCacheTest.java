@@ -60,6 +60,7 @@ public class DistributedCacheTest {
 
 		HdfsResourceLoader loader = new HdfsResourceLoader(cfg);
 		assertTrue(loader.getResources("~/local/*.txt").length >= 3);
+		loader.close();
 		ctx.getBean("hadoopCache");
 	}
 
@@ -73,7 +74,6 @@ public class DistributedCacheTest {
 	@Test
 	public void testClassPathArchives() throws Exception {
 		Path[] archives = DistributedCache.getArchiveClassPaths(cfg);
-		System.out.println("Found cp archives " + Arrays.toString(archives));
 		assertTrue(archives.length >= 1);
 		assertEquals(new Path("/cp/some-zip.zip").makeQualified(fs), archives[0].makeQualified(fs));
 	}
@@ -82,7 +82,6 @@ public class DistributedCacheTest {
 	@Test
 	public void testClassPathFiles() throws Exception {
 		Path[] files = DistributedCache.getFileClassPaths(cfg);
-		System.out.println("Found cp files " + Arrays.toString(files));
 		assertTrue(files.length >= 1);
 		Path path = files[0].makeQualified(fs);
 		String p = path.toUri().getPath();
@@ -97,6 +96,7 @@ public class DistributedCacheTest {
 	@Test
 	public void testCacheArchives() throws Exception {
 		URI[] archives = DistributedCache.getCacheArchives(cfg);
+		System.out.println(Arrays.toString(archives));
 		assertEquals(2, archives.length);
 		assertEquals("/cp/some-zip.zip", archives[0].getPath());
 		//assertEquals("some-zip.zip", archives[0].getFragment());
@@ -107,6 +107,7 @@ public class DistributedCacheTest {
 	@Test
 	public void testCacheFiles() throws Exception {
 		URI[] files = DistributedCache.getCacheFiles(cfg);
+		System.out.println(Arrays.toString(files));
 		assertEquals(2, files.length);
 		assertEquals("/cp/some-library.jar", files[0].getPath());
 		assertEquals("library.jar", files[0].getFragment());

@@ -79,6 +79,7 @@ public class DistributedCacheFactoryBean implements InitializingBean, FactoryBea
 	private FileSystem fs;
 	private boolean createSymlink = false;
 	private Collection<CacheEntry> entries;
+	private boolean fixWinPathSeparator = true;
 
 	@Override
 	public DistributedCache getObject() throws Exception {
@@ -113,66 +114,72 @@ public class DistributedCacheFactoryBean implements InitializingBean, FactoryBea
 
 		HdfsResourceLoader loader = new HdfsResourceLoader(conf);
 
-		for (CacheEntry entry : entries) {
-			Resource[] resources = loader.getResources(entry.value);
-			if (!ObjectUtils.isEmpty(resources)) {
-				for (Resource resource : resources) {
-					HdfsResource res = (HdfsResource) resource;
+		boolean shouldFixCpEntry = fixWinPathSeparator && System.getProperty("os.name").toLowerCase().startsWith("win");
+		
+		try {
+			for (CacheEntry entry : entries) {
+				Resource[] resources = loader.getResources(entry.value);
+				if (!ObjectUtils.isEmpty(resources)) {
+					for (Resource resource : resources) {
+						HdfsResource res = (HdfsResource) resource;
 
-					URI uri = res.getURI();
-					String defaultLink = resource.getFilename();
-					boolean isArchive = (defaultLink.endsWith(".tgz") || defaultLink.endsWith(".tar")
-							|| defaultLink.endsWith(".tar.gz") || defaultLink.endsWith(".zip"));
+						URI uri = res.getURI();
+						String path = getPathWithFragment(uri);
 
-					switch (entry.type) {
-					case CP:
-						Path p = res.getPath();
+						String defaultLink = resource.getFilename();
+						boolean isArchive = (defaultLink.endsWith(".tgz") || defaultLink.endsWith(".tar")
+								|| defaultLink.endsWith(".tar.gz") || defaultLink.endsWith(".zip"));
 
-						//						if (!StringUtils.hasText(p.toUri().getFragment())) {
-						//							p = new Path(URI.create(p.toString() + "#" + defaultLink));
-						//						}
+						switch (entry.type) {
+						case CP:
+							// Path does not handle fragments so use the URI instead
+							Path p = new Path(URI.create(path));
 
-						if (isArchive) {
-							DistributedCache.addArchiveToClassPath(p, conf, fs);
+							if (shouldFixCpEntry) {
+								System.setProperty("path.separator", ":");
+								if (isArchive) {
+									DistributedCache.addArchiveToClassPath(p, conf, fs);
+								}
+								else {
+									DistributedCache.addFileToClassPath(p, conf, fs);
+								}
+								System.setProperty("path.separator", ";");
+							}
+							
+							break;
+
+						case LOCAL:
+
+							if (isArchive) {
+								DistributedCache.addLocalArchives(conf, path);
+							}
+							else {
+								DistributedCache.addLocalFiles(conf, path);
+							}
+
+							break;
+
+						case CACHE:
+
+							if (!path.contains("#")) {
+								// use the path to avoid adding the host:port into the uri
+								uri = URI.create(path + "#" + defaultLink);
+							}
+
+							if (isArchive) {
+								DistributedCache.addCacheArchive(uri, conf);
+							}
+							else {
+								DistributedCache.addCacheFile(uri, conf);
+							}
+
+							break;
 						}
-						else {
-							DistributedCache.addFileToClassPath(p, conf, fs);
-						}
-
-						break;
-
-					case LOCAL:
-
-						//						if (!StringUtils.hasText(uri.getFragment())) {
-						//							uri = URI.create(uri.toString() + "#" + defaultLink);
-						//						}
-
-						if (isArchive) {
-							DistributedCache.addLocalArchives(conf, uri.toString());
-						}
-						else {
-							DistributedCache.addLocalFiles(conf, uri.toString());
-						}
-
-						break;
-
-					case CACHE:
-
-						if (!StringUtils.hasText(uri.getFragment())) {
-							uri = URI.create(uri.toString() + "#" + defaultLink);
-						}
-
-						if (isArchive) {
-							DistributedCache.addCacheArchive(uri, conf);
-						}
-						else {
-							DistributedCache.addCacheFile(uri, conf);
-						}
-
-						break;
 					}
 				}
 			}
+		} finally {
+			loader.close();
 		}
 	}
 
@@ -256,5 +263,25 @@ public class DistributedCacheFactoryBean implements InitializingBean, FactoryBea
 	 */
 	public void setCreateSymlink(boolean createSymlink) {
 		this.createSymlink = createSymlink;
+	}
+
+	private static String getPathWithFragment(URI uri) {
+		String path = uri.getPath();
+		String fragment = uri.getFragment();
+		if (StringUtils.hasText(fragment)) {
+			path = path + "#" + fragment;
+		}
+		return path;
+	}
+
+	/**
+	 * Work-around for HADOOP-9123. Turned on by default, this flag checks
+	 * whether the client platform is Windows-based and if so, uses the *nix
+	 * path separator to properly construct the classpath on the server. 
+	 * 
+	 * @param fixWinPathSeparator
+	 */
+	public void setFixWinPathSeparator(boolean fixWinPathSeparator) {
+		this.fixWinPathSeparator = fixWinPathSeparator;
 	}
 }

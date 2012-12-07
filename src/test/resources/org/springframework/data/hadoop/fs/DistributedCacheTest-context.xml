@@ -10,6 +10,7 @@
 	<hdp:cache create-symlink="true">
 		<hdp:classpath value="/cp/some-library.jar#library.jar" />
 		<hdp:classpath value="/cp/some-zip.zip" />
+		<hdp:classpath value="/cp/some-extra-zip.zip" />
 		<hdp:cache value="/cache/some-archive.tgz#main-archive" />
 		<hdp:cache value="/cache/some-resource.res" />
 		<hdp:local value="some-file.txt" />
