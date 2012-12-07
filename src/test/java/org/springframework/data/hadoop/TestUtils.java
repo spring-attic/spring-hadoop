@@ -72,6 +72,10 @@ public class TestUtils {
 			fs.mkdirs(new Path(resource.getURI()));
 			return loader.getResource(dir);
 		} catch (IOException ex) {
+			try {
+				loader.close();
+			} catch (IOException ioe) {
+			}
 			throw new IllegalArgumentException(ex);
 		}
 

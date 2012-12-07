@@ -61,6 +61,8 @@ public class DistCpTest {
 		String srcA = loader.getResource(src).getURI().toString();
 		String dstA = loader.getResource(dir + "dst/").getURI().toString();
 
+		loader.close();
+
 		System.out.println(srcA);
 		System.out.println(dstA);
 
@@ -80,6 +82,7 @@ public class DistCpTest {
 		String src2A = loader.getResource(src2).getURI().toString();
 		String dstA = loader.getResource(dir + "dst/").getURI().toString();
 
+		loader.close();
 		new DistCp(cfg).copy(src1A, src2A, dstA);
 	}
 }

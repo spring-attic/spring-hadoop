@@ -246,7 +246,7 @@ public class HdfsResourceLoader implements ResourcePatternResolver, PriorityOrde
 
 	@Override
 	public void close() throws IOException {
-		if (fs != null & internalFS) {
+		if (fs != null && internalFS) {
 			fs.close();
 		}
 	}
