@@ -227,7 +227,7 @@ test {
     testLogging {
         events "started"
         minGranularity 2
-        maxGranularity 3
+        maxGranularity 2
     }
 
     doFirst() {
