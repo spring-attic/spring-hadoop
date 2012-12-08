@@ -131,7 +131,7 @@ public class TestUtils {
 	}
 
 	public static boolean isHadoop2X() {
-		return ClassUtils.isPresent("org.apache.hadoop.fs.shell.Command", JobClient.class.getClassLoader());
+		return ClassUtils.isPresent("org.apache.hadoop.fs.FsShellPermissions$Chmod", JobClient.class.getClassLoader());
 	}
 
 	public static boolean isHadoop1X() {

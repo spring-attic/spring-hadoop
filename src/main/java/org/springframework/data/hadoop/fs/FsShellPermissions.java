@@ -35,7 +35,7 @@ import org.springframework.util.ReflectionUtils;
  */
 abstract class FsShellPermissions {
 
-	private static boolean IS_HADOOP_20X = ClassUtils.isPresent("org.apache.hadoop.fs.shell.Command",
+	private static boolean IS_HADOOP_20X = ClassUtils.isPresent("org.apache.hadoop.fs.FsShellPermissions$Chmod",
 			FsShellPermissions.class.getClassLoader());
 
 	enum Op {
