@@ -27,6 +27,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsAction;
 import org.apache.hadoop.fs.permission.FsPermission;
+import org.hamcrest.core.Is;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,6 +39,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.util.Assert;
 
 import static org.junit.Assert.*;
+import static org.junit.Assume.*;
 
 /**
  * FsShell ReadOnly integration tests.
@@ -160,9 +162,10 @@ public abstract class AbstractROFsShellTest {
 		assertTrue(count.toString().contains(name2));
 	}
 
-	//@Test
+	@Test
 	// TODO: FsShell most likely needs to be rewritten for Hadoop 2
 	public void testDUS() throws Exception {
+		assumeThat(TestUtils.isHadoop1X(), Is.is(Boolean.TRUE));
 		String fName1 = UUID.randomUUID() + ".txt";
 		String name1 = "local/" + fName1;
 		int length1 = name1.length();

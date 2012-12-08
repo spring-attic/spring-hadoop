@@ -23,11 +23,13 @@ import java.util.Properties;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.mapred.JobClient;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.data.hadoop.fs.HdfsResourceLoader;
 import org.springframework.data.hadoop.util.PermissionUtils;
+import org.springframework.util.ClassUtils;
 
 /**
  * @author Costin Leau
@@ -127,4 +129,13 @@ public class TestUtils {
 			}
 		}
 	}
+
+	public static boolean isHadoop2X() {
+		return ClassUtils.isPresent("org.apache.hadoop.fs.shell.Command", JobClient.class.getClassLoader());
+	}
+
+	public static boolean isHadoop1X() {
+		return !isHadoop2X();
+	}
+
 }
