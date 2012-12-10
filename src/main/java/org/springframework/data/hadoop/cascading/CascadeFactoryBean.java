@@ -15,17 +15,20 @@
  */
 package org.springframework.data.hadoop.cascading;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Properties;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
-import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.data.hadoop.configuration.ConfigurationUtils;
 import org.springframework.data.hadoop.util.ResourceUtils;
+import org.springframework.util.Assert;
 
 import cascading.cascade.Cascade;
 import cascading.cascade.CascadeConnector;
@@ -39,7 +42,9 @@ import cascading.property.AppProps;
  * 
  * @author Costin Leau
  */
-public class CascadeFactoryBean implements InitializingBean, BeanNameAware, BeanClassLoaderAware, FactoryBean<Cascade> {
+public class CascadeFactoryBean implements InitializingBean, BeanNameAware, FactoryBean<Cascade> {
+
+	private static final Log log = LogFactory.getLog(CascadeFactoryBean.class);
 
 	private Configuration configuration;
 	private Properties properties;
@@ -53,8 +58,6 @@ public class CascadeFactoryBean implements InitializingBean, BeanNameAware, Bean
 
 	private Cascade cascade;
 	private boolean jarSetup = true;
-
-	private ClassLoader classLoader;
 
 	@Override
 	public Cascade getObject() throws Exception {
@@ -79,20 +82,29 @@ public class CascadeFactoryBean implements InitializingBean, BeanNameAware, Bean
 
 		if (jarSetup) {
 			if (jar != null) {
-				AppProps.setApplicationJarPath(props, jar.getURI().toString());
+				AppProps.setApplicationJarPath(props, ResourceUtils.decode(jar.getURI().toString()));
 			}
 			else if (jarClass != null) {
 				AppProps.setApplicationJarClass(props, jarClass);
 			}
 			else {
 				// auto-detection based on the classpath
-				// find cascading-core
+				ClassLoader cascadingCL = Cascade.class.getClassLoader();
 				Resource cascadingCore = ResourceUtils.findContainingJar(Cascade.class);
-				// find cascading-hadoop
-				Resource cascadingHadoop = ResourceUtils.findContainingJar(classLoader,
-						"cascading.flow.hadoop.HadoopFlow");
+				Resource cascadingHadoop = ResourceUtils.findContainingJar(cascadingCL, "cascading/flow/hadoop/HadoopFlow.class");
+				// find jgrapht
+				Resource jgrapht = ResourceUtils.findContainingJar(cascadingCL, "org/jgrapht/Graph.class");
 
-				ConfigurationUtils.addLibs(configuration, cascadingCore, cascadingHadoop);
+				Assert.notNull(cascadingCore, "Cannot find cascading-core.jar");
+				Assert.notNull(cascadingHadoop, "Cannot find cascading-hadoop.jar");
+				Assert.notNull(jgrapht, "Cannot find jgraphts-jdk.jar");
+				
+				if (log.isDebugEnabled()) {
+					log.debug("Auto-detecting Cascading Libs ["
+							+ Arrays.toString(new Resource[] { cascadingCore, cascadingHadoop, jgrapht }) + "]");
+				}
+
+				ConfigurationUtils.addLibs(configuration, cascadingCore, cascadingHadoop, jgrapht);
 			}
 		}
 
@@ -165,10 +177,5 @@ public class CascadeFactoryBean implements InitializingBean, BeanNameAware, Bean
 	 */
 	public void setJarSetup(boolean jarSetup) {
 		this.jarSetup = jarSetup;
-	}
-
-	@Override
-	public void setBeanClassLoader(ClassLoader classLoader) {
-		this.classLoader = classLoader;
 	}
 }

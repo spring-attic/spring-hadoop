@@ -44,6 +44,12 @@
 	<bean id="rl-init" class="org.springframework.data.hadoop.InitBeforeHadoop" lazy-init="true" />
 
 	<hdp:script language="javascript" run-at-startup="true">
+		// set System 'path.separator' to ':' - see HADOOP-9123
+		if (java.lang.System.getProperty("os.name").toLowerCase().startsWith("win")) {
+			println("Fudging the 'path.separator' on Win for DistributedCache to work")
+			java.lang.System.setProperty("path.separator", ":")
+		}
+	
 		if (fsh.test(".staging"))
 			fsh.rmr(".staging")
 	</hdp:script>	

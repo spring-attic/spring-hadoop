@@ -17,6 +17,7 @@ package org.springframework.data.hadoop.util;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
@@ -44,16 +45,28 @@ public abstract class ResourceUtils {
 		}
 	}
 
+	/**
+	 * Locates the jar (within the classpath) containing the given class.
+	 * As this method requires loading a class, it's recommended to use {@link #findContainingJar(ClassLoader, String)}
+	 * instead.
+	 * 
+	 * @param clazz the class to look for
+	 * @return the containing jar.
+	 */
 	public static Resource findContainingJar(Class<?> clazz) {
-		return findContainingJar(clazz.getClassLoader(), clazz.getName());
+		return findContainingJar(clazz.getClassLoader(), clazz.getName().replace(".", "/") + ".class");
 	}
 
-	public static Resource findContainingJar(ClassLoader loader, String className) {
-		String binaryName = className;
-		if (!className.endsWith(".class")) {
-			binaryName = className.replace(".", "/") + ".class";
-		}
-			
+	/**
+	 * Locates a jar (within the classpath) containing the given resource.
+	 * 
+	 * @param loader class loader to use for locating the jar
+	 * @param resourceName resource to look for
+	 * @return the containing jar
+	 */
+	public static Resource findContainingJar(ClassLoader loader, String resourceName) {
+		String binaryName = resourceName;
+
 		try {
 			for (Enumeration<URL> urls = loader.getResources(binaryName); urls.hasMoreElements();) {
 				URL url = urls.nextElement();
@@ -63,11 +76,32 @@ public abstract class ResourceUtils {
 				}
 			}
 		} catch (IOException ex) {
-			throw new IllegalArgumentException("Cannot find jar for class " + className, ex);
+			throw new IllegalArgumentException("Cannot find jar for class " + resourceName, ex);
 		}
 		return null;
 	}
 
+	/**
+	 * Decodes the given encoded source String into an URI. Based on the following
+	 * rules:
+	 * <ul>
+	 * <li>Alphanumeric characters {@code "a"} through {@code "z"},
+	 * {@code "A"} through {@code "Z"}, and {@code "0"} through {@code "9"}
+	 * stay the same.
+	 * <li>Special characters {@code "-"}, {@code "_"}, {@code "."}, and
+	 * {@code "*"} stay the same.
+	 * <li>All other characters are converted into one or more bytes using the
+	 * given encoding scheme. Each of the resulting bytes is written as a
+	 * hexadecimal string in the {@code %xy} format.
+	 * <li>A sequence "<code>%<i>xy</i></code>" is interpreted as a hexadecimal
+	 * representation of the character.
+	 * </ul>
+	 * @param source the source string
+	 * @param encoding the encoding
+	 * @return the decoded URI
+	 * @throws UnsupportedEncodingException when the given encoding parameter is not supported
+	 * @see java.net.URLDecoder#decode(String, String)
+	 */
 	public static String decode(String source) {
 		Assert.notNull(source, "'source' must not be null");
 		int length = source.length();
