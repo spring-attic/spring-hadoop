@@ -123,6 +123,7 @@ public class DistributedCacheTest {
 	public void testLocalFiles() throws Exception {
 		Path[] files = DistributedCache.getLocalCacheFiles(cfg);
 		// include the 3 files from the pattern matcher
+		System.out.println(Arrays.toString(files));
 		assertEquals(4, files.length);
 		assertEquals("some-file.txt", files[0].getName());
 	}
@@ -130,6 +131,7 @@ public class DistributedCacheTest {
 	@Test
 	public void testLocalArchives() throws Exception {
 		Path[] archives = DistributedCache.getLocalCacheArchives(cfg);
+		System.out.println(Arrays.toString(archives));
 		assertEquals(1, archives.length);
 		assertEquals("some-tar.tar", archives[0].getName());
 	}
