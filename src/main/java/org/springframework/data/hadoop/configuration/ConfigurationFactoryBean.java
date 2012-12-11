@@ -28,6 +28,7 @@ import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
+import org.springframework.util.StringUtils;
 
 /**
  * FactoryBean for creating {@link Configuration} instances.
@@ -48,6 +49,9 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 	private boolean initialize = true;
 	private boolean registerJvmUrl = false;
 
+	private String fsUri;
+	private String jtUri;
+
 	public void afterPropertiesSet() throws Exception {
 		internalConfig = createConfiguration(configuration);
 
@@ -59,6 +63,15 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 		}
 
 		ConfigurationUtils.addProperties(internalConfig, properties);
+
+		// set hdfs / fs URI last to override all other properties
+		if (StringUtils.hasText(fsUri)) {
+			properties.setProperty("fs.default.name", fsUri.trim());
+		}
+
+		if (StringUtils.hasText(jtUri)) {
+			properties.setProperty("mapred.job.tracker", jtUri.trim());
+		}
 
 		if (initialize) {
 			internalConfig.size();
@@ -167,5 +180,23 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 	 */
 	public void setRegisterUrlHandler(boolean register) {
 		this.registerJvmUrl = register;
+	}
+
+	/**
+	 * Sets the File System ('fs.default.name') URI.
+	 * 
+	 * @param fsUri
+	 */
+	public void setFileSystemUri(String fsUri) {
+		this.fsUri = fsUri;
+	}
+
+	/**
+	 * Sets the Job Tracker ('mapred.jobtracker') URI.
+	 * 
+	 * @param jtUri
+	 */
+	public void setJobTrackerUri(String jtUri) {
+		this.jtUri = jtUri;
 	}
 }

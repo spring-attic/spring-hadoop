@@ -33,9 +33,7 @@
 	<!--  default id is 'hadoopConfiguration' /   -->
 	<!--  properties-location="s3.properties" -->
 	<!--  -->
-	<hdp:configuration register-url-handler="false" depends-on="cfg-init">
-		fs.default.name=${hadoop.fs}
-		mapred.job.tracker=${hadoop.jt}
+	<hdp:configuration register-url-handler="false" depends-on="cfg-init" file-system-uri="${hadoop.fs}" job-tracker-uri="${hadoop.jt}">
 		cfg=main
 	</hdp:configuration>
 	

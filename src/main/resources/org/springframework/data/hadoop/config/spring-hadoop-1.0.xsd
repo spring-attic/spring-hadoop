@@ -7,7 +7,7 @@
 	targetNamespace="http://www.springframework.org/schema/hadoop"
 	elementFormDefault="qualified"
 	attributeFormDefault="unqualified"
-	version="1.0.0.RC1">
+	version="1.0.0.RC2">
 
 	<xsd:import namespace="http://www.springframework.org/schema/beans" />
 	<xsd:import namespace="http://www.springframework.org/schema/tool" />
@@ -188,7 +188,19 @@ in a given JVM hence the default is false.
 	The names of the beans that this bean depends on being initialized. Typically used to guarantee
 	the initialization of certain beans before the Hadoop cluster gets configured and started (directly
 	or not through the use of its configuration and file-system).
-				</xsd:documentation></xsd:annotation></xsd:attribute>				
+				</xsd:documentation></xsd:annotation></xsd:attribute>
+				<xsd:attribute name="file-system-uri" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+The default file-system address (host:port). Equivalent to 'fs.default.name' property.]]></xsd:documentation>
+			 	</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="job-tracker-uri" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+The Map/Reduce job tracker address (host:port). Equivalent to 'mapred.job.tracker' property.]]></xsd:documentation>
+			 	</xsd:annotation>
+				</xsd:attribute>
 		</xsd:extension>
 		</xsd:complexContent>
 		</xsd:complexType>
@@ -1205,6 +1217,28 @@ Defines an HBase configuration.
 Bean id (default is "hbaseConfiguration").
 				]]></xsd:documentation>
 			</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="host" type="xsd:string">
+			<xsd:annotation>
+					<xsd:documentation><![CDATA[
+HBase host. If not specified, the default value (picked from hbase-site.xml inside the classpath) is used.]]></xsd:documentation>
+					<xsd:appinfo>
+						<tool:annotation kind="ref">
+							<tool:expected-type type="org.apache.hadoop.conf.Configuration" />
+						</tool:annotation>
+					</xsd:appinfo>
+		 	</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="port" type="xsd:string">
+			<xsd:annotation>
+					<xsd:documentation source="java:org.apache.hadoop.conf.Configuration"><![CDATA[
+HBase port. If not specified, the default value (picked from hbase-site.xml inside the classpath) is used.]]></xsd:documentation>
+					<xsd:appinfo>
+						<tool:annotation kind="ref">
+							<tool:expected-type type="org.apache.hadoop.conf.Configuration" />
+						</tool:annotation>
+					</xsd:appinfo>
+		 	</xsd:annotation>
 			</xsd:attribute>
 			<xsd:attribute name="stop-proxy" type="xsd:string" default="true"/>
 			<xsd:attribute name="delete-connection" type="xsd:string" default="true"/>
