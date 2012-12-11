@@ -98,6 +98,7 @@ public class TestUtils {
 			byte[] bytes = filename.getBytes();
 			OutputStream out = fs.create(new Path(resource.getURI()));
 			out.write(bytes);
+			out.flush();
 			out.close();
 
 			return loader.getResource(filename);
