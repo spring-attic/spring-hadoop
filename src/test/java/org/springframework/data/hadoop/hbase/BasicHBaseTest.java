@@ -117,7 +117,6 @@ public class BasicHBaseTest {
 		template.execute(tableName, new TableCallback<Object>() {
 			@Override
 			public Object doInTable(HTableInterface table) throws Throwable {
-				assertSame(t, table);
 				Put p = new Put(Bytes.toBytes(rowName));
 				p.add(Bytes.toBytes(columnName), Bytes.toBytes(qualifier), Bytes.toBytes(value));
 				table.put(p);
@@ -128,6 +127,8 @@ public class BasicHBaseTest {
 				byte[] val = r.getValue(Bytes.toBytes(columnName), Bytes.toBytes(qualifier));
 
 				assertEquals(value, Bytes.toString(val));
+
+				assertSame(t, table);
 				return null;
 			}
 		});

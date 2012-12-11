@@ -12,8 +12,7 @@
 
 	<import resource="../hadoop-ctx.xml"/>
 	 
-	<hdp:hbase-configuration configuration-ref="hadoopConfiguration">
-		#hbase.zookeeper.quorum=v-debian.lan
+	<hdp:hbase-configuration configuration-ref="hadoopConfiguration" host="${hbase.host}" port="${hbase.port}">
 		head=bucket
 	</hdp:hbase-configuration>
 	 

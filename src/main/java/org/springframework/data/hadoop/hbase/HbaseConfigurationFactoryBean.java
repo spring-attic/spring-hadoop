@@ -19,11 +19,13 @@ import java.util.Properties;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
+import org.apache.hadoop.hbase.HConstants;
 import org.apache.hadoop.hbase.client.HConnectionManager;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.data.hadoop.configuration.ConfigurationUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * Factory for creating HBase specific configuration. By default cleans up any connection associated with the current configuration.
@@ -39,6 +41,8 @@ public class HbaseConfigurationFactoryBean implements InitializingBean, Disposab
 	private Configuration configuration;
 	private Configuration hadoopConfig;
 	private Properties properties;
+	private String host;
+	private Integer port;
 
 	/**
 	 * Indicates whether the potential connection created by this config is destroyed at shutdown (default).
@@ -85,6 +89,14 @@ public class HbaseConfigurationFactoryBean implements InitializingBean, Disposab
 	public void afterPropertiesSet() {
 		configuration = (hadoopConfig != null ? HBaseConfiguration.create(hadoopConfig) : HBaseConfiguration.create());
 		ConfigurationUtils.addProperties(configuration, properties);
+
+		// set host and port last to override any other properties
+		if (StringUtils.hasText(host)) {
+			configuration.set(HConstants.ZOOKEEPER_QUORUM, host.trim());
+		}
+		if (port != null) {
+			configuration.set(HConstants.ZOOKEEPER_CLIENT_PORT, port.toString());
+		}
 	}
 
 	public Configuration getObject() {
@@ -97,5 +109,23 @@ public class HbaseConfigurationFactoryBean implements InitializingBean, Disposab
 
 	public boolean isSingleton() {
 		return true;
+	}
+
+	/**
+	 * Sets the HBase host to connect to. If not specified, the default is used.
+	 * 
+	 * @param host HBase host.
+	 */
+	public void setHost(String host) {
+		this.host = host;
+	}
+
+	/**
+	 * Sets the HBase port to connect to. If not specified, the default is used.
+	 * 
+	 * @param port HBase port.
+	 */
+	public void setPort(Integer port) {
+		this.port = port;
 	}
 }

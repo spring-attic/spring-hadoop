@@ -12,7 +12,7 @@
 
 	<import resource="../hadoop-ctx.xml"/>
 	
-		<hdp:script id="script" language="javascript" run-at-startup="true">
+	<hdp:script id="script" language="javascript" run-at-startup="true">
 	if (fsh.test("/tmp/hbase/out")) { fsh.rmr("/tmp/hbase/out") }
 	if (fsh.test("/tmp/hbase/in")) { fsh.rmr("/tmp/hbase/in") }
 	
@@ -20,13 +20,11 @@
 	</hdp:script>
 	
 	 
-	<hdp:hbase-configuration configuration-ref="hadoopConfiguration">
-		#hbase.zookeeper.quorum=v-debian.lan
+	<hdp:hbase-configuration configuration-ref="hadoopConfiguration" host="${hbase.host}">
 		head=bucket
 	</hdp:hbase-configuration>
 	 
-	<context:property-placeholder location="test.properties"/>
-	
+
 	<hdp:job id="hjob" configuration-ref="hbaseConfiguration"
 	  mapper="org.springframework.data.hadoop.hbase.Mapper"
 	  reducer="org.springframework.data.hadoop.hbase.Reducer"
