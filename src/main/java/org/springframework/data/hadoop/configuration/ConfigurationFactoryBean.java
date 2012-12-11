@@ -66,11 +66,11 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 
 		// set hdfs / fs URI last to override all other properties
 		if (StringUtils.hasText(fsUri)) {
-			properties.setProperty("fs.default.name", fsUri.trim());
+			internalConfig.set("fs.default.name", fsUri.trim());
 		}
 
 		if (StringUtils.hasText(jtUri)) {
-			properties.setProperty("mapred.job.tracker", jtUri.trim());
+			internalConfig.set("mapred.job.tracker", jtUri.trim());
 		}
 
 		if (initialize) {
