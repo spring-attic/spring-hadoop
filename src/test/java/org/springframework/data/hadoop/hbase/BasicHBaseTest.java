@@ -112,7 +112,9 @@ public class BasicHBaseTest {
 	public void testTemplate() throws Exception {
 		assertTrue(HbaseSynchronizationManager.getTableNames().isEmpty());
 
+		// manual bind
 		final HTableInterface t = HbaseUtils.getHTable(tableName, config);
+		HbaseSynchronizationManager.bindResource(tableName, t);
 
 		template.execute(tableName, new TableCallback<Object>() {
 			@Override
@@ -144,6 +146,8 @@ public class BasicHBaseTest {
 			}
 		}));
 
+		// manual unbind
+		HTableInterface unboundTable = HbaseSynchronizationManager.unbindResource(tableName);
 		HbaseUtils.releaseTable(tableName, t);
 		assertTrue(HbaseSynchronizationManager.getTableNames().isEmpty());
 	}

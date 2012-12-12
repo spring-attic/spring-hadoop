@@ -12,7 +12,7 @@
 
 	<import resource="../hadoop-ctx.xml"/>
 	 
-	<hdp:hbase-configuration configuration-ref="hadoopConfiguration" host="${hbase.host}" port="${hbase.port}">
+	<hdp:hbase-configuration zk-quorum="${hbase.host}" zk-port="${hbase.port}">
 		head=bucket
 	</hdp:hbase-configuration>
 	 

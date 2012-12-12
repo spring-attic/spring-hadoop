@@ -41,7 +41,7 @@ public class HbaseConfigurationFactoryBean implements InitializingBean, Disposab
 	private Configuration configuration;
 	private Configuration hadoopConfig;
 	private Properties properties;
-	private String host;
+	private String quorum;
 	private Integer port;
 
 	/**
@@ -91,8 +91,8 @@ public class HbaseConfigurationFactoryBean implements InitializingBean, Disposab
 		ConfigurationUtils.addProperties(configuration, properties);
 
 		// set host and port last to override any other properties
-		if (StringUtils.hasText(host)) {
-			configuration.set(HConstants.ZOOKEEPER_QUORUM, host.trim());
+		if (StringUtils.hasText(quorum)) {
+			configuration.set(HConstants.ZOOKEEPER_QUORUM, quorum.trim());
 		}
 		if (port != null) {
 			configuration.set(HConstants.ZOOKEEPER_CLIENT_PORT, port.toString());
@@ -112,20 +112,20 @@ public class HbaseConfigurationFactoryBean implements InitializingBean, Disposab
 	}
 
 	/**
-	 * Sets the HBase host to connect to. If not specified, the default is used.
+	 * Sets the HBase Zookeeper Quorum host(s). If not specified, the default value (picked the the classpath) is used.
 	 * 
-	 * @param host HBase host.
+	 * @param quorum HBase ZK quorum hosts.
 	 */
-	public void setHost(String host) {
-		this.host = host;
+	public void setZkQuorum(String quorum) {
+		this.quorum = quorum;
 	}
 
 	/**
-	 * Sets the HBase port to connect to. If not specified, the default is used.
+	 * Sets the HBase Zookeeper port for clients to connect to. If not specified, the default value (picked from the classpath) is used.
 	 * 
-	 * @param port HBase port.
+	 * @param port HBase ZK client port.
 	 */
-	public void setPort(Integer port) {
+	public void setZkPort(Integer port) {
 		this.port = port;
 	}
 }

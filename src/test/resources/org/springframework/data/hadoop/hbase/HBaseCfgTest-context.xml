@@ -20,7 +20,7 @@
 	</hdp:script>
 	
 	 
-	<hdp:hbase-configuration configuration-ref="hadoopConfiguration" host="${hbase.host}">
+	<hdp:hbase-configuration configuration-ref="hadoopConfiguration" zk-quorum="${hbase.host}">
 		head=bucket
 	</hdp:hbase-configuration>
 	 

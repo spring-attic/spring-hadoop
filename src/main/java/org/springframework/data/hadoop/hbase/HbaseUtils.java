@@ -88,7 +88,7 @@ public class HbaseUtils {
 	}
 
 	/**
-	 * Releases (and closes) the given table, created via the given configuration if it is not managed externally.
+	 * Releases (or closes) the given table, created via the given configuration if it is not managed externally (or bound to the thread).
 	 * 
 	 * @param tableName
 	 * @param table
@@ -98,7 +98,7 @@ public class HbaseUtils {
 	}
 
 	/**
-	 * Releases (and closes) the given table, created via the given configuration if it is not managed externally.
+	 * Releases (or closes) the given table, created via the given configuration if it is not managed externally (or bound to the thread).
 	 * 
 	 * @param tableName
 	 * @param table
@@ -118,6 +118,7 @@ public class HbaseUtils {
 			return;
 		}
 
+		// close only if its unbound 
 		if (!isBoundToThread(tableName)) {
 			if (tableFactory != null) {
 				tableFactory.releaseHTableInterface(table);

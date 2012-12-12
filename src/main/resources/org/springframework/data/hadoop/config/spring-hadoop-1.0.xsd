@@ -1218,10 +1218,10 @@ Bean id (default is "hbaseConfiguration").
 				]]></xsd:documentation>
 			</xsd:annotation>
 			</xsd:attribute>
-			<xsd:attribute name="host" type="xsd:string">
+			<xsd:attribute name="zk-quorum" type="xsd:string">
 			<xsd:annotation>
 					<xsd:documentation><![CDATA[
-HBase host. If not specified, the default value (picked from hbase-site.xml inside the classpath) is used.]]></xsd:documentation>
+HBase Zookeeper Quorum host(s). If not specified, the default value (picked the the classpath) is used.]]></xsd:documentation>
 					<xsd:appinfo>
 						<tool:annotation kind="ref">
 							<tool:expected-type type="org.apache.hadoop.conf.Configuration" />
@@ -1229,10 +1229,10 @@ HBase host. If not specified, the default value (picked from hbase-site.xml insi
 					</xsd:appinfo>
 		 	</xsd:annotation>
 			</xsd:attribute>
-			<xsd:attribute name="port" type="xsd:string">
+			<xsd:attribute name="zk-port" type="xsd:string">
 			<xsd:annotation>
 					<xsd:documentation source="java:org.apache.hadoop.conf.Configuration"><![CDATA[
-HBase port. If not specified, the default value (picked from hbase-site.xml inside the classpath) is used.]]></xsd:documentation>
+HBase Zookeeper port for clients to connect to. If not specified, the default value (picked from the classpath) is used.]]></xsd:documentation>
 					<xsd:appinfo>
 						<tool:annotation kind="ref">
 							<tool:expected-type type="org.apache.hadoop.conf.Configuration" />
