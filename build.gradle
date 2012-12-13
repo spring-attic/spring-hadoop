@@ -4,6 +4,7 @@ buildscript {
     }
     dependencies {
         classpath 'org.springframework.build.gradle:docbook-reference-plugin:0.1.6'
+        classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.1'
     }
 }
 
@@ -19,7 +20,9 @@ apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply from: "$rootDir/maven.gradle"
 apply plugin: 'docbook-reference'
-
+apply plugin: 'propdeps'
+apply plugin: 'propdeps-idea'
+apply plugin: 'propdeps-eclipse'
 
 // 
 //  Select the Hadoop distribution used for building the binaries
@@ -37,8 +40,8 @@ switch (hadoopDistro) {
     println "Using Cloudera CDH3 [$hadoopVersion]"
     
     dependencies {
-        compile ("org.apache.hadoop:hadoop-streaming:$hadoopVersion", optional) 
-        compile ("org.apache.hadoop:hadoop-tools:$hadoopVersion", optional)
+        optional("org.apache.hadoop:hadoop-streaming:$hadoopVersion") 
+        optional("org.apache.hadoop:hadoop-tools:$hadoopVersion")
     }
 
   break;    
@@ -49,10 +52,10 @@ switch (hadoopDistro) {
     println "Using Cloudera CDH4 [$hadoopVersion]"
 
     dependencies {
-        compile ("org.apache.hadoop:hadoop-streaming:$hadoopVersion", optional) 
-        compile ("org.apache.hadoop:hadoop-tools:$hadoopVersion", optional)
-        compile ("org.apache.hadoop:hadoop-common:$cdh4Version", optional)
-        compile ("org.apache.hadoop:hadoop-hdfs:$cdh4Version", optional)
+        optional("org.apache.hadoop:hadoop-streaming:$hadoopVersion") 
+        optional("org.apache.hadoop:hadoop-tools:$hadoopVersion")
+        optional("org.apache.hadoop:hadoop-common:$cdh4Version")
+        optional("org.apache.hadoop:hadoop-hdfs:$cdh4Version")
     }
 
   break;    
@@ -74,36 +77,31 @@ switch (hadoopDistro) {
               "org.apache.hadoop:hadoop-tools:$hadoopVersion"]
 }
 
-// make Hadoop dependencies optional
-//hadoop = hadoop.collect { it.concat(", optional") }
-
-
 // Common dependencies
 dependencies {
     compile hadoop
     
     // Logging
-    compile "org.slf4j:slf4j-api:$slf4jVersion"
-    compile ("org.slf4j:jcl-over-slf4j:$slf4jVersion", optional)
-    testRuntime "log4j:log4j:$log4jVersion"
-    testRuntime "org.slf4j:slf4j-log4j12:$slf4jVersion"
+    compile("org.slf4j:slf4j-api:$slf4jVersion")
+    optional("org.slf4j:jcl-over-slf4j:$slf4jVersion")
+    testRuntime("log4j:log4j:$log4jVersion")
+    testRuntime("org.slf4j:slf4j-log4j12:$slf4jVersion")
 
     // Spring Framework
     compile("org.springframework:spring-core:$springVersion") {
         exclude module: "commons-logging"
     }
     compile "org.springframework:spring-context-support:$springVersion"
-    compile("org.springframework:spring-tx:$springVersion", optional)
-    compile("org.springframework:spring-aop:$springVersion", optional)
-    compile("org.springframework:spring-jdbc:$springVersion", optional)
-    compile("org.springframework.batch:spring-batch-core:$springBatchVersion", optional)
-    compile("org.springframework.integration:spring-integration-stream:$springIntVersion", optional)
-    compile("org.springframework.integration:spring-integration-file:$springIntVersion", optional)
+    optional("org.springframework:spring-tx:$springVersion")
+    optional("org.springframework:spring-aop:$springVersion")
+    optional("org.springframework:spring-jdbc:$springVersion")
+    optional("org.springframework.batch:spring-batch-core:$springBatchVersion")
+    optional("org.springframework.integration:spring-integration-stream:$springIntVersion")
+    optional("org.springframework.integration:spring-integration-file:$springIntVersion")
 
 
     // cascading
-    compile("cascading:cascading-hadoop:$cascadingVersion") { dep ->
-        optional dep
+    optional("cascading:cascading-hadoop:$cascadingVersion") { dep ->
         exclude module: "hadoop-core"
     }
     
@@ -114,8 +112,8 @@ dependencies {
     testRuntime "cglib:cglib:$cglibVersion"
 
     // Hive
-    compile("org.apache.hive:hive-metastore:$hiveVersion", optional) 
-    compile("org.apache.hive:hive-service:$hiveVersion", optional)
+    optional("org.apache.hive:hive-metastore:$hiveVersion") 
+    optional("org.apache.hive:hive-service:$hiveVersion")
 
     testRuntime "org.apache.hive:hive-common:$hiveVersion"
     testRuntime "org.apache.hive:hive-jdbc:$hiveVersion"
@@ -125,11 +123,10 @@ dependencies {
     testRuntime "org.apache.thrift:libfb303:$thriftVersion"
 
     // Pig
-    compile("org.apache.pig:pig:$pigVersion", optional)
+    optional("org.apache.pig:pig:$pigVersion")
     
     // HBase
-    compile("org.apache.hbase:hbase:$hbaseVersion") { dep ->
-        optional dep
+    optional("org.apache.hbase:hbase:$hbaseVersion") { dep ->
         exclude module: "thrift"
     }
 
@@ -142,7 +139,7 @@ dependencies {
     testCompile "junit:junit:$junitVersion"
     testCompile "org.mockito:mockito-core:$mockitoVersion"
     testCompile "org.springframework:spring-test:$springVersion"
-    testCompile("javax.annotation:jsr250-api:1.0", optional)
+    testCompile("javax.annotation:jsr250-api:1.0")
     testCompile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
     
     testRuntime "org.springframework.integration:spring-integration-event:$springIntVersion"
