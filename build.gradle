@@ -25,8 +25,12 @@ apply plugin: 'docbook-reference'
 //  Select the Hadoop distribution used for building the binaries
 // 
 def List hadoop = []
+
 def hadoopDistro = project.hasProperty("distro") ? project.getProperty("distro") : "hadoop10"
 def hadoopVersion = hadoop10Version
+
+// handle older Hive version
+def hiveGroup = "org.apache.hive"
 
 // default is Hadoop 1.0.x
 switch (hadoopDistro) {
@@ -40,6 +44,13 @@ switch (hadoopDistro) {
         compile ("org.apache.hadoop:hadoop-streaming:$hadoopVersion", optional) 
         compile ("org.apache.hadoop:hadoop-tools:$hadoopVersion", optional)
     }
+    
+    hbaseVersion = cdh3HbaseVersion
+    // Hive in CDH3 is too old and does not allow Hive Server to be compiled
+    // Note that the POMs and repo are incomplete (hive-builtin is missing)
+    // hiveVersion = cdh3HiveVersion
+    // hiveGroup = "org.apache.hadoop.hive"
+    pigVersion = cdh3PigVersion
 
   break;    
 
@@ -54,6 +65,10 @@ switch (hadoopDistro) {
         compile ("org.apache.hadoop:hadoop-common:$cdh4Version", optional)
         compile ("org.apache.hadoop:hadoop-hdfs:$cdh4Version", optional)
     }
+
+    hbaseVersion = cdh4HbaseVersion
+    hiveVersion = cdh4HiveVersion
+    pigVersion = cdh4PigVersion
 
   break;    
 
@@ -73,9 +88,6 @@ switch (hadoopDistro) {
     hadoop = ["org.apache.hadoop:hadoop-streaming:$hadoopVersion",
               "org.apache.hadoop:hadoop-tools:$hadoopVersion"]
 }
-
-// make Hadoop dependencies optional
-//hadoop = hadoop.collect { it.concat(", optional") }
 
 
 // Common dependencies
@@ -109,18 +121,17 @@ dependencies {
     
     // Missing dependency in Hadoop 1.0.3
     testRuntime "commons-io:commons-io:$commonsioVersion"
-    //testRuntime "org.codehaus.jackson:jackson-core-asl:$jacksonVersion"
     testRuntime "org.codehaus.jackson:jackson-mapper-asl:$jacksonVersion"
     testRuntime "cglib:cglib:$cglibVersion"
 
     // Hive
-    compile("org.apache.hive:hive-metastore:$hiveVersion", optional) 
-    compile("org.apache.hive:hive-service:$hiveVersion", optional)
+    compile("$hiveGroup:hive-metastore:$hiveVersion", optional) 
+    compile("$hiveGroup:hive-service:$hiveVersion", optional)
 
-    testRuntime "org.apache.hive:hive-common:$hiveVersion"
-    testRuntime "org.apache.hive:hive-jdbc:$hiveVersion"
-    testRuntime "org.apache.hive:hive-shims:$hiveVersion"
-    testRuntime "org.apache.hive:hive-serde:$hiveVersion"
+    testRuntime "$hiveGroup:hive-common:$hiveVersion"
+    testRuntime "$hiveGroup:hive-jdbc:$hiveVersion"
+    testRuntime "$hiveGroup:hive-shims:$hiveVersion"
+    testRuntime "$hiveGroup:hive-serde:$hiveVersion"
     testRuntime "org.apache.thrift:libthrift:$thriftVersion"
     testRuntime "org.apache.thrift:libfb303:$thriftVersion"
 
@@ -152,7 +163,7 @@ dependencies {
     testRuntime "org.python:jython-standalone:$jythonVersion"
     testRuntime "org.apache.hive:hive-builtins:$hiveVersion"
 
-    // specify a version of antlr that works with both hive and pig
+    // specify a version of antlr that works with both hive and pig (works only during compilation)
     testRuntime "org.antlr:antlr-runtime:$antlrVersion"
     testCompile "cascading:cascading-local:$cascadingVersion"
     
