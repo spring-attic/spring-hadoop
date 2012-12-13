@@ -126,7 +126,7 @@ public class PigServerFactoryBean implements FactoryBean<PigServerFactory>, Bean
 		}
 
 		if (validateEachStatement != null) {
-			pigServer.setValidateEachStatement(validateEachStatement);
+			PigUtils.validateEachStatement(pigServer, validateEachStatement);
 		}
 
 
