@@ -31,7 +31,9 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import static org.hamcrest.core.Is.*;
 import static org.junit.Assert.*;
+import static org.junit.Assume.*;
 
 /**
  * Test for basic JDBC connectivity to Hive following 
@@ -100,6 +102,7 @@ public class BasicHiveTest {
 	@Test
 	// disabled due to antlr incompatibility between Pig (which requires antlr 3.4) and Hive (3.0.x) 
 	public void testHiveServer() throws Exception {
+		assumeThat(ctx.containsBean("hive-server"), is(Boolean.TRUE));
 		TServer server = ctx.getBean("hive-server", TServer.class);
 		assertNotNull(server);
 		assertTrue(server.isServing());

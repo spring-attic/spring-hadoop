@@ -19,9 +19,12 @@
 			hive.metastore.metadb.dir=.${file.separator}build
 			hive.metastore.warehouse.dir=.${file.separator}build
 			]]>
-			-->
+			
+	Cannot test automatically since it conflits with the ANTLR version used by Pig...
+	
 	<bean id="hive-server" class="org.springframework.data.hadoop.hive.HiveServerFactoryBean" p:port="${hive.port}" p:configuration-ref="hadoopConfiguration"/>
-
+	-->
+	
 	<hdp:hive-server properties-ref="props" properties-location="cfg-1.properties, cfg-2.properties" port="${hive.port}" configuration-ref="hadoopConfiguration">
 		star=chasing
 		return=captain eo
