@@ -63,8 +63,8 @@ switch (hadoopDistro) {
     println "Using Cloudera CDH4 [$hadoopVersion]"
 
     dependencies {
-        optional("org.apache.hadoop:hadoop-streaming:$hadoopVersion") 
-        optional("org.apache.hadoop:hadoop-tools:$hadoopVersion")
+        optional("org.apache.hadoop:hadoop-streaming:$cdh4MR1Version") 
+        optional("org.apache.hadoop:hadoop-tools:$cdh4MR1Version")
         optional("org.apache.hadoop:hadoop-common:$cdh4Version")
         optional("org.apache.hadoop:hadoop-hdfs:$cdh4Version")
     }
