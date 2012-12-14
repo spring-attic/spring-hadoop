@@ -121,12 +121,12 @@ public class HiveBatchTest {
 	public void testScriptParamExecute() throws Exception {
 		Resource data = ctx.getResource("classpath:data/apache-short.txt");
 		assertTrue(data.exists());
-		String uri = data.getURI().toString();
-		System.out.println(uri);
+		String uri = data.getURI().getPath();
+		System.out.println("Loading data from " + uri);
 
 		String script = "DROP TABLE IF EXISTS ${hiveconf:xxx};set zzz;set hiveconf:yyy;"
 				+ "create table ${hiveconf:xxx} (key int, value string);"
-				+ "LOAD DATA LOCAL INPATH ${hiveconf:data} INTO TABLE ${hiveconf:xxx};"
+				+ "LOAD DATA LOCAL INPATH '${hiveconf:data}' INTO TABLE ${hiveconf:xxx};"
 				+ "select count(1) from ${hiveconf:xxx};";
 		Resource res = new ByteArrayResource(script.getBytes());
 		Properties params = new Properties();
