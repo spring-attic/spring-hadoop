@@ -97,7 +97,6 @@ public abstract class ResourceUtils {
 	 * representation of the character.
 	 * </ul>
 	 * @param source the source string
-	 * @param encoding the encoding
 	 * @return the decoded URI
 	 * @throws UnsupportedEncodingException when the given encoding parameter is not supported
 	 * @see java.net.URLDecoder#decode(String, String)
