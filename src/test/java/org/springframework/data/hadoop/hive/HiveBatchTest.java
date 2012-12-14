@@ -139,7 +139,7 @@ public class HiveBatchTest {
 		System.out.println(run);
 		assertEquals("zzz=onions", run.get(0));
 		assertEquals("hiveconf:yyy=unleashed", run.get(1));
-		assertEquals("0", run.get(1));
+		assertEquals("10", run.get(2));
 	}
 
 	@Test
