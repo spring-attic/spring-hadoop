@@ -72,6 +72,7 @@ switch (hadoopDistro) {
     hbaseVersion = cdh4HbaseVersion
     hiveVersion = cdh4HiveVersion
     pigVersion = cdh4PigVersion
+    thriftVersion = cdh4ThriftVersion
 
   break;    
 
@@ -125,15 +126,16 @@ dependencies {
     testRuntime "cglib:cglib:$cglibVersion"
 
     // Hive
-    optional("$hiveGroup:hive-metastore:$hiveVersion") 
+    //optional("$hiveGroup:hive-metastore:$hiveVersion") 
     optional("$hiveGroup:hive-service:$hiveVersion")
 
-    testRuntime "$hiveGroup:hive-common:$hiveVersion"
-    testRuntime "$hiveGroup:hive-jdbc:$hiveVersion"
-    testRuntime "$hiveGroup:hive-shims:$hiveVersion"
-    testRuntime "$hiveGroup:hive-serde:$hiveVersion"
-    testRuntime "org.apache.thrift:libthrift:$thriftVersion"
-    testRuntime "org.apache.thrift:libfb303:$thriftVersion"
+    //testRuntime "$hiveGroup:hive-common:$hiveVersion"
+    //testRuntime "$hiveGroup:hive-jdbc:$hiveVersion"
+    //testRuntime "$hiveGroup:hive-shims:$hiveVersion"
+    //testRuntime "$hiveGroup:hive-serde:$hiveVersion"
+    //testRuntime "$hiveGroup:hive-builtins:$hiveVersion"
+    //testRuntime "org.apache.thrift:libthrift:$thriftVersion"
+    //testRuntime "org.apache.thrift:libfb303:$thriftVersion"
 
     // Pig
     optional("org.apache.pig:pig:$pigVersion")
@@ -160,12 +162,10 @@ dependencies {
     testRuntime "org.codehaus.groovy:groovy:$groovyVersion"
     testRuntime "org.jruby:jruby:$jrubyVersion"
     testRuntime "org.python:jython-standalone:$jythonVersion"
-    testRuntime "org.apache.hive:hive-builtins:$hiveVersion"
-
+    
     // specify a version of antlr that works with both hive and pig (works only during compilation)
     testRuntime "org.antlr:antlr-runtime:$antlrVersion"
     testCompile "cascading:cascading-local:$cascadingVersion"
-    
 }
 
 // exclude poms from the classpath (pulled in by Cloudera)
