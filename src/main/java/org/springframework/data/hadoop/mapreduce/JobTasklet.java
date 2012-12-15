@@ -15,10 +15,19 @@
  */
 package org.springframework.data.hadoop.mapreduce;
 
+import java.io.IOException;
+import java.util.Collection;
+
+import org.apache.hadoop.mapred.RunningJob;
+import org.apache.hadoop.mapred.Task;
+import org.apache.hadoop.mapreduce.Counter;
+import org.apache.hadoop.mapreduce.Counters;
+import org.apache.hadoop.mapreduce.Job;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Batch tasklet for executing one Hadoop job.
@@ -29,7 +38,65 @@ import org.springframework.batch.repeat.RepeatStatus;
 public class JobTasklet extends JobExecutor implements Tasklet {
 
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		executeJobs();
+		Collection<Job> jbs = findJobs();
+
+		if (CollectionUtils.isEmpty(jbs)) {
+			return RepeatStatus.FINISHED;
+		}
+
+		Boolean succesful = Boolean.TRUE;
+		for (Job job : jbs) {
+			if (!isWaitForJob()) {
+				job.submit();
+			}
+			else {
+				succesful &= job.waitForCompletion(isVerbose());
+				try {
+					saveCounters(job, contribution);
+				} catch (IOException ex) {
+					log.warn("Cannot get Hadoop Counters", ex);
+
+				}
+				if (!succesful) {
+					RunningJob rj = JobUtils.getRunningJob(job);
+					throw new IllegalStateException("Job [" + job.getJobName() + "] failed - "
+							+ (rj != null ? rj.getFailureInfo() : "N/A"));
+				}
+			}
+		}
+		
 		return RepeatStatus.FINISHED;
+	}
+
+	private void saveCounters(Job job, StepContribution contribution) throws Exception {
+		Counters counters = job.getCounters();
+		if (counters == null) {
+			return;
+		}
+
+		Counter count = counters.findCounter(Task.Counter.MAP_INPUT_RECORDS);
+
+		for (int i = 0; i < safeLongToInt(count.getValue()); i++) {
+			contribution.incrementReadCount();
+		}
+
+		count = counters.findCounter(Task.Counter.MAP_SKIPPED_RECORDS);
+		contribution.incrementReadSkipCount(safeLongToInt(count.getValue()));
+
+		count = counters.findCounter(Task.Counter.REDUCE_OUTPUT_RECORDS);
+		contribution.incrementWriteCount(safeLongToInt(count.getValue()));
+
+		count = counters.findCounter(Task.Counter.REDUCE_SKIPPED_RECORDS);
+
+		for (int i = 0; i < safeLongToInt(count.getValue()); i++) {
+			contribution.incrementWriteSkipCount();
+		}
+	}
+
+	public static int safeLongToInt(long l) {
+		if (l < Integer.MIN_VALUE || l > Integer.MAX_VALUE) {
+			throw new IllegalArgumentException(l + " cannot be cast to int without changing its value.");
+		}
+		return (int) l;
 	}
 }

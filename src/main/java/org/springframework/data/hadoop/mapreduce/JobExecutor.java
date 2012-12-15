@@ -21,6 +21,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.mapred.RunningJob;
 import org.apache.hadoop.mapreduce.Job;
 import org.springframework.beans.BeansException;
@@ -44,6 +46,8 @@ abstract class JobExecutor implements InitializingBean, BeanFactoryAware {
 	private BeanFactory beanFactory;
 	private boolean verbose = true;
 
+	protected Log log = LogFactory.getLog(getClass());
+
 	public void afterPropertiesSet() throws Exception {
 		Assert.isTrue(jobs != null | jobNames != null, "A Hadoop job or its name is required");
 
@@ -59,13 +63,17 @@ abstract class JobExecutor implements InitializingBean, BeanFactoryAware {
 	}
 
 	protected void executeJobs() throws Exception {
-		Boolean succesful = Boolean.TRUE;
-
 		Collection<Job> jbs = findJobs();
 
 		if (CollectionUtils.isEmpty(jbs)) {
 			return;
 		}
+
+		doExecuteJobs(jbs);
+	}
+
+	protected void doExecuteJobs(Collection<Job> jbs) throws Exception {
+		Boolean succesful = Boolean.TRUE;
 
 		for (Job job : jbs) {
 			if (!waitForJobs) {
@@ -82,7 +90,7 @@ abstract class JobExecutor implements InitializingBean, BeanFactoryAware {
 		}
 	}
 
-	private Collection<Job> findJobs() {
+	protected Collection<Job> findJobs() {
 		if (jobs != null) {
 			return jobs;
 		}
@@ -123,6 +131,15 @@ abstract class JobExecutor implements InitializingBean, BeanFactoryAware {
 	}
 
 	/**
+	 * Indicates whether the tasklet should return for the job to complete (default).
+	 * 
+	 * @return whether to wait for the job to complete or not.
+	 */
+	public boolean isWaitForJob() {
+		return waitForJobs;
+	}
+
+	/**
 	 * Indicates whether the tasklet should return for the job to complete (default)
 	 * after submission or not.
 	 * 
@@ -130,6 +147,15 @@ abstract class JobExecutor implements InitializingBean, BeanFactoryAware {
 	 */
 	public void setWaitForJob(boolean waitForJob) {
 		this.waitForJobs = waitForJob;
+	}
+
+	/**
+	 * Indicates whether the job execution is verbose (the default) or not.
+	 * 
+	 * @return whether the job execution is verbose or not.
+	 */
+	public boolean isVerbose() {
+		return verbose;
 	}
 
 	/**
