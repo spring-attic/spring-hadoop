@@ -15,19 +15,26 @@
  */
 package org.springframework.data.hadoop.batch;
 
+import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.hadoop.TestUtils;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Unit tests covering the job parameters/step scope functionality
@@ -59,6 +66,15 @@ public class JobParamsTest {
 
 	@Test
 	public void testJobMRJob() throws Exception {
-		JobsTrigger.startJobs(ctx, params);
+		List<JobExecution> startJobs = JobsTrigger.startJobs(ctx, params);
+		assertFalse(startJobs.isEmpty());
+
+		// check records
+		Collection<StepExecution> steps = startJobs.get(0).getStepExecutions();
+		for (StepExecution stepExecution : steps) {
+			if ("do-mr".equals(stepExecution.getStepName())) {
+				assertTrue(stepExecution.getReadCount() > 0);
+			}
+		}
 	}
 }
