@@ -327,10 +327,25 @@ javadoc {
 }
 
 jar {
+    manifest.attributes["Created-By"] = "${System.getProperty("java.version")} (${System.getProperty("java.specification.vendor")})"
     manifest.attributes['Implementation-Title'] = 'spring-data-hadoop'
     manifest.attributes['Implementation-Version'] = project.version
-    manifest.attributes['Build'] = "" + System.env['SHDP.BUILD']
-    manifest.attributes['Repository-Revision'] = "" + System.env['SHDP.REV']
+    manifest.attributes['Implementation-URL'] = "http://www.springsource.org/spring-data/hadoop"
+    manifest.attributes['Implementation-Vendor'] = "SpringSource"
+    manifest.attributes['Implementation-Vendor-Id'] = "org.springframework"
+    
+    def build = System.env['SHDP.BUILD']
+    if (build != null)
+        manifest.attributes['Build'] = build
+    
+    String rev = "unknown"
+    
+    // parse the git files to find out the revision
+    File gitHead = file('.git/HEAD')
+    if (gitHead.exists()) {
+        gitHead = file('.git/' + gitHead.text.trim().replace('ref: ',''))
+        if (gitHead.exists()) { rev = gitHead.text }
+    }
 
     from("$rootDir/docs/src/info") {
         include "license.txt"
@@ -338,6 +353,8 @@ jar {
         into "META-INF"
         expand(copyright: new Date().format('yyyy'), version: project.version)
     }
+
+    manifest.attributes['Repository-Revision'] = rev
 }
 
 task sourcesJar(type: Jar, dependsOn:classes) {
