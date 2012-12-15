@@ -18,9 +18,7 @@ package org.springframework.data.hadoop.mapreduce;
 import java.beans.PropertyEditorSupport;
 
 import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapred.RunningJob;
 import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.JobID;
 import org.springframework.beans.PropertyEditorRegistrar;
 import org.springframework.beans.PropertyEditorRegistry;
 
@@ -71,24 +69,32 @@ class MapReducePropertyEditorRegistrar implements PropertyEditorRegistrar {
 
 	@Override
 	public void registerCustomEditors(PropertyEditorRegistry registry) {
-		registry.registerCustomEditor(RunningJob.class, new BaseJobEditor() {
-			@Override
-			protected Object convert(Job job) {
-				return JobUtils.getRunningJob(job);
-			}
-		});
-		registry.registerCustomEditor(JobID.class, new BaseJobEditor() {
-			@Override
-			protected Object convert(Job job) {
-				return JobUtils.getJobId(job);
-			}
-		});
-		registry.registerCustomEditor(org.apache.hadoop.mapred.JobID.class, new BaseJobEditor() {
-			@Override
-			protected Object convert(Job job) {
-				return JobUtils.getOldJobId(job);
-			}
-		});
+
+		// Running job is transitive info
+		//		registry.registerCustomEditor(RunningJob.class, new BaseJobEditor() {
+		//			@Override
+		//			protected Object convert(Job job) {
+		//				return JobUtils.getRunningJob(job);
+		//			}
+		//		});
+
+		// Same as this one
+		//		registry.registerCustomEditor(JobID.class, new BaseJobEditor() {
+		//			@Override
+		//			protected Object convert(Job job) {
+		//				return JobUtils.getJobId(job);
+		//			}
+		//		});
+
+		// And this one
+		//		registry.registerCustomEditor(org.apache.hadoop.mapred.JobID.class, new BaseJobEditor() {
+		//			@Override
+		//			protected Object convert(Job job) {
+		//				return JobUtils.getOldJobId(job);
+		//			}
+		//		});
+
+
 		registry.registerCustomEditor(JobConf.class, new BaseJobEditor() {
 			@Override
 			protected Object convert(Job job) {
