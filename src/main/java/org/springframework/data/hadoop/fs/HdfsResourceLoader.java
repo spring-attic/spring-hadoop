@@ -247,7 +247,11 @@ public class HdfsResourceLoader implements ResourcePatternResolver, PriorityOrde
 	@Override
 	public void close() throws IOException {
 		if (fs != null && internalFS) {
-			fs.close();
+			try {
+				fs.close();
+				// swallow bug in FS closing too early - HADOOP-4829
+			} catch (NullPointerException npe) {
+			}
 		}
 	}
 
