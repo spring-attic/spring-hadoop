@@ -1,10 +1,10 @@
 buildscript {
     repositories {
-        maven { url 'http://repo.springsource.org/plugins-release' }
+        maven { url 'http://repo.springsource.org/plugins-snapshot' }
     }
     dependencies {
         classpath 'org.springframework.build.gradle:docbook-reference-plugin:0.1.6'
-        classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.2'
+        classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.3-SNAPSHOT'
     }
 }
 
