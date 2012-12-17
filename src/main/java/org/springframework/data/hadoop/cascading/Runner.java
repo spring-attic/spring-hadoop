@@ -26,7 +26,7 @@ import cascading.stats.CascadingStats;
  */
 class Runner {
 
-	static CascadingStats run(UnitOfWork<CascadingStats> unitOfWork, boolean wait) {
+	static <S extends CascadingStats> S run(UnitOfWork<S> unitOfWork, boolean wait) {
 		if (wait) {
 			unitOfWork.complete();
 

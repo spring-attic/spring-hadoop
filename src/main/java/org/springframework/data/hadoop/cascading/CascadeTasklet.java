@@ -15,6 +15,7 @@
  */
 package org.springframework.data.hadoop.cascading;
 
+import org.apache.hadoop.mapred.Task;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -22,7 +23,7 @@ import org.springframework.batch.repeat.RepeatStatus;
 
 import cascading.cascade.Cascade;
 import cascading.management.UnitOfWork;
-import cascading.stats.CascadingStats;
+import cascading.stats.CascadeStats;
 
 /**
  * Batch tasklet for executing a {@link Cascade} as part of a job.
@@ -31,14 +32,37 @@ import cascading.stats.CascadingStats;
  */
 public class CascadeTasklet implements Tasklet {
 
-	private UnitOfWork<CascadingStats> unitOfWork;
+	private UnitOfWork<? extends CascadeStats> unitOfWork;
 	private boolean waitToComplete = true;
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		Runner.run(unitOfWork, waitToComplete);
+		System.out.println("Before execution " + contribution);
+		CascadeStats stats = Runner.run(unitOfWork, waitToComplete);
+
+		// save stats
+		for (int i = 0; i < safeLongToInt(stats.getCounterValue(Task.Counter.MAP_INPUT_BYTES)); i++) {
+			contribution.incrementReadCount();
+		}
+
+		contribution.incrementReadSkipCount(safeLongToInt(stats.getCounterValue(Task.Counter.MAP_SKIPPED_RECORDS)));
+		contribution.incrementWriteCount(safeLongToInt(stats.getCounterValue(Task.Counter.REDUCE_OUTPUT_RECORDS)));
+
+		for (int i = 0; i < safeLongToInt(stats.getCounterValue(Task.Counter.REDUCE_SKIPPED_RECORDS)); i++) {
+			contribution.incrementWriteSkipCount();
+		}
+
+		System.out.println("After execution " + contribution);
 		return RepeatStatus.FINISHED;
 	}
+
+	static int safeLongToInt(long l) {
+		if (l < Integer.MIN_VALUE || l > Integer.MAX_VALUE) {
+			throw new IllegalArgumentException(l + " cannot be cast to int without changing its value.");
+		}
+		return (int) l;
+	}
+
 
 	/**
 	 * Sets the unit of work or a {@link Cascade}.
@@ -46,6 +70,6 @@ public class CascadeTasklet implements Tasklet {
 	 * @param cascade the new cascade
 	 */
 	public void setUnitOfWork(Cascade cascade) {
-		this.unitOfWork = unitOfWork;
+		this.unitOfWork = cascade;
 	}
 }
