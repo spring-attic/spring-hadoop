@@ -11,11 +11,20 @@
 	<import resource="../batch-common.xml"/>
 	<import resource="../hadoop-ctx.xml"/>
 	
+	<hdp:script language="javascript" run-at-startup="true">
+		log="src/test/resources/logs/apache_access.log"
+		if (!fsh.test(log)) {
+			fs.copyFromLocalFile(log, log)
+			println("Copied Pig log files to HDFS")
+ 		}
+	</hdp:script>	
+	
+	
 	<job id="mainJob" xmlns="http://www.springframework.org/schema/batch">
-		<step id="bean" next="ns">
+		<step id="bean" next="do-pig">
 			<tasklet ref="tasklet"/>
 		</step>
-		<step id="ns">
+		<step id="do-pig">
 			<tasklet ref="pig-script"/>
 		</step>
 	</job>
@@ -30,7 +39,7 @@
 		</property>
 	</bean>
 
-	<hdp:pig-factory configuration-ref="hadoopConfiguration" exec-type="LOCAL" job-name="pig-script"/> 
+	<hdp:pig-factory configuration-ref="hadoopConfiguration" exec-type="MAPREDUCE" job-name="pig-script"/> 
 	
 	<hdp:pig-tasklet id="pig-script" scope="prototype">
 		<hdp:script location="org/springframework/data/hadoop/pig/script.pig" />
