@@ -68,7 +68,6 @@ public class CascadingTest {
 
 	@Test
 	public void testManualCascade() throws Exception {
-		ctx.getBean("script");
 
 		Scheme sourceScheme = new TextDelimited(new Fields("name", "definition"), ",");
 		Tap source = new Hfs(sourceScheme, "/test/cascading/names/input/babynamedefinitions.csv.gz");
