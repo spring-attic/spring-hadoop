@@ -15,10 +15,13 @@
  */
 package org.springframework.data.hadoop.batch;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.BeanInitializationException;
@@ -31,18 +34,21 @@ import org.springframework.context.ApplicationContext;
  */
 public class JobsTrigger {
 
-	public static void startJobs(ApplicationContext ctx) {
-		startJobs(ctx, new JobParameters());
+	public static List<JobExecution> startJobs(ApplicationContext ctx) {
+		return startJobs(ctx, new JobParameters());
 	}
 
-	public static void startJobs(ApplicationContext ctx, JobParameters params) {
+	public static List<JobExecution> startJobs(ApplicationContext ctx, JobParameters params) {
 		JobLauncher launcher = ctx.getBean(JobLauncher.class);
 		Map<String, Job> jobs = ctx.getBeansOfType(Job.class);
 
+		List<JobExecution> executions = new ArrayList<JobExecution>(jobs.size());
 		for (Map.Entry<String, Job> entry : jobs.entrySet()) {
 			RuntimeException e = null;
 			try {
-				if (launcher.run(entry.getValue(), params).getStatus().equals(BatchStatus.FAILED)) {
+				JobExecution jobExec = launcher.run(entry.getValue(), params);
+				executions.add(jobExec);
+				if (jobExec.getStatus().equals(BatchStatus.FAILED)) {
 					e = new BeanInitializationException("Failed executing job " + entry.getKey());
 				}
 			} catch (Exception ex) {
@@ -52,5 +58,6 @@ public class JobsTrigger {
 				throw e;
 			}
 		}
+		return executions;
 	}
 }

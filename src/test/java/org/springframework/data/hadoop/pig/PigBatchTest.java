@@ -15,8 +15,13 @@
  */
 package org.springframework.data.hadoop.pig;
 
+import java.util.Collection;
+import java.util.List;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.hadoop.TestUtils;
@@ -24,7 +29,7 @@ import org.springframework.data.hadoop.batch.JobsTrigger;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Costin Leau
@@ -45,8 +50,16 @@ public class PigBatchTest {
 	@Test
 	public void testServerNamespace() throws Exception {
 		assertTrue(ctx.isPrototype("pig-script"));
-		JobsTrigger tj = new JobsTrigger();
-		tj.startJobs(ctx);
+		List<JobExecution> startJobs = JobsTrigger.startJobs(ctx);
+
+		// check records
+		Collection<StepExecution> steps = startJobs.get(0).getStepExecutions();
+		for (StepExecution stepExecution : steps) {
+			if ("do-pig".equals(stepExecution.getStepName())) {
+				assertTrue(stepExecution.getReadCount() > 0);
+			}
+		}
+
 	}
 
 	@Test

@@ -24,6 +24,7 @@ import org.springframework.beans.factory.InitializingBean;
 import cascading.cascade.Cascade;
 import cascading.flow.Flow;
 import cascading.management.UnitOfWork;
+import cascading.stats.CascadeStats;
 import cascading.stats.CascadingStats;
 
 /**
@@ -37,7 +38,7 @@ public class CascadeRunner implements InitializingBean, DisposableBean, Callable
 
 	private boolean waitToComplete = true;
 	private boolean runAtStartup = false;
-	private UnitOfWork<CascadingStats> uow;
+	private UnitOfWork<? extends CascadeStats> uow;
 
 	private Iterable<Callable<?>> preActions;
 	private Iterable<Callable<?>> postActions;
@@ -59,6 +60,7 @@ public class CascadeRunner implements InitializingBean, DisposableBean, Callable
 	@Override
 	public CascadingStats call() throws Exception {
 		invoke(preActions);
+
 		CascadingStats stats = Runner.run(uow, waitToComplete);
 		invoke(postActions);
 
@@ -70,7 +72,7 @@ public class CascadeRunner implements InitializingBean, DisposableBean, Callable
 	 *
 	 * @param uow the new unit of work.
 	 */
-	public void setUnitOfWork(UnitOfWork<CascadingStats> uow) {
+	public void setUnitOfWork(UnitOfWork<? extends CascadeStats> uow) {
 		this.uow = uow;
 	}
 

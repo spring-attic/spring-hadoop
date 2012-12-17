@@ -15,7 +15,9 @@
  */
 package org.springframework.data.hadoop.cascading;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -24,9 +26,14 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.springframework.beans.factory.BeanNameAware;
+import org.springframework.core.io.Resource;
 import org.springframework.data.hadoop.configuration.ConfigurationUtils;
+import org.springframework.data.hadoop.util.ResourceUtils;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 import cascading.cascade.Cascade;
@@ -35,6 +42,7 @@ import cascading.flow.FlowProps;
 import cascading.flow.hadoop.HadoopFlow;
 import cascading.flow.hadoop.HadoopFlowConnector;
 import cascading.pipe.Pipe;
+import cascading.property.AppProps;
 import cascading.tap.Tap;
 
 
@@ -46,6 +54,8 @@ import cascading.tap.Tap;
  * @author Costin Leau
  */
 public class HadoopFlowFactoryBean extends FlowFactoryBean<HadoopFlow> implements BeanNameAware {
+
+	private static final Log log = LogFactory.getLog(CascadeFactoryBean.class);
 
 	private static String MARKER = HadoopFlowFactoryBean.class.getName() + "#SINGLE";
 
@@ -64,8 +74,12 @@ public class HadoopFlowFactoryBean extends FlowFactoryBean<HadoopFlow> implement
 
 	private FlowDef flowDef;
 
+	private Class<?> jarClass;
+	private Resource jar;
+	private boolean jarSetup = true;
+
 	@Override
-	HadoopFlow createFlow() {
+	HadoopFlow createFlow() throws IOException {
 		// copy flowDef
 		FlowDef def = FlowDef.flowDef();
 
@@ -118,8 +132,41 @@ public class HadoopFlowFactoryBean extends FlowFactoryBean<HadoopFlow> implement
 			}
 		}
 
+		Configuration cfg = ConfigurationUtils.createFrom(configuration, properties);
+		Properties props = ConfigurationUtils.asProperties(cfg);
 
-		Properties props = ConfigurationUtils.asProperties(ConfigurationUtils.createFrom(configuration, properties));
+		if (jarSetup) {
+			if (jar != null) {
+				AppProps.setApplicationJarPath(props, ResourceUtils.decode(jar.getURI().toString()));
+			}
+			else if (jarClass != null) {
+				AppProps.setApplicationJarClass(props, jarClass);
+			}
+			else {
+				// auto-detection based on the classpath
+				ClassLoader cascadingCL = Cascade.class.getClassLoader();
+				Resource cascadingCore = ResourceUtils.findContainingJar(Cascade.class);
+				Resource cascadingHadoop = ResourceUtils.findContainingJar(cascadingCL,
+						"cascading/flow/hadoop/HadoopFlow.class");
+				// find jgrapht
+				Resource jgrapht = ResourceUtils.findContainingJar(cascadingCL, "org/jgrapht/Graph.class");
+
+				Assert.notNull(cascadingCore, "Cannot find cascading-core.jar");
+				Assert.notNull(cascadingHadoop, "Cannot find cascading-hadoop.jar");
+				Assert.notNull(jgrapht, "Cannot find jgraphts-jdk.jar");
+
+				if (log.isDebugEnabled()) {
+					log.debug("Auto-detecting Cascading Libs ["
+							+ Arrays.toString(new Resource[] { cascadingCore, cascadingHadoop, jgrapht }) + "]");
+				}
+
+				ConfigurationUtils.addLibs(cfg, cascadingCore, cascadingHadoop, jgrapht);
+
+				// config changed, reinit properties
+				props = ConfigurationUtils.asProperties(cfg);
+			}
+		}
+
 
 		if (jobPoolingInterval != null) {
 			FlowProps.setJobPollingInterval(props, jobPoolingInterval);
@@ -243,5 +290,38 @@ public class HadoopFlowFactoryBean extends FlowFactoryBean<HadoopFlow> implement
 	 */
 	public void setFlowDef(FlowDef flowDef) {
 		this.flowDef = flowDef;
+	}
+
+	/**
+	 * Determines the job jar (available on the classpath) based on the given class.
+	 * 
+	 * @param jarClass The jarClass to set.
+	 */
+	public void setJarByClass(Class<?> jarClass) {
+		this.jarClass = jarClass;
+	}
+
+	/**
+	 * Sets the job jar (which might not be on the classpath).
+	 * 
+	 * @param jar The jar to set.
+	 */
+	public void setJar(Resource jar) {
+		this.jar = jar;
+	}
+
+	/**
+	 * Indicates whether the Cascading jar should be set for the cascade.
+	 * By default it is true, meaning the factory will use the user provided settings
+	 * ({@link #setJar(Resource)} and {@link #setJarByClass(Class)} or falling back
+	 * to its own discovery mechanism if the above are not setup. 
+	 * 
+	 * When running against a cluster where cascading is already present, turn this to false
+	 * to avoid shipping the library jar with the job.
+	 * 
+	 * @param jarSetup
+	 */
+	public void setJarSetup(boolean jarSetup) {
+		this.jarSetup = jarSetup;
 	}
 }

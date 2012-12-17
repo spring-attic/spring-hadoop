@@ -18,10 +18,10 @@
 		<step id="import" next="import-2">
 			<tasklet ref="nested-script-tasklet"/>
 		</step>
-		<step id="import-2" next="do">
+		<step id="import-2" next="do-mr">
 			<tasklet ref="ref-script-tasklet"/>
 		</step>
-		<step id="do">
+		<step id="do-mr">
 			<tasklet ref="hadoop-tasklet"/>
 		</step>
 		<!-- 
