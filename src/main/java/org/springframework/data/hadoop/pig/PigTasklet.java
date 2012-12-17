@@ -53,7 +53,8 @@ public class PigTasklet extends PigExecutor implements Tasklet {
 			PigStats stats = execJob.getStatistics();
 
 			// embedded pig contains no stats and further more throws Exceptions
-			if (!stats.isEmbedded()) {
+			// use CDH3 compatible comparison
+			if (!stats.getClass().getName().contains("EmbeddedPigStats")) {
 				// compute the input stats manually
 				List<InputStats> inputStats = stats.getInputStats();
 
