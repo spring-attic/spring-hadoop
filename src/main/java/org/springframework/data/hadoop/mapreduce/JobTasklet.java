@@ -15,10 +15,8 @@
  */
 package org.springframework.data.hadoop.mapreduce;
 
-import java.io.IOException;
 import java.util.Collection;
 
-import org.apache.hadoop.mapred.RunningJob;
 import org.apache.hadoop.mapred.Task;
 import org.apache.hadoop.mapreduce.Counter;
 import org.apache.hadoop.mapreduce.Counters;
@@ -27,7 +25,6 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.util.CollectionUtils;
 
 /**
  * Batch tasklet for executing one Hadoop job.
@@ -38,33 +35,12 @@ import org.springframework.util.CollectionUtils;
 public class JobTasklet extends JobExecutor implements Tasklet {
 
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		Collection<Job> jbs = findJobs();
+		Collection<Job> jobs = executeJobs();
 
-		if (CollectionUtils.isEmpty(jbs)) {
-			return RepeatStatus.FINISHED;
+		for (Job job : jobs) {
+			saveCounters(job, contribution);
 		}
 
-		Boolean succesful = Boolean.TRUE;
-		for (Job job : jbs) {
-			if (!isWaitForJob()) {
-				job.submit();
-			}
-			else {
-				succesful &= job.waitForCompletion(isVerbose());
-				try {
-					saveCounters(job, contribution);
-				} catch (IOException ex) {
-					log.warn("Cannot get Hadoop Counters", ex);
-
-				}
-				if (!succesful) {
-					RunningJob rj = JobUtils.getRunningJob(job);
-					throw new IllegalStateException("Job [" + job.getJobName() + "] failed - "
-							+ (rj != null ? rj.getFailureInfo() : "N/A"));
-				}
-			}
-		}
-		
 		return RepeatStatus.FINISHED;
 	}
 

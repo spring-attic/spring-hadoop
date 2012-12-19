@@ -15,11 +15,14 @@
  */
 package org.springframework.data.hadoop.mapreduce;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,8 +32,8 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -45,6 +48,7 @@ abstract class JobExecutor implements InitializingBean, BeanFactoryAware {
 	private boolean waitForJobs = true;
 	private BeanFactory beanFactory;
 	private boolean verbose = true;
+	private Executor taskExecutor;
 
 	protected Log log = LogFactory.getLog(getClass());
 
@@ -62,32 +66,81 @@ abstract class JobExecutor implements InitializingBean, BeanFactoryAware {
 		}
 	}
 
-	protected void executeJobs() throws Exception {
-		Collection<Job> jbs = findJobs();
+	/**
+	 * Stops running job.
+	 * 
+	 * @return list of stopped jobs.
+	 * @throws Exception
+	 */
+	protected Collection<Job> stopJobs() {
+		final Collection<Job> jbs = findJobs();
 
-		if (CollectionUtils.isEmpty(jbs)) {
-			return;
-		}
+		final List<Job> killedJobs = new ArrayList<Job>();
 
-		doExecuteJobs(jbs);
-	}
-
-	protected void doExecuteJobs(Collection<Job> jbs) throws Exception {
-		Boolean succesful = Boolean.TRUE;
-
-		for (Job job : jbs) {
-			if (!waitForJobs) {
-				job.submit();
-			}
-			else {
-				succesful &= job.waitForCompletion(verbose);
-				if (!succesful) {
-					RunningJob rj = JobUtils.getRunningJob(job);
-					throw new IllegalStateException("Job [" + job.getJobName() + "] failed - "
-							+ (rj != null ? rj.getFailureInfo() : "N/A"));
+		taskExecutor.execute(new Runnable() {
+			@Override
+			public void run() {
+				for (final Job job : jbs) {
+					try {
+						if (JobUtils.isJobStarted(job) && !job.isComplete()) {
+							synchronized (killedJobs) {
+								killedJobs.add(job);
+							}
+							job.killJob();
+						}
+					} catch (IOException ex) {
+						log.warn("Cannot kill job [" + job.getJobName() + "]", ex);
+						throw new IllegalStateException(ex);
+					}
 				}
 			}
-		}
+		});
+
+		return jbs;
+	}
+
+	protected Collection<Job> executeJobs() {
+		final Collection<Job> jbs = findJobs();
+
+		final AtomicBoolean succesful = new AtomicBoolean(true);
+
+		final List<Job> started = new ArrayList<Job>();
+
+		taskExecutor.execute(new Runnable() {
+			@Override
+			public void run() {
+				for (final Job job : jbs) {
+					try {
+						// job is already running - ignore it
+						if (JobUtils.isJobStarted(job)) {
+							break;
+						}
+
+						synchronized (started) {
+							started.add(job);
+						}
+						if (!waitForJobs) {
+							job.submit();
+						}
+						else {
+							boolean succes = !job.waitForCompletion(verbose);
+							if (!succes) {
+								succesful.set(false);
+
+								RunningJob rj = JobUtils.getRunningJob(job);
+								throw new IllegalStateException("Job [" + job.getJobName() + "] failed - "
+										+ (rj != null ? rj.getFailureInfo() : "N/A"));
+							}
+						}
+					} catch (Exception ex) {
+						log.warn("Cannot start job [" + job.getJobName() + "]", ex);
+						throw new IllegalStateException(ex);
+					}
+				}
+			}
+		});
+
+		return started;
 	}
 
 	protected Collection<Job> findJobs() {
@@ -170,5 +223,15 @@ abstract class JobExecutor implements InitializingBean, BeanFactoryAware {
 	@Override
 	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
 		this.beanFactory = beanFactory;
+	}
+
+	/**
+	 * Set the TaskExecutor used for waiting/tracking the Hadoop jobs.
+	 * By default, {@link SyncTaskExecutor} is used, meaning the calling thread. 
+	 * 
+	 * @param taskExecutor the task executor to use
+	 */
+	public void setTaskExecutor(Executor taskExecutor) {
+		this.taskExecutor = taskExecutor;
 	}
 }

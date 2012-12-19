@@ -21,6 +21,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.RunningJob;
 import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Job.JobState;
 import org.apache.hadoop.mapreduce.JobID;
 import org.springframework.data.hadoop.configuration.ConfigurationUtils;
 import org.springframework.util.ReflectionUtils;
@@ -34,10 +35,13 @@ import org.springframework.util.ReflectionUtils;
 public abstract class JobUtils {
 
 	static Field JOB_INFO;
+	static Field JOB_STATE;
 
 	static {
 		JOB_INFO = ReflectionUtils.findField(Job.class, "info");
 		ReflectionUtils.makeAccessible(JOB_INFO);
+		JOB_STATE = ReflectionUtils.findField(Job.class, "state");
+		ReflectionUtils.makeAccessible(JOB_STATE);
 	}
 
 	public static RunningJob getRunningJob(Job job) {
@@ -77,5 +81,17 @@ public abstract class JobUtils {
 		}
 
 		return (JobConf) ConfigurationUtils.createFrom(configuration, null);
+	}
+
+	public static JobState getJobState(Job job) {
+		if (job == null) {
+			return null;
+		}
+
+		return (JobState) ReflectionUtils.getField(JOB_STATE, job);
+	}
+
+	public static boolean isJobStarted(Job job) {
+		return (job != null && JobState.RUNNING == getJobState(job));
 	}
 }
