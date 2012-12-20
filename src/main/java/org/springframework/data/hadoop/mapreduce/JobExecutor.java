@@ -31,6 +31,7 @@ import org.apache.hadoop.mapreduce.Job;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.util.Assert;
@@ -41,14 +42,21 @@ import org.springframework.util.StringUtils;
  * 
  * @author Costin Leau
  */
-abstract class JobExecutor implements InitializingBean, BeanFactoryAware {
+abstract class JobExecutor implements InitializingBean, DisposableBean, BeanFactoryAware {
+
+	interface JobListener {
+
+		void jobFinished(Job job);
+
+		void jobKilled(Job job);
+	}
 
 	private Collection<Job> jobs;
 	private Iterable<String> jobNames;
 	private boolean waitForJobs = true;
 	private BeanFactory beanFactory;
 	private boolean verbose = true;
-	private Executor taskExecutor;
+	private Executor taskExecutor = new SyncTaskExecutor();
 
 	protected Log log = LogFactory.getLog(getClass());
 
@@ -66,6 +74,11 @@ abstract class JobExecutor implements InitializingBean, BeanFactoryAware {
 		}
 	}
 
+	@Override
+	public void destroy() throws Exception {
+		stopJobs();
+	}
+
 	/**
 	 * Stops running job.
 	 * 
@@ -73,6 +86,17 @@ abstract class JobExecutor implements InitializingBean, BeanFactoryAware {
 	 * @throws Exception
 	 */
 	protected Collection<Job> stopJobs() {
+		return stopJobs(null);
+	}
+
+	/**
+	 * Stops running job.
+	 *
+	 * @param listener job listener
+	 * @return list of stopped jobs.
+	 * @throws Exception
+	 */
+	protected Collection<Job> stopJobs(final JobListener listener) {
 		final Collection<Job> jbs = findJobs();
 
 		final List<Job> killedJobs = new ArrayList<Job>();
@@ -82,11 +106,15 @@ abstract class JobExecutor implements InitializingBean, BeanFactoryAware {
 			public void run() {
 				for (final Job job : jbs) {
 					try {
-						if (JobUtils.isJobStarted(job) && !job.isComplete()) {
+						if (JobUtils.getStatus(job).isRunning()) {
 							synchronized (killedJobs) {
 								killedJobs.add(job);
 							}
+							log.info("Killing job [" + job.getJobName() + "]");
 							job.killJob();
+							if (listener != null) {
+								listener.jobKilled(job);
+							}
 						}
 					} catch (IOException ex) {
 						log.warn("Cannot kill job [" + job.getJobName() + "]", ex);
@@ -99,7 +127,11 @@ abstract class JobExecutor implements InitializingBean, BeanFactoryAware {
 		return jbs;
 	}
 
-	protected Collection<Job> executeJobs() {
+	protected Collection<Job> startJobs() {
+		return startJobs(null);
+	}
+
+	protected Collection<Job> startJobs(final JobListener listener) {
 		final Collection<Job> jbs = findJobs();
 
 		final AtomicBoolean succesful = new AtomicBoolean(true);
@@ -112,10 +144,12 @@ abstract class JobExecutor implements InitializingBean, BeanFactoryAware {
 				for (final Job job : jbs) {
 					try {
 						// job is already running - ignore it
-						if (JobUtils.isJobStarted(job)) {
+						if (JobUtils.getStatus(job).isStarted()) {
+							log.info("Job [" + job.getJobName() + "] already started; skipping it...");
 							break;
 						}
 
+						log.info("Starting job [" + job.getJobName() + "]");
 						synchronized (started) {
 							started.add(job);
 						}
@@ -123,7 +157,11 @@ abstract class JobExecutor implements InitializingBean, BeanFactoryAware {
 							job.submit();
 						}
 						else {
-							boolean succes = !job.waitForCompletion(verbose);
+							boolean succes = job.waitForCompletion(verbose);
+							if (listener != null) {
+								listener.jobFinished(job);
+							}
+
 							if (!succes) {
 								succesful.set(false);
 
@@ -132,6 +170,9 @@ abstract class JobExecutor implements InitializingBean, BeanFactoryAware {
 										+ (rj != null ? rj.getFailureInfo() : "N/A"));
 							}
 						}
+					} catch (InterruptedException ex) {
+						log.warn("Job [" + job.getJobName() + "] killed");
+						throw new IllegalStateException(ex);
 					} catch (Exception ex) {
 						log.warn("Cannot start job [" + job.getJobName() + "]", ex);
 						throw new IllegalStateException(ex);
@@ -232,6 +273,7 @@ abstract class JobExecutor implements InitializingBean, BeanFactoryAware {
 	 * @param taskExecutor the task executor to use
 	 */
 	public void setTaskExecutor(Executor taskExecutor) {
+		Assert.notNull(taskExecutor, "a non-null task executor is required");
 		this.taskExecutor = taskExecutor;
 	}
 }

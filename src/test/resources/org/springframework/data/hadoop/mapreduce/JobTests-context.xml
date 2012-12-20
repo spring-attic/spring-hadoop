@@ -16,6 +16,7 @@
 	if (fsh.test("/ide-test/runner/output-2")) { fsh.rmr("/ide-test/runner/output-2") }
 	if (fsh.test("/ide-test/runner/output-3")) { fsh.rmr("/ide-test/runner/output-3") }
 	if (fsh.test("/ide-test/runner/output-4")) { fsh.rmr("/ide-test/runner/output-4") }
+	if (fsh.test("/ide-test/runner/killed")) { fsh.rmr("/ide-test/runner/killed") }
 	
 	fsh.put("src/test/resources/input/word", "/ide-test/input/word")			
 	</hdp:script>
@@ -34,7 +35,7 @@
 	</bean>
 
 
-	<hdp:job-runner id="ns-runner" pre-action="nop-script" job-ref="jar-job, ns-job" run-at-startup="true"/>
+	<hdp:job-runner id="ns-runner" pre-action="nop-script" job-ref="jar-job, ns-job" run-at-startup="false"/>
 	
 	<bean id="no-wait" class="org.springframework.data.hadoop.mapreduce.JobRunner" depends-on="script">
 		<property name="jobs">
@@ -63,7 +64,7 @@
 		libs="some-tool.jar"
 		number-reducers="1"
 		scope="prototype" /> 
-	
+
 	<hdp:job id="ns-job" 
 	   	input-path="/ide-test/input/word/" output-path="/ide-test/runner/output/"
 		mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
@@ -90,6 +91,17 @@
 	<task:scheduled-tasks scheduler="myScheduler">
  		<task:scheduled ref="ns-runner" method="call" fixed-rate="60000"/>
  	</task:scheduled-tasks>
+
+
+	<hdp:job-runner id="killer-runner" job-ref="victim-job" wait-for-job="false"/>
+	
+	<hdp:job id="victim-job" 
+	   	input-path="/ide-test/input/word/" output-path="/ide-test/runner/killed/"
+		mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
+		reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"
+		scope="singleton"
+		libs="classpath:mini-hadoop-examples.jar"/>
+
  	
  	<!-- PE tests - currently disabled
  	<bean id="jobInfo" class="org.springframework.data.hadoop.mapreduce.JobTests$JobInfo"

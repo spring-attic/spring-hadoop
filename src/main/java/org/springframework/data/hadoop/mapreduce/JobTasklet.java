@@ -15,6 +15,7 @@
  */
 package org.springframework.data.hadoop.mapreduce;
 
+import java.io.IOException;
 import java.util.Collection;
 
 import org.apache.hadoop.mapred.Task;
@@ -34,8 +35,20 @@ import org.springframework.batch.repeat.RepeatStatus;
  */
 public class JobTasklet extends JobExecutor implements Tasklet {
 
-	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		Collection<Job> jobs = executeJobs();
+	public RepeatStatus execute(final StepContribution contribution, ChunkContext chunkContext) throws Exception {
+		// save the contribution as a class listener
+
+		Collection<Job> jobs = startJobs(new JobListener() {
+			@Override
+			public void jobKilled(Job job) {
+				saveCounters(job, contribution);
+			}
+
+			@Override
+			public void jobFinished(Job job) {
+				saveCounters(job, contribution);
+			}
+		});
 
 		for (Job job : jobs) {
 			saveCounters(job, contribution);
@@ -44,8 +57,13 @@ public class JobTasklet extends JobExecutor implements Tasklet {
 		return RepeatStatus.FINISHED;
 	}
 
-	private void saveCounters(Job job, StepContribution contribution) throws Exception {
-		Counters counters = job.getCounters();
+	private void saveCounters(Job job, StepContribution contribution) {
+		Counters counters = null;
+		try {
+			counters = job.getCounters();
+		} catch (IOException ex) {
+			// ignore - we just can't get stats
+		}
 		if (counters == null) {
 			return;
 		}

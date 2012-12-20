@@ -15,6 +15,7 @@
  */
 package org.springframework.data.hadoop.mapreduce;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 
 import org.apache.hadoop.conf.Configuration;
@@ -34,14 +35,95 @@ import org.springframework.util.ReflectionUtils;
  */
 public abstract class JobUtils {
 
+	/**
+	 * Status of a job. The enum tries to reuse as much as possible
+	 * the internal Hadoop terminology.
+	 * 
+	 * @author Costin Leau
+	 */
+	public enum JobStatus {
+		/**
+		 * The status cannot be determined - either because the job might be invalid
+		 * or maybe because of a communication failure.  
+		 */
+		UNKNOWN,
+		/**
+		 * The job is has been/is being defined or configured.
+		 * It has not been submitted to the job tracker.
+		 */
+		DEFINED,
+		/**
+		 * The job has been submited to the tracker and its execution
+		 * is being prepared.
+		 */
+		PREPARING,
+		/**
+		 * The job is actually running.
+		 */
+		RUNNING,
+		/**
+		 * The execution has completed successfully.
+		 */
+		SUCCEEDED,
+		/**
+		 * The execution has failed.
+		 */
+		FAILED,
+		/**
+		 * The execution was cancelled or killed.
+		 */
+		KILLED;
+
+		public static JobStatus fromRunState(int state) {
+			switch (state) {
+			case 1:
+				return RUNNING;
+			case 2:
+				return SUCCEEDED;
+			case 3:
+				return FAILED;
+			case 4:
+				return PREPARING;
+			case 5:
+				return KILLED;
+			default:
+				return UNKNOWN;
+			}
+		}
+
+		public static JobStatus fromJobState(JobState jobState) {
+			switch (jobState) {
+			case DEFINE:
+				return DEFINED;
+			case RUNNING:
+				return RUNNING;
+			default:
+				return UNKNOWN;
+			}
+		}
+
+		public boolean isRunning() {
+			return PREPARING == this || RUNNING == this;
+		}
+
+		public boolean isFinished() {
+			return SUCCEEDED == this || FAILED == this || KILLED == this;
+		}
+
+		public boolean isStarted() {
+			return DEFINED != this;
+		}
+	}
+
 	static Field JOB_INFO;
-	static Field JOB_STATE;
+	static Field JOB_CLIENT_STATE;
 
 	static {
 		JOB_INFO = ReflectionUtils.findField(Job.class, "info");
 		ReflectionUtils.makeAccessible(JOB_INFO);
-		JOB_STATE = ReflectionUtils.findField(Job.class, "state");
-		ReflectionUtils.makeAccessible(JOB_STATE);
+
+		JOB_CLIENT_STATE = ReflectionUtils.findField(Job.class, "state");
+		ReflectionUtils.makeAccessible(JOB_CLIENT_STATE);
 	}
 
 	public static RunningJob getRunningJob(Job job) {
@@ -83,15 +165,29 @@ public abstract class JobUtils {
 		return (JobConf) ConfigurationUtils.createFrom(configuration, null);
 	}
 
-	public static JobState getJobState(Job job) {
+	/**
+	 * Returns the status of the given job. May return null indicating accessing the job
+	 * caused exceptions. 
+	 * 
+	 * @param job
+	 * @return
+	 */
+	public static JobStatus getStatus(Job job) {
 		if (job == null) {
-			return null;
+			return JobStatus.UNKNOWN;
 		}
 
-		return (JobState) ReflectionUtils.getField(JOB_STATE, job);
-	}
+		// go first for the running info
+		RunningJob runningJob = getRunningJob(job);
+		if (runningJob != null) {
+			try {
+				return JobStatus.fromRunState(runningJob.getJobState());
+			} catch (IOException ex) {
+				return JobStatus.UNKNOWN;
+			}
+		}
 
-	public static boolean isJobStarted(Job job) {
-		return (job != null && JobState.RUNNING == getJobState(job));
+		// no running info found, assume it's being defined
+		return JobStatus.DEFINED;
 	}
 }

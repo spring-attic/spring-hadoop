@@ -49,7 +49,7 @@ public class JobRunner extends JobExecutor implements Callable<Void> {
 	public Void call() throws Exception {
 		// pre action
 		invoke(preActions);
-		executeJobs();
+		startJobs();
 		// post action
 		invoke(postActions);
 		return null;
