@@ -22,7 +22,9 @@ import org.apache.hadoop.mapred.Task;
 import org.apache.hadoop.mapreduce.Counter;
 import org.apache.hadoop.mapreduce.Counters;
 import org.apache.hadoop.mapreduce.Job;
+import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -35,8 +37,11 @@ import org.springframework.batch.repeat.RepeatStatus;
  */
 public class JobTasklet extends JobExecutor implements Tasklet {
 
+
 	public RepeatStatus execute(final StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		// save the contribution as a class listener
+
+		StepExecution stepExecution = chunkContext.getStepContext().getStepExecution();
+		JobExecution jobExecution = stepExecution.getJobExecution();
 
 		Collection<Job> jobs = startJobs(new JobListener() {
 			@Override

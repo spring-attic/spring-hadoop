@@ -25,7 +25,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.BeanInitializationException;
-import org.springframework.context.ApplicationContext;
+import org.springframework.beans.factory.ListableBeanFactory;
 
 /**
  * Trigger bean used for executing jobs after a context has been initialized.
@@ -34,13 +34,13 @@ import org.springframework.context.ApplicationContext;
  */
 public class JobsTrigger {
 
-	public static List<JobExecution> startJobs(ApplicationContext ctx) {
-		return startJobs(ctx, new JobParameters());
+	public static List<JobExecution> startJobs(ListableBeanFactory bf) {
+		return startJobs(bf, new JobParameters());
 	}
 
-	public static List<JobExecution> startJobs(ApplicationContext ctx, JobParameters params) {
-		JobLauncher launcher = ctx.getBean(JobLauncher.class);
-		Map<String, Job> jobs = ctx.getBeansOfType(Job.class);
+	public static List<JobExecution> startJobs(ListableBeanFactory bf, JobParameters params) {
+		JobLauncher launcher = bf.getBean(JobLauncher.class);
+		Map<String, Job> jobs = bf.getBeansOfType(Job.class);
 
 		List<JobExecution> executions = new ArrayList<JobExecution>(jobs.size());
 		for (Map.Entry<String, Job> entry : jobs.entrySet()) {
@@ -59,5 +59,11 @@ public class JobsTrigger {
 			}
 		}
 		return executions;
+	}
+
+	public static JobExecution startJob(ListableBeanFactory lbf, String jobName) throws Exception {
+		Job job = lbf.getBean(jobName, Job.class);
+		JobLauncher launcher = lbf.getBean(JobLauncher.class);
+		return launcher.run(job, new JobParameters());
 	}
 }
