@@ -22,23 +22,18 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 
 import cascading.cascade.Cascade;
-import cascading.management.UnitOfWork;
-import cascading.stats.CascadeStats;
+import cascading.stats.CascadingStats;
 
 /**
  * Batch tasklet for executing a {@link Cascade} as part of a job.
  * 
  * @author Costin Leau
  */
-public class CascadeTasklet implements Tasklet {
-
-	private UnitOfWork<? extends CascadeStats> unitOfWork;
-	private boolean waitToComplete = true;
+public class CascadingTasklet extends CascadingExecutor implements Tasklet {
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		System.out.println("Before execution " + contribution);
-		CascadeStats stats = Runner.run(unitOfWork, waitToComplete);
+		CascadingStats stats = execute();
 
 		// save stats
 		for (int i = 0; i < safeLongToInt(stats.getCounterValue(Task.Counter.MAP_INPUT_BYTES)); i++) {
@@ -52,7 +47,6 @@ public class CascadeTasklet implements Tasklet {
 			contribution.incrementWriteSkipCount();
 		}
 
-		System.out.println("After execution " + contribution);
 		return RepeatStatus.FINISHED;
 	}
 
@@ -61,15 +55,5 @@ public class CascadeTasklet implements Tasklet {
 			throw new IllegalArgumentException(l + " cannot be cast to int without changing its value.");
 		}
 		return (int) l;
-	}
-
-
-	/**
-	 * Sets the unit of work or a {@link Cascade}.
-	 *
-	 * @param cascade the new cascade
-	 */
-	public void setUnitOfWork(Cascade cascade) {
-		this.unitOfWork = cascade;
 	}
 }
