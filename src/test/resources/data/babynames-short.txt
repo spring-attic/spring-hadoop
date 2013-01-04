@@ -1,7 +1,7 @@
 AARON,To sing
 ABBIE,From the name ABIGAIL
 ABBOTT,Father
-ABBRA,Example, Lesson
+ABBRA,Example
 ABBY,From the name ABIGAIL
 ABE,From the name ABRAHAM
 ABEL,A Breath

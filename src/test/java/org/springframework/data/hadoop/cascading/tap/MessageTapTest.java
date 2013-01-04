@@ -42,7 +42,7 @@ import cascading.scheme.local.TextDelimited;
 import cascading.scheme.local.TextLine;
 import cascading.tap.Tap;
 import cascading.tuple.Fields;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Costin Leau

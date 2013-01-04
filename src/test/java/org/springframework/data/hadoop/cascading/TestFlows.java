@@ -33,10 +33,8 @@ import cascading.tuple.Fields;
 public class TestFlows {
 
 	public static FlowDef copyFlow(String sourcePath, String sinkPath) {
-		Scheme sourceScheme = new TextDelimited(new Fields("name", "definition", "synonym", "synonym2"), null, false,
-				false, ",",
-				false, null,
-				null, false);
+		Scheme sourceScheme = new TextDelimited(new Fields("name", "definition"), ",");
+
 		Tap source = new Hfs(sourceScheme, sourcePath);
 
 		Scheme sinkScheme = new TextDelimited(new Fields("definition", "name"), " $$ ");
