@@ -47,11 +47,6 @@ public class CascadingBatchTest {
 	ApplicationContext ctx;
 
 	@Test
-	public void testSanity() {
-		assertTrue(ctx.containsBean("copyFlow"));
-	}
-
-	//@Test
 	public void testCascadeTasklet() throws Exception {
 		List<JobExecution> startJobs = JobsTrigger.startJobs(ctx);
 		assertFalse(startJobs.isEmpty());

@@ -16,7 +16,9 @@
 package org.springframework.data.hadoop.cascading;
 
 import cascading.flow.FlowDef;
+import cascading.operation.Debug;
 import cascading.operation.DebugLevel;
+import cascading.pipe.Each;
 import cascading.pipe.Pipe;
 import cascading.scheme.Scheme;
 import cascading.scheme.hadoop.TextDelimited;
@@ -31,14 +33,20 @@ import cascading.tuple.Fields;
 public class TestFlows {
 
 	public static FlowDef copyFlow(String sourcePath, String sinkPath) {
-		Scheme sourceScheme = new TextDelimited(new Fields("name", "definition"), ",");
+		Scheme sourceScheme = new TextDelimited(new Fields("name", "definition", "synonym", "synonym2"), null, false,
+				false, ",",
+				false, null,
+				null, false);
 		Tap source = new Hfs(sourceScheme, sourcePath);
 
 		Scheme sinkScheme = new TextDelimited(new Fields("definition", "name"), " $$ ");
 		Tap sink = new Hfs(sinkScheme, sinkPath, SinkMode.REPLACE);
 
+		Pipe assembly = new Pipe("copy");
+		assembly = new Each(assembly, DebugLevel.VERBOSE, new Debug());
+
 		FlowDef flowDef = FlowDef.flowDef().setName("copy");
-		flowDef.addTail(new Pipe("copy"));
+		flowDef.addTail(assembly);
 		flowDef.addSource("copy", source);
 		flowDef.addSink("copy", sink);
 		flowDef.setDebugLevel(DebugLevel.VERBOSE);
