@@ -18,6 +18,7 @@ package org.springframework.data.hadoop.cascading;
 import java.util.Collection;
 import java.util.List;
 
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
@@ -28,6 +29,7 @@ import org.springframework.data.hadoop.batch.JobsTrigger;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import cascading.cascade.Cascade;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -41,6 +43,8 @@ public class CascadingBatchTest {
 	{
 		TestUtils.hackHadoopStagingOnWin();
 	}
+
+	private static long WAIT_FOR_JOB_TO_START = 12 * 1000;
 
 	@Autowired
 	ApplicationContext ctx;
@@ -57,5 +61,18 @@ public class CascadingBatchTest {
 				assertTrue(stepExecution.getReadCount() > 0);
 			}
 		}
+	}
+
+	@Test
+	public void testJobTaskletKill() throws Exception {
+		// start async job execution
+		JobExecution batchJob = JobsTrigger.startJob(ctx, "mainJob");
+		Cascade cascade = ctx.getBean("cascade", Cascade.class);
+
+		Thread.sleep(WAIT_FOR_JOB_TO_START);
+		assertTrue(cascade.getStats().isEngaged());
+		batchJob.stop();
+		Thread.sleep(5000);
+		assertTrue(cascade.getStats().isStopped());
 	}
 }

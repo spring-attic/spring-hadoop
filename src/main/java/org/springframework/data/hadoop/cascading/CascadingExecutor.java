@@ -15,6 +15,8 @@
  */
 package org.springframework.data.hadoop.cascading;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.DisposableBean;
 
 import cascading.cascade.Cascade;
@@ -29,12 +31,21 @@ import cascading.stats.CascadingStats;
  */
 class CascadingExecutor implements DisposableBean {
 
-	private boolean waitToComplete = true;
-	private UnitOfWork<? extends CascadingStats> uow;
+	protected boolean waitToComplete = true;
+	protected UnitOfWork<? extends CascadingStats> uow;
 
+	protected Log log = LogFactory.getLog(getClass());
 
 	protected CascadingStats execute() {
-		return Runner.run(uow, waitToComplete);
+		if (waitToComplete) {
+			uow.complete();
+
+		}
+		else {
+			uow.start();
+		}
+
+		return uow.getStats();
 	}
 
 	@Override

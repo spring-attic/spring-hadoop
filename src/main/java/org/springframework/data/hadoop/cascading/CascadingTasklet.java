@@ -17,6 +17,7 @@ package org.springframework.data.hadoop.cascading;
 
 import org.apache.hadoop.mapred.Task;
 import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -31,9 +32,37 @@ import cascading.stats.CascadingStats;
  */
 public class CascadingTasklet extends CascadingExecutor implements Tasklet {
 
+
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		CascadingStats stats = execute();
+
+		StepExecution stepExecution = chunkContext.getStepContext().getStepExecution();
+		boolean stopped = false;
+
+		// keep looping to get the stopping signal
+		if (waitToComplete) {
+			uow.start();
+			CascadingStats stats = uow.getStats();
+			while (!stats.isFinished()) {
+				if (stepExecution.isTerminateOnly()) {
+					log.info("Killing Cascading UoW [" + uow.getID() + "]");
+					stopped = true;
+					uow.stop();
+				}
+				else {
+					// wait a bit more then the internal hadoop threads
+					Thread.sleep(5500);
+				}
+			}
+			if (!stopped) {
+				uow.complete();
+			}
+		}
+		else {
+			uow.start();
+		}
+
+		CascadingStats stats = uow.getStats();
 
 		// save stats
 		for (int i = 0; i < safeLongToInt(stats.getCounterValue(Task.Counter.MAP_INPUT_BYTES)); i++) {
