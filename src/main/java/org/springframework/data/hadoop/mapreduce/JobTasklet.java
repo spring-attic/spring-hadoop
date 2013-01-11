@@ -16,7 +16,7 @@
 package org.springframework.data.hadoop.mapreduce;
 
 import java.io.IOException;
-import java.util.Collection;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.hadoop.mapred.Task;
 import org.apache.hadoop.mapreduce.Counter;
@@ -43,20 +43,37 @@ public class JobTasklet extends JobExecutor implements Tasklet {
 		StepExecution stepExecution = chunkContext.getStepContext().getStepExecution();
 		JobExecution jobExecution = stepExecution.getJobExecution();
 
-		Collection<Job> jobs = startJobs(new JobListener() {
+		final AtomicBoolean done = new AtomicBoolean(false);
+
+		final JobListener jobListener = new JobListener() {
 			@Override
 			public void jobKilled(Job job) {
+				done.set(true);
 				saveCounters(job, contribution);
 			}
 
 			@Override
 			public void jobFinished(Job job) {
+				done.set(true);
 				saveCounters(job, contribution);
 			}
-		});
+		};
 
-		for (Job job : jobs) {
-			saveCounters(job, contribution);
+		startJobs(jobListener);
+
+		boolean stopped = false;
+		// check status (if we have to wait)
+		if (isWaitForJob()) {
+			while (!done.get() && !stopped) {
+				if (stepExecution.isTerminateOnly()) {
+					stopped = true;
+					stopJobs(jobListener);
+				}
+				else {
+					// wait a bit more then the internall hadoop threads
+					Thread.sleep(5500);
+				}
+			}
 		}
 
 		return RepeatStatus.FINISHED;

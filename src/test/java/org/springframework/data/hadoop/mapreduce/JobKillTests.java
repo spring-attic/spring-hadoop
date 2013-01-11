@@ -85,7 +85,7 @@ public class JobKillTests {
 			Thread.sleep(1000 * 5);
 			status = JobUtils.getStatus(victimJob);
 		}
-		assertTrue(status.isFinished());
 		assertTrue(JobStatus.KILLED == JobUtils.getStatus(victimJob));
+		assertTrue(status.isFinished());
 	}
 }

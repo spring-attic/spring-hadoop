@@ -26,14 +26,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.hadoop.mapred.RunningJob;
 import org.apache.hadoop.mapreduce.Job;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.SyncTaskExecutor;
+import org.springframework.data.hadoop.mapreduce.JobUtils.JobStatus;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -56,7 +57,9 @@ abstract class JobExecutor implements InitializingBean, DisposableBean, BeanFact
 	private boolean waitForJobs = true;
 	private BeanFactory beanFactory;
 	private boolean verbose = true;
-	private Executor taskExecutor = new SyncTaskExecutor();
+	private Executor taskExecutor = new SimpleAsyncTaskExecutor();
+	/** used for preventing exception noise during shutdowns */
+	private volatile boolean shuttingDown = false;
 
 	protected Log log = LogFactory.getLog(getClass());
 
@@ -97,6 +100,8 @@ abstract class JobExecutor implements InitializingBean, DisposableBean, BeanFact
 	 * @throws Exception
 	 */
 	protected Collection<Job> stopJobs(final JobListener listener) {
+		shuttingDown = true;
+
 		final Collection<Job> jbs = findJobs();
 
 		final List<Job> killedJobs = new ArrayList<Job>();
@@ -142,6 +147,7 @@ abstract class JobExecutor implements InitializingBean, DisposableBean, BeanFact
 			@Override
 			public void run() {
 				for (final Job job : jbs) {
+					boolean succes = false;
 					try {
 						// job is already running - ignore it
 						if (JobUtils.getStatus(job).isStarted()) {
@@ -157,18 +163,11 @@ abstract class JobExecutor implements InitializingBean, DisposableBean, BeanFact
 							job.submit();
 						}
 						else {
-							boolean succes = job.waitForCompletion(verbose);
+							succes = job.waitForCompletion(verbose);
 							if (listener != null) {
 								listener.jobFinished(job);
 							}
 
-							if (!succes) {
-								succesful.set(false);
-
-								RunningJob rj = JobUtils.getRunningJob(job);
-								throw new IllegalStateException("Job [" + job.getJobName() + "] failed - "
-										+ (rj != null ? rj.getFailureInfo() : "N/A"));
-							}
 						}
 					} catch (InterruptedException ex) {
 						log.warn("Job [" + job.getJobName() + "] killed");
@@ -176,6 +175,21 @@ abstract class JobExecutor implements InitializingBean, DisposableBean, BeanFact
 					} catch (Exception ex) {
 						log.warn("Cannot start job [" + job.getJobName() + "]", ex);
 						throw new IllegalStateException(ex);
+					}
+
+					if (!succes) {
+						succesful.set(false);
+						if (!shuttingDown) {
+							if (JobStatus.KILLED == JobUtils.getStatus(job)) {
+								throw new IllegalStateException("Job " + job.getJobName() + "] killed");
+							}
+							else {
+								throw new IllegalStateException("Job " + job.getJobName() + "] failed to start");
+							}
+						}
+						else {
+							log.info("Job [" + job.getJobName() + "] killed by shutdown");
+						}
 					}
 				}
 			}
@@ -225,7 +239,7 @@ abstract class JobExecutor implements InitializingBean, DisposableBean, BeanFact
 	}
 
 	/**
-	 * Indicates whether the tasklet should return for the job to complete (default).
+	 * Indicates whether the tasklet should wait for the job to complete (default).
 	 * 
 	 * @return whether to wait for the job to complete or not.
 	 */
@@ -234,7 +248,7 @@ abstract class JobExecutor implements InitializingBean, DisposableBean, BeanFact
 	}
 
 	/**
-	 * Indicates whether the tasklet should return for the job to complete (default)
+	 * Indicates whether the tasklet should wait for the job to complete (default)
 	 * after submission or not.
 	 * 
 	 * @param waitForJob whether to wait for the job to complete or not.
