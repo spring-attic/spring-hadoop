@@ -16,18 +16,17 @@
 package org.springframework.data.hadoop.mapreduce;
 
 import java.io.IOException;
-import java.util.Collection;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.hadoop.mapred.RunningJob;
 import org.apache.hadoop.mapred.Task;
 import org.apache.hadoop.mapreduce.Counter;
 import org.apache.hadoop.mapreduce.Counters;
 import org.apache.hadoop.mapreduce.Job;
 import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.util.CollectionUtils;
 
 /**
  * Batch tasklet for executing one Hadoop job.
@@ -37,39 +36,54 @@ import org.springframework.util.CollectionUtils;
  */
 public class JobTasklet extends JobExecutor implements Tasklet {
 
-	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		Collection<Job> jbs = findJobs();
 
-		if (CollectionUtils.isEmpty(jbs)) {
-			return RepeatStatus.FINISHED;
+	public RepeatStatus execute(final StepContribution contribution, ChunkContext chunkContext) throws Exception {
+
+		StepExecution stepExecution = chunkContext.getStepContext().getStepExecution();
+
+		final AtomicBoolean done = new AtomicBoolean(false);
+
+		final JobListener jobListener = new JobListener() {
+			@Override
+			public void jobKilled(Job job) {
+				done.set(true);
+				saveCounters(job, contribution);
+			}
+
+			@Override
+			public void jobFinished(Job job) {
+				done.set(true);
+				saveCounters(job, contribution);
+			}
+		};
+
+		startJobs(jobListener);
+
+		boolean stopped = false;
+		// check status (if we have to wait)
+		if (isWaitForJob()) {
+			while (!done.get() && !stopped) {
+				if (stepExecution.isTerminateOnly()) {
+					stopped = true;
+					stopJobs(jobListener);
+				}
+				else {
+					// wait a bit more then the internal hadoop threads
+					Thread.sleep(5500);
+				}
+			}
 		}
 
-		Boolean succesful = Boolean.TRUE;
-		for (Job job : jbs) {
-			if (!isWaitForJob()) {
-				job.submit();
-			}
-			else {
-				succesful &= job.waitForCompletion(isVerbose());
-				try {
-					saveCounters(job, contribution);
-				} catch (IOException ex) {
-					log.warn("Cannot get Hadoop Counters", ex);
-
-				}
-				if (!succesful) {
-					RunningJob rj = JobUtils.getRunningJob(job);
-					throw new IllegalStateException("Job [" + job.getJobName() + "] failed - "
-							+ (rj != null ? rj.getFailureInfo() : "N/A"));
-				}
-			}
-		}
-		
 		return RepeatStatus.FINISHED;
 	}
 
-	private void saveCounters(Job job, StepContribution contribution) throws Exception {
-		Counters counters = job.getCounters();
+	private void saveCounters(Job job, StepContribution contribution) {
+		Counters counters = null;
+		try {
+			counters = job.getCounters();
+		} catch (IOException ex) {
+			// ignore - we just can't get stats
+		}
 		if (counters == null) {
 			return;
 		}

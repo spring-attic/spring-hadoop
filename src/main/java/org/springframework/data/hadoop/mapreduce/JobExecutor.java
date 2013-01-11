@@ -15,22 +15,27 @@
  */
 package org.springframework.data.hadoop.mapreduce;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.hadoop.mapred.RunningJob;
 import org.apache.hadoop.mapreduce.Job;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.core.task.SyncTaskExecutor;
+import org.springframework.data.hadoop.mapreduce.JobUtils.JobStatus;
 import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -38,13 +43,27 @@ import org.springframework.util.StringUtils;
  * 
  * @author Costin Leau
  */
-abstract class JobExecutor implements InitializingBean, BeanFactoryAware {
+abstract class JobExecutor implements InitializingBean, DisposableBean, BeanFactoryAware {
+
+	interface JobListener {
+
+		void jobFinished(Job job);
+
+		void jobKilled(Job job);
+	}
 
 	private Collection<Job> jobs;
 	private Iterable<String> jobNames;
 	private boolean waitForJobs = true;
 	private BeanFactory beanFactory;
 	private boolean verbose = true;
+	private Executor taskExecutor = new SimpleAsyncTaskExecutor();
+
+	/** used for preventing exception noise during shutdowns */
+	private volatile boolean shuttingDown = false;
+
+	/** jobs alias used during destruction to avoid a BF lookup */
+	private Collection<Job> recentJobs = Collections.emptyList();
 
 	protected Log log = LogFactory.getLog(getClass());
 
@@ -62,43 +81,147 @@ abstract class JobExecutor implements InitializingBean, BeanFactoryAware {
 		}
 	}
 
-	protected void executeJobs() throws Exception {
-		Collection<Job> jbs = findJobs();
-
-		if (CollectionUtils.isEmpty(jbs)) {
-			return;
-		}
-
-		doExecuteJobs(jbs);
+	@Override
+	public void destroy() throws Exception {
+		stopJobs();
 	}
 
-	protected void doExecuteJobs(Collection<Job> jbs) throws Exception {
-		Boolean succesful = Boolean.TRUE;
+	/**
+	 * Stops running job.
+	 * 
+	 * @return list of stopped jobs.
+	 * @throws Exception
+	 */
+	protected Collection<Job> stopJobs() {
+		return stopJobs(null);
+	}
 
-		for (Job job : jbs) {
-			if (!waitForJobs) {
-				job.submit();
-			}
-			else {
-				succesful &= job.waitForCompletion(verbose);
-				if (!succesful) {
-					RunningJob rj = JobUtils.getRunningJob(job);
-					throw new IllegalStateException("Job [" + job.getJobName() + "] failed - "
-							+ (rj != null ? rj.getFailureInfo() : "N/A"));
+	/**
+	 * Stops running job.
+	 *
+	 * @param listener job listener
+	 * @return list of stopped jobs.
+	 * @throws Exception
+	 */
+	protected Collection<Job> stopJobs(final JobListener listener) {
+		shuttingDown = true;
+
+		final Collection<Job> jbs = findJobs();
+
+		final List<Job> killedJobs = new ArrayList<Job>();
+
+		taskExecutor.execute(new Runnable() {
+			@Override
+			public void run() {
+				for (final Job job : jbs) {
+					try {
+						if (JobUtils.getStatus(job).isRunning()) {
+							synchronized (killedJobs) {
+								killedJobs.add(job);
+							}
+							log.info("Killing job [" + job.getJobName() + "]");
+							job.killJob();
+							if (listener != null) {
+								listener.jobKilled(job);
+							}
+						}
+					} catch (IOException ex) {
+						log.warn("Cannot kill job [" + job.getJobName() + "]", ex);
+						throw new IllegalStateException(ex);
+					}
 				}
 			}
-		}
+		});
+
+		return jbs;
+	}
+
+	protected Collection<Job> startJobs() {
+		return startJobs(null);
+	}
+
+	protected Collection<Job> startJobs(final JobListener listener) {
+		final Collection<Job> jbs = findJobs();
+
+		final AtomicBoolean succesful = new AtomicBoolean(true);
+
+		final List<Job> started = new ArrayList<Job>();
+
+		taskExecutor.execute(new Runnable() {
+			@Override
+			public void run() {
+				for (final Job job : jbs) {
+					boolean succes = false;
+					try {
+						// job is already running - ignore it
+						if (JobUtils.getStatus(job).isStarted()) {
+							log.info("Job [" + job.getJobName() + "] already started; skipping it...");
+							break;
+						}
+
+						log.info("Starting job [" + job.getJobName() + "]");
+						synchronized (started) {
+							started.add(job);
+						}
+						if (!waitForJobs) {
+							job.submit();
+						}
+						else {
+							succes = job.waitForCompletion(verbose);
+							if (listener != null) {
+								listener.jobFinished(job);
+							}
+
+						}
+					} catch (InterruptedException ex) {
+						log.warn("Job [" + job.getJobName() + "] killed");
+						throw new IllegalStateException(ex);
+					} catch (Exception ex) {
+						log.warn("Cannot start job [" + job.getJobName() + "]", ex);
+						throw new IllegalStateException(ex);
+					}
+
+					if (!succes) {
+						succesful.set(false);
+						if (!shuttingDown) {
+							if (JobStatus.KILLED == JobUtils.getStatus(job)) {
+								throw new IllegalStateException("Job " + job.getJobName() + "] killed");
+							}
+							else {
+								throw new IllegalStateException("Job " + job.getJobName() + "] failed to start");
+							}
+						}
+						else {
+							log.info("Job [" + job.getJobName() + "] killed by shutdown");
+						}
+					}
+				}
+			}
+		});
+
+		return started;
 	}
 
 	protected Collection<Job> findJobs() {
+		Collection<Job> js = null;
+
 		if (jobs != null) {
-			return jobs;
+			js = jobs;
 		}
-		List<Job> jobs = new ArrayList<Job>();
-		for (String name : jobNames) {
-			jobs.add(beanFactory.getBean(name, Job.class));
+
+		else {
+			if (shuttingDown) {
+				return recentJobs;
+			}
+
+			js = new ArrayList<Job>();
+			for (String name : jobNames) {
+				js.add(beanFactory.getBean(name, Job.class));
+			}
 		}
-		return jobs;
+
+		recentJobs = js;
+		return js;
 	}
 
 	/**
@@ -131,7 +254,7 @@ abstract class JobExecutor implements InitializingBean, BeanFactoryAware {
 	}
 
 	/**
-	 * Indicates whether the tasklet should return for the job to complete (default).
+	 * Indicates whether the tasklet should wait for the job to complete (default).
 	 * 
 	 * @return whether to wait for the job to complete or not.
 	 */
@@ -140,7 +263,7 @@ abstract class JobExecutor implements InitializingBean, BeanFactoryAware {
 	}
 
 	/**
-	 * Indicates whether the tasklet should return for the job to complete (default)
+	 * Indicates whether the tasklet should wait for the job to complete (default)
 	 * after submission or not.
 	 * 
 	 * @param waitForJob whether to wait for the job to complete or not.
@@ -170,5 +293,16 @@ abstract class JobExecutor implements InitializingBean, BeanFactoryAware {
 	@Override
 	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
 		this.beanFactory = beanFactory;
+	}
+
+	/**
+	 * Set the TaskExecutor used for waiting/tracking the Hadoop jobs.
+	 * By default, {@link SyncTaskExecutor} is used, meaning the calling thread. 
+	 * 
+	 * @param taskExecutor the task executor to use
+	 */
+	public void setTaskExecutor(Executor taskExecutor) {
+		Assert.notNull(taskExecutor, "a non-null task executor is required");
+		this.taskExecutor = taskExecutor;
 	}
 }

@@ -39,7 +39,7 @@ fsh.put("src/test/resources/data/babynamedefinitions.csv.gz", "/test/cascading/n
 		<constructor-arg name="sinkPath"><value>/test/cascading/names/output/simplepipe]]</value></constructor-arg>
 	</bean>
 
-	<bean id="cascadeTasklet" class="org.springframework.data.hadoop.cascading.CascadeTasklet" p:unit-of-work-ref="cascade"/>
+	<bean id="cascadeTasklet" class="org.springframework.data.hadoop.cascading.CascadingTasklet" p:unit-of-work-ref="cascade"/>
 
 	<!-- Cascading definition -->
 	<bean id="cascade" class="org.springframework.data.hadoop.cascading.CascadeFactoryBean" p:configuration-ref="hadoopConfiguration">
@@ -48,4 +48,7 @@ fsh.put("src/test/resources/data/babynamedefinitions.csv.gz", "/test/cascading/n
 				p:flowDef-ref="copyFlow"/>
 		</property>
 	</bean>
+	
+	<!-- replace Spring Batch default task executor -->
+	<bean id="taskExecutor" class="org.springframework.core.task.SimpleAsyncTaskExecutor"/>		
 </beans>

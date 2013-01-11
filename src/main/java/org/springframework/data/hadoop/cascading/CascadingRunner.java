@@ -18,13 +18,10 @@ package org.springframework.data.hadoop.cascading;
 import java.util.Collection;
 import java.util.concurrent.Callable;
 
-import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 
 import cascading.cascade.Cascade;
 import cascading.flow.Flow;
-import cascading.management.UnitOfWork;
-import cascading.stats.CascadeStats;
 import cascading.stats.CascadingStats;
 
 /**
@@ -34,11 +31,9 @@ import cascading.stats.CascadingStats;
  * 
  * @author Costin Leau
  */
-public class CascadeRunner implements InitializingBean, DisposableBean, Callable<CascadingStats> {
+public class CascadingRunner extends CascadingExecutor implements InitializingBean, Callable<CascadingStats> {
 
-	private boolean waitToComplete = true;
 	private boolean runAtStartup = false;
-	private UnitOfWork<? extends CascadeStats> uow;
 
 	private Iterable<Callable<?>> preActions;
 	private Iterable<Callable<?>> postActions;
@@ -51,29 +46,11 @@ public class CascadeRunner implements InitializingBean, DisposableBean, Callable
 	}
 
 	@Override
-	public void destroy() {
-		if (uow != null) {
-			uow.stop();
-		}
-	}
-
-	@Override
 	public CascadingStats call() throws Exception {
 		invoke(preActions);
-
-		CascadingStats stats = Runner.run(uow, waitToComplete);
+		CascadingStats stats = execute();
 		invoke(postActions);
-
 		return stats;
-	}
-
-	/**
-	 * Sets the unit of work. Can be of type {@link Flow} or {@link Cascade}.
-	 *
-	 * @param uow the new unit of work.
-	 */
-	public void setUnitOfWork(UnitOfWork<? extends CascadeStats> uow) {
-		this.uow = uow;
 	}
 
 	/**

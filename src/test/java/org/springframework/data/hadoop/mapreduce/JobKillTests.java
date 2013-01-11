@@ -13,23 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.hadoop.cascading;
+package org.springframework.data.hadoop.mapreduce;
 
-import java.util.Collection;
-import java.util.List;
-
+import org.apache.hadoop.mapreduce.Job;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.StepExecution;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.hadoop.TestUtils;
 import org.springframework.data.hadoop.batch.JobsTrigger;
+import org.springframework.data.hadoop.mapreduce.JobUtils.JobStatus;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import cascading.cascade.Cascade;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -38,7 +35,11 @@ import static org.junit.Assert.assertTrue;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration
-public class CascadingBatchTest {
+public class JobKillTests {
+
+	@Autowired
+	private ApplicationContext ctx;
+
 
 	{
 		TestUtils.hackHadoopStagingOnWin();
@@ -46,33 +47,45 @@ public class CascadingBatchTest {
 
 	private static long WAIT_FOR_JOB_TO_START = 12 * 1000;
 
-	@Autowired
-	ApplicationContext ctx;
-
 	@Test
-	public void testCascadeTasklet() throws Exception {
-		List<JobExecution> startJobs = JobsTrigger.startJobs(ctx);
-		assertFalse(startJobs.isEmpty());
+	public void testJobKill() throws Exception {
+		Job victimJob = ctx.getBean("victim-job", Job.class);
+		JobRunner runner = ctx.getBean("killer-runner", JobRunner.class);
 
-		// check records
-		Collection<StepExecution> steps = startJobs.get(0).getStepExecutions();
-		for (StepExecution stepExecution : steps) {
-			if ("do-cascade".equals(stepExecution.getStepName())) {
-				assertTrue(stepExecution.getReadCount() > 0);
-			}
-		}
+		assertFalse(JobUtils.getStatus(victimJob).isStarted());
+		runner.call();
+
+		// wait a bit for the job to be started
+		Thread.sleep(WAIT_FOR_JOB_TO_START);
+		assertTrue(JobUtils.getStatus(victimJob).isRunning());
+		runner.destroy();
+
+		checkHadoopJobWasKilled(victimJob);
 	}
 
 	@Test
 	public void testJobTaskletKill() throws Exception {
+		Job victimJob = ctx.getBean("tasklet-victim-job", Job.class);
+
 		// start async job execution
 		JobExecution batchJob = JobsTrigger.startJob(ctx, "mainJob");
-		Cascade cascade = ctx.getBean("cascade", Cascade.class);
 
 		Thread.sleep(WAIT_FOR_JOB_TO_START);
-		assertTrue(cascade.getStats().isEngaged());
+		assertTrue(JobUtils.getStatus(victimJob).isRunning());
+
 		batchJob.stop();
-		Thread.sleep(5000);
-		assertTrue(cascade.getStats().isStopped());
+
+		checkHadoopJobWasKilled(victimJob);
+	}
+
+	private static void checkHadoopJobWasKilled(Job victimJob) throws Exception {
+		JobStatus status = JobStatus.UNKNOWN;
+		// wait for the job status to be updated...
+		for (int i = 0; i < 5 && !status.isFinished(); i++) {
+			Thread.sleep(1000 * 5);
+			status = JobUtils.getStatus(victimJob);
+		}
+		assertTrue(JobStatus.KILLED == JobUtils.getStatus(victimJob));
+		assertTrue(status.isFinished());
 	}
 }

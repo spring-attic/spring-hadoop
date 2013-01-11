@@ -34,7 +34,10 @@ import org.springframework.data.hadoop.mapreduce.ToolTests.TestTool;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Costin Leau
@@ -141,4 +144,5 @@ public class JobTests {
 		assertNotNull(jobInfo.oldJobId);
 		assertNotNull(jobInfo.runningJob);
 	}
+
 }

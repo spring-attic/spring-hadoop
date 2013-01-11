@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:hdp="http://www.springframework.org/schema/hadoop"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd
+		http://www.springframework.org/schema/batch	http://www.springframework.org/schema/batch/spring-batch.xsd">
+
+	<import resource="../batch-common.xml"/>
+	<import resource="../hadoop-ctx.xml"/>
+
+
+	<!-- required since Job is a class not an interface -->
+	<bean class="org.springframework.batch.core.scope.StepScope" p:proxyTargetClass="true"/>
+
+	<hdp:script id="script" language="javascript" run-at-startup="true">
+	if (fsh.test("/ide-test/input/word")) { fsh.rmr("/ide-test/input/word") }
+	if (fsh.test("/ide-test/runner/killed")) { fsh.rmr("/ide-test/runner/killed") }
+	if (fsh.test("/ide-test/runner/killed-tasklet")) { fsh.rmr("/ide-test/runner/killed-tasklet") }
+	
+	fsh.put("src/test/resources/input/word", "/ide-test/input/word")			
+	</hdp:script>
+
+	<hdp:script id="nop-script" language="javascript">
+	println("Called script")
+	</hdp:script>
+
+	<job id="mainJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="do-hadoop">
+			<tasklet ref="hdp-tasklet"/>
+		</step>
+	</job>
+
+	<hdp:job-runner id="killer-runner" job-ref="victim-job" wait-for-job="false"/>
+	
+	<hdp:job id="victim-job" 
+	   	input-path="/ide-test/input/word/" output-path="/ide-test/runner/killed/"
+		mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
+		reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"
+		scope="singleton"
+		libs="classpath:mini-hadoop-examples.jar"/>
+
+	<hdp:job-tasklet id="hdp-tasklet" job-ref="tasklet-victim-job" wait-for-job="true" />
+	
+	<hdp:job id="tasklet-victim-job" 
+	   	input-path="/ide-test/input/word/" output-path="/ide-test/runner/killed-tasklet/"
+		mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
+		reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"
+		scope="singleton"
+		libs="classpath:mini-hadoop-examples.jar"/>
+
+	
+	<!-- replace Spring Batch default task executor -->
+	<bean id="taskExecutor" class="org.springframework.core.task.SimpleAsyncTaskExecutor"/>		
+</beans>
