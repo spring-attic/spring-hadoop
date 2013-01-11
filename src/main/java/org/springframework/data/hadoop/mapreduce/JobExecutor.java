@@ -58,8 +58,12 @@ abstract class JobExecutor implements InitializingBean, DisposableBean, BeanFact
 	private BeanFactory beanFactory;
 	private boolean verbose = true;
 	private Executor taskExecutor = new SimpleAsyncTaskExecutor();
+
 	/** used for preventing exception noise during shutdowns */
 	private volatile boolean shuttingDown = false;
+
+	/** jobs alias used during destruction to avoid a BF lookup */
+	private Collection<Job> recentJobs = Collections.emptyList();
 
 	protected Log log = LogFactory.getLog(getClass());
 
@@ -199,14 +203,25 @@ abstract class JobExecutor implements InitializingBean, DisposableBean, BeanFact
 	}
 
 	protected Collection<Job> findJobs() {
+		Collection<Job> js = null;
+
 		if (jobs != null) {
-			return jobs;
+			js = jobs;
 		}
-		List<Job> jobs = new ArrayList<Job>();
-		for (String name : jobNames) {
-			jobs.add(beanFactory.getBean(name, Job.class));
+
+		else {
+			if (shuttingDown) {
+				return recentJobs;
+			}
+
+			js = new ArrayList<Job>();
+			for (String name : jobNames) {
+				js.add(beanFactory.getBean(name, Job.class));
+			}
 		}
-		return jobs;
+
+		recentJobs = js;
+		return js;
 	}
 
 	/**
