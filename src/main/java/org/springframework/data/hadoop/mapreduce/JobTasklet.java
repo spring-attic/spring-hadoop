@@ -25,6 +25,7 @@ import org.apache.hadoop.mapreduce.Job;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 
@@ -39,11 +40,29 @@ public class JobTasklet extends JobExecutor implements Tasklet {
 
 	public RepeatStatus execute(final StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
-		StepExecution stepExecution = chunkContext.getStepContext().getStepExecution();
+		final StepExecution stepExecution = chunkContext.getStepContext().getStepExecution();
 
 		final AtomicBoolean done = new AtomicBoolean(false);
 
 		final JobListener jobListener = new JobListener() {
+
+			@Override
+			public Object beforeAction() {
+				// double check the underlying thread to see whether it is aware of a step execution
+				if (StepSynchronizationManager.getContext() == null) {
+					StepSynchronizationManager.register(stepExecution);
+					return Boolean.TRUE;
+				}
+				return Boolean.FALSE;
+			}
+
+			@Override
+			public void afterAction(Object state) {
+				if (Boolean.TRUE.equals(state)) {
+					StepSynchronizationManager.close();
+				}
+			}
+
 			@Override
 			public void jobKilled(Job job) {
 				done.set(true);

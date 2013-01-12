@@ -22,7 +22,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Executor;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -46,6 +45,10 @@ import org.springframework.util.StringUtils;
 abstract class JobExecutor implements InitializingBean, DisposableBean, BeanFactoryAware {
 
 	interface JobListener {
+
+		Object beforeAction();
+
+		void afterAction(Object state);
 
 		void jobFinished(Job job);
 
@@ -107,27 +110,38 @@ abstract class JobExecutor implements InitializingBean, DisposableBean, BeanFact
 		shuttingDown = true;
 
 		final Collection<Job> jbs = findJobs();
-
 		final List<Job> killedJobs = new ArrayList<Job>();
 
 		taskExecutor.execute(new Runnable() {
 			@Override
 			public void run() {
-				for (final Job job : jbs) {
-					try {
-						if (JobUtils.getStatus(job).isRunning()) {
-							synchronized (killedJobs) {
-								killedJobs.add(job);
+
+				Object listenerInit = null;
+				if (listener != null) {
+					listenerInit = listener.beforeAction();
+				}
+
+				try {
+					for (final Job job : jbs) {
+						try {
+							if (JobUtils.getStatus(job).isRunning()) {
+								synchronized (killedJobs) {
+									killedJobs.add(job);
+								}
+								log.info("Killing job [" + job.getJobName() + "]");
+								job.killJob();
+								if (listener != null) {
+									listener.jobKilled(job);
+								}
 							}
-							log.info("Killing job [" + job.getJobName() + "]");
-							job.killJob();
-							if (listener != null) {
-								listener.jobKilled(job);
-							}
+						} catch (IOException ex) {
+							log.warn("Cannot kill job [" + job.getJobName() + "]", ex);
+							throw new IllegalStateException(ex);
 						}
-					} catch (IOException ex) {
-						log.warn("Cannot kill job [" + job.getJobName() + "]", ex);
-						throw new IllegalStateException(ex);
+					}
+				} finally {
+					if (listener != null) {
+						listener.afterAction(listenerInit);
 					}
 				}
 			}
@@ -143,57 +157,67 @@ abstract class JobExecutor implements InitializingBean, DisposableBean, BeanFact
 	protected Collection<Job> startJobs(final JobListener listener) {
 		final Collection<Job> jbs = findJobs();
 
-		final AtomicBoolean succesful = new AtomicBoolean(true);
-
 		final List<Job> started = new ArrayList<Job>();
 
 		taskExecutor.execute(new Runnable() {
 			@Override
 			public void run() {
-				for (final Job job : jbs) {
-					boolean succes = false;
-					try {
-						// job is already running - ignore it
-						if (JobUtils.getStatus(job).isStarted()) {
-							log.info("Job [" + job.getJobName() + "] already started; skipping it...");
-							break;
-						}
 
-						log.info("Starting job [" + job.getJobName() + "]");
-						synchronized (started) {
-							started.add(job);
-						}
-						if (!waitForJobs) {
-							job.submit();
-						}
-						else {
-							succes = job.waitForCompletion(verbose);
-							if (listener != null) {
-								listener.jobFinished(job);
+				Object listenerInit = null;
+				if (listener != null) {
+					listener.beforeAction();
+				}
+
+				try {
+
+					for (final Job job : jbs) {
+						boolean succes = false;
+						try {
+							// job is already running - ignore it
+							if (JobUtils.getStatus(job).isStarted()) {
+								log.info("Job [" + job.getJobName() + "] already started; skipping it...");
+								break;
 							}
 
-						}
-					} catch (InterruptedException ex) {
-						log.warn("Job [" + job.getJobName() + "] killed");
-						throw new IllegalStateException(ex);
-					} catch (Exception ex) {
-						log.warn("Cannot start job [" + job.getJobName() + "]", ex);
-						throw new IllegalStateException(ex);
-					}
-
-					if (!succes) {
-						succesful.set(false);
-						if (!shuttingDown) {
-							if (JobStatus.KILLED == JobUtils.getStatus(job)) {
-								throw new IllegalStateException("Job " + job.getJobName() + "] killed");
+							log.info("Starting job [" + job.getJobName() + "]");
+							synchronized (started) {
+								started.add(job);
+							}
+							if (!waitForJobs) {
+								job.submit();
 							}
 							else {
-								throw new IllegalStateException("Job " + job.getJobName() + "] failed to start");
+								succes = job.waitForCompletion(verbose);
+								if (listener != null) {
+									listener.jobFinished(job);
+								}
+
+							}
+						} catch (InterruptedException ex) {
+							log.warn("Job [" + job.getJobName() + "] killed");
+							throw new IllegalStateException(ex);
+						} catch (Exception ex) {
+							log.warn("Cannot start job [" + job.getJobName() + "]", ex);
+							throw new IllegalStateException(ex);
+						}
+
+						if (!succes) {
+							if (!shuttingDown) {
+								if (JobStatus.KILLED == JobUtils.getStatus(job)) {
+									throw new IllegalStateException("Job " + job.getJobName() + "] killed");
+								}
+								else {
+									throw new IllegalStateException("Job " + job.getJobName() + "] failed to start");
+								}
+							}
+							else {
+								log.info("Job [" + job.getJobName() + "] killed by shutdown");
 							}
 						}
-						else {
-							log.info("Job [" + job.getJobName() + "] killed by shutdown");
-						}
+					}
+				} finally {
+					if (listener != null) {
+						listener.afterAction(listenerInit);
 					}
 				}
 			}
