@@ -45,7 +45,7 @@ public class JobKillTests {
 		TestUtils.hackHadoopStagingOnWin();
 	}
 
-	private static long WAIT_FOR_JOB_TO_START = 12 * 1000;
+	private static long WAIT_FOR_JOB_TO_START = 1 * 1000;
 
 	@Test
 	public void testJobKill() throws Exception {
@@ -56,8 +56,9 @@ public class JobKillTests {
 		runner.call();
 
 		// wait a bit for the job to be started
-		Thread.sleep(WAIT_FOR_JOB_TO_START);
-		assertTrue(JobUtils.getStatus(victimJob).isRunning());
+		while (!JobUtils.getStatus(victimJob).isRunning()) {
+			Thread.sleep(WAIT_FOR_JOB_TO_START);
+		}
 		runner.destroy();
 
 		checkHadoopJobWasKilled(victimJob);
@@ -70,8 +71,10 @@ public class JobKillTests {
 		// start async job execution
 		JobExecution batchJob = JobsTrigger.startJob(ctx, "mainJob");
 
-		Thread.sleep(WAIT_FOR_JOB_TO_START);
-		assertTrue(JobUtils.getStatus(victimJob).isRunning());
+		// wait a bit for the job to be started
+		while (!JobUtils.getStatus(victimJob).isRunning()) {
+			Thread.sleep(WAIT_FOR_JOB_TO_START);
+		}
 
 		batchJob.stop();
 
