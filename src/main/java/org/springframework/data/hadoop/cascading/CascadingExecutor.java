@@ -63,4 +63,23 @@ class CascadingExecutor implements DisposableBean {
 	public void setUnitOfWork(UnitOfWork<? extends CascadingStats> uow) {
 		this.uow = uow;
 	}
+
+	/**
+	 * Indicates whether the 'runner' should wait for the UnitOfWork to complete (default).
+	 *
+	 * @return whether the runner waits for the unit to complete or not.
+	 */
+	public boolean isWaitToComplete() {
+		return waitToComplete;
+	}
+
+	/**
+	 * Indicates whether the 'runner' should wait for the UnitOfWork to complete (default)
+	 * after submission or not.
+	 * 
+	 * @param waitToComplete whether to wait for the unit to complete or not.
+	 */
+	public void setWaitToComplete(boolean waitToComplete) {
+		this.waitToComplete = waitToComplete;
+	}
 }

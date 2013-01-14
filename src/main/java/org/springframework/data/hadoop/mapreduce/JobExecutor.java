@@ -32,7 +32,6 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
-import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.data.hadoop.mapreduce.JobUtils.JobStatus;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -58,6 +57,7 @@ abstract class JobExecutor implements InitializingBean, DisposableBean, BeanFact
 	private Collection<Job> jobs;
 	private Iterable<String> jobNames;
 	private boolean waitForJobs = true;
+	private boolean killJobsAtShutdown = true;
 	private BeanFactory beanFactory;
 	private boolean verbose = true;
 	private Executor taskExecutor = new SimpleAsyncTaskExecutor();
@@ -82,11 +82,17 @@ abstract class JobExecutor implements InitializingBean, DisposableBean, BeanFact
 				}
 			}
 		}
+
+		if (isWaitForJob()) {
+			setKillJobAtShutdown(true);
+		}
 	}
 
 	@Override
 	public void destroy() throws Exception {
-		stopJobs();
+		if (isWaitForJob() || isKillJobsAtShutdown()) {
+			stopJobs();
+		}
 	}
 
 	/**
@@ -279,7 +285,7 @@ abstract class JobExecutor implements InitializingBean, DisposableBean, BeanFact
 	}
 
 	/**
-	 * Indicates whether the tasklet should wait for the job to complete (default).
+	 * Indicates whether the 'runner' should wait for the job to complete (default).
 	 * 
 	 * @return whether to wait for the job to complete or not.
 	 */
@@ -288,7 +294,7 @@ abstract class JobExecutor implements InitializingBean, DisposableBean, BeanFact
 	}
 
 	/**
-	 * Indicates whether the tasklet should wait for the job to complete (default)
+	 * Indicates whether the 'runner' should wait for the job to complete (default)
 	 * after submission or not.
 	 * 
 	 * @param waitForJob whether to wait for the job to complete or not.
@@ -321,13 +327,38 @@ abstract class JobExecutor implements InitializingBean, DisposableBean, BeanFact
 	}
 
 	/**
-	 * Set the TaskExecutor used for waiting/tracking the Hadoop jobs.
-	 * By default, {@link SyncTaskExecutor} is used, meaning the calling thread. 
+	 * Sets the TaskExecutor used for executing the Hadoop job.
+	 * By default, {@link SimpleAsyncTaskExecutor} is used, meaning a background thread is used.
+	 * For a fine-tuned control, a dedicated {@link Executor} is recommended. 
 	 * 
-	 * @param taskExecutor the task executor to use
+	 * @param executor the task executor to use execute the Hadoop job.
 	 */
-	public void setTaskExecutor(Executor taskExecutor) {
-		Assert.notNull(taskExecutor, "a non-null task executor is required");
-		this.taskExecutor = taskExecutor;
+	public void setExecutor(Executor executor) {
+		Assert.notNull(executor, "a non-null task executor is required");
+		this.taskExecutor = executor;
+	}
+
+	/**
+	 * Indicates whether the configured jobs should be 'killed' when the application
+	 * shuts down or not.
+	 * 
+	 * @return
+	 */
+	public boolean isKillJobsAtShutdown() {
+		return killJobsAtShutdown;
+	}
+
+	/**
+	 * Indicates whether the configured jobs should be 'killed' when the application
+	 * shuts down (default) or not. For long-running or fire-and-forget jobs that live beyond
+	 * the starting application, set this to false.
+	 * 
+	 * Note that if {@link #setWaitForJob(boolean)} is true, this flag is considered to be true as otherwise
+	 * the application cannot shut down (since it has to keep waiting for the job).
+	 * 
+	 * @param killJobsAtShutdown whether or not to kill configured jobs when the application shuts down
+	 */
+	public void setKillJobAtShutdown(boolean killJobsAtShutdown) {
+		this.killJobsAtShutdown = killJobsAtShutdown;
 	}
 }

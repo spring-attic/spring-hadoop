@@ -61,30 +61,32 @@ public class CascadingTasklet extends CascadingExecutor implements Tasklet {
 			if (!stopped) {
 				uow.complete();
 			}
+
+			stats = uow.getStats();
+
+			// wait for the stats to be updated
+			while (!stats.isFinished()) {
+				Thread.sleep(5000);
+			}
+
+
+			// save stats
+			for (int i = 0; i < safeLongToInt(stats.getCounterValue(Task.Counter.MAP_INPUT_BYTES)); i++) {
+				contribution.incrementReadCount();
+			}
+
+			contribution.incrementReadSkipCount(safeLongToInt(stats.getCounterValue(Task.Counter.MAP_SKIPPED_RECORDS)));
+			contribution.incrementWriteCount(safeLongToInt(stats.getCounterValue(Task.Counter.REDUCE_OUTPUT_RECORDS)));
+
+			for (int i = 0; i < safeLongToInt(stats.getCounterValue(Task.Counter.REDUCE_SKIPPED_RECORDS)); i++) {
+				contribution.incrementWriteSkipCount();
+			}
+
 		}
 		else {
 			uow.start();
 		}
 
-		CascadingStats stats = uow.getStats();
-
-		// wait for the stats to be updated
-		while (!stats.isFinished()) {
-			Thread.sleep(5000);
-		}
-
-
-		// save stats
-		for (int i = 0; i < safeLongToInt(stats.getCounterValue(Task.Counter.MAP_INPUT_BYTES)); i++) {
-			contribution.incrementReadCount();
-		}
-
-		contribution.incrementReadSkipCount(safeLongToInt(stats.getCounterValue(Task.Counter.MAP_SKIPPED_RECORDS)));
-		contribution.incrementWriteCount(safeLongToInt(stats.getCounterValue(Task.Counter.REDUCE_OUTPUT_RECORDS)));
-
-		for (int i = 0; i < safeLongToInt(stats.getCounterValue(Task.Counter.REDUCE_SKIPPED_RECORDS)); i++) {
-			contribution.incrementWriteSkipCount();
-		}
 
 		return RepeatStatus.FINISHED;
 	}
