@@ -19,6 +19,8 @@ import org.apache.hadoop.mapred.Task;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.core.scope.context.StepContext;
+import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 
@@ -36,14 +38,16 @@ public class CascadingTasklet extends CascadingExecutor implements Tasklet {
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
-		StepExecution stepExecution = chunkContext.getStepContext().getStepExecution();
+		StepContext context = StepSynchronizationManager.getContext();
+		final StepExecution stepExecution = (context != null) ? context.getStepExecution() : null;
+
 		boolean stopped = false;
 
 		// keep looping to get the stopping signal
 		if (waitToComplete) {
 			uow.start();
 			CascadingStats stats = uow.getStats();
-			while (!stats.isFinished()) {
+			while (!stats.isFinished() && !stopped) {
 				if (stepExecution.isTerminateOnly()) {
 					log.info("Killing Cascading UoW [" + uow.getID() + "]");
 					stopped = true;
@@ -63,6 +67,12 @@ public class CascadingTasklet extends CascadingExecutor implements Tasklet {
 		}
 
 		CascadingStats stats = uow.getStats();
+
+		// wait for the stats to be updated
+		while (!stats.isFinished()) {
+			Thread.sleep(5000);
+		}
+
 
 		// save stats
 		for (int i = 0; i < safeLongToInt(stats.getCounterValue(Task.Counter.MAP_INPUT_BYTES)); i++) {

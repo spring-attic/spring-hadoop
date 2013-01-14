@@ -23,12 +23,12 @@
 	</job>
 
 	<hdp:script id="script" language="javascript">
+if (fsh.test("/test/cascading/logs/")) fsh.rmr("/test/cascading/logs/")
 fsh.mkdir("/test/cascading/logs/test/")
-fsh.rmr("/test/cascading/logs/")
 fsh.put("src/test/resources/logs/apache_access.log", "/test/cascading/logs/input");
 
+if (fsh.test("/test/cascading/names/")) fsh.rmr("/test/cascading/names/")
 fsh.mkdir("/test/cascading/names/test")
-fsh.rmr("/test/cascading/names/")
 fsh.put("src/test/resources/data/babynamedefinitions.csv.gz", "/test/cascading/names/input/babynamedefinitions.csv.gz");
 	</hdp:script>
 
