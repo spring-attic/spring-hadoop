@@ -25,6 +25,7 @@ import org.apache.hadoop.mapreduce.Job;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -40,7 +41,8 @@ public class JobTasklet extends JobExecutor implements Tasklet {
 
 	public RepeatStatus execute(final StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
-		final StepExecution stepExecution = chunkContext.getStepContext().getStepExecution();
+		StepContext context = StepSynchronizationManager.getContext();
+		final StepExecution stepExecution = (context != null) ? context.getStepExecution() : null;
 
 		final AtomicBoolean done = new AtomicBoolean(false);
 
@@ -61,17 +63,17 @@ public class JobTasklet extends JobExecutor implements Tasklet {
 				if (Boolean.TRUE.equals(state)) {
 					StepSynchronizationManager.close();
 				}
+				done.set(true);
+				done.notify();
 			}
 
 			@Override
 			public void jobKilled(Job job) {
-				done.set(true);
 				saveCounters(job, contribution);
 			}
 
 			@Override
 			public void jobFinished(Job job) {
-				done.set(true);
 				saveCounters(job, contribution);
 			}
 		};
@@ -83,8 +85,16 @@ public class JobTasklet extends JobExecutor implements Tasklet {
 		if (isWaitForJob()) {
 			while (!done.get() && !stopped) {
 				if (stepExecution.isTerminateOnly()) {
+					log.info("Cancelling job tasklet");
 					stopped = true;
 					stopJobs(jobListener);
+
+					// wait for stopping to properly occur
+					while (!done.get()) {
+						synchronized (done) {
+							done.wait();
+						}
+					}
 				}
 				else {
 					// wait a bit more then the internal hadoop threads

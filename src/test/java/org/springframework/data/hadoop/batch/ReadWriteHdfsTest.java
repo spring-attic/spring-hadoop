@@ -19,13 +19,15 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.Job;
+import org.junit.Before;
 import org.junit.Test;
+import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.context.support.GenericXmlApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.data.hadoop.TestUtils;
 import org.springframework.data.hadoop.fs.HdfsResourceLoader;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -37,6 +39,12 @@ public class ReadWriteHdfsTest {
 
 	{
 		TestUtils.hackHadoopStagingOnWin();
+	}
+
+	@Before
+	public void before() {
+		StepSynchronizationManager.release();
+		StepSynchronizationManager.close();
 	}
 
 	@Test
@@ -56,6 +64,8 @@ public class ReadWriteHdfsTest {
 
 		fs.delete(new Path(resource.getURI().toString()), true);
 
+		StepSynchronizationManager ssm = new StepSynchronizationManager();
+
 		JobsTrigger.startJobs(ctx);
 
 		Path p = new Path("/ide-test/output/word/");
@@ -65,6 +75,8 @@ public class ReadWriteHdfsTest {
 		System.out.println("FS is " + fs2.getClass().getName());
 
 		fs2.exists(p);
+
+		ctx.close();
 	}
 
 	@Test
@@ -79,7 +91,10 @@ public class ReadWriteHdfsTest {
 
 		assertTrue(ctx.isPrototype("hadoop-tasklet"));
 
+		StepSynchronizationManager ssm = new StepSynchronizationManager();
+
 		JobsTrigger.startJobs(ctx);
+		ctx.close();
 	}
 
 }

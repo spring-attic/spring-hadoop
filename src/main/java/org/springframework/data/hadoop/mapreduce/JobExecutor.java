@@ -165,7 +165,7 @@ abstract class JobExecutor implements InitializingBean, DisposableBean, BeanFact
 
 				Object listenerInit = null;
 				if (listener != null) {
-					listener.beforeAction();
+					listenerInit = listener.beforeAction();
 				}
 
 				try {
@@ -188,6 +188,7 @@ abstract class JobExecutor implements InitializingBean, DisposableBean, BeanFact
 							}
 							else {
 								succes = job.waitForCompletion(verbose);
+								log.info("Completed job [" + job.getJobName() + "]");
 								if (listener != null) {
 									listener.jobFinished(job);
 								}
