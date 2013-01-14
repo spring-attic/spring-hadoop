@@ -40,7 +40,7 @@ public class CascadingBatchTest {
 		TestUtils.hackHadoopStagingOnWin();
 	}
 
-	private static long WAIT_FOR_JOB_TO_START = 1 * 1000;
+	private static long WAIT_FOR_JOB = 1 * 1000;
 
 	@Autowired
 	GenericXmlApplicationContext ctx;
@@ -78,12 +78,14 @@ public class CascadingBatchTest {
 		Cascade cascade = ctx.getBean("cascade", Cascade.class);
 
 		while (!cascade.getStats().isEngaged()) {
-			Thread.sleep(WAIT_FOR_JOB_TO_START);
+			Thread.sleep(WAIT_FOR_JOB);
 		}
 
 		batchJob.stop();
-		Thread.sleep(10000);
 		CascadeStats stats = cascade.getStats();
+		while (!stats.isFinished()) {
+			Thread.sleep(WAIT_FOR_JOB);
+		}
 		assertTrue(stats.isStopped());
 	}
 }
