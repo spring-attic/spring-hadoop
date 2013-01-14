@@ -58,17 +58,6 @@ cannot shut down (since it has to keep waiting for the job).
 				]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
-		<xsd:attribute name="job-ref">
-			<xsd:annotation>
-				<xsd:documentation source="java:org.apache.hadoop.mapreduce.Job"><![CDATA[
-Hadoop Job. Multiple names can be specified using comma (,) as a separator.]]></xsd:documentation>
-				<xsd:appinfo>
-					<tool:annotation kind="ref">
-						<tool:expected-type type="org.apache.hadoop.mapreduce.Job" />
-					</tool:annotation>
-				</xsd:appinfo>
-			</xsd:annotation>
-		</xsd:attribute>
 		<xsd:attribute name="executor" type="xsd:string" use="optional">
 			<xsd:annotation>
 				<xsd:documentation source="java:java.util.concurrent.Executor"><![CDATA[
