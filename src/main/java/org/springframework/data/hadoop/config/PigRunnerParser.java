@@ -55,4 +55,9 @@ class PigRunnerParser extends AbstractImprovedSimpleBeanDefinitionParser {
 			builder.addPropertyValue("scripts", scripts);
 		}
 	}
+
+	@Override
+	protected boolean shouldGenerateIdAsFallback() {
+		return true;
+	}
 }

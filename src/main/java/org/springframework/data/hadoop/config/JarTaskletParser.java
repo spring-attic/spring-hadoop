@@ -37,4 +37,9 @@ class JarTaskletParser extends AbstractGenericOptionsParser {
 		super.doParse(element, parserContext, builder);
 		JarRunnerParser.parseJarDefinition(element, parserContext, builder);
 	}
+
+	@Override
+	protected boolean shouldGenerateIdAsFallback() {
+		return true;
+	}
 }

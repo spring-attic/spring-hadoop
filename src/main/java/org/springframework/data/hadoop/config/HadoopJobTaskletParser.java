@@ -44,4 +44,9 @@ class HadoopJobTaskletParser extends AbstractImprovedSimpleBeanDefinitionParser 
 
 		NamespaceUtils.setCSVProperty(element, builder, "job-ref", "jobNames");
 	}
+
+	@Override
+	protected boolean shouldGenerateIdAsFallback() {
+		return true;
+	}
 }

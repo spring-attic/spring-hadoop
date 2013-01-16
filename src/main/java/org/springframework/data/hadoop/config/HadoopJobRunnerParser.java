@@ -48,4 +48,9 @@ class HadoopJobRunnerParser extends AbstractImprovedSimpleBeanDefinitionParser {
 		NamespaceUtils.setCSVReferenceProperty(element, builder, "pre-action", "preAction");
 		NamespaceUtils.setCSVReferenceProperty(element, builder, "post-action", "postAction");
 	}
+
+	@Override
+	protected boolean shouldGenerateIdAsFallback() {
+		return true;
+	}
 }

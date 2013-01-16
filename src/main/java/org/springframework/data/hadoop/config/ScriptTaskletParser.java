@@ -70,7 +70,7 @@ class ScriptTaskletParser extends AbstractSimpleBeanDefinitionParser {
 
 	@Override
 	protected boolean shouldGenerateIdAsFallback() {
-		return false;
+		return true;
 	}
 
 	@Override

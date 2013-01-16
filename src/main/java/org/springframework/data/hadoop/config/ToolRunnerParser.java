@@ -75,4 +75,9 @@ class ToolRunnerParser extends AbstractGenericOptionsParser {
 		
 		builder.addPropertyValue("arguments", args);
 	}
+
+	@Override
+	protected boolean shouldGenerateIdAsFallback() {
+		return true;
+	}
 }

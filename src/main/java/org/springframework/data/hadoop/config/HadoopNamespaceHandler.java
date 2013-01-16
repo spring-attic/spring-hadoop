@@ -63,6 +63,11 @@ class HadoopNamespaceHandler extends NamespaceHandlerSupport {
 		registerBeanDefinitionParser("hive-runner", new HiveRunnerParser());
 
 		registerBeanDefinitionParser("hbase-configuration", new HbaseConfigurationParser());
+		
+		registerBeanDefinitionParser("cascading-cascade", new CascadingCascadeParser());
+		registerBeanDefinitionParser("cascading-flow", new CascadingFlowParser());
+		registerBeanDefinitionParser("cascading-runner", new CascadingRunnerParser());
+		registerBeanDefinitionParser("cascading-tasklet", new CascadingTaskletParser());
 	}
 
 	@Override

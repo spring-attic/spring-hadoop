@@ -112,4 +112,9 @@ class HiveTaskletParser extends AbstractImprovedSimpleBeanDefinitionParser {
 
 		return Collections.emptyList();
 	}
+	
+	@Override
+	protected boolean shouldGenerateIdAsFallback() {
+		return true;
+	}
 }

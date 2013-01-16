@@ -37,4 +37,9 @@ class ToolTaskletParser extends AbstractGenericOptionsParser {
 		super.doParse(element, parserContext, builder);
 		ToolRunnerParser.parseToolDefinition(element, parserContext, builder);
 	}
+
+	@Override
+	protected boolean shouldGenerateIdAsFallback() {
+		return true;
+	}
 }
