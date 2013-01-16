@@ -61,7 +61,7 @@ fsh.put("src/test/resources/data/babynamedefinitions.csv.gz", "/test/cascading/n
 	
 	</bean>
 
-	<bean id="cascade-runner" class="org.springframework.data.hadoop.cascading.CascadingRunner" p:unit-of-work-ref="cascade" depends-on="script" p:run-at-startup="true"/>
+	<hdp:cascading-runner id="runner" unit-of-work-ref="cascade" run-at-startup="true"/>
 	 
 	<!-- Java configuration -->
 	<bean id="copyFlowDef" class="org.springframework.data.hadoop.cascading.TestFlows" factory-method="copyFlow">
@@ -69,7 +69,5 @@ fsh.put("src/test/resources/data/babynamedefinitions.csv.gz", "/test/cascading/n
 		<constructor-arg name="sinkPath"><value>/test/cascading/names/output/simplepipe]]</value></constructor-arg>
 	</bean>
 	
-	<!-- wrap copy flow -->
-	<bean id="copyFlow" class="org.springframework.data.hadoop.cascading.HadoopFlowFactoryBean" p:configuration-ref="hadoopConfiguration" p:flow-def-ref="copyFlowDef"/>
-	 
+	<hdp:cascading-flow id="copyFlow" definition-ref="copyFlowDef" />
 </beans>

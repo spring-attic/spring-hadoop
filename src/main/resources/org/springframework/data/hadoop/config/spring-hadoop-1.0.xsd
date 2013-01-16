@@ -21,7 +21,7 @@ Defines the configuration elements for Spring Data Hadoop.
 	<!-- common attributes shared by Job executors 
 		 NOT meant for extensibility - do NOT rely on this type as it might be removed in the future -->
 	<xsd:complexType name="jobRunnerType">
-		<xsd:attribute name="id" type="xsd:ID" use="required">
+		<xsd:attribute name="id" type="xsd:ID" use="optional">
 			<xsd:annotation>
 			<xsd:documentation><![CDATA[
 Bean id.]]></xsd:documentation>
@@ -39,10 +39,10 @@ Hadoop Job. Multiple names can be specified using comma (,) as a separator.]]></
 				</xsd:appinfo>
 			</xsd:annotation>
 		</xsd:attribute>
-		<xsd:attribute name="wait-for-job" type="xsd:string" use="optional" default="true">
+		<xsd:attribute name="wait-for-completion" type="xsd:string" use="optional" default="true">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[
-Whether to synchronously wait for the job to finish (the default) or not.
+Whether to synchronously wait for the job(s) to finish (the default) or not.
 				]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
@@ -112,7 +112,7 @@ Defines a runner for Hadoop jobs.
 					<xsd:attribute name="run-at-startup" type="xsd:string" default="false">
 						<xsd:annotation>
 							<xsd:documentation><![CDATA[
-Whether the Jar runs at startup or not (default).
+Whether the Job runs at startup or not (default).
 							]]></xsd:documentation>
 			         	</xsd:annotation>
 			       	</xsd:attribute>
@@ -707,7 +707,7 @@ Tool argument.]]></xsd:documentation>
 					</xsd:complexType>
 				</xsd:element>
 			</xsd:sequence>
-			<xsd:attribute name="id" type="xsd:ID" use="required">
+			<xsd:attribute name="id" type="xsd:ID" use="optional">
 				<xsd:annotation>
 				<xsd:documentation><![CDATA[
 Bean id.]]></xsd:documentation>
@@ -1096,7 +1096,7 @@ Pig script.]]></xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
-		<xsd:attribute name="id" type="xsd:ID" use="required">
+		<xsd:attribute name="id" type="xsd:ID" use="optional">
 			<xsd:annotation>
 			<xsd:documentation><![CDATA[
 Bean id.]]></xsd:documentation>
@@ -1366,7 +1366,7 @@ Hive script.]]></xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
-		<xsd:attribute name="id" type="xsd:ID" use="required">
+		<xsd:attribute name="id" type="xsd:ID" use="optional">
 			<xsd:annotation>
 			<xsd:documentation><![CDATA[
 Bean id.]]></xsd:documentation>
@@ -1619,7 +1619,7 @@ Nested script declaration.]]></xsd:documentation>
 			 	</xsd:complexType>			
 				</xsd:element>
 			</xsd:sequence>			
-			<xsd:attribute name="id" type="xsd:ID" use="required">
+			<xsd:attribute name="id" type="xsd:ID" use="optional">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[
 Bean id.]]></xsd:documentation>
@@ -1639,4 +1639,243 @@ Reference to a script declaration.]]></xsd:documentation>
 			<xsd:attribute name="scope" type="xsd:string" use="optional" />			
 		</xsd:complexType>
 	</xsd:element>
+	
+	<!-- Cascading -->
+	<xsd:complexType name="cascadingRunnerType">
+		<xsd:attribute name="id" type="xsd:ID" use="optional">
+			<xsd:annotation>
+			<xsd:documentation><![CDATA[
+Bean id.]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="unit-of-work-ref" type="xsd:string" use="required">
+			<xsd:annotation>
+			<xsd:documentation source="java:cascading.manangement.UnitOfWork"><![CDATA[
+Reference to a Cascading UnitOfWork (or uow) - that is a Cascade or sometimes a Flow.
+				]]></xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref">
+						<tool:expected-type type="cascading.manangement.UnitOfWork" />
+					</tool:annotation>
+				</xsd:appinfo>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="wait-for-completion" type="xsd:string" use="optional" default="true">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+Whether to synchronously wait for the unit of work to finish (the default) or not.
+				]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+
+	<xsd:element name="cascading-tasklet">
+		<xsd:annotation>
+		   <xsd:documentation><![CDATA[
+Defines a Spring Batch tasklet for Cascading.
+				]]>
+          </xsd:documentation>
+	      <xsd:appinfo>
+	        <tool:annotation>
+	          <tool:exports type="org.springframework.data.hadoop.cascading.CascadingTasklet"/>
+	        </tool:annotation>
+	      </xsd:appinfo>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="cascadingRunnerType">
+					<xsd:attribute name="scope" type="xsd:string" use="optional" />
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="cascading-runner">
+		<xsd:annotation>
+		   <xsd:documentation><![CDATA[
+Defines a runner for Cascading unit of work (typically Cascades).
+				]]>
+          </xsd:documentation>
+	      <xsd:appinfo>
+	        <tool:annotation>
+	          <tool:exports type="org.springframework.data.hadoop.cascading.CascadingRunner"/>
+	        </tool:annotation>
+	      </xsd:appinfo>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="cascadingRunnerType">
+					<xsd:attribute name="run-at-startup" type="xsd:string" default="false">
+						<xsd:annotation>
+							<xsd:documentation><![CDATA[
+Whether the Cascade runs at startup or not (default).
+							]]></xsd:documentation>
+			         	</xsd:annotation>
+			       	</xsd:attribute>
+					<xsd:attribute name="pre-action" type="xsd:string" default="">
+						<xsd:annotation>
+						<xsd:documentation><![CDATA[
+Pre actions/beans to be called before running the action. Multiple bean names can be specified using comma-separated list.]]></xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>			
+					<xsd:attribute name="post-action" type="xsd:string" default="">
+						<xsd:annotation>
+						<xsd:documentation><![CDATA[
+Post actions/beans to be called before running the action. Multiple bean names can be specified using comma-separated list.]]></xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>		
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="cascading-cascade">
+		<xsd:annotation>
+		   <xsd:documentation><![CDATA[
+Defines a Cascading Cascade (an assembly of Flows).
+				]]></xsd:documentation>
+	      <xsd:appinfo>
+	        <tool:annotation>
+	          <tool:exports type="org.springframework.data.hadoop.cascading.CascadeFactoryBean"/>
+	        </tool:annotation>
+	      </xsd:appinfo>
+		</xsd:annotation>
+		<xsd:complexType>
+		<xsd:complexContent mixed="true">
+		<xsd:extension base="propertiesConfigurableType">
+			<xsd:attribute name="id" type="xsd:ID" use="required">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+Bean id.
+				]]></xsd:documentation>
+			</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="definition-ref" type="xsd:string" use="optional">
+			<xsd:annotation>
+			<xsd:documentation source="java:cascading.cascade.CascadeDef"><![CDATA[
+Reference to a Cascade definition.
+				]]></xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref">
+						<tool:expected-type type="cascading.cascade.CascadeDef" />
+					</tool:annotation>
+				</xsd:appinfo>
+			</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="flow-ref" type="xsd:string" use="optional">
+			<xsd:annotation>
+			<xsd:documentation source="java:cascading.flow.Flow"><![CDATA[
+Reference to a Cascading Flow. Multiple names can be specified using comma (,) as a separator. 
+				]]></xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref">
+						<tool:expected-type type="cascading.flow.Flow" />
+					</tool:annotation>
+				</xsd:appinfo>
+			</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="configuration-ref" default="hadoopConfiguration">
+			<xsd:annotation>
+					<xsd:documentation source="java:org.apache.hadoop.conf.Configuration"><![CDATA[
+Reference to the Hadoop configuration. Defaults to 'hadoopConfiguration'.]]></xsd:documentation>
+					<xsd:appinfo>
+						<tool:annotation kind="ref">
+							<tool:expected-type type="org.apache.hadoop.conf.Configuration" />
+						</tool:annotation>
+					</xsd:appinfo>
+		 	</xsd:annotation>
+		 	</xsd:attribute>		
+		</xsd:extension>
+		</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="cascading-flow">
+		<xsd:annotation>
+		   <xsd:documentation><![CDATA[
+Defines a Cascading Hadoop Flow using a FlowDef.
+For declarative configuration of Sinks and Taps consider using the HadoopFlowFactoryBean directly.
+				]]></xsd:documentation>
+	      <xsd:appinfo>
+	        <tool:annotation>
+	          <tool:exports type="org.springframework.data.hadoop.cascading.HadoopFlowFactoryBean"/>
+	        </tool:annotation>
+	      </xsd:appinfo>
+		</xsd:annotation>
+		<xsd:complexType>
+		<xsd:complexContent mixed="true">
+		<xsd:extension base="propertiesConfigurableType">
+			<xsd:attribute name="id" type="xsd:ID" use="required">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+Bean id.
+				]]></xsd:documentation>
+			</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="definition-ref" type="xsd:string" use="required">
+			<xsd:annotation>
+			<xsd:documentation source="java:cascading.flow.FlowDef"><![CDATA[
+Reference to a Flow definition.
+				]]></xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref">
+						<tool:expected-type type="cascading.flow.FlowDef" />
+					</tool:annotation>
+				</xsd:appinfo>
+			</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="jar-setup" type="xsd:string" use="optional" default="true">
+			<xsd:annotation>
+			<xsd:documentation source="java:cascading.flow.FlowDef"><![CDATA[
+Indicates whether the application jarshould be set for this flow.
+By default it is true, meaning the factory will use the user provided settings through
+'setJar(Resource)' and 'setJarByClass(Class)' or fall back to its own discovery mechanism if 
+the above are not setup. 
+
+When running against a cluster where Cascading jars are already installed, turn this to false
+to avoid shipping the library jars with the job.
+					]]></xsd:documentation>
+				</xsd:annotation>
+				</xsd:attribute>
+			<xsd:attribute name="jar" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+Indicates the user jar (which can be outside the classpath) for this Flow.
+				]]></xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation>
+						<tool:expected-type type="org.springframework.core.io.Resource" />
+					</tool:annotation>
+				</xsd:appinfo>
+		 	</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="jar-by-class" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+Indicates the job's jar file by finding an example class location.
+				]]></xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="direct">
+						<tool:expected-type type="java.lang.Class" />
+					</tool:annotation>
+				</xsd:appinfo>
+		 	</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="write-dot" type="xsd:string" use="optional"/>
+			<xsd:attribute name="configuration-ref" default="hadoopConfiguration">
+			<xsd:annotation>
+					<xsd:documentation source="java:org.apache.hadoop.conf.Configuration"><![CDATA[
+Reference to the Hadoop configuration. Defaults to 'hadoopConfiguration'.]]></xsd:documentation>
+					<xsd:appinfo>
+						<tool:annotation kind="ref">
+							<tool:expected-type type="org.apache.hadoop.conf.Configuration" />
+						</tool:annotation>
+					</xsd:appinfo>
+		 	</xsd:annotation>
+		 	</xsd:attribute>		
+		</xsd:extension>
+		</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	
 </xsd:schema>

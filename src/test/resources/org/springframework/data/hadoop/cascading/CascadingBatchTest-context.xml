@@ -15,10 +15,10 @@
 	
 	<job id="mainJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="provision" next="do-cascade">
-			<hdp:script-tasklet id="provision" script-ref="script"/>
+			<hdp:script-tasklet script-ref="script"/>
 		</step>
 		<step id="do-cascade">
-			<tasklet ref="cascadeTasklet"/>
+			<hdp:cascading-tasklet unit-of-work-ref="cascade"/>
 		</step>
 	</job>
 
@@ -34,20 +34,14 @@ fsh.put("src/test/resources/data/babynamedefinitions.csv.gz", "/test/cascading/n
 
 	
 	<!-- Java configuration -->
-	<bean id="copyFlow" class="org.springframework.data.hadoop.cascading.TestFlows" factory-method="copyFlow">
+	<bean id="copyFlowDef" class="org.springframework.data.hadoop.cascading.TestFlows" factory-method="copyFlow">
 		<constructor-arg name="sourcePath"><value>/test/cascading/names/input/babynamedefinitions.csv.gz</value></constructor-arg>
 		<constructor-arg name="sinkPath"><value>/test/cascading/names/output/simplepipe]]</value></constructor-arg>
 	</bean>
 
-	<bean id="cascadeTasklet" class="org.springframework.data.hadoop.cascading.CascadingTasklet" p:unit-of-work-ref="cascade"/>
-
 	<!-- Cascading definition -->
-	<bean id="cascade" class="org.springframework.data.hadoop.cascading.CascadeFactoryBean" p:configuration-ref="hadoopConfiguration">
-		<property name="flows">
-			<bean class="org.springframework.data.hadoop.cascading.HadoopFlowFactoryBean" p:configuration-ref="hadoopConfiguration"
-				p:flowDef-ref="copyFlow"/>
-		</property>
-	</bean>
+	<hdp:cascading-cascade id="cascade" flow-ref="copyFlow" />
+	<hdp:cascading-flow id="copyFlow" definition-ref="copyFlowDef" write-dot="copy-flow.dot"/>
 	
 	<!-- replace Spring Batch default task executor -->
 	<bean id="taskExecutor" class="org.springframework.core.task.SimpleAsyncTaskExecutor"/>		

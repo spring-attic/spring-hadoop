@@ -86,8 +86,9 @@ public class HadoopFlowFactoryBean extends FlowFactoryBean<HadoopFlow> implement
 		if (flowDef != null) {
 			def.addSinks(flowDef.getSinksCopy()).addSources(flowDef.getSourcesCopy()).addTraps(flowDef.getTrapsCopy()).addTails(
 					flowDef.getTailsArray()).setAssertionLevel(flowDef.getAssertionLevel()).setDebugLevel(
-					flowDef.getDebugLevel()).addCheckpoints(flowDef.getCheckpointsCopy()).addTags(flowDef.getTags()).setName(
-					flowDef.getName());
+					flowDef.getDebugLevel()).addCheckpoints(flowDef.getCheckpointsCopy()).
+					addTags(StringUtils.commaDelimitedListToStringArray(flowDef.getTags())).
+					setName(flowDef.getName());
 		}
 
 		Set<Pipe> heads = new LinkedHashSet<Pipe>();
@@ -313,7 +314,7 @@ public class HadoopFlowFactoryBean extends FlowFactoryBean<HadoopFlow> implement
 	 * 
 	 * @param flowDef
 	 */
-	public void setFlowDef(FlowDef flowDef) {
+	public void setDefinition(FlowDef flowDef) {
 		this.flowDef = flowDef;
 	}
 
@@ -336,7 +337,7 @@ public class HadoopFlowFactoryBean extends FlowFactoryBean<HadoopFlow> implement
 	}
 
 	/**
-	 * Indicates whether the Cascading jar should be set for the cascade.
+	 * Indicates whether the application jarshould be set for this flow.
 	 * By default it is true, meaning the factory will use the user provided settings
 	 * ({@link #setJar(Resource)} and {@link #setJarByClass(Class)} or falling back
 	 * to its own discovery mechanism if the above are not setup. 
@@ -344,7 +345,7 @@ public class HadoopFlowFactoryBean extends FlowFactoryBean<HadoopFlow> implement
 	 * When running against a cluster where cascading is already present, turn this to false
 	 * to avoid shipping the library jar with the job.
 	 * 
-	 * @param jarSetup
+	 * @param jarSetup whether to setup the application jar (based on the user settings) or not
 	 */
 	public void setJarSetup(boolean jarSetup) {
 		this.jarSetup = jarSetup;

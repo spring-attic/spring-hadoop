@@ -23,9 +23,13 @@ import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.data.hadoop.configuration.ConfigurationUtils;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import cascading.cascade.Cascade;
 import cascading.cascade.CascadeConnector;
+import cascading.cascade.CascadeDef;
+import cascading.cascade.CascadeListener;
 import cascading.cascade.CascadeProps;
 import cascading.flow.Flow;
 import cascading.flow.FlowSkipStrategy;
@@ -41,10 +45,12 @@ public class CascadeFactoryBean implements InitializingBean, BeanNameAware, Fact
 	private Properties properties;
 	private FlowSkipStrategy skipStrategy;
 	private Collection<Flow> flows;
-	private int concurrentFlows = 0;
+	private int concurrentFlows = -1;
 	private String beanName;
+	private Collection<CascadeListener> listeners;
 
 	private Cascade cascade;
+	private CascadeDef def;
 
 	@Override
 	public Cascade getObject() throws Exception {
@@ -65,11 +71,34 @@ public class CascadeFactoryBean implements InitializingBean, BeanNameAware, Fact
 	public void afterPropertiesSet() throws Exception {
 		Properties props = ConfigurationUtils.asProperties(ConfigurationUtils.createFrom(configuration, properties));
 
-		CascadeProps.setMaxConcurrentFlows(props, concurrentFlows);
+		CascadeDef cascadeDef = CascadeDef.cascadeDef();
+		// copy definition
 
-		cascade = new CascadeConnector(properties).connect(beanName, flows);
+		if (def != null) {
+			cascadeDef.addFlows(def.getFlows()).setName(def.getName()).setMaxConcurrentFlows(
+					def.getMaxConcurrentFlows()).addTags(StringUtils.commaDelimitedListToStringArray(def.getTags()));
+		}
+
+		if (concurrentFlows != -1) {
+			CascadeProps.setMaxConcurrentFlows(props, concurrentFlows);
+			cascadeDef.setMaxConcurrentFlows(concurrentFlows);
+		}
+
+		cascadeDef.addFlows(flows);
+
+		if (!StringUtils.hasText(cascadeDef.getName())) {
+			cascadeDef.setName(beanName);
+		}
+
+		cascade = new CascadeConnector(properties).connect(cascadeDef);
+
 		if (skipStrategy != null) {
 			cascade.setFlowSkipStrategy(skipStrategy);
+		}
+		if (!CollectionUtils.isEmpty(listeners)) {
+			for (CascadeListener listener : listeners) {
+				cascade.addListener(listener);
+			}
 		}
 	}
 
@@ -103,5 +132,23 @@ public class CascadeFactoryBean implements InitializingBean, BeanNameAware, Fact
 	 */
 	public void setFlows(Collection<Flow> flows) {
 		this.flows = flows;
+	}
+
+	/**
+	 * Sets the cascade definition.
+	 * 
+	 * @param def Cascade definition to use.
+	 */
+	public void setDefinition(CascadeDef def) {
+		this.def = def;
+	}
+
+	/**
+	 * Sets the listeners.
+	 *
+	 * @param listeners The listeners to add.
+	 */
+	public void setListeners(Collection<CascadeListener> listeners) {
+		this.listeners = listeners;
 	}
 }

@@ -69,7 +69,7 @@ class CascadingExecutor implements DisposableBean {
 	 *
 	 * @return whether the runner waits for the unit to complete or not.
 	 */
-	public boolean isWaitToComplete() {
+	public boolean isWaitForCompletion() {
 		return waitToComplete;
 	}
 
@@ -77,9 +77,9 @@ class CascadingExecutor implements DisposableBean {
 	 * Indicates whether the 'runner' should wait for the UnitOfWork to complete (default)
 	 * after submission or not.
 	 * 
-	 * @param waitToComplete whether to wait for the unit to complete or not.
+	 * @param waitForCompletion whether to wait for the unit to complete or not.
 	 */
-	public void setWaitToComplete(boolean waitToComplete) {
-		this.waitToComplete = waitToComplete;
+	public void setWaitForCompletion(boolean waitForCompletion) {
+		this.waitToComplete = waitForCompletion;
 	}
 }
