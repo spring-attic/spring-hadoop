@@ -44,7 +44,6 @@ class CascadingCascadeParser extends AbstractPropertiesConfiguredBeanDefinitionP
 		super.doParse(element, parserContext, builder);
 
 		NamespaceUtils.setCSVReferenceProperty(element, builder, "flow-ref", "flows");
-		NamespaceUtils.setPropertyValue(element, builder, "write-dot", "writeDOT");
 
 		// parse properties
 		String props = DomUtils.getTextValue(element);

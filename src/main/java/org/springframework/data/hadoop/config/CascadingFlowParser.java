@@ -33,9 +33,16 @@ class CascadingFlowParser extends AbstractPropertiesConfiguredBeanDefinitionPars
 	}
 
 	@Override
+	protected boolean isEligibleAttribute(String attributeName) {
+		return !("write-dot".equals(attributeName)) && super.isEligibleAttribute(attributeName);
+	}
+
+	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 		// parse attributes using conventions
 		super.doParse(element, parserContext, builder);
+
+		NamespaceUtils.setPropertyValue(element, builder, "write-dot", "writeDOT");
 
 		// parse properties
 		String props = DomUtils.getTextValue(element);
