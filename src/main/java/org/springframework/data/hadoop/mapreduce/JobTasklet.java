@@ -64,7 +64,9 @@ public class JobTasklet extends JobExecutor implements Tasklet {
 					StepSynchronizationManager.close();
 				}
 				done.set(true);
-				done.notify();
+				synchronized (done) {
+					done.notify();
+				}
 			}
 
 			@Override
