@@ -56,8 +56,8 @@ import cascading.tap.Tap;
 public class HadoopFlowFactoryBean extends FlowFactoryBean<HadoopFlow> implements BeanNameAware {
 
 	private static final Log log = LogFactory.getLog(CascadeFactoryBean.class);
-
 	private static String MARKER = HadoopFlowFactoryBean.class.getName() + "#SINGLE";
+	private static boolean FILE_SEPARATOR_WARNING = true;
 
 	private Configuration configuration;
 	private Properties properties;
@@ -143,27 +143,52 @@ public class HadoopFlowFactoryBean extends FlowFactoryBean<HadoopFlow> implement
 				AppProps.setApplicationJarClass(props, jarClass);
 			}
 			else {
-				// auto-detection based on the classpath
-				ClassLoader cascadingCL = Cascade.class.getClassLoader();
-				Resource cascadingCore = ResourceUtils.findContainingJar(Cascade.class);
-				Resource cascadingHadoop = ResourceUtils.findContainingJar(cascadingCL,
-						"cascading/flow/hadoop/HadoopFlow.class");
-				// find jgrapht
-				Resource jgrapht = ResourceUtils.findContainingJar(cascadingCL, "org/jgrapht/Graph.class");
+				// auto-detection based on the classpath when dealing with a non-local JT
+				if (!"local".equals(configuration.get("mapred.job.tracker", "local"))) {
 
-				Assert.notNull(cascadingCore, "Cannot find cascading-core.jar");
-				Assert.notNull(cascadingHadoop, "Cannot find cascading-hadoop.jar");
-				Assert.notNull(jgrapht, "Cannot find jgraphts-jdk.jar");
+					boolean warnCpEntry = !":".equals(System.getProperty("path.separator"));
 
-				if (log.isDebugEnabled()) {
-					log.debug("Auto-detecting Cascading Libs ["
-							+ Arrays.toString(new Resource[] { cascadingCore, cascadingHadoop, jgrapht }) + "]");
+					if (FILE_SEPARATOR_WARNING && warnCpEntry) {
+						log.warn("System path separator is not ':' - this will likely cause invalid classpath entries within the DistributedCache. See the docs and HADOOP-9123 for more information.");
+						// show the warning once per CL
+						FILE_SEPARATOR_WARNING = false;
+					}
+
+					ClassLoader cascadingCL = Cascade.class.getClassLoader();
+					Resource cascadingCore = ResourceUtils.findContainingJar(Cascade.class);
+					Resource cascadingHadoop = ResourceUtils.findContainingJar(cascadingCL,
+							"cascading/flow/hadoop/HadoopFlow.class");
+					// find jgrapht
+					Resource jgrapht = ResourceUtils.findContainingJar(cascadingCL, "org/jgrapht/Graph.class");
+					// find riffle
+					Resource riffle = ResourceUtils.findContainingJar(cascadingCL, "riffle/process/Process.class");
+					// find janino
+					Resource janino = ResourceUtils.findContainingJar(cascadingCL, "org/codehaus/janino/Java.class");
+					// find janino commons-compiler
+					Resource commonsCompiler = ResourceUtils.findContainingJar(cascadingCL,
+							"org/codehaus/commons/compiler/CompileException.class");
+
+
+
+					Assert.notNull(cascadingCore, "Cannot find cascading-core.jar");
+					Assert.notNull(cascadingHadoop, "Cannot find cascading-hadoop.jar");
+					Assert.notNull(jgrapht, "Cannot find jgraphts-jdk.jar");
+					Assert.notNull(riffle, "Cannot find riffle.jar");
+					Assert.notNull(janino, "Cannot find janino.jar");
+					Assert.notNull(commonsCompiler, "Cannot find commons-compiler.jar");
+
+					if (log.isDebugEnabled()) {
+						log.debug("Auto-detecting Cascading Libs ["
+								+ Arrays.toString(new Resource[] { cascadingCore, cascadingHadoop, jgrapht, riffle,
+										janino, commonsCompiler }) + "]");
+					}
+
+					ConfigurationUtils.addLibs(cfg, cascadingCore, cascadingHadoop, jgrapht, riffle, janino,
+							commonsCompiler);
+
+					// config changed, reinit properties
+					props = ConfigurationUtils.asProperties(cfg);
 				}
-
-				ConfigurationUtils.addLibs(cfg, cascadingCore, cascadingHadoop, jgrapht);
-
-				// config changed, reinit properties
-				props = ConfigurationUtils.asProperties(cfg);
 			}
 		}
 
