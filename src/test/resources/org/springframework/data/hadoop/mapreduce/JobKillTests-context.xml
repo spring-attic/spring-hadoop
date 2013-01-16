@@ -31,7 +31,7 @@
 		</step>
 	</job>
 
-	<hdp:job-runner id="killer-runner" job-ref="victim-job" wait-for-job="false"/>
+	<hdp:job-runner id="killer-runner" job-ref="victim-job" wait-for-completion="false"/>
 	
 	<hdp:job id="victim-job" 
 	   	input-path="/ide-test/input/word/" output-path="/ide-test/runner/killed/"
@@ -40,7 +40,7 @@
 		scope="singleton"
 		libs="classpath:mini-hadoop-examples.jar"/>
 
-	<hdp:job-tasklet id="hdp-tasklet" job-ref="tasklet-victim-job" wait-for-job="true" />
+	<hdp:job-tasklet id="hdp-tasklet" job-ref="tasklet-victim-job" wait-for-completion="true" />
 	
 	<hdp:job id="tasklet-victim-job" 
 	   	input-path="/ide-test/input/word/" output-path="/ide-test/runner/killed-tasklet/"

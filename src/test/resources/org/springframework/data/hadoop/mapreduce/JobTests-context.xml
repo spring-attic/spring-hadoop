@@ -93,7 +93,7 @@
  	</task:scheduled-tasks>
 
 
-	<hdp:job-runner id="killer-runner" job-ref="victim-job" wait-for-job="false"/>
+	<hdp:job-runner id="killer-runner" job-ref="victim-job" wait-for-completion="false"/>
 	
 	<hdp:job id="victim-job" 
 	   	input-path="/ide-test/input/word/" output-path="/ide-test/runner/killed/"

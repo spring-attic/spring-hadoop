@@ -19,10 +19,9 @@
 		</step>
 	</job>
 	
-	
 	<bean id="file-reader" class="org.springframework.batch.item.file.ResourcesItemReader" p:resources="classpath:/input/word/*.txt"/>
 
-	<bean id="hadoop-tasklet" class="org.springframework.data.hadoop.mapreduce.JobTasklet" p:job-ref="mr-job" p:wait-for-job="true"/>
+	<bean id="hadoop-tasklet" class="org.springframework.data.hadoop.mapreduce.JobTasklet" p:job-ref="mr-job" p:wait-for-completion="true"/>
 	
 	<bean id="mr-job" class="org.springframework.data.hadoop.mapreduce.JobFactoryBean"
 		p:configuration-ref="hadoopConfiguration"
