@@ -56,7 +56,7 @@ abstract class JobExecutor implements InitializingBean, DisposableBean, BeanFact
 
 	private Collection<Job> jobs;
 	private Iterable<String> jobNames;
-	private boolean waitForJobs = true;
+	private boolean waitForCompletion = true;
 	private boolean killJobsAtShutdown = true;
 	private BeanFactory beanFactory;
 	private boolean verbose = true;
@@ -83,14 +83,14 @@ abstract class JobExecutor implements InitializingBean, DisposableBean, BeanFact
 			}
 		}
 
-		if (isWaitForJob()) {
+		if (isWaitForCompletion()) {
 			setKillJobAtShutdown(true);
 		}
 	}
 
 	@Override
 	public void destroy() throws Exception {
-		if (isWaitForJob() || isKillJobsAtShutdown()) {
+		if (isWaitForCompletion() || isKillJobsAtShutdown()) {
 			stopJobs();
 		}
 	}
@@ -189,7 +189,7 @@ abstract class JobExecutor implements InitializingBean, DisposableBean, BeanFact
 							synchronized (started) {
 								started.add(job);
 							}
-							if (!waitForJobs) {
+							if (!waitForCompletion) {
 								job.submit();
 							}
 							else {
@@ -289,8 +289,8 @@ abstract class JobExecutor implements InitializingBean, DisposableBean, BeanFact
 	 * 
 	 * @return whether to wait for the job to complete or not.
 	 */
-	public boolean isWaitForJob() {
-		return waitForJobs;
+	public boolean isWaitForCompletion() {
+		return waitForCompletion;
 	}
 
 	/**
@@ -299,8 +299,8 @@ abstract class JobExecutor implements InitializingBean, DisposableBean, BeanFact
 	 * 
 	 * @param waitForJob whether to wait for the job to complete or not.
 	 */
-	public void setWaitForJob(boolean waitForJob) {
-		this.waitForJobs = waitForJob;
+	public void setWaitForCompletion(boolean waitForJob) {
+		this.waitForCompletion = waitForJob;
 	}
 
 	/**
@@ -353,7 +353,7 @@ abstract class JobExecutor implements InitializingBean, DisposableBean, BeanFact
 	 * shuts down (default) or not. For long-running or fire-and-forget jobs that live beyond
 	 * the starting application, set this to false.
 	 * 
-	 * Note that if {@link #setWaitForJob(boolean)} is true, this flag is considered to be true as otherwise
+	 * Note that if {@link #setWaitForCompletion(boolean)} is true, this flag is considered to be true as otherwise
 	 * the application cannot shut down (since it has to keep waiting for the job).
 	 * 
 	 * @param killJobsAtShutdown whether or not to kill configured jobs when the application shuts down

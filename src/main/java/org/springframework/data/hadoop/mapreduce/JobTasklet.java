@@ -82,7 +82,7 @@ public class JobTasklet extends JobExecutor implements Tasklet {
 
 		boolean stopped = false;
 		// check status (if we have to wait)
-		if (isWaitForJob()) {
+		if (isWaitForCompletion()) {
 			while (!done.get() && !stopped) {
 				if (stepExecution.isTerminateOnly()) {
 					log.info("Cancelling job tasklet");
