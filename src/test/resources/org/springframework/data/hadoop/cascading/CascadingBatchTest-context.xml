@@ -41,7 +41,7 @@ fsh.put("src/test/resources/data/babynamedefinitions.csv.gz", "/test/cascading/n
 
 	<!-- Cascading definition -->
 	<hdp:cascading-cascade id="cascade" flow-ref="copyFlow" />
-	<hdp:cascading-flow id="copyFlow" definition-ref="copyFlowDef" write-dot="copy-flow.dot"/>
+	<hdp:cascading-flow id="copyFlow" definition-ref="copyFlowDef" />
 	
 	<!-- replace Spring Batch default task executor -->
 	<bean id="taskExecutor" class="org.springframework.core.task.SimpleAsyncTaskExecutor"/>		
