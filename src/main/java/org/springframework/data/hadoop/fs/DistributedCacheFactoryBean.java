@@ -20,6 +20,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.fs.FileSystem;
@@ -74,12 +75,13 @@ public class DistributedCacheFactoryBean implements InitializingBean, FactoryBea
 		}
 	}
 
+	private static boolean FILE_SEPARATOR_WARNING = true;
+
 	private Configuration conf;
 	private DistributedCache ds;
 	private FileSystem fs;
 	private boolean createSymlink = false;
 	private Collection<CacheEntry> entries;
-	private boolean fixWinPathSeparator = true;
 
 	@Override
 	public DistributedCache getObject() throws Exception {
@@ -114,7 +116,7 @@ public class DistributedCacheFactoryBean implements InitializingBean, FactoryBea
 
 		HdfsResourceLoader loader = new HdfsResourceLoader(conf);
 
-		boolean shouldFixCpEntry = fixWinPathSeparator && System.getProperty("os.name").toLowerCase().startsWith("win");
+		boolean warnCpEntry = !":".equals(System.getProperty("path.separator"));
 
 		try {
 			for (CacheEntry entry : entries) {
@@ -135,24 +137,19 @@ public class DistributedCacheFactoryBean implements InitializingBean, FactoryBea
 							// Path does not handle fragments so use the URI instead
 							Path p = new Path(URI.create(path));
 
-							try {
-								if (shouldFixCpEntry) {
-									System.setProperty("path.separator", ":");
-								}
-
-								if (isArchive) {
-									DistributedCache.addArchiveToClassPath(p, conf, fs);
-								}
-								else {
-									DistributedCache.addFileToClassPath(p, conf, fs);
-								}
-
-							} finally {
-								if (shouldFixCpEntry) {
-									System.setProperty("path.separator", ";");
-								}
+							if (FILE_SEPARATOR_WARNING && warnCpEntry) {
+								LogFactory.getLog(DistributedCacheFactoryBean.class).warn(
+										"System path separator is not ':' - this will likely cause invalid classpath entries within the DistributedCache. See the docs and HADOOP-9123 for more information.");
+								// show the warning once per CL
+								FILE_SEPARATOR_WARNING = false;
 							}
 
+							if (isArchive) {
+								DistributedCache.addArchiveToClassPath(p, conf, fs);
+							}
+							else {
+								DistributedCache.addFileToClassPath(p, conf, fs);
+							}
 
 							break;
 
@@ -280,19 +277,5 @@ public class DistributedCacheFactoryBean implements InitializingBean, FactoryBea
 			path = path + "#" + fragment;
 		}
 		return path;
-	}
-
-	/**
-	 * Work-around for HADOOP-9123. Turned on by default, this flag checks
-	 * whether the client platform is Windows-based and if so, uses the *nix
-	 * path separator to properly construct the classpath on the server.
-	 * 
-	 * Note that accessing DistributedCache from Windows will yield incorrect results - for
-	 * such cases disable this option.
-	 * 
-	 * @param fixWinPathSeparator
-	 */
-	public void setFixWinPathSeparator(boolean fixWinPathSeparator) {
-		this.fixWinPathSeparator = fixWinPathSeparator;
 	}
 }
