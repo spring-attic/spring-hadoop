@@ -16,7 +16,7 @@
 
     This sample demonstrates how to execute a MapReduce application and a script that interacts with HDFS inside a Spring based application. It does not use spring Batch or Spring Integration.
 
-    <para>The example code is located in the distribution directory
-    <literal>&lt;spring-hadoop-install-dir&gt;/samples/wordcount</literal>.</para>
+    <para>The example code is located in the sample 
+    <ulink url="http://github.com/SpringSource/spring-hadoop-samples">repository</ulink> under the <literal>wordcount</literal>.</para>
   </section>
 </chapter>
