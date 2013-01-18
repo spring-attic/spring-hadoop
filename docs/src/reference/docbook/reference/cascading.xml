@@ -19,44 +19,44 @@
 	
 	<programlisting language="java"><![CDATA[public class Impatient {
     public static FlowDef createFlowDef(String docPath, String wcPath) {
-		// create source and sink taps
-		Tap docTap = new Hfs(new TextDelimited(true, "\t"), docPath);
-		Tap wcTap = new Hfs(new TextDelimited(true, "\t"), wcPath);
+        // create source and sink taps
+        Tap docTap = new Hfs(new TextDelimited(true, "\t"), docPath);
+        Tap wcTap = new Hfs(new TextDelimited(true, "\t"), wcPath);
 
-		// specify a regex operation to split the "document" text lines into a token stream
-		Fields token = new Fields("token");
-		Fields text = new Fields("text");
-		RegexSplitGenerator splitter = new RegexSplitGenerator(token, "[ \\[\\]\\(\\),.]");
-		// only returns "token"
-		Pipe docPipe = new Each("token", text, splitter, Fields.RESULTS);
+        // specify a regex operation to split the "document" text lines into a token stream
+        Fields token = new Fields("token");
+        Fields text = new Fields("text");
+        RegexSplitGenerator splitter = new RegexSplitGenerator(token, "[ \\[\\]\\(\\),.]");
+        // only returns "token"
+        Pipe docPipe = new Each("token", text, splitter, Fields.RESULTS);
 
-		// determine the word counts
-		Pipe wcPipe = new Pipe("wc", docPipe);
-		wcPipe = new GroupBy(wcPipe, token);
-		wcPipe = new Every(wcPipe, Fields.ALL, new Count(), Fields.ALL);
+        // determine the word counts
+        Pipe wcPipe = new Pipe("wc", docPipe);
+        wcPipe = new GroupBy(wcPipe, token);
+        wcPipe = new Every(wcPipe, Fields.ALL, new Count(), Fields.ALL);
 
-		// connect the taps, pipes, etc., into a flow
-		FlowDef flowDef = FlowDef.flowDef().setName("wc").addSource(docPipe, docTap).addTailSink(wcPipe, wcTap);
+        // connect the taps, pipes, etc., into a flow
+        FlowDef flowDef = FlowDef.flowDef().setName("wc").addSource(docPipe, docTap).addTailSink(wcPipe, wcTap);
         return flowDef; }
 }]]></programlisting>
 
     <para>The entire Cascading configuration (defining the <literal>Flow</literal>) is encapsulated within one method, which can be called by the container:</para>
     
-	<programlisting language="xml"><![CDATA[<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:hdp="http://www.springframework.org/schema/hadoop"
-	xmlns:c="http://www.springframework.org/schema/c"
-	xmlns:p="http://www.springframework.org/schema/p"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd"
-	
-	<!-- factory-method approach called with two parameters available as property placeholders -->
-	<bean id="flowDef" class="impatient.Main" factory-method="createFlowDef" c:_0="${in}" c:_1="${out}"/>
+    <programlisting language="xml"><![CDATA[<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:hdp="http://www.springframework.org/schema/hadoop"
+    xmlns:c="http://www.springframework.org/schema/c"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd"
+    
+    <!-- factory-method approach called with two parameters available as property placeholders -->
+    <bean id="flowDef" class="impatient.Main" factory-method="createFlowDef" c:_0="${in}" c:_1="${out}"/>
 
     <hdp:cascading-flow id="wc" definition-ref="flowDef" write-dot="dot/wc.dot"/>
     <hdp:cascading-cascade id="cascade" flow-ref="wc"/>
-	<hdp:cascading-runner unit-of-work-ref="cascade" run-at-startup="true"/>
+    <hdp:cascading-runner unit-of-work-ref="cascade" run-at-startup="true"/>
 </beans>]]></programlisting>
 	
 	<para>One can break-down the configuration method in multiple pieces which is useful for reusing the components between multiple flows/cascades. This goes hand in hand with Spring
