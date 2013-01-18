@@ -6,17 +6,26 @@
 
   <para>Spring for Apache Hadoop requires JDK level 6.0 (just like Hadoop) and above,
   Spring <ulink url="http://www.springsource.org/about">Framework</ulink> 3.0
-  (3.1 recommended) and above and <ulink
-  url="http://www.gemstone.com/products/gemfire">Hadoop</ulink> 0.20.2
-  (1.0.0 recommended) and above. Regarding Hadoop-related projects, SDHP
-  supports <ulink url="http://hbase.apache.org/">HBase</ulink> 0.90.x, <ulink
+  (3.2 recommended) and above and <ulink
+  url="http://hadoop.apache.org/">Apache Hadoop</ulink> 0.20.2
+  (1.0.0 recommended) and above. SHDP supports and is 
+  <ulink url="https://build.springsource.org/browse/SPRINGDATAHADOOP">tested</ulink> daily 
+  against various Hadoop distributions, such as
+  <ulink url="http://www.cloudera.com/">Cloudera</ulink> CDH3 (CD3u5) and
+  CDH4 (CDH4.1u2) distributions and <ulink url="http://www.greenplum.com/">Greenplum</ulink>
+  HD (1.2). Any distro compatible with Apache Hadoop 1.0.x should be supported.</para>
+  
+  <para>
+  Regarding Hadoop-related projects, SDHP
+  supports <ulink url="http://cascading.org/">Cascading</ulink> 2.1, 
+  <ulink url="http://hbase.apache.org/">HBase</ulink> 0.90.x, <ulink
   url="http://hive.apache.org/">Hive</ulink> 0.7.x and <ulink
   url="http://pig.apache.org/">Pig</ulink> 0.9.x and above. As a rule of
   thumb, when using Hadoop-related projects, such as Hive or Pig, use the
   required Hadoop version as a basis for discovering the supported
   versions.</para>
 
-  <para>Spring for Apache Hadoop also requires you have a Hadoop installation up and
+  <para>Spring for Apache Hadoop also requires a Hadoop installation up and
   running. If you don't already have a Hadoop cluster up and running in your
   environment, a good first step is to create a single-node cluster. To
   install Hadoop 0.20.x+, the <link
@@ -32,5 +41,8 @@
   ns6:href="http://www.greenplum.com/products/greenplum-hd">EMC Greenplum
   HD</link> distribution or get a tech preview of the <link
   ns6:href="http://hortonworks.com/technology/techpreview/">Hortonworks
-  distribution</link>.</para>
+  distribution</link>.
+  Additionally, the <link linkend="appendices">appendix</link> provides information on how to use Spring for Apache Hadoop and setup
+  Hadoop with cloud providers, such as Amazon Web Services.
+  </para>
 </chapter>
