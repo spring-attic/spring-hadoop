@@ -7,10 +7,61 @@
 	one can create <literal>Flow</literal>s or <literal>Cascade</literal>s, either through XML or/and Java and execute them, either in a simplistic manner or as part of a Spring Batch job.
 	In addition, dedicated <literal>Tap</literal>s for Spring environments are available.</para>
 	
-	<para>As Cascading is aimed at code configuration, typically one would configure the library programatically. This type of configuration is supported through Spring's <literal>@Configuration</literal>
-	and <literal>@Bean</literal> (see <ulink url="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/beans.html#beans-java">this chapter</ulink> for more information). In short
-	one use Java code (or any JVM language for that matter) to create beans. Below is an example of using that to create various Cascading components (do refer to the Cascading 
-	<ulink url="http://github.com/cwensel/cascading.samples/">examples</ulink> for more context):</para>
+	<para>As Cascading is aimed at code configuration, typically one would configure the library programatically. Such code can easily be integrated into Spring in various ways - through 
+	<literal><ulink url="http://static.springsource.org/spring/docs/3.2.x/spring-framework-reference/html/beans.html#beans-factory-class-static-factory-method">factory methods</ulink></literal> or 
+	<literal>@Configuration</literal> and <literal>@Bean</literal> (see <ulink url="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/beans.html#beans-java">this chapter
+	</ulink> for more information). In short one use Java code (or any JVM language for that matter) to create beans.</para>
+	
+	<para>For example, looking at the official Cascading sample (<ulink url="http://www.cascading.org/2012/07/09/cascading-for-the-impatient-part-2/">Cascading for the Impatient, Part2</ulink>)
+	one can simply call the Cascading setup method from within the Spring container (
+	<ulink url="http://github.com/Cascading/Impatient/blob/5c19c2d02fcf26b7c63ca6548a9239a9a764f302/part2/src/main/java/impatient/Main.java#L57">original</ulink> vs 
+	<ulink url="http://github.com/SpringSource/spring-hadoop-samples/blob/6b2365ae80c84b6b037e18e1fe8749e839fcf33f/original-samples/cascading/src/main/java/impatient/Main.java#L67">updated</ulink>):</para>
+	
+	<programlisting language="java"><![CDATA[public class Impatient {
+    public static FlowDef createFlowDef(String docPath, String wcPath) {
+		// create source and sink taps
+		Tap docTap = new Hfs(new TextDelimited(true, "\t"), docPath);
+		Tap wcTap = new Hfs(new TextDelimited(true, "\t"), wcPath);
+
+		// specify a regex operation to split the "document" text lines into a token stream
+		Fields token = new Fields("token");
+		Fields text = new Fields("text");
+		RegexSplitGenerator splitter = new RegexSplitGenerator(token, "[ \\[\\]\\(\\),.]");
+		// only returns "token"
+		Pipe docPipe = new Each("token", text, splitter, Fields.RESULTS);
+
+		// determine the word counts
+		Pipe wcPipe = new Pipe("wc", docPipe);
+		wcPipe = new GroupBy(wcPipe, token);
+		wcPipe = new Every(wcPipe, Fields.ALL, new Count(), Fields.ALL);
+
+		// connect the taps, pipes, etc., into a flow
+		FlowDef flowDef = FlowDef.flowDef().setName("wc").addSource(docPipe, docTap).addTailSink(wcPipe, wcTap);
+        return flowDef; }
+}]]></programlisting>
+
+    <para>The entire Cascading configuration (defining the <literal>Flow</literal>) is encapsulated within one method, which can be called by the container:</para>
+    
+	<programlisting language="xml"><![CDATA[<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:hdp="http://www.springframework.org/schema/hadoop"
+	xmlns:c="http://www.springframework.org/schema/c"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd"
+	
+	<!-- factory-method approach called with two parameters available as property placeholders -->
+	<bean id="flowDef" class="impatient.Main" factory-method="createFlowDef" c:_0="${in}" c:_1="${out}"/>
+
+    <hdp:cascading-flow id="wc" definition-ref="flowDef" write-dot="dot/wc.dot"/>
+    <hdp:cascading-cascade id="cascade" flow-ref="wc"/>
+	<hdp:cascading-runner unit-of-work-ref="cascade" run-at-startup="true"/>
+</beans>]]></programlisting>
+	
+	<para>One can break-down the configuration method in multiple pieces which is useful for reusing the components between multiple flows/cascades. This goes hand in hand with Spring
+	<literal>@Configuration</literal> feature - see the example below that configures a Cascade pipes and taps as individual beans 
+	(see the original <ulink url="http://github.com/cwensel/cascading.samples/">example</ulink>):</para>
 	
 	<programlisting language="java"><![CDATA[@Configuration
 public class CascadingAnalysisConfig {
@@ -61,10 +112,9 @@ public class CascadingAnalysisConfig {
 <!-- Tap created through XML rather then code (using Spring's 3.1 c: namespace)-->
 <bean id="tap" class="cascading.tap.hadoop.Hfs" c:fields-ref="fields" c:string-path-value="${cascade.input}"/>
 
-<bean id="cascade" class="org.springframework.data.hadoop.cascading.CascadeFactoryBean" p:configuration-ref="hadoopConfiguration">
-  <property name="flows"><list>
-    <bean class="org.springframework.data.hadoop.cascading.HadoopFlowFactoryBean"
-      p:configuration-ref="hadoopConfiguration" p:source-ref="tap" p:sinks-ref="sinks">
+<!-- standard bean declaration used to showcase the container flexibility -->
+<!-- note the tap and sinks are imported from the CascadingAnalysisConfig bean -->
+<bean id="analysisFlow" class="org.springframework.data.hadoop.cascading.HadoopFlowFactoryBean" p:configuration-ref="hadoopConfiguration" p:source-ref="tap" p:sinks-ref="sinks">
      <property name="tails"><list>
          <ref bean="tsCountPipe"/>
          <ref bean="tmCountPipe"/>
@@ -72,11 +122,12 @@ public class CascadingAnalysisConfig {
     </bean>
   </list></property>
 </bean>
-	
-<bean id="cascade-runner" class="org.springframework.data.hadoop.cascading.CascadeRunner" p:unit-of-work-ref="cascade" p:run-at-startup="true" />]]></programlisting>
 
-	<para>The XML above, whose main purpose is to illustrate possible ways of configuring, uses SHDP classes to create a <literal>Cascade</literal> with one nested <literal>Flow</literal> using the taps and sinks
-	configured by the code class. Additionally it also shows how the cascade is ran (through <literal>CascadeRunner</literal>).
+<hdp:cascading-cascade flow="analysisFlow" />
+<hdp:cascading-runner unit-of-work-ref="cascade" run-at-startup="true"/>]]></programlisting>
+
+	<para>The XML above, whose main purpose is to illustrate possible ways of configuring, uses SHDP classes to create a <literal>Cascade</literal> with one nested <literal>Flow</literal> using the taps 
+	and sinks configured by the code class. Additionally it also shows how the cascade is ran (through <literal>cascading-runner</literal>).
 	The runner will trigger the execution during the application start-up (notice 
 	the <literal>run-at-startup</literal> flag which is by default <literal>false</literal>). Do note that the runner will not run unless triggered manually or if <literal>run-at-startup</literal> is set to <literal>true</literal>.
 	Additionally the runner (as in fact do all <link linkend="runners">runners</link> in SHDP) allows one or
@@ -91,10 +142,10 @@ public class CascadingAnalysisConfig {
 	<section id="cascading:tasklet">
 		<title>Using the Cascading tasklet</title>
 
-		<para>For Spring Batch environments, SHDP provides a dedicated tasklet (similar to <literal>CascadeRunner</literal> above) for executing <literal>Cascade</literal> or <literal>Flow</literal> instances, 
-		on demand, as part of a batch or workflow. The declaration is pretty straight forward:</para>
+		<para>For Spring Batch environments, SHDP provides a dedicated tasklet (similar to <literal>CascadeRunner</literal> above) for executing <literal>Cascade</literal> or <literal>Flow</literal> 
+		instances, on demand, as part of a batch or workflow. The declaration is pretty straight forward:</para>
 		
-		<programlisting language="xml"><![CDATA[<bean id="cascade-tasklet" class="org.springframework.data.hadoop.cascading.CascadeTasklet" p:unit-of-work-ref="cascade" />]]></programlisting>
+		<programlisting language="xml"><![CDATA[<hdp:tasklet p:unit-of-work-ref="cascade" />]]></programlisting>
 	</section>
 	
 	<section id="cascading:scalding">
