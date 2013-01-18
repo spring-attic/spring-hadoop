@@ -342,7 +342,7 @@ abstract class JobExecutor implements InitializingBean, DisposableBean, BeanFact
 	 * Indicates whether the configured jobs should be 'killed' when the application
 	 * shuts down or not.
 	 * 
-	 * @return
+	 * @return whether or not to kill the configured jobs at shutdown
 	 */
 	public boolean isKillJobsAtShutdown() {
 		return killJobsAtShutdown;

@@ -259,6 +259,11 @@ public class HadoopFlowFactoryBean extends FlowFactoryBean<HadoopFlow> implement
 		this.sources = sources;
 	}
 
+	/**
+	 * Sets the source.
+	 * 
+	 * @param source The source to set.
+	 */
 	public void setSource(Tap source) {
 		Map<String, Tap> sources = new HashMap<String, Tap>();
 		sources.put(MARKER, source);

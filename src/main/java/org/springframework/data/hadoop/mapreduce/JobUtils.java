@@ -170,7 +170,7 @@ public abstract class JobUtils {
 	 * caused exceptions. 
 	 * 
 	 * @param job
-	 * @return
+	 * @return the job status
 	 */
 	public static JobStatus getStatus(Job job) {
 		if (job == null) {
