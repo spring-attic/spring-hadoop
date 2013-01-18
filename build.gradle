@@ -310,7 +310,7 @@ javadoc {
         "http://download.oracle.com/javase/6/docs/api",
         "http://logging.apache.org/log4j/1.2/apidocs/",
         "http://hadoop.apache.org/common/docs/current/api/",
-        "http://hbase.apache.org/xref/",
+        "http://hbase.apache.org/apidocs/",
         "http://pig.apache.org/docs/r0.10.0/api/",
         "http://hive.apache.org/docs/r0.7.1/api/",
         "http://static.springsource.org/spring-batch/apidocs/",
