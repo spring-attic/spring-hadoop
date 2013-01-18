@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<appendix xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="appendix-apache-whirr" xmlns:xi="http://www.w3.org/2001/XInclude">
+    <title>Using Spring for Apache Hadoop with EC2/Apache Whirr</title>
+
+	<para>As mentioned above, those interested in using on-demand Hadoop clusters can use Amazon Elastic Map Reduce (or Amazon EMR) service. An alternative to that, for those that want maximum control over
+	the cluster, is to use Amazon Elastic Compute Cloud or <ulink url="http://aws.amazon.com/ec2/">EC2</ulink>. EC2 is in fact the service on top of which Amazon EMR runs and that is, a resizable, 
+	configurable compute capacity in the cloud.
+	</para>
+	
+	<important>This chapter assumes the user is familiar with Amazon EC2 and the <ulink url="http://aws.amazon.com/ec2/pricing/">cost</ulink> associated with it and its related services - we strongly recommend getting familiar with the official EC2 <ulink url="http://aws.amazon.com/documentation/ec2/">documentation</ulink>.</important>	
+
+	<para>Just like Amazon EMR, using EC2 means the Hadoop cluster (or whatever service you run on it) runs in the cloud and thus 'development' access to it, is different then when running the service in 
+	local network. There are various tips and tools out there that can handle the initial provisioning and configure the access to the cluster. Such a solution is 
+	<ulink url="http://whirr.apache.org/">Apache Whirr</ulink> which is a set of libraries for running cloud services. Though it provides a Java API as well, one can easily configure, start and stop 
+	services from the command-line.</para>
+	
+	<section id="whirr:setup">
+		<title>Setting up the Hadoop cluster on EC2 with Apache Whirr</title>
+
+	<para>
+	The Whirr <ulink url="http://whirr.apache.org/docs/0.8.1/quick-start-guide.html">documentation</ulink> provides more detail on how to interact with the various cloud providers out-there through Whirr.
+	In case of EC2, one needs Java 6 (which is required by Apache Hadoop), an account on EC2 and an SSH client (available out of the box on *nix platforms and freely downloadable (such as PuTTY) on Windows).
+	Since Whirr does most of the heavy lifting, one needs to tell Whirr what Cloud provider and account is used, either by setting some environment properties or through the 
+	<literal>~/.whirr/credentials file</literal>:
+	</para>
+	 
+	<programlisting><![CDATA[whirr.provider=aws-ec2
+whirr.identity=your-aws-key
+whirr.credential=your-aws-secret]]></programlisting>
+	
+	<para>Now instruct Whirr to configure a Hadoop cluster on EC2 - just add the following properties to a configuration file (say <literal>hadoop.properties</literal>):</para>
+	
+	<programlisting><![CDATA[whirr.cluster-name=myhadoopcluster 
+whirr.instance-templates=1 hadoop-jobtracker+hadoop-namenode,1 hadoop-datanode+hadoop-tasktracker 
+whirr.provider=aws-ec2
+whirr.private-key-file=${sys:user.home}/.ssh/id_rsa
+whirr.public-key-file=${sys:user.home}/.ssh/id_rsa.pub]]></programlisting>
+	
+	<para>The configuration above assumes the SSH keys for your user have been already generated. Now start your Hadoop cluster:</para>
+	
+	<programlisting><![CDATA[bin/whirr launch-cluster --config hadoop.properties]]></programlisting>
+		
+	<para>As with Amazon EMR, one cannot correct to the Hadoop cluster from outside - however Whirr provides out of the box the feature to create an SSH tunnel to create a SOCKS proxy (on port 6666).
+	When a cluster is created, Whirr creates a script to launch the cluster which may be found in <literal>~/.whirr/cluster-name</literal>. Run it as a follows (in a new terminal window):</para>
+
+    <programlisting><![CDATA[~/.whirr/myhadoopcluster/hadoop-proxy.sh]]></programlisting>
+
+    <para>At this point, one can just the <link linkend="emr:socks">SOCKS proxy</link> configuration from the Amazon EMR section to configure the Hadoop client.</para>
+    
+    <para>To destroy the cluster, one can use the Amazon EMR console or Whirr itself:</para>
+    
+    <programlisting><![CDATA[bin/whirr destroy-cluster --config hadoop.properties]]></programlisting>
+	</section>
+</appendix>
