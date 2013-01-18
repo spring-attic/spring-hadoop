@@ -23,8 +23,11 @@
 	
 	<section id="emr:startup">
 		<title>Start up the cluster</title>
-	
-	<para>A nice feature of Amazon EMR is starting a cluster for an indefinite period. That is rather then submitting a job and creating the cluster until it finished, one can create a cluster (along side a job) but request
+
+	<important>Make sure you read the whole chapter before starting up the EMR cluster</important>
+		
+	<para>
+	A nice feature of Amazon EMR is starting a cluster for an indefinite period. That is rather then submitting a job and creating the cluster until it finished, one can create a cluster (along side a job) but request
 	to be kept <emphasis>alive</emphasis> even if there is no work for it. This is <ulink url="http://docs.amazonwebservices.com/ElasticMapReduce/latest/GettingStartedGuide/Essentials.html#emr-gsg-creating-a-job-flow">easily done</ulink>
 	 through the <literal>--create --alive</literal> parameters:</para>
 	 
@@ -41,22 +44,56 @@
 		<ulink url="http://docs.amazonwebservices.com/AWSEC2/latest/UserGuide/using-instance-addressing.html">Amazon Elastic IP</ulink>, that is a static, predefined IP, 
 		so that she knows before-hand the cluster address. Refer to 
 		<ulink url="http://docs.amazonwebservices.com/ElasticMapReduce/latest/DeveloperGuide/environmentconfig_eip.html">this</ulink> section inside the EMR documentation for more information.</note>
+		
+	<para>However, to remotely access the cluster from outside (as oppose to just running a jar within the cluster), one needs to tweak the cluster settings just a tiny bit - as mentioned below.</para>
+	
 	</section>
 
-	<section id="emr:jt">
-		<title>Accessing the Job Tracker</title>
+	<section id="emr:ssh">
+		<title>Open an SSH Tunnel as a SOCKS proxy</title>
 		
-		<para>Once started, the cluster job tracker is available inside the newly EMR cluster, being bound to an internal IP. The easiest way to get access to it from outside is to open a SSH tunnel to it.
-		The <emphasis role="bold">remote</emphasis> job tracker is available on the default port <emphasis role="bold"><literal>9001</literal></emphasis>. 
-		One can bind it to the same local port <literal>9001</literal> or a different one such as <literal>20001</literal>. 
-		The SSH tunnel provides a secure
-		connection between your machine on the cluster preventing any snooping or man-in-the-middle attacks. Further more it is quite easy to automate and be executed along side the cluster creation, programmatically or through
-		some script. The Amazon EMR docs have dedicated sections on <ulink url="http://docs.amazonwebservices.com/ElasticMapReduce/latest/GettingStartedGuide/SignUp.html#emr-gsg-ssh-setup-config">
+		<para>Due to security reasons, the EMR cluster is not exposed to the outside world and is bound only to the machine internal IP. While you can open up the firewall to allow access (note that you also have to do
+		some port forwarding since again, Hadoop is bound to the cluster internal IP rather then all available network cards), it is recommended to use a SSH tunnel instead.
+		The SSH tunnel provides a secure connection between your machine on the cluster preventing any snooping or man-in-the-middle attacks. Further more it is quite easy to automate and be executed along side the 
+		cluster creation, programmatically or through some script. The Amazon EMR docs have dedicated sections on <ulink url="http://docs.amazonwebservices.com/ElasticMapReduce/latest/GettingStartedGuide/SignUp.html#emr-gsg-ssh-setup-config">
 		SSH Setup and Configuration</ulink> and on opening a <ulink url="http://docs.amazonwebservices.com/ElasticMapReduce/latest/DeveloperGuide/emr-ssh-tunnel.html">SSH Tunnel to the master node</ulink> so please refer
-		to them. One advantage of the SSH tunnel is that it <emphasis>encapsulates</emphasis> the connection setup to the remote cluster - no matter the cluster IP (whether static or not), the local port is entirely up to the user;
-		one can chose to bind the cluster always to the same port - whether that is connected to a local cluster or a remote one, created on-demand is transparent to the using application.</para>
+		to them.
+		Make sure to setup the SSH tunnel as a SOCKS proxy, that is to redirect all calls to remote ports - this is crucial when working with Hadoop (or other applications) that use a range of ports for communication.</para>
 	</section>
-	
+
+	<section id="emr:socks">
+		<title>Configuring Hadoop to use a SOCKS proxy</title>
+		
+		<para>Once the tunnel or the SOCKS proxy is in place, one needs to configure Hadoop to use it. By default, Hadoop makes connections directly to its target which is fine for regular use, but in this case, we need to
+		use the SOCKS proxy to pass through the firewall. One can do so through the <literal>hadoop.rpc.socket.factory.class.default</literal> and <literal>hadoop.socks.server</literal> properties:</para>
+		
+		<programlisting><![CDATA[
+hadoop.rpc.socket.factory.class.default=org.apache.hadoop.net.SocksSocketFactory
+# this configure assumes the SOCKS proxy is opened on local port 6666
+hadoop.socks.server=localhost:6666
+]]></programlisting> 
+
+		<para>At this point, all Hadoop communication will go through the SOCKS proxy at localhost on port 6666. The main advantage is that all the IPs, domain names, ports are resolved on the 'remote' side of the proxy so
+		one can just start using the remote cluster IPs. However, only the Hadoop client needs to use the proxy - to avoid having the client configuration be read by the cluster nodes (which would mean the nodes would
+		try to use a SOCKS proxy on the remote side as well), make sure the master node (and thus all its nodes)
+		<literal>hadoop-site.xml</literal> marks the default network setting as final (see this <ulink url="http://blog.cloudera.com/blog/2008/12/securing-a-hadoop-cluster-through-a-gateway/">blog post</ulink> for a detailed 
+		explanation):</para>
+		
+		<programlisting language="xml"><![CDATA[<property>
+    <name>hadoop.rpc.socket.factory.class.default</name>
+    <value>org.apache.hadoop.net.StandardSocketFactory</value>
+    <final>true</final>
+</property>]]></programlisting> 		
+		
+		<para>Simply pass this configuration (and other options that you might have) to the master node using a <ulink url="http://docs.aws.amazon.com/ElasticMapReduce/latest/DeveloperGuide/Bootstrap.html">bootstrap</ulink> action. 
+		One can find this file ready for usage, already deployed to Amazon S3 at <ulink url="http://dist.springframework.org.s3.amazonaws.com/release/SHDP/emr-settings.xml">s3://dist.springframework.org/release/SHDP/emr-settings.xml</ulink>. Simply pass the file to command-line used for firing up
+		the EMR cluster:</para>
+		
+		<programlisting><![CDATA[./elastic-mapreduce --create --alive --bootstrap-action s3://elasticmapreduce/bootstrap-actions/configure-hadoop --args "--site-config-file,s3://dist.springframework.org/release/SHDP/emr-settings.xml"]]></programlisting>
+		
+		<note>For security reasons, we recommend copying the 'emr-settings.xml' file to one of your S3 buckets and use that location instead.</note> 
+	</section>
+		
 	<section id="emr:s3">
 		<title>Accessing the file-system</title>
 		
@@ -133,14 +170,14 @@
 		<para>To put it all together, to use Amazon EMR one can use the following work-flow with SHDP:
 		
 		<itemizedlist>
-			<listitem><para>Start an <emphasis>alive</emphasis> cluster and create a SSH tunnel to the Job Tracker</para>
+			<listitem><para>Start an <emphasis>alive</emphasis> cluster using the bootstrap action to guarantees the cluster does NOT use a socks proxy. Open a SSH tunnel, in SOCKS mode, to the EMR cluster.</para>
 			
-			Start the cluster for an indefinite period. Once the server is up, create an SSH tunnel to the remote job tracker node. The remote port is <literal>9001</literal> and let us assume the local tunnelled port
-			is <literal>20001</literal>.  This step does not have to be repeated unless the cluster is terminated - one can (and should) submit multiple jobs to it. 
+			Start the cluster for an indefinite period. Once the server is up, create an SSH tunnel,in SOCKS mode, to the remote cluster. This allows the client to communicate directly with the remote nodes as if they are
+			part of the same network.This step does not have to be repeated unless the cluster is terminated - one can (and should) submit multiple jobs to it. 
 			</listitem>
 			
 			<listitem><para>Configure SHDP</para></listitem>
-			<listitem>Once the cluster is up and the SSH tunnel is in place, point SHDP to the new configuration. The example below shows how the configuration can look like:
+			<listitem>Once the cluster is up and the SSH tunnel/SOCKS proxy is in place, point SHDP to the new configuration. The example below shows how the configuration can look like:
 			
 			<para>hadoop-context.xml</para>
 			
@@ -155,20 +192,25 @@
 <!-- property placeholder backed by hadoop.properties -->		
 <context:property-placeholder location="hadoop.properties"/>
 
-<!-- Hadoop FileSystem using a placeholder and s3.properties -->
-<hdp:configuration register-url-handler="false" properties-location="s3.properties">
-	fs.default.name=${hd.fs}
-</hdp:configuration>]]></programlisting>
+<!-- Hadoop FileSystem using a placeholder and emr.properties -->
+<hdp:configuration properties-location="emr.properties" file-system-uri="${hd.fs}" job-tracker-uri="${hd.jt}/>
+]]></programlisting>
 			
 			<para>hadoop.properties</para>
 			<programlisting><![CDATA[# Amazon EMR
-# S3 bucked backing the HDFS S3 fs
-hd.fs=s3n://work-emr/tmp/
-# job tracker pointing to the local SSH tunnelled port
-mapred.job.tracker=localhost:20001]]></programlisting>
+# S3 bucket backing the HDFS S3 fs
+hd.fs=s3n://my-working-bucket/
+# job tracker pointing to the EMR internal IP
+hd.jt=10.123.123.123:9000
+]]></programlisting>
 
-			<para>s3.properties</para>
-			<programlisting><![CDATA[# S3 credentials
+			<para>emr.properties</para>
+			<programlisting><![CDATA[# Amazon EMR
+# Use a SOCKS proxy 
+hadoop.rpc.socket.factory.class.default=org.apache.hadoop.net.SocksSocketFactory
+hadoop.socks.server=localhost:6666
+
+# S3 credentials
 # for s3:// uri
 fs.s3.awsAccessKeyId=XXXXXXXXXXXXXXXXXXXX
 fs.s3.awsSecretAccessKey=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -179,6 +221,8 @@ fs.s3n.awsSecretAccessKey=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 ]]></programlisting>
 			Spring Hadoop is now ready to talk to your Amazon EMR cluster. Try it out!		
 
+			<note>The inquisitive reader might wonder why the example above uses two properties file, <literal>hadoop.properties</literal> and <literal>emr.properties</literal> instead of just one. While one file is enough,
+			the example tries to isolate the EMR configuration into a separate configuration (especially as it contains security credentials).</note>
 		</listitem>
 		
 		<listitem>
