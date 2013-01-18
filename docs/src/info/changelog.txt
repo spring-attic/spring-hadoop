@@ -5,6 +5,45 @@ http://www.springsource.org/spring-data/hadoop
 Commit changelog: http://github.com/SpringSource/spring-hadoop/tree/v[version]
 Issues changelog: http://jira.springsource.org/secure/ReleaseNote.jspa?projectId=10801
 
+Changes in version 1.0 RC2 (2013-01-dd)
+---------------------------------------
+
+General
+* Enhanced Cascading, Pig and MapReduce tasklets to expose execution stats to the Spring Batch infrastructure
+* Enhanced Cascading and MapReduce tasklets and runners to support cancellation
+* Introduced Cascading namespace
+* Improved spring-hadoop.xsd namespace
+* Extended test-suite to include CDH3u4, CDH4u2, Greenplum HD 1.2 and Apache Hadoop 1.1.x
+* Upgraded to Cascading 2.1.2
+* Upgraded to Hadoop 1.0.4
+* Upgraded to Hive 0.10
+* Upgraded to Pig 0.10.1
+* Upgraded to Gradle 1.3
+
+Package o.s.data.hadoop.cascading
+* Refined local Taps timestamp for compatibility with Cascading 2.1
+* Enhanced FlowFactoryBean to automatically add Cascading jars & dependencies to the target Flow when needed
+
+Package o.s.data.hadoop.configuration
+* Added top-level file-system/job-tracker uri attributes to the Configuration element
+
+Package o.s.data.hadoop.fs
+* Refined classpath setup for DistributedCache
+* Added warning regarding invalid classpath setup on Windows platform for DistributedCache (see HADOOP-9123)
+* Added work-around for early closing of the Hadoop file-system
+
+Package o.s.data.hadoop.hbase
+* Replaced HTable (class type) with HTableInterface (interface)
+* Improved HTable release process based on their producing factories
+* Added 'zk-host' and 'zk-port' attributes for ZooKeeper configuration to HBase element
+
+Package o.s.data.hadoop.mapreduce
+* Introduced depends-on attibute to Hadoop configuration, file-system and resource-loader elements for staged start-up
+* Refined the job configuration under Jar/Tool runner
+* Improved 'output' Job attribute by making it optional
+* Introduced utility for discovering a Job status from provisioning to completion
+
+
 Changes in version 1.0 RC1 (2012-10-07)
 ---------------------------------------
 
