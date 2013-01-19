@@ -18,7 +18,13 @@
   property=value
 </hdp:hbase-configuration>]]></programlisting>
 
-	<para>Notice that like with the other elements, one can specify additional properties specific to this configuration. In fact <literal>hbase-configuration</literal> provides the same properties
+    <para>Additionally, one can specify the ZooKeeper port used by the HBase server - this is especially useful when connecting to a remote instance (note one can fully configure HBase including the
+    ZooKeeper host and port through properties; the attributes here act as shortcuts for easier declaration):</para>
+    
+	<programlisting language="xml"><![CDATA[<!-- specify ZooKeeper host/port -->
+<hdp:hbase-configuration zk-quorum="${hbase.host}" zk-port="${hbase.port}">]]></programlisting>
+    
+    <para>Notice that like with the other elements, one can specify additional properties specific to this configuration. In fact <literal>hbase-configuration</literal> provides the same properties
 	configuration <literal>knobs</literal> as <link linkend="hadoop:config:properties">hadoop configuration</link>:</para>
 	
 	<programlisting language="xml"><![CDATA[<hdp:hbase-configuration properties-ref="some-props-bean" properties-location="classpath:/conf/testing/hbase.properties"/>]]></programlisting>	
