@@ -156,10 +156,10 @@ dependencies {
     testCompile "org.springframework:spring-test:$springVersion"
     testCompile("javax.annotation:jsr250-api:1.0")
     testCompile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
-    
+    testCompile "org.springframework.integration:spring-integration-stream:$springIntVersion"
+    testCompile "org.springframework.integration:spring-integration-file:$springIntVersion"
+
     testRuntime "org.springframework.integration:spring-integration-event:$springIntVersion"
-    testRuntime("org.springframework.integration:spring-integration-stream:$springIntVersion")
-    testRuntime("org.springframework.integration:spring-integration-file:$springIntVersion")
     
     testRuntime "org.codehaus.groovy:groovy:$groovyVersion"
     testRuntime "org.jruby:jruby:$jrubyVersion"
