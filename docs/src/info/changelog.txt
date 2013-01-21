@@ -23,6 +23,7 @@ General
 * Upgraded to Gradle 1.3
 * Revised artifact Maven pom.xml to minimize number of dependencies
 * Removed any logging library declaration (project relies on the 'commons-logging' transitive dependency)
+* Removed o.s.data.hadoop.batch package
 
 Package o.s.data.hadoop.cascading
 * Refined local Taps timestamp for compatibility with Cascading 2.1
