@@ -311,14 +311,21 @@
 		Additionally the runner (as in fact do all <link linkend="runners">runners</link> in SHDP) allows one or
 		multiple <literal>pre</literal> and <literal>post</literal> actions to be specified to be executed before and after each run. Typically other runners (such as other jobs or scripts) can be specified but any JDK <literal>Callable</literal> can be 
 		passed in. For more information on runners, see the <link linkend="runners">dedicated</link> chapter.</para>
-
+		
+		<note>As the Hadoop job submittion and execution (when <literal>wait-for-completion</literal> is <literal>true</literal>) is blocking, <literal>JobRunner</literal> uses a JDK <literal>Executor</literal> to start (or stop)
+		a job. The default implementation, <literal>SimpleAsyncTaskExecutor</literal> creates a new <literal>Thread</literal> for each new task. Before going into production, it is recommended to double-check whether this strategy
+		is suitable or whether a throttled or pooled implementation is better. One can customize the behaviour through <literal>executor</literal> parameter.</note>
+		
+		<para>The job runner also allows running jobs to be cancelled (or killed) at shutdown. This applies only to jobs that the runner waits for (<literal>wait-for-completion</literal> is <literal>true</literal>). To customize
+		this behaviour, one should set <literal>kill-job-at-shutdown</literal> attribute to <literal>false</literal>.</para>
+		
 	   <section id="hadoop:tasklet">
 			<title>Using the Hadoop Job tasklet</title>
 	
 			<para>For Spring Batch environments, SHDP provides a dedicated tasklet to execute Hadoop jobs as a step in a Spring Batch workflow. An example declaration is shown below:</para>
 			
-			<programlisting language="xml"><![CDATA[<hdp:job-tasklet id="hadoop-tasklet" job-ref="mr-job" wait-for-job="true" />]]></programlisting>
-			<para>The tasklet above references a Hadoop job definition named "mr-job".  By default, <literal>wait-for-job</literal> is true so that the tasklet will wait for the job to complete when it executes.  Setting wait-for-job to false will submit the job to the Hadoop cluster but not wait for it to complete.</para>	
+			<programlisting language="xml"><![CDATA[<hdp:job-tasklet id="hadoop-tasklet" job-ref="mr-job" wait-for-completion="true" />]]></programlisting>
+			<para>The tasklet above references a Hadoop job definition named "mr-job".  By default, <literal>wait-for-completion</literal> is true so that the tasklet will wait for the job to complete when it executes.  Setting wait-for-completion to false will submit the job to the Hadoop cluster but not wait for it to complete.</para>	
 		</section>
 	 </section>   	 
    
@@ -520,6 +527,10 @@ hadoop jar job10.jar ...]]></programlisting>
 	files that are copied as-is. As with the rest of the namespace declarations, the definition above relies on defaults - since it requires a Hadoop <literal>Configuration</literal> and <literal>FileSystem</literal>
 	objects and none are specified (through <literal>configuration-ref</literal> and <literal>file-system-ref</literal>) it falls back to the default naming and is wired with the bean named 
 	<emphasis>hadoopConfiguration</emphasis>, creating the <literal>FileSystem</literal> automatically.</para>
+	
+	<warning>Clients setting up a <emphasis>classpath</emphasis> in the <literal>DistributedCache</literal>, running on Windows platforms should set the System <literal>path.separator</literal> property to <literal>:</literal>
+	(easily done through a small <literal>script</literal> entry).
+	Otherwise the classpath will be set incorrectly and will be ignored. See <ulink url="https://issues.apache.org/jira/browse/HADOOP-9123">HADOOP-9123</ulink> bug report for more information.</warning>
    </section>
 
 	<section id="hadoop:generic-options">
