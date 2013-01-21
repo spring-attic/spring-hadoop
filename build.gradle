@@ -95,25 +95,21 @@ switch (hadoopDistro) {
 // Common dependencies
 dependencies {
     compile hadoop
-    
-    // Logging
-    compile("org.slf4j:slf4j-api:$slf4jVersion")
-    optional("org.slf4j:jcl-over-slf4j:$slf4jVersion")
+
+    // Logging - using commons-logging from spring-core
     testRuntime("log4j:log4j:$log4jVersion")
-    testRuntime("org.slf4j:slf4j-log4j12:$slf4jVersion")
 
     // Spring Framework
-    compile("org.springframework:spring-core:$springVersion") {
-        exclude module: "commons-logging"
-    }
+    // context-support -> spring-aop/beans/core -> commons-logging
     compile "org.springframework:spring-context-support:$springVersion"
+    // used for DAO exceptions by Pig/HBase/Hive packages
     optional("org.springframework:spring-tx:$springVersion")
-    optional("org.springframework:spring-aop:$springVersion")
+    // used by Hive package
     optional("org.springframework:spring-jdbc:$springVersion")
+    // tasklet integration
     optional("org.springframework.batch:spring-batch-core:$springBatchVersion")
-    optional("org.springframework.integration:spring-integration-stream:$springIntVersion")
-    optional("org.springframework.integration:spring-integration-file:$springIntVersion")
-
+    // Cascading local Taps
+    optional("org.springframework.integration:spring-integration-core:$springIntVersion")
 
     // cascading
     optional("cascading:cascading-hadoop:$cascadingVersion") { dep ->
@@ -162,6 +158,8 @@ dependencies {
     testCompile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
     
     testRuntime "org.springframework.integration:spring-integration-event:$springIntVersion"
+    testRuntime("org.springframework.integration:spring-integration-stream:$springIntVersion")
+    testRuntime("org.springframework.integration:spring-integration-file:$springIntVersion")
     
     testRuntime "org.codehaus.groovy:groovy:$groovyVersion"
     testRuntime "org.jruby:jruby:$jrubyVersion"
