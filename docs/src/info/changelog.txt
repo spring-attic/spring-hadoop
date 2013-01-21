@@ -5,7 +5,7 @@ http://www.springsource.org/spring-data/hadoop
 Commit changelog: http://github.com/SpringSource/spring-hadoop/tree/v[version]
 Issues changelog: http://jira.springsource.org/secure/ReleaseNote.jspa?projectId=10801
 
-Changes in version 1.0 RC2 (2013-01-dd)
+Changes in version 1.0 RC2 (2013-01-21)
 ---------------------------------------
 
 General
