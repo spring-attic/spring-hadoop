@@ -26,6 +26,7 @@ import java.util.List;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.ipc.RemoteException;
 import org.apache.hadoop.tools.DistCp.DuplicationException;
+import org.springframework.data.hadoop.configuration.ConfigurationUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
@@ -51,7 +52,10 @@ public class DistCp {
 	 */
 	public DistCp(Configuration configuration) {
 		Assert.notNull(configuration, "configuration required");
-		this.configuration = configuration;
+		this.configuration = ConfigurationUtils.createFrom(configuration, null);
+		// disable GenericOptionsParser
+		this.configuration.setBoolean("mapred.used.genericoptionsparser", true);
+		this.configuration.setBoolean("mapreduce.client.genericoptionsparser.used", true);
 	};
 
 	/**
@@ -136,7 +140,8 @@ public class DistCp {
 		Boolean g = (preserve != null && preserve.contains(Preserve.GROUP));
 		Boolean p = (preserve != null && preserve.contains(Preserve.PERMISSION));
 
-		copy(r, b, u, g, p, ignoreFailures, skipCrc, logDir, mappers, overwrite, update, delete, fileLimit, sizeLimit, fileList, uris);
+		copy(r, b, u, g, p, ignoreFailures, skipCrc, logDir, mappers, overwrite, update, delete, fileLimit, sizeLimit,
+				fileList, uris);
 	}
 
 	/**
@@ -172,6 +177,9 @@ public class DistCp {
 		if (Boolean.TRUE.equals(skipCrc)) {
 			args.add("-skipcrccheck");
 		}
+		if (logDir != null) {
+			args.add("-log " + logDir);
+		}
 		if (mappers != null) {
 			args.add("-m " + mappers.intValue());
 		}
@@ -184,9 +192,17 @@ public class DistCp {
 		if (Boolean.TRUE.equals(delete)) {
 			args.add("-delete");
 		}
-		if (logDir != null) {
-			args.add("-log " + logDir);
+		if (fileLimit != null) {
+			args.add("-filelimit " + fileLimit);
 		}
+		if (sizeLimit != null) {
+			args.add("-sizelimit " + sizeLimit);
+		}
+		if (StringUtils.hasText(fileList)) {
+			args.add("-f " + fileList);
+		}
+
+		CollectionUtils.mergeArrayIntoCollection(uris, args);
 
 		copy(args.toArray(new String[args.size()]));
 	}
