@@ -8,13 +8,18 @@
   Spring <ulink url="http://www.springsource.org/about">Framework</ulink> 3.0
   (3.2 recommended) and above and <ulink
   url="http://hadoop.apache.org/">Apache Hadoop</ulink> 0.20.2
-  (1.0.0 recommended) and above. SHDP supports and is 
-  <ulink url="https://build.springsource.org/browse/SPRINGDATAHADOOP">tested</ulink> daily 
+  (1.0.0 recommended) and above. SHDP supports and is <ulink url="https://build.springsource.org/browse/SPRINGDATAHADOOP">tested</ulink> daily 
   against various Hadoop distributions, such as
   <ulink url="http://www.cloudera.com/">Cloudera</ulink> CDH3 (CD3u5) and
-  CDH4 (CDH4.1u2) distributions and <ulink url="http://www.greenplum.com/">Greenplum</ulink>
+  CDH4 (CDH4.1u3 MRv1) distributions and <ulink url="http://www.greenplum.com/">Greenplum</ulink>
   HD (1.2). Any distro compatible with Apache Hadoop 1.0.x should be supported.</para>
   
+  <warning>Note that Hadoop YARN, NextGen or 2.x (currently in alpha stage), is NOT supported yet. Some
+  Hadoop distros offer both the stable Hadoop (also known as 1.x or MRv1) and the YARN variant
+  (also known as 2.x or MRv2) bundled together. Since SHDP supports only Hadoop 1.x, make sure to use <emphasis>only</emphasis>
+  the 1.x/MRv1 services and libraries both on the clients and server, as 2.x/MRv2, or a mixture of the two,
+  will cause errors.</warning>
+
   <para>
   Regarding Hadoop-related projects, SDHP
   supports <ulink url="http://cascading.org/">Cascading</ulink> 2.1, 
