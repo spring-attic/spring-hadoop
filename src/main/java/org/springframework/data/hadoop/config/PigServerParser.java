@@ -121,15 +121,9 @@ class PigServerParser extends AbstractPropertiesConfiguredBeanDefinitionParser {
 						context.getReaderContext().error("no 'location' or nested script specified", element);
 					}
 
-					byte[] bytes = null;
-					try{
-						bytes = inline.getBytes("UTF-8");	
-					} catch (IOException ex){
-						context.getReaderContext().warning("cannot convert inlined script using 'utf-8', falling back to platform default", element);
-						bytes = inline.getBytes();
-					}
-					
-					resource = new ByteArrayResource(bytes, "resource for inlined script");
+					resource = BeanDefinitionBuilder.genericBeanDefinition(ByteArrayResource.class).
+							addConstructorArgValue(inline).
+							addConstructorArgValue("resource for inlined script").getBeanDefinition();
 				}
 
 				def.getConstructorArgumentValues().addIndexedArgumentValue(0, resource, Resource.class.getName());
@@ -138,7 +132,8 @@ class PigServerParser extends AbstractPropertiesConfiguredBeanDefinitionParser {
 
 				if (args != null) {
 					// create linked properties
-					def.getConstructorArgumentValues().addIndexedArgumentValue(1, new LinkedProperties(args));
+					BeanDefinition params = BeanDefinitionBuilder.genericBeanDefinition(LinkedProperties.class).addConstructorArgValue(args).getBeanDefinition();
+					def.getConstructorArgumentValues().addIndexedArgumentValue(1, params);
 				}
 				defs.add(def);
 			}

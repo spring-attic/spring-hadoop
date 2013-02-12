@@ -34,7 +34,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.ReflectionUtils;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Costin Leau
@@ -63,8 +64,7 @@ public class HiveBatchTest {
 	@Test
 	public void testServerNamespace() throws Exception {
 		assertTrue(ctx.isPrototype("hive-script"));
-		JobsTrigger tj = new JobsTrigger();
-		tj.startJobs(ctx);
+		JobsTrigger.startJobs(ctx);
 	}
 
 	@Test

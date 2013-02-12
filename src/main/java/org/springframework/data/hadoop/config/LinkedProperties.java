@@ -23,14 +23,20 @@ import java.util.LinkedHashSet;
 import java.util.Properties;
 import java.util.Set;
 
+import org.springframework.beans.factory.support.ManagedProperties;
+
 /**
  * Properties hack to provide an ordered Properties object.
  * 
  * @author Costin Leau
  */
-class LinkedProperties extends Properties {
+class LinkedProperties extends ManagedProperties {
 
 	private final LinkedHashSet<Object> keys = new LinkedHashSet<Object>();
+
+	LinkedProperties() {
+		super();
+	}
 
 	LinkedProperties(String text) {
 		super();
@@ -64,5 +70,22 @@ class LinkedProperties extends Properties {
 
 	public Set<Object> keySet() {
 		return keys;
+	}
+
+	@Override
+	public Object merge(Object parent) {
+		if (!isMergeEnabled()) {
+			throw new IllegalStateException("Not allowed to merge when the 'mergeEnabled' property is set to 'false'");
+		}
+		if (parent == null) {
+			return this;
+		}
+		if (!(parent instanceof Properties)) {
+			throw new IllegalArgumentException("Cannot merge with object of type [" + parent.getClass() + "]");
+		}
+		Properties merged = new LinkedProperties();
+		merged.putAll((Properties) parent);
+		merged.putAll(this);
+		return merged;
 	}
 }
