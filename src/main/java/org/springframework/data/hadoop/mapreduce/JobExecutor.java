@@ -190,6 +190,7 @@ abstract class JobExecutor implements InitializingBean, DisposableBean, BeanFact
 								started.add(job);
 							}
 							if (!waitForCompletion) {
+								succes = true;
 								job.submit();
 							}
 							else {
@@ -210,11 +211,12 @@ abstract class JobExecutor implements InitializingBean, DisposableBean, BeanFact
 
 						if (!succes) {
 							if (!shuttingDown) {
-								if (JobStatus.KILLED == JobUtils.getStatus(job)) {
+								JobStatus status = JobUtils.getStatus(job);
+								if (JobStatus.KILLED == status) {
 									throw new IllegalStateException("Job " + job.getJobName() + "] killed");
 								}
 								else {
-									throw new IllegalStateException("Job " + job.getJobName() + "] failed to start");
+									throw new IllegalStateException("Job " + job.getJobName() + "] failed to start; status=" +status);
 								}
 							}
 							else {
