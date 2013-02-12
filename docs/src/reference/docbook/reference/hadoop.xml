@@ -528,9 +528,14 @@ hadoop jar job10.jar ...]]></programlisting>
 	objects and none are specified (through <literal>configuration-ref</literal> and <literal>file-system-ref</literal>) it falls back to the default naming and is wired with the bean named 
 	<emphasis>hadoopConfiguration</emphasis>, creating the <literal>FileSystem</literal> automatically.</para>
 	
-	<warning>Clients setting up a <emphasis>classpath</emphasis> in the <literal>DistributedCache</literal>, running on Windows platforms should set the System <literal>path.separator</literal> property to <literal>:</literal>
-	(easily done through a small <literal>script</literal> entry).
-	Otherwise the classpath will be set incorrectly and will be ignored. See <ulink url="https://issues.apache.org/jira/browse/HADOOP-9123">HADOOP-9123</ulink> bug report for more information.</warning>
+	<warning>Clients setting up a <emphasis>classpath</emphasis> in the <literal>DistributedCache</literal>, running on Windows platforms should set the <literal>System</literal> <literal>path.separator</literal> property to <literal>:</literal>.	Otherwise the classpath will be set incorrectly and will be ignored; see <ulink url="https://issues.apache.org/jira/browse/HADOOP-9123">HADOOP-9123</ulink> bug report for more information.
+	<para>There are multiple ways to change the <literal>path.separator</literal> <literal>System</literal> property - a quick one being a simple <literal>script</literal> in 
+	Javascript (that uses the Rhino package bundled with the JDK) that runs at start-up:</para>
+  	 <programlisting language="xml"><![CDATA[<hdp:script language="javascript" run-at-startup="true">
+    // set System 'path.separator' to ':' - see HADOOP-9123
+    java.lang.System.setProperty("path.separator", ":")
+</hdp:script>]]></programlisting>
+	</warning>
    </section>
 
 	<section id="hadoop:generic-options">
