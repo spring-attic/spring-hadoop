@@ -120,6 +120,11 @@ public abstract class JobUtils {
 
 	static {
 		JOB_INFO = ReflectionUtils.findField(Job.class, "info");
+		if (JOB_INFO == null) {
+			throw new IllegalStateException(
+					"Invalid Job.class detected, probably caused by a Hadoop YARN library, which is NOT supported yet.\n"
+							+ "See the Requirements chapter in the reference documentation for more information.");
+		}
 		ReflectionUtils.makeAccessible(JOB_INFO);
 
 		JOB_CLIENT_STATE = ReflectionUtils.findField(Job.class, "state");
