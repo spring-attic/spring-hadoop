@@ -58,7 +58,7 @@ cannot shut down (since it has to keep waiting for the job).
 				]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
-		<xsd:attribute name="executor" type="xsd:string" use="optional">
+		<xsd:attribute name="executor-ref" type="xsd:string" use="optional">
 			<xsd:annotation>
 				<xsd:documentation source="java:java.util.concurrent.Executor"><![CDATA[
 The task executor responsible for executing the task. By default SimpleAsyncTaskExecutor is used, meaning a background thread is used.

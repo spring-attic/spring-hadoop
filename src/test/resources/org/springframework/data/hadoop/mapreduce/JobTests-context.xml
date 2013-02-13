@@ -34,8 +34,9 @@
 		</property>
 	</bean>
 
+	<hdp:job-runner id="another-runner" pre-action="nop-script" job-ref="custom-jar-job" run-at-startup="true" executor-ref="executor"/>
 
-	<hdp:job-runner id="ns-runner" pre-action="nop-script" job-ref="jar-job, ns-job" run-at-startup="false"/>
+	<hdp:job-runner id="ns-runner" pre-action="another-runner" job-ref="jar-job, ns-job" run-at-startup="false" executor-ref="executor"/>
 	
 	<bean id="no-wait" class="org.springframework.data.hadoop.mapreduce.JobRunner" depends-on="script">
 		<property name="jobs">
@@ -75,7 +76,7 @@
 		codec="org.apache.hadoop.io.compress.DefaultCodec"
 		compress-output="false"
 		scope="singleton"
-		libs="classpath:mini-hadoop-examples.jar" >
+		libs="classpath:mini-hadoop-examples.jar">
 
 		star=chasing
 		return=captain eo
@@ -84,6 +85,8 @@
 		mapred.map.tasks=4
 	</hdp:job>
 
+	<bean id="executor" class="org.springframework.core.task.SyncTaskExecutor"/>
+	
 	<util:properties id="props" location="props.properties"/>
 
  	<task:scheduler id="myScheduler" pool-size="10"/>
