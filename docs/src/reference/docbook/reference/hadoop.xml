@@ -313,11 +313,15 @@
 		passed in. For more information on runners, see the <link linkend="runners">dedicated</link> chapter.</para>
 		
 		<note>As the Hadoop job submittion and execution (when <literal>wait-for-completion</literal> is <literal>true</literal>) is blocking, <literal>JobRunner</literal> uses a JDK <literal>Executor</literal> to start (or stop)
-		a job. The default implementation, <literal>SimpleAsyncTaskExecutor</literal> creates a new <literal>Thread</literal> for each new task. Before going into production, it is recommended to double-check whether this strategy
-		is suitable or whether a throttled or pooled implementation is better. One can customize the behaviour through <literal>executor</literal> parameter.</note>
+		a job. The default implementation, <literal>SyncTaskExecutor</literal> uses the calling thread to execute the job, mimicking the hadoop command line behaviour. However, as the hadoop jobs are time-consuming,
+		in some cases this can lead to <quote>application freeze</quote>, preventing normal operations or even application shutdown from occuring properly. 
+		Before going into production, it is recommended to double-check whether this strategy is suitable or whether a throttled or pooled implementation is better. 
+		One can customize the behaviour through <literal>executor-ref</literal> parameter.</note>
 		
-		<para>The job runner also allows running jobs to be cancelled (or killed) at shutdown. This applies only to jobs that the runner waits for (<literal>wait-for-completion</literal> is <literal>true</literal>). To customize
-		this behaviour, one should set <literal>kill-job-at-shutdown</literal> attribute to <literal>false</literal>.</para>
+		<para>The job runner also allows running jobs to be cancelled (or killed) at shutdown. 
+		This applies only to jobs that the runner waits for (<literal>wait-for-completion</literal> is <literal>true</literal>) using a different executor then the default - that is, using a different thread
+		then the calling one (since otherwise the calling thread has to wait for the job to finish first before executing the next task).
+		To customize this behaviour, one should set <literal>kill-job-at-shutdown</literal> attribute to <literal>false</literal> and/or change the <literal>executor-ref</literal> implementation.</para>
 		
 	   <section id="hadoop:tasklet">
 			<title>Using the Hadoop Job tasklet</title>
@@ -325,7 +329,8 @@
 			<para>For Spring Batch environments, SHDP provides a dedicated tasklet to execute Hadoop jobs as a step in a Spring Batch workflow. An example declaration is shown below:</para>
 			
 			<programlisting language="xml"><![CDATA[<hdp:job-tasklet id="hadoop-tasklet" job-ref="mr-job" wait-for-completion="true" />]]></programlisting>
-			<para>The tasklet above references a Hadoop job definition named "mr-job".  By default, <literal>wait-for-completion</literal> is true so that the tasklet will wait for the job to complete when it executes.  Setting wait-for-completion to false will submit the job to the Hadoop cluster but not wait for it to complete.</para>	
+			<para>The tasklet above references a Hadoop job definition named "mr-job".  By default, <literal>wait-for-completion</literal> is true so that the tasklet will wait for the job to complete when it executes.  Setting <literal>wait-for-completion</literal> to 
+			<literal>false</literal> will submit the job to the Hadoop cluster but not wait for it to complete.</para>	
 		</section>
 	 </section>   	 
    
