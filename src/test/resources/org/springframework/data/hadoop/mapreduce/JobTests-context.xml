@@ -34,9 +34,9 @@
 		</property>
 	</bean>
 
-	<hdp:job-runner id="another-runner" pre-action="nop-script" job-ref="custom-jar-job" run-at-startup="true" executor-ref="executor"/>
+	<hdp:job-runner id="another-runner" pre-action="nop-script" job-ref="custom-jar-job" run-at-startup="true"/>
 
-	<hdp:job-runner id="ns-runner" pre-action="another-runner" job-ref="jar-job, ns-job" run-at-startup="false" executor-ref="executor"/>
+	<hdp:job-runner id="ns-runner" pre-action="another-runner" job-ref="jar-job, ns-job" run-at-startup="false"/>
 	
 	<bean id="no-wait" class="org.springframework.data.hadoop.mapreduce.JobRunner" depends-on="script">
 		<property name="jobs">
@@ -96,7 +96,7 @@
  	</task:scheduled-tasks>
 
 
-	<hdp:job-runner id="killer-runner" job-ref="victim-job" wait-for-completion="false"/>
+	<hdp:job-runner id="killer-runner" job-ref="victim-job" wait-for-completion="false" executor-ref="async"/>
 	
 	<hdp:job id="victim-job" 
 	   	input-path="/ide-test/input/word/" output-path="/ide-test/runner/killed/"
@@ -105,6 +105,7 @@
 		scope="singleton"
 		libs="classpath:mini-hadoop-examples.jar"/>
 
+	<bean id="async" class="org.springframework.core.task.SyncTaskExecutor" />
  	
  	<!-- PE tests - currently disabled
  	<bean id="jobInfo" class="org.springframework.data.hadoop.mapreduce.JobTests$JobInfo"

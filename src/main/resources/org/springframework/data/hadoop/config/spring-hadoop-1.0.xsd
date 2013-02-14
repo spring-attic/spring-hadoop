@@ -61,7 +61,8 @@ cannot shut down (since it has to keep waiting for the job).
 		<xsd:attribute name="executor-ref" type="xsd:string" use="optional">
 			<xsd:annotation>
 				<xsd:documentation source="java:java.util.concurrent.Executor"><![CDATA[
-The task executor responsible for executing the task. By default SimpleAsyncTaskExecutor is used, meaning a background thread is used.
+The task executor responsible for executing the task. By default SyncTaskExecutor is used, meaning the calling thread is used.
+While this replicates the Hadoop behavior, it prevents running jobs from being killed if the application shuts down.
 For fine-tuned control, a dedicated Executor is recommended. 
 				]]></xsd:documentation>
 				<xsd:appinfo>

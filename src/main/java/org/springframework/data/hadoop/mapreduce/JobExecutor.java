@@ -31,7 +31,7 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.data.hadoop.mapreduce.JobUtils.JobStatus;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -60,7 +60,7 @@ abstract class JobExecutor implements InitializingBean, DisposableBean, BeanFact
 	private boolean killJobsAtShutdown = true;
 	private BeanFactory beanFactory;
 	private boolean verbose = true;
-	private Executor taskExecutor = new SimpleAsyncTaskExecutor();
+	private Executor taskExecutor = new SyncTaskExecutor();
 
 	/** used for preventing exception noise during shutdowns */
 	private volatile boolean shuttingDown = false;
@@ -330,7 +330,8 @@ abstract class JobExecutor implements InitializingBean, DisposableBean, BeanFact
 
 	/**
 	 * Sets the TaskExecutor used for executing the Hadoop job.
-	 * By default, {@link SimpleAsyncTaskExecutor} is used, meaning a background thread is used.
+	 * By default, {@link SyncTaskExecutor} is used, meaning the calling thread is used.
+	 * While this replicates the Hadoop behavior, it prevents running jobs from being killed if the application shuts down. 
 	 * For a fine-tuned control, a dedicated {@link Executor} is recommended. 
 	 * 
 	 * @param executor the task executor to use execute the Hadoop job.
