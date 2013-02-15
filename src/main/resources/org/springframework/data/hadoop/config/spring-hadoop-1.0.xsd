@@ -72,9 +72,10 @@ For fine-tuned control, a dedicated Executor is recommended.
 				</xsd:appinfo>
 			</xsd:annotation>
 		</xsd:attribute>
+		<xsd:attribute name="scope" type="xsd:string" use="optional" />
 	</xsd:complexType>
 
-	<xsd:element name="job-tasklet">
+	<xsd:element name="job-tasklet" type="jobRunnerType">
 		<xsd:annotation>
 		   <xsd:documentation><![CDATA[
 Defines a Spring Batch tasklet for Hadoop Jobs.
@@ -86,13 +87,6 @@ Defines a Spring Batch tasklet for Hadoop Jobs.
 	        </tool:annotation>
 	      </xsd:appinfo>
 		</xsd:annotation>
-		<xsd:complexType>
-			<xsd:complexContent>
-				<xsd:extension base="jobRunnerType">
-					<xsd:attribute name="scope" type="xsd:string" use="optional" />
-				</xsd:extension>
-			</xsd:complexContent>
-		</xsd:complexType>
 	</xsd:element>
 
 	<xsd:element name="job-runner">
@@ -767,6 +761,7 @@ Default is true. Turn this off, if the jar uses the same file-system as the rest
 					]]></xsd:documentation>
 				</xsd:annotation>
 			</xsd:attribute>
+			<xsd:attribute name="scope" type="xsd:string" use="optional" />
 		</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
@@ -803,18 +798,11 @@ Post actions/beans to be called before running the action. Multiple bean names c
 		</xsd:complexType>
 	</xsd:element>
 
-	<xsd:element name="jar-tasklet">
+	<xsd:element name="jar-tasklet" type="jarRunnerType">
 		<xsd:annotation>
 		   <xsd:documentation><![CDATA[
 Defines a Hadoop Jar Tasklet.]]></xsd:documentation>
 		</xsd:annotation>
-		<xsd:complexType>
-			<xsd:complexContent>
-				<xsd:extension base="jarRunnerType">
-					<xsd:attribute name="scope" type="xsd:string" use="optional" />
-				</xsd:extension>
-			</xsd:complexContent>
-		</xsd:complexType>
 	</xsd:element>
 	
 	
@@ -877,6 +865,7 @@ Default is true. Turn this off, if the jar uses the same file-system as the rest
 					]]></xsd:documentation>
 				</xsd:annotation>
 			</xsd:attribute>
+			<xsd:attribute name="scope" type="xsd:string" use="optional" />			
 		</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
@@ -913,18 +902,11 @@ Post actions/beans to be called before running the action. Multiple bean names c
 		</xsd:complexType>
 	</xsd:element>
 
-	<xsd:element name="tool-tasklet">
+	<xsd:element name="tool-tasklet" type="toolRunnerType">
 		<xsd:annotation>
 		   <xsd:documentation><![CDATA[
 Defines a Hadoop Tool Tasklet.]]></xsd:documentation>
 		</xsd:annotation>
-		<xsd:complexType>
-			<xsd:complexContent>
-				<xsd:extension base="toolRunnerType">
-					<xsd:attribute name="scope" type="xsd:string" use="optional" />
-				</xsd:extension>
-			</xsd:complexContent>
-		</xsd:complexType>
 	</xsd:element>
 
 	<xsd:complexType name="entryType">
@@ -1127,9 +1109,10 @@ Reference to a PigTemplate. Alternative to 'pig-server-ref' attribute.
 				</xsd:appinfo>
 			</xsd:annotation>
 		</xsd:attribute>
+		<xsd:attribute name="scope" type="xsd:string" use="optional" />		
 	</xsd:complexType>
 
-	<xsd:element name="pig-tasklet">
+	<xsd:element name="pig-tasklet" type="pigRunnerType">
 		<xsd:annotation>
 		   <xsd:documentation><![CDATA[
 Defines a PigTasklet.
@@ -1140,13 +1123,6 @@ Defines a PigTasklet.
 	        </tool:annotation>
 	      </xsd:appinfo>
 		</xsd:annotation>
-		<xsd:complexType>
-			<xsd:complexContent>
-				<xsd:extension base="pigRunnerType">
-					<xsd:attribute name="scope" type="xsd:string" use="optional" />
-				</xsd:extension>
-			</xsd:complexContent>
-		</xsd:complexType>
 	</xsd:element>
 	
 	<xsd:element name="pig-runner">
@@ -1397,9 +1373,10 @@ Reference to a HiveTemplate instance.   Alternative to 'hive-client-factory-ref'
 				</xsd:appinfo>
 			</xsd:annotation>
 		</xsd:attribute>
+		<xsd:attribute name="scope" type="xsd:string" use="optional" />		
 	</xsd:complexType>
 	
-	<xsd:element name="hive-tasklet">
+	<xsd:element name="hive-tasklet" type="hiveRunnerType">
 		<xsd:annotation>
 		   <xsd:documentation><![CDATA[
 Defines a HiveTasklet.
@@ -1410,13 +1387,6 @@ Defines a HiveTasklet.
 	        </tool:annotation>
 	      </xsd:appinfo>
 		</xsd:annotation>
-		<xsd:complexType>
-			<xsd:complexContent>
-				<xsd:extension base="hiveRunnerType">
-				<xsd:attribute name="scope" type="xsd:string" use="optional" />
-				</xsd:extension>
-			</xsd:complexContent>
-		</xsd:complexType>
 	</xsd:element>
 	
 	<xsd:element name="hive-runner">
@@ -1668,9 +1638,10 @@ Whether to synchronously wait for the unit of work to finish (the default) or no
 				]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
+		<xsd:attribute name="scope" type="xsd:string" use="optional" />		
 	</xsd:complexType>
 
-	<xsd:element name="cascading-tasklet">
+	<xsd:element name="cascading-tasklet" type="cascadingRunnerType">
 		<xsd:annotation>
 		   <xsd:documentation><![CDATA[
 Defines a Spring Batch tasklet for Cascading.
@@ -1682,13 +1653,6 @@ Defines a Spring Batch tasklet for Cascading.
 	        </tool:annotation>
 	      </xsd:appinfo>
 		</xsd:annotation>
-		<xsd:complexType>
-			<xsd:complexContent>
-				<xsd:extension base="cascadingRunnerType">
-					<xsd:attribute name="scope" type="xsd:string" use="optional" />
-				</xsd:extension>
-			</xsd:complexContent>
-		</xsd:complexType>
 	</xsd:element>
 	
 	<xsd:element name="cascading-runner">
@@ -1878,5 +1842,4 @@ Reference to the Hadoop configuration. Defaults to 'hadoopConfiguration'.]]></xs
 		</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	
 </xsd:schema>

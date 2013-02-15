@@ -17,7 +17,7 @@
 		web=war
 	</hdp:jar-runner>
 	
-	<hdp:jar-runner id="other-class" jar="some-jar.jar" main-class="test.OtherMainClass" files="some-jar.jar" run-at-startup="true" pre-action="bad-main-class" post-action="">
+	<hdp:jar-runner id="other-class" jar="some-jar.jar" main-class="test.OtherMainClass" files="some-jar.jar" run-at-startup="true" pre-action="bad-main-class" post-action="" scope="singleton">
 		<hdp:arg value="42"/>
 		land=buckethead
 	</hdp:jar-runner>

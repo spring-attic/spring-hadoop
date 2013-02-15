@@ -61,7 +61,7 @@ fsh.put("src/test/resources/data/babynamedefinitions.csv.gz", "/test/cascading/n
 	
 	</bean>
 
-	<hdp:cascading-runner id="runner" unit-of-work-ref="cascade" run-at-startup="true"/>
+	<hdp:cascading-runner id="runner" unit-of-work-ref="cascade" run-at-startup="true" scope="singleton"/>
 	 
 	<!-- Java configuration -->
 	<bean id="copyFlowDef" class="org.springframework.data.hadoop.cascading.TestFlows" factory-method="copyFlow">

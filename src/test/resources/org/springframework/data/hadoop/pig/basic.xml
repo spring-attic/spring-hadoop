@@ -45,7 +45,7 @@
 	</hdp:script>
 	
 	
-	<pig-runner id="pig-scripts" xmlns="http://www.springframework.org/schema/hadoop" post-action="nop-script">
+	<pig-runner id="pig-scripts" xmlns="http://www.springframework.org/schema/hadoop" post-action="nop-script" scope="singleton">
 		<script location="org/springframework/data/hadoop/pig/script.pig"  />
 		<script>
 			<arguments>

@@ -23,13 +23,13 @@
 	Cannot test automatically since it conflits with the ANTLR version used by Pig...
 	
 	<bean id="hive-server" class="org.springframework.data.hadoop.hive.HiveServerFactoryBean" p:port="${hive.port}" p:configuration-ref="hadoopConfiguration"/>
-	
+	-->
 	<hdp:hive-server properties-ref="props" properties-location="cfg-1.properties, cfg-2.properties" port="${hive.port}" configuration-ref="hadoopConfiguration">
 		star=chasing
 		return=captain eo
 		train=last
 	</hdp:hive-server>
-	-->
+	
  	
 	
 	<util:properties id="props" location="props.properties"/>
@@ -40,7 +40,7 @@
 	
 	<hdp:hive-template id="foo" hive-client-factory-ref="hiveClientFactory"/>
 	
-	<hdp:hive-runner id="hiveRunner" hive-client-factory-ref="hiveClientFactory" run-at-startup="false">
+	<hdp:hive-runner id="hiveRunner" hive-client-factory-ref="hiveClientFactory" run-at-startup="false" scope="singleton">
 		<hdp:script location="org/springframework/data/hadoop/hive/drop-script.q"/>
 	</hdp:hive-runner>
 
