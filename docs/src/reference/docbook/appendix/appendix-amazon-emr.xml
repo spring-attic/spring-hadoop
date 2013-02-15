@@ -43,7 +43,11 @@
 		<note>By default, each newly created cluster has a new public IP that is not typically reused. To simplify the setup, one can use 
 		<ulink url="http://docs.amazonwebservices.com/AWSEC2/latest/UserGuide/using-instance-addressing.html">Amazon Elastic IP</ulink>, that is a static, predefined IP, 
 		so that she knows before-hand the cluster address. Refer to 
-		<ulink url="http://docs.amazonwebservices.com/ElasticMapReduce/latest/DeveloperGuide/environmentconfig_eip.html">this</ulink> section inside the EMR documentation for more information.</note>
+		<ulink url="http://docs.amazonwebservices.com/ElasticMapReduce/latest/DeveloperGuide/environmentconfig_eip.html">this</ulink> section inside the EMR documentation for more information.
+		As an alternative, one can use the <ulink url="http://docs.aws.amazon.com/AWSEC2/latest/APIReference/Welcome.html">EC2 API</ulink> in combinatioon with the 
+		<ulink url="http://docs.aws.amazon.com/ElasticMapReduce/latest/API/Welcome.html">EMR API</ulink> to retrieve the private IP of address of the master node of her cluster or even 
+		programatically configure and start the EMR cluster on demand without having to hard-code the private IPs.
+		</note>
 		
 	<para>However, to remotely access the cluster from outside (as oppose to just running a jar within the cluster), one needs to tweak the cluster settings just a tiny bit - as mentioned below.</para>
 	
