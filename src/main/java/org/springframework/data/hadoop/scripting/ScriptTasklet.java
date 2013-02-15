@@ -27,7 +27,7 @@ import org.springframework.batch.repeat.RepeatStatus;
  * 
  * @author Costin Leau
  */
-class ScriptTasklet implements Tasklet {
+public class ScriptTasklet implements Tasklet {
 
 	private Callable<Object> scriptCallback;
 
