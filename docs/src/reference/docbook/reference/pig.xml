@@ -57,7 +57,7 @@
 		<section id="pig:tasklet">
 			<title>Using the Pig tasklet</title>
 	
-			<para>For Spring Batch environments, SHDP provides a dedicated tasklet to execute Pig queries, on demand, as part of a batch or workflow. The declaration is pretty straight forward:</para>
+			<para>For Spring Batch environments, SHDP provides a dedicated tasklet to execute Pig queries, on demand, as part of a batch or workflow. The declaration is pretty straightforward:</para>
 			
 			<programlisting language="xml"><![CDATA[<hdp:pig-tasklet id="pig-script">
    <hdp:script location="org/company/pig/handsome.pig" />
@@ -71,7 +71,7 @@
 		<title>Interacting with the Pig API</title>
 		
 		<para>For those that need to programmatically interact directly with Pig , Spring for Apache Hadoop provides a dedicated <ulink url="http://en.wikipedia.org/wiki/Template_method_pattern">template</ulink>, 
-		similar to the aforementioned <literal>HiveTemplate</literal>. The template handles the redundant, boiler-plate code, required for interacting with Pig such as, creating a new <literal>PigServer</literal>, 
+		similar to the aforementioned <literal>HiveTemplate</literal>. The template handles the redundant, boiler-plate code, required for interacting with Pig such as creating a new <literal>PigServer</literal>, 
 		executing the scripts, catching any exceptions and performing clean-up. One can programmatically execute scripts but also interact with the Hive API through the <literal>PigServerCallback</literal>.
 		For example:</para>
 		
@@ -83,20 +83,21 @@
 <context:component-scan base-package="some.pkg" /> ]]></programlisting>
 
 		<programlisting language="java"><![CDATA[public class SomeClass {
-@Inject
-private PigTemplate template;
+  @Inject
+  private PigTemplate template;
 
-public Set<String> getDbs() {
-    return pigTemplate.execute(new PigCallback<Set<String>() {
-       @Override
-       public Set<String> doInPig(PigServer pig) throws ExecException, IOException {
-          return pig.getAliasKeySet();
-       }
-    }));
-}}]]></programlisting>
+  public Set<String> getDbs() {
+      return pigTemplate.execute(new PigCallback<Set<String>() {
+         @Override
+         public Set<String> doInPig(PigServer pig) throws ExecException, IOException {
+            return pig.getAliasKeySet();
+         }
+      });
+  }
+}]]></programlisting>
 
 		<para>The example above shows a basic container configuration wiring a <literal>PigTemplate</literal> into a user class which uses it to interact with the <literal>PigServer</literal> API. Notice that the 
-		user does not has to handle the lifecycle of the <literal>PigServer</literal> instance or catch any exception - these are handled automatically by the template
+		user does not have to handle the lifecycle of the <literal>PigServer</literal> instance or catch any exception - these are handled automatically by the template
 		which converts them, like the rest of the Spring templates, into <literal>DataAccessException</literal>s. Thus the application only has to track only one exception hierarchy across all data technologies instead of 
 		one per technology.</para>
 	</section>

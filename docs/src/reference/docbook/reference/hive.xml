@@ -4,7 +4,7 @@
 	<title>Hive integration</title>
 	
 	<para>When working with <ulink url="http://hive.apache.org"/> from a Java environment, one can choose between the <ulink url="http://thrift.apache.org/">Thrift</ulink> client or using the Hive JDBC-like
-	<ulink url="http://hive.apache.org/docs/r0.7.1/api/org/apache/hadoop/hive/jdbc/package-summary.html">driver</ulink>. Both have their pros and cons but no matter the choice, Spring and SHDP supports both of them.</para>
+	<ulink url="http://hive.apache.org/docs/r0.7.1/api/org/apache/hadoop/hive/jdbc/package-summary.html">driver</ulink>. Both have their pros and cons but no matter the choice, Spring and SHDP support both of them.</para>
 
 	<section id="hive:server">
 	    <title>Starting a Hive Server</title>
@@ -35,8 +35,8 @@
 	    <programlisting language="xml"><![CDATA[<!-- by default, the definition name is 'hiveClientFactory' -->
 <hdp:hive-client-factory host="some-other-host" port="10001" />]]></programlisting>
 		<para>Note that since Thrift clients are not thread-safe, <literal>hive-client-factory</literal> returns a factory (named <literal>org.springframework.data.hadoop.hive.HiveClientFactory</literal>) 
-		for creating <literal>HiveClient</literal> new instances for each invocation. Further more, the client definition
-		also allows Hive scripts (either declared inlined or externally) to be executed during initialization, once the client connects; this quite useful for doing Hive specific initialization:</para>
+		for creating <literal>HiveClient</literal> new instances for each invocation. Furthermore, the client definition
+		also allows Hive scripts (either declared inlined or externally) to be executed during initialization, once the client connects; this is quite useful for doing Hive specific initialization:</para>
 		
 		<programlisting language="xml"><![CDATA[<hive-client-factory host="some-host" port="some-port" xmlns="http://www.springframework.org/schema/hadoop">
    <hdp:script>
@@ -48,9 +48,8 @@
    </hdp:script>
 </hive-client-factory>]]></programlisting>
 		
-		<para>In the example above, two scripts are executed each time a new Hive client is created (if the scripts need to be executed only once considering using a tasklet) by the factory.
-		The first executed a script defined inlined while the second read the script from the classpath and passed one parameter
-		to it. For more information on using parameter (or variables) in Hive scripts, see <ulink url="http://hive.apache.org/docs/r0.9.0/language_manual/var_substitution.html">this</ulink> section in the Hive manual.</para>
+		<para>In the example above, two scripts are executed each time a new Hive client is created (if the scripts need to be executed only once consider using a tasklet) by the factory.
+		The first script is defined inline while the second is read from the classpath and passed one parameter. For more information on using parameters (or variables) in Hive scripts, see <ulink url="http://hive.apache.org/docs/r0.9.0/language_manual/var_substitution.html">this</ulink> section in the Hive manual.</para>
 	</section>
 	
 	<section id="hive:jdbc">
@@ -115,7 +114,7 @@
 	   	<section id="hive:tasklet">
 			<title>Using the Hive tasklet</title>
 	
-			<para>For Spring Batch environments, SHDP provides a dedicated tasklet to execute Hive queries, on demand, as part of a batch or workflow. The declaration is pretty straight forward:</para>
+			<para>For Spring Batch environments, SHDP provides a dedicated tasklet to execute Hive queries, on demand, as part of a batch or workflow. The declaration is pretty straightforward:</para>
 			
 			<programlisting language="xml"><![CDATA[<hdp:hive-tasklet id="hive-script">
    <hdp:script>
@@ -133,7 +132,7 @@
 		<title>Interacting with the Hive API</title>
 		
 		<para>For those that need to programmatically interact with the Hive API, Spring for Apache Hadoop provides a dedicated <ulink url="http://en.wikipedia.org/wiki/Template_method_pattern">template</ulink>, similar to the
-		aforementioned <literal>JdbcTemplate</literal>. The template handles the redundant, boiler-plate code, required for interacting with Hive such as, creating a new <literal>HiveClient</literal>, executing the queries,
+		aforementioned <literal>JdbcTemplate</literal>. The template handles the redundant, boiler-plate code, required for interacting with Hive such as creating a new <literal>HiveClient</literal>, executing the queries,
 		catching any exceptions and performing clean-up. One can programmatically execute queries (and get the raw results or convert them to longs or ints) or scripts but also interact with the Hive API through the <literal>HiveClientCallback</literal>.
 		For example:</para>
 		
@@ -146,21 +145,22 @@
 
 		<programlisting language="java"><![CDATA[public class SomeClass {
 
-private HiveTemplate template;
+  private HiveTemplate template;
 
-public void setHiveTemplate(HiveTemplate template) { this.template = template; }
+  public void setHiveTemplate(HiveTemplate template) { this.template = template; }
 
-public List<String> getDbs() {
-    return hiveTemplate.execute(new HiveClientCallback<List<String>>() {
-       @Override
-       public List<String> doInHive(HiveClient hiveClient) throws Exception {
-          return hiveClient.get_all_databases();
-       }
-    }));
-}}]]></programlisting>
+  public List<String> getDbs() {
+      return hiveTemplate.execute(new HiveClientCallback<List<String>>() {
+         @Override
+         public List<String> doInHive(HiveClient hiveClient) throws Exception {
+            return hiveClient.get_all_databases();
+         }
+      }));
+  }
+}]]></programlisting>
 
 		<para>The example above shows a basic container configuration wiring a <literal>HiveTemplate</literal> into a user class which uses it to interact with the <literal>HiveClient</literal> Thrift API. Notice that the 
-		user does not has to handle the lifecycle of the <literal>HiveClient</literal> instance or catch any exception (out of the many thrown by Hive itself and the Thrift fabric) - these are handled automatically by the template
+		user does not have to handle the lifecycle of the <literal>HiveClient</literal> instance or catch any exception (out of the many thrown by Hive itself and the Thrift fabric) - these are handled automatically by the template
 		which converts them, like the rest of the Spring templates, into <literal>DataAccessException</literal>s. Thus the application only has to track only one exception hierarchy across all data technologies instead of 
 		one per technology.</para>
 	</section>

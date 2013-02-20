@@ -34,7 +34,7 @@
 		
 		<para>One of the most popular and powerful feature in Spring Framework is the Data Access Object (or DAO) 
 		<ulink url="http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/dao.html">support</ulink>. It makes dealing with data access technologies easy and consistent allowing easy switch
-		or interconnection of the aforementioned persistent stores with minimal friction (no worrying about catching exceptions, writing boiler-plate code or handling resource acquisition and disposal). Rather then reiterating
+		or interconnection of the aforementioned persistent stores with minimal friction (no worrying about catching exceptions, writing boiler-plate code or handling resource acquisition and disposal). Rather than reiterating
 		here the value proposal of the DAO support, we recommend the DAO <ulink url="http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/jdbc.html">section</ulink> in the Spring Framework reference documentation </para>
 		
 		<para>SHDP provides the same functionality for Apache HBase through its <literal>org.springframework.data.hadoop.hbase</literal> package: an <literal>HbaseTemplate</literal> along with several callbacks
@@ -76,11 +76,11 @@ List<String> rows = template.find("MyTable", "SomeColumn", new RowMapper<String>
   }
 }));]]></programlisting>
 
-		<para>The first snippet show-cases the generic <literal>TableCallback</literal> - the most generic of the callbacks, it does the table lookup and resource cleanup so that the user code does not have to. 
+		<para>The first snippet showcases the generic <literal>TableCallback</literal> - the most generic of the callbacks, it does the table lookup and resource cleanup so that the user code does not have to. 
 		Notice the callback signature - any exception thrown by the HBase API is automatically caught, converted to Spring's 
 		<ulink url="http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/dao.html#dao-exceptions">DAO exceptions</ulink> and resource clean-up applied transparently.
 		The second example, displays the dedicated lookup methods - in this case <literal>find</literal> which, as the name implies, finds all the rows matching the given criteria and allows user code to be executed against each
-		of them (typically for doing some sort of type conversion of mapping). If the entire result is required, then one can use <literal>ResultsExtractor</literal> instead of <literal>RowMapper</literal>.</para>
+		of them (typically for doing some sort of type conversion or mapping). If the entire result is required, then one can use <literal>ResultsExtractor</literal> instead of <literal>RowMapper</literal>.</para>
 		
 		<para>Besides the template, the package offers support for automatically binding HBase table to the current thread through <literal>HbaseInterceptor</literal> and <literal>HbaseSynchronizationManager</literal>.
 		That is, each class that performs DAO operations on HBase can be <ulink url="http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/aop.html#aop-schema-advisors"><emphasis>wrapped</emphasis></ulink> 
