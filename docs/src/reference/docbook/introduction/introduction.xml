@@ -2,12 +2,12 @@
 
 <partintro xmlns="http://docbook.org/ns/docbook" version="5.0">
     <para>
-Spring for Apache Hadoop provides integration with the Spring Framework to create and run Hadoop MapReduce, Hive, and Pig jobs as well as work with HDFS and HBase. If you have simple needs to work with Hadoop, including basic scheduling, you can add the Spring for Apache Hadoop namespace to your Spring based project and get going quickly using Hadoop. As the complexity of your Hadoop application increases, you may want to use Spring Batch and Spring Integration to regin in the complexity of developing a large Hadoop application.
+Spring for Apache Hadoop provides integration with the Spring Framework to create and run Hadoop MapReduce, Hive, and Pig jobs as well as work with HDFS and HBase. If you have simple needs to work with Hadoop, including basic scheduling, you can add the Spring for Apache Hadoop namespace to your Spring based project and get going quickly using Hadoop. As the complexity of your Hadoop application increases, you may want to use Spring Batch and Spring Integration to regain on the complexity of developing a large Hadoop application.
     </para>
     <para>This document is the reference guide for Spring for Apache Hadoop project (SHDP). It explains the relationship
       between the Spring framework and Hadoop as well as related projects such as Spring Batch and Spring Integration.
-      The first part describes the integration wtih the Spring framework to define the base concepts and semantics of the 
-      integration and how they can be use effectively.  The second part describes how you can build upon these base 
+      The first part describes the integration with the Spring framework to define the base concepts and semantics of the 
+      integration and how they can be used effectively.  The second part describes how you can build upon these base 
       concepts and create workflow based solutions provided by the integration with Spring Batch.
     </para>
 </partintro>

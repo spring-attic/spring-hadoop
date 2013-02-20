@@ -32,7 +32,7 @@
 
  		<calloutlist>
  			<callout arearefs="hdp-ns-prefix">
- 				<para>Spring for Apache Hadoop namespace prefix. Any name can do but through out the reference documentation, the <literal>hdp</literal> will be used.</para>
+ 				<para>Spring for Apache Hadoop namespace prefix. Any name can do but throughout the reference documentation, <literal>hdp</literal> will be used.</para>
  			</callout>
  			<callout arearefs="hdp-ns-uri">
  				<para>The namespace URI.</para>
@@ -46,9 +46,9 @@
  			</callout>
  		</calloutlist>
  	
- 	<para>Once declared, the namespace elements can be declared simply by appending the aforementioned prefix. Note that is possible to change the default namespace,
+ 	<para>Once imported, the namespace elements can be declared simply by using the aforementioned prefix. Note that is possible to change the default namespace,
  	for example from <literal>&lt;beans&gt;</literal> to <literal>&lt;hdp&gt;</literal>. This is useful for configuration composed mainly of Hadoop components as
- 	it avoids declaring the prefix. To achieve this, simply swap the namespace prefix declaration above:</para>
+ 	it avoids declaring the prefix. To achieve this, simply swap the namespace prefix declarations above:</para>
     
  		<programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <beans:beans xmlns="http://www.springframework.org/schema/hadoop"]]><co id="hdp-def-ns-prefix"/><![CDATA[
@@ -79,7 +79,7 @@
  			</callout>
  		</calloutlist>
  		
- 	<para>For the remainder of this doc, to improve readability, the XML examples will simply refer to the <literal>&lt;hdp&gt;</literal> namespace
+ 	<para>For the remainder of this doc, to improve readability, the XML examples may simply refer to the <literal>&lt;hdp&gt;</literal> namespace
  	without the namespace declaration, where possible.</para>
   </section>
   
@@ -184,14 +184,14 @@
 </beans>]]></programlisting>
      
      <para>When merging several properties, ones defined locally win. In the example above the configuration properties are the primary source, followed by the <literal>props</literal> bean followed by the external
-     properties file based on their defined order. While it's not typical for a configuration to refer to use so many properties, the example showcases the various options available.
+     properties file based on their defined order. While it's not typical for a configuration to refer to so many properties, the example showcases the various options available.
      
      <note>For more properties utilities, including using the System as a source or fallback, or control over the merging order, consider using Spring's <literal>
      <ulink url="http://static.springsource.org/spring/docs/3.0.x/api/org/springframework/beans/factory/config/PropertiesFactoryBean.html">PropertiesFactoryBean</ulink></literal> (which is what Spring for Apache Hadoop and 
      <literal>util:properties</literal> use underneath).</note>
      </para>
      
-     <para><anchor id="hadoop:config:inherit"/>It is possible to create configuration based on existing ones - this allows one to create dedicated configurations, slightly different from the main ones, usable for certain jobs 
+     <para><anchor id="hadoop:config:inherit"/>It is possible to create configurations based on existing ones - this allows one to create dedicated configurations, slightly different from the main ones, usable for certain jobs 
      (such as streaming - more on that <link linkend="hadoop:job:streaming">below</link>). Simply use the <literal>configuration-ref</literal> attribute to refer to the <emphasis>parent</emphasis> configuration - all its properties will be inherited and
      overridden as specified by the child:</para>
 
@@ -207,17 +207,17 @@
 
 ...
 ]]></programlisting>     
-     <para>Make sure though you specify a different name since otherwise, since both definitions will have the same name, the Spring container will interpret this as being the same
+     <para>Make sure though that you specify a different name since otherwise, because both definitions will have the same name, the Spring container will interpret this as being the same
      definition (and will usually consider the last one found).</para>
      
      <para>Another option worth mentioning is <literal>register-url-handler</literal> which, as the name implies, automatically registers an URL handler in the running VM. This allows urls referrencing 
-     <emphasis>hdfs</emphasis> resource (by using the <literal>hdfs</literal> prefix) to be properly resolved - if the handler is not registered, such an URL would through an exception since the VM does not know what 
-     <literal>hdfs</literal> mean.</para>
+     <emphasis>hdfs</emphasis> resource (by using the <literal>hdfs</literal> prefix) to be properly resolved - if the handler is not registered, such an URL will throw an exception since the VM does not know what 
+     <literal>hdfs</literal> means.</para>
      <note><para>Since only one URL handler can be registered per VM, at most once, this option is turned off by default. Due to the reasons mentioned before, once enabled if it fails, it will log the error but will not
      throw an exception. If your <literal>hdfs</literal> URLs stop working, make sure to investigate this aspect.</para></note>
      
-     <para>Last but not least a reminder that one can mix and match all these options to her preference. In general, consider externalizing configuration since it allows easier updates without interfering with the 
-     application configuration. When dealing with multiple, similar configuration use configuration <emphasis>composition</emphasis> as it tends to keep the definitions concise, in sync and easy to update.</para>
+     <para>Last but not least a reminder that one can mix and match all these options to her preference. In general, consider externalizing Hadoop configuration since it allows easier updates without interfering with the 
+     application configuration. When dealing with multiple, similar configurations use configuration <emphasis>composition</emphasis> as it tends to keep the definitions concise, in sync and easy to update.</para>
    </section>
    
    <section id="hadoop-job">
@@ -232,11 +232,11 @@
   reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"/>]]></programlisting>
    	 
    	 <para>The declaration above creates a typical Hadoop <literal>Job</literal>: specifies its input and output, the mapper and the reducer classes. Notice that there is no reference to the Hadoop configuration above - that's
-   	 because, if not specified, the default naming convention (<literal>hadoopConfiguration</literal>) will be used instead. Neither are the key or value types - these two are automatically determined through a best-effort attempt
+   	 because, if not specified, the default naming convention (<literal>hadoopConfiguration</literal>) will be used instead. Neither is there to the key or value types - these two are automatically determined through a best-effort attempt
    	 by analyzing the class information of the mapper and the reducer. Of course, these settings can be overridden: the former through the <literal>configuration-ref</literal> element, the latter through <literal>key</literal> and
    	 <literal>value</literal> attributes.
    	 There are plenty of options available not shown in the example (for simplicity) such as the jar (specified directly or by class), sort or group comparator, the combiner, the partitioner, the codecs to use or the input/output format just to name a few - 
-   	 they are supported, just take a look at the SHDP schema (<xref linkend="appendix-schema"/>) or simply trigger auto-completion (usually <literal>ALT+SPACE</literal>) in your IDE; if it supports XML namespaces and is properly configured it will display the
+   	 they are supported, just take a look at the SHDP schema (<xref linkend="appendix-schema"/>) or simply trigger auto-completion (usually <literal>CTRL+SPACE</literal>) in your IDE; if it supports XML namespaces and is properly configured it will display the
    	 available elements. Additionally one can extend the default Hadoop configuration object and add any special properties not available in the namespace or its backing bean 
    	 (<classname>JobFactoryBean</classname>).</para>
    	 
@@ -251,26 +251,26 @@
     electric=sea
 </hdp:job>]]></programlisting>
    	 
-   <para><literal>job</literal> provides additional properties, such as the <link linkend="hadoop:generic-options">generic options</link>, however one that is worth mentioning is <literal>jar</literal> which
-   allows a job (and its dependencies) to be loaded form entirely from a specified jar. This is useful for isolating jobs and avoiding classpath and versioning collisions. Note that provisioning of the jar 
-   into the cluster, still depends on the target environment - see the aforementioned <link linkend="hadoop:generic-options">section</link> for more info (such as <literal>libs</literal>).
+   <para><literal>&lt;hdp:job&gt;</literal> provides additional properties, such as the <link linkend="hadoop:generic-options">generic options</link>, however one that is worth mentioning is <literal>jar</literal> which
+   allows a job (and its dependencies) to be loaded entirely from a specified jar. This is useful for isolating jobs and avoiding classpath and versioning collisions. Note that provisioning of the jar 
+   into the cluster still depends on the target environment - see the aforementioned <link linkend="hadoop:generic-options">section</link> for more info (such as <literal>libs</literal>).
    </para>
 
 	 <section id="hadoop:job:streaming">
 	 	<title>Creating a Hadoop Streaming Job</title>
 	 	
-	 	<para>Hadoop <ulink url="http://hadoop.apache.org/common/docs/current/streaming.html">Streaming</ulink> job (or in short streaming), is a popular feature of Hadoop as they allow the creation of Map/Reduce jobs
+	 	<para>Hadoop <ulink url="http://hadoop.apache.org/common/docs/current/streaming.html">Streaming</ulink> job (or in short streaming), is a popular feature of Hadoop as it allows the creation of Map/Reduce jobs
 	 	with any executable or script (the equivalent of using the previous counting words example is to use <ulink url="http://en.wikipedia.org/wiki/Cat_%28Unix%29"><literal>cat</literal></ulink> and 
 	 	<ulink url="http://en.wikipedia.org/wiki/Wc_%28Unix%29"><literal>wc</literal></ulink> commands).
 	 	While it is rather easy to start up streaming from the command line, doing so programatically, such as from a Java environment, can be challenging due to the various number of parameters (and their ordering) 
-	 	that need to be parsed. SHDP simplifies such as tasks - it's as easy and straight-forward as declaring a <literal>job</literal> from the previous section; in fact most of the attributes will be the same:</para>
+	 	that need to be parsed. SHDP simplifies such a task - it's as easy and straightforward as declaring a <literal>job</literal> from the previous section; in fact most of the attributes will be the same:</para>
 	 	
    	 <programlisting language="xml"><![CDATA[<hdp:streaming id="streaming" 
   input-path="/input/" output-path="/ouput/"
   mapper="${path.cat}" reducer="${path.wc}"/>]]></programlisting>
 	 	
-	 	<para>Existing users might be wondering how can they pass the command line arguments (such as <literal>-D</literal> or <literal>-cmdenv</literal>). These former customize the Hadoop configuration 
-	 	(which has been convered in the previous <link linkend="hadoop:config">section</link>) while the latter are supported through the <literal>cmd-env</literal> element:</para>
+	 	<para>Existing users might be wondering how they can pass the command line arguments (such as <literal>-D</literal> or <literal>-cmdenv</literal>). While the former customize the Hadoop configuration 
+	 	(which has been convered in the previous <link linkend="hadoop:config">section</link>), the latter are supported through the <literal>cmd-env</literal> element:</para>
 	 	
    	 <programlisting language="xml"><![CDATA[<hdp:streaming id="streaming-env" 
   input-path="/input/" output-path="/ouput/"
@@ -308,20 +308,20 @@
 
 		<para>One or multiple Map-Reduce jobs can be specified through the <literal>job</literal> attribute in the order of the execution. The runner will trigger the execution during the application start-up (notice 
 		the <literal>run-at-startup</literal> flag which is by default <literal>false</literal>). Do note that the runner will not run unless triggered manually or if <literal>run-at-startup</literal> is set to <literal>true</literal>.
-		Additionally the runner (as in fact do all <link linkend="runners">runners</link> in SHDP) allows one or
-		multiple <literal>pre</literal> and <literal>post</literal> actions to be specified to be executed before and after each run. Typically other runners (such as other jobs or scripts) can be specified but any JDK <literal>Callable</literal> can be 
+		Additionally the <literal>job-runner</literal> (as in fact do all <link linkend="runners">runners</link> in SHDP) allows one or
+		multiple <literal>pre</literal> and <literal>post</literal> actions to be executed before and after each run. Typically other runners (such as other jobs or scripts) can be specified but any JDK <literal>Callable</literal> can be 
 		passed in. For more information on runners, see the <link linkend="runners">dedicated</link> chapter.</para>
 		
-		<note>As the Hadoop job submittion and execution (when <literal>wait-for-completion</literal> is <literal>true</literal>) is blocking, <literal>JobRunner</literal> uses a JDK <literal>Executor</literal> to start (or stop)
+		<note>As the Hadoop job submission and execution (when <literal>wait-for-completion</literal> is <literal>true</literal>) is blocking, <literal>JobRunner</literal> uses a JDK <literal>Executor</literal> to start (or stop)
 		a job. The default implementation, <literal>SyncTaskExecutor</literal> uses the calling thread to execute the job, mimicking the hadoop command line behaviour. However, as the hadoop jobs are time-consuming,
 		in some cases this can lead to <quote>application freeze</quote>, preventing normal operations or even application shutdown from occuring properly. 
 		Before going into production, it is recommended to double-check whether this strategy is suitable or whether a throttled or pooled implementation is better. 
-		One can customize the behaviour through <literal>executor-ref</literal> parameter.</note>
+		One can customize the behaviour through the <literal>executor-ref</literal> parameter.</note>
 		
 		<para>The job runner also allows running jobs to be cancelled (or killed) at shutdown. 
 		This applies only to jobs that the runner waits for (<literal>wait-for-completion</literal> is <literal>true</literal>) using a different executor then the default - that is, using a different thread
 		then the calling one (since otherwise the calling thread has to wait for the job to finish first before executing the next task).
-		To customize this behaviour, one should set <literal>kill-job-at-shutdown</literal> attribute to <literal>false</literal> and/or change the <literal>executor-ref</literal> implementation.</para>
+		To customize this behaviour, one should set the <literal>kill-job-at-shutdown</literal> attribute to <literal>false</literal> and/or change the <literal>executor-ref</literal> implementation.</para>
 		
 	   <section id="hadoop:tasklet">
 			<title>Using the Hadoop Job tasklet</title>
@@ -338,11 +338,11 @@
 		<title>Running a Hadoop Tool</title>
 		
 		<para>It is common for Hadoop utilities and libraries to be started from the command-line (ex: <literal>hadoop jar</literal> <emphasis>some.jar</emphasis>). SHDP offers generic support for such cases provided
-		that the packages in question are built on top of Hadoop standard infrastructure, namely <interfacename>Tool</interfacename> and <classname>ToolRunner</classname> classes. As oppose to the command-line usage,
+		that the packages in question are built on top of Hadoop standard infrastructure, namely <interfacename>Tool</interfacename> and <classname>ToolRunner</classname> classes. As opposed to the command-line usage,
 		<interfacename>Tool</interfacename> instances benefit from Spring's IoC features; they can be parameterized, created and destroyed on demand and have their properties (such as the Hadoop configuration) injected. 
 		</para>
 		<para>Consider the typical <literal>jar</literal> example - invoking a class with some (two in this case) arguments (notice that the Hadoop configuration properties are passed as well):</para>
-		<programlisting language=""><![CDATA[bin/hadoop jar -conf hadoop-site.xml -jt darwin:50020 -D property=value someJar.jar]]> <emphasis>org.foo.SomeTool</emphasis> <literal>data/in.txt data/out.txt</literal></programlisting>
+		<programlisting language=""><![CDATA[bin/hadoop jar -conf hadoop-site.xml -jt darwin:50020 -Dproperty=value someJar.jar]]> <emphasis>org.foo.SomeTool</emphasis> <literal>data/in.txt data/out.txt</literal></programlisting>
 		
 		<para>Since SHDP has first-class support for <link linkend="hadoop:config">configuring</link> Hadoop, the so called <literal>generic options</literal> aren't needed any more, even more so since typically there is only one Hadoop configuration 
 		per application. Through <literal>tool-runner</literal> element (and its backing <literal>ToolRunner</literal> class) one typically just needs to specify the <literal>Tool</literal> implementation and its arguments:
@@ -355,6 +355,8 @@
    property=value
 </hdp:tool-runner>]]></programlisting>
 
+
+    <!-- Pull Request review: The following paragraph seems to be copy/pasted from above -->
 		<para>Additionally the runner (just like the job runner) allows one or multiple <literal>pre</literal> and <literal>post</literal> actions to be specified to be executed before and after each run. 
 		Typically other runners (such as other jobs or scripts) can be specified but any JDK <literal>Callable</literal> can be 
 		passed in. Do note that the runner will not run unless triggered manually or if <literal>run-at-startup</literal> is set to <literal>true</literal>.  
@@ -367,14 +369,13 @@
     ...
 </hdp:tool-runner>]]></programlisting>
     <para>The jar is used to instantiate and start the tool - in fact all its dependencies are loaded from the jar meaning they no longer need to be part of the classpath. This mechanism provides proper
-    isolation between tools as each of them might depend on certain libraries with different versions; rather then adding them all into the same app (which might be impossible due to versioning conflicts
-    ), one can simply point to the different jars and be on her way. Note that when using a jar, if the main class (as specified by the 
+    isolation between tools as each of them might depend on certain libraries with different versions; rather then adding them all into the same app (which might be impossible due to versioning conflicts), one can simply point to the different jars and be on her way. Note that when using a jar, if the main class (as specified by the 
     <ulink url="http://docs.oracle.com/javase/tutorial/deployment/jar/appman.html">Main-Class</ulink> entry) is the target <classname>Tool</classname>, one can skip specifying the tool as it will
     picked up automatically.</para>
 	
 	<para>Like the rest of the SHDP elements, <literal>tool-runner</literal> allows the passed Hadoop configuration (by default <literal>hadoopConfiguration</literal> but specified in the example for clarity) to be
 		<link linkend="hadoop:config:properties">customized</link> accordingly; the snippet only highlights the property initialization for simplicity but more options are available. Since usually the <literal>Tool</literal>
-		implementation has a default argument, one can use the <literal>tool-class</literal> attribute however it is possible to refer to another <literal>Tool</literal> instance or declare a nested one: </para> 
+		implementation has a default argument, one can use the <literal>tool-class</literal> attribute. However it is possible to refer to another <literal>Tool</literal> instance or declare a nested one: </para> 
 
 		<programlisting language="xml"><![CDATA[<hdp:tool-runner id="someTool" run-at-startup="true">
    <hdp:tool>
@@ -382,7 +383,7 @@
    </hdp:tool>
 </hdp:tool-runner>]]></programlisting>
 
-		<para>This is quite convenient if the <literal>Tool</literal> class provides setters or richer constructors. Note that by default the <literal>tool-runner</literal> does not executes the <literal>Tool</literal>until
+		<para>This is quite convenient if the <literal>Tool</literal> class provides setters or richer constructors. Note that by default the <literal>tool-runner</literal> does not execute the <literal>Tool</literal> until
 		its definition is actually called - this behavior can be changed through the <literal>run-at-startup</literal> attribute above.</para>
 		
 		<section id="hadoop:tool-scripts">
@@ -408,8 +409,8 @@ hadoop jar job10.jar ...]]></programlisting>
 
 			<para>All the features have been explained in the previous sections but let us review what happens here. 
 			As mentioned before, each tool gets autowired with the <literal>hadoopConfiguration</literal>; <literal>job1</literal> goes beyond this and uses its own properties instead.
-			For the first jar, the <classname>Tool</classname> class is specified, however the rest assume the jar <emphasis>main class</emphasis>es implement the 
-			<interfacename>Tool</interfacename> interface; the namespace will discover them automatically and use it accordingly.
+			For the first jar, the <classname>Tool</classname> class is specified, however the rest assume the jar <emphasis>Main-Class</emphasis>es implement the 
+			<interfacename>Tool</interfacename> interface; the namespace will discover them automatically and use them accordingly.
 			When needed (such as with <literal>job1</literal>), additional files or libs are provisioned in the cluster. Same thing with the job arguments.</para>
 			
 			<para>However more things that go beyond scripting, can be applied to this configuration - each job can have multiple properties loaded or declared inlined - not just from the local file system, but also
@@ -448,14 +449,14 @@ hadoop jar job10.jar ...]]></programlisting>
 
 		<note>Just like the <literal>hadoop jar</literal> command, by default the jar support reads the jar's <literal>Main-Class</literal> if none is specified. This can be customized through the <literal>main-class</literal> attribute.</note>
 		
-
+  <!-- Pull Request review: Again, same copy paste.-->
 	<para>Additionally the runner (just like the job runner) allows one or multiple <literal>pre</literal> and <literal>post</literal> actions to be specified to be executed before and after each run. 
 		Typically other runners (such as other jobs or scripts) can be specified but any JDK <literal>Callable</literal> can be 
 		passed in. Do note that the runner will not run unless triggered manually or if <literal>run-at-startup</literal> is set to <literal>true</literal>.  
 		For more information on runners, see the <link linkend="runners">dedicated</link> chapter.</para>
 		
 		<para>The <literal>jar support</literal> provides a nice and easy migration path from jar invocations from the command-line to SHDP (note that Hadoop <link linkend="hadoop:generic-options">generic options</link>
-		are also supported). Especially since SHDP enables Hadoop <literal>Configuration</literal> objects created during the jar execution, to automatically inherit the context Hadoop configuration. In fact, just
+		are also supported). Especially since SHDP enables Hadoop <literal>Configuration</literal> objects, created during the jar execution, to automatically inherit the context Hadoop configuration. In fact, just
 		like other SHDP elements, the <literal>jar</literal> element allows <link linkend="hadoop:config:properties">configurations properties</link> to be declared locally, just for the jar run. So for example,
 		if one would use the following declaration:</para>
 		
@@ -489,8 +490,8 @@ hadoop jar job10.jar ...]]></programlisting>
 		</listitem>
 	</itemizedlist>
 
-	SHDP tries to use sensible defaults to provide the best integration experience possible but at the end of the day, without any contract in place, there are no guarantees. Hence why using the <literal>Tool</literal>
-	interface, is a much better alternative.
+	SHDP tries to use sensible defaults to provide the best integration experience possible but at the end of the day, without any contract in place, there are no guarantees. Hence using the <literal>Tool</literal>
+	interface is a much better alternative.
 	</para>
 
 		<section id="hadoop:jar-tasklet">
@@ -507,8 +508,8 @@ hadoop jar job10.jar ...]]></programlisting>
 	<section id="hadoop:distributed-cache">
    	 <title>Configuring the Hadoop <literal>DistributedCache</literal></title>
    	 
-   	 <para><ulink url="http://hadoop.apache.org/common/docs/stable/mapred_tutorial.html#DistributedCache">DistributedCache</ulink> is a Hadoop facility for distributing application-specific, large, read-only files (
-   	 text, archives, jars and so on) efficiently. Applications specify the files to be cached via urls (<literal>hdfs://</literal>) using <literal>DistributedCache</literal> and the framework will copy the necessary
+   	 <para><ulink url="http://hadoop.apache.org/common/docs/stable/mapred_tutorial.html#DistributedCache">DistributedCache</ulink> is a Hadoop facility for distributing application-specific, large, read-only files
+   	 (text, archives, jars and so on) efficiently. Applications specify the files to be cached via urls (<literal>hdfs://</literal>) using <literal>DistributedCache</literal> and the framework will copy the necessary
    	 files to the slave nodes before any tasks for the job are executed on that node. Its efficiency stems from the fact that the files are only copied once per job and the ability to cache archives which are 
    	 un-archived on the slaves.
    	 Note that <literal>DistributedCache</literal> assumes that the files to be cached (and specified via hdfs:// urls) are already present on the Hadoop <literal>FileSystem</literal>.</para>
@@ -548,9 +549,9 @@ hadoop jar job10.jar ...]]></programlisting>
 	 
 	 <para>The <literal>job</literal>, <literal>streaming</literal> and <literal>tool</literal> all support a subset of <ulink url="http://hadoop.apache.org/common/docs/stable/commands_manual.html#Generic+Options">generic options</ulink>,
 	 specifically <literal>archives</literal>, <literal>files</literal> and <literal>libs</literal>. <literal>libs</literal> is probably the most useful as it enriches a job classpath (typically with some jars) - however the 
-	 other two allow resources or archives to be copied through-out the cluster for the job to consume. Whenver faced with provisioning issues, revisit these options as they can help up significantly.
+	 other two allow resources or archives to be copied throughout the cluster for the job to consume. Whenver faced with provisioning issues, revisit these options as they can help up significantly.
 	 Note that the <literal>fs</literal>, <literal>jt</literal> or <literal>conf</literal> options are not supported - these are designed for command-line usage, for bootstrapping the application. 
-	 This is no longer the case, as the SHDP offers first-class support for defining and customizing Hadoop <link linkend="hadoop:config">configuration</link>s.</para>
+	 This is no longer needed, as the SHDP offers first-class support for defining and customizing Hadoop <link linkend="hadoop:config">configuration</link>s.</para>
 	</section>
    
 </chapter>
