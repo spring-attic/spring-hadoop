@@ -27,7 +27,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.Assert;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Costin Leau
@@ -50,7 +50,14 @@ public class HBaseCfgTest {
 	public void testConfigProperties() throws Exception {
 		Assert.notNull(hbaseConfiguration);
 		assertEquals("bucket", hbaseConfiguration.get("head"));
+		assertEquals("main", hbaseConfiguration.get("cfg"));
 	}
+
+	@Test
+	public void testLocalConfigOverride() throws Exception {
+		assertEquals("anothervalue", hbaseConfiguration.get("someparam"));
+	}
+
 
 	@Test
 	public void testJobCfg() throws Exception {

@@ -35,6 +35,7 @@
 	<!--  -->
 	<hdp:configuration register-url-handler="false" depends-on="cfg-init" file-system-uri="${hadoop.fs}" job-tracker-uri="${hadoop.jt}">
 		cfg=main
+		someparam=somevalue
 	</hdp:configuration>
 	
 	<bean id="cfg-init" class="org.springframework.data.hadoop.InitBeforeHadoop" lazy-init="true" />

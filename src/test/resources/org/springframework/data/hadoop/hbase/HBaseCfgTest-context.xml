@@ -22,6 +22,7 @@
 	 
 	<hdp:hbase-configuration configuration-ref="hadoopConfiguration" zk-quorum="${hbase.host}">
 		head=bucket
+		someparam=anothervalue
 	</hdp:hbase-configuration>
 	 
 
