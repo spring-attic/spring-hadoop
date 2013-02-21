@@ -12,12 +12,12 @@
 		<title>HDFS permissions</title>
 	
 		<para>HDFS layer provides file permissions designed to be similar to those present in *nix OS. The official <ulink url="http://hadoop.apache.org/common/docs/r1.0.3/hdfs_permissions_guide.html">guide</ulink>
-		explains the major components but in short, the access for each file (whether it's for reading, writing or in case of directories accessing) can be restricted to a certain users or groups. Depending on the
+		explains the major components but in short, the access for each file (whether it's for reading, writing or in case of directories accessing) can be restricted to certain users or groups. Depending on the
 		user identity (which is typically based on the host operating system), code executing against the Hadoop cluster can see or/and interact with the file-system based on these permissions. Do note that 
 		each HDFS or <literal>FileSystem</literal> implementation can have slightly different semantics or implementation.</para>
 		
 		<para>SHDP obeys the HDFS permissions, using the identity of the current user (by default) for interacting with the file system. In particular, the <literal>HdfsResourceLoader</literal> considers when doing pattern matching,
-		only the files that its suppose to <emphasis>see</emphasis> and does not perform any privileged action. It is possible however to specify a different user, meaning the <literal>ResourceLoader</literal> interacts with HDFS 
+		only the files that it's supposed to <emphasis>see</emphasis> and does not perform any privileged action. It is possible however to specify a different user, meaning the <literal>ResourceLoader</literal> interacts with HDFS 
 		using that user's rights - however this obeys the <link linkend="security:kerberos">user impersonation</link> rules. 
 		When using different users, it is recommended to create separate <literal>ResourceLoader</literal> instances (one per user) instead of assigning additional permissions or groups to one user - 
 		this makes it easier to manage and wire the different HDFS <emphasis>views</emphasis> without having to modify the ACLs. Note however that when using impersonation, the <literal>ResourceLoader</literal> might
@@ -29,7 +29,7 @@
 	
 		<para>Securing a Hadoop cluster can be a difficult task - each machine can have a different set of users and groups, each with different passwords. Hadoop relies on 
 		<ulink url="http://en.wikipedia.org/wiki/Kerberos_%28protocol%29">Kerberos</ulink>, a ticket-based protocol for allowing nodes to communicate over a non-secure network to prove their identity to one another in a
-		secure manner. Unfortunately there is not a lot of documentation on this topic out there however the there are <ulink url="http://hortonworks.com/blog/fine-tune-your-apache-hadoop-security-settings/">some</ulink>
+		secure manner. Unfortunately there is not a lot of documentation on this topic out there. However there are <ulink url="http://hortonworks.com/blog/fine-tune-your-apache-hadoop-security-settings/">some</ulink>
 		<ulink url="https://ccp.cloudera.com/display/CDHDOC/Configuring+Hadoop+Security+in+CDH3">resources</ulink> to get you started.</para>
 		
 		<para>SHDP does not require any extra configuration - it simply obeys the security system in place. By default, when running inside a <emphasis>secure</emphasis> Hadoop, SHDP uses the current user (as expected).

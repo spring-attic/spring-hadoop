@@ -3,7 +3,7 @@
 
    	 <title>Using the <emphasis>runner</emphasis> classes</title>
    	 
-   	 <para>Spring for Apache Hadoop provides for each Hadoop interaction type, whether it is vanilla Map/Reduce, Cascading, Hive or Pig, a <emphasis>runner</emphasis>, a dedicated class used for declarative (or programmatic) interaction. The list below illustrates the existing <emphasis>runner</emphasis> classes for each type, its name and namespace element</para>
+   	 <para>Spring for Apache Hadoop provides for each Hadoop interaction type, whether it is vanilla Map/Reduce, Cascading, Hive or Pig, a <emphasis>runner</emphasis>, a dedicated class used for declarative (or programmatic) interaction. The list below illustrates the existing <emphasis>runner</emphasis> classes for each type, their name and namespace element.</para>
    	 
 		<table id="runners:type:table" pgwide="1" align="center">
  			<title>Available <emphasis>Runner</emphasis>s</title>
