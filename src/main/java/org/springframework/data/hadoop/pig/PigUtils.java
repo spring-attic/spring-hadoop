@@ -156,7 +156,7 @@ abstract class PigUtils {
 	 * @param arguments
 	 */
 	private static void registerScript(PigServer pig, InputStream in, Map<String, String> arguments) throws IOException {
-		Method registerScript = ReflectionUtils.findMethod(PigServer.class, "registerScript", Map.class);
+		Method registerScript = ReflectionUtils.findMethod(PigServer.class, "registerScript", InputStream.class, Map.class);
 		if (registerScript != null) {
 			ReflectionUtils.invokeMethod(registerScript, pig, in, arguments);
 		}
