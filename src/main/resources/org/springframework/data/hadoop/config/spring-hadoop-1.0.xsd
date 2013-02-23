@@ -1792,7 +1792,7 @@ Reference to a Flow definition.
 			<xsd:attribute name="add-cascading-jars" type="xsd:string" use="optional" default="true">
 			<xsd:annotation>
 			<xsd:documentation><![CDATA[
-Indicates whether the Cascading library jars should be to the flow classpath (by adding them to the
+Indicates whether the Cascading library jars should be added to the flow classpath (through the
 DistributedCache). By default it is true. 
 
 When running against a cluster where Cascading jars are already installed, turn this to false

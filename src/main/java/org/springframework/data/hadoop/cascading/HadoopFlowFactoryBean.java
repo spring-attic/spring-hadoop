@@ -329,17 +329,14 @@ public class HadoopFlowFactoryBean extends FlowFactoryBean<HadoopFlow> implement
 	}
 
 	/**
-	 * Indicates whether the application jar should be set for this flow.
-	 * By default it is true, meaning the factory will use the user provided settings
-	 * ({@link #setJar(Resource)} and {@link #setJarByClass(Class)} or falling back
-	 * to its own discovery mechanism if the above are not setup. 
+	 * Indicates whether the Cascading library jars should be added to the flow classpath (through the
+	 * DistributedCache). By default it is true.
+	 * When running against a cluster where Cascading jars are already installed, turn this to false
+	 * to avoid shipping the library jars with the job.
 	 * 
-	 * When running against a cluster where cascading is already present, turn this to false
-	 * to avoid shipping the library jar with the job.
-	 * 
-	 * @param jarSetup whether to setup the application jar (based on the user settings) or not
+	 * @param addCascadingJars whether the Cascading library jars should be added to the flow classpath or not
 	 */
-	public void setJarSetup(boolean jarSetup) {
-		this.jarSetup = jarSetup;
+	public void setAddCascadingJars(boolean addCascadingJars) {
+		this.addCascadingJars = addCascadingJars;
 	}
 }
