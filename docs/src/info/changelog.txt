@@ -11,6 +11,9 @@ Changes in version 1.0 GA (2013-02-dd)
 General
 * Adjusted 'input-path' attribute in 'job' element from required to optional
 
+Package o.s.data.hadoop.cascading
+* Replaced HadoopFlowFactoryBean/cascading-flow jarSetup param/attribute with addCascadingJars
+
 Package o.s.data.hadoop.fs
 * Fixed incorrect DistCp.copy() method
 * Removed 'GenericOptionsParser' warning when invoking DistCp

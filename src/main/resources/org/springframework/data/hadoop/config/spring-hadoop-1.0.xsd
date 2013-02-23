@@ -1789,13 +1789,11 @@ Reference to a Flow definition.
 				</xsd:appinfo>
 			</xsd:annotation>
 			</xsd:attribute>
-			<xsd:attribute name="jar-setup" type="xsd:string" use="optional" default="true">
+			<xsd:attribute name="add-cascading-jars" type="xsd:string" use="optional" default="true">
 			<xsd:annotation>
-			<xsd:documentation source="java:cascading.flow.FlowDef"><![CDATA[
-Indicates whether the application jarshould be set for this flow.
-By default it is true, meaning the factory will use the user provided settings through
-'setJar(Resource)' and 'setJarByClass(Class)' or fall back to its own discovery mechanism if 
-the above are not setup. 
+			<xsd:documentation><![CDATA[
+Indicates whether the Cascading library jars should be to the flow classpath (by adding them to the
+DistributedCache). By default it is true. 
 
 When running against a cluster where Cascading jars are already installed, turn this to false
 to avoid shipping the library jars with the job.

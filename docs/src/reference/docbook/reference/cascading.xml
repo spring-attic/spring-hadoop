@@ -59,11 +59,11 @@
     <hdp:cascading-runner unit-of-work-ref="cascade" run-at-startup="true"/>
 </beans>]]></programlisting>
 	
-	<para>Note that no jar needs to be setup - the Cascading namespace (in particular <literal>cascading-flow</literal>, backed by <literal>FlowFactoryBean</literal>) tries to automatically setup the
-	resulting job classpath. By default, it will automatically add the Cascading library and its dependency to Hadoo <literal>DistributedCache</literal> so that when the job runs inside the Hadoop
-	cluster, the jars are properly found. When using custom jars (for example to add custom Cascading functions) or when running against a cluster that is already provisioned, one can customize this
-	behaviour through the <literal>jar-setup</literal>, <literal>jar</literal> and <literal>jar-by-class</literal>. For Cascading users, these settings are the equivalent of the 
-	<literal>AppProps.setApplicationJarClass()</literal>.</para>
+	<para>Note that no jar needs to be setup - the Cascading namespace (in particular <literal>cascading-flow</literal>, backed by <literal>HadoopFlowFactoryBean</literal>) tries to automatically setup the
+	resulting job classpath. By default, it will automatically add the Cascading library and its dependency to Hadoop <literal>DistributedCache</literal> so that when the job runs inside the Hadoop
+	cluster, the jars are properly found. When using custom jars (for example to add custom Cascading functions) that already include Cascading or when running against a cluster that is already provisioned, 
+	one can customize this behaviour through the <literal>add-cascading-jars</literal>, <literal>jar</literal> and <literal>jar-by-class</literal> attributes. 
+	For Cascading users, these settings are the equivalent of the <literal>AppProps.setApplicationJarClass()</literal>.</para>
 	
 	<para>Further more, one can break-down the configuration method in multiple pieces which is useful for reusing the components between multiple flows/cascades. This goes hand in hand with Spring
 	<literal>@Configuration</literal> feature - see the example below that configures a Cascade pipes and taps as individual beans 

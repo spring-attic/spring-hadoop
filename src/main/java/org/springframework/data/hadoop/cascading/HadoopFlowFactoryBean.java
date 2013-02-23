@@ -76,7 +76,7 @@ public class HadoopFlowFactoryBean extends FlowFactoryBean<HadoopFlow> implement
 
 	private Class<?> jarClass;
 	private Resource jar;
-	private boolean jarSetup = true;
+	private boolean addCascadingJars = true;
 
 	@Override
 	HadoopFlow createFlow() throws IOException {
@@ -136,63 +136,50 @@ public class HadoopFlowFactoryBean extends FlowFactoryBean<HadoopFlow> implement
 		Configuration cfg = ConfigurationUtils.createFrom(configuration, properties);
 		Properties props = ConfigurationUtils.asProperties(cfg);
 
-		if (jarSetup) {
-			if (jar != null) {
-				AppProps.setApplicationJarPath(props, ResourceUtils.decode(jar.getURI().toString()));
-			}
-			else if (jarClass != null) {
-				AppProps.setApplicationJarClass(props, jarClass);
-			}
-			else {
-				// auto-detection based on the classpath when dealing with a non-local JT
-				if (!"local".equals(configuration.get("mapred.job.tracker", "local"))) {
-
-					boolean warnCpEntry = !":".equals(System.getProperty("path.separator"));
-
-					if (FILE_SEPARATOR_WARNING && warnCpEntry) {
-						log.warn("System path separator is not ':' - this will likely cause invalid classpath entries within the DistributedCache. See the docs and HADOOP-9123 for more information.");
-						// show the warning once per CL
-						FILE_SEPARATOR_WARNING = false;
-					}
-
-					ClassLoader cascadingCL = Cascade.class.getClassLoader();
-					Resource cascadingCore = ResourceUtils.findContainingJar(Cascade.class);
-					Resource cascadingHadoop = ResourceUtils.findContainingJar(cascadingCL,
-							"cascading/flow/hadoop/HadoopFlow.class");
-					// find jgrapht
-					Resource jgrapht = ResourceUtils.findContainingJar(cascadingCL, "org/jgrapht/Graph.class");
-					// find riffle
-					Resource riffle = ResourceUtils.findContainingJar(cascadingCL, "riffle/process/Process.class");
-					// find janino
-					Resource janino = ResourceUtils.findContainingJar(cascadingCL, "org/codehaus/janino/Java.class");
-					// find janino commons-compiler
-					Resource commonsCompiler = ResourceUtils.findContainingJar(cascadingCL,
-							"org/codehaus/commons/compiler/CompileException.class");
-
-
-
-					Assert.notNull(cascadingCore, "Cannot find cascading-core.jar");
-					Assert.notNull(cascadingHadoop, "Cannot find cascading-hadoop.jar");
-					Assert.notNull(jgrapht, "Cannot find jgraphts-jdk.jar");
-					Assert.notNull(riffle, "Cannot find riffle.jar");
-					Assert.notNull(janino, "Cannot find janino.jar");
-					Assert.notNull(commonsCompiler, "Cannot find commons-compiler.jar");
-
-					if (log.isDebugEnabled()) {
-						log.debug("Auto-detecting Cascading Libs ["
-								+ Arrays.toString(new Resource[] { cascadingCore, cascadingHadoop, jgrapht, riffle,
-										janino, commonsCompiler }) + "]");
-					}
-
-					ConfigurationUtils.addLibs(cfg, cascadingCore, cascadingHadoop, jgrapht, riffle, janino,
-							commonsCompiler);
-
-					// config changed, reinit properties
-					props = ConfigurationUtils.asProperties(cfg);
-				}
-			}
+		if (jar != null) {
+			AppProps.setApplicationJarPath(props, ResourceUtils.decode(jar.getURI().toString()));
 		}
+		else if (jarClass != null) {
+			AppProps.setApplicationJarClass(props, jarClass);
+		}
+		if (addCascadingJars) {
+			if (FILE_SEPARATOR_WARNING && !":".equals(System.getProperty("path.separator"))) {
+				log.warn("System path separator is not ':' - this will likely cause invalid classpath entries within the DistributedCache. See the docs and HADOOP-9123 for more information.");
+				// show the warning once per CL
+				FILE_SEPARATOR_WARNING = false;
+			}
 
+			ClassLoader cascadingCL = Cascade.class.getClassLoader();
+			Resource cascadingCore = ResourceUtils.findContainingJar(Cascade.class);
+			Resource cascadingHadoop = ResourceUtils.findContainingJar(cascadingCL,
+					"cascading/flow/hadoop/HadoopFlow.class");
+			// find jgrapht
+			Resource jgrapht = ResourceUtils.findContainingJar(cascadingCL, "org/jgrapht/Graph.class");
+			// find riffle
+			Resource riffle = ResourceUtils.findContainingJar(cascadingCL, "riffle/process/Process.class");
+			// find janino
+			Resource janino = ResourceUtils.findContainingJar(cascadingCL, "org/codehaus/janino/Java.class");
+			// find janino commons-compiler
+			Resource commonsCompiler = ResourceUtils.findContainingJar(cascadingCL, "org/codehaus/commons/compiler/CompileException.class");
+
+			Assert.notNull(cascadingCore, "Cannot find cascading-core.jar");
+			Assert.notNull(cascadingHadoop, "Cannot find cascading-hadoop.jar");
+			Assert.notNull(jgrapht, "Cannot find jgraphts-jdk.jar");
+			Assert.notNull(riffle, "Cannot find riffle.jar");
+			Assert.notNull(janino, "Cannot find janino.jar");
+			Assert.notNull(commonsCompiler, "Cannot find commons-compiler.jar");
+
+			if (log.isDebugEnabled()) {
+				log.debug("Auto-detecting Cascading Libs ["
+						+ Arrays.toString(new Resource[] { cascadingCore, cascadingHadoop, jgrapht, riffle, janino,
+								commonsCompiler }) + "]");
+			}
+
+			ConfigurationUtils.addLibs(cfg, cascadingCore, cascadingHadoop, jgrapht, riffle, janino, commonsCompiler);
+
+			// config changed, reinit properties
+			props = ConfigurationUtils.asProperties(cfg);
+		}
 
 		if (jobPoolingInterval != null) {
 			FlowProps.setJobPollingInterval(props, jobPoolingInterval);
@@ -342,7 +329,7 @@ public class HadoopFlowFactoryBean extends FlowFactoryBean<HadoopFlow> implement
 	}
 
 	/**
-	 * Indicates whether the application jarshould be set for this flow.
+	 * Indicates whether the application jar should be set for this flow.
 	 * By default it is true, meaning the factory will use the user provided settings
 	 * ({@link #setJar(Resource)} and {@link #setJarByClass(Class)} or falling back
 	 * to its own discovery mechanism if the above are not setup. 
