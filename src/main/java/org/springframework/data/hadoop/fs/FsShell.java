@@ -295,7 +295,6 @@ public class FsShell implements Closeable, DisposableBean {
 		} catch (IOException ex) {
 			throw new HadoopException("Cannot copy resources " + ex.getMessage(), ex);
 		}
-
 	}
 
 	// copied from FsShell

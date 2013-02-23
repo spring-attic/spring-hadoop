@@ -17,12 +17,14 @@ package org.springframework.data.hadoop.fs;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.LinkedList;
 
 import org.apache.hadoop.conf.Configurable;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FsShell;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.hadoop.HadoopException;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.ReflectionUtils;
@@ -91,8 +93,17 @@ abstract class FsShellPermissions {
 			Class<?> targetClz = ClassUtils.resolveClassName("org.apache.hadoop.fs.FsShellPermissions$Chmod", config.getClass().getClassLoader());
 			Configurable target = (Configurable) BeanUtils.instantiate(targetClz);
 			target.setConf(config);
-			Method m = ReflectionUtils.findMethod(cmd, "run", String[].class);
-			ReflectionUtils.invokeMethod(m, target, (Object) argvs);
+			// run(String...) swallows the exceptions - re-implement it here
+			//
+			LinkedList<String> args = new LinkedList<String>(Arrays.asList(argvs));
+			try {
+				Method m = ReflectionUtils.findMethod(cmd, "processOptions", LinkedList.class);
+				ReflectionUtils.invokeMethod(m, target, args);
+				m = ReflectionUtils.findMethod(cmd, "processRawArguments", LinkedList.class);
+				ReflectionUtils.invokeMethod(m, target, args);
+			} catch (IllegalStateException ex){
+				throw new HadoopException("Cannot change permissions/ownership " + ex.getCause().getMessage(), ex.getCause());
+			}
 		}
 	}
 }
