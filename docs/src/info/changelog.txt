@@ -17,6 +17,7 @@ Package o.s.data.hadoop.cascading
 Package o.s.data.hadoop.fs
 * Fixed incorrect DistCp.copy() method
 * Removed 'GenericOptionsParser' warning when invoking DistCp
+* Add user impersonation to DistCp utility
 
 
 Changes in version 1.0 RC2 (2013-01-21)
