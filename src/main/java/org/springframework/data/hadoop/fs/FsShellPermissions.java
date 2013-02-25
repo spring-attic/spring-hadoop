@@ -98,11 +98,13 @@ abstract class FsShellPermissions {
 			LinkedList<String> args = new LinkedList<String>(Arrays.asList(argvs));
 			try {
 				Method m = ReflectionUtils.findMethod(cmd, "processOptions", LinkedList.class);
+				ReflectionUtils.makeAccessible(m);
 				ReflectionUtils.invokeMethod(m, target, args);
 				m = ReflectionUtils.findMethod(cmd, "processRawArguments", LinkedList.class);
+				ReflectionUtils.makeAccessible(m);
 				ReflectionUtils.invokeMethod(m, target, args);
 			} catch (IllegalStateException ex){
-				throw new HadoopException("Cannot change permissions/ownership " + ex.getCause().getMessage(), ex.getCause());
+				throw new HadoopException("Cannot change permissions/ownership " + ex);
 			}
 		}
 	}
