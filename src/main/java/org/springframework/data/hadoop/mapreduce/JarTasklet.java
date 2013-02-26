@@ -21,6 +21,8 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 
 /**
+ * Batch tasklet for executing Hadoop jars.
+ * 
  * @author Costin Leau
  */
 public class JarTasklet extends JarExecutor implements Tasklet {
