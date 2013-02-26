@@ -33,6 +33,7 @@
       <title>Introduction</title>
       <xi:include href="introduction/introduction.xml"/>
       <xi:include href="introduction/requirements.xml"/>      
+	  <xi:include href="introduction/resources.xml"/>      
   </part>
   
   <part id="core">
