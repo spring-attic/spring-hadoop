@@ -287,6 +287,17 @@ test {
     }
 }
 
+task downloadGutenbergBooks {
+   ant.get(src: 'http://www.gutenberg.lib.md.us/1/0/100/100.txt', 
+           dest: 'src/test/resources/input/gutenberg',verbose:true)
+   ant.get(src: 'http://www.gutenberg.lib.md.us/1/3/135/135.txt', 
+           dest: 'src/test/resources/input/gutenberg',verbose:true)
+   ant.get(src: 'http://www.gutenberg.lib.md.us/1/3/9/1399/1399.txt', 
+           dest: 'src/test/resources/input/gutenberg',verbose:true)
+   ant.get(src: 'http://www.gutenberg.lib.md.us/2/6/0/2600/2600.txt', 
+           dest: 'src/test/resources/input/gutenberg',verbose:true)
+}
+
 javadoc {
   ext.srcDir = file("${projectDir}/docs/src/api")
   

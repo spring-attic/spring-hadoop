@@ -56,7 +56,7 @@ public class JobKillTests {
 		runner.call();
 
 		// wait a bit for the job to be started
-		while (!JobUtils.getStatus(victimJob).isRunning()) {
+		while (!(JobUtils.getStatus(victimJob).isRunning() || JobUtils.getStatus(victimJob).isFinished())) {
 			Thread.sleep(WAIT_FOR_JOB_TO_START);
 		}
 		runner.destroy();
@@ -72,7 +72,7 @@ public class JobKillTests {
 		JobExecution batchJob = JobsTrigger.startJob(ctx, "mainJob");
 
 		// wait a bit for the job to be started
-		while (!JobUtils.getStatus(victimJob).isRunning()) {
+		while (!(JobUtils.getStatus(victimJob).isRunning() || JobUtils.getStatus(victimJob).isFinished())) {
 			Thread.sleep(WAIT_FOR_JOB_TO_START);
 		}
 
