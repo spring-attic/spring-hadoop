@@ -142,7 +142,7 @@ abstract class JobExecutor implements InitializingBean, DisposableBean, BeanFact
 							}
 						} catch (Exception ex) {
 							log.warn("Cannot kill job [" + job.getJobName() + "]", ex);
-							if (ex.getClass().isAssignableFrom(RuntimeException.class)) {
+							if (RuntimeException.class.isAssignableFrom(ex.getClass())) {
 								throw (RuntimeException)ex;
 							} else {
 								throw new IllegalStateException(ex);

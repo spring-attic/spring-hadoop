@@ -113,7 +113,7 @@ public class JobTasklet extends JobExecutor implements Tasklet {
 		try {
 			counters = job.getCounters();
 		} catch (Exception ex) {
-			if (ex.getClass().isAssignableFrom(RuntimeException.class)) {
+			if (RuntimeException.class.isAssignableFrom(ex.getClass())) {
 				throw (RuntimeException)ex;
 			} else {
 				// ignore - we just can't get stats
