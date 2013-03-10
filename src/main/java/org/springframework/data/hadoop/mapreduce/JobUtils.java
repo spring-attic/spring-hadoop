@@ -16,15 +16,18 @@
 package org.springframework.data.hadoop.mapreduce;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.mapred.JobClient;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.RunningJob;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Job.JobState;
 import org.apache.hadoop.mapreduce.JobID;
 import org.springframework.data.hadoop.configuration.ConfigurationUtils;
+import org.springframework.data.hadoop.util.VersionUtils;
 import org.springframework.util.ReflectionUtils;
 
 /**
@@ -32,6 +35,8 @@ import org.springframework.util.ReflectionUtils;
  * Mainly used for converting a Job instance to different types.
  * 
  * @author Costin Leau
+ * @author Mark Pollack
+ * @author Thomas Risberg
  */
 public abstract class JobUtils {
 
@@ -119,14 +124,15 @@ public abstract class JobUtils {
 	static Field JOB_CLIENT_STATE;
 
 	static {
-		JOB_INFO = ReflectionUtils.findField(Job.class, "info");
-		if (JOB_INFO == null) {
-			throw new IllegalStateException(
-					"Invalid Job.class detected, probably caused by a Hadoop YARN library, which is NOT supported yet.\n"
-							+ "See the Requirements chapter in the reference documentation for more information.");
+		if (!VersionUtils.isHadoop2X()) {
+			JOB_INFO = ReflectionUtils.findField(Job.class, "info");
+			if (JOB_INFO == null) {
+				throw new IllegalStateException(
+						"Invalid Job.class detected, probably caused by a Hadoop YARN library, which is NOT supported yet.\n"
+								+ "See the Requirements chapter in the reference documentation for more information.");
+			}
+			ReflectionUtils.makeAccessible(JOB_INFO);
 		}
-		ReflectionUtils.makeAccessible(JOB_INFO);
-
 		JOB_CLIENT_STATE = ReflectionUtils.findField(Job.class, "state");
 		ReflectionUtils.makeAccessible(JOB_CLIENT_STATE);
 	}
@@ -136,18 +142,42 @@ public abstract class JobUtils {
 			return null;
 		}
 
-		return (RunningJob) ReflectionUtils.getField(JOB_INFO, job);
+		if (VersionUtils.isHadoop2X()) {
+			try {
+				Configuration cfg = job.getConfiguration();
+				cfg.set("mapreduce.framework.name", "yarn");
+				JobClient jobClient = null;
+				try {
+					Constructor<JobClient> constr = JobClient.class.getConstructor(Configuration.class);
+					jobClient = constr.newInstance(cfg);
+				} catch (Exception e) {
+					jobClient = new JobClient();
+				}
+				org.apache.hadoop.mapred.JobID id = getOldJobId(job);
+				if (id != null) {
+					return jobClient.getJob(id);
+				} else {
+					return null;
+				}
+			} catch (IOException e) {
+				return null;
+			}
+		} else {
+			return (RunningJob) ReflectionUtils.getField(JOB_INFO, job);
+		}
 	}
 
 	public static JobID getJobId(Job job) {
 		if (job == null) {
 			return null;
 		}
-
 		return job.getJobID();
 	}
 
 	public static org.apache.hadoop.mapred.JobID getOldJobId(Job job) {
+		if (job == null) {
+			return null;
+		}
 		JobID id = getJobId(job);
 		if (id != null) {
 			return org.apache.hadoop.mapred.JobID.downgrade(id);

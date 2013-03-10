@@ -17,7 +17,8 @@ package org.springframework.data.hadoop.util;
 
 import java.lang.reflect.Field;
 
-import org.apache.hadoop.filecache.TrackerDistributedCacheManager;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.mapreduce.JobSubmissionFiles;
 import org.springframework.util.ReflectionUtils;
@@ -28,8 +29,25 @@ import org.springframework.util.ReflectionUtils;
  * Needs to be called, once per class-loader, before submitting a job to Hadoop.
  * 
  * @author Costin Leau
+ * @author Thomas Risberg
  */
 public class PermissionUtils {
+
+	private static final Log log = LogFactory.getLog(PermissionUtils.class);
+
+	private static Class<?> trackerDistributedCacheManagerClass;
+
+	static {
+		if (System.getProperty("os.name").toLowerCase().startsWith("win")) {
+			try {
+				trackerDistributedCacheManagerClass = Class.forName("org.apache.hadoop.filecache.TrackerDistributedCacheManager");
+			} catch (ClassNotFoundException e) {
+				trackerDistributedCacheManagerClass = null;
+				log.warn("Unable to provide Windows jar permission fix: " + e.getMessage());
+				e.printStackTrace();
+			}
+		}
+	}
 
 	public static void hackHadoopStagingOnWin() {
 		// do the assignment only on Windows systems
@@ -38,11 +56,13 @@ public class PermissionUtils {
 			JobSubmissionFiles.JOB_DIR_PERMISSION.fromShort((short) 0650);
 			JobSubmissionFiles.JOB_FILE_PERMISSION.fromShort((short) 0650);
 
-			// handle jar permissions as well 
-			Field field = ReflectionUtils.findField(TrackerDistributedCacheManager.class, "PUBLIC_CACHE_OBJECT_PERM");
-			ReflectionUtils.makeAccessible(field);
-			FsPermission perm = (FsPermission) ReflectionUtils.getField(field, null);
-			perm.fromShort((short) 0650);
+			if (trackerDistributedCacheManagerClass != null) {
+				// handle jar permissions as well
+				Field field = ReflectionUtils.findField(trackerDistributedCacheManagerClass, "PUBLIC_CACHE_OBJECT_PERM");
+				ReflectionUtils.makeAccessible(field);
+				FsPermission perm = (FsPermission) ReflectionUtils.getField(field, null);
+				perm.fromShort((short) 0650);
+			}
 		}
 	}
 }

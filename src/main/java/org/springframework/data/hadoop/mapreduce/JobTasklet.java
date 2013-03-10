@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 the original author or authors.
+ * Copyright 2011-2013 the original author or authors.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  */
 package org.springframework.data.hadoop.mapreduce;
 
-import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.hadoop.mapred.Task;
@@ -35,6 +34,7 @@ import org.springframework.batch.repeat.RepeatStatus;
  * Can be configured to not wait for the job to finish - by default the tasklet waits for the job submitted to finish.
  * 
  * @author Costin Leau
+ * @author Thomas Risberg
  */
 public class JobTasklet extends JobExecutor implements Tasklet {
 
@@ -112,8 +112,12 @@ public class JobTasklet extends JobExecutor implements Tasklet {
 		Counters counters = null;
 		try {
 			counters = job.getCounters();
-		} catch (IOException ex) {
-			// ignore - we just can't get stats
+		} catch (Exception ex) {
+			if (ex.getClass().isAssignableFrom(RuntimeException.class)) {
+				throw (RuntimeException)ex;
+			} else {
+				// ignore - we just can't get stats
+			}
 		}
 		if (counters == null) {
 			return;

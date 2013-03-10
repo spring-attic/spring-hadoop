@@ -46,6 +46,7 @@ switch (hadoopDistro) {
     dependencies {
         optional("org.apache.hadoop:hadoop-streaming:$hadoopVersion") 
         optional("org.apache.hadoop:hadoop-tools:$hadoopVersion")
+        testCompile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
     }
     
     hbaseVersion = cdh3HbaseVersion
@@ -67,6 +68,7 @@ switch (hadoopDistro) {
         optional("org.apache.hadoop:hadoop-tools:$cdh4MR1Version")
         optional("org.apache.hadoop:hadoop-common:$cdh4Version")
         optional("org.apache.hadoop:hadoop-hdfs:$cdh4Version")
+        testCompile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
     }
 
     hbaseVersion = cdh4HbaseVersion
@@ -76,6 +78,30 @@ switch (hadoopDistro) {
 
   break;    
 
+  // Hadoop 2.0 Alpha
+  case "hadoop20":
+    hadoopVersion = hd20Version
+    println "Using Apache Hadoop 2.0 - [$hadoopVersion]"
+
+    hadoop = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
+              "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
+              "org.apache.hadoop:hadoop-mapreduce:$hadoopVersion",
+              "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
+              "org.apache.hadoop:hadoop-streaming:$hadoopVersion",
+              "org.apache.hadoop:hadoop-distcp:$hadoopVersion"]
+
+    dependencies {
+        testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
+        testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
+    }
+
+    hbaseVersion = hd20HbaseVersion
+    hiveVersion = hd20HiveVersion
+    pigVersion = hd20PigVersion
+    thriftVersion = hd20ThriftVersion
+
+  break;
+
   // Hadoop 1.1.x
   case "hadoop11":
     hadoopVersion = hadoop11Version
@@ -84,6 +110,11 @@ switch (hadoopDistro) {
     
     hadoop = ["org.apache.hadoop:hadoop-streaming:$hadoopVersion",
               "org.apache.hadoop:hadoop-tools:$hadoopVersion"]
+
+    dependencies {
+        testCompile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
+    }
+
   break;
 
   default:
@@ -91,6 +122,11 @@ switch (hadoopDistro) {
     hadoopVersion = hadoop10Version
     hadoop = ["org.apache.hadoop:hadoop-streaming:$hadoopVersion",
               "org.apache.hadoop:hadoop-tools:$hadoopVersion"]
+
+    dependencies {
+        testCompile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
+    }
+
 }
 // Common dependencies
 dependencies {
@@ -155,7 +191,6 @@ dependencies {
     testCompile "org.mockito:mockito-core:$mockitoVersion"
     testCompile "org.springframework:spring-test:$springVersion"
     testCompile("javax.annotation:jsr250-api:1.0")
-    testCompile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
     testCompile "org.springframework.integration:spring-integration-stream:$springIntVersion"
     testCompile "org.springframework.integration:spring-integration-file:$springIntVersion"
 
@@ -184,6 +219,7 @@ ext.skipPig = true
 ext.skipHive = true
 ext.skipHBase = true
 ext.skipWebHdfs = true
+ext.skipCascading = true
 
 task enablePigTests {
     description = "Enable Pig tests"
@@ -218,8 +254,16 @@ task enableWebHdfsTests {
     }
 }
 
+task enableCascadingTests {
+    description = "Enable Cascading tests"
+    group = "Verification"
+    doLast() {
+        project.ext.skipCascading = false
+    }
+}
+
 task enableAllTests() {
-    description = "Enable all (incl. Pig, Hive, HBase, WebHdfs) tests"
+    description = "Enable all (incl. Pig, Hive, HBase, WebHdfs, Cascading) tests"
     group = "Verification"
     doFirst() {
       println "Enable all tests"
@@ -227,6 +271,7 @@ task enableAllTests() {
       project.ext.skipHBase = false
       project.ext.skipHive = false
       project.ext.skipWebHdfs = false
+      project.ext.skipCascading = false
     }
 }
 
@@ -243,7 +288,7 @@ test {
     }
 
     doFirst() {
-        ext.msg = ""
+        ext.msg = " "
         
         if (skipPig) {
             ext.msg += "Pig "
@@ -260,8 +305,13 @@ test {
         }
 
         if (skipWebHdfs) {
-            ext.msg += "WebHdfs"
+            ext.msg += "WebHdfs "
             excludes.add("**/WebHdfs*")
+        }
+
+        if (skipCascading) {
+            ext.msg += "Cascading "
+            excludes.add("**/cascading/**")
         }
         
         if (!msg.isEmpty())
@@ -289,13 +339,13 @@ test {
 
 task downloadGutenbergBooks {
    ant.get(src: 'http://www.gutenberg.lib.md.us/1/0/100/100.txt', 
-           dest: 'src/test/resources/input/gutenberg',verbose:true)
+           dest: 'src/test/resources/input/gutenberg',skipexisting:true)
    ant.get(src: 'http://www.gutenberg.lib.md.us/1/3/135/135.txt', 
-           dest: 'src/test/resources/input/gutenberg',verbose:true)
+           dest: 'src/test/resources/input/gutenberg',skipexisting:true)
    ant.get(src: 'http://www.gutenberg.lib.md.us/1/3/9/1399/1399.txt', 
-           dest: 'src/test/resources/input/gutenberg',verbose:true)
+           dest: 'src/test/resources/input/gutenberg',skipexisting:true)
    ant.get(src: 'http://www.gutenberg.lib.md.us/2/6/0/2600/2600.txt', 
-           dest: 'src/test/resources/input/gutenberg',verbose:true)
+           dest: 'src/test/resources/input/gutenberg',skipexisting:true)
 }
 
 javadoc {

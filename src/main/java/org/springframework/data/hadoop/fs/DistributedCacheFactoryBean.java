@@ -16,6 +16,7 @@
 package org.springframework.data.hadoop.fs;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,14 +30,17 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.data.hadoop.fs.DistributedCacheFactoryBean.CacheEntry.EntryType;
+import org.springframework.data.hadoop.util.VersionUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
  * Factory for easy declarative configuration of a {@link DistributedCache}.
  * 
  * @author Costin Leau
+ * @author Thomas Risberg
  */
 public class DistributedCacheFactoryBean implements InitializingBean, FactoryBean<DistributedCache> {
 
@@ -156,10 +160,24 @@ public class DistributedCacheFactoryBean implements InitializingBean, FactoryBea
 						case LOCAL:
 
 							if (isArchive) {
-								DistributedCache.addLocalArchives(conf, path);
+								if (VersionUtils.isHadoop2X()) {
+									// TODO - Need to figure out how to add local archive
+								} else {
+									Method addLocalArchives =
+											ReflectionUtils.findMethod(DistributedCache.class, "addLocalArchives",
+													Configuration.class, String.class);
+									addLocalArchives.invoke(null, conf, path);
+								}
 							}
 							else {
-								DistributedCache.addLocalFiles(conf, path);
+								if (VersionUtils.isHadoop2X()) {
+									// TODO - Need to figure out how to add local files
+								} else {
+									Method addLocalFiles =
+											ReflectionUtils.findMethod(DistributedCache.class, "addLocalFiles",
+													Configuration.class, String.class);
+									addLocalFiles.invoke(null, conf, path);
+								}
 							}
 
 							break;

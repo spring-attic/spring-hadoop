@@ -27,8 +27,8 @@ import java.util.List;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.ipc.RemoteException;
 import org.apache.hadoop.security.UserGroupInformation;
-import org.apache.hadoop.tools.DistCp.DuplicationException;
 import org.springframework.data.hadoop.configuration.ConfigurationUtils;
+import org.springframework.data.hadoop.util.VersionUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
@@ -42,6 +42,7 @@ import org.springframework.util.StringUtils;
  * through {@link #copy(String...)} or specify individual arguments through the rest of the methods. 
  * 
  * @author Costin Leau
+ * @author Thomas Risberg
  */
 public class DistCp {
 
@@ -288,8 +289,13 @@ public class DistCp {
 
 			if (throwable instanceof IOException) {
 				IOException ioe = ((IOException) throwable);
-				if (ioe instanceof DuplicationException) {
-					throw new IllegalStateException("Duplicated files found...", ioe);
+				if (!VersionUtils.isHadoop2X()) {
+					try {
+						Class<?> duplicationException = Class.forName("org.apache.hadoop.tools.DistCp.DuplicationException");
+						if (duplicationException.isAssignableFrom(ioe.getClass())) {
+							throw new IllegalStateException("Duplicated files found...", ioe);
+						}
+					} catch (ClassNotFoundException e) {}
 				}
 				if (ioe instanceof RemoteException) {
 					throw new IllegalStateException("Cannot distCopy", ((RemoteException) ioe).unwrapRemoteException());
