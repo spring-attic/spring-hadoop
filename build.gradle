@@ -13,6 +13,7 @@ group = 'org.springframework.data'
 
 repositories {
   maven { url "http://repo.springsource.org/libs-snapshot" }
+  maven { url 'http://localhost:8081/archiva/repository/internal' }
 }
 
 apply plugin: "java"
@@ -77,6 +78,33 @@ switch (hadoopDistro) {
     thriftVersion = cdh4ThriftVersion
 
   break;    
+
+  // Pivotal HD 2.0
+  case "pihd2":
+    hadoopVersion = pihd2Version
+    println "Using Pivotal HD 2.0 - [$hadoopVersion]"
+
+    hbaseVersion = pihd2HbaseVersion
+    hiveVersion = pihd2HiveVersion
+    pigVersion = pihd2PigVersion
+    thriftVersion = pihd2ThriftVersion
+
+    hadoop = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
+              "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
+              "org.apache.hadoop:hadoop-mapreduce:$hadoopVersion",
+              "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
+              "org.apache.hadoop:hadoop-streaming:$hadoopVersion",
+              "org.apache.hadoop:hadoop-distcp:$hadoopVersion"]
+
+    dependencies {
+        compile "org.apache.hive:hive-common:$hiveVersion"
+        compile "org.apache.hive:hive-metastore:$hiveVersion"
+        compile "org.apache.hive:hive-exec:$hiveVersion"
+        testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
+        testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
+    }
+
+  break;
 
   // Hadoop 2.0 Alpha
   case "hadoop20":
