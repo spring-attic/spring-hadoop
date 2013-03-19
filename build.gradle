@@ -91,7 +91,6 @@ switch (hadoopDistro) {
 
     hadoop = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
               "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
-              "org.apache.hadoop:hadoop-mapreduce:$hadoopVersion",
               "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
               "org.apache.hadoop:hadoop-streaming:$hadoopVersion",
               "org.apache.hadoop:hadoop-distcp:$hadoopVersion"]
@@ -113,7 +112,6 @@ switch (hadoopDistro) {
 
     hadoop = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
               "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
-              "org.apache.hadoop:hadoop-mapreduce:$hadoopVersion",
               "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
               "org.apache.hadoop:hadoop-streaming:$hadoopVersion",
               "org.apache.hadoop:hadoop-distcp:$hadoopVersion"]
