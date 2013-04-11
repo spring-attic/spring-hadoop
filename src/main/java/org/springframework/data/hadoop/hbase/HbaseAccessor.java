@@ -31,8 +31,8 @@ import org.springframework.util.Assert;
  */
 public abstract class HbaseAccessor implements InitializingBean {
 
-	private String encoding;
-	private Charset charset = HbaseUtils.getCharset(encoding);
+	protected String encoding;
+	protected Charset charset = HbaseUtils.getCharset(encoding);
 
 	private HTableInterfaceFactory tableFactory;
 	private Configuration configuration;

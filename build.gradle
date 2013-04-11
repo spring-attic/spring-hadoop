@@ -12,8 +12,10 @@ description = 'Spring for Apache Hadoop'
 group = 'org.springframework.data'
 
 repositories {
+/*
   maven { url "http://repo.springsource.org/libs-snapshot" }
-  maven { url 'http://localhost:8081/archiva/repository/internal' }
+*/
+  maven { url 'http://nexus.kohls.com/content/groups/public' }
 }
 
 apply plugin: "java"

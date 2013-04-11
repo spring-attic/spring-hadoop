@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:hdp="http://www.springframework.org/schema/hadoop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <import resource="../hadoop-ctx.xml"/>
+
+    <hdp:hbase-configuration zk-quorum="${hbase.host}" zk-port="${hbase.port}">
+        head=bucket
+    </hdp:hbase-configuration>
+
+    <util:list id="addressList" value-type="java.lang.String">
+        <value>${hbase.rest.url}</value>
+    </util:list>
+
+    <bean id="hbaseRestProtocol" class="org.springframework.data.hadoop.hbase.HBaseRestProtocol"
+          destroy-method="shutdown">
+        <constructor-arg name="addresses" ref="addressList"/>
+    </bean>
+    <bean id="template" class="org.springframework.data.hadoop.hbase.HbaseTemplate">
+        <property name="protocol" ref="hbaseRestProtocol"/>
+    </bean>
+
+    <context:property-placeholder location="test.properties"/>
+</beans>
