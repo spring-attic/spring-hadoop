@@ -1,0 +1,58 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:hdp="http://www.springframework.org/schema/hadoop"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+      	http://www.springframework.org/schema/batch	http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
+      	http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
+
+	<import resource="../batch-common.xml"/>
+	<import resource="../hadoop-ctx.xml"/>
+	
+	<job id="mainJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="import" next="do">
+			<tasklet>
+				<chunk reader="itemReader" writer="hdfsItemWriter" commit-interval="100"/>
+			</tasklet>
+		</step>
+		<step id="do" next="clean">
+			<tasklet ref="hadoop-tasklet"/>
+		</step>
+		<step id="clean">
+			<hdp:script-tasklet id="script-tasklet">
+				<hdp:script language="javascript">
+if (fsh.test("/test/word/")) fsh.rmr("/test/word/")
+				</hdp:script>
+			</hdp:script-tasklet>
+		</step>
+	</job>
+	
+	<bean id="itemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
+		<property name="resource" value="/data/babynames-short.txt"/>
+		<property name="lineMapper">
+			<bean class="org.springframework.batch.item.file.mapping.PassThroughLineMapper"/>
+		</property>
+	</bean>
+	
+	<bean id="hdfsItemWriter" class="org.springframework.data.hadoop.fs.HdfsItemWriter">
+		<constructor-arg>
+			<bean class="org.springframework.data.hadoop.fs.FileSystemFactoryBean" p:configuration-ref="hadoopConfiguration"/>
+		</constructor-arg>
+		<constructor-arg>
+			<bean class="org.springframework.core.serializer.DefaultSerializer"/>
+		</constructor-arg>
+		<constructor-arg value="/test/word/input/out.txt"/>
+	</bean>
+
+	<bean id="hadoop-tasklet" class="org.springframework.data.hadoop.mapreduce.JobTasklet" p:job-ref="mr-job" p:wait-for-completion="true"/>
+	
+	<bean id="mr-job" class="org.springframework.data.hadoop.mapreduce.JobFactoryBean"
+		p:configuration-ref="hadoopConfiguration"
+		p:input-path="/test/word/input/"
+		p:output-path="/test/word/output/"
+		p:mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
+		p:reducer="org.apache.hadoop.examples.WordCount.IntSumReducer"
+		p:jar="mini-hadoop-examples.jar"
+	/>
+</beans>
