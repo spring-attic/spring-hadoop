@@ -16,7 +16,7 @@
   project and get going quickly using Hadoop.</para>
 
   <para>As the complexity of your Hadoop application increases, you may want
-  to use Spring Batch to regin in the complexity of developing a large Hadoop
+  to use Spring Batch to regain on the complexity of developing a large Hadoop
   application. Spring Batch provides an extension to the Spring programming
   model to support common batch job scenarios characterized by the processing
   of large amounts of data from flat files, databases and messaging systems.
@@ -37,15 +37,15 @@
   are of particular interest to Hadoop developers, as they directly support
   common Hadoop use-cases such as polling a directory or FTP folder for the
   presence of a file or group of files. Then once the files are present, a
-  message is sent internal to the application to do additional processing.
+  message is sent internally to the application to do additional processing.
   This additional processing can be calling a Hadoop MapReduce job directly or
   starting a more complex Spring Batch based workflow. Similarly, a step in a
   Spring Batch workflow can invoke functionality in Spring Integration, for
   example to send a message though an email adapter.</para>
 
-  <para>Not matter if you use the Spring Batch project with the Spring
+  <para>No matter if you use the Spring Batch project with the Spring
   Framework by itself or with additional extentions such as Spring Batch and
-  Spring Integration that focus on a particular domain, you will you benefit
+  Spring Integration that focus on a particular domain, you will benefit
   from the core values that Spring projects bring to the table, namely
   enabling modularity, reuse and extensive support for unit and integration
   testing.</para>
@@ -58,7 +58,7 @@
     available in both the commercial and open source spaces such as Quartz,
     Tivoli, Control-M, etc. It is intended to work in conjunction with a
     scheduler, not replace a scheduler. As a lightweight solution, you can use
-    Spring's built in scheduling support that will give you cron like and
+    Spring's built in scheduling support that will give you cron-like and
     other basic scheduling trigger functionality. See the <link
     xlink:href="http://static.springsource.org/spring-batch/faq.html#schedulers">Task
     Execution and Scheduling</link> documention for more info. A middle
@@ -75,9 +75,9 @@
   <section>
     <title>Batch Job Listeners</title>
 
-    <para>Spring Batch let's you attached listeners at the job and step levels
+    <para>Spring Batch lets you attach listeners at the job and step levels
     to perform additional processing. For example, at the end of a job you can
-    perform some notification or perhaps even start another Spring Batch Jobs.
+    perform some notification or perhaps even start another Spring Batch job.
     As a brief example, implement the interface <link
     xlink:href="http://static.springsource.org/spring-batch/apidocs/org/springframework/batch/core/JobExecutionListener.html">JobExecutionListener</link>
     and configure it into the Spring Batch job as shown below.</para>

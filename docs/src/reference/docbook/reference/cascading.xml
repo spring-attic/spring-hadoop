@@ -10,11 +10,10 @@
 	<para>As Cascading is aimed at code configuration, typically one would configure the library programatically. Such code can easily be integrated into Spring in various ways - through 
 	<literal><ulink url="http://static.springsource.org/spring/docs/3.2.x/spring-framework-reference/html/beans.html#beans-factory-class-static-factory-method">factory methods</ulink></literal> or 
 	<literal>@Configuration</literal> and <literal>@Bean</literal> (see <ulink url="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/beans.html#beans-java">this chapter
-	</ulink> for more information). In short one use Java code (or any JVM language for that matter) to create beans.</para>
+	</ulink> for more information). In short one uses Java code (or any JVM language for that matter) to create beans.</para>
 	
 	<para>For example, looking at the official Cascading sample (<ulink url="http://www.cascading.org/2012/07/09/cascading-for-the-impatient-part-2/">Cascading for the Impatient, Part2</ulink>)
-	one can simply call the Cascading setup method from within the Spring container (
-	<ulink url="http://github.com/Cascading/Impatient/blob/5c19c2d02fcf26b7c63ca6548a9239a9a764f302/part2/src/main/java/impatient/Main.java#L57">original</ulink> vs 
+	one can simply call the Cascading setup method from within the Spring container (<ulink url="http://github.com/Cascading/Impatient/blob/5c19c2d02fcf26b7c63ca6548a9239a9a764f302/part2/src/main/java/impatient/Main.java#L57">original</ulink> vs 
 	<ulink url="http://github.com/SpringSource/spring-hadoop-samples/blob/6b2365ae80c84b6b037e18e1fe8749e839fcf33f/original-samples/cascading/src/main/java/impatient/Main.java#L67">updated</ulink>):</para>
 	
 	<programlisting language="java"><![CDATA[public class Impatient {
@@ -49,7 +48,7 @@
     xmlns:p="http://www.springframework.org/schema/p"
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd
-        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd"
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
     
     <!-- factory-method approach called with two parameters available as property placeholders -->
     <bean id="flowDef" class="impatient.Main" factory-method="createFlowDef" c:_0="${in}" c:_1="${out}"/>
@@ -61,11 +60,11 @@
 	
 	<para>Note that no jar needs to be setup - the Cascading namespace (in particular <literal>cascading-flow</literal>, backed by <literal>HadoopFlowFactoryBean</literal>) tries to automatically setup the
 	resulting job classpath. By default, it will automatically add the Cascading library and its dependency to Hadoop <literal>DistributedCache</literal> so that when the job runs inside the Hadoop
-	cluster, the jars are properly found. When using custom jars (for example to add custom Cascading functions) that already include Cascading or when running against a cluster that is already provisioned, 
-	one can customize this behaviour through the <literal>add-cascading-jars</literal>, <literal>jar</literal> and <literal>jar-by-class</literal> attributes. 
-	For Cascading users, these settings are the equivalent of the <literal>AppProps.setApplicationJarClass()</literal>.</para>
+	cluster, the jars are properly found. When using custom jars (for example to add custom Cascading functions) or when running against a cluster that is already provisioned, one can customize this
+	behaviour through the <literal>jar-setup</literal>, <literal>jar</literal> and <literal>jar-by-class</literal>. For Cascading users, these settings are the equivalent of the 
+	<literal>AppProps.setApplicationJarClass()</literal>.</para>
 	
-	<para>Further more, one can break-down the configuration method in multiple pieces which is useful for reusing the components between multiple flows/cascades. This goes hand in hand with Spring
+	<para>Furthermore, one can break down the configuration method in multiple pieces which is useful for reusing the components between multiple flows/cascades. This goes hand in hand with Spring
 	<literal>@Configuration</literal> feature - see the example below that configures a Cascade pipes and taps as individual beans 
 	(see the original <ulink url="http://github.com/cwensel/cascading.samples/">example</ulink>):</para>
 	
@@ -143,13 +142,13 @@ public class CascadingAnalysisConfig {
 	
 	
 	<para>Whether XML or Java config is better is up to the user and is usually based on the type of the configuration required. Java config suits Cascading better but note that the <literal>FactoryBean</literal>s
-	above handle the life-cycle and some default configuration for both the <literal>Flow</literal> and <literal>Cascade</literal> object. Either way, whatever option is used, SHDP fully supports it.</para>
+	above handle the lifecycle and some default configuration for both the <literal>Flow</literal> and <literal>Cascade</literal> objects. Either way, whatever option is used, SHDP fully supports it.</para>
 	
 	<section id="cascading:tasklet">
 		<title>Using the Cascading tasklet</title>
 
 		<para>For Spring Batch environments, SHDP provides a dedicated tasklet (similar to <literal>CascadeRunner</literal> above) for executing <literal>Cascade</literal> or <literal>Flow</literal> 
-		instances, on demand, as part of a batch or workflow. The declaration is pretty straight forward:</para>
+		instances, on demand, as part of a batch or workflow. The declaration is pretty straightforward:</para>
 		
 		<programlisting language="xml"><![CDATA[<hdp:tasklet p:unit-of-work-ref="cascade" />]]></programlisting>
 	</section>
@@ -158,12 +157,12 @@ public class CascadingAnalysisConfig {
 		<title>Using Scalding</title>
 		
 		<para>There are quite a number of DSLs built on top of Cascading, most noteably <ulink url="https://github.com/nathanmarz/cascalog">Cascalog</ulink> (written in Clojure) and 
-		<ulink url="https://github.com/twitter/scalding">Scalding</ulink> (written in Scala). This documentation will cover Scalding however the same concepts can be applied across the board to the
+		<ulink url="https://github.com/twitter/scalding">Scalding</ulink> (written in Scala). This documentation will cover Scalding however the same concepts can be applied across the board to all
 		DSLs.</para>
 		
-		<para>As with the rest of the DSLs, Scalding offers a simplified, fluent syntax for creating units of code that built on top of Cascading. This in turn translate to Map Reduce jobs that get executed on Hadoop.
+		<para>As with the rest of the DSLs, Scalding offers a simplified, fluent syntax for creating units of code that build on top of Cascading. This in turn translates to Map Reduce jobs that get executed on Hadoop.
 		Once compiled, the DSL gets translated into actual JVM classes that get executed by Scalding through its own <literal>Tool</literal> instance (namely <classname>com.twitter.scalding.Tool</classname>).
-		One has the option or either deploy the Scalding jobs directly (by invoking the aforementioned <literal>Tool</literal>) or use Scalding's <literal>scald.rb</literal> script which does the same thing based
+		One has the option of either deploy the Scalding jobs directly (by invoking the aforementioned <literal>Tool</literal>) or use Scalding's <literal>scald.rb</literal> script which does the same thing based
 		on the various attributes passed to it. Both approaches can be used in SHDP, the former through the <link linkend="hadoop:tool-runner">Tool</link> support (described below) and the latter by invoking the 
 		<literal>scald.rb</literal> script directly through the <link linkend="scripting">scripting</link> feature.</para>
 		
@@ -185,7 +184,7 @@ public class CascadingAnalysisConfig {
 		
 		<sidebar>
 			<title>Why only local <literal>Tap</literal>?</title>
-			<para>Because Hadoop is designed a distributed file-system (HDFS) and splitable resources. Non-HDFS resources tend to not be cluster friendly: for example don't offer any notion of node locality, true chucking
+			<para>Because Hadoop is designed as a distributed file-system (HDFS) and splitable resources. Non-HDFS resources tend to not be cluster friendly: for example don't offer any notion of node locality, true chucking
 			or even scalability (as there are no copies, partial or not made). These being said, the team is pursuing certain approaches to see whether they are viable or not. Feedback is of course welcome.</para>
 		</sidebar>
 		
@@ -245,7 +244,7 @@ public class CascadingAnalysisConfig {
 	<constructor-arg><value>classpath:/data/*.txt</value></constructor-arg>
 </bean>]]></programlisting>
 
-		<para>The <literal>Tap</literal> above, reads all the text files in the classpath, under <literal>data</literal> folder, through Cascading <literal>TextLine</literal>. Simply wire that to a Cascading flow 
+		<para>The <literal>Tap</literal> above reads all the text files in the classpath, under <literal>data</literal> folder, through Cascading <literal>TextLine</literal>. Simply wire that to a Cascading flow 
 		(as described in the previous section) and you are good to go.</para>
 	</section>
 	

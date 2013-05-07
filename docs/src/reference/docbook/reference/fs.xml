@@ -14,7 +14,7 @@
  		<title>Configuring the file-system</title>
  	
  		<para>The Hadoop file-system, HDFS, can be accessed in various ways - this section will cover the most popular protocols for interacting with HDFS and their pros and cons. SHDP does not enforce any specific protocol
- 		to be used - in fact, as described in this section any <literal>FileSystem</literal> implementation can be used, allowing even other implementations then HDFS to be used.</para> 
+ 		to be used - in fact, as described in this section any <literal>FileSystem</literal> implementation can be used, allowing even other implementations than HDFS to be used.</para> 
  		
  		<para>The table below describes the common HDFS APIs in use:</para>
  		
@@ -70,22 +70,22 @@
  		   implementations are supported as well - Spring for Apache Hadoop has no dependency on the underlying system rather just on the public Hadoop API.</para>
  		</sidebar>
  		  
- 		<para><literal>hdfs://</literal> protocol should be familiar to most reader - most docs (and in fact the previous chapter as well) mention it. It works out of the box and it's fairly efficient however because it is
+ 		<para><literal>hdfs://</literal> protocol should be familiar to most readers - most docs (and in fact the previous chapter as well) mention it. It works out of the box and it's fairly efficient. However because it is
  		RPC based, it requires both the client and the Hadoop cluster to share the same version. Upgrading one without the other causes serialization errors meaning the client cannot interact with the cluster. As an alternative
  		one can use <literal>hftp://</literal> which is HTTP-based or its more secure brother <literal>hsftp://</literal> (based on SSL) which gives you a version independent protocol meaning you can use it to interact
- 		with clusters with an unknown or different version then that of the client. <literal>hftp</literal> is read only (write operations will fail right away) and it is typically used with <literal>disctp</literal> for
+ 		with clusters with an unknown or different version than that of the client. <literal>hftp</literal> is read only (write operations will fail right away) and it is typically used with <literal>disctp</literal> for
  		reading data. <literal>webhdfs://</literal> is one of the additions in Hadoop 1.0 and is a mixture between <literal>hdfs</literal> and <literal>hftp</literal> protocol - it provides a version-independent, read-write, 
- 		REST-based protocol which means that you can read and write to/from Hadoop clusters no matter their version. Further more, since <literal>webhdfs://</literal> is backed by a REST APIs, clients in other languages can
+ 		REST-based protocol which means that you can read and write to/from Hadoop clusters no matter their version. Furthermore, since <literal>webhdfs://</literal> is backed by a REST API, clients in other languages can
  		use it with minimal effort.</para>
  		
  		<note>
- 			<para>Not all file-system work out of the box. For example WebHDFS needs to be enabled first in the cluster (through <literal>dfs.webhdfs.enabled</literal> property) see this 
+ 			<para>Not all file systems work out of the box. For example WebHDFS needs to be enabled first in the cluster (through <literal>dfs.webhdfs.enabled</literal> property, see this 
  			<ulink url="http://hadoop.apache.org/common/docs/r1.0.0/webhdfs.html#Document+Conventions">document</ulink> for more information) while the secure <literal>hftp</literal>, <literal>hsftp</literal> 
  			requires the SSL configuration (such as certificates) to be specified. More about this (and how to use <literal>hftp/hsftp</literal> for proxying) in 
  			this <ulink url="http://hadoop.apache.org/hdfs/docs/r0.21.0/hdfsproxy.html">page</ulink>.</para> 
  		</note>
  		 		
- 		<para>Once the schema has been decided upon, one can specify it through the standard Hadoop <link linkend="hadoop:config">configuration</link>, either through the Hadoop configuration files and its properties:</para>
+ 		<para>Once the scheme has been decided upon, one can specify it through the standard Hadoop <link linkend="hadoop:config">configuration</link>, either through the Hadoop configuration files or its properties:</para>
  		
  		<programlisting language="xml"><![CDATA[<hdp:configuration>
   fs.default.name=webhdfs://localhost
@@ -93,12 +93,12 @@
 </hdp:configuration>]]></programlisting>
  		
  		<para>This instructs Hadoop (and automatically SHDP) what the default, implied file-system is. In SHDP, one can create additional file-systems (potentially to connect to other clusters) and specify a different 
- 		schema:</para>
+ 		scheme:</para>
  		
  		<programlisting language="xml"><![CDATA[<!-- manually creates the default SHDP file-system named 'hadoopFs' -->
 <hdp:file-system uri="webhdfs://localhost"/>
  
-<!-- create a different FileSystem instance --> 
+<!-- creates a different FileSystem instance --> 
 <hdp:file-system id="old-cluster" uri="hftp://old-cluster/"/>]]></programlisting>
  
  		<para>As with the rest of the components, the file systems can be injected where needed - such as file shell or inside scripts (see the next section).</para>
@@ -117,17 +117,17 @@
     	</sidebar>
     
     	<para>Since Hadoop is written in Java, accessing its APIs in a <emphasis>native</emphasis> way provides maximum control and flexibility over the interaction with Hadoop. This holds true for working with
-    	its files system; in fact all the other tools that one might use are built upon these. The main entry point is the <classname>org.apache.hadoop.fs.FileSystem</classname> abstract class which provides the
+    	its file systems; in fact all the other tools that one might use are built upon these. The main entry point is the <classname>org.apache.hadoop.fs.FileSystem</classname> abstract class which provides the
     	foundation of most (if not all) of the actual file system implementations out there. Whether one is using a local, remote or distributed store through the <classname>FileSystem</classname> API she
     	can query and manipulate the available resources or create new ones. To do so however, one needs to write Java code, compile the classes and configure them which is somewhat cumbersome especially when
-    	performing simple, straight-forward operations (like copy a file or delete a directory).</para>
+    	performing simple, straightforward operations (like copy a file or delete a directory).</para>
     	
     	<para>JVM scripting languages (such as <ulink url="http://groovy.codehaus.org/">Groovy</ulink>, <ulink url="http://jruby.org/">JRuby</ulink>, <ulink url="http://www.jython.org/">Jython</ulink> or 
     	<ulink url="http://www.mozilla.org/rhino/">Rhino</ulink> to name just a few) provide a nice solution to the Java language; they run on the JVM, can interact with the Java code with no or few
     	changes or restrictions and have a nicer, simpler, less <emphasis>ceremonial</emphasis> syntax; that is, there is no need to define a class or a method - simply write the code that you want to execute and you are done.
-    	SHDP combines the two, taking care of the configuration and the infrastructure so one can interact with the Hadoop environment from her language of choice</para>
+    	SHDP combines the two, taking care of the configuration and the infrastructure so one can interact with the Hadoop environment from her language of choice.</para>
     	
-    	<para>Let us take a look of a JavaScript example using Rhino (which is part of JDK 6 or higher, meaning one does not need any extra libraries):</para>
+    	<para>Let us take a look at a JavaScript example using Rhino (which is part of JDK 6 or higher, meaning one does not need any extra libraries):</para>
 
 		<programlisting language="xml"><![CDATA[<beans xmlns="http://www.springframework.org/schema/beans" ...>		
   <hdp:configuration .../>
@@ -146,17 +146,16 @@
 	 
 </beans>]]></programlisting>
 
-		<para>The <literal>script</literal> element, part of the SHDP namespace, builds on top of the scripting support in Spring permitting script declarations to be evaluated and declared as normal bean definitions. Further
-		more it automatically exposes Hadoop-specific objects, based on the existing configuration, to the script such as the <literal>FileSystem</literal> (more on that in the next section). As one can see, the script
-		is fairly obvious: it generates a random name (using the <classname>UUID</classname> class from <literal>java.util</literal> package) and the copies a local file into HDFS under the random name. The last line returns
+		<para>The <literal>script</literal> element, part of the SHDP namespace, builds on top of the scripting support in Spring permitting script declarations to be evaluated and declared as normal bean definitions. Furthermore it automatically exposes Hadoop-specific objects, based on the existing configuration, to the script such as the <literal>FileSystem</literal> (more on that in the next section). As one can see, the script
+		is fairly obvious: it generates a random name (using the <classname>UUID</classname> class from <literal>java.util</literal> package) and then copies a local file into HDFS under the random name. The last line returns
 		the length of the copied file which becomes the value of the declaring bean (in this case <literal>inlined-js</literal>) - note that this might vary based on the scripting engine used.</para>
 		
 		<note>The attentive reader might have noticed that the arguments passed to the <literal>FileSystem</literal> object are not of type <literal>Path</literal> but rather <literal>String</literal>. To avoid
 		the creation of <literal>Path</literal> object, SHDP uses a wrapper class (<literal>SimplerFileSystem</literal>) which automatically does the conversion so you don't have to. For more information see the 
 		<link linkend="scripting:vars">implicit variables</link> section.</note>
-		<para>Note that for inlined scripts, one can use Spring's property placeholder configurer to automatically expand variables at runtime. Using one of the examples before:</para>
+		<para>Note that for inlined scripts, one can use Spring's property placeholder configurer to automatically expand variables at runtime. Using one of the examples seen before:</para>
 		
-		<programlisting language="xml"><![CDATA[<beans ...>
+		<programlisting language="xml"><![CDATA[<beans ... >
   <context:property-placeholder location="classpath:hadoop.properties" />
    
   <hdp:script language="javascript" run-at-startup="true">
@@ -178,8 +177,8 @@
 		<section id="scripting:api:scripts">
 			<title>Using scripts</title>
 			
-			<para>Inlined scripting is quite handy for doing simple operations and couple with the property expansion is quite a powerful tool that can handle a variety of use cases. However when more logic is required
-or the script is affected by XML formatting, encoding or syntax restrictions (such as Jython/Python for which white-spaces are important) one should consider externalization. That is rather then declaring the script
+			<para>Inlined scripting is quite handy for doing simple operations and coupled with the property expansion is quite a powerful tool that can handle a variety of use cases. However when more logic is required
+or the script is affected by XML formatting, encoding or syntax restrictions (such as Jython/Python for which white-spaces are important) one should consider externalization. That is, rather than declaring the script
 directly inside the XML, one can declare it in its own file. And speaking of Python, consider the variation of the previous example:</para>
 
 			<programlisting language="xml"><![CDATA[<hdp:script location="org/company/basic-script.py" run-at-startup="true"/>]]></programlisting>
@@ -268,8 +267,8 @@ print Path(name).makeQualified(fs)]]></programlisting>
           	</tgroup>  
 		</table>
 		
-		<note>If no Hadoop <literal>Configuration</literal> can be detected (either by name <literal>hadoopConfiguration</literal> or type), several log warnings will be made and none of the Hadoop-based variables namely 
-		<literal>cfg</literal>, <literal>distcp</literal>, <literal>fs</literal>, <literal>fsh</literal>, <literal>distcp</literal> or <literal>hdfsRL</literal> bound.
+		<note>If no Hadoop <literal>Configuration</literal> can be detected (either by name <literal>hadoopConfiguration</literal> or by type), several log warnings will be made and none of the Hadoop-based variables (namely 
+		<literal>cfg</literal>, <literal>distcp</literal>, <literal>fs</literal>, <literal>fsh</literal>, <literal>distcp</literal> or <literal>hdfsRL</literal>) will be bound.
 		</note>
 		<para>As mentioned in the <emphasis>Description</emphasis> column, the variables are first looked (either by name or by type) in the application context and, in case they are missing, created on the spot based on
 		the existing configuration. Note that it is possible to override or add new variables to the scripts through the <literal>property</literal> sub-element that can set values or references to other beans:</para>
@@ -285,7 +284,7 @@ print Path(name).makeQualified(fs)]]></programlisting>
 		<para>The <literal>script</literal> namespace provides various options to adjust its behaviour depending on the script content. By default the script is simply declared - that is, no execution occurs. 
 		One however can change that so that the script gets evaluated at startup (as all the examples in this section do) through the <literal>run-at-startup</literal> flag 
 		(which is by default <literal>false</literal>) or when invoked manually
-		(through the <interfacename>Callable</interfacename>)
+		(through the <interfacename>Callable</interfacename>).
 		Similarily, by default the script gets evaluated on each run. However for scripts that are expensive and return the same
 		value every time one has various <emphasis>caching</emphasis> options, so the evaluation occurs only when needed through the <literal>evaluate</literal> attribute:</para>
 		
@@ -316,7 +315,7 @@ print Path(name).makeQualified(fs)]]></programlisting>
           	      <entry><literal>evaluate</literal></entry>
           	      <entry><literal>ALWAYS</literal>(default), <literal>IF_MODIFIED</literal>, <literal>ONCE</literal></entry>
           	      <entry>Wether to actually evaluate the script when invoked or used a previous value. <literal>ALWAYS</literal> means evaluate every time, <literal>IF_MODIFIED</literal> evaluate if the backing
-          	      resource (such as a file) has been modified in the meantime and <literal>ONCE</literal> only one.</entry>
+          	      resource (such as a file) has been modified in the meantime and <literal>ONCE</literal> only once.</entry>
           	    </row>
           	  </tbody>
           	</tgroup>  
@@ -353,11 +352,11 @@ print Path(name).makeQualified(fs)]]></programlisting>
     	<title>File System Shell (FsShell)</title>
     	
     	<para>A handy utility provided by the Hadoop distribution is the file system <ulink url="http://hadoop.apache.org/common/docs/stable/file_system_shell.html">shell</ulink> which allows UNIX-like commands to be
-    	executed against HDFS. One can check for the existance of files, delete, move, copy directories or files or setting up permissions. However the utility is only available from the command-line which makes it hard
-    	to use it from/inside a Java application. To address this problem, SHDP provides a lightweight, fully embeddable shell, called <literal>FsShell</literal> which mimics most of the commands available from the command line:
-    	rather then dealing with the <literal>System.in</literal> or <literal>System.out</literal>, one deals with objects.</para>
+    	executed against HDFS. One can check for the existence of files, delete, move, copy directories or files or set up permissions. However the utility is only available from the command-line which makes it hard
+    	to use from/inside a Java application. To address this problem, SHDP provides a lightweight, fully embeddable shell, called <literal>FsShell</literal> which mimics most of the commands available from the command line:
+    	rather than dealing with <literal>System.in</literal> or <literal>System.out</literal>, one deals with objects.</para>
     	
-    	<para>Let us take a look of using <literal>FsShell</literal> by building on the previous scripting examples:</para>
+    	<para>Let us take a look at using <literal>FsShell</literal> by building on the previous scripting examples:</para>
     	
     	<programlisting language="xml"><![CDATA[<hdp:script location="org/company/basic-script.groovy" run-at-startup="true"/>]]></programlisting>
     	
@@ -365,7 +364,7 @@ print Path(name).makeQualified(fs)]]></programlisting>
 scriptName = "src/test/resources/test.properties"
 fs.copyFromLocalFile(scriptName, name)
 
-// use the shell (made available under variable ]]><emphasis role="strong">fsh</emphasis> 
+// use the shell made available under variable ]]><emphasis role="strong">fsh</emphasis>
 dir = "script-dir"
 if (!fsh.test(dir)) {
    fsh.mkdir(dir); fsh.cp(name, dir); fsh.chmodr(700, dir)
@@ -375,10 +374,10 @@ println fsh.ls(dir).toString()
 fsh.rmr(dir)
 </programlisting>
 
-		<para>As mentioned in the previous section, a <literal>FsShell</literal> instance is automatically created and for configured for scripts, under the name <emphasis>fsh</emphasis>. 
+		<para>As mentioned in the previous section, a <literal>FsShell</literal> instance is automatically created and configured for scripts, under the name <emphasis>fsh</emphasis>. 
 		Notice how the entire block relies on the usual	commands: <literal>test</literal>, <literal>mkdir</literal>, <literal>cp</literal> and so on. 
 		Their semantics are exactly the same as in the command-line version however one has access to a native Java API that returns
-		actual objects (rather then <literal>String</literal>s) making it easy to use them programmatically whether in Java or another language. Further more, the class offers enhanced methods (such as <literal>chmodr</literal>
+		actual objects (rather than <literal>String</literal>s) making it easy to use them programmatically whether in Java or another language. Furthermore, the class offers enhanced methods (such as <literal>chmodr</literal>
 		which stands for <emphasis>recursive</emphasis> <literal>chmod</literal>) and multiple overloaded methods taking advantage of <ulink url="http://docs.oracle.com/javase/1.5.0/docs/guide/language/varargs.html">varargs</ulink> 
 		so that multiple parameters can be specified. Consult the <ulink url="http://static.springsource.org/spring-hadoop/docs/current/api/index.html?org/springframework/data/hadoop/fs/FsShell.html">API</ulink> for more information.
 		</para>
@@ -406,10 +405,10 @@ print $fsh.ls(dir).to_s]]></programlisting>
 		<programlisting><![CDATA[drwx------   - user     supergroup          0 2012-01-26 14:08 /user/user/script-dir
 -rw-r--r--   3 user     supergroup        344 2012-01-26 14:08 /user/user/script-dir/520cf2f6-a0b6-427e-a232-2d5426c2bc4e]]></programlisting>
 
-		<para>As you can see, not only you can reuse the existing tools and commands with Hadoop inside SHDP, but you can also code against them in various scripting languages. And as you might have noticed, there is no
+		<para>As you can see, not only can you reuse the existing tools and commands with Hadoop inside SHDP, but you can also code against them in various scripting languages. And as you might have noticed, there is no
 		special configuration required - this is automatically inferred from the enclosing application context.</para>
 		
-		<note>The careful reader might have noticed that besides the syntax, there are some minor differences in how the various langauges interact with the java objects. For example the automatic <literal>toString</literal>
+		<note>The careful reader might have noticed that besides the syntax, there are some minor differences in how the various languages interact with the java objects. For example the automatic <literal>toString</literal>
 		call called in Java for doing automatic <literal>String</literal> conversion is not necessarily supported (hence the <literal>to_s</literal> in Ruby or <literal>str</literal> in Python). This is to be expected
 		as each language has its own semantics - for the most part these are easy to pick up but do pay attention to details.</note>
 
@@ -418,7 +417,7 @@ print $fsh.ls(dir).to_s]]></programlisting>
 			<title>DistCp API</title>
 			
 			<para>Similar to the <literal>FsShell</literal>, SHDP provides a lightweight, fully embeddable <ulink url="http://hadoop.apache.org/common/docs/stable/distcp.html"><literal>DistCp</literal></ulink> version 
-			that builds on top of the <literal>distcp</literal> from the Hadoop distro.	The semantics are configuration options are the same however, one can use it from within an Java application without having to use 
+			that builds on top of the <literal>distcp</literal> from the Hadoop distro.	The semantics and configuration options are the same however, one can use it from within a Java application without having to use 
 			the command-line. See the <ulink url="http://static.springsource.org/spring-hadoop/docs/current/api/index.html?org/springframework/data/hadoop/fs/DistCp.html">API</ulink> for more information:</para>
 			
 			<programlisting language="xml"><![CDATA[<hdp:script language="groovy">distcp.copy("${distcp.src}", "${distcp.dst}")</hdp:script>]]></programlisting>
