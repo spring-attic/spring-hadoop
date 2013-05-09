@@ -51,9 +51,8 @@ dependencies {
 }
 ~~~~~
 
-The latest milestone is _1.0.0.RC2_
+The available releases can be seen in the [SpringSource Repository](http://repo.springsource.org/simple/libs-milestone/org/springframework/data/spring-data-hadoop/)
 
-The latest nightly is _1.0.0.BUILD-SNAPSHOT_
 
 # Building
 
@@ -65,20 +64,20 @@ from the project root folder. This will compile the sources, run the tests and c
 
 ## Supported distros
 
-By default Spring for Apache Hadoop compiles against Apache Hadoop 1.0.x. Apache Hadoop 1.1.x (hadoop11) and Cloudera CDH3 (cdh3) and CDH4 (cdh4) are also supported; to compile against them pass the `-Pdistro=<label>` project property, like so:
+By default Spring for Apache Hadoop compiles against Apache Hadoop 1.0.x. Apache Hadoop 1.1.x (hadoop11), Apache Hadoop 2.0.x Alpha (hadoop20), Cloudera CDH3 (cdh3), Cloudera CDH4 (cdh4) and Pivotal HD 1.0 (phd1) are also supported; to compile against them pass the `-Pdistro=<label>` project property, like so:
 
     gradlew -Pdistro=hadoop11 build
     
 Note that the chosen distro is displayed on the screen:
 
-    Using Apache Hadoop 1.1.x [1.1.0]
+    Using Apache Hadoop 1.1.x [1.1.2]
 
 In this case, the specified Hadoop distribution (above Apache Hadoop 1.1.x) is used to create the project binaries. This option is useful when testing against Hadoop clusters incompatible with the Hadoop stable line.
 
 # Testing
 
-For its testing, Spring for Apache Hadoop expects a pseudo-distributed/local Hadoop instalation available on the `localhost` at the default ports (`9000` and `9001`). The local Hadoop setup allows
-the project classpath to be automatically used by the Hadoop job tracker. These settings can be customized in two ways:
+For its testing, Spring for Apache Hadoop expects a pseudo-distributed/local Hadoop instalation available on `localhost` configured with a port of `8020` for HDFS. The `local` Hadoop setup allows the project classpath to be automatically used by the Hadoop job tracker. These settings can be customized in two ways:
+
 * Build properties
 
 From the command-line, use `hd.fs` for the file-system (to avoid confusion, specify the protocol such as 'hdfs://', 's3://', etc - if none is specified, `hdfs://` will be used), `hd.jt` for the jobtracker and `hd.hive` for the Hive host/port information, to override the defaults. For example to run against HDFS at `dumbo:8020` one would use:
@@ -89,8 +88,8 @@ From the command-line, use `hd.fs` for the file-system (to avoid confusion, spec
 
 Through the `test.properties` file under `src/test/resources` folder (further tweaks can be applied through `hadoop-ctx.xml` file under `src/test/resources/org/springframework/data/hadoop`).
 
-## Enabling Hbase/Hive/Pig/WebHdfs Tests
-Note that by default, only the vanilla Hadoop tests are running - you can enable additional tests (such as Hive or Pig) by adding the tasks `enableHBaseTests`, `enableHiveTests`, `enablePigTests` and `webHdfsTests` (or `enableAllTests` in short). Use `test.properties` file for customizing the default location for these services as well.
+## Enabling Hbase/Hive/Pig/WebHdfs/Cascading Tests
+Note that by default, only the vanilla Hadoop tests are running - you can enable additional tests (such as Hive or Pig) by adding the tasks `enableHBaseTests`, `enableHiveTests`, `enablePigTests`, `enableWebHdfsTests` or `enableCascadingTests` (or `enableAllTests` in short). Use `test.properties` file for customizing the default location for these services as well.
 
 ## Disabling test execution
 You can disable all tests by skipping the `test` task:
@@ -110,5 +109,6 @@ Github is for social coding: if you want to write code, we encourage contributio
 
 # Staying in touch
 
-Follow the project team ([Costin](http://twitter.com/costinl), [Mark](http://twitter.com/markpollack)) on Twitter. In-depth articles can be
-found at the SpringSource [team blog](http://blog.springsource.org), and releases are announced via our [news feed](http://www.springsource.org/news-events).
+Follow the project team ([Costin](http://twitter.com/costinl), [Mark](http://twitter.com/markpollack), [Thomas](http://twitter.com/trisberg)) on Twitter. 
+
+In-depth articles can be found at the SpringSource [team blog](http://blog.springsource.org), and releases are announced via our [news feed](http://www.springsource.org/news-events).
