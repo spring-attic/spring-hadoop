@@ -12,8 +12,8 @@ description = 'Spring for Apache Hadoop'
 group = 'org.springframework.data'
 
 repositories {
-  maven { url "http://repo.springsource.org/libs-snapshot" }
-  maven { url 'http://localhost:8081/archiva/repository/internal' }
+    mavenCentral()
+    maven { url "http://repo.springsource.org/libs-snapshot" }
 }
 
 apply plugin: "java"
@@ -79,15 +79,15 @@ switch (hadoopDistro) {
 
   break;    
 
-  // Pivotal HD 2.0
-  case "pihd2":
-    hadoopVersion = pihd2Version
+  // Pivotal HD 1.0
+  case "phd1":
+    hadoopVersion = phd1Version
     println "Using Pivotal HD 2.0 - [$hadoopVersion]"
 
-    hbaseVersion = pihd2HbaseVersion
-    hiveVersion = pihd2HiveVersion
-    pigVersion = pihd2PigVersion
-    thriftVersion = pihd2ThriftVersion
+    hbaseVersion = phd1HbaseVersion
+    hiveVersion = phd1HiveVersion
+    pigVersion = phd1PigVersion
+    thriftVersion = phd1ThriftVersion
 
     hadoop = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
               "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
