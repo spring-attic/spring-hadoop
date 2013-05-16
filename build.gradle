@@ -82,7 +82,7 @@ switch (hadoopDistro) {
   // Pivotal HD 1.0
   case "phd1":
     hadoopVersion = phd1Version
-    println "Using Pivotal HD 2.0 - [$hadoopVersion]"
+    println "Using Pivotal HD 1.0 - [$hadoopVersion]"
 
     hbaseVersion = phd1HbaseVersion
     hiveVersion = phd1HiveVersion
