@@ -15,12 +15,15 @@
  */
 package org.springframework.data.hadoop.configuration;
 
+import java.io.IOException;
 import java.util.Properties;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.mapreduce.Job;
+import org.junit.Before;
 import org.junit.Test;
+import org.springframework.data.hadoop.util.VersionUtils;
 
 import static org.junit.Assert.*;
 
@@ -29,6 +32,15 @@ import static org.junit.Assert.*;
  * @author Costin Leau
  */
 public class UrlInfiniteLoopTest {
+
+    @Before
+    public void setUp() throws Exception {
+        if (VersionUtils.isHadoop2X()) {
+            // Avoid potential StackOverflowError for Hadoop 2.0.x (see SHDP-111)
+            Configuration conf = (Configuration) Class.forName("org.apache.hadoop.yarn.conf.YarnConfiguration").newInstance();
+            FileSystem.getFileSystemClass("hdfs", conf);
+        }
+    }
 
 	@Test
 	public void testInfiniteLoop() throws Exception {
