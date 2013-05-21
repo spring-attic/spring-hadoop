@@ -16,6 +16,7 @@
 package org.springframework.data.hadoop.configuration;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.Properties;
 
 import org.apache.hadoop.conf.Configuration;
@@ -24,6 +25,7 @@ import org.apache.hadoop.mapreduce.Job;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.data.hadoop.util.VersionUtils;
+import org.springframework.util.ReflectionUtils;
 
 import static org.junit.Assert.*;
 
@@ -38,7 +40,10 @@ public class UrlInfiniteLoopTest {
         if (VersionUtils.isHadoop2X()) {
             // Avoid potential StackOverflowError for Hadoop 2.0.x (see SHDP-111)
             Configuration conf = (Configuration) Class.forName("org.apache.hadoop.yarn.conf.YarnConfiguration").newInstance();
-            FileSystem.getFileSystemClass("hdfs", conf);
+            Method getFileSystemClass =
+                    ReflectionUtils.findMethod(FileSystem.class, "getFileSystemClass",
+                            String.class, Configuration.class);
+            getFileSystemClass.invoke(null, "hdfs", conf);
         }
     }
 
