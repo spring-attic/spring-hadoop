@@ -35,6 +35,7 @@
         <hdp:cmd-env>
         	EXAMPLE_DIR=/home/example/dictionaries/
         </hdp:cmd-env>
+        mapreduce.framework.name=yarn
 		star=chasing
 		return=captain eo
 		train=last
