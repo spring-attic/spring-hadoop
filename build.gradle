@@ -128,6 +128,26 @@ switch (hadoopDistro) {
 
   break;
 
+  // Hadoop 1.2.x Beta
+  case "hadoop12":
+    hadoopVersion = hd12Version
+    
+    println "Using Apache Hadoop 1.2.x [$hadoopVersion]"
+    
+    hadoop = ["org.apache.hadoop:hadoop-streaming:$hadoopVersion",
+              "org.apache.hadoop:hadoop-tools:$hadoopVersion"]
+
+    dependencies {
+        testCompile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
+    }
+
+    hbaseVersion = hd12HbaseVersion
+    hiveVersion = hd12HiveVersion
+    pigVersion = hd12PigVersion
+    thriftVersion = hd12ThriftVersion
+
+  break;
+
   // Hadoop 1.1.x
   case "hadoop11":
     hadoopVersion = hadoop11Version
