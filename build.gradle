@@ -30,8 +30,12 @@ apply plugin: 'propdeps-eclipse'
 // 
 def List hadoop = []
 
-def hadoopDistro = project.hasProperty("distro") ? project.getProperty("distro") : "hadoop10"
+def hadoopDefault = "hadoop10"
+def hadoopDistro = project.hasProperty("distro") ? project.getProperty("distro") : hadoopDefault
 def hadoopVersion = hadoop10Version
+
+// make it possible to use Pig jars compiled for Hadoop 2.0
+def pigQualifier = ''
 
 // handle older Hive version
 def hiveGroup = "org.apache.hive"
@@ -119,11 +123,13 @@ switch (hadoopDistro) {
     dependencies {
         testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
         testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
+        testRuntime "dk.brics.automaton:automaton:1.11-8"
     }
 
     hbaseVersion = hd20HbaseVersion
     hiveVersion = hd20HiveVersion
     pigVersion = hd20PigVersion
+    pigQualifier = ':h2'
     thriftVersion = hd20ThriftVersion
 
   break;
@@ -164,7 +170,15 @@ switch (hadoopDistro) {
   break;
 
   default:
-    println "Using Apache Hadoop 1.0.x [$hadoopVersion]"
+    if (!project.hasProperty("distro")) {
+        println "Using default distro: Apache Hadoop [$hadoopVersion]"
+    } else {
+        if (hadoopDistro == hadoopDefault) {
+            println "Using Apache Hadoop 1.0.x [$hadoopVersion]"
+        } else {
+            println "$hadoopDistro is not a supported distro; using default distro: Apache Hadoop [$hadoopVersion]"
+        }
+    }
     hadoopVersion = hadoop10Version
     hadoop = ["org.apache.hadoop:hadoop-streaming:$hadoopVersion",
               "org.apache.hadoop:hadoop-tools:$hadoopVersion"]
@@ -220,7 +234,7 @@ dependencies {
     //testRuntime "org.apache.thrift:libfb303:$thriftVersion"
 
     // Pig
-    optional("org.apache.pig:pig:$pigVersion")
+    optional("org.apache.pig:pig:$pigVersion$pigQualifier")
     
     // HBase
     optional("org.apache.hbase:hbase:$hbaseVersion") { dep ->
