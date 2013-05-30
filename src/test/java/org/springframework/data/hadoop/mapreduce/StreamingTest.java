@@ -61,7 +61,6 @@ public class StreamingTest {
 
 	@Test
 	public void testStreaming() throws Exception {
-		assumeTrue(!VersionUtils.isHadoop2X()); // TODO: need to figure out a way to support this
 		cleanOutput(ctx);
 
 		assertTrue(ctx.isPrototype("vanilla-stream-job"));

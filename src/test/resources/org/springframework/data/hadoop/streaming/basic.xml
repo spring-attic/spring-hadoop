@@ -19,7 +19,6 @@
 		p:output-path="output"
 		p:mapper="${path.cat}"
 		p:reducer="${path.wc}"
-		p:libs="cfg-1.properties"
 		scope="prototype"/>
 		
 	<hdp:streaming id="ns-stream-job"
