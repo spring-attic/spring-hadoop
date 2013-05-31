@@ -109,6 +109,27 @@ switch (hadoopDistro) {
 
   break;
 
+  // Hortonworks Data Platform 1.3
+  case "hdp13":
+    hadoopVersion = hdp13Version
+    
+    println "Using Hortonworks Data Platform 1.3 [$hadoopVersion]"
+    
+    hadoop = ["org.apache.hadoop:hadoop-streaming:$hadoopVersion",
+              "org.apache.hadoop:hadoop-tools:$hadoopVersion"]
+
+    dependencies {
+        testCompile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
+        testRuntime "dk.brics.automaton:automaton:1.11-8"
+    }
+
+    hbaseVersion = hdp13HbaseVersion
+    hiveVersion = hdp13HiveVersion
+    pigVersion = hdp13PigVersion
+    thriftVersion = hdp13ThriftVersion
+
+  break;
+
   // Hadoop 2.0 Alpha
   case "hadoop20":
     hadoopVersion = hd20Version

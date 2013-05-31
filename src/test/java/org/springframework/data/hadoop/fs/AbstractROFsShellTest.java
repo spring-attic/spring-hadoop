@@ -88,8 +88,8 @@ public abstract class AbstractROFsShellTest {
 		FsPermission perm = hadoopFs.getFileStatus(new Path(name)).getPermission();
 		assertTrue(perm.getGroupAction().implies(FsAction.READ));
 		assertTrue(perm.getOtherAction().implies(FsAction.READ));
-	
-		shell.chmod("700", name);
+
+		shell.chmod("600", name);
 	
 		perm = hadoopFs.getFileStatus(new Path(name)).getPermission();
 		assertTrue(perm.getUserAction().equals(FsAction.READ_WRITE));
