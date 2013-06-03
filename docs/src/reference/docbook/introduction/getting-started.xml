@@ -8,7 +8,7 @@
          xmlns:ns="http://docbook.org/ns/docbook">
   <title>Overview of Spring for Apache Hadoop</title>
 
-  <para>This chapter describes the various components that Spirng Hadoop uses
+  <para>This chapter describes the various components that Spring Hadoop uses
   and builds upon.</para>
 
   <section label="overview-batch">

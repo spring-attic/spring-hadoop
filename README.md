@@ -64,7 +64,7 @@ from the project root folder. This will compile the sources, run the tests and c
 
 ## Supported distros
 
-By default Spring for Apache Hadoop compiles against Apache Hadoop 1.0.x. Apache Hadoop 1.1.x (hadoop11), Apache Hadoop 2.0.x Alpha (hadoop20), Cloudera CDH3 (cdh3), Cloudera CDH4 (cdh4) and Pivotal HD 1.0 (phd1) are also supported; to compile against them pass the `-Pdistro=<label>` project property, like so:
+By default Spring for Apache Hadoop compiles against Apache Hadoop 1.0.x. Apache Hadoop 1.1.x (hadoop11) Apache Hadoop 1.2.x (hadoop12), Apache Hadoop 2.0.x Alpha (hadoop20), Cloudera CDH3 (cdh3), Cloudera CDH4 (cdh4), Hortonworks HDP 1.3 (hdp13) and Pivotal HD 1.0 (phd1) are also supported; to compile against them pass the `-Pdistro=<label>` project property, like so:
 
     gradlew -Pdistro=hadoop11 build
     
@@ -73,6 +73,18 @@ Note that the chosen distro is displayed on the screen:
     Using Apache Hadoop 1.1.x [1.1.2]
 
 In this case, the specified Hadoop distribution (above Apache Hadoop 1.1.x) is used to create the project binaries. This option is useful when testing against Hadoop clusters incompatible with the Hadoop stable line.
+
+# CI Builds
+
+The results for CI builds are available at [Spring Data Hadoop: Project Summary - Spring CI](https://build.springsource.org/browse/SPRINGDATAHADOOP)
+
+We are currently running tests against the following distributions:
+-Apache Hadoop 1.0.4
+-Apache Hadoop 1.1.2
+-Cloudera CDH3
+-Cloudera CDH4
+-Greenplum HD 1.2
+-Hortonworks HDP 1.3
 
 # Testing
 

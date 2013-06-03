@@ -4,28 +4,43 @@
          xmlns:ns6="http://www.w3.org/1999/xlink">
   <title>Requirements</title>
 
-  <para>Spring for Apache Hadoop requires JDK level 6.0 (just like Hadoop) and above,
-  Spring <ulink url="http://www.springsource.org/about">Framework</ulink> 3.0
-  (3.2 recommended) and above and <ulink
-  url="http://hadoop.apache.org/">Apache Hadoop</ulink> 0.20.2
-  (1.0.4 recommended) and above. SHDP supports and is <ulink url="https://build.springsource.org/browse/SPRINGDATAHADOOP">tested</ulink> daily 
-  against various Hadoop distributions, such as
-  <ulink url="http://www.cloudera.com/">Cloudera</ulink> CDH3 (CD3u5) and
-  CDH4 (CDH4.1u3 MRv1) distributions and <ulink url="http://www.greenplum.com/">Greenplum</ulink>
-  HD (1.2). Any distro compatible with Apache Hadoop 1.0.x should be supported.</para>
-  <para>Spring Data Hadoop is provided out of the box and it is certified to work on Greenplum/Pivotal
-  HD distribution.</para>
-  
-  <warning>Note that Hadoop YARN, NextGen or 2.x (currently in alpha stage), is NOT supported yet. Some
-  Hadoop distros offer both the stable Hadoop (also known as 1.x or MRv1) and the YARN variant
-  (also known as 2.x or MRv2) bundled together. Since SHDP supports only Hadoop 1.x, make sure to use <emphasis>only</emphasis>
-  the 1.x/MRv1 services and libraries both on the clients and server, as 2.x/MRv2, or a mixture of the two,
-  will cause errors.</warning>
+  <para>Spring for Apache Hadoop requires JDK level 6.0 (just like Hadoop) and
+  above, Spring <ulink
+  url="http://www.springsource.org/about">Framework</ulink> 3.0 (3.2
+  recommended) and above and <ulink url="http://hadoop.apache.org/">Apache
+  Hadoop</ulink> 0.20.2 (1.0.4 or 1.1.2 recommended) and above. SHDP supports
+  and is <ulink
+  url="https://build.springsource.org/browse/SPRINGDATAHADOOP">tested</ulink>
+  daily against Apache Hadoop 1.0.4 and Apache Hadoop 1.1.2 as well as against
+  various Hadoop distributions: 
+  <itemizedlist>
+    <listitem>
+      <para><ulink url="http://www.cloudera.com/">Cloudera</ulink> CDH3 (CD3u5),
+      CDH4 (CDH4.1u3 MRv1) distributions</para>
+    </listitem>
+    <listitem>
+      <para><ulink url="http://www.hortonworks.com/">Hortonworks</ulink> Data
+      Platform 1.3</para>
+    </listitem>
+    <listitem>
+      <para><ulink url="http://www.greenplum.com/">Greenplum</ulink> HD
+      (1.2)</para>
+    </listitem>
+  </itemizedlist>
 
-  <para>
-  Regarding Hadoop-related projects, SDHP
-  supports <ulink url="http://cascading.org/">Cascading</ulink> 2.1, 
-  <ulink url="http://hbase.apache.org/">HBase</ulink> 0.90.x, <ulink
+  Any distro compatible with Apache Hadoop 1.0.x should be
+  supported.</para>
+
+  <para>Spring Data Hadoop is provided out of the box and it is certified to
+  work on Greenplum and Pivotal HD distributions.</para>
+
+  <warning>
+     Note that Hadoop YARN and Hadoop 2.0.x (currently in alpha stage), is not explicitly supported yet, but we have added support to allow 2.0.x based distributions to be used with the current functionality. We are running some limited test builds against Apache Hadoop 2.0.4-alpha, Pivotal HD 1.0 and Hortonworks Data Platform 2.0. 
+  </warning>
+
+  <para>Regarding Hadoop-related projects, SDHP supports <ulink
+  url="http://cascading.org/">Cascading</ulink> 2.1, <ulink
+  url="http://hbase.apache.org/">HBase</ulink> 0.90.x, <ulink
   url="http://hive.apache.org/">Hive</ulink> 0.8.x and <ulink
   url="http://pig.apache.org/">Pig</ulink> 0.9.x and above. As a rule of
   thumb, when using Hadoop-related projects, such as Hive or Pig, use the
@@ -35,10 +50,11 @@
   <para>Spring for Apache Hadoop also requires a Hadoop installation up and
   running. If you don't already have a Hadoop cluster up and running in your
   environment, a good first step is to create a single-node cluster. To
-  install Hadoop 0.20.x+, the <link
+  install Hadoop 1.1.2, the <link
   ns6:href="http://hadoop.apache.org/common/docs/stable/#Getting+Started">Getting
-  Started</link> page from the official Apache documentation is a good general guide.
-  If you are running on Ubuntu, the tutorial from Michael G. Noll, "<link
+  Started</link> page from the official Apache documentation is a good general
+  guide. If you are running on Ubuntu, the tutorial from Michael G. Noll,
+  "<link
   ns6:href="http://www.michael-noll.com/tutorials/running-hadoop-on-ubuntu-linux-single-node-cluster/">Running
   Hadoop On Ubuntu Linux (Single-Node Cluster)</link>" provides more details.
   It is also convenient to download a Virtual Machine where Hadoop is setup
@@ -46,10 +62,10 @@
   ns6:href="https://ccp.cloudera.com/display/SUPPORT/Cloudera%27s+Hadoop+Demo+VM">here</link>.
   You can also download the <link
   ns6:href="http://www.greenplum.com/products/greenplum-hd">EMC Greenplum
-  HD</link> distribution or get a tech preview of the <link
-  ns6:href="http://hortonworks.com/technology/techpreview/">Hortonworks
-  distribution</link>.
-  Additionally, the <link linkend="appendices">appendix</link> provides information on how to use Spring for Apache Hadoop and setup
-  Hadoop with cloud providers, such as Amazon Web Services.
-  </para>
+  HD</link> distribution or download one of <link
+  ns6:href="http://hortonworks.com/products/hortonworksdataplatform/">Hortonworks
+  distributions</link>. Additionally, the <link
+  linkend="appendices">appendix</link> provides information on how to use
+  Spring for Apache Hadoop and setup Hadoop with cloud providers, such as
+  Amazon Web Services.</para>
 </chapter>

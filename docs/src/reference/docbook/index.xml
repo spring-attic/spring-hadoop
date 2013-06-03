@@ -13,7 +13,12 @@
       <author>
         <firstname>Costin</firstname>
         <surname>Leau</surname>
-        <affiliation>SpringSource, a division of VMware</affiliation>
+        <affiliation>Elasticsearch</affiliation>
+      </author>
+      <author>
+        <firstname>Thomas</firstname>
+        <surname>Risberg</surname>
+        <affiliation>Pivotal</affiliation>
       </author>
     </authorgroup>
 
