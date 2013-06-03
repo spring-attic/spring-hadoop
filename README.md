@@ -79,12 +79,12 @@ In this case, the specified Hadoop distribution (above Apache Hadoop 1.1.x) is u
 The results for CI builds are available at [Spring Data Hadoop: Project Summary - Spring CI](https://build.springsource.org/browse/SPRINGDATAHADOOP)
 
 We are currently running tests against the following distributions:
--Apache Hadoop 1.0.4
--Apache Hadoop 1.1.2
--Cloudera CDH3
--Cloudera CDH4
--Greenplum HD 1.2
--Hortonworks HDP 1.3
+* Apache Hadoop 1.0.4
+* Apache Hadoop 1.1.2
+* Cloudera CDH3
+* Cloudera CDH4
+* Greenplum HD 1.2
+* Hortonworks HDP 1.3
 
 # Testing
 
