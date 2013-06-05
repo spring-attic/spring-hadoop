@@ -87,7 +87,7 @@ public class StreamingTest {
 
 	private void cleanOutput(ApplicationContext ctx) throws Exception {
 		FileSystem fs = FileSystem.get(ctx.getBean(Configuration.class));
-		fs.copyFromLocalFile(new Path("./build.gradle"), new Path("test/"));
+		fs.copyFromLocalFile(new Path("../build.gradle"), new Path("test/"));
 		fs.delete(new Path("output"), true);
 	}
 

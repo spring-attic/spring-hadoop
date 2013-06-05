@@ -1,1 +1,40 @@
 rootProject.name = 'spring-data-hadoop'
+
+ext.hadoopDistro = hasProperty("distro") ? getProperty("distro") : "default"
+switch (ext.hadoopDistro) {
+	case "cdh3":
+		ext.version1 = true
+		break    
+	case "cdh4":
+		ext.version1 = false
+		break    
+	case "phd1":
+		ext.version1 = false
+		break
+	case "hadoop20":
+		ext.version1 = false
+		break
+	case "hadoop11":
+		ext.version1 = true
+		break
+	default:
+		ext.version1 = true
+}
+include 'spring-hadoop-core'
+rootProject.children.find{ it.name == 'spring-hadoop-core' }.name = 'spring-data-hadoop-core'
+include 'spring-hadoop-batch'
+rootProject.children.find{ it.name == 'spring-hadoop-batch' }.name = 'spring-data-hadoop-batch'
+include 'spring-hadoop-config'
+rootProject.children.find{ it.name == 'spring-hadoop-config' }.name = 'spring-data-hadoop-config'
+include 'spring-hadoop-test'
+if (version1) {
+  print "Based on selected distro (${hadoopDistro}) we are including spring-cascading and skipping spring-yarn\n"
+  include 'spring-cascading'
+}
+else {
+  print "Based on selected distro (${hadoopDistro}) we are skipping spring-cascading and including spring-yarn\n"
+  include 'spring-yarn'
+}
+
+
+
