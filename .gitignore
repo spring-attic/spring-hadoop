@@ -7,7 +7,6 @@ build
 *.iml
 *.ipr
 *.iws
-*.log
 metastore_db
 /samples/pig-scripting/src/main/resources/ml-100k.zip
 /samples/pig-scripting/src/main/resources/ml-100k/u.data
