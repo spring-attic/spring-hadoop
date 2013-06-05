@@ -34,7 +34,7 @@ import org.springframework.util.ReflectionUtils;
  * 
  * @author Costin Leau
  */
-abstract class JarExecutor extends HadoopCodeExecutor<Object> {
+public abstract class JarExecutor extends HadoopCodeExecutor<Object> {
 
 	private File savedConfiguration;
 	private String configName;

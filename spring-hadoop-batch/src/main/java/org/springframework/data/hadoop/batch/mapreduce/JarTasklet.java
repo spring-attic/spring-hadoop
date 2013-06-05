@@ -13,34 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.hadoop.scripting;
-
-import java.util.concurrent.Callable;
+package org.springframework.data.hadoop.batch.mapreduce;
 
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.data.hadoop.mapreduce.JarExecutor;
 
 /**
- * Scripting tasklet. Currently protected since the class isn't really extensible.
+ * Batch tasklet for executing Hadoop jars.
  * 
  * @author Costin Leau
  */
-public class ScriptTasklet implements Tasklet {
-
-	private Callable<Object> scriptCallback;
+public class JarTasklet extends JarExecutor implements Tasklet {
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		scriptCallback.call();
+		runCode();
 		return RepeatStatus.FINISHED;
-	}
-
-	/**
-	 * @param scriptCallback Callback to the underlying script.
-	 */
-	public void setScriptCallback(Callable<Object> scriptCallback) {
-		this.scriptCallback = scriptCallback;
 	}
 }

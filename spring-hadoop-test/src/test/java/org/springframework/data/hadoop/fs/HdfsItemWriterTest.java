@@ -44,6 +44,7 @@ import org.springframework.batch.support.transaction.ResourcelessTransactionMana
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.serializer.DefaultSerializer;
 import org.springframework.core.serializer.Serializer;
+import org.springframework.data.hadoop.batch.item.HdfsItemWriter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;

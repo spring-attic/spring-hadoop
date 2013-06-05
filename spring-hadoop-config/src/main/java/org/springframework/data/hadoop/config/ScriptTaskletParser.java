@@ -81,6 +81,6 @@ class ScriptTaskletParser extends AbstractSimpleBeanDefinitionParser {
 
 	@Override
 	protected String getBeanClassName(Element element) {
-		return "org.springframework.data.hadoop.scripting.ScriptTasklet";
+		return "org.springframework.data.hadoop.batch.scripting.ScriptTasklet";
 	}
 }

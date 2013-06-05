@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.hadoop.hive;
+package org.springframework.data.hadoop.batch.hive;
 
 import org.apache.hadoop.hive.service.HiveClient;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.data.hadoop.hive.HiveExecutor;
 
 /**
  * Hive tasklet running Hive scripts on demand, against a {@link HiveClient}.

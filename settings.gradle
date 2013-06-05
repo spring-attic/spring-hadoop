@@ -27,12 +27,9 @@ rootProject.children.find{ it.name == 'spring-hadoop-batch' }.name = 'spring-dat
 include 'spring-hadoop-config'
 rootProject.children.find{ it.name == 'spring-hadoop-config' }.name = 'spring-data-hadoop-config'
 include 'spring-hadoop-test'
-if (version1) {
-  print "Based on selected distro (${hadoopDistro}) we are including spring-cascading and skipping spring-yarn\n"
-  include 'spring-cascading'
-}
-else {
-  print "Based on selected distro (${hadoopDistro}) we are skipping spring-cascading and including spring-yarn\n"
+include 'spring-cascading'
+if (!version1) {
+  print "Based on selected distro (${hadoopDistro}) we are including spring-yarn\n"
   include 'spring-yarn'
 }
 

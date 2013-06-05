@@ -7,8 +7,8 @@
       	http://www.springframework.org/schema/batch	http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
       	http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
 
-	<import resource="../batch-common.xml"/>
-	<import resource="../hadoop-ctx.xml"/>
+	<import resource="../../batch-common.xml"/>
+	<import resource="../../hadoop-ctx.xml"/>
 	
 	<job id="mainJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="bean" next="ns">

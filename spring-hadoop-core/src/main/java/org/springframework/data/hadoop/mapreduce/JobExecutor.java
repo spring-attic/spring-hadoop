@@ -41,9 +41,9 @@ import org.springframework.util.StringUtils;
  * @author Costin Leau
  * @author Thomas Risberg
  */
-abstract class JobExecutor implements InitializingBean, DisposableBean, BeanFactoryAware {
+public abstract class JobExecutor implements InitializingBean, DisposableBean, BeanFactoryAware {
 
-	interface JobListener {
+	protected interface JobListener {
 
 		Object beforeAction();
 

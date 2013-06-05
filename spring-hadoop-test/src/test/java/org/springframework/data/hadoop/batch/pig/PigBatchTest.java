@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.hadoop.pig;
+package org.springframework.data.hadoop.batch.pig;
 
 import java.util.Collection;
 import java.util.List;
@@ -26,6 +26,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.hadoop.TestUtils;
 import org.springframework.data.hadoop.batch.JobsTrigger;
+import org.springframework.data.hadoop.batch.pig.PigTasklet;
+import org.springframework.data.hadoop.pig.PigServerFactory;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 

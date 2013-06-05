@@ -26,7 +26,7 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.hadoop.hive.HiveScript;
-import org.springframework.data.hadoop.hive.HiveTasklet;
+import org.springframework.data.hadoop.batch.hive.HiveTasklet;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;

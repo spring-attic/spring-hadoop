@@ -24,7 +24,7 @@ import org.springframework.util.Assert;
  * 
  * @author Costin Leau
  */
-abstract class ToolExecutor extends HadoopCodeExecutor<Tool> {
+public abstract class ToolExecutor extends HadoopCodeExecutor<Tool> {
 
 	@Override
 	protected Integer invokeTargetObject(Configuration cfg, Tool target, Class<Tool> targetClass, String[] args) throws Exception {

@@ -44,7 +44,7 @@
 		</step>
 	</job>
 	
-	<bean id="tasklet" class="org.springframework.data.hadoop.mapreduce.ToolTasklet" p:tool-ref="test-tool" p:configuration-ref="hadoopConfiguration" />
+	<bean id="tasklet" class="org.springframework.data.hadoop.batch.mapreduce.ToolTasklet" p:tool-ref="test-tool" p:configuration-ref="hadoopConfiguration" />
 	
 	<hdp:tool-tasklet id="tasklet-ns" scope="prototype" files="some-tool.jar">
 		<hdp:tool>

@@ -10,8 +10,8 @@
       	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
       	http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
 
-	<import resource="../batch-common.xml"/>
-	<import resource="../hadoop-ctx.xml"/>
+	<import resource="../../batch-common.xml"/>
+	<import resource="../../hadoop-ctx.xml"/>
 	
 	<!--use the bean definition to go beyond the configuration options provided by the namespace -->
 	<bean name="ppc" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" 
@@ -35,7 +35,7 @@
 		</step>
 	</job>
 
-	<bean id="tasklet" class="org.springframework.data.hadoop.hive.HiveTasklet" p:hive-client-factory-ref="hiveClientFactory">
+	<bean id="tasklet" class="org.springframework.data.hadoop.batch.pig.HiveTasklet" p:hive-client-factory-ref="hiveClientFactory">
 		<property name="scripts">
 			<list>
 				<bean class="org.springframework.data.hadoop.hive.HiveScript">

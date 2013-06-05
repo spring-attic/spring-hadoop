@@ -29,7 +29,7 @@ import org.springframework.util.CollectionUtils;
  *  
  * @author Costin Leau
  */
-abstract class PigExecutor implements InitializingBean {
+public abstract class PigExecutor implements InitializingBean {
 
 	private PigServerFactory pigFactory;
 	private PigOperations pigTemplate;

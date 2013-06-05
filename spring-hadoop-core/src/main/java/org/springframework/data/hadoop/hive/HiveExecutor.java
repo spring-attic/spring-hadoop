@@ -28,7 +28,7 @@ import org.springframework.util.CollectionUtils;
  * 
  * @author Costin Leau
  */
-abstract class HiveExecutor implements InitializingBean {
+public abstract class HiveExecutor implements InitializingBean {
 
 	private HiveClientFactory hiveClientFactory;
 	private HiveOperations hiveTemplate;

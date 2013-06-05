@@ -59,7 +59,7 @@ abstract class HadoopCodeExecutor<T> extends JobGenericOptions implements Initia
 	}
 
 
-	int runCode() throws Exception {
+	protected int runCode() throws Exception {
 		// merge configuration options
 		final Configuration cfg = resolveConfiguration();
 

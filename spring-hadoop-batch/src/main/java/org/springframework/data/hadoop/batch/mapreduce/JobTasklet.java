@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.hadoop.mapreduce;
+package org.springframework.data.hadoop.batch.mapreduce;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -28,6 +28,7 @@ import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.data.hadoop.mapreduce.JobExecutor;
 
 /**
  * Batch tasklet for executing one Hadoop job.

@@ -13,52 +13,45 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.hadoop.batch;
+package org.springframework.data.hadoop.batch.scripting;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.file.MultiResourceItemReader;
-import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
+import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.data.hadoop.TestUtils;
+import org.springframework.data.hadoop.batch.JobsTrigger;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.junit.Assert.*;
 
 /**
+ * 
  * @author Costin Leau
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration
-public class HdfsItemReaderTest {
+public class ScriptingBatchTest {
 
 	@Autowired
-	ApplicationContext ctx;
-	@Autowired
-	ResourceAwareItemReaderItemStream reader;
-	@Autowired
-	MultiResourceItemReader multiReader;
+	private ApplicationContext ctx;
 
-	@Test
-	public void testSingleReader() throws Exception {
-		try {
-			reader.open(new ExecutionContext());
-			assertNotNull(reader.read());
-		} finally {
-			reader.close();
-		}
+
+	{
+		TestUtils.hackHadoopStagingOnWin();
 	}
 
 	@Test
-	public void testMultiReader() throws Exception {
-		assertNotNull(multiReader);
-		try {
-			multiReader.open(new ExecutionContext());
-			assertNotNull(multiReader.read());
-		} finally {
-			reader.close();
-		}
+	public void testNamespace() throws Exception {
+		JobsTrigger tj = new JobsTrigger();
+		tj.startJobs(ctx);
+	}
+
+	@Test
+	public void testTasklet() throws Exception {
+		Tasklet st = ctx.getBean("tasklet", Tasklet.class);
+		assertNotNull(st);
 	}
 }

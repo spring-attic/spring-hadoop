@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.hadoop.pig;
+package org.springframework.data.hadoop.batch.pig;
 
 import java.util.List;
 
@@ -25,6 +25,7 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.data.hadoop.pig.PigExecutor;
 import org.springframework.util.CollectionUtils;
 
 /**

@@ -17,7 +17,7 @@ package org.springframework.data.hadoop.config;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.data.hadoop.mapreduce.JobTasklet;
+import org.springframework.data.hadoop.batch.mapreduce.JobTasklet;
 import org.w3c.dom.Element;
 
 /**

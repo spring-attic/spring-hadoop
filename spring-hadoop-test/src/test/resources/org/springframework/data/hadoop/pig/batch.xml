@@ -29,7 +29,7 @@
 		</step>
 	</job>
 
-	<bean id="tasklet" class="org.springframework.data.hadoop.pig.PigTasklet" p:pig-factory-ref="pigFactory">
+	<bean id="tasklet" class="org.springframework.data.hadoop.batch.pig.PigTasklet" p:pig-factory-ref="pigFactory">
 		<property name="scripts">
 			<list>
 				<bean class="org.springframework.data.hadoop.pig.PigScript">

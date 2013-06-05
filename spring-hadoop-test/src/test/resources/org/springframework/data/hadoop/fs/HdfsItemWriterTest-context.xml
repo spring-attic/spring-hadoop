@@ -35,7 +35,7 @@ if (fsh.test("/test/word/")) fsh.rmr("/test/word/")
 		</property>
 	</bean>
 	
-	<bean id="hdfsItemWriter" class="org.springframework.data.hadoop.fs.HdfsItemWriter">
+	<bean id="hdfsItemWriter" class="org.springframework.data.hadoop.batch.item.HdfsItemWriter">
 		<constructor-arg>
 			<bean class="org.springframework.data.hadoop.fs.FileSystemFactoryBean" p:configuration-ref="hadoopConfiguration"/>
 		</constructor-arg>
@@ -45,7 +45,7 @@ if (fsh.test("/test/word/")) fsh.rmr("/test/word/")
 		<constructor-arg value="/test/word/input/out.txt"/>
 	</bean>
 
-	<bean id="hadoop-tasklet" class="org.springframework.data.hadoop.mapreduce.JobTasklet" p:job-ref="mr-job" p:wait-for-completion="true"/>
+	<bean id="hadoop-tasklet" class="org.springframework.data.hadoop.batch.mapreduce.JobTasklet" p:job-ref="mr-job" p:wait-for-completion="true"/>
 	
 	<bean id="mr-job" class="org.springframework.data.hadoop.mapreduce.JobFactoryBean"
 		p:configuration-ref="hadoopConfiguration"

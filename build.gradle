@@ -2,6 +2,9 @@ description = 'Spring for Apache Hadoop'
 
 defaultTasks 'build'
 
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+
 buildscript {
 	repositories {
 		maven { url "http://repo.springsource.org/plugins-release" }
@@ -200,68 +203,6 @@ configure(javaProjects()) {
 	}
 
 	assemble.dependsOn = ['jar', 'sourcesJar']
-
-	test {
-		//forkEvery = 1
-		systemProperties['input.path'] = 'build/classes/test/input'
-		systemProperties['output.path'] = 'build/classes/test/output'
-		includes = ["**/*.class"]
-
-		testLogging {
-			events "started"
-			minGranularity 2
-			maxGranularity 2
-		}
-
-		doFirst() {
-			ext.msg = " "
-	
-			if (project.ext.skipPig) {
-				ext.msg += "Pig "
-				excludes.add("**/pig/**")
-			}
-			if (project.ext.skipHBase) {
-				ext.msg += "HBase "
-				excludes.add("**/hbase/**")
-			}
-	
-			if (project.ext.skipHive) {
-				ext.msg += "Hive "
-				excludes.add("**/hive/**")
-			}
-
-			if (project.ext.skipWebHdfs) {
-				ext.msg += "WebHdfs "
-				excludes.add("**/WebHdfs*")
-			}
-
-			if (project.ext.skipCascading) {
-				ext.msg += "Cascading "
-				excludes.add("**/cascading/**")
-			}
-	
-			if (!msg.trim().isEmpty())
-					println "Skipping [$msg] Tests";
-	
-			// check prefix for hd.fs
-			// first copy the properties since we can't change them
-			ext.projProps = project.properties
-	
-			if (projProps.containsKey("hd.fs")) {
-					String hdfs = projProps["hd.fs"].toString()
-					if (!hdfs.contains("://")) {
-						projProps.put("hd.fs", "hdfs://" + hdfs)
-					}
-			}
-			
-			// due to GRADLE-2475, set the system properties manually
-			projProps.each { k,v ->
-					if (k.toString().startsWith("hd.")) {
-						systemProperties[k] = projProps[k]
-					}
-			}
-		}
-	}
 
 	javadoc {
 		ext.srcDir = file("${projectDir}/docs/src/api")
@@ -471,12 +412,6 @@ configure(hadoopProjects()) {
 
 project('spring-data-hadoop-core') {
 	description = 'Spring for Apache Hadoop Core'
-
-	dependencies {
-		compile "org.springframework.batch:spring-batch-core:$springBatchVersion"
-		testRuntime "org.springframework.integration:spring-integration-file:$springIntVersion"
-	}
-
 }
 
 project('spring-data-hadoop-batch') {
@@ -484,6 +419,8 @@ project('spring-data-hadoop-batch') {
 
 	dependencies {
 		compile project(":spring-data-hadoop-core")
+		compile "org.springframework.batch:spring-batch-core:$springBatchVersion"
+		testRuntime "org.springframework.integration:spring-integration-file:$springIntVersion"
 	}
 
 }
@@ -506,9 +443,7 @@ project('spring-hadoop-test') {
 		compile project(":spring-data-hadoop-core")
 		compile project(":spring-data-hadoop-batch")
 		compile project(":spring-data-hadoop-config")
-		if (hadoopVersion < "2") {
-			compile project(":spring-cascading")
-		}
+		compile project(":spring-cascading")
 
 		// Testing
 		testCompile "junit:junit:$junitVersion"
@@ -537,83 +472,150 @@ project('spring-hadoop-test') {
 				dest: 'src/test/resources/input/gutenberg',skipexisting:true)
 	}
 
-}
+	task enablePigTests {
+		description = "Enabling Pig tests"
+		group = "Verification"
+		doLast() {
+			println description
+			project.ext.skipPig = false
+		}
+	}
 
-if (hadoopVersion < "2") {
-	project('spring-cascading') {
-		description = 'Spring Cascading Support'
+	task enableHiveTests {
+		description = "Enabling Hive tests"
+		group = "Verification"
+		doLast() {
+			println description
+			project.ext.skipHive = false
+		}
+	}
 
-		dependencies {
-			compile project(":spring-data-hadoop-batch")
+	task enableHBaseTests {
+		description = "Enabling HBase tests"
+		group = "Verification"
+		doLast() {
+			println description
+			project.ext.skipHBase = false
+		}
+	}
 
-			compile "org.springframework.integration:spring-integration-core:$springIntVersion"
-			// cascading
-			compile("cascading:cascading-hadoop:$cascadingVersion") { dep ->
-				exclude module: "hadoop-core"
+	task enableWebHdfsTests {
+		description = "Enabling WebHdfs tests"
+		group = "Verification"
+		doLast() {
+			println description
+			project.ext.skipWebHdfs = false
+		}
+	}
+
+	task enableCascadingTests {
+		description = "Enabling Cascading tests"
+		group = "Verification"
+		doLast() {
+			println description
+			project.ext.skipCascading = false
+		}
+	}
+
+	task enableAllTests() {
+		description = "Enabling all (incl. Pig, Hive, HBase, WebHdfs, Cascading) tests"
+		group = "Verification"
+		doLast() {
+			println description
+			project.ext.skipPig = false
+			project.ext.skipHive = false
+			project.ext.skipHBase = false
+			project.ext.skipWebHdfs = false
+			project.ext.skipCascading = false
+		}
+	}
+
+	test {
+		//forkEvery = 1
+		systemProperties['input.path'] = 'build/classes/test/input'
+		systemProperties['output.path'] = 'build/classes/test/output'
+		includes = ["**/*.class"]
+
+		testLogging {
+			events "started"
+			minGranularity 2
+			maxGranularity 2
+		}
+
+		doFirst() {
+			ext.msg = " "
+
+			println "PIG: ${project.ext.skipPig} :: ${skipPig}"
+			println "HIVE: ${project.ext.skipHive} :: ${skipHive}"
+	
+			if (project.ext.skipPig) {
+				ext.msg += "Pig "
+				excludes.add("**/pig/**")
+			}
+			if (project.ext.skipHBase) {
+				ext.msg += "HBase "
+				excludes.add("**/hbase/**")
+			}
+	
+			if (project.ext.skipHive) {
+				ext.msg += "Hive "
+				excludes.add("**/hive/**")
 			}
 
+			if (project.ext.skipWebHdfs) {
+				ext.msg += "WebHdfs "
+				excludes.add("**/WebHdfs*")
+			}
+
+			if (project.ext.skipCascading) {
+				ext.msg += "Cascading "
+				excludes.add("**/cascading/**")
+			}
+	
+			if (!msg.trim().isEmpty())
+					println "Skipping [$msg] Tests";
+	
+			// check prefix for hd.fs
+			// first copy the properties since we can't change them
+			ext.projProps = project.properties
+	
+			if (projProps.containsKey("hd.fs")) {
+					String hdfs = projProps["hd.fs"].toString()
+					if (!hdfs.contains("://")) {
+						projProps.put("hd.fs", "hdfs://" + hdfs)
+					}
+			}
+			
+			// due to GRADLE-2475, set the system properties manually
+			projProps.each { k,v ->
+					if (k.toString().startsWith("hd.")) {
+						systemProperties[k] = projProps[k]
+					}
+			}
+		}
+	}
+
+}
+
+project('spring-cascading') {
+	description = 'Spring Cascading Support'
+
+	dependencies {
+		compile project(":spring-data-hadoop-batch")
+
+		compile "org.springframework.integration:spring-integration-core:$springIntVersion"
+		// cascading
+		compile("cascading:cascading-hadoop:$cascadingVersion") { dep ->
+			exclude module: "hadoop-core"
 		}
 
 	}
+
 }
 
 if (hadoopVersion >= "2") {
 	project('spring-yarn') {
 		description = 'Spring for Apache Hadoop YARN'
-	}
-}
-
-task enablePigTests {
-	description = "Enable Pig tests"
-	group = "Verification"
-	doLast() {
-		configure(javaProjects()) { ext.skipPig = false }
-	}
-}
-
-task enableHiveTests {
-	description = "Enable Hive tests"
-	group = "Verification"
-	doLast() {
-		configure(javaProjects()) { ext.skipHive = false }
-	}
-}
-
-task enableHBaseTests {
-	description = "Enable HBase tests"
-	group = "Verification"
-	doLast() {
-		configure(javaProjects()) { ext.skipHBase = false }
-	}
-}
-
-task enableWebHdfsTests {
-	description = "Enable WebHdfs tests"
-	group = "Verification"
-	doLast() {
-		configure(javaProjects()) { ext.skipWebHdfs = false }
-	}
-}
-
-task enableCascadingTests {
-	description = "Enable Cascading tests"
-	group = "Verification"
-	doLast() {
-		configure(javaProjects()) { ext.skipCascading = false }
-	}
-}
-
-task enableAllTests() {
-	description = "Enable all (incl. Pig, Hive, HBase, WebHdfs, Cascading) tests"
-	group = "Verification"
-	doLast() {
-		configure(javaProjects()) { ext.skipPig = false }
-		configure(javaProjects()) { ext.skipHive = false }
-		configure(javaProjects()) { ext.skipHBase = false }
-		configure(javaProjects()) { ext.skipWebHdfs = false }
-		if (hadoopVersion < "2") {
-			configure(javaProjects()) { ext.skipCascading = false }
-		}
 	}
 }
 

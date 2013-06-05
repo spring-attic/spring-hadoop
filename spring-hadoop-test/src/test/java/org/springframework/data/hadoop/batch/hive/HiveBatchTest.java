@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.hadoop.hive;
+package org.springframework.data.hadoop.batch.hive;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
@@ -30,6 +30,9 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.hadoop.TestUtils;
 import org.springframework.data.hadoop.batch.JobsTrigger;
+import org.springframework.data.hadoop.hive.HiveClientFactory;
+import org.springframework.data.hadoop.hive.HiveOperations;
+import org.springframework.data.hadoop.hive.HiveScript;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.ReflectionUtils;

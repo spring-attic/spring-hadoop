@@ -83,7 +83,7 @@ Defines a Spring Batch tasklet for Hadoop Jobs.
           </xsd:documentation>
 	      <xsd:appinfo>
 	        <tool:annotation>
-	          <tool:exports type="org.springframework.data.hadoop.mapreduce.JobTasklet"/>
+	          <tool:exports type="org.springframework.data.hadoop.batch.mapreduce.JobTasklet"/>
 	        </tool:annotation>
 	      </xsd:appinfo>
 		</xsd:annotation>

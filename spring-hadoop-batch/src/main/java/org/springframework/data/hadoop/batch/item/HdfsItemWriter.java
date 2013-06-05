@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.hadoop.fs;
+package org.springframework.data.hadoop.batch.item;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

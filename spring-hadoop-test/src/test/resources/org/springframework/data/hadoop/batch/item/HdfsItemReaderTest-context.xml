@@ -6,7 +6,7 @@
       	http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
 
 
-	<import resource="../hadoop-ctx.xml"/>
+	<import resource="../../hadoop-ctx.xml"/>
 	
 	<bean id="customRL" class="org.springframework.data.hadoop.fs.CustomResourceLoaderRegistrar" p:loader-ref="hadoopResourceLoader" />
 	
