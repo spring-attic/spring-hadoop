@@ -2,9 +2,6 @@ description = 'Spring for Apache Hadoop'
 
 defaultTasks 'build'
 
-apply plugin: 'eclipse'
-apply plugin: 'idea'
-
 buildscript {
 	repositories {
 		maven { url "http://repo.springsource.org/plugins-release" }
@@ -412,6 +409,145 @@ configure(hadoopProjects()) {
 	
 		// specify a version of antlr that works with both hive and pig (works only during compilation)
 		testRuntime "org.antlr:antlr-runtime:$antlrVersion"
+	}
+
+}
+
+configure(rootProject) {
+
+	apply plugin: 'eclipse'
+	apply plugin: 'idea'
+
+	apply plugin: "docbook-reference"
+
+	reference {
+		sourceDir = file("docs/src/reference/docbook")
+		pdfFilename = "spring-data-hadoop-reference.pdf"
+	}
+
+	// don't publish the default jar for the root project
+	configurations.archives.artifacts.clear()
+
+	task api(type: Javadoc) {
+		group = "Documentation"
+		description = "Generates aggregated Javadoc API documentation."
+		title = "${rootProject.description} ${version} API"
+
+		dependsOn {
+			subprojects.collect {
+				it.tasks.getByName("jar")
+			}
+		}
+		options.memberLevel = org.gradle.external.javadoc.JavadocMemberLevel.PROTECTED
+		options.author = true
+		options.header = rootProject.description
+		options.overview = "docs/src/api/overview.html"
+		options.stylesheetFile = file("docs/src/api/spring-javadoc.css")
+		options.splitIndex = true
+		//options.links(project.ext.javadocLinks)
+
+		source subprojects.collect { project ->
+			project.sourceSets.main.allJava
+		}
+
+		maxMemory = "1024m"
+		destinationDir = new File(buildDir, "api")
+
+		doFirst {
+			classpath = files(subprojects.collect { it.sourceSets.main.compileClasspath })
+		}
+	}
+
+	task docsZip(type: Zip) {
+		group = "Distribution"
+		baseName = "spring-data-hadoop"
+		classifier = "docs"
+		description = "Builds -${classifier} archive containing api and reference " +
+			"for deployment at http://static.springframework.org/spring-hadoop/docs."
+
+		from("docs/src/info") {
+			include "changelog.txt"
+		}
+
+		from (api) {
+			into "javadoc-api"
+		}
+
+		from (reference) {
+			into "spring-data-hadoop-reference"
+		}
+	}
+
+	task schemaZip(type: Zip) {
+		group = "Distribution"
+		baseName = "spring-framework"
+		classifier = "schema"
+		description = "Builds -${classifier} archive containing all " +
+			"XSDs for deployment at http://springframework.org/schema."
+
+		subprojects.each { subproject ->
+			def Properties schemas = new Properties();
+
+			subproject.sourceSets.main.resources.find {
+				it.path.endsWith("META-INF/spring.schemas")
+			}?.withInputStream { schemas.load(it) }
+
+			for (def key : schemas.keySet()) {
+				def shortName = key.replaceAll(/http.*schema.(.*).spring-.*/, '$1')
+				assert shortName != key
+				File xsdFile = subproject.sourceSets.main.resources.find {
+					it.path.endsWith(schemas.get(key))
+				}
+				assert xsdFile != null
+				into (shortName) {
+					from xsdFile.path
+				}
+			}
+		}
+	}
+
+	task distZip(type: Zip, dependsOn: [docsZip, schemaZip]) {
+		group = "Distribution"
+		baseName = "spring-framework"
+		classifier = "dist"
+		description = "Builds -${classifier} archive, containing all jars and docs, " +
+					"suitable for community download page."
+
+		ext.baseDir = "${baseName}-${project.version}";
+
+		from("docs/src/info") {
+			include "readme.txt"
+			include "license.txt"
+			include "notice.txt"
+			into "${baseDir}"
+			expand(copyright: new Date().format("yyyy"), version: project.version)
+		}
+
+		from(zipTree(docsZip.archivePath)) {
+			into "${baseDir}/docs"
+		}
+
+		from(zipTree(schemaZip.archivePath)) {
+			into "${baseDir}/schema"
+		}
+
+		subprojects.each { subproject ->
+			into ("${baseDir}/libs") {
+				from subproject.jar
+				if (subproject.tasks.findByPath("sourcesJar")) {
+					from subproject.sourcesJar
+				}
+				if (subproject.tasks.findByPath("javadocJar")) {
+					from subproject.javadocJar
+				}
+			}
+		}
+	}
+
+	artifacts {
+		archives docsZip
+		archives schemaZip
+		archives distZip
 	}
 
 }
