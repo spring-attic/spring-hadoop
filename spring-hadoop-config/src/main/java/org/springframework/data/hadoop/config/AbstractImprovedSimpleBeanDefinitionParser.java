@@ -34,7 +34,7 @@ import org.w3c.dom.NamedNodeMap;
  * 
  * @author Costin Leau
  */
-abstract class AbstractImprovedSimpleBeanDefinitionParser extends AbstractSimpleBeanDefinitionParser {
+public abstract class AbstractImprovedSimpleBeanDefinitionParser extends AbstractSimpleBeanDefinitionParser {
 
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {

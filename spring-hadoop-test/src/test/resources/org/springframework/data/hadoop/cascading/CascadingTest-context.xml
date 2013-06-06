@@ -3,12 +3,12 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:hdp="http://www.springframework.org/schema/hadoop"
-	xmlns:util="http://www.springframework.org/schema/util"
+    xmlns:casc="http://www.springframework.org/schema/cascading"
 	xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
-		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+		http://www.springframework.org/schema/cascading http://www.springframework.org/schema/cascading/spring-cascading.xsd">
 
 	<import resource="../hadoop-ctx.xml"/>
 	
@@ -61,7 +61,7 @@ fsh.put("src/test/resources/data/babynamedefinitions.csv.gz", "/test/cascading/n
 	
 	</bean>
 
-	<hdp:cascading-runner id="runner" unit-of-work-ref="cascade" run-at-startup="true" scope="singleton"/>
+	<casc:cascading-runner id="runner" unit-of-work-ref="cascade" run-at-startup="true" scope="singleton"/>
 	 
 	<!-- Java configuration -->
 	<bean id="copyFlowDef" class="org.springframework.data.hadoop.cascading.TestFlows" factory-method="copyFlow">
@@ -69,5 +69,5 @@ fsh.put("src/test/resources/data/babynamedefinitions.csv.gz", "/test/cascading/n
 		<constructor-arg name="sinkPath"><value>/test/cascading/names/output/simplepipe]]</value></constructor-arg>
 	</bean>
 	
-	<hdp:cascading-flow id="copyFlow" definition-ref="copyFlowDef" />
+	<casc:cascading-flow id="copyFlow" definition-ref="copyFlowDef" />
 </beans>

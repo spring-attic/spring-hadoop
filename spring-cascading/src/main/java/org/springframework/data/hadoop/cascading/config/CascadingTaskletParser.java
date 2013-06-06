@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.hadoop.config;
+package org.springframework.data.hadoop.cascading.config;
 
 import org.springframework.data.hadoop.cascading.CascadingTasklet;
+import org.springframework.data.hadoop.config.AbstractImprovedSimpleBeanDefinitionParser;
 import org.w3c.dom.Element;
 
 /**

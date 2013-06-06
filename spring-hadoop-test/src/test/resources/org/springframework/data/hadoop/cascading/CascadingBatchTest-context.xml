@@ -2,13 +2,13 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:batch="http://www.springframework.org/schema/batch"
 	xmlns:hdp="http://www.springframework.org/schema/hadoop"
-	xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:casc="http://www.springframework.org/schema/cascading"
 	xmlns:c="http://www.springframework.org/schema/c"
 	xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
       	http://www.springframework.org/schema/batch	http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
-      	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
-      	http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
+      	http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd
+      	http://www.springframework.org/schema/cascading http://www.springframework.org/schema/cascading/spring-cascading.xsd">
 
 	<import resource="../batch-common.xml"/>
 	<import resource="../hadoop-ctx.xml"/>
@@ -18,7 +18,7 @@
 			<hdp:script-tasklet script-ref="script"/>
 		</step>
 		<step id="do-cascade">
-			<hdp:cascading-tasklet unit-of-work-ref="cascade"/>
+			<casc:cascading-tasklet unit-of-work-ref="cascade"/>
 		</step>
 	</job>
 
@@ -40,8 +40,8 @@ fsh.put("src/test/resources/data/babynamedefinitions.csv.gz", "/test/cascading/n
 	</bean>
 
 	<!-- Cascading definition -->
-	<hdp:cascading-cascade id="cascade" flow-ref="copyFlow" />
-	<hdp:cascading-flow id="copyFlow" definition-ref="copyFlowDef" />
+	<casc:cascading-cascade id="cascade" flow-ref="copyFlow" />
+	<casc:cascading-flow id="copyFlow" definition-ref="copyFlowDef" />
 	
 	<!-- replace Spring Batch default task executor -->
 	<bean id="taskExecutor" class="org.springframework.core.task.SimpleAsyncTaskExecutor"/>		

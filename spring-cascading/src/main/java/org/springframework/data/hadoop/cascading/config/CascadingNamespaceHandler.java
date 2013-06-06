@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.hadoop.config;
+package org.springframework.data.hadoop.cascading.config;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.CustomEditorConfigurer;
@@ -24,45 +24,20 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /**
- * Core Spring Hadoop namespace handler
+ * Spring Cascading namespace handler
  *
  * @author Costin Leau
+ * @author Thomas Risberg
  */
-class HadoopNamespaceHandler extends NamespaceHandlerSupport {
+class CascadingNamespaceHandler extends NamespaceHandlerSupport {
 
 	private static String DEFAULT_CONVERTER = "org.springframework.data.hadoop.mapreduce.MapReducePropertyEditorRegistrar.ns.registration";
 
 	public void init() {
-		registerBeanDefinitionParser("job-tasklet", new HadoopJobTaskletParser());
-		registerBeanDefinitionParser("job-runner", new HadoopJobRunnerParser());
-		registerBeanDefinitionParser("job", new HadoopJobParser());
-		registerBeanDefinitionParser("streaming", new HadoopStreamJobParser());
-		registerBeanDefinitionParser("configuration", new HadoopConfigParser());
-		registerBeanDefinitionParser("file-system", new HadoopFileSystemParser());
-		registerBeanDefinitionParser("resource-loader", new HadoopResourceLoaderParser());
-		registerBeanDefinitionParser("cache", new DistributedCacheParser());
-
-		registerBeanDefinitionParser("tool-runner", new ToolRunnerParser());
-		registerBeanDefinitionParser("tool-tasklet", new ToolTaskletParser());
-
-		registerBeanDefinitionParser("jar-runner", new JarRunnerParser());
-		registerBeanDefinitionParser("jar-tasklet", new JarTaskletParser());
-
-		registerBeanDefinitionParser("script", new ScriptParser());
-		registerBeanDefinitionParser("script-tasklet", new ScriptTaskletParser());
-
-		registerBeanDefinitionParser("pig-factory", new PigServerParser());
-		registerBeanDefinitionParser("pig-tasklet", new PigTaskletParser());
-		registerBeanDefinitionParser("pig-template", new PigTemplateParser());
-		registerBeanDefinitionParser("pig-runner", new PigRunnerParser());
-
-		registerBeanDefinitionParser("hive-client-factory", new HiveClientParser());
-		registerBeanDefinitionParser("hive-server", new HiveServerParser());
-		registerBeanDefinitionParser("hive-tasklet", new HiveTaskletParser());
-		registerBeanDefinitionParser("hive-template", new HiveTemplateParser());
-		registerBeanDefinitionParser("hive-runner", new HiveRunnerParser());
-
-		registerBeanDefinitionParser("hbase-configuration", new HbaseConfigurationParser());
+		registerBeanDefinitionParser("cascading-cascade", new CascadingCascadeParser());
+		registerBeanDefinitionParser("cascading-flow", new CascadingFlowParser());
+		registerBeanDefinitionParser("cascading-runner", new CascadingRunnerParser());
+		registerBeanDefinitionParser("cascading-tasklet", new CascadingTaskletParser());
 	}
 
 	@Override

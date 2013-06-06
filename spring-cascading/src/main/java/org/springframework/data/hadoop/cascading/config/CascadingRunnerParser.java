@@ -13,28 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.hadoop.config;
+package org.springframework.data.hadoop.cascading.config;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.data.hadoop.cascading.HadoopFlowFactoryBean;
-import org.springframework.util.StringUtils;
-import org.springframework.util.xml.DomUtils;
+import org.springframework.data.hadoop.cascading.CascadingRunner;
+import org.springframework.data.hadoop.config.AbstractImprovedSimpleBeanDefinitionParser;
+import org.springframework.data.hadoop.config.NamespaceUtils;
 import org.w3c.dom.Element;
 
 /**
  * @author Costin Leau
  */
-class CascadingFlowParser extends AbstractPropertiesConfiguredBeanDefinitionParser {
+/**
+ * @author Costin Leau
+ */
+class CascadingRunnerParser extends AbstractImprovedSimpleBeanDefinitionParser {
 
 	@Override
 	protected Class<?> getBeanClass(Element element) {
-		return HadoopFlowFactoryBean.class;
+		return CascadingRunner.class;
 	}
 
 	@Override
 	protected boolean isEligibleAttribute(String attributeName) {
-		return !("write-dot".equals(attributeName)) && super.isEligibleAttribute(attributeName);
+		return !("pre-action".equals(attributeName) || "post-action".equals(attributeName))
+				&& super.isEligibleAttribute(attributeName);
 	}
 
 	@Override
@@ -42,13 +46,12 @@ class CascadingFlowParser extends AbstractPropertiesConfiguredBeanDefinitionPars
 		// parse attributes using conventions
 		super.doParse(element, parserContext, builder);
 
-		NamespaceUtils.setPropertyValue(element, builder, "write-dot", "writeDOT");
+		NamespaceUtils.setCSVReferenceProperty(element, builder, "pre-action", "preAction");
+		NamespaceUtils.setCSVReferenceProperty(element, builder, "post-action", "postAction");
+	}
 
-		// parse properties
-		String props = DomUtils.getTextValue(element);
-
-		if (StringUtils.hasText(props)) {
-			builder.addPropertyValue("properties", props);
-		}
+	@Override
+	protected boolean shouldGenerateIdAsFallback() {
+		return true;
 	}
 }

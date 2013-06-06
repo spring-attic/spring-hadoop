@@ -437,7 +437,6 @@ project('spring-data-hadoop') {
 	dependencies {
 		compile project(":spring-data-hadoop-core")
 		compile project(":spring-data-hadoop-batch")
-		compile project(":spring-cascading")
 	}
 
 }
@@ -598,7 +597,7 @@ project('spring-cascading') {
 	description = 'Spring Cascading Support'
 
 	dependencies {
-		compile project(":spring-data-hadoop-batch")
+		compile project(":spring-data-hadoop")
 
 		compile "org.springframework.integration:spring-integration-core:$springIntVersion"
 		// cascading

@@ -30,7 +30,7 @@ import org.w3c.dom.Element;
  * 
  * @author Costin Leau
  */
-abstract class AbstractPropertiesConfiguredBeanDefinitionParser extends AbstractImprovedSimpleBeanDefinitionParser {
+public abstract class AbstractPropertiesConfiguredBeanDefinitionParser extends AbstractImprovedSimpleBeanDefinitionParser {
 
 	protected boolean isEligibleAttribute(String attributeName) {
 		return !("properties-ref".equals(attributeName) || "properties-location".equals(attributeName))

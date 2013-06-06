@@ -13,30 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.hadoop.config;
+package org.springframework.data.hadoop.cascading.config;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.data.hadoop.cascading.CascadingRunner;
+import org.springframework.data.hadoop.cascading.HadoopFlowFactoryBean;
+import org.springframework.data.hadoop.config.AbstractPropertiesConfiguredBeanDefinitionParser;
+import org.springframework.data.hadoop.config.NamespaceUtils;
+import org.springframework.util.StringUtils;
+import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
 
 /**
  * @author Costin Leau
  */
-/**
- * @author Costin Leau
- */
-class CascadingRunnerParser extends AbstractImprovedSimpleBeanDefinitionParser {
+class CascadingFlowParser extends AbstractPropertiesConfiguredBeanDefinitionParser {
 
 	@Override
 	protected Class<?> getBeanClass(Element element) {
-		return CascadingRunner.class;
+		return HadoopFlowFactoryBean.class;
 	}
 
 	@Override
 	protected boolean isEligibleAttribute(String attributeName) {
-		return !("pre-action".equals(attributeName) || "post-action".equals(attributeName))
-				&& super.isEligibleAttribute(attributeName);
+		return !("write-dot".equals(attributeName)) && super.isEligibleAttribute(attributeName);
 	}
 
 	@Override
@@ -44,12 +44,13 @@ class CascadingRunnerParser extends AbstractImprovedSimpleBeanDefinitionParser {
 		// parse attributes using conventions
 		super.doParse(element, parserContext, builder);
 
-		NamespaceUtils.setCSVReferenceProperty(element, builder, "pre-action", "preAction");
-		NamespaceUtils.setCSVReferenceProperty(element, builder, "post-action", "postAction");
-	}
+		NamespaceUtils.setPropertyValue(element, builder, "write-dot", "writeDOT");
 
-	@Override
-	protected boolean shouldGenerateIdAsFallback() {
-		return true;
+		// parse properties
+		String props = DomUtils.getTextValue(element);
+
+		if (StringUtils.hasText(props)) {
+			builder.addPropertyValue("properties", props);
+		}
 	}
 }

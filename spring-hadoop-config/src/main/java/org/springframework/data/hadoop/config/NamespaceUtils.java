@@ -25,7 +25,7 @@ import org.w3c.dom.Element;
  * 
  * @author Costin Leau
  */
-abstract class NamespaceUtils {
+public abstract class NamespaceUtils {
 
 	static final String REF_ATTRIBUTE = "ref";
 
@@ -33,7 +33,7 @@ abstract class NamespaceUtils {
 		return attributeName.endsWith("-ref");
 	}
 
-	static void setPropertyValue(Element element, BeanDefinitionBuilder builder, String attrName, String propertyName) {
+	public static void setPropertyValue(Element element, BeanDefinitionBuilder builder, String attrName, String propertyName) {
 		String attr = element.getAttribute(attrName);
 		if (StringUtils.hasText(attr)) {
 			builder.addPropertyValue(propertyName, attr);
@@ -73,7 +73,7 @@ abstract class NamespaceUtils {
 		return false;
 	}
 
-	static boolean setCSVReferenceProperty(Element element, BeanDefinitionBuilder builder, String attrName, String propertyName) {
+	public static boolean setCSVReferenceProperty(Element element, BeanDefinitionBuilder builder, String attrName, String propertyName) {
 		String attr = element.getAttribute(attrName);
 		if (StringUtils.hasText(attr)) {
 			String[] strs = StringUtils.commaDelimitedListToStringArray(attr);
