@@ -213,18 +213,18 @@ configure(javaProjects()) {
 		ext.srcDir = file("${projectDir}/docs/src/api")
 	  
 		configure(options) {
-			stylesheetFile = file("${srcDir}/spring-javadoc.css")
-			overview = "${srcDir}/overview.html"
+			stylesheetFile = file("${rootProject.projectDir}/docs/src/api/spring-javadoc.css")
+			overview = "${rootProject.projectDir}/docs/src/api/overview.html"
 			docFilesSubDirs = true
 			outputLevel = org.gradle.external.javadoc.JavadocOutputLevel.QUIET
 			breakIterator = true
 			author = true
 			showFromProtected()
-	
+
 	//		groups = [
 	//		'Spring Data Hadoop' : ['org.springframework.data.hadoop*'],
 	//		]
-	  
+  
 			links = [
 				"http://static.springframework.org/spring/docs/3.0.x/javadoc-api",
 				"http://download.oracle.com/javase/6/docs/api",
@@ -431,7 +431,7 @@ project('spring-data-hadoop-batch') {
 
 }
 
-project('spring-data-hadoop-config') {
+project('spring-data-hadoop') {
 	description = 'Spring for Apache Hadoop Configuration'
 
 	dependencies {
@@ -448,7 +448,7 @@ project('spring-hadoop-test') {
 	dependencies {
 		compile project(":spring-data-hadoop-core")
 		compile project(":spring-data-hadoop-batch")
-		compile project(":spring-data-hadoop-config")
+		compile project(":spring-data-hadoop")
 		compile project(":spring-cascading")
 
 		// Testing

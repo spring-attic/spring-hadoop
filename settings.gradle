@@ -1,4 +1,4 @@
-rootProject.name = 'spring-data-hadoop'
+//rootProject.name = 'spring-data-hadoop'
 
 ext.hadoopDistro = hasProperty("distro") ? getProperty("distro") : "default"
 switch (ext.hadoopDistro) {
@@ -25,7 +25,7 @@ rootProject.children.find{ it.name == 'spring-hadoop-core' }.name = 'spring-data
 include 'spring-hadoop-batch'
 rootProject.children.find{ it.name == 'spring-hadoop-batch' }.name = 'spring-data-hadoop-batch'
 include 'spring-hadoop-config'
-rootProject.children.find{ it.name == 'spring-hadoop-config' }.name = 'spring-data-hadoop-config'
+rootProject.children.find{ it.name == 'spring-hadoop-config' }.name = 'spring-data-hadoop'
 include 'spring-hadoop-test'
 include 'spring-cascading'
 if (!version1) {
