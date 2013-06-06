@@ -37,8 +37,12 @@ def hadoopProjects() {
 // 
 def List hadoop = []
 
-def hadoopDistro = project.hasProperty("distro") ? project.getProperty("distro") : "hadoop10"
+def hadoopDefault = "hadoop10"
+def hadoopDistro = project.hasProperty("distro") ? project.getProperty("distro") : hadoopDefault
 def hadoopVersion = hadoop10Version
+
+// make it possible to use Pig jars compiled for Hadoop 2.0
+def pigQualifier = ''
 
 // handle older Hive version
 def hiveGroup = "org.apache.hive"
@@ -107,6 +111,7 @@ switch (hadoopDistro) {
 		hbaseVersion = hd20HbaseVersion
 		hiveVersion = hd20HiveVersion
 		pigVersion = hd20PigVersion
+		pigQualifier = ':h2'
 		thriftVersion = hd20ThriftVersion
 		break;
 
@@ -323,6 +328,7 @@ configure(hadoopProjects()) {
 			dependencies {
 				testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
 				testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
+				testRuntime "dk.brics.automaton:automaton:1.11-8"
 			}
 			break;
 
@@ -382,7 +388,7 @@ configure(hadoopProjects()) {
 		//testRuntime "org.apache.thrift:libfb303:$thriftVersion"
 
 		// Pig
-		optional("org.apache.pig:pig:$pigVersion")
+		optional("org.apache.pig:pig:$pigVersion$pigQualifier")
 	
 		// HBase
 		optional("org.apache.hbase:hbase:$hbaseVersion") { dep ->
@@ -476,7 +482,6 @@ project('spring-hadoop-test') {
 		description = "Enabling Pig tests"
 		group = "Verification"
 		doLast() {
-			println description
 			project.ext.skipPig = false
 		}
 	}
@@ -485,7 +490,6 @@ project('spring-hadoop-test') {
 		description = "Enabling Hive tests"
 		group = "Verification"
 		doLast() {
-			println description
 			project.ext.skipHive = false
 		}
 	}
@@ -494,7 +498,6 @@ project('spring-hadoop-test') {
 		description = "Enabling HBase tests"
 		group = "Verification"
 		doLast() {
-			println description
 			project.ext.skipHBase = false
 		}
 	}
@@ -503,7 +506,6 @@ project('spring-hadoop-test') {
 		description = "Enabling WebHdfs tests"
 		group = "Verification"
 		doLast() {
-			println description
 			project.ext.skipWebHdfs = false
 		}
 	}
@@ -512,7 +514,6 @@ project('spring-hadoop-test') {
 		description = "Enabling Cascading tests"
 		group = "Verification"
 		doLast() {
-			println description
 			project.ext.skipCascading = false
 		}
 	}
@@ -521,7 +522,6 @@ project('spring-hadoop-test') {
 		description = "Enabling all (incl. Pig, Hive, HBase, WebHdfs, Cascading) tests"
 		group = "Verification"
 		doLast() {
-			println description
 			project.ext.skipPig = false
 			project.ext.skipHive = false
 			project.ext.skipHBase = false
@@ -545,9 +545,6 @@ project('spring-hadoop-test') {
 		doFirst() {
 			ext.msg = " "
 
-			println "PIG: ${project.ext.skipPig} :: ${skipPig}"
-			println "HIVE: ${project.ext.skipHive} :: ${skipHive}"
-	
 			if (project.ext.skipPig) {
 				ext.msg += "Pig "
 				excludes.add("**/pig/**")
