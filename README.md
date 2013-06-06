@@ -51,6 +51,11 @@ dependencies {
 }
 ~~~~~
 
+The dependency shown above is the standard one that includes the namespace support as well as core and batch support. If you don't use the namespace then you can 
+use either the `spring-data-hadoop-batch` or `spring-data-hadoop-core` artifacts, depending on if you use any of the batch features or not. 
+
+For the Cascading support you need to include a dependency on the `spring-cascading` artifact.
+
 The available releases can be seen in the [SpringSource Repository](http://repo.springsource.org/simple/libs-milestone/org/springframework/data/spring-data-hadoop/)
 
 
@@ -76,7 +81,7 @@ In this case, the specified Hadoop distribution (above Apache Hadoop 1.1.x) is u
 
 # CI Builds
 
-The results for CI builds are available at [Spring Data Hadoop: Project Summary - Spring CI](https://build.springsource.org/browse/SPRINGDATAHADOOP)
+The status of the CI builds are available at [Status Summary Screen](https://build.springsource.org/telemetry.action?filter=project&projectKey=SPRINGDATAHADOOP)
 
 We are currently running tests against the following distributions:
 * Apache Hadoop 1.0.4
