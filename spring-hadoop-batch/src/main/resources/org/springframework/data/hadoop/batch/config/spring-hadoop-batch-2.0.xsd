@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.springframework.org/schema/hadoop-batch"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:tool="http://www.springframework.org/schema/tool"
+	xmlns:hdp="http://www.springframework.org/schema/hadoop"
+	targetNamespace="http://www.springframework.org/schema/hadoop-batch"
+	elementFormDefault="qualified"
+	attributeFormDefault="unqualified"
+	version="2.0.0">
+
+	<xsd:import namespace="http://www.springframework.org/schema/beans" />
+	<xsd:import namespace="http://www.springframework.org/schema/tool" />
+	<xsd:import namespace="http://www.springframework.org/schema/hadoop" />
+
+	<xsd:annotation>
+		<xsd:documentation><![CDATA[
+Defines the configuration elements for Spring Data Hadoop tasklet.
+		]]></xsd:documentation>
+	</xsd:annotation>
+
+	<xsd:element name="job-tasklet" type="hdp:jobRunnerType">
+		<xsd:annotation>
+		   <xsd:documentation><![CDATA[
+Defines a Spring Batch tasklet for Hadoop Jobs.
+				]]>
+          </xsd:documentation>
+	      <xsd:appinfo>
+	        <tool:annotation>
+	          <tool:exports type="org.springframework.data.hadoop.batch.mapreduce.JobTasklet"/>
+	        </tool:annotation>
+	      </xsd:appinfo>
+		</xsd:annotation>
+	</xsd:element>
+
+	<xsd:element name="jar-tasklet" type="hdp:jarRunnerType">
+		<xsd:annotation>
+		   <xsd:documentation><![CDATA[
+Defines a Hadoop Jar Tasklet.]]></xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	
+	
+	<xsd:element name="tool-tasklet" type="hdp:toolRunnerType">
+		<xsd:annotation>
+		   <xsd:documentation><![CDATA[
+Defines a Hadoop Tool Tasklet.]]></xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+
+	<xsd:element name="pig-tasklet" type="hdp:pigRunnerType">
+		<xsd:annotation>
+		   <xsd:documentation><![CDATA[
+Defines a PigTasklet.
+				]]></xsd:documentation>
+	      <xsd:appinfo>
+	        <tool:annotation>
+	          <tool:exports type="org.springframework.data.hadoop.batch.pig.PigTasklet"/>
+	        </tool:annotation>
+	      </xsd:appinfo>
+		</xsd:annotation>
+	</xsd:element>
+	
+	<xsd:element name="hive-tasklet" type="hdp:hiveRunnerType">
+		<xsd:annotation>
+		   <xsd:documentation><![CDATA[
+Defines a HiveTasklet.
+				]]></xsd:documentation>
+	      <xsd:appinfo>
+	        <tool:annotation>
+	          <tool:exports type="org.springframework.data.hadoop.batch.tasklet.HiveTasket"/>
+	        </tool:annotation>
+	      </xsd:appinfo>
+		</xsd:annotation>
+	</xsd:element>
+	
+	<xsd:element name="script-tasklet">
+		<xsd:complexType>
+			<xsd:annotation>
+			   <xsd:documentation><![CDATA[
+Defines a scripting Tasklet for interacting with Hadoop. Allows Groovy, JavaScript (Rhino), Ruby (JRuby), Python (Jython)
+or any JSR-223 scripting language to be used for executing commands against Hadoop, in particular its file system.  
+					]]>
+	          </xsd:documentation>
+		      <xsd:appinfo>
+		        <tool:annotation>
+		          <tool:exports type="java.lang.Object"/>
+		        </tool:annotation>
+		      </xsd:appinfo>
+			</xsd:annotation>
+			<xsd:sequence>
+				<xsd:element name="script" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+						<xsd:documentation><![CDATA[
+Nested script declaration.]]></xsd:documentation>
+			 	</xsd:annotation>
+			 	<xsd:complexType mixed="true">
+			 		<xsd:complexContent>
+			 			<xsd:extension base="hdp:scriptingType"/>
+			 		</xsd:complexContent>
+			 	</xsd:complexType>			
+				</xsd:element>
+			</xsd:sequence>			
+			<xsd:attribute name="id" type="xsd:ID" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+Bean id.]]></xsd:documentation>
+			</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="script-ref" type="xsd:string">
+				<xsd:annotation>
+						<xsd:documentation><![CDATA[
+Reference to a script declaration.]]></xsd:documentation>
+						<xsd:appinfo>
+							<tool:annotation kind="ref">
+								<tool:expected-type type="java.lang.Object" />
+							</tool:annotation>
+						</xsd:appinfo>
+			 	</xsd:annotation>			
+			</xsd:attribute>
+			<xsd:attribute name="scope" type="xsd:string" use="optional" />			
+		</xsd:complexType>
+	</xsd:element>
+	
+</xsd:schema>

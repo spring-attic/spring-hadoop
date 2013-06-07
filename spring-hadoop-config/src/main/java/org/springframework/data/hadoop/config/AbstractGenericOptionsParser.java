@@ -22,7 +22,7 @@ import org.w3c.dom.Element;
 /**
  * @author Costin Leau
  */
-class AbstractGenericOptionsParser extends AbstractPropertiesConfiguredBeanDefinitionParser {
+public class AbstractGenericOptionsParser extends AbstractPropertiesConfiguredBeanDefinitionParser {
 
 	protected boolean isEligibleAttribute(String attributeName) {
 		return !("files".equals(attributeName) || "libs".equals(attributeName) || "archives".equals(attributeName))

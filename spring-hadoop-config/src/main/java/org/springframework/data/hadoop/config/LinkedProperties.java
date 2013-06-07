@@ -30,7 +30,7 @@ import org.springframework.beans.factory.support.ManagedProperties;
  * 
  * @author Costin Leau
  */
-class LinkedProperties extends ManagedProperties {
+public class LinkedProperties extends ManagedProperties {
 
 	private final LinkedHashSet<Object> keys = new LinkedHashSet<Object>();
 

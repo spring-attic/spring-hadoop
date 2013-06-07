@@ -75,20 +75,6 @@ For fine-tuned control, a dedicated Executor is recommended.
 		<xsd:attribute name="scope" type="xsd:string" use="optional" />
 	</xsd:complexType>
 
-	<xsd:element name="job-tasklet" type="jobRunnerType">
-		<xsd:annotation>
-		   <xsd:documentation><![CDATA[
-Defines a Spring Batch tasklet for Hadoop Jobs.
-				]]>
-          </xsd:documentation>
-	      <xsd:appinfo>
-	        <tool:annotation>
-	          <tool:exports type="org.springframework.data.hadoop.batch.mapreduce.JobTasklet"/>
-	        </tool:annotation>
-	      </xsd:appinfo>
-		</xsd:annotation>
-	</xsd:element>
-
 	<xsd:element name="job-runner">
 		<xsd:annotation>
 		   <xsd:documentation><![CDATA[
@@ -798,14 +784,6 @@ Post actions/beans to be called before running the action. Multiple bean names c
 		</xsd:complexType>
 	</xsd:element>
 
-	<xsd:element name="jar-tasklet" type="jarRunnerType">
-		<xsd:annotation>
-		   <xsd:documentation><![CDATA[
-Defines a Hadoop Jar Tasklet.]]></xsd:documentation>
-		</xsd:annotation>
-	</xsd:element>
-	
-	
 	<!-- common attributes shared by properties based configurations 
 		 NOT meant for extensibility - do NOT rely on this type as it might be removed in the future -->
 	<xsd:complexType name="toolRunnerType">
@@ -900,13 +878,6 @@ Post actions/beans to be called before running the action. Multiple bean names c
 		</xsd:extension>
 		</xsd:complexContent>
 		</xsd:complexType>
-	</xsd:element>
-
-	<xsd:element name="tool-tasklet" type="toolRunnerType">
-		<xsd:annotation>
-		   <xsd:documentation><![CDATA[
-Defines a Hadoop Tool Tasklet.]]></xsd:documentation>
-		</xsd:annotation>
 	</xsd:element>
 
 	<xsd:complexType name="entryType">
@@ -1112,19 +1083,6 @@ Reference to a PigTemplate. Alternative to 'pig-server-ref' attribute.
 		<xsd:attribute name="scope" type="xsd:string" use="optional" />		
 	</xsd:complexType>
 
-	<xsd:element name="pig-tasklet" type="pigRunnerType">
-		<xsd:annotation>
-		   <xsd:documentation><![CDATA[
-Defines a PigTasklet.
-				]]></xsd:documentation>
-	      <xsd:appinfo>
-	        <tool:annotation>
-	          <tool:exports type="org.springframework.data.hadoop.pig.PigTasket"/>
-	        </tool:annotation>
-	      </xsd:appinfo>
-		</xsd:annotation>
-	</xsd:element>
-	
 	<xsd:element name="pig-runner">
 		<xsd:annotation>
 		   <xsd:documentation><![CDATA[
@@ -1376,19 +1334,6 @@ Reference to a HiveTemplate instance.   Alternative to 'hive-client-factory-ref'
 		<xsd:attribute name="scope" type="xsd:string" use="optional" />		
 	</xsd:complexType>
 	
-	<xsd:element name="hive-tasklet" type="hiveRunnerType">
-		<xsd:annotation>
-		   <xsd:documentation><![CDATA[
-Defines a HiveTasklet.
-				]]></xsd:documentation>
-	      <xsd:appinfo>
-	        <tool:annotation>
-	          <tool:exports type="org.springframework.data.hadoop.hive.HiveTasket"/>
-	        </tool:annotation>
-	      </xsd:appinfo>
-		</xsd:annotation>
-	</xsd:element>
-	
 	<xsd:element name="hive-runner">
 		<xsd:annotation>
 		   <xsd:documentation><![CDATA[
@@ -1560,54 +1505,6 @@ Post actions/beans to be called before running the action. Multiple bean names c
 				</xsd:attribute>			
 				</xsd:extension>
 			</xsd:complexContent>
-		</xsd:complexType>
-	</xsd:element>
-	
-	<xsd:element name="script-tasklet">
-		<xsd:complexType>
-			<xsd:annotation>
-			   <xsd:documentation><![CDATA[
-Defines a scripting Tasklet for interacting with Hadoop. Allows Groovy, JavaScript (Rhino), Ruby (JRuby), Python (Jython)
-or any JSR-223 scripting language to be used for executing commands against Hadoop, in particular its file system.  
-					]]>
-	          </xsd:documentation>
-		      <xsd:appinfo>
-		        <tool:annotation>
-		          <tool:exports type="java.lang.Object"/>
-		        </tool:annotation>
-		      </xsd:appinfo>
-			</xsd:annotation>
-			<xsd:sequence>
-				<xsd:element name="script" minOccurs="0" maxOccurs="1">
-				<xsd:annotation>
-						<xsd:documentation><![CDATA[
-Nested script declaration.]]></xsd:documentation>
-			 	</xsd:annotation>
-			 	<xsd:complexType mixed="true">
-			 		<xsd:complexContent>
-			 			<xsd:extension base="scriptingType"/>
-			 		</xsd:complexContent>
-			 	</xsd:complexType>			
-				</xsd:element>
-			</xsd:sequence>			
-			<xsd:attribute name="id" type="xsd:ID" use="optional">
-			<xsd:annotation>
-				<xsd:documentation><![CDATA[
-Bean id.]]></xsd:documentation>
-			</xsd:annotation>
-			</xsd:attribute>
-			<xsd:attribute name="script-ref" type="xsd:string">
-				<xsd:annotation>
-						<xsd:documentation><![CDATA[
-Reference to a script declaration.]]></xsd:documentation>
-						<xsd:appinfo>
-							<tool:annotation kind="ref">
-								<tool:expected-type type="java.lang.Object" />
-							</tool:annotation>
-						</xsd:appinfo>
-			 	</xsd:annotation>			
-			</xsd:attribute>
-			<xsd:attribute name="scope" type="xsd:string" use="optional" />			
 		</xsd:complexType>
 	</xsd:element>
 </xsd:schema>

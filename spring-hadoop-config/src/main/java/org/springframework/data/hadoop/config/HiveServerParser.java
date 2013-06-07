@@ -55,7 +55,7 @@ class HiveServerParser extends AbstractPropertiesConfiguredBeanDefinitionParser 
 		}
 
 		// parse scripts
-		Collection<Object> scripts = HiveTaskletParser.parseScripts(parserContext, element);
+		Collection<Object> scripts = HiveRunnerParser.parseScripts(parserContext, element);
 		if (!CollectionUtils.isEmpty(scripts)) {
 			builder.addPropertyValue("scripts", scripts);
 		}

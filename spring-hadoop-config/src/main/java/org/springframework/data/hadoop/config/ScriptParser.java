@@ -36,7 +36,7 @@ import org.w3c.dom.Element;
  * 
  * @author Costin Leau
  */
-class ScriptParser extends AbstractImprovedSimpleBeanDefinitionParser {
+public class ScriptParser extends AbstractImprovedSimpleBeanDefinitionParser {
 
 
 	@Override

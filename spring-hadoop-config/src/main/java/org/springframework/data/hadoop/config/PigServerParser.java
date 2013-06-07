@@ -41,7 +41,7 @@ import org.w3c.dom.Element;
  * 
  * @author Costin Leau
  */
-class PigServerParser extends AbstractPropertiesConfiguredBeanDefinitionParser {
+public class PigServerParser extends AbstractPropertiesConfiguredBeanDefinitionParser {
 
 	@Override
 	protected Class<?> getBeanClass(Element element) {
@@ -91,7 +91,7 @@ class PigServerParser extends AbstractPropertiesConfiguredBeanDefinitionParser {
 		builder.addPropertyValue("pigContext", contextBuilder.getBeanDefinition());
 	}
 
-	static Collection<BeanDefinition> parseScripts(ParserContext context, Element element) {
+	public static Collection<BeanDefinition> parseScripts(ParserContext context, Element element) {
 		Collection<Element> children = DomUtils.getChildElementsByTagName(element, "script");
 
 		if (!children.isEmpty()) {

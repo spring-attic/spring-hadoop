@@ -59,7 +59,7 @@ public abstract class NamespaceUtils {
 						attrName.length() - 4) : attrName));
 	}
 
-	static boolean setCSVProperty(Element element, BeanDefinitionBuilder builder, String attrName, String propertyName) {
+	public static boolean setCSVProperty(Element element, BeanDefinitionBuilder builder, String attrName, String propertyName) {
 		String attr = element.getAttribute(attrName);
 		if (StringUtils.hasText(attr)) {
 			String[] strs = StringUtils.commaDelimitedListToStringArray(attr);

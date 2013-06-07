@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 the original author or authors.
+ * Copyright 2011 the original author or authors.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,29 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.hadoop.config;
+package org.springframework.data.hadoop.batch.config;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.data.hadoop.batch.mapreduce.JarTasklet;
+import org.springframework.data.hadoop.batch.mapreduce.JobTasklet;
+import org.springframework.data.hadoop.config.AbstractImprovedSimpleBeanDefinitionParser;
+import org.springframework.data.hadoop.config.NamespaceUtils;
 import org.w3c.dom.Element;
 
 /**
- * Parser for 'jar-tasklet' element.
+ * Hadoop Tasklet Parser.
  * 
  * @author Costin Leau
  */
-class JarTaskletParser extends AbstractGenericOptionsParser {
+class HadoopJobTaskletParser extends AbstractImprovedSimpleBeanDefinitionParser {
 
 	@Override
 	protected Class<?> getBeanClass(Element element) {
-		return JarTasklet.class;
+		return JobTasklet.class;
+	}
+
+	@Override
+	protected boolean isEligibleAttribute(String attributeName) {
+		return (!"job-ref".equals(attributeName)) && super.isEligibleAttribute(attributeName);
 	}
 
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
+		// parse attributes using conventions
 		super.doParse(element, parserContext, builder);
-		JarRunnerParser.parseJarDefinition(element, parserContext, builder);
+
+		NamespaceUtils.setCSVProperty(element, builder, "job-ref", "jobNames");
 	}
 
 	@Override

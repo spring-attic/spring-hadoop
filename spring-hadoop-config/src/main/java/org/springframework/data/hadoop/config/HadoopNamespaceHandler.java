@@ -33,7 +33,6 @@ class HadoopNamespaceHandler extends NamespaceHandlerSupport {
 	private static String DEFAULT_CONVERTER = "org.springframework.data.hadoop.mapreduce.MapReducePropertyEditorRegistrar.ns.registration";
 
 	public void init() {
-		registerBeanDefinitionParser("job-tasklet", new HadoopJobTaskletParser());
 		registerBeanDefinitionParser("job-runner", new HadoopJobRunnerParser());
 		registerBeanDefinitionParser("job", new HadoopJobParser());
 		registerBeanDefinitionParser("streaming", new HadoopStreamJobParser());
@@ -43,22 +42,17 @@ class HadoopNamespaceHandler extends NamespaceHandlerSupport {
 		registerBeanDefinitionParser("cache", new DistributedCacheParser());
 
 		registerBeanDefinitionParser("tool-runner", new ToolRunnerParser());
-		registerBeanDefinitionParser("tool-tasklet", new ToolTaskletParser());
 
 		registerBeanDefinitionParser("jar-runner", new JarRunnerParser());
-		registerBeanDefinitionParser("jar-tasklet", new JarTaskletParser());
 
 		registerBeanDefinitionParser("script", new ScriptParser());
-		registerBeanDefinitionParser("script-tasklet", new ScriptTaskletParser());
 
 		registerBeanDefinitionParser("pig-factory", new PigServerParser());
-		registerBeanDefinitionParser("pig-tasklet", new PigTaskletParser());
 		registerBeanDefinitionParser("pig-template", new PigTemplateParser());
 		registerBeanDefinitionParser("pig-runner", new PigRunnerParser());
 
 		registerBeanDefinitionParser("hive-client-factory", new HiveClientParser());
 		registerBeanDefinitionParser("hive-server", new HiveServerParser());
-		registerBeanDefinitionParser("hive-tasklet", new HiveTaskletParser());
 		registerBeanDefinitionParser("hive-template", new HiveTemplateParser());
 		registerBeanDefinitionParser("hive-runner", new HiveRunnerParser());
 

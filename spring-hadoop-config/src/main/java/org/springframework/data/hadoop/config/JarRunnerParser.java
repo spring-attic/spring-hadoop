@@ -29,7 +29,7 @@ import org.w3c.dom.Element;
  * 
  * @author Costin Leau
  */
-class JarRunnerParser extends AbstractGenericOptionsParser {
+public class JarRunnerParser extends AbstractGenericOptionsParser {
 
 	@Override
 	protected Class<?> getBeanClass(Element element) {
@@ -48,7 +48,7 @@ class JarRunnerParser extends AbstractGenericOptionsParser {
 		parseJarDefinition(element, parserContext, builder);
 	}
 
-	static void parseJarDefinition(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
+	public static void parseJarDefinition(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 		List<Element> list = DomUtils.getChildElements(element);
 		
 		ManagedList<Object> args = new ManagedList<Object>();

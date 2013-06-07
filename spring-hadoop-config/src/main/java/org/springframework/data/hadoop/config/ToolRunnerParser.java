@@ -29,7 +29,7 @@ import org.w3c.dom.Element;
  * 
  * @author Costin Leau
  */
-class ToolRunnerParser extends AbstractGenericOptionsParser {
+public class ToolRunnerParser extends AbstractGenericOptionsParser {
 
 	@Override
 	protected Class<?> getBeanClass(Element element) {
@@ -52,7 +52,7 @@ class ToolRunnerParser extends AbstractGenericOptionsParser {
 		NamespaceUtils.setCSVReferenceProperty(element, builder, "post-action", "postAction");
 	}
 
-	static void parseToolDefinition(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
+	public static void parseToolDefinition(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 		List<Element> list = DomUtils.getChildElements(element);
 		
 		ManagedList<Object> args = new ManagedList<Object>();

@@ -1,0 +1,2 @@
+http\://www.springframework.org/schema/hadoop/spring-hadoop-batch-2.0.xsd=/org/springframework/data/hadoop/batch/config/spring-hadoop-batch-2.0.xsd
+http\://www.springframework.org/schema/hadoop/spring-hadoop-batch.xsd=/org/springframework/data/hadoop/batch/config/spring-hadoop-batch-2.0.xsd

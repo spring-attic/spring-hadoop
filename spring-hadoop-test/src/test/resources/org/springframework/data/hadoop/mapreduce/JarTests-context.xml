@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:hdp="http://www.springframework.org/schema/hadoop"
+	xmlns:hdpb="http://www.springframework.org/schema/hadoop-batch"
 	xmlns:batch="http://www.springframework.org/schema/batch"
 	xmlns:util="http://www.springframework.org/schema/util"
 	xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd
+		http://www.springframework.org/schema/hadoop-batch http://www.springframework.org/schema/hadoop/spring-hadoop-batch.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
 		http://www.springframework.org/schema/batch	http://www.springframework.org/schema/batch/spring-batch-2.1.xsd">
 
@@ -24,18 +26,18 @@
 
 	<job id="mainJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="cleanup" next="wordcount">
-			<hdp:jar-tasklet id="tasklet-ns" scope="prototype" jar="mini-hadoop-examples.jar">
+			<hdpb:jar-tasklet id="tasklet-ns" scope="prototype" jar="mini-hadoop-examples.jar">
 				<hdp:arg value="wordcount"/>
 				<hdp:arg value="/ide-test/input/word"/>
 				<hdp:arg value="/ide-test/output/wc"/>
-			</hdp:jar-tasklet>
+			</hdpb:jar-tasklet>
 		</step>
 		<step id="wordcount">
-			<hdp:script-tasklet id="script-tasklet">
+			<hdpb:script-tasklet id="script-tasklet">
 				<hdp:script language="javascript">
 if (fsh.test("/ide-test/output/wc")) fsh.rmr("/ide-test/output/wc")
 				</hdp:script>
-			</hdp:script-tasklet>
+			</hdpb:script-tasklet>
 		</step>
 	</job>
 	

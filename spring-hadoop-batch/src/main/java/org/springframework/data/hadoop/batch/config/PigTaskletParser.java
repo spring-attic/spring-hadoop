@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.hadoop.config;
+package org.springframework.data.hadoop.batch.config;
 
 import java.util.Collection;
 
@@ -21,6 +21,8 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.data.hadoop.batch.pig.PigTasklet;
+import org.springframework.data.hadoop.config.AbstractImprovedSimpleBeanDefinitionParser;
+import org.springframework.data.hadoop.config.PigServerParser;
 import org.springframework.util.CollectionUtils;
 import org.w3c.dom.Element;
 

@@ -46,7 +46,7 @@ class HiveClientParser extends AbstractImprovedSimpleBeanDefinitionParser {
 		super.doParse(element, parserContext, builder);
 
 		// parse scripts
-		Collection<Object> scripts = HiveTaskletParser.parseScripts(parserContext, element);
+		Collection<Object> scripts = HiveRunnerParser.parseScripts(parserContext, element);
 		if (!CollectionUtils.isEmpty(scripts)) {
 			builder.addPropertyValue("scripts", scripts);
 		}

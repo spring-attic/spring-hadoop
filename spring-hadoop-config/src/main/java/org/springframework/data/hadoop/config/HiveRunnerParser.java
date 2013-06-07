@@ -16,17 +16,26 @@
 package org.springframework.data.hadoop.config;
 
 import java.util.Collection;
+import java.util.Collections;
 
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.GenericBeanDefinition;
+import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.data.hadoop.hive.HiveRunner;
+import org.springframework.data.hadoop.hive.HiveScript;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
+import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
 
 /**
  * @author Costin Leau
  */
-class HiveRunnerParser extends AbstractImprovedSimpleBeanDefinitionParser {
+public class HiveRunnerParser extends AbstractImprovedSimpleBeanDefinitionParser {
 
 	@Override
 	protected Class<?> getBeanClass(Element element) {
@@ -48,13 +57,64 @@ class HiveRunnerParser extends AbstractImprovedSimpleBeanDefinitionParser {
 		NamespaceUtils.setCSVReferenceProperty(element, builder, "post-action", "postAction");
 
 		// parse scripts
-		Collection<Object> scripts = HiveTaskletParser.parseScripts(parserContext, element);
+		Collection<Object> scripts = parseScripts(parserContext, element);
 		if (!CollectionUtils.isEmpty(scripts)) {
 			builder.addPropertyValue("scripts", scripts);
 		}
 	}
 
-	@Override
+    public static Collection<Object> parseScripts(ParserContext context, Element element) {
+        Collection<Element> children = DomUtils.getChildElementsByTagName(element, "script");
+
+        if (!children.isEmpty()) {
+            Collection<Object> defs = new ManagedList<Object>(children.size());
+
+            for (Element child : children) {
+                // parse source
+                String location = child.getAttribute("location");
+                String inline = DomUtils.getTextValue(child);
+                boolean hasScriptInlined = StringUtils.hasText(inline);
+
+                GenericBeanDefinition def = new GenericBeanDefinition();
+                def.setSource(child);
+                def.setBeanClass(HiveScript.class);
+
+                Object resource = null;
+
+                if (StringUtils.hasText(location)) {
+                    if (hasScriptInlined) {
+                        context.getReaderContext().error("cannot specify both 'location' and a nested script; use only one", element);
+                    }
+                    resource = location;
+                }
+                else {
+                    if (!hasScriptInlined) {
+                        context.getReaderContext().error("no 'location' or nested script specified", element);
+                    }
+
+                    resource = BeanDefinitionBuilder.genericBeanDefinition(ByteArrayResource.class).
+                            addConstructorArgValue(inline).
+                            addConstructorArgValue("resource for inlined script").getBeanDefinition();
+                }
+
+                def.getConstructorArgumentValues().addIndexedArgumentValue(0, resource, Resource.class.getName());
+                String args = DomUtils.getChildElementValueByTagName(child, "arguments");
+
+                if (args != null) {
+                    BeanDefinition params = BeanDefinitionBuilder.genericBeanDefinition(LinkedProperties.class).addConstructorArgValue(args).getBeanDefinition();
+                    def.getConstructorArgumentValues().addIndexedArgumentValue(1, params);
+                }
+                defs.add(def);
+
+            }
+
+            return defs;
+        }
+
+        return Collections.emptyList();
+    }
+
+    @Override
 	protected boolean shouldGenerateIdAsFallback() {
 		return true;
 	}

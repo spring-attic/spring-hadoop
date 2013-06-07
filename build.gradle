@@ -560,7 +560,7 @@ project('spring-data-hadoop-batch') {
 	description = 'Spring for Apache Hadoop Batch Features'
 
 	dependencies {
-		compile project(":spring-data-hadoop-core")
+		compile project(":spring-data-hadoop")
 		compile "org.springframework.batch:spring-batch-core:$springBatchVersion"
 		testRuntime "org.springframework.integration:spring-integration-file:$springIntVersion"
 	}
@@ -572,7 +572,6 @@ project('spring-data-hadoop') {
 
 	dependencies {
 		compile project(":spring-data-hadoop-core")
-		compile project(":spring-data-hadoop-batch")
 	}
 
 }
@@ -733,7 +732,7 @@ project('spring-cascading') {
 	description = 'Spring Cascading Support'
 
 	dependencies {
-		compile project(":spring-data-hadoop")
+		compile project(":spring-data-hadoop-batch")
 
 		compile "org.springframework.integration:spring-integration-core:$springIntVersion"
 		// cascading
