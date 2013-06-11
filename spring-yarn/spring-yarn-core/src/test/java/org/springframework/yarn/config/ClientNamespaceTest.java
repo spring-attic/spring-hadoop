@@ -118,16 +118,16 @@ public class ClientNamespaceTest {
 		String appName = TestUtils.readField("appName", customYarnClientFactoryBean);
 		assertThat(appName, is("customAppName"));
 
-		int priority = TestUtils.readField("priority", customYarnClientFactoryBean);
+		Integer priority = TestUtils.readField("priority", customYarnClientFactoryBean);
 		assertThat(priority, is(1));
 
-		int memory = TestUtils.readField("memory", customYarnClientFactoryBean);
+		Integer memory = TestUtils.readField("memory", customYarnClientFactoryBean);
 		assertThat(memory, is(11));
 
 		String queue = TestUtils.readField("queue", customYarnClientFactoryBean);
 		assertThat(queue, is("customqueue"));
 
-		int virtualcores = TestUtils.readField("virtualcores", customYarnClientFactoryBean);
+		Integer virtualcores = TestUtils.readField("virtualcores", customYarnClientFactoryBean);
 		assertThat(virtualcores, is(2));
 	}
 
