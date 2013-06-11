@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:yarn="http://www.springframework.org/schema/yarn"
+	xsi:schemaLocation="http://www.springframework.org/schema/yarn http://www.springframework.org/schema/yarn/spring-yarn.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<context:property-placeholder location="hadoop-fake.properties"/>
+
+	<yarn:configuration>
+		fs.default.name=${hd.fs}
+		yarn.resourcemanager.address=${hd.rm}
+		test.foo=jee
+	</yarn:configuration>
+
+	<yarn:configuration id="complexConfig" resources="classpath:/test-site-1.xml, classpath:/test-site-2.xml" configuration-ref="yarnConfiguration">
+		test.foo.2=jee2
+	</yarn:configuration>
+
+	<yarn:configuration id="propsConfig" properties-ref="props" properties-location="cfg-1.properties, cfg-2.properties">
+		foo26=jee26
+		foo27=jee27
+		foo28=jee28
+	</yarn:configuration>
+
+	<util:properties id="props" location="props.properties"/>
+
+
+</beans>

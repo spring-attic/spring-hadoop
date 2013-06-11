@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.springframework.org/schema/integration"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:tool="http://www.springframework.org/schema/tool"
+	targetNamespace="http://www.springframework.org/schema/yarn/integration"
+	elementFormDefault="qualified"
+	attributeFormDefault="unqualified"
+	version="1.0.0">
+
+	<xsd:import namespace="http://www.springframework.org/schema/beans" />
+	<xsd:import namespace="http://www.springframework.org/schema/tool" />
+
+	<xsd:annotation>
+		<xsd:documentation><![CDATA[
+	Defines the configuration elements for Spring Yarn Integration.
+		]]></xsd:documentation>
+	</xsd:annotation>
+
+	<!-- start of top level types -->
+
+	<xsd:element name="amservice">
+		<xsd:complexType>
+			<xsd:attribute name="id" type="xsd:ID" use="optional"/>
+			<xsd:attribute name="service-impl" type="xsd:string" use="optional">
+				<xsd:annotation>
+					<xsd:documentation source="java:java.lang.Class"><![CDATA[
+	The fully qualified name of the appmaster service class.
+					]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="service-ref" type="xsd:string" use="optional"/>
+			<xsd:attribute name="channel" type="xsd:string" use="optional"/>
+			<xsd:attribute name="default-port" type="xsd:string" use="optional"/>
+			<xsd:attribute name="socket-support" type="xsd:string" use="optional"/>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="amservice-client">
+		<xsd:complexType>
+			<xsd:attribute name="id" type="xsd:ID" use="optional"/>
+			<xsd:attribute name="service-impl" type="xsd:string" use="optional">
+				<xsd:annotation>
+					<xsd:documentation source="java:java.lang.Class"><![CDATA[
+	The fully qualified name of the appmaster service client class.
+					]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="host" type="xsd:string" use="optional"/>
+			<xsd:attribute name="port" type="xsd:string" use="optional"/>
+			<xsd:attribute name="request-channel" type="xsd:string" use="optional"/>
+			<xsd:attribute name="response-channel" type="xsd:string" use="optional"/>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="converter">
+		<xsd:annotation>
+			<xsd:documentation>
+	Allows you to register Converters (implementation of the Converter interface) that will
+	be automatically registered with the ConversionService. ConversionService itself does
+	not have to be explicitly defined since the default ConversionService will be registered
+	under the name 'yarnIntegrationConversionService' unless bean with this name is already registered.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:all minOccurs="0" maxOccurs="1">
+				<xsd:element ref="beans:bean" />
+			</xsd:all>
+			<xsd:attribute name="ref" type="xsd:string" use="optional">
+				<xsd:annotation>
+					<xsd:appinfo>
+						<tool:annotation kind="ref">
+							<tool:expected-type type="java.lang.Object" />
+						</tool:annotation>
+					</xsd:appinfo>
+					<xsd:documentation>
+						<![CDATA[
+	[OPTIONAL] points to a bean reference which implements this Converter.
+	Could also be defined as inner &lt;bean&gt; element.
+						]]>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>
+
+
+
+</xsd:schema>

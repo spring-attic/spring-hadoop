@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:ip="http://www.springframework.org/schema/integration/ip"
+	xmlns:yarn-int="http://www.springframework.org/schema/yarn/integration"
+	xmlns:int-ip="http://www.springframework.org/schema/integration/ip"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/yarn/integration
+		http://www.springframework.org/schema/yarn/integration/spring-yarn-integration.xsd
+		http://www.springframework.org/schema/integration
+		http://www.springframework.org/schema/integration/spring-integration.xsd
+		http://www.springframework.org/schema/integration/ip
+		http://www.springframework.org/schema/integration/ip/spring-integration-ip.xsd
+		http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util
+		http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<yarn-int:amservice-client service-impl="org.springframework.yarn.integration.ip.mind.TestServiceClient"/>
+
+	<bean id="serializer" class="org.springframework.yarn.integration.ip.mind.MindRpcSerializer" />
+	<bean id="deserializer" class="org.springframework.yarn.integration.ip.mind.MindRpcSerializer" />
+	<ip:tcp-connection-factory id="clientConnectionFactory"
+		type="client"
+		host="localhost"
+		port="1234"
+		serializer="serializer"
+		deserializer="deserializer"/>
+	<ip:tcp-outbound-gateway id="outboundGateway"
+		connection-factory="clientConnectionFactory"
+		request-channel="clientRequestChannel"
+		reply-channel="clientResponseChannel" />
+	<int:channel id="clientRequestChannel" />
+	<int:channel id="clientResponseChannel" >
+		<int:queue />
+	</int:channel>
+
+	<yarn-int:amservice-client
+		id="yarnAmserviceClient2"
+		service-impl="org.springframework.yarn.integration.ip.mind.TestServiceClient"
+		response-channel="clientResponseChannel"
+		request-channel="clientRequestChannel" />
+
+</beans>

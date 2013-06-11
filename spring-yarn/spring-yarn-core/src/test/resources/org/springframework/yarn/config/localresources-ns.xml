@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:yarn="http://www.springframework.org/schema/yarn"
+	xsi:schemaLocation="http://www.springframework.org/schema/yarn http://www.springframework.org/schema/yarn/spring-yarn.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<context:property-placeholder location="hadoop.properties"/>
+
+	<yarn:configuration>
+		fs.default.name=${hd.fs}
+		yarn.resourcemanager.address=${hd.rm}
+	</yarn:configuration>
+
+	<yarn:configuration id="customConfiguration">
+		fs.default.name=${hd.fs}
+		yarn.resourcemanager.address=${hd.rm}
+	</yarn:configuration>
+
+	<yarn:localresources>
+		<yarn:copy src="foo.jar" dest="/tmp" staging="true"/>
+		<yarn:hdfs path="/tmp/foo.jar" staging="false"/>
+	</yarn:localresources>
+
+	<yarn:localresources id="yarnLocalresourcesWithDefaults" local="hdfs://0.0.0.0:9000" remote="hdfs://192.168.223.139:9000" type="ARCHIVE" visibility="PRIVATE">
+		<yarn:hdfs path="/tmp/foo.jar"/>
+	</yarn:localresources>
+
+	<yarn:localresources id="yarnLocalresourcesWithMixed" local="hdfs://0.0.0.0:9000" remote="hdfs://192.168.223.139:9000" type="ARCHIVE" visibility="PRIVATE">
+		<yarn:hdfs path="/tmp/foo.jar" local="hdfs://0.0.0.0:9001" remote="hdfs://192.168.223.139:9000" type="FILE" visibility="PUBLIC"/>
+		<yarn:hdfs path="/tmp/jee.jar" local="hdfs://0.0.0.0:9000" remote="hdfs://192.168.223.139:9001" type="FILE" visibility="PUBLIC"/>
+		<yarn:hdfs path="/tmp/bar.jar"/>
+	</yarn:localresources>
+
+	<yarn:localresources id="yarnLocalresourcesOverride" configuration="customConfiguration" local="hdfs://0.0.0.0:9000" remote="${test.remote}">
+		<yarn:hdfs path="/tmp/foo.jar"/>
+	</yarn:localresources>
+
+</beans>

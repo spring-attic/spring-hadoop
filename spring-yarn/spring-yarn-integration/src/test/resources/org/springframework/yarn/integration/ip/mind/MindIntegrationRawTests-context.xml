@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:ip="http://www.springframework.org/schema/integration/ip"
+	xmlns:yarn-int="http://www.springframework.org/schema/yarn/integration"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+			http://www.springframework.org/schema/beans/spring-beans.xsd
+			http://www.springframework.org/schema/yarn/integration
+			http://www.springframework.org/schema/yarn/integration/spring-yarn-integration.xsd
+			http://www.springframework.org/schema/integration
+			http://www.springframework.org/schema/integration/spring-integration.xsd
+			http://www.springframework.org/schema/integration/ip
+			http://www.springframework.org/schema/integration/ip/spring-integration-ip.xsd">
+
+	<bean id="tcpIpUtils" class="org.springframework.integration.test.util.SocketUtils" />
+
+	<bean id="serializer" class="org.springframework.yarn.integration.ip.mind.MindRpcSerializer" />
+	<bean id="deserializer" class="org.springframework.yarn.integration.ip.mind.MindRpcSerializer" />
+
+	<bean id="socketSupport" class="org.springframework.yarn.integration.support.DefaultPortExposingTcpSocketSupport" />
+
+	<ip:tcp-connection-factory id="serverConnectionFactory"
+		type="server"
+		port="#{tcpIpUtils.findAvailableServerSocket(7400)}"
+		socket-support="socketSupport"
+		serializer="serializer"
+		deserializer="deserializer"/>
+
+	<ip:tcp-connection-factory id="clientConnectionFactory"
+		type="client"
+		host="localhost"
+		port="#{serverConnectionFactory.port}"
+		serializer="serializer"
+		deserializer="deserializer"/>
+
+	<ip:tcp-inbound-gateway id="inboundGateway"
+		connection-factory="serverConnectionFactory"
+		request-channel="serverChannel" />
+
+	<ip:tcp-outbound-gateway id="outboundGateway"
+		connection-factory="clientConnectionFactory"
+		request-channel="clientRequestChannel"
+		reply-channel="clientResponseChannel" />
+
+	<int:channel id="serverChannel" />
+	<int:channel id="clientRequestChannel" />
+	<int:channel id="clientResponseChannel" >
+		<int:queue />
+	</int:channel>
+
+	<!--
+	<int:service-activator id="serviceActivator"
+		input-channel="serverChannel"
+		ref="mindAppmasterService"
+		method="handleMessage" />
+
+	<bean id="loginService" class="org.springframework.yarn.integration.ip.mind.TestService" />
+	 -->
+
+	<bean id="mapper" class="org.springframework.yarn.integration.support.Jackson2ObjectMapperFactoryBean" />
+
+	<yarn-int:converter>
+		<bean class="org.springframework.yarn.integration.convert.MindObjectToHolderConverter">
+			<constructor-arg ref="mapper"/>
+		</bean>
+	</yarn-int:converter>
+
+	<yarn-int:converter>
+		<bean class="org.springframework.yarn.integration.convert.MindHolderToObjectConverter">
+			<constructor-arg ref="mapper"/>
+			<constructor-arg value="org.springframework.yarn.integration.ip.mind"/>
+		</bean>
+	</yarn-int:converter>
+
+	<bean id="mindAppmasterService" class="org.springframework.yarn.integration.ip.mind.TestService" >
+		<property name="socketSupport" ref="socketSupport"/>
+		<property name="messageChannel" ref="serverChannel"/>
+	</bean>
+
+	<bean id="mindAppmasterServiceClient" class="org.springframework.yarn.integration.ip.mind.DefaultMindAppmasterServiceClient">
+		<property name="requestChannel" ref="clientRequestChannel"/>
+		<property name="responseChannel" ref="clientResponseChannel"/>
+	</bean>
+
+
+</beans>

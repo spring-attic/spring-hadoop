@@ -1,0 +1,1 @@
+http\://www.springframework.org/schema/yarn/integration=org.springframework.yarn.integration.config.IntegrationNamespaceHandler
