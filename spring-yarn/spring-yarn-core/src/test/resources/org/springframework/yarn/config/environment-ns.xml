@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:yarn="http://www.springframework.org/schema/yarn"
+	xsi:schemaLocation="http://www.springframework.org/schema/yarn http://www.springframework.org/schema/yarn/spring-yarn.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<context:property-placeholder location="env.properties"/>
+
+	<util:properties id="props" location="props.properties"/>
+
+	<yarn:environment>
+		foo=jee
+		test-myvar1=${myvar1}
+	</yarn:environment>
+
+	<yarn:environment id="propsEnv" properties-ref="props" properties-location="cfg-1.properties, cfg-2.properties">
+		foo26=jee26
+		foo27=jee27
+		foo28=jee28
+	</yarn:environment>
+
+	<yarn:environment id="defClasspathEnv">
+		<yarn:classpath default-yarn-app-classpath="true" delimiter=":">
+			./*
+		</yarn:classpath>
+	</yarn:environment>
+
+	<yarn:environment id="defClasspathEnvMixed">
+		<yarn:classpath default-yarn-app-classpath="true" delimiter=":">
+			./*
+		</yarn:classpath>
+		foo=jee
+		test-myvar1=${myvar1}
+	</yarn:environment>
+
+</beans>

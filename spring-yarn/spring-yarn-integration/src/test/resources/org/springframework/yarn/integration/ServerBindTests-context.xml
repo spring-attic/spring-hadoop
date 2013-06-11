@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:ip="http://www.springframework.org/schema/integration/ip"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+			http://www.springframework.org/schema/beans/spring-beans.xsd
+			http://www.springframework.org/schema/integration
+			http://www.springframework.org/schema/integration/spring-integration.xsd
+			http://www.springframework.org/schema/integration/ip
+			http://www.springframework.org/schema/integration/ip/spring-integration-ip.xsd">
+
+	<bean id="javaSerializer" class="org.springframework.core.serializer.DefaultSerializer" />
+	<bean id="javaDeserializer" class="org.springframework.core.serializer.DefaultDeserializer" />
+
+	<bean id="socketSupport" class="org.springframework.yarn.integration.ServerBindTests$TestTcpSocketSupport" />
+
+	<ip:tcp-connection-factory id="javaSerialServer"
+		type="server"
+		port="0"
+		socket-support="socketSupport"
+		serializer="javaSerializer"
+		deserializer="javaDeserializer"/>
+
+	<ip:tcp-inbound-gateway id="gatewaySerialized"
+		connection-factory="javaSerialServer"
+		request-channel="toSA" />
+
+	<int:channel id="toSA" />
+
+	<int:service-activator id="SA"
+		input-channel="toSA"
+		ref="service"
+		method="test" />
+
+	<bean id="service" class="org.springframework.yarn.integration.ServerBindTests$TestService" />
+
+</beans>

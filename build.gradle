@@ -29,6 +29,10 @@ def hadoopProjects() {
 	subprojects.findAll { project -> project.name.contains('-hadoop-') || project.name.contains('-cascading') }
 }
 
+def yarnProjects() {
+	subprojects.findAll { project -> project.name.contains('-yarn-') }
+}
+
 // 
 //  Select the Hadoop distribution used for building the binaries
 // 
@@ -745,9 +749,68 @@ project('spring-cascading') {
 }
 
 if (hadoopVersion >= "2") {
-	project('spring-yarn') {
-		description = 'Spring for Apache Hadoop YARN'
+
+	configure(yarnProjects()) {
+		task integrationTest(type: Test) {
+			include '**/*IntegrationTests.*'
+		}
+		test {
+			exclude '**/*IntegrationTests.*'
+		}
+		dependencies {
+			testCompile "junit:junit:$junitVersion"
+			testCompile "org.springframework:spring-test:$springVersion"
+			testCompile "org.hamcrest:hamcrest-core:$hamcrestVersion"
+			testCompile "org.hamcrest:hamcrest-library:$hamcrestVersion"
+		}
 	}
+
+	project('spring-yarn') {
+		description = 'Spring for Apache Hadoop YARN'	
+		dependencies {
+			compile project("spring-yarn-batch")
+		}
+	}
+	
+	project('spring-yarn:spring-yarn-core') {
+		description = 'Spring Yarn Core'
+		dependencies {
+			compile "org.apache.hadoop:hadoop-yarn-client:$hadoopVersion"
+			compile "org.apache.hadoop:hadoop-common:$hadoopVersion"
+		}
+	}
+
+	project('spring-yarn:spring-yarn-integration') {
+		description = 'Spring Yarn Integration'
+		dependencies {
+			compile project(":spring-yarn:spring-yarn-core")
+			compile "org.springframework.integration:spring-integration-ip:$springIntVersion"
+			compile "com.fasterxml.jackson.core:jackson-core:$jackson2Version"
+			compile "com.fasterxml.jackson.core:jackson-databind:$jackson2Version"
+			testCompile "org.springframework.integration:spring-integration-test:$springIntVersion"
+		}
+	}
+
+	project('spring-yarn:spring-yarn-batch') {
+		description = 'Spring Yarn Batch'
+		dependencies {
+			compile project(":spring-yarn:spring-yarn-integration")
+			compile "org.springframework.batch:spring-batch-core:$springBatchVersion"
+			compile "org.springframework.batch:spring-batch-infrastructure:$springBatchVersion"
+			testCompile project(":spring-data-hadoop-core")
+		}
+	}
+
+	project('spring-yarn:spring-yarn-test') {
+		description = 'Spring Yarn Test'
+		dependencies {
+			compile project(":spring-yarn:spring-yarn-core")
+			compile "org.apache.hadoop:hadoop-yarn-client:$hadoopVersion"
+			compile "org.apache.hadoop:hadoop-common:$hadoopVersion"
+			compile "org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion"
+		}
+	}
+	
 }
 
 task wrapper(type: Wrapper) {
