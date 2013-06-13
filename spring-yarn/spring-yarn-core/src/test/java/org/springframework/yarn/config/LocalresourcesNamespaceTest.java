@@ -91,7 +91,7 @@ public class LocalresourcesNamespaceTest {
 		//should be something like fs.defaultFS=hdfs://x.x.x.x:9000
 		String defaultFs = configuration.get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY);
 		assertThat(defaultFs, startsWith("hdfs"));
-		assertThat(defaultFs, endsWith("9000"));
+		assertThat(defaultFs, endsWith("8020"));
 
 		Collection<TransferEntry> hdfsEntries = TestUtils.readField("hdfsEntries", defaultLocalResourcesFactoryBean);
 		assertNotNull(hdfsEntries);
@@ -107,11 +107,11 @@ public class LocalresourcesNamespaceTest {
 		String local = TestUtils.readField("local", entry);
 		assertThat(local, notNullValue());
 		assertThat(local, startsWith("hdfs"));
-		assertThat(local, endsWith("9000"));
+		assertThat(local, endsWith("8020"));
 		String remote = TestUtils.readField("remote", entry);
 		assertThat(remote, notNullValue());
 		assertThat(remote, startsWith("hdfs"));
-		assertThat(remote, endsWith("9000"));
+		assertThat(remote, endsWith("8020"));
 	}
 
 	@Test
