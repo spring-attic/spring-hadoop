@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:ip="http://www.springframework.org/schema/integration/ip"
+	xmlns:yarn-int="http://www.springframework.org/schema/yarn/integration"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+			http://www.springframework.org/schema/beans/spring-beans.xsd
+			http://www.springframework.org/schema/yarn/integration
+			http://www.springframework.org/schema/yarn/integration/spring-yarn-integration.xsd
+			http://www.springframework.org/schema/integration
+			http://www.springframework.org/schema/integration/spring-integration.xsd
+			http://www.springframework.org/schema/integration/ip
+			http://www.springframework.org/schema/integration/ip/spring-integration-ip.xsd">
+
+	<!-- We can't use random ports in tests, so use below trick to get one available -->
+	<bean id="tcpIpUtils" class="org.springframework.integration.test.util.SocketUtils" />
+	<bean id="socketPort" class="java.lang.Integer" >
+		<constructor-arg index="0" value="#{tcpIpUtils.findAvailableServerSocket(7400)}"/>
+	</bean>
+
+	<bean id="mapper" class="org.springframework.yarn.integration.support.Jackson2ObjectMapperFactoryBean" />
+
+	<yarn-int:converter>
+		<bean class="org.springframework.yarn.integration.convert.MindObjectToHolderConverter">
+			<constructor-arg ref="mapper"/>
+		</bean>
+	</yarn-int:converter>
+
+	<yarn-int:converter>
+		<bean class="org.springframework.yarn.integration.convert.MindHolderToObjectConverter">
+			<constructor-arg ref="mapper"/>
+			<constructor-arg value="org.springframework.yarn.integration.ip.mind"/>
+		</bean>
+	</yarn-int:converter>
+
+	<yarn-int:amservice
+		service-impl="org.springframework.yarn.integration.ip.mind.TestService"
+		default-port="#{socketPort.intValue()}"/>
+	<yarn-int:amservice-client
+		service-impl="org.springframework.yarn.integration.ip.mind.DefaultMindAppmasterServiceClient"
+		host="localhost"
+		port="#{socketPort.intValue()}"/>
+
+</beans>

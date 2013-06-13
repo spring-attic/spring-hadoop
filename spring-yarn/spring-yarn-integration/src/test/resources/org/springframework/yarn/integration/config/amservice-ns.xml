@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:yarn-int="http://www.springframework.org/schema/yarn/integration"
+	xmlns:int-ip="http://www.springframework.org/schema/integration/ip"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/yarn/integration
+		http://www.springframework.org/schema/yarn/integration/spring-yarn-integration.xsd
+		http://www.springframework.org/schema/integration
+		http://www.springframework.org/schema/integration/spring-integration.xsd
+		http://www.springframework.org/schema/integration/ip
+		http://www.springframework.org/schema/integration/ip/spring-integration-ip.xsd
+		http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util
+		http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<yarn-int:amservice service-impl="org.springframework.yarn.integration.ip.mind.TestService"/>
+
+	<bean id="serializer" class="org.springframework.yarn.integration.ip.mind.MindRpcSerializer" />
+	<bean id="deserializer" class="org.springframework.yarn.integration.ip.mind.MindRpcSerializer" />
+	<bean id="socketSupport" class="org.springframework.yarn.integration.support.DefaultPortExposingTcpSocketSupport" />
+	<int-ip:tcp-connection-factory id="serverConnectionFactory"
+		type="server"
+		port="0"
+		socket-support="socketSupport"
+		serializer="serializer"
+		deserializer="deserializer"/>
+	<int-ip:tcp-inbound-gateway id="inboundGateway"
+		connection-factory="serverConnectionFactory"
+		request-channel="serverChannel" />
+	<int:channel id="serverChannel" />
+
+	<yarn-int:amservice id="yarnAmservice2"
+		service-impl="org.springframework.yarn.integration.ip.mind.TestService"
+		channel="serverChannel"
+		socket-support="socketSupport" />
+
+	<bean id="testService" class="org.springframework.yarn.integration.ip.mind.TestService"/>
+	<yarn-int:amservice id="yarnAmservice3" service-ref="testService"/>
+
+</beans>

@@ -1,0 +1,1 @@
+http\://www.springframework.org/schema/yarn/batch=org.springframework.yarn.batch.config.BatchNamespaceHandler
