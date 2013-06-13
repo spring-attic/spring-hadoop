@@ -389,7 +389,9 @@ configure(hadoopProjects()) {
 		//testRuntime "org.apache.thrift:libfb303:$thriftVersion"
 
 		// Pig
-		optional("org.apache.pig:pig:$pigVersion$pigQualifier")
+		optional("org.apache.pig:pig:$pigVersion$pigQualifier") { dep ->
+			exclude module: "junit"
+		}
 	
 		// HBase
 		optional("org.apache.hbase:hbase:$hbaseVersion") { dep ->
@@ -403,16 +405,6 @@ configure(hadoopProjects()) {
 	
 		// Testing
 		testCompile "junit:junit:$junitVersion"
-		testCompile "org.mockito:mockito-core:$mockitoVersion"
-		testCompile "org.springframework:spring-test:$springVersion"
-		testCompile("javax.annotation:jsr250-api:1.0")
-	
-		testRuntime "org.codehaus.groovy:groovy:$groovyVersion"
-		testRuntime "org.jruby:jruby:$jrubyVersion"
-		testRuntime "org.python:jython-standalone:$jythonVersion"
-	
-		// specify a version of antlr that works with both hive and pig (works only during compilation)
-		testRuntime "org.antlr:antlr-runtime:$antlrVersion"
 	}
 
 }
@@ -591,7 +583,9 @@ project('spring-hadoop-test') {
 
 		// Testing
 		testCompile "junit:junit:$junitVersion"
-		testCompile "org.mockito:mockito-core:$mockitoVersion"
+		testCompile("org.mockito:mockito-core:$mockitoVersion") { dep ->
+			exclude group: "org.hamcrest"
+		}
 		testCompile "org.springframework:spring-test:$springVersion"
 		testCompile("javax.annotation:jsr250-api:1.0")
 		testCompile "org.springframework.integration:spring-integration-stream:$springIntVersion"
@@ -603,6 +597,13 @@ project('spring-hadoop-test') {
 
 		testCompile "cascading:cascading-local:$cascadingVersion"
 
+		// Testing
+		testRuntime "org.codehaus.groovy:groovy:$groovyVersion"
+		testRuntime "org.jruby:jruby:$jrubyVersion"
+		testRuntime "org.python:jython-standalone:$jythonVersion"
+	
+		// specify a version of antlr that works with both hive and pig (works only during compilation)
+		testRuntime "org.antlr:antlr-runtime:$antlrVersion"
 	}
 
 	task downloadGutenbergBooks {
@@ -758,10 +759,10 @@ if (hadoopVersion >= "2") {
 			exclude '**/*IntegrationTests.*'
 		}
 		dependencies {
-			testCompile "junit:junit:$junitVersion"
 			testCompile "org.springframework:spring-test:$springVersion"
 			testCompile "org.hamcrest:hamcrest-core:$hamcrestVersion"
 			testCompile "org.hamcrest:hamcrest-library:$hamcrestVersion"
+			testCompile "junit:junit:$junitVersion"
 		}
 	}
 
@@ -776,7 +777,9 @@ if (hadoopVersion >= "2") {
 		description = 'Spring Yarn Core'
 		dependencies {
 			compile "org.apache.hadoop:hadoop-yarn-client:$hadoopVersion"
-			compile "org.apache.hadoop:hadoop-common:$hadoopVersion"
+			compile("org.apache.hadoop:hadoop-common:$hadoopVersion") { dep ->
+				exclude module: "junit"
+			}
 		}
 	}
 
@@ -806,7 +809,9 @@ if (hadoopVersion >= "2") {
 		dependencies {
 			compile project(":spring-yarn:spring-yarn-core")
 			compile "org.apache.hadoop:hadoop-yarn-client:$hadoopVersion"
-			compile "org.apache.hadoop:hadoop-common:$hadoopVersion"
+			compile("org.apache.hadoop:hadoop-common:$hadoopVersion") { dep ->
+				exclude module: "junit"
+			}
 			compile "org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion"
 		}
 	}
