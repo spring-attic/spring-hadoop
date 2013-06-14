@@ -3,23 +3,26 @@
 ext.hadoopDistro = hasProperty("distro") ? getProperty("distro") : "default"
 switch (ext.hadoopDistro) {
 	case "cdh3":
-		ext.version1 = true
+		ext.mr2 = false
 		break    
 	case "cdh4":
-		ext.version1 = false
+		ext.mr2 = false
 		break    
 	case "phd1":
-		ext.version1 = false
+		ext.mr2 = true
 		break
 	case "hadoop20":
-		ext.version1 = false
+		ext.mr2 = true
 		break
 	case "hadoop11":
-		ext.version1 = true
+        ext.mr2 = false
 		break
 	default:
-		ext.version1 = true
+        ext.mr2 = false
 }
+
+gradle.ext.mr2 = mr2
+
 include 'spring-hadoop-core'
 rootProject.children.find{ it.name == 'spring-hadoop-core' }.name = 'spring-data-hadoop-core'
 include 'spring-hadoop-batch'
@@ -28,7 +31,7 @@ include 'spring-hadoop-config'
 rootProject.children.find{ it.name == 'spring-hadoop-config' }.name = 'spring-data-hadoop'
 include 'spring-hadoop-test'
 include 'spring-cascading'
-if (!version1) {
+if (mr2) {
   print "Based on selected distro (${hadoopDistro}) we are including spring-yarn\n"
   include 'spring-yarn:spring-yarn-core','spring-yarn:spring-yarn-integration','spring-yarn:spring-yarn-batch','spring-yarn:spring-yarn-test'
 }

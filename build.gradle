@@ -749,7 +749,7 @@ project('spring-cascading') {
 
 }
 
-if (hadoopVersion >= "2") {
+if (gradle.ext.mr2) {
 
 	configure(yarnProjects()) {
 		task integrationTest(type: Test) {
