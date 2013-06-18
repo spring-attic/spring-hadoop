@@ -18,6 +18,7 @@ package org.springframework.yarn.integration.ip.mind;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assume.assumeTrue;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -52,6 +53,7 @@ public class MindIntegrationDefaultTests {
 		assertNotNull(appmasterService);
 		assertNotNull(appmasterServiceClient);
 
+        assumeTrue(appmasterService.getPort() > 0); //TODO: if we didn't get a good port - skip test for now
 		SimpleTestRequest request = new SimpleTestRequest();
 		SimpleTestResponse response = (SimpleTestResponse) ((MindAppmasterServiceClient)appmasterServiceClient).doMindRequest(request);
 		assertNotNull(response);
