@@ -29,15 +29,11 @@ import org.springframework.yarn.support.NetworkUtils;
  */
 public class DefaultPortExposingTcpSocketSupport implements PortExposingTcpSocketSupport {
 
-	private int serverSocketPort = -1;
-	private String serverSocketAddress;
+	private ServerSocket serverSocket;
 
 	@Override
 	public void postProcessServerSocket(ServerSocket serverSocket) {
-		serverSocketPort = serverSocket.getLocalPort();
-		serverSocketAddress = NetworkUtils.getDefaultAddress();
-		// TODO: do better address resolving
-		//serverSocketAddress = serverSocket.getInetAddress().getHostAddress();
+		this.serverSocket = serverSocket;
 	}
 
 	@Override
@@ -46,13 +42,13 @@ public class DefaultPortExposingTcpSocketSupport implements PortExposingTcpSocke
 
 	@Override
 	public int getServerSocketPort() {
-		return serverSocketPort;
+		return serverSocket != null ? serverSocket.getLocalPort() : -1;
 	}
 
 	@Override
 	public String getServerSocketAddress() {
-		return serverSocketAddress;
+		// TODO: do better address resolving
+		return serverSocket != null ? NetworkUtils.getDefaultAddress() : null;
 	}
-
 
 }
