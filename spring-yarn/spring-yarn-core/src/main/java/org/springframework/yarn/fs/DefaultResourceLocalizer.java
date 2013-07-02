@@ -165,8 +165,15 @@ public class DefaultResourceLocalizer implements ResourceLocalizer {
 		for (CopyEntry e : copyEntries) {
 			for (String pattern : StringUtils.commaDelimitedListToStringArray(e.src)) {
 				for (Resource res : resolver.getResources(pattern)) {
-					FSDataOutputStream os = fs.create(getDestinationPath(e, res));
-					FileCopyUtils.copy(res.getInputStream(), os);
+					Path destinationPath = getDestinationPath(e, res);
+					if (log.isDebugEnabled()) {
+						log.debug("For pattern=" + pattern + " found res=" + res + " destinationPath=" + destinationPath);
+					}
+					FSDataOutputStream os = fs.create(destinationPath);
+					int bytes = FileCopyUtils.copy(res.getInputStream(), os);
+					if (log.isDebugEnabled()) {
+						log.debug("bytes copied:" + bytes);
+					}
 				}
 			}
 		}
@@ -181,16 +188,21 @@ public class DefaultResourceLocalizer implements ResourceLocalizer {
 	 * @throws IOException
 	 */
 	private Path getDestinationPath(CopyEntry entry, Resource res) throws IOException {
+		Path dest = null;
 		Path resolvedStagingDirectory = resolveStagingDirectory();
-		if (resolvedStagingDirectory != null) {
+		if (entry.staging) {
 			if (StringUtils.hasText(entry.dest)) {
-				return new Path(resolvedStagingDirectory, entry.dest);
+				dest = new Path(resolvedStagingDirectory, entry.dest);
 			} else {
-				return new Path(resolvedStagingDirectory, res.getFilename());
+				dest = new Path(resolvedStagingDirectory, res.getFilename());
 			}
 		} else {
-			return new Path(entry.dest);
+			dest =  new Path(entry.dest, res.getFilename());
 		}
+		if (log.isDebugEnabled()) {
+			log.debug("Copy for resource=[" + res + "] dest=[" + dest + "]" + " resolvedStagingDirectory=" + resolvedStagingDirectory);
+		}
+		return dest;
 	}
 
 	/**
@@ -208,13 +220,16 @@ public class DefaultResourceLocalizer implements ResourceLocalizer {
 			Path remotePath = (!e.staging) ?
 					new Path(e.remote + e.path) :
 					new Path(e.remote + resolvedStagingDirectory.toUri().getPath() + e.path);
-			if(log.isDebugEnabled()) {
-				log.debug("Trying path " + remotePath);
-			}
 			URI localUri = new URI(e.local);
 			FileStatus[] fileStatuses = fs.globStatus(remotePath);
+			if(log.isDebugEnabled()) {
+				log.debug("Trying path " + remotePath + " glob fileStatus length=" + (fileStatuses != null ? fileStatuses.length : "null"));
+			}
 			if (!ObjectUtils.isEmpty(fileStatuses)) {
 				for(FileStatus status : fileStatuses) {
+					if(log.isDebugEnabled()) {
+						log.debug("FileStatus=" + status);
+					}
 					if(status.isFile()) {
 						URI remoteUri = status.getPath().toUri();
 						Path path = new Path(new Path(localUri), remoteUri.getPath());
