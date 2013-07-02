@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:ip="http://www.springframework.org/schema/integration/ip"
+	xmlns:yarn-int="http://www.springframework.org/schema/yarn/integration"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+			http://www.springframework.org/schema/beans/spring-beans.xsd
+			http://www.springframework.org/schema/yarn/integration
+			http://www.springframework.org/schema/yarn/integration/spring-yarn-integration.xsd
+			http://www.springframework.org/schema/integration
+			http://www.springframework.org/schema/integration/spring-integration.xsd
+			http://www.springframework.org/schema/integration/ip
+			http://www.springframework.org/schema/integration/ip/spring-integration-ip.xsd">
+
+	<bean id="tcpIpUtils" class="org.springframework.integration.test.util.SocketUtils" />
+
+	<bean id="socketSupport" class="org.springframework.yarn.integration.support.DefaultPortExposingTcpSocketSupport" />
+
+	<ip:tcp-connection-factory id="serverConnectionFactory"
+		type="server"
+		using-nio="true"
+		port="#{tcpIpUtils.findAvailableServerSocket(7400)}"
+		socket-support="socketSupport"/>
+
+	<ip:tcp-inbound-gateway id="inboundGateway"
+		connection-factory="serverConnectionFactory"
+		request-channel="serverChannel" />
+
+	<int:channel id="serverChannel" />
+
+	<bean id="mindAppmasterService" class="org.springframework.yarn.integration.ip.mind.TestService" >
+		<property name="socketSupport" ref="socketSupport"/>
+		<property name="messageChannel" ref="serverChannel"/>
+	</bean>
+
+</beans>
