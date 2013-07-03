@@ -29,4 +29,7 @@ public class VersionUtils {
 		return ClassUtils.isPresent("org.apache.hadoop.fs.FsShellPermissions$Chmod", JobClient.class.getClassLoader());
 	}
 
+	public static boolean isYarnAvailable() {
+		return ClassUtils.isPresent("org.apache.hadoop.yarn.conf.YarnConfiguration", JobClient.class.getClassLoader());
+	}
 }

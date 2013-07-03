@@ -15,7 +15,6 @@
  */
 package org.springframework.data.hadoop.configuration;
 
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Properties;
 
@@ -39,13 +38,23 @@ public class UrlInfiniteLoopTest {
     public void setUp() {
         if (VersionUtils.isHadoop2X()) {
             // Avoid potential StackOverflowError for Hadoop 2.0.x (see SHDP-111)
-            try {
-                Configuration conf = (Configuration) Class.forName("org.apache.hadoop.yarn.conf.YarnConfiguration").newInstance();
-                Method getFileSystemClass =
-                        ReflectionUtils.findMethod(FileSystem.class, "getFileSystemClass",
-                                String.class, Configuration.class);
-                getFileSystemClass.invoke(null, "hdfs", conf);
-            } catch (Exception e) {}
+            if (VersionUtils.isYarnAvailable()) {
+                try {
+                    Configuration conf = (Configuration) Class.forName("org.apache.hadoop.yarn.conf.YarnConfiguration").newInstance();
+                    Method getFileSystemClass =
+                            ReflectionUtils.findMethod(FileSystem.class, "getFileSystemClass",
+                                    String.class, Configuration.class);
+                    getFileSystemClass.invoke(null, "hdfs", conf);
+                } catch (Exception e) {}
+            } else {
+                try {
+                    Configuration conf = (Configuration) Class.forName("org.apache.hadoop.conf.Configuration").newInstance();
+                    Method getFileSystemClass =
+                            ReflectionUtils.findMethod(FileSystem.class, "getFileSystemClass",
+                                    String.class, Configuration.class);
+                    getFileSystemClass.invoke(null, "hdfs", conf);
+                } catch (Exception e) {}
+            }
         }
     }
 
