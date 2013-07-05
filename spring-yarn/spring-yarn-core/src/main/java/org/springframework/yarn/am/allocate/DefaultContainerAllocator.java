@@ -16,10 +16,12 @@
 package org.springframework.yarn.am.allocate;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -77,6 +79,9 @@ public class DefaultContainerAllocator extends AbstractPollingAllocator implemen
 
 	/** Queued container id's to be released */
 	private Queue<ContainerId> releaseContainers = new ConcurrentLinkedQueue<ContainerId>();
+	
+	/** Internal set of containers marked as garbage by allocate tracker */
+	private Set<ContainerId> garbageContainers = new HashSet<ContainerId>();
 
 	/** Tracker for request counts */
 	private DefaultAllocateCountTracker allocateCountTracker = new DefaultAllocateCountTracker();
@@ -180,6 +185,7 @@ public class DefaultContainerAllocator extends AbstractPollingAllocator implemen
 			if (processed != null) {
 				preProcessed.add(processed);
 			} else {
+				garbageContainers.add(container.getId());
 				releaseContainers.add(container.getId());
 			}
 		}
@@ -198,7 +204,19 @@ public class DefaultContainerAllocator extends AbstractPollingAllocator implemen
 
 	@Override
 	protected void handleCompletedContainers(List<ContainerStatus> containerStatuses) {
-		allocatorListener.completed(containerStatuses);
+		// strip away containers which were already marked
+		// garbage by allocate tracker. system
+		// never knew those even exist and might create mess
+		// with monitor component. monitor only sees
+		// complete status which is also the case for garbage
+		// when it's released.
+		List<ContainerStatus> garbageFree = new ArrayList<ContainerStatus>();
+		for (ContainerStatus status : containerStatuses) {
+			if (!garbageContainers.contains(status.getContainerId())) {
+				garbageFree.add(status);
+			}
+		}
+		allocatorListener.completed(garbageFree);
 	}
 
 	@Override

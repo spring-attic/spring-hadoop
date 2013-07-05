@@ -166,6 +166,9 @@ public abstract class AbstractPollingAllocator extends AbstractAllocator {
 		if(allocatedContainers != null && allocatedContainers.size() > 0) {
 			if (log.isDebugEnabled()){
 				log.debug("response has " + allocatedContainers.size() + " new containers");
+				for (Container c : allocatedContainers) {
+					log.debug("new container: " + c.getId());
+				}
 			}
 			handleAllocatedContainers(allocatedContainers);
 			if(getYarnEventPublisher() != null) {
@@ -180,6 +183,9 @@ public abstract class AbstractPollingAllocator extends AbstractAllocator {
 		if(containerStatuses != null && containerStatuses.size() > 0) {
 			if (log.isDebugEnabled()){
 				log.debug("response has " + containerStatuses.size() + " completed containers");
+				for (ContainerStatus cs : containerStatuses) {
+					log.debug("competed container: " + cs.getContainerId() + " with status=" + cs);					
+				}
 			}
 			handleCompletedContainers(containerStatuses);
 			if(getYarnEventPublisher() != null) {
