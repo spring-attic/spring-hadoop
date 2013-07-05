@@ -74,7 +74,11 @@ public class ClientParser extends AbstractSingleBeanDefinitionParser {
 		if(masterRunnerElement != null && masterCommandElement == null) {
 			BeanDefinitionBuilder defBuilder = BeanDefinitionBuilder.genericBeanDefinition(LaunchCommandsFactoryBean.class);
 			YarnNamespaceUtils.setValueIfAttributeDefined(defBuilder, masterRunnerElement, "command");
-			defBuilder.addPropertyValue("runner", CommandLineAppmasterRunner.class);
+			if (masterRunnerElement.hasAttribute("runner")) {
+				defBuilder.addPropertyValue("runner", masterRunnerElement.getAttribute("runner"));								
+			} else {
+				defBuilder.addPropertyValue("runner", CommandLineAppmasterRunner.class);				
+			}
 			YarnNamespaceUtils.setValueIfAttributeDefined(defBuilder, masterRunnerElement, "context-file", false, "appmaster-context.xml");
 			YarnNamespaceUtils.setValueIfAttributeDefined(defBuilder, masterRunnerElement, "bean-name", false, YarnSystemConstants.DEFAULT_ID_APPMASTER);
 			YarnNamespaceUtils.setReferenceIfAttributeDefined(defBuilder, masterRunnerElement, "arguments");

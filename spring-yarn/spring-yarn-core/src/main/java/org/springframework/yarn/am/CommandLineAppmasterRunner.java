@@ -25,6 +25,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.util.StringUtils;
 import org.springframework.yarn.YarnSystemConstants;
 import org.springframework.yarn.launch.AbstractCommandLineRunner;
+import org.springframework.yarn.launch.ExitStatus;
 import org.springframework.yarn.listener.AppmasterStateListener;
 
 /**
@@ -41,7 +42,7 @@ public class CommandLineAppmasterRunner extends AbstractCommandLineRunner<YarnAp
 	private CountDownLatch latch = new CountDownLatch(1);
 
 	@Override
-	protected void handleBeanRun(YarnAppmaster bean, String[] parameters, Set<String> opts) {
+	protected ExitStatus handleBeanRun(YarnAppmaster bean, String[] parameters, Set<String> opts) {
 		Properties properties = StringUtils.splitArrayElementsIntoProperties(parameters, "=");
 		bean.setParameters(properties != null ? properties : new Properties());
 		if(log.isDebugEnabled()) {
@@ -68,6 +69,7 @@ public class CommandLineAppmasterRunner extends AbstractCommandLineRunner<YarnAp
 			log.debug("Latch interrupted");
 		}
 		log.info("Bean run completed");
+		return ExitStatus.COMPLETED;
 	}
 
 	@Override

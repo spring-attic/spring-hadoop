@@ -86,16 +86,33 @@ public class LaunchCommandsFactoryBean implements InitializingBean, FactoryBean<
 
 		List<String> commandsList = new ArrayList<String>();
 		commandsList.add(command);
-		commandsList.add(runner.getCanonicalName());
-		commandsList.add(contextFile);
-		commandsList.add(beanName);
+
+		// -D arguments needs to be right after main command
 		if(arguments != null) {
 			Enumeration<?> names = arguments.propertyNames();
 			while (names.hasMoreElements()) {
 				String key = (String) names.nextElement();
-				commandsList.add(key + "=" + arguments.getProperty(key));
+				if (key.startsWith("-D")) {
+					commandsList.add(key + "=" + arguments.getProperty(key));					
+				}
 			}
 		}
+		
+		commandsList.add(runner.getCanonicalName());
+		commandsList.add(contextFile);
+		commandsList.add(beanName);
+		
+		// arguments without -D
+		if(arguments != null) {
+			Enumeration<?> names = arguments.propertyNames();
+			while (names.hasMoreElements()) {
+				String key = (String) names.nextElement();
+				if (!key.startsWith("-D")) {
+					commandsList.add(key + "=" + arguments.getProperty(key));					
+				}
+			}
+		}
+		
 		commandsList.add("1>" + stdout);
 		commandsList.add("2>" + stderr);
 		commands = commandsList.toArray(new String[0]);

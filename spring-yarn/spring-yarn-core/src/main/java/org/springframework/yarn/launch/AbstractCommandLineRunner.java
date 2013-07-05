@@ -32,50 +32,154 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.util.StringUtils;
 
 /**
- * Base implementation for launching Spring context
- * from command line using classpath resources and executing
- * bean methods.
+ * Base implementation used for launching a Spring Application
+ * Context and executing a bean using a command line. This
+ * command line runner is meant to be used from a subclass. 
  * <p>
+ * The general idea of this launcher concept is to provide
+ * a way to define context config location, bean name for execution
+ * handling, options and a arguments. Possible examples are:
+ * <p>
+ * <pre>
+ * contextConfig
+ * contextConfig,childContextConfig beanIdentifier
+ * contextConfig beanIdentifier &lt;arguments>
+ * contextConfig &lt;options> beanIdentifier
+ * contextConfig &lt;options> beanIdentifier &lt;arguments>
+ * &lt;options> contextConfig &lt;options> beanIdentifier &lt;arguments>
+ * </pre>
  *
  * @author Janne Valkealahti
  *
+ * @param <T> the type of bean to run
  */
 public abstract class AbstractCommandLineRunner<T> {
 
 	private static final Log log = LogFactory.getLog(AbstractCommandLineRunner.class);
 
+	/** Mapper for exit codes */
 	private ExitCodeMapper exitCodeMapper = new SimpleJvmExitCodeMapper();
 
+	/** Static error message holder for testing */
 	private static String message = "";
 
+	/** Exiter helping for testing */
 	private static SystemExiter systemExiter = new JvmSystemExiter();
 
+	/**
+	 * Gets the static error message set for
+	 * this class. This is useful for tests.
+	 * 
+	 * @return the static error message
+	 */
 	public static String getErrorMessage() {
 		return message;
 	}
 
+	/**
+	 * Sets the {@link SystemExiter}. Useful
+	 * for testing.
+	 * 
+	 * @param systemExiter the system exiter
+	 */
 	public static void presetSystemExiter(SystemExiter systemExiter) {
 		AbstractCommandLineRunner.systemExiter = systemExiter;
 	}
 
-	protected abstract void handleBeanRun(T bean, String[] parameters, Set<String> opts);
+	/**
+	 * Handles the execution of a bean after Application Context(s) has
+	 * been initialized. This is considered to be a main entry point
+	 * what the application will do after initialization.
+	 * <p>
+	 * It is implementors responsibility to decide what to do 
+	 * with the given bean since this class only knows the 
+	 * typed bean instance.
+	 * 
+	 * @param bean the bean instance
+	 * @param parameters the parameters
+	 * @param opts the options
+	 * @return the exit status
+	 */
+	protected abstract ExitStatus handleBeanRun(T bean, String[] parameters, Set<String> opts);
 
+	/**
+	 * Gets a default bean id which is used to resolve
+	 * the instance from an Application Context.
+	 * 
+	 * @return the id of the bean
+	 */
 	protected abstract String getDefaultBeanIdentifier();
 
-	protected abstract List<String> getValidOpts();
+	/**
+	 * Gets the list of valid option arguments.
+	 * Default implementation returns null thus
+	 * not allowing any options exist on a command line.
+	 * <p>
+	 * When overriding valid options make sure that options
+	 * doesn't match anything else planned to be used in
+	 * a command line. i.e. usually it's advised to prefix
+	 * options with '-' character.
+	 * 
+	 * @return the list of option arguments
+	 */
+	protected List<String> getValidOpts() {
+		return null;
+	}
+	
+	/**
+	 * Allows subclass to modify parsed context configuration path.
+	 * Effectively path returned from this method is used
+	 * internally for the Application Context config location.
+	 * <p>
+	 * Default implementation just returns the given
+	 * without modifying it.
+	 * 
+	 * @param path the parsed config path
+	 * @return the config path
+	 */
+	protected String getContextConfigPath(String path) {
+		return path;
+	}
 
-	protected int start(String configLocation, String masterIdentifier, String[] parameters, Set<String> opts) {
+	/**
+	 * Allows subclass to modify parsed context configuration path.
+	 * Effectively path returned from this method is used
+	 * internally for the Application Context config location.
+	 * <p>
+	 * Default implementation just returns the given
+	 * without modifying it.
+	 * 
+	 * @param path the parsed config path
+	 * @return the config path
+	 */
+	protected String getChildContextConfigPath(String path) {
+		return path;
+	}
+
+	/**
+	 * Builds the Application Context(s) and handles 'execution'
+	 * of a bean.
+	 * 
+	 * @param configLocation the main context config location
+	 * @param masterIdentifier the bean identifier
+	 * @param childConfigLocation the child context config location
+	 * @param parameters the parameters
+	 * @param opts the options
+	 * @return the status of the execution
+	 */
+	protected int start(String configLocation, String masterIdentifier,
+			String childConfigLocation, String[] parameters, Set<String> opts) {
 
 		ConfigurableApplicationContext context = null;
 
+		ExitStatus exitStatus = ExitStatus.COMPLETED;
 		try {
-			context = new ClassPathXmlApplicationContext(configLocation);
-			context.getAutowireCapableBeanFactory().autowireBeanProperties(this,
-					AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
+			context = getApplicationContext(configLocation);
+			getChildApplicationContext(childConfigLocation, context);
 
 			@SuppressWarnings("unchecked")
 			T bean = (T) context.getBean(masterIdentifier);
-			handleBeanRun(bean, parameters, opts);
+			exitStatus = handleBeanRun(bean, parameters, opts);
 
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -88,23 +192,68 @@ public abstract class AbstractCommandLineRunner<T> {
 				context.close();
 			}
 		}
-		return 0;
+		return exitCodeMapper.intValue(exitStatus.getExitCode());
+	}
+	
+	/**
+	 * Gets the Application Context.
+	 * 
+	 * @param configLocation the context config location
+	 * @return the configured context
+	 */
+	protected ConfigurableApplicationContext getApplicationContext(String configLocation) {
+		ConfigurableApplicationContext context =
+				new ClassPathXmlApplicationContext(configLocation);
+		context.getAutowireCapableBeanFactory().autowireBeanProperties(this,
+				AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
+		return context;
+	}
+	
+	/**
+	 * Gets the Application Context.
+	 * 
+	 * @param configLocation the context config location
+	 * @param parent the parent context
+	 * @return the configured context
+	 */
+	protected ConfigurableApplicationContext getChildApplicationContext(
+			String configLocation, ConfigurableApplicationContext parent) {
+		if (configLocation != null) {
+			ConfigurableApplicationContext context =
+					new ClassPathXmlApplicationContext(new String[]{configLocation}, parent);
+			context.getAutowireCapableBeanFactory().autowireBeanProperties(this,
+					AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
+			return context;			
+		} else {
+			return null;
+		}
 	}
 
+	/**
+	 * Exit method wrapping handling through
+	 * {@link SystemExiter}. This method mostly
+	 * exist order to not do a real exit on
+	 * a unit tests.
+	 * 
+	 * @param status the exit code
+	 */
 	public void exit(int status) {
 		 systemExiter.exit(status);
 	}
 
 	/**
-	 *
-	 * @param args
+	 * Main method visible to sub-classes.
+	 * 
+	 * @param args the Arguments
 	 */
 	protected void doMain(String[] args) {
 
 		AbstractCommandLineRunner.message = "";
 
+		// stash normal process arguments
 		List<String> newargs = new ArrayList<String>(Arrays.asList(args));
 
+		// read from stdin
 		try {
 			if (System.in.available() > 0) {
 				BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
@@ -129,8 +278,10 @@ public abstract class AbstractCommandLineRunner<T> {
 
 		int count = 0;
 		String ctxConfigPath = null;
+		String childCtxConfigPath = null;
 		String beanIdentifier = null;
 
+		// did subclass provide valid opts
 		List<String> validOpts = getValidOpts();
 
 		for (String arg : newargs) {
@@ -139,24 +290,34 @@ public abstract class AbstractCommandLineRunner<T> {
 			} else {
 				switch (count) {
 				case 0:
-					ctxConfigPath = arg;
+					if (!arg.contains("=")) {
+						String[] argSplit = arg.split(",");
+						ctxConfigPath = argSplit[0];
+						if (argSplit.length > 1) {
+							childCtxConfigPath = argSplit[1];
+						}
+					}
 					break;
 				case 1:
-					beanIdentifier = arg;
+					if (!arg.contains("=")) {
+						beanIdentifier = arg;						
+					} else {
+						params.add(arg);						
+					}
 					break;
 				default:
-					params.add(arg);
 					break;
 				}
 				count++;
 			}
 		}
 
-		// TODO: leaving out beanIdentifier breaks if there are parameters defined
-
 		if(beanIdentifier == null) {
 			beanIdentifier = getDefaultBeanIdentifier();
 		}
+		
+		ctxConfigPath = getContextConfigPath(ctxConfigPath);
+		childCtxConfigPath = getChildContextConfigPath(childCtxConfigPath);
 
 		if (ctxConfigPath == null || beanIdentifier == null) {
 			String message = "At least 2 arguments are required: Context Config and Bean Identifier.";
@@ -167,7 +328,7 @@ public abstract class AbstractCommandLineRunner<T> {
 
 		String[] parameters = params.toArray(new String[params.size()]);
 
-		int result = start(ctxConfigPath, beanIdentifier, parameters, opts);
+		int result = start(ctxConfigPath, beanIdentifier, childCtxConfigPath, parameters, opts);
 		exit(result);
 	}
 

@@ -20,6 +20,8 @@ import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -46,6 +48,8 @@ import org.springframework.yarn.support.compat.ResourceCompat;
  *
  */
 public abstract class AbstractYarnClient implements YarnClient, InitializingBean {
+	
+	private final static Log log = LogFactory.getLog(AbstractYarnClient.class);
 
 	/** Template communicating for resource manager */
 	private ClientRmOperations clientRmOperations;
@@ -117,6 +121,11 @@ public abstract class AbstractYarnClient implements YarnClient, InitializingBean
 		resourceLocalizer.distribute();
 
 		ApplicationSubmissionContext submissionContext = getSubmissionContext(applicationId);
+		
+		if (log.isDebugEnabled()) {
+			log.debug("Using ApplicationSubmissionContext=" + submissionContext);
+		}
+		
 		clientRmOperations.submitApplication(submissionContext);
 		return applicationId;
 	}
@@ -151,6 +160,15 @@ public abstract class AbstractYarnClient implements YarnClient, InitializingBean
 	}
 
 	/**
+	 * Gets the environment variables. 
+	 * 
+	 * @return the map of environment variables
+	 */
+	public Map<String, String> getEnvironment() {
+		return environment;
+	}
+	
+	/**
 	 * Sets the environment for appmaster.
 	 *
 	 * @param environment the environment
@@ -168,6 +186,17 @@ public abstract class AbstractYarnClient implements YarnClient, InitializingBean
 		this.commands = commands;
 	}
 
+	/**
+	 * Get the {@link Configuration} of this client. Internally
+	 * this method is called to get the configuration which
+	 * allows sub-classes to override and add additional settings.
+	 * 
+	 * @return the {@link Configuration}
+	 */
+	public Configuration getConfiguration() {
+		return configuration;
+	}
+	
 	/**
 	 * Sets the Yarn configuration.
 	 *
@@ -299,7 +328,7 @@ public abstract class AbstractYarnClient implements YarnClient, InitializingBean
 	protected ContainerLaunchContext getMasterContainerLaunchContext() {
 		ContainerLaunchContext context = Records.newRecord(ContainerLaunchContext.class);
 		context.setLocalResources(resourceLocalizer.getResources());
-		context.setEnvironment(environment);
+		context.setEnvironment(getEnvironment());
 		context.setCommands(commands);
 		Resource capability = Records.newRecord(Resource.class);
 		capability.setMemory(memory);

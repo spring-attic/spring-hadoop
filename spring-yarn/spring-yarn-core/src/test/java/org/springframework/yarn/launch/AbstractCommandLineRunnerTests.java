@@ -20,10 +20,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.util.ClassUtils;
@@ -36,40 +36,108 @@ import org.springframework.util.ClassUtils;
  */
 public class AbstractCommandLineRunnerTests {
 
-	private String ctxConfigPath = ClassUtils.addResourcePathToPackagePath(
+	private final static String ctxConfigPath = ClassUtils.addResourcePathToPackagePath(
 			AbstractCommandLineRunnerTests.class, "AbstractCommandLineRunnerTests-run.xml");
 
+	private final static String childCtxConfigPath = ClassUtils.addResourcePathToPackagePath(
+			AbstractCommandLineRunnerTests.class, "AbstractCommandLineRunnerTests-child.xml");
+	
 	@Before
-	public void setUp() throws Exception {
+	public void setup() {
+		StubCommandLineRunner.presetSystemExiter(new StubSystemExiter());	
+		StubCommandLineRunner.opts = null;
 	}
-
-	@After
-	public void tearDown() throws Exception {
-
-	}
-
+	
 	@Test
 	public void testWithArgs() {
-		String[] args = new String[] {ctxConfigPath, "stubTestBean1"};
-		StubCommandLineRunner.presetSystemExiter(new StubSystemExiter());
+		String[] args = new String[] {ctxConfigPath, "stubTestBean"};
 		StubCommandLineRunner.main(args);
 		assertEquals(0, StubSystemExiter.status);
-		String errorMessage = StubCommandLineRunner.getErrorMessage();
-		assertThat(0, is(errorMessage.length()));
+		String error = StubCommandLineRunner.getErrorMessage();
+		assertThat(0, is(error.length()));
 	}
 
 	@Test
-	public void testInvalidArgs() throws Exception {
+	public void testMissingArgs() throws Exception {
 		String[] args = new String[] {};
-		StubCommandLineRunner.presetSystemExiter(new StubSystemExiter());
 		StubCommandLineRunner.main(args);
 		assertEquals(1, StubSystemExiter.status);
-		String errorMessage = StubCommandLineRunner.getErrorMessage();
-		assertTrue("Wrong error message: " + errorMessage, errorMessage.contains("Config locations must not be null"));
+		String error = StubCommandLineRunner.getErrorMessage();
+		assertTrue("Wrong error message: " + error, error.contains("Config locations must not be null"));
 	}
 
+	@Test
+	public void testMissingBeanName() throws Exception {
+		String[] args = new String[] {ctxConfigPath};
+		StubCommandLineRunner.main(args);
+		assertEquals(0, StubSystemExiter.status);
+		String error = StubCommandLineRunner.getErrorMessage();
+		assertThat(0, is(error.length()));
+	}
+
+	@Test
+	public void testMissingBeanNameWithParams() throws Exception {
+		String[] args = new String[] {ctxConfigPath, "foo1=jee1"};
+		StubCommandLineRunner.main(args);
+		assertEquals(0, StubSystemExiter.status);
+		String error = StubCommandLineRunner.getErrorMessage();
+		assertThat(0, is(error.length()));
+	}
+	
+	@Test
+	public void testWithArgsAndOptions1() {
+		String[] args = new String[] {"-option1", ctxConfigPath, "stubTestBean"};
+		StubCommandLineRunner.opts = new String[]{"-option1", "-option2"};
+		StubCommandLineRunner.main(args);
+		assertEquals(0, StubSystemExiter.status);
+		String error = StubCommandLineRunner.getErrorMessage();
+		assertThat(0, is(error.length()));
+	}
+
+	@Test
+	public void testWithArgsAndOptions2() {
+		String[] args = new String[] {ctxConfigPath, "-option1", "stubTestBean"};
+		StubCommandLineRunner.opts = new String[]{"-option1", "-option2"};
+		StubCommandLineRunner.main(args);
+		assertEquals(0, StubSystemExiter.status);
+		String error = StubCommandLineRunner.getErrorMessage();
+		assertThat(0, is(error.length()));
+	}
+
+	@Test
+	public void testWithArgsAndOptions3() {
+		String[] args = new String[] {ctxConfigPath, "stubTestBean", "-option1"};
+		StubCommandLineRunner.opts = new String[]{"-option1", "-option2"};
+		StubCommandLineRunner.main(args);
+		assertEquals(0, StubSystemExiter.status);
+		String error = StubCommandLineRunner.getErrorMessage();
+		assertThat(0, is(error.length()));
+	}
+
+	@Test
+	public void testWithArgsAndOptions4() {
+		String[] args = new String[] {"-option2", ctxConfigPath, "-option1", "stubTestBean"};
+		StubCommandLineRunner.opts = new String[]{"-option1", "-option2"};
+		StubCommandLineRunner.main(args);
+		assertEquals(0, StubSystemExiter.status);
+		String error = StubCommandLineRunner.getErrorMessage();
+		assertThat(0, is(error.length()));
+	}
+	
+	@Test
+	public void testWithChildContext() {
+		String[] args = new String[] {ctxConfigPath + "," + childCtxConfigPath, "stubTestBean"};
+		StubCommandLineRunner.main(args);
+		assertEquals(0, StubSystemExiter.status);
+		String error = StubCommandLineRunner.getErrorMessage();
+		assertThat(0, is(error.length()));
+	}
+	
+	
 	public static class StubCommandLineRunner extends AbstractCommandLineRunner<StubBean> {
 
+		public static String[] opts = null;
+		
 		@Override
 		protected String getDefaultBeanIdentifier() {
 			return "stubTestBean";
@@ -77,7 +145,11 @@ public class AbstractCommandLineRunnerTests {
 
 		@Override
 		protected List<String> getValidOpts() {
-			return null;
+			if (opts != null) {
+				return Arrays.asList(opts);
+			} else {
+				return null;				
+			}
 		}
 
 		public static void main(String[] args) {
@@ -86,14 +158,19 @@ public class AbstractCommandLineRunnerTests {
 		}
 
 		@Override
-		protected void handleBeanRun(StubBean bean, String[] parameters, Set<String> opts) {
+		protected ExitStatus handleBeanRun(StubBean bean, String[] parameters, Set<String> opts) {
 			if(!"data".equals(bean.getData())) {
 				throw new RuntimeException();
 			}
+			return ExitStatus.COMPLETED;
 		}
 
 	}
 
+	/**
+	 * Stub to know what exit value was used without
+	 * doing System.exit().
+	 */
 	public static class StubSystemExiter implements SystemExiter {
 
 		private static int status;
@@ -108,6 +185,9 @@ public class AbstractCommandLineRunnerTests {
 		}
 	}
 
+	/**
+	 * Just stub bean used in test contexts.
+	 */
 	public static class StubBean {
 
 		String data;

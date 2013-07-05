@@ -24,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.util.StringUtils;
 import org.springframework.yarn.YarnSystemConstants;
 import org.springframework.yarn.launch.AbstractCommandLineRunner;
+import org.springframework.yarn.launch.ExitStatus;
 
 /**
  * A simple container runner executing a bean
@@ -37,7 +38,7 @@ public class CommandLineContainerRunner extends AbstractCommandLineRunner<YarnCo
 	private static final Log log = LogFactory.getLog(CommandLineContainerRunner.class);
 
 	@Override
-	protected void handleBeanRun(YarnContainer bean, String[] parameters, Set<String> opts) {
+	protected ExitStatus handleBeanRun(YarnContainer bean, String[] parameters, Set<String> opts) {
 		Properties properties = StringUtils.splitArrayElementsIntoProperties(parameters, "=");
 		bean.setParameters(properties != null ? properties : new Properties());
 		bean.setEnvironment(System.getenv());
@@ -48,6 +49,7 @@ public class CommandLineContainerRunner extends AbstractCommandLineRunner<YarnCo
 		if(log.isDebugEnabled()) {
 			log.debug("YarnClient bean complete");
 		}
+		return ExitStatus.COMPLETED;
 	}
 
 	@Override
