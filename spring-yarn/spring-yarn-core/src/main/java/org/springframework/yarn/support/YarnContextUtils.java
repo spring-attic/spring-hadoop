@@ -21,6 +21,7 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.util.Assert;
 import org.springframework.yarn.YarnSystemConstants;
 import org.springframework.yarn.am.AppmasterService;
+import org.springframework.yarn.am.AppmasterTrackService;
 import org.springframework.yarn.event.YarnEventPublisher;
 
 /**
@@ -40,6 +41,9 @@ public class YarnContextUtils {
 	/** Default app master client service bean name */
 	public static final String TASK_AMSERVER_BEAN_NAME = "yarnAmservice";
 
+	/** Default app master tracker service bean name */
+	public static final String TASK_AMTRACKSERVER_BEAN_NAME = "yarnAmTrackservice";
+	
 	/**
 	 * Return the {@link TaskScheduler} bean whose name is "taskScheduler" if
 	 * available.
@@ -61,7 +65,7 @@ public class YarnContextUtils {
 	}
 
 	/**
-	 * Return the {@link AppmasterService} bean whose name is "yarnAmserver" if
+	 * Return the {@link AppmasterService} bean whose name is "yarnAmservice" if
 	 * available.
 	 *
 	 * @param beanFactory BeanFactory for lookup, must not be null.
@@ -70,6 +74,16 @@ public class YarnContextUtils {
 		return getBeanOfType(beanFactory, TASK_AMSERVER_BEAN_NAME, AppmasterService.class);
 	}
 
+	/**
+	 * Return the {@link AppmasterTrackService} bean whose name is "yarnAmTrackservice" if
+	 * available.
+	 *
+	 * @param beanFactory BeanFactory for lookup, must not be null.
+	 */
+	public static AppmasterTrackService getAppmasterTrackService(BeanFactory beanFactory) {
+		return getBeanOfType(beanFactory, TASK_AMTRACKSERVER_BEAN_NAME, AppmasterTrackService.class);
+	}
+	
 	/**
 	 * Return the {@link YarnEventPublisher} bean whose name is "yarnEventPublisher" if
 	 * available.

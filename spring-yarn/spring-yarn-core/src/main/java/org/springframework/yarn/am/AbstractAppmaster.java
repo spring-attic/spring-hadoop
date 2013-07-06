@@ -75,6 +75,9 @@ public abstract class AbstractAppmaster extends LifecycleObjectSupport {
 	/** Handle to service if exists */
 	private AppmasterService appmasterService;
 
+	/** Handle to track service if exists */
+	private AppmasterTrackService appmasterTrackService;
+
 	/** State if we're done successful registration */
 	private boolean applicationRegistered;
 
@@ -290,6 +293,19 @@ public abstract class AbstractAppmaster extends LifecycleObjectSupport {
 	}
 
 	/**
+	 * Gets a {@link AppmasterTrackService} set to this instance.
+	 *
+	 * @return the instance of {@link AppmasterTrackService}
+	 */
+	protected AppmasterTrackService getAppmasterTrackService() {
+		if(appmasterTrackService == null && getBeanFactory() != null) {
+			log.debug("getting appmaster track service from bean factory " + getBeanFactory());
+			appmasterTrackService = YarnContextUtils.getAppmasterTrackService(getBeanFactory());
+		}
+		return appmasterTrackService;
+	}
+	
+	/**
 	 * Register appmaster.
 	 *
 	 * @return the register application master response
@@ -300,9 +316,11 @@ public abstract class AbstractAppmaster extends LifecycleObjectSupport {
 			log.warn("Not sending register request because we are already registered");
 			return null;
 		}
-		log.info("Registering application master with applicationAttemptId=" + applicationAttemptId);
+		String trackUrl = getAppmasterTrackService() != null ? getAppmasterTrackService().getTrackUrl() : null;
+		log.info("Registering application master with applicationAttemptId=" + applicationAttemptId +
+				" trackUrl=" + trackUrl);
 		RegisterApplicationMasterResponse response =
-				rmTemplate.registerApplicationMaster(applicationAttemptId, null, null, null);
+				rmTemplate.registerApplicationMaster(applicationAttemptId, null, null, trackUrl);
 		applicationRegistered = true;
 		return response;
 	}
