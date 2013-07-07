@@ -49,4 +49,13 @@ public interface YarnClient {
 	 */
 	void killApplication(ApplicationId applicationId);
 
+	/**
+	 * Gets a report of the application.
+	 * 
+	 * @param applicationId the application id
+	 * 
+	 * @return the {@link ApplicationReport}
+	 */
+	ApplicationReport getApplicationReport(ApplicationId applicationId);
+
 }

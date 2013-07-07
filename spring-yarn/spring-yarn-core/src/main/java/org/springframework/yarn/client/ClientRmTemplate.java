@@ -22,6 +22,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.yarn.api.ClientRMProtocol;
 import org.apache.hadoop.yarn.api.protocolrecords.GetAllApplicationsRequest;
 import org.apache.hadoop.yarn.api.protocolrecords.GetAllApplicationsResponse;
+import org.apache.hadoop.yarn.api.protocolrecords.GetApplicationReportRequest;
 import org.apache.hadoop.yarn.api.protocolrecords.GetDelegationTokenRequest;
 import org.apache.hadoop.yarn.api.protocolrecords.GetNewApplicationRequest;
 import org.apache.hadoop.yarn.api.protocolrecords.GetNewApplicationResponse;
@@ -115,6 +116,18 @@ public class ClientRmTemplate extends YarnRpcAccessor<ClientRMProtocol> implemen
 				return proxy.getDelegationToken(request).getRMDelegationToken();
 			}
 		});
+	}
+	
+	@Override
+	public ApplicationReport getApplicationReport(final ApplicationId applicationId) {
+		return execute(new YarnRpcCallback<ApplicationReport, ClientRMProtocol>() {
+			@Override
+			public ApplicationReport doInYarn(ClientRMProtocol proxy) throws YarnRemoteException {
+				GetApplicationReportRequest request = Records.newRecord(GetApplicationReportRequest.class);
+				request.setApplicationId(applicationId);
+				return proxy.getApplicationReport(request).getApplicationReport();
+			}
+		});		
 	}
 
 	@Override

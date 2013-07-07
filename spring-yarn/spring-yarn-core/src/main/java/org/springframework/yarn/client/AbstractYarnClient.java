@@ -140,6 +140,11 @@ public abstract class AbstractYarnClient implements YarnClient, InitializingBean
 		return clientRmOperations.listApplications();
 	}
 
+	@Override
+	public ApplicationReport getApplicationReport(ApplicationId applicationId) {
+		return clientRmOperations.getApplicationReport(applicationId);
+	}
+
 	/**
 	 * Sets the {@link ClientRmOperations} implementation for
 	 * accessing resource manager.

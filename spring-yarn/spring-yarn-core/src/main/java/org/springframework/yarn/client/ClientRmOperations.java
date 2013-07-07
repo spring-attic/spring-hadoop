@@ -76,4 +76,14 @@ public interface ClientRmOperations {
 	 * @return the delegation token
 	 */
 	DelegationToken getDelegationToken(String renewer);
+
+	/**
+	 * Gets a report of the application.
+	 * 
+	 * @param applicationId the application id
+	 * 
+	 * @return the {@link ApplicationReport}
+	 */
+	ApplicationReport getApplicationReport(ApplicationId applicationId);
+
 }
