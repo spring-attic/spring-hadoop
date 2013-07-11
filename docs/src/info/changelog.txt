@@ -5,6 +5,15 @@ http://www.springsource.org/spring-data/hadoop
 Commit changelog: http://github.com/SpringSource/spring-hadoop/tree/v[version]
 Issues changelog: http://jira.springsource.org/secure/ReleaseNote.jspa?projectId=10801
 
+Changes in version 1.0.1 RC1 (2013-07-11)
+-----------------------------------------
+
+General
+* Adding support to test against Hadoop version 1.1.2
+* Adding initial support for Hadoop alpha version 2.0.3
+* Adding Pivotal HD 1.0 as a supported distribution
+
+
 Changes in version 1.0 GA (2013-02-26)
 --------------------------------------
 
