@@ -44,11 +44,17 @@ public class YarnSystemConstants {
 	/** Default bean id for appmaster service. */
 	public static final String DEFAULT_ID_AMSERVICE = "yarnAmservice";
 
+	/** Default bean id for appmaster track service. */
+	public static final String DEFAULT_ID_AMTRACKSERVICE = "yarnAmTrackservice";
+
 	/** Default bean id for Yarn event publisher. */
 	public static final String DEFAULT_ID_EVENT_PUBLISHER = "yarnEventPublisher";
 
 	/** Default bean id for appmaster service client. */
 	public static final String DEFAULT_ID_AMSERVICE_CLIENT = "yarnAmserviceClient";
+
+	/** Default bean id for appmaster client service. */
+	public static final String DEFAULT_ID_CLIENT_AMSERVICE = "yarnClientAmservice";
 
 	/** Default env variable for amservice port. */
 	public static final String AMSERVICE_PORT = "syarn.amservice.port";
@@ -73,5 +79,14 @@ public class YarnSystemConstants {
 
 	/** Default staging directory name. */
 	public static final String DEFAULT_STAGING_DIR_NAME = "staging";
+
+	/** Default env variable for resource manager address. */
+	public static final String RM_ADDRESS = "syarn.hd.rm";
+
+	/** Default env variable for hdfs address. */
+	public static final String FS_ADDRESS = "syarn.hd.fs";
+
+	/** Default env variable for resource manager scheduler address. */
+	public static final String SCHEDULER_ADDRESS = "syarn.hd.scheduler";
 
 }

@@ -23,6 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.yarn.api.protocolrecords.StartContainerRequest;
 import org.apache.hadoop.yarn.api.records.Container;
 import org.apache.hadoop.yarn.api.records.ContainerLaunchContext;
+import org.apache.hadoop.yarn.util.ConverterUtils;
 import org.apache.hadoop.yarn.util.Records;
 import org.springframework.yarn.YarnSystemConstants;
 
@@ -41,6 +42,7 @@ public class DefaultContainerLauncher extends AbstractLauncher implements Contai
 		if (log.isDebugEnabled()) {
 			log.debug("Launching container: " + container);
 		}
+
 		ContainerLaunchContext ctx = Records.newRecord(ContainerLaunchContext.class);
 		ctx.setContainerId(container.getId());
 		ctx.setResource(container.getResource());
@@ -50,8 +52,10 @@ public class DefaultContainerLauncher extends AbstractLauncher implements Contai
 		ctx.setLocalResources(getResourceLocalizer().getResources());
 		ctx.setCommands(commands);
 
+		// Yarn doesn't tell container what is its container id
+		// so we do it here
 		Map<String, String> env = getEnvironment();
-		env.put(YarnSystemConstants.SYARN_CONTAINER_ID, Integer.toString(container.getId().getId()));
+		env.put(YarnSystemConstants.SYARN_CONTAINER_ID, ConverterUtils.toString(container.getId()));
 		ctx.setEnvironment(env);
 		ctx = getInterceptors().preLaunch(ctx);
 
@@ -59,6 +63,7 @@ public class DefaultContainerLauncher extends AbstractLauncher implements Contai
 		request.setContainerLaunchContext(ctx);
 		getCmTemplate(container).startContainer(request);
 
+		// notify interested parties of new launched container
 		if(getYarnEventPublisher() != null) {
 			getYarnEventPublisher().publishContainerLaunched(this, container);
 		}

@@ -75,6 +75,9 @@ public abstract class AbstractAppmaster extends LifecycleObjectSupport {
 	/** Handle to service if exists */
 	private AppmasterService appmasterService;
 
+	/** Handle to client service if exists */
+	private AppmasterService appmasterClientService;
+
 	/** Handle to track service if exists */
 	private AppmasterTrackService appmasterTrackService;
 
@@ -293,6 +296,19 @@ public abstract class AbstractAppmaster extends LifecycleObjectSupport {
 	}
 
 	/**
+	 * Gets a client facing {@link AppmasterService} set to this instance.
+	 *
+	 * @return the instance of {@link AppmasterService}
+	 */
+	protected AppmasterService getAppmasterClientService() {
+		if(appmasterClientService == null && getBeanFactory() != null) {
+			log.debug("getting appmaster client service from bean factory " + getBeanFactory());
+			appmasterClientService = YarnContextUtils.getAppmasterClientService(getBeanFactory());
+		}
+		return appmasterClientService;
+	}
+
+	/**
 	 * Gets a {@link AppmasterTrackService} set to this instance.
 	 *
 	 * @return the instance of {@link AppmasterTrackService}
@@ -304,7 +320,7 @@ public abstract class AbstractAppmaster extends LifecycleObjectSupport {
 		}
 		return appmasterTrackService;
 	}
-	
+
 	/**
 	 * Register appmaster.
 	 *
@@ -316,11 +332,24 @@ public abstract class AbstractAppmaster extends LifecycleObjectSupport {
 			log.warn("Not sending register request because we are already registered");
 			return null;
 		}
+
+		// resolving tracking url if any
 		String trackUrl = getAppmasterTrackService() != null ? getAppmasterTrackService().getTrackUrl() : null;
+
+		// resolving client facing service if any
+		String rpcHost = null;
+		Integer rpcPort = null;
+		AppmasterService clientService = getAppmasterClientService();
+		if (clientService != null) {
+			rpcHost = clientService.getHost();
+			rpcPort = clientService.getPort();
+		}
+
 		log.info("Registering application master with applicationAttemptId=" + applicationAttemptId +
-				" trackUrl=" + trackUrl);
+				" trackUrl=" + trackUrl + " rpcHost=" + rpcHost + " rpcPort=" + rpcPort);
+
 		RegisterApplicationMasterResponse response =
-				rmTemplate.registerApplicationMaster(applicationAttemptId, null, null, trackUrl);
+				rmTemplate.registerApplicationMaster(applicationAttemptId, rpcHost, rpcPort, trackUrl);
 		applicationRegistered = true;
 		return response;
 	}

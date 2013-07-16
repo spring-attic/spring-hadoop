@@ -79,7 +79,7 @@ public class DefaultContainerAllocator extends AbstractPollingAllocator implemen
 
 	/** Queued container id's to be released */
 	private Queue<ContainerId> releaseContainers = new ConcurrentLinkedQueue<ContainerId>();
-	
+
 	/** Internal set of containers marked as garbage by allocate tracker */
 	private Set<ContainerId> garbageContainers = new HashSet<ContainerId>();
 
@@ -125,6 +125,9 @@ public class DefaultContainerAllocator extends AbstractPollingAllocator implemen
 
 	@Override
 	public void releaseContainer(ContainerId containerId) {
+		if (log.isDebugEnabled()) {
+			log.debug("Adding new container to be released containerId=" + containerId);
+		}
 		releaseContainers.add(containerId);
 	}
 
@@ -149,6 +152,10 @@ public class DefaultContainerAllocator extends AbstractPollingAllocator implemen
 			for (ResourceRequest resourceRequest : requestedContainers) {
 				log.debug("ResourceRequest: " + resourceRequest + " with count=" +
 						resourceRequest.getNumContainers() + " with hostName=" + resourceRequest.getHostName());
+			}
+			log.debug("Releasing containers " + release.size());
+			for (ContainerId cid : release) {
+				log.debug("Release container=" + cid);
 			}
 			log.debug("Request id will be: " + requestId.get());
 		}

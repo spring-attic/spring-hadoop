@@ -38,12 +38,6 @@ public class YarnContextUtils {
 	/** Default task executor bean name */
 	public static final String TASK_EXECUTOR_BEAN_NAME = "taskExecutor";
 
-	/** Default app master client service bean name */
-	public static final String TASK_AMSERVER_BEAN_NAME = "yarnAmservice";
-
-	/** Default app master tracker service bean name */
-	public static final String TASK_AMTRACKSERVER_BEAN_NAME = "yarnAmTrackservice";
-	
 	/**
 	 * Return the {@link TaskScheduler} bean whose name is "taskScheduler" if
 	 * available.
@@ -71,8 +65,20 @@ public class YarnContextUtils {
 	 * @param beanFactory BeanFactory for lookup, must not be null.
 	 */
 	public static AppmasterService getAppmasterService(BeanFactory beanFactory) {
-		return getBeanOfType(beanFactory, TASK_AMSERVER_BEAN_NAME, AppmasterService.class);
+		return getBeanOfType(beanFactory, YarnSystemConstants.DEFAULT_ID_AMSERVICE, AppmasterService.class);
 	}
+
+	/**
+	 * Return the {@link AppmasterService} bean whose name is "yarnClientAmservice" if
+	 * available. This bean should be the one providing rpc api for external
+	 * clients talking to Application Master.
+	 *
+	 * @param beanFactory BeanFactory for lookup, must not be null.
+	 */
+	public static AppmasterService getAppmasterClientService(BeanFactory beanFactory) {
+		return getBeanOfType(beanFactory, YarnSystemConstants.DEFAULT_ID_CLIENT_AMSERVICE, AppmasterService.class);
+	}
+
 
 	/**
 	 * Return the {@link AppmasterTrackService} bean whose name is "yarnAmTrackservice" if
@@ -81,9 +87,9 @@ public class YarnContextUtils {
 	 * @param beanFactory BeanFactory for lookup, must not be null.
 	 */
 	public static AppmasterTrackService getAppmasterTrackService(BeanFactory beanFactory) {
-		return getBeanOfType(beanFactory, TASK_AMTRACKSERVER_BEAN_NAME, AppmasterTrackService.class);
+		return getBeanOfType(beanFactory, YarnSystemConstants.DEFAULT_ID_AMTRACKSERVICE, AppmasterTrackService.class);
 	}
-	
+
 	/**
 	 * Return the {@link YarnEventPublisher} bean whose name is "yarnEventPublisher" if
 	 * available.

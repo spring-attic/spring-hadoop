@@ -15,6 +15,13 @@
  */
 package org.springframework.yarn.am;
 
+/**
+ * Currently this is empty and only used as marker interface
+ * making indication that a class is used client for
+ * Application Master Service.
+ *
+ * @author Janne Valkealahti
+ *
+ */
 public interface AppmasterServiceClient {
-
 }
