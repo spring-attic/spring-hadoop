@@ -34,7 +34,7 @@ import org.springframework.util.StringUtils;
 /**
  * Base implementation used for launching a Spring Application
  * Context and executing a bean using a command line. This
- * command line runner is meant to be used from a subclass. 
+ * command line runner is meant to be used from a subclass.
  * <p>
  * The general idea of this launcher concept is to provide
  * a way to define context config location, bean name for execution
@@ -69,7 +69,7 @@ public abstract class AbstractCommandLineRunner<T> {
 	/**
 	 * Gets the static error message set for
 	 * this class. This is useful for tests.
-	 * 
+	 *
 	 * @return the static error message
 	 */
 	public static String getErrorMessage() {
@@ -79,7 +79,7 @@ public abstract class AbstractCommandLineRunner<T> {
 	/**
 	 * Sets the {@link SystemExiter}. Useful
 	 * for testing.
-	 * 
+	 *
 	 * @param systemExiter the system exiter
 	 */
 	public static void presetSystemExiter(SystemExiter systemExiter) {
@@ -91,10 +91,10 @@ public abstract class AbstractCommandLineRunner<T> {
 	 * been initialized. This is considered to be a main entry point
 	 * what the application will do after initialization.
 	 * <p>
-	 * It is implementors responsibility to decide what to do 
-	 * with the given bean since this class only knows the 
+	 * It is implementors responsibility to decide what to do
+	 * with the given bean since this class only knows the
 	 * typed bean instance.
-	 * 
+	 *
 	 * @param bean the bean instance
 	 * @param parameters the parameters
 	 * @param opts the options
@@ -105,7 +105,7 @@ public abstract class AbstractCommandLineRunner<T> {
 	/**
 	 * Gets a default bean id which is used to resolve
 	 * the instance from an Application Context.
-	 * 
+	 *
 	 * @return the id of the bean
 	 */
 	protected abstract String getDefaultBeanIdentifier();
@@ -119,13 +119,13 @@ public abstract class AbstractCommandLineRunner<T> {
 	 * doesn't match anything else planned to be used in
 	 * a command line. i.e. usually it's advised to prefix
 	 * options with '-' character.
-	 * 
+	 *
 	 * @return the list of option arguments
 	 */
 	protected List<String> getValidOpts() {
 		return null;
 	}
-	
+
 	/**
 	 * Allows subclass to modify parsed context configuration path.
 	 * Effectively path returned from this method is used
@@ -133,7 +133,7 @@ public abstract class AbstractCommandLineRunner<T> {
 	 * <p>
 	 * Default implementation just returns the given
 	 * without modifying it.
-	 * 
+	 *
 	 * @param path the parsed config path
 	 * @return the config path
 	 */
@@ -148,7 +148,7 @@ public abstract class AbstractCommandLineRunner<T> {
 	 * <p>
 	 * Default implementation just returns the given
 	 * without modifying it.
-	 * 
+	 *
 	 * @param path the parsed config path
 	 * @return the config path
 	 */
@@ -159,7 +159,7 @@ public abstract class AbstractCommandLineRunner<T> {
 	/**
 	 * Builds the Application Context(s) and handles 'execution'
 	 * of a bean.
-	 * 
+	 *
 	 * @param configLocation the main context config location
 	 * @param masterIdentifier the bean identifier
 	 * @param childConfigLocation the child context config location
@@ -194,10 +194,10 @@ public abstract class AbstractCommandLineRunner<T> {
 		}
 		return exitCodeMapper.intValue(exitStatus.getExitCode());
 	}
-	
+
 	/**
 	 * Gets the Application Context.
-	 * 
+	 *
 	 * @param configLocation the context config location
 	 * @return the configured context
 	 */
@@ -208,10 +208,10 @@ public abstract class AbstractCommandLineRunner<T> {
 				AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
 		return context;
 	}
-	
+
 	/**
 	 * Gets the Application Context.
-	 * 
+	 *
 	 * @param configLocation the context config location
 	 * @param parent the parent context
 	 * @return the configured context
@@ -223,7 +223,7 @@ public abstract class AbstractCommandLineRunner<T> {
 					new ClassPathXmlApplicationContext(new String[]{configLocation}, parent);
 			context.getAutowireCapableBeanFactory().autowireBeanProperties(this,
 					AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
-			return context;			
+			return context;
 		} else {
 			return null;
 		}
@@ -234,7 +234,7 @@ public abstract class AbstractCommandLineRunner<T> {
 	 * {@link SystemExiter}. This method mostly
 	 * exist order to not do a real exit on
 	 * a unit tests.
-	 * 
+	 *
 	 * @param status the exit code
 	 */
 	public void exit(int status) {
@@ -243,7 +243,7 @@ public abstract class AbstractCommandLineRunner<T> {
 
 	/**
 	 * Main method visible to sub-classes.
-	 * 
+	 *
 	 * @param args the Arguments
 	 */
 	protected void doMain(String[] args) {
@@ -300,12 +300,13 @@ public abstract class AbstractCommandLineRunner<T> {
 					break;
 				case 1:
 					if (!arg.contains("=")) {
-						beanIdentifier = arg;						
+						beanIdentifier = arg;
 					} else {
-						params.add(arg);						
+						params.add(arg);
 					}
 					break;
 				default:
+					params.add(arg);
 					break;
 				}
 				count++;
@@ -315,7 +316,7 @@ public abstract class AbstractCommandLineRunner<T> {
 		if(beanIdentifier == null) {
 			beanIdentifier = getDefaultBeanIdentifier();
 		}
-		
+
 		ctxConfigPath = getContextConfigPath(ctxConfigPath);
 		childCtxConfigPath = getChildContextConfigPath(childCtxConfigPath);
 

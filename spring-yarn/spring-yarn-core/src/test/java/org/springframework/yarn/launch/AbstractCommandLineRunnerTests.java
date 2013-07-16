@@ -41,18 +41,30 @@ public class AbstractCommandLineRunnerTests {
 
 	private final static String childCtxConfigPath = ClassUtils.addResourcePathToPackagePath(
 			AbstractCommandLineRunnerTests.class, "AbstractCommandLineRunnerTests-child.xml");
-	
+
 	@Before
 	public void setup() {
-		StubCommandLineRunner.presetSystemExiter(new StubSystemExiter());	
+		StubCommandLineRunner.presetSystemExiter(new StubSystemExiter());
 		StubCommandLineRunner.opts = null;
+		StubCommandLineRunner.parameters = null;
 	}
-	
+
 	@Test
 	public void testWithArgs() {
 		String[] args = new String[] {ctxConfigPath, "stubTestBean"};
 		StubCommandLineRunner.main(args);
 		assertEquals(0, StubSystemExiter.status);
+		String error = StubCommandLineRunner.getErrorMessage();
+		assertThat(0, is(error.length()));
+	}
+
+	@Test
+	public void testWithArgsWithParams() {
+		String[] args = new String[] {ctxConfigPath, "stubTestBean", "foo1=jee1"};
+		StubCommandLineRunner.main(args);
+		assertEquals(0, StubSystemExiter.status);
+		assertEquals(1, StubCommandLineRunner.parameters.length);
+		assertEquals("foo1=jee1", StubCommandLineRunner.parameters[0]);
 		String error = StubCommandLineRunner.getErrorMessage();
 		assertThat(0, is(error.length()));
 	}
@@ -80,10 +92,12 @@ public class AbstractCommandLineRunnerTests {
 		String[] args = new String[] {ctxConfigPath, "foo1=jee1"};
 		StubCommandLineRunner.main(args);
 		assertEquals(0, StubSystemExiter.status);
+		assertEquals(1, StubCommandLineRunner.parameters.length);
+		assertEquals("foo1=jee1", StubCommandLineRunner.parameters[0]);
 		String error = StubCommandLineRunner.getErrorMessage();
 		assertThat(0, is(error.length()));
 	}
-	
+
 	@Test
 	public void testWithArgsAndOptions1() {
 		String[] args = new String[] {"-option1", ctxConfigPath, "stubTestBean"};
@@ -123,7 +137,7 @@ public class AbstractCommandLineRunnerTests {
 		String error = StubCommandLineRunner.getErrorMessage();
 		assertThat(0, is(error.length()));
 	}
-	
+
 	@Test
 	public void testWithChildContext() {
 		String[] args = new String[] {ctxConfigPath + "," + childCtxConfigPath, "stubTestBean"};
@@ -132,12 +146,13 @@ public class AbstractCommandLineRunnerTests {
 		String error = StubCommandLineRunner.getErrorMessage();
 		assertThat(0, is(error.length()));
 	}
-	
-	
+
+
 	public static class StubCommandLineRunner extends AbstractCommandLineRunner<StubBean> {
 
 		public static String[] opts = null;
-		
+		public static String[] parameters = null;
+
 		@Override
 		protected String getDefaultBeanIdentifier() {
 			return "stubTestBean";
@@ -148,7 +163,7 @@ public class AbstractCommandLineRunnerTests {
 			if (opts != null) {
 				return Arrays.asList(opts);
 			} else {
-				return null;				
+				return null;
 			}
 		}
 
@@ -159,6 +174,7 @@ public class AbstractCommandLineRunnerTests {
 
 		@Override
 		protected ExitStatus handleBeanRun(StubBean bean, String[] parameters, Set<String> opts) {
+			StubCommandLineRunner.parameters = parameters;
 			if(!"data".equals(bean.getData())) {
 				throw new RuntimeException();
 			}
