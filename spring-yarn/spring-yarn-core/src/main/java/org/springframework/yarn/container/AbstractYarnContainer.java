@@ -18,6 +18,10 @@ package org.springframework.yarn.container;
 import java.util.Map;
 import java.util.Properties;
 
+import org.springframework.yarn.listener.CompositeContainerStateListener;
+import org.springframework.yarn.listener.ContainerStateListener;
+import org.springframework.yarn.listener.ContainerStateListener.ContainerState;
+
 /**
  * Base implementation of {@link YarnContainer} providing
  * some common functionality like environment properties,
@@ -26,13 +30,16 @@ import java.util.Properties;
  * @author Janne Valkealahti
  *
  */
-public abstract class AbstractYarnContainer implements YarnContainer {
+public abstract class AbstractYarnContainer implements LongRunningYarnContainer {
 
 	/** Environment variables for the process. */
 	private Map<String, String> environment;
 
 	/** Parameters passed to the container. */
 	private Properties parameters;
+
+	/** Listener handling state events */
+	private CompositeContainerStateListener stateListener = new CompositeContainerStateListener();
 
 	@Override
 	public final void run() {
@@ -75,6 +82,23 @@ public abstract class AbstractYarnContainer implements YarnContainer {
 	 */
 	public Properties getParameters() {
 		return parameters;
+	}
+
+	@Override
+	public void addContainerStateListener(ContainerStateListener listener) {
+		stateListener.register(listener);
+	}
+
+	@Override
+	public boolean isWaitCompleteState() {
+		return false;
+	}
+
+	/**
+	 * Notify completed state to container state listeners.
+	 */
+	protected void notifyCompleted() {
+		stateListener.state(ContainerState.COMPLETED);
 	}
 
 	/**

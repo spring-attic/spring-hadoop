@@ -18,6 +18,7 @@ package org.springframework.yarn.container;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,6 +26,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.yarn.YarnSystemConstants;
 import org.springframework.yarn.launch.AbstractCommandLineRunner;
 import org.springframework.yarn.launch.ExitStatus;
+import org.springframework.yarn.listener.ContainerStateListener;
 
 /**
  * A simple container runner executing a bean
@@ -37,18 +39,47 @@ public class CommandLineContainerRunner extends AbstractCommandLineRunner<YarnCo
 
 	private static final Log log = LogFactory.getLog(CommandLineContainerRunner.class);
 
+	/** Latch to wait container complete state */
+	private CountDownLatch latch;
+
 	@Override
 	protected ExitStatus handleBeanRun(YarnContainer bean, String[] parameters, Set<String> opts) {
 		Properties properties = StringUtils.splitArrayElementsIntoProperties(parameters, "=");
 		bean.setParameters(properties != null ? properties : new Properties());
 		bean.setEnvironment(System.getenv());
+
 		if(log.isDebugEnabled()) {
 			log.debug("Starting YarnClient bean: " + StringUtils.arrayToCommaDelimitedString(parameters));
 		}
+
+		// use latch if container wants to be long running
+		if (bean instanceof LongRunningYarnContainer && ((LongRunningYarnContainer)bean).isWaitCompleteState()) {
+			latch = new CountDownLatch(1);
+			((LongRunningYarnContainer)bean).addContainerStateListener(new ContainerStateListener() {
+				@Override
+				public void state(ContainerState state) {
+					if(state == ContainerState.COMPLETED) {
+						latch.countDown();
+					}
+				}
+			});
+		}
+
 		bean.run();
+
+		if (latch != null) {
+			try {
+				// TODO: should we use timeout?
+				latch.await();
+			} catch (InterruptedException e) {
+				log.debug("Latch interrupted");
+			}
+		}
+
 		if(log.isDebugEnabled()) {
 			log.debug("YarnClient bean complete");
 		}
+
 		return ExitStatus.COMPLETED;
 	}
 
