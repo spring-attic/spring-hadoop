@@ -43,7 +43,26 @@ public class PortExposingTcpSocketSupportNetTests {
 	@Test
 	public void testExposedSocketPort() throws Exception {
 		assertNotNull(mindAppmasterService);
-		assertThat(mindAppmasterService.getPort(), greaterThan(0));
+		// framework classes using port support are
+		// waiting and polling for some amount of time
+		// need to do same here
+		assertThat(waitAndPollPort(), greaterThan(0));
+	}
+
+	private int waitAndPollPort() {
+		int port = mindAppmasterService.getPort();
+		for (int i = 0; i<10; i++) {
+			if (port > 0) {
+				break;
+			} else {
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+				}
+				port = mindAppmasterService.getPort();
+			}
+		}
+		return port;
 	}
 
 }
