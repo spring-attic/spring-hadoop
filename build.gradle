@@ -198,6 +198,11 @@ configure(javaProjects()) {
 		from sourceSets.main.allJava
 	}
 
+	task testJar(type: Jar) {
+		classifier = 'tests'
+		from sourceSets.test.output
+	}
+
 	task javadocJar(type: Jar) {
 		classifier = 'javadoc'
 		from javadoc
@@ -208,7 +213,7 @@ configure(javaProjects()) {
 		archives javadocJar
 	}
 
-	assemble.dependsOn = ['jar', 'sourcesJar']
+	assemble.dependsOn = ['jar', 'sourcesJar', 'testJar']
 
 	javadoc {
 		ext.srcDir = file("${projectDir}/docs/src/api")
@@ -764,6 +769,7 @@ if (gradle.ext.mr2) {
 			testCompile "org.hamcrest:hamcrest-library:$hamcrestVersion"
 			testCompile "junit:junit:$junitVersion"
 		}
+		clean.doLast {ant.delete(dir: "target")}
 	}
 
 	project('spring-yarn') {
@@ -804,18 +810,59 @@ if (gradle.ext.mr2) {
 		}
 	}
 
-	project('spring-yarn:spring-yarn-test') {
-		description = 'Spring Yarn Test'
+	project('spring-yarn:spring-yarn-test-core') {
+		description = 'Spring Yarn Test Core'
+		configurations {
+			hadoopruntime.exclude group: 'log4j'
+			hadoopruntime.exclude group: 'org.slf4j'
+			hadoopruntime.exclude group: 'org.apache.hadoop'
+			hadoopruntime.exclude group: 'commons-logging'
+			hadoopruntime.exclude group: 'org.codehaus.jettison'
+			hadoopruntime.exclude group: 'com.thoughtworks.xstream'
+		}
 		dependencies {
-			compile project(":spring-yarn:spring-yarn-core")
+			compile "org.springframework:spring-test:$springVersion"
+			compile "junit:junit:$junitVersion"
 			compile "org.apache.hadoop:hadoop-yarn-client:$hadoopVersion"
 			compile("org.apache.hadoop:hadoop-common:$hadoopVersion") { dep ->
 				exclude module: "junit"
 			}
 			compile "org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion"
+			compile "org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion:tests"
+			compile "org.apache.hadoop:hadoop-hdfs:$hadoopVersion"
+			compile "org.apache.hadoop:hadoop-hdfs:$hadoopVersion:tests"
+			compile "org.apache.hadoop:hadoop-common:$hadoopVersion:tests"
+			hadoopruntime configurations.runtime
 		}
+		task copyHadoopRuntimeDeps(type: Copy) {
+			into "$buildDir/dependency-libs"
+			from configurations.hadoopruntime
+		}
+		test.dependsOn(copyHadoopRuntimeDeps)
 	}
-	
+
+	project('spring-yarn:spring-yarn-test') {
+		description = 'Spring Yarn Test'
+		configurations {
+			hadoopruntime.exclude group: 'log4j'
+			hadoopruntime.exclude group: 'org.slf4j'
+			hadoopruntime.exclude group: 'org.apache.hadoop'
+			hadoopruntime.exclude group: 'commons-logging'
+			hadoopruntime.exclude group: 'org.codehaus.jettison'
+			hadoopruntime.exclude group: 'com.thoughtworks.xstream'
+		}
+		dependencies {
+			compile project(":spring-yarn:spring-yarn-core")
+			compile project(":spring-yarn:spring-yarn-test-core")
+			hadoopruntime configurations.runtime
+		}
+		task copyHadoopRuntimeDeps(type: Copy) {
+			into "$buildDir/dependency-libs"
+			from configurations.hadoopruntime
+		}
+		test.dependsOn(copyHadoopRuntimeDeps)
+	}
+
 }
 
 task wrapper(type: Wrapper) {

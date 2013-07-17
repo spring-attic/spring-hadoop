@@ -15,6 +15,14 @@
  */
 package org.springframework.yarn.client;
 
+import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.hadoop.fs.CommonConfigurationKeysPublic;
+import org.apache.hadoop.yarn.conf.YarnConfiguration;
+import org.springframework.yarn.YarnSystemConstants;
+
 /**
  * Default Yarn client utilising functionality in {@link AbstractYarnClient}.
  *
@@ -22,6 +30,8 @@ package org.springframework.yarn.client;
  *
  */
 public class CommandYarnClient extends AbstractYarnClient {
+	
+	private final static Log log = LogFactory.getLog(CommandYarnClient.class);
 
 	/**
 	 * Constructs a default client with a given template.
@@ -30,6 +40,25 @@ public class CommandYarnClient extends AbstractYarnClient {
 	 */
 	public CommandYarnClient(ClientRmOperations clientRmOperations) {
 		super(clientRmOperations);
+	}
+	
+	@Override
+	public Map<String, String> getEnvironment() {
+		// For the environment we set additional env variables
+		// from configuration. This is most useful for unit
+		// testing where resource manager and hdfs are created 
+		// dynamically within mini clusters.
+		Map<String, String> env = super.getEnvironment();
+		env.put(YarnSystemConstants.RM_ADDRESS, getConfiguration().get(YarnConfiguration.RM_ADDRESS));		
+		env.put(YarnSystemConstants.FS_ADDRESS, getConfiguration().get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY));
+		env.put(YarnSystemConstants.SCHEDULER_ADDRESS, getConfiguration().get(YarnConfiguration.RM_SCHEDULER_ADDRESS));
+		if (log.isDebugEnabled()) {
+			log.debug("Setting additional env variables " +
+					YarnSystemConstants.RM_ADDRESS + "=" + env.get(YarnSystemConstants.RM_ADDRESS) +
+					YarnSystemConstants.FS_ADDRESS + "=" + env.get(YarnSystemConstants.FS_ADDRESS) +
+					YarnSystemConstants.SCHEDULER_ADDRESS + "=" + env.get(YarnSystemConstants.SCHEDULER_ADDRESS));
+		}
+		return env;
 	}
 
 }

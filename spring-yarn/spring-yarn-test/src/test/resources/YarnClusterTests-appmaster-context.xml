@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:yarn="http://www.springframework.org/schema/yarn"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/yarn http://www.springframework.org/schema/yarn/spring-yarn.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<context:property-placeholder/>
+
+	<yarn:configuration>
+		fs.defaultFS=${syarn.hd.fs}
+		yarn.resourcemanager.address=${syarn.hd.rm}
+		yarn.resourcemanager.scheduler.address=${syarn.hd.scheduler}
+	</yarn:configuration>
+
+	<yarn:localresources>
+		<yarn:hdfs path="/*" staging="true"/>
+	</yarn:localresources>
+
+	<yarn:environment>
+		<yarn:classpath default-yarn-app-classpath="true" delimiter=":">
+			./*
+		</yarn:classpath>
+	</yarn:environment>
+
+	<yarn:master>
+		<yarn:container-allocator/>
+		<yarn:container-command>
+			<![CDATA[
+			date
+			1><LOG_DIR>/Container.stdout
+			2><LOG_DIR>/Container.stderr
+			]]>
+		</yarn:container-command>
+	</yarn:master>
+
+</beans>
