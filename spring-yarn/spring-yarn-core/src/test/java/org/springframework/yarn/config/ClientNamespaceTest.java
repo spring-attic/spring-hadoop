@@ -17,6 +17,7 @@ package org.springframework.yarn.config;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertNotNull;
 
@@ -139,7 +140,7 @@ public class ClientNamespaceTest {
 		List<String> commands  = TestUtils.readField("commands", customYarnClientWithRunnerDefaultsFactoryBean);
 		assertNotNull(commands);
 		assertThat(commands.size(), is(6));
-		assertThat(commands.get(0).trim(), is("java"));
+		assertThat(commands.get(0).trim(), containsString("JAVA_HOME"));
 		assertThat(commands.get(1).trim(), is("org.springframework.yarn.am.CommandLineAppmasterRunner"));
 		assertThat(commands.get(2).trim(), is("appmaster-context.xml"));
 		assertThat(commands.get(3).trim(), is("yarnAppmaster"));
