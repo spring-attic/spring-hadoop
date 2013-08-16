@@ -102,19 +102,26 @@ public class YarnClusterTests {
 		Resource[] resources = resolver.getResources(locationPattern);
 
 		// get possible appmaster error from stderr file
-		String masterFailReason = "";
+		StringBuilder masterFailReason = new StringBuilder();
 		for (Resource res : resources) {
 			File file = res.getFile();
 			if (file.getName().endsWith("Appmaster.stderr") && file.length() > 0) {
 				Scanner scanner = new Scanner(file);
-				masterFailReason = scanner.useDelimiter("\\A").next();
+				masterFailReason.append("[Appmaster.stderr=");
+				masterFailReason.append(scanner.useDelimiter("\\A").next());
+				masterFailReason.append("]");
 				scanner.close();
 				break;
 			}
 		}
 
-		assertThat(masterFailReason, state, is(YarnApplicationState.FINISHED));
+		masterFailReason.append(", [ApplicationReport Diagnostics=");
+		masterFailReason.append(client.getApplicationReport(applicationId).getDiagnostics());
+		masterFailReason.append("], [Num of log files=");
+		masterFailReason.append(resources.length);
+		masterFailReason.append("]");
 
+		assertThat(masterFailReason.toString(), state, is(YarnApplicationState.FINISHED));
 
 		// appmaster and 4 containers should
 		// make it 10 log files
