@@ -23,6 +23,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.util.Scanner;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.CommonConfigurationKeysPublic;
@@ -92,7 +93,6 @@ public class YarnClusterTests {
 			Thread.sleep(1000);
 		}
 		assertThat(state, notNullValue());
-		assertThat(state, is(YarnApplicationState.FINISHED));
 
 		YarnCluster cluster = (YarnCluster) ctx.getBean("yarnCluster");
 		File testWorkDir = cluster.getYarnWorkDir();
@@ -100,6 +100,21 @@ public class YarnClusterTests {
 		PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
 		String locationPattern = "file:" + testWorkDir.getAbsolutePath() + "/**/*.std*";
 		Resource[] resources = resolver.getResources(locationPattern);
+
+		// get possible appmaster error from stderr file
+		String masterFailReason = "";
+		for (Resource res : resources) {
+			File file = res.getFile();
+			if (file.getName().endsWith("Appmaster.stderr") && file.length() > 0) {
+				Scanner scanner = new Scanner(file);
+				masterFailReason = scanner.useDelimiter("\\A").next();
+				scanner.close();
+				break;
+			}
+		}
+
+		assertThat(masterFailReason, state, is(YarnApplicationState.FINISHED));
+
 
 		// appmaster and 4 containers should
 		// make it 10 log files
