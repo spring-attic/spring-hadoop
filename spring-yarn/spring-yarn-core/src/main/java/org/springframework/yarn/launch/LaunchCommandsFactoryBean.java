@@ -20,6 +20,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.hadoop.yarn.api.ApplicationConstants;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
@@ -33,8 +34,8 @@ import org.springframework.util.Assert;
  */
 public class LaunchCommandsFactoryBean implements InitializingBean, FactoryBean<String[]>{
 
-	/** Main command */
-	private String command = "java";
+	/** Main command, default to <JAVA_HOME>/bin/java */
+	private String command = ApplicationConstants.Environment.JAVA_HOME.$() + "/bin/java";
 
 	/** Class to run */
 	private Class<? extends AbstractCommandLineRunner<?>> runner;
@@ -93,26 +94,26 @@ public class LaunchCommandsFactoryBean implements InitializingBean, FactoryBean<
 			while (names.hasMoreElements()) {
 				String key = (String) names.nextElement();
 				if (key.startsWith("-D")) {
-					commandsList.add(key + "=" + arguments.getProperty(key));					
+					commandsList.add(key + "=" + arguments.getProperty(key));
 				}
 			}
 		}
-		
+
 		commandsList.add(runner.getCanonicalName());
 		commandsList.add(contextFile);
 		commandsList.add(beanName);
-		
+
 		// arguments without -D
 		if(arguments != null) {
 			Enumeration<?> names = arguments.propertyNames();
 			while (names.hasMoreElements()) {
 				String key = (String) names.nextElement();
 				if (!key.startsWith("-D")) {
-					commandsList.add(key + "=" + arguments.getProperty(key));					
+					commandsList.add(key + "=" + arguments.getProperty(key));
 				}
 			}
 		}
-		
+
 		commandsList.add("1>" + stdout);
 		commandsList.add("2>" + stderr);
 		commands = commandsList.toArray(new String[0]);

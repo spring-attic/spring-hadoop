@@ -2,6 +2,7 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:yarn="http://www.springframework.org/schema/yarn"
+	xmlns:util="http://www.springframework.org/schema/util"
 	xmlns:context="http://www.springframework.org/schema/context"
 	xsi:schemaLocation="http://www.springframework.org/schema/yarn http://www.springframework.org/schema/yarn/spring-yarn.xsd
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
@@ -32,18 +33,12 @@
 		</yarn:classpath>
 	</yarn:environment>
 
+	<util:properties id="arguments">
+		<prop key="container-count">4</prop>
+	</util:properties>
+
 	<yarn:client app-name="simple-command" memory="1000">
-		<yarn:master-command>
-			<![CDATA[
-			java
-			org.springframework.yarn.am.CommandLineAppmasterRunner
-			YarnClusterTests-appmaster-context.xml
-			yarnAppmaster
-			container-count=4
-			1><LOG_DIR>/AppMaster.stdout
-			2><LOG_DIR>/AppMaster.stderr
-			]]>
-		</yarn:master-command>
+		<yarn:master-runner context-file="YarnClusterTests-appmaster-context.xml" arguments="arguments"/>
 	</yarn:client>
 
 </beans>
