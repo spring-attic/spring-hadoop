@@ -46,7 +46,7 @@ import org.springframework.yarn.test.context.YarnCluster;
  * Test for verifying that mini yarn cluster is
  * executed properly and a simple application
  * is uploaded and executed without failures.
- * 
+ *
  * @author Janne Valkealahti
  *
  */
@@ -56,13 +56,13 @@ public class YarnClusterTests {
 
 	@Autowired
 	private ApplicationContext ctx;
-	
+
 	@Test
 	public void testConfiguredConfiguration() {
 		assertTrue(ctx.containsBean("yarnConfiguration"));
 		Configuration config = (Configuration) ctx.getBean("yarnConfiguration");
 		assertNotNull(config);
-		
+
 		String rm = config.get(YarnConfiguration.RM_ADDRESS);
 		String fs = config.get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY);
 		String scheduler = config.get(YarnConfiguration.RM_SCHEDULER_ADDRESS);
@@ -71,18 +71,17 @@ public class YarnClusterTests {
 		assertNotNull(scheduler);
 	}
 
-	//TODO: diabling test until we solve the classpath configuration problem
-	//@Test
-	@Timed(millis=60000)
+	@Test
+	@Timed(millis=120000)
 	public void testAppSubmission() throws Exception {
 		YarnClient client = (YarnClient) ctx.getBean("yarnClient");
 		assertThat(client, notNullValue());
-		
+
 		ApplicationId applicationId = client.submitApplication();
 		assertThat(applicationId, notNullValue());
-		
+
 		YarnApplicationState state = null;
-		for (int i = 0; i<60; i++) {
+		for (int i = 0; i<120; i++) {
 			state = findState(client, applicationId);
 			if (state == null) {
 				break;
@@ -92,31 +91,31 @@ public class YarnClusterTests {
 			}
 			Thread.sleep(1000);
 		}
-		assertThat(state, notNullValue());		
+		assertThat(state, notNullValue());
 		assertThat(state, is(YarnApplicationState.FINISHED));
-		
+
 		YarnCluster cluster = (YarnCluster) ctx.getBean("yarnCluster");
 		File testWorkDir = cluster.getYarnWorkDir();
-		
+
 		PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
 		String locationPattern = "file:" + testWorkDir.getAbsolutePath() + "/**/*.std*";
 		Resource[] resources = resolver.getResources(locationPattern);
-		
+
 		// appmaster and 4 containers should
 		// make it 10 log files
 		assertThat(resources, notNullValue());
 		assertThat(resources.length, is(10));
-		
+
 		for (Resource res : resources) {
 			File file = res.getFile();
 			if (file.getName().endsWith("stdout")) {
-				assertThat(file.length(), greaterThan(0l));				
+				assertThat(file.length(), greaterThan(0l));
 			} else if (file.getName().endsWith("stderr")) {
 				assertThat(file.length(), is(0l));
 			}
 		}
 	}
-	
+
 	private YarnApplicationState findState(YarnClient client, ApplicationId applicationId) {
 		YarnApplicationState state = null;
 		for (ApplicationReport report : client.listApplications()) {
@@ -127,5 +126,5 @@ public class YarnClusterTests {
 		}
 		return state;
 	}
-	
+
 }

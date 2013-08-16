@@ -838,7 +838,11 @@ if (gradle.ext.mr2) {
 			into "$buildDir/dependency-libs"
 			from configurations.hadoopruntime
 		}
-		test.dependsOn(copyHadoopRuntimeDeps)
+		task copyHadoopRuntimeDepsAll(type: Copy) {
+			into "$buildDir/dependency-all-libs"
+			from configurations.runtime
+		}
+		test.dependsOn([copyHadoopRuntimeDeps,copyHadoopRuntimeDepsAll])
 	}
 
 	project('spring-yarn:spring-yarn-test') {
@@ -860,7 +864,11 @@ if (gradle.ext.mr2) {
 			into "$buildDir/dependency-libs"
 			from configurations.hadoopruntime
 		}
-		test.dependsOn(copyHadoopRuntimeDeps)
+		task copyHadoopRuntimeDepsAll(type: Copy) {
+			into "$buildDir/dependency-all-libs"
+			from configurations.runtime
+		}
+		test.dependsOn([copyHadoopRuntimeDeps,copyHadoopRuntimeDepsAll])
 	}
 
 }

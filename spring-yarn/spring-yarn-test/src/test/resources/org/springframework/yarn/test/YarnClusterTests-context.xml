@@ -12,7 +12,7 @@
 		<property name="clusterId" value="YarnClusterTests"/>
 		<property name="autoStart" value="true"/>
 	</bean>
-	
+
 	<bean id="yarnConfiguredConfiguration" class="org.springframework.yarn.test.support.ConfigurationDelegatingFactoryBean">
 		<property name="cluster" ref="yarnCluster"/>
 	</bean>
@@ -20,13 +20,14 @@
 	<yarn:configuration id="yarnConfiguration" configuration-ref="yarnConfiguredConfiguration"/>
 
 	<yarn:localresources>
-		<yarn:copy src="file:build/dependency-libs/*" staging="true"/>
+		<yarn:copy src="file:build/dependency-all-libs/*" staging="true"/>
 		<yarn:copy src="file:build/libs/*" staging="true"/>
 		<yarn:hdfs path="/*" staging="true"/>
 	</yarn:localresources>
-	
+
+	<!-- do not rely on default classpath, instead use all dependencies -->
 	<yarn:environment include-system-env="false">
-		<yarn:classpath default-yarn-app-classpath="true" delimiter=":">
+		<yarn:classpath default-yarn-app-classpath="false" delimiter=":">
 			./*
 		</yarn:classpath>
 	</yarn:environment>

@@ -21,8 +21,9 @@
 		<yarn:hdfs path="/*" staging="true"/>
 	</yarn:localresources>
 
+	<!-- do not rely on default classpath, instead use all dependencies -->
 	<yarn:environment>
-		<yarn:classpath default-yarn-app-classpath="true" delimiter=":">
+		<yarn:classpath default-yarn-app-classpath="false" delimiter=":">
 			./*
 		</yarn:classpath>
 	</yarn:environment>
