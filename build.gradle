@@ -38,9 +38,9 @@ def yarnProjects() {
 // 
 def List hadoop = []
 
-def hadoopDefault = "hadoop10"
+def hadoopDefault = "hadoop12"
 def hadoopDistro = project.hasProperty("distro") ? project.getProperty("distro") : hadoopDefault
-def hadoopVersion = hadoop10Version
+def hadoopVersion = hd12Version
 
 // make it possible to use Pig jars compiled for Hadoop 2.0
 def pigQualifier = ''
@@ -48,7 +48,7 @@ def pigQualifier = ''
 // handle older Hive version
 def hiveGroup = "org.apache.hive"
 
-// default is Hadoop 1.0.x
+// default is Hadoop 1.2.x
 switch (hadoopDistro) {
 
 	// Cloudera CDH3
@@ -116,22 +116,18 @@ switch (hadoopDistro) {
 		thriftVersion = hd20ThriftVersion
 		break;
 
-	// Hadoop 1.2.x Beta
-	case "hadoop12":
-		hadoopVersion = hd12Version
-		println "Using Apache Hadoop 1.2.x [$hadoopVersion]"
-		hadoop = ["org.apache.hadoop:hadoop-streaming:$hadoopVersion",
-			"org.apache.hadoop:hadoop-tools:$hadoopVersion"]
-		hbaseVersion = hd12HbaseVersion
-		hiveVersion = hd12HiveVersion
-		pigVersion = hd12PigVersion
-		thriftVersion = hd12ThriftVersion
-		break;
-
 	// Hadoop 1.1.x
 	case "hadoop11":
-		hadoopVersion = hadoop11Version
+		hadoopVersion = hd11Version
 		println "Using Apache Hadoop 1.1.x [$hadoopVersion]"
+		hadoop = ["org.apache.hadoop:hadoop-streaming:$hadoopVersion",
+			  "org.apache.hadoop:hadoop-tools:$hadoopVersion"]
+		break;
+
+	// Hadoop 1.0.x
+	case "hadoop10":
+		hadoopVersion = hd10Version
+		println "Using Apache Hadoop 1.0.x [$hadoopVersion]"
 		hadoop = ["org.apache.hadoop:hadoop-streaming:$hadoopVersion",
 			  "org.apache.hadoop:hadoop-tools:$hadoopVersion"]
 		break;
@@ -141,14 +137,21 @@ switch (hadoopDistro) {
 			println "Using default distro: Apache Hadoop [$hadoopVersion]"
 		} else {
 			if (hadoopDistro == hadoopDefault) {
-				println "Using Apache Hadoop 1.0.x [$hadoopVersion]"
+				println "Using Apache Hadoop 1.2.x [$hadoopVersion]"
 			} else {
-				println "$hadoopDistro is not a supported distro; using default distro: Apache Hadoop [$hadoopVersion]"
+				println "Failing build: $hadoopDistro is not a supported distro"
+				println "Supported distros: hadoop10, hadoop11, hadoop12[*], hadoop20, hdp13, chd3, chd4 and phd1"
+				println "* default"
+				throw new InvalidUserDataException("$hadoopDistro is not a supported distro")
 			}
 		}
-		hadoopVersion = hadoop10Version
+		hadoopVersion = hd12Version
 		hadoop = ["org.apache.hadoop:hadoop-streaming:$hadoopVersion",
-			  "org.apache.hadoop:hadoop-tools:$hadoopVersion"]
+			"org.apache.hadoop:hadoop-tools:$hadoopVersion"]
+		hbaseVersion = hd12HbaseVersion
+		hiveVersion = hd12HiveVersion
+		pigVersion = hd12PigVersion
+		thriftVersion = hd12ThriftVersion
 }
 
 configure(javaProjects()) {
@@ -287,7 +290,7 @@ configure(javaProjects()) {
 
 configure(hadoopProjects()) {
 
-	// default is Hadoop 1.0.x
+	// default is Hadoop 1.2.x
 	switch (hadoopDistro) {
 
 		// Cloudera CDH3
@@ -338,15 +341,15 @@ configure(hadoopProjects()) {
 			}
 			break;
 
-		// Hadoop 1.2.x Beta
-		case "hadoop12":
+		// Hadoop 1.1.x
+		case "hadoop11":
 			dependencies {
 				testCompile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
 			}
 			break;
 
-		// Hadoop 1.1.x
-		case "hadoop11":
+		// Hadoop 1.0.x
+		case "hadoop10":
 			dependencies {
 				testCompile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
 			}
@@ -675,7 +678,9 @@ project('spring-hadoop-test') {
 	}
 
 	test {
-		//forkEvery = 1
+		if (project.hasProperty('test.forkEvery')) {
+			forkEvery = project.getProperty('test.forkEvery').toInteger()
+		}
 		systemProperties['input.path'] = 'build/classes/test/input'
 		systemProperties['output.path'] = 'build/classes/test/output'
 		includes = ["**/*.class"]
