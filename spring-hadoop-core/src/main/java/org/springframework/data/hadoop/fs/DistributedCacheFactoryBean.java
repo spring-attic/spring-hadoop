@@ -118,7 +118,7 @@ public class DistributedCacheFactoryBean implements InitializingBean, FactoryBea
 			DistributedCache.createSymlink(conf);
 		}
 
-		HdfsResourceLoader loader = new HdfsResourceLoader(conf);
+		HdfsResourceLoader loader = new HdfsResourceLoader(fs);
 
 		boolean warnCpEntry = !":".equals(System.getProperty("path.separator"));
 
