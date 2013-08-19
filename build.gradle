@@ -30,9 +30,9 @@ apply plugin: 'propdeps-eclipse'
 // 
 def List hadoop = []
 
-def hadoopDefault = "hadoop10"
+def hadoopDefault = "hadoop12"
 def hadoopDistro = project.hasProperty("distro") ? project.getProperty("distro") : hadoopDefault
-def hadoopVersion = hadoop10Version
+def hadoopVersion = hd12Version
 
 // make it possible to use Pig jars compiled for Hadoop 2.0
 def pigQualifier = ''
@@ -40,7 +40,7 @@ def pigQualifier = ''
 // handle older Hive version
 def hiveGroup = "org.apache.hive"
 
-// default is Hadoop 1.0.x
+// default is Hadoop 1.2.x
 switch (hadoopDistro) {
 
   // Cloudera CDH3
@@ -155,11 +155,58 @@ switch (hadoopDistro) {
 
   break;
 
-  // Hadoop 1.2.x Beta
-  case "hadoop12":
-    hadoopVersion = hd12Version
+  // Hadoop 1.1.x
+  case "hadoop11":
+    hadoopVersion = hd11Version
     
-    println "Using Apache Hadoop 1.2.x [$hadoopVersion]"
+    println "Using Apache Hadoop 1.1.x [$hadoopVersion]"
+    
+    hadoop = ["org.apache.hadoop:hadoop-streaming:$hadoopVersion",
+              "org.apache.hadoop:hadoop-tools:$hadoopVersion"]
+
+    dependencies {
+        testCompile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
+    }
+
+    hbaseVersion = hd11HbaseVersion
+    hiveVersion = hd11HiveVersion
+    pigVersion = hd11PigVersion
+
+  break;
+
+  // Hadoop 1.0.x
+  case "hadoop10":
+    hadoopVersion = hd10Version
+
+    println "Using Apache Hadoop 1.0.x [$hadoopVersion]"
+
+    hadoop = ["org.apache.hadoop:hadoop-streaming:$hadoopVersion",
+              "org.apache.hadoop:hadoop-tools:$hadoopVersion"]
+
+    dependencies {
+        testCompile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
+    }
+
+    hbaseVersion = hd10HbaseVersion
+    hiveVersion = hd10HiveVersion
+    pigVersion = hd10PigVersion
+
+  break;
+
+  default:
+    if (!project.hasProperty("distro")) {
+        println "Using default distro: Apache Hadoop [$hadoopVersion]"
+    } else {
+        if (hadoopDistro == hadoopDefault) {
+            println "Using Apache Hadoop 1.2.x [$hadoopVersion]"
+        } else {
+            println "Failing build: $hadoopDistro is not a supported distro"
+            println "Supported distros: hadoop10, hadoop11, hadoop12[*], hadoop20, hdp13, chd3, chd4 and phd1"
+            println "* default"
+            throw new InvalidUserDataException("$hadoopDistro is not a supported distro")
+        }
+    }
+    hadoopVersion = hd12Version
     
     hadoop = ["org.apache.hadoop:hadoop-streaming:$hadoopVersion",
               "org.apache.hadoop:hadoop-tools:$hadoopVersion"]
@@ -172,41 +219,6 @@ switch (hadoopDistro) {
     hiveVersion = hd12HiveVersion
     pigVersion = hd12PigVersion
     thriftVersion = hd12ThriftVersion
-
-  break;
-
-  // Hadoop 1.1.x
-  case "hadoop11":
-    hadoopVersion = hadoop11Version
-    
-    println "Using Apache Hadoop 1.1.x [$hadoopVersion]"
-    
-    hadoop = ["org.apache.hadoop:hadoop-streaming:$hadoopVersion",
-              "org.apache.hadoop:hadoop-tools:$hadoopVersion"]
-
-    dependencies {
-        testCompile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
-    }
-
-  break;
-
-  default:
-    if (!project.hasProperty("distro")) {
-        println "Using default distro: Apache Hadoop [$hadoopVersion]"
-    } else {
-        if (hadoopDistro == hadoopDefault) {
-            println "Using Apache Hadoop 1.0.x [$hadoopVersion]"
-        } else {
-            println "$hadoopDistro is not a supported distro; using default distro: Apache Hadoop [$hadoopVersion]"
-        }
-    }
-    hadoopVersion = hadoop10Version
-    hadoop = ["org.apache.hadoop:hadoop-streaming:$hadoopVersion",
-              "org.apache.hadoop:hadoop-tools:$hadoopVersion"]
-
-    dependencies {
-        testCompile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
-    }
 
 }
 // Common dependencies
@@ -357,7 +369,9 @@ task enableAllTests() {
 }
 
 test {
-    //forkEvery = 1
+    if (project.hasProperty('test.forkEvery')) {
+        forkEvery = project.getProperty('test.forkEvery').toInteger()
+    }
     systemProperties['input.path'] = 'build/classes/test/input'
     systemProperties['output.path'] = 'build/classes/test/output'
     includes = ["**/*.class"]
