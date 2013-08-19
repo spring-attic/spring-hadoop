@@ -89,7 +89,7 @@ public class JobKillTests {
 			status = JobUtils.getStatus(victimJob);
 		}
 		JobStatus status2 = JobUtils.getStatus(victimJob);
-		assertTrue("job not killed - " + status2, JobStatus.KILLED == status2);
+		assertTrue("job not killed - " + status2, (JobStatus.KILLED == status2 || JobStatus.FAILED == status2));
 		assertTrue(status.isFinished());
 	}
 }
