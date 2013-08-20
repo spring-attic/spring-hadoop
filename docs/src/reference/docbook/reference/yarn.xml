@@ -1,0 +1,2021 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0"  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" xml:id="yarn">
+  
+  <title>Yarn Support</title>
+
+  <para>You've propbably seen a lot of topics around Yarn and next version of
+  Hadoop's Map Reduce called <emphasis>MapReduce Version 2</emphasis>.
+  Originally Yarn was a component of MapReduce itself created to overcome
+  some performance issues in Hadoop's original design. The fundamental idea of
+  MapReduce v2 is to split up the two major functionalities of the JobTracker,
+  resource management and job scheduling/monitoring, into separate daemons.
+  The idea is to have a global <emphasis>Resource Manager</emphasis>
+  (RM) and per-application <emphasis>Application Master</emphasis> (AM).
+  An application is either a single job in the classical sense of 
+  Map-Reduce jobs or a group of jobs.</para>
+
+  <para>Let's take a step back and see how original
+  <emphasis>MapReduce Version 1</emphasis> works.
+  <emphasis>Job Tracker</emphasis> is a global singleton entity responsible
+  for managing resources like per node <emphasis>Task Trackers</emphasis> and
+  job life-cycle. <emphasis>Task Tracker</emphasis> is responsible for
+  executing tasks from a <emphasis>Job Tracker</emphasis> and periodically
+  reporting back the status of the tasks. Naturally there is a much
+  more going on behind the scenes but the main point of this is that the
+  <emphasis>Job Tracker</emphasis> has always been a bottleneck in terms
+  of scalability. This is where Yarn steps in by splitting the load
+  away from a global resource management and job tracking into per
+  application masters. Global resource manager can then concentrate in
+  its main task of handling the management of resources.</para>
+  
+  <note>Yarn is usually referred as a synonym for
+  <emphasis>MapReduce Version 2</emphasis>. This is not exactly true
+  and it's easier to understand the relationship between those two
+  by saying that <emphasis>MapReduce Version 2</emphasis> is an
+  application running on top of <emphasis>Yarn</emphasis>.</note>
+  
+  <para>As we just mentioned <emphasis>MapReduce Version 2</emphasis>
+  is an application running of top of <emphasis>Yarn</emphasis>. It is
+  possible to make similar custom <emphasis>Yarn</emphasis> based
+  application which have nothing to do with <emphasis>MapReduce</emphasis>.
+  <emphasis>Yarn</emphasis> itself doesn't know that it is
+  running <emphasis>MapReduce Version 2</emphasis>.
+  While there's nothing wrong to do everything from scratch one
+  will soon realise that steps to learn how to work with
+  <emphasis>Yarn</emphasis> are rather deep. This is where
+  Spring Hadoop support for Yarn steps in by trying to make
+  things easier so that user could concentrate on his own code
+  and not having to worry about framework internals.</para>
+  
+  <section id="yarn:ns">
+  	<title>Using the Spring for Apache Yarn Namespace</title>  	
+
+  	<para>To simplify configuration, SHDP provides a dedicated namespace for
+	<emphasis>Yarn</emphasis> components. However, one can opt to configure the beans
+  	directly through the usual <literal>&lt;bean&gt;</literal> definition.
+	For more information about XML Schema-based configuration in Spring, see 
+  	<ulink url="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/xsd-config.html">this</ulink>
+	appendix in the Spring Framework reference documentation.</para>
+	  	
+  	<para>To use the SHDP namespace, one just needs to import
+	it inside the configuration:</para>
+
+    <programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:]]><co id="yarn-ns-prefix"/><![CDATA[yarn="]]><co id="yarn-ns-uri"/><![CDATA[http://www.springframework.org/schema/yarn"
+  xmlns:]]><co id="yarn-ns-int-prefix"/><![CDATA[yarn-int="]]><co id="yarn-ns-int-uri"/><![CDATA[http://www.springframework.org/schema/yarn/integration"
+  xmlns:]]><co id="yarn-ns-batch-prefix"/><![CDATA[yarn-batch="]]><co id="yarn-ns-batch-uri"/><![CDATA[http://www.springframework.org/schema/yarn/batch"
+  xsi:schemaLocation="
+    http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/yarn
+    http://www.springframework.org/schema/yarn/spring-yarn.xsd]]><co id="yarn-ns-uri-loc"/><![CDATA[
+    http://www.springframework.org/schema/yarn/integration
+    http://www.springframework.org/schema/yarn/integration/spring-yarn-integration.xsd]]><co id="yarn-ns-int-uri-loc"/><![CDATA[
+    http://www.springframework.org/schema/yarn/batch
+    http://www.springframework.org/schema/yarn/batch/spring-yarn-batch.xsd]]><co id="yarn-ns-batch-uri-loc"/><![CDATA[">
+
+  <bean id ... >
+
+  ]]><co id="yarn-ns-example"/><![CDATA[<yarn:configuration ...>
+</beans>]]></programlisting>
+
+    <calloutlist>
+      <callout arearefs="yarn-ns-prefix">
+        <para>Spring for Apache Hadoop Yarn namespace prefix for core package.
+        Any name can do but through out the reference documentation, the <literal>yarn</literal>
+        will be used.</para>
+      </callout>
+      <callout arearefs="yarn-ns-uri">
+        <para>The namespace URI.</para>
+      </callout>
+      <callout arearefs="yarn-ns-int-prefix">
+        <para>Spring for Apache Hadoop Yarn namespace prefix for integration package.
+        Any name can do but through out the reference documentation, the <literal>yarn-int</literal>
+        will be used.</para>
+      </callout>
+      <callout arearefs="yarn-ns-int-uri">
+        <para>The namespace URI.</para>
+      </callout>
+      <callout arearefs="yarn-ns-batch-prefix">
+        <para>Spring for Apache Hadoop Yarn namespace prefix for batch package.
+        Any name can do but through out the reference documentation, the <literal>yarn-batch</literal>
+        will be used.</para>
+      </callout>
+      <callout arearefs="yarn-ns-batch-uri">
+        <para>The namespace URI.</para>
+      </callout>
+      <callout arearefs="yarn-ns-uri-loc">
+        <para>The namespace URI location. Note that even though the location
+		points to an external address (which exists and is valid), Spring
+		will resolve the schema locally as it is included in the Spring
+		for Apache Hadoop Yarn library.</para>
+      </callout>
+      <callout arearefs="yarn-ns-int-uri-loc">
+        <para>The namespace URI location.</para>
+      </callout>
+      <callout arearefs="yarn-ns-batch-uri-loc">
+        <para>The namespace URI location.</para>
+      </callout>
+      <callout arearefs="yarn-ns-example">
+        <para>Declaration example for the Yarn namespace.
+		Notice the prefix usage.</para>
+      </callout>
+    </calloutlist>
+ 	
+ 	<para>Once declared, the namespace elements can be declared simply by
+	appending the aforementioned prefix. Note that is possible to change
+	the default namespace, for example from <literal>&lt;beans&gt;</literal>
+	to <literal>&lt;yarn&gt;</literal>. This is useful for configuration
+	composed mainly of Hadoop components as it avoids declaring the prefix.
+	To achieve this, simply swap the namespace prefix declaration above:</para>
+    
+    <programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/yarn"]]><co id="yarn-def-ns-prefix"/><![CDATA[
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  ]]><co id="yarn-def-ns-beans-prefix"/><![CDATA[xmlns:beans="http://www.springframework.org/schema/beans"
+  xsi:schemaLocation="
+    http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/yarn
+    http://www.springframework.org/schema/yarn/spring-yarn.xsd">
+	    
+    ]]><co id="yarn-def-ns-beans-example"/><![CDATA[<beans:bean id ... >
+	
+    ]]><co id="yarn-def-ns-yarn-example"/><![CDATA[<configuration ...>
+	
+</beans:beans>]]></programlisting>
+
+    <calloutlist>
+      <callout arearefs="yarn-def-ns-prefix">
+        <para>The default namespace declaration for this XML file points
+		to the Spring for Apache Yarn namespace.</para>
+      </callout>
+      <callout arearefs="yarn-def-ns-beans-prefix">
+        <para>The beans namespace prefix declaration.</para>
+      </callout>
+      <callout arearefs="yarn-def-ns-beans-example">
+        <para>Bean declaration using the <literal>&lt;beans&gt;</literal>
+		namespace. Notice the prefix.</para>
+      </callout>
+      <callout arearefs="yarn-def-ns-yarn-example">
+        <para>Bean declaration using the <literal>&lt;yarn&gt;</literal>
+		namespace. Notice the <emphasis>lack</emphasis> of prefix
+		(as <literal>yarn</literal> is the default namespace).</para>
+      </callout>
+    </calloutlist>
+ 			
+  </section>
+
+  <section id="yarn:config">
+  
+    <title>Configuring Yarn</title>
+	
+    <para>In order to use Hadoop and Yarn, one needs to first configure it namely by
+	creating a <literal>YarnConfiguration</literal> object. The configuration holds
+	information about the various parameters of the Yarn system.</para>
+
+    <note>
+      <para>Configuration for <literal>&lt;yarn:configuration&gt;</literal> looks
+	  very similar than <literal>&lt;hdp:configuration&gt;</literal>. Reason for
+	  this is a simple separation for Hadoop's <classname>YarnConfiguration</classname>
+	  and <classname>JobConf</classname> classes.</para>
+    </note>
+	
+   	<para>In its simplest form, the configuration definition is a one liner:</para>
+   	 
+   	<programlisting language="xml"><![CDATA[<yarn:configuration />]]></programlisting>
+   	 
+   	<para>The declaration above defines a <classname>YarnConfiguration</classname>
+	bean (to be precise a factory bean of type <classname>ConfigurationFactoryBean</classname>)
+	named, by default, <literal>yarnConfiguration</literal>. The default name
+	is used, by conventions, by the other elements that require
+	a configuration - this leads to simple and very concise configurations as the 
+   	main components can automatically wire themselves up without
+	requiring any specific configuration.</para>
+   	 
+   	<para>For scenarios where the defaults need to be tweaked, one
+	can pass in additional configuration files:</para>
+   	 
+   	<programlisting language="xml"><![CDATA[<yarn:configuration resources="classpath:/custom-site.xml, classpath:/hq-site.xml">]]></programlisting>
+   	 
+   	<para>In this example, two additional Hadoop configuration
+	resources are added to the configuration.</para>
+   	 
+    <note>
+      <para>Note that the configuration makes use of Spring's <ulink
+      url="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/resources.html"><interfacename>Resource</interfacename></ulink>
+      abstraction to locate the file. This allows various search patterns
+	  to be used, depending on the running environment or the prefix
+	  specified(if any) by the value - in this example the classpath is used.</para>
+    </note>
+
+    <para>In addition to referencing configuration resources, one can tweak
+	Hadoop settings directly through Java <classname>Properties</classname>. 
+    This can be quite handy when just a few options need to be changed:</para>
+    
+    <programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:yarn="http://www.springframework.org/schema/yarn"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/yarn http://www.springframework.org/schema/yarn/spring-yarn.xsd">
+        
+  <yarn:configuration>
+    fs.defaultFS=hdfs://localhost:9000
+    hadoop.tmp.dir=/tmp/hadoop
+    electric=sea
+  </yarn:configuration>
+</beans>]]></programlisting>
+
+    <para>One can further customize the settings by avoiding the so
+	called <emphasis>hard-coded</emphasis> values by externalizing them so they
+	can be replaced at runtime, based on the existing
+    environment without touching the configuration:</para>
+     
+    <programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:yarn="http://www.springframework.org/schema/yarn"
+  xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+    http://www.springframework.org/schema/yarn http://www.springframework.org/schema/yarn/spring-yarn.xsd">
+        
+  <yarn:configuration>
+    fs.defaultFS=${hd.fs}
+    hadoop.tmp.dir=file://${java.io.tmpdir}
+    hangar=${number:18}
+  </yarn:configuration>
+     
+  <context:property-placeholder location="classpath:hadoop.properties" />     
+</beans>]]></programlisting>
+     
+    <para>Through Spring's property placeholder <ulink url="http://static.springsource.org/spring/docs/3.0.x/reference/beans.html#beans-factory-placeholderconfigurer">support</ulink>, <ulink url="http://static.springsource.org/spring/docs/3.0.x/reference/expressions.html">SpEL</ulink> and the <ulink url="http://blog.springsource.com/2011/06/09/spring-framework-3-1-m2-released/">environment 
+    abstraction</ulink> (available in Spring 3.1). one can externalize
+	environment specific properties from the main code base easing the
+	deployment across multiple machines. In the example above, the default
+	file system is replaced based on the properties available in
+	<literal>hadoop.properties</literal> while the temp dir is determined
+	dynamically through <literal>SpEL</literal>. Both approaches offer a lot
+	of flexbility in adapting to the running environment - in fact we use this
+	approach extensivly in the Spring for Apache Hadoop test suite to cope with
+	the differences between the different development boxes and the CI server.</para>
+          
+    <para>
+      <anchor id="yarn:config:properties"/>
+      Additionally, external <literal>Properties</literal> files can be loaded, <literal>Properties</literal> beans (typically declared through Spring's <literal>
+      <ulink url="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/xsd-config.html#xsd-config-body-schemas-util-properties">util</ulink></literal> namespace). 
+      Along with the nested properties declaration, this allows customized configurations to be easily declared:
+    </para>
+     
+    <programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:yarn="http://www.springframework.org/schema/yarn"
+  xmlns:context="http://www.springframework.org/schema/context"
+  xmlns:util="http://www.springframework.org/schema/util"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+    http://www.springframework.org/schema/yarn http://www.springframework.org/schema/yarn/spring-yarn.xsd">
+
+  <!-- merge the local properties, the props bean and the two properties files -->        
+  <yarn:configuration properties-ref="props" properties-location="cfg-1.properties, cfg-2.properties">
+    star=chasing
+    captain=eo
+  </yarn:configuration>
+     
+  <util:properties id="props" location="props.properties"/>     
+</beans>]]></programlisting>
+     
+    <para>When merging several properties, ones defined locally win. In the example
+	above the configuration properties are the primary source, followed by
+	the <literal>props</literal> bean followed by the external properties
+	file based on their defined order. While it's not typical for a configuration
+	to refer to use so many properties, the example showcases the various options available.</para>
+	
+    <note>For more properties utilities, including using the System as a source or
+	fallback, or control over the merging order, consider using Spring's <literal>
+    <ulink url="http://static.springsource.org/spring/docs/3.0.x/api/org/springframework/beans/factory/config/PropertiesFactoryBean.html">PropertiesFactoryBean</ulink></literal> (which is what Spring for
+	Apache Hadoop Yarn and <literal>util:properties</literal> use underneath).</note>
+     
+    <para><anchor id="yarn:config:inherit"/>It is possible to create configuration
+	based on existing ones - this allows one to create dedicated configurations, slightly
+	different from the main ones, usable for certain jobs (such as streaming - more
+	on that <link linkend="yarn:job:streaming">below</link>). Simply use
+	the <literal>configuration-ref</literal> attribute to refer to
+	the <emphasis>parent</emphasis> configuration - all its properties
+	will be inherited and overridden as specified by the child:</para>
+
+    <programlisting language="xml"><![CDATA[<!-- default name is 'yarnConfiguration' -->
+<yarn:configuration>
+  fs.defaultFS=${hd.fs}
+  hadoop.tmp.dir=file://${java.io.tmpdir}
+</yarn:configuration>
+     
+<yarn:configuration id="custom" configuration-ref="yarnConfiguration">
+  fs.defaultFS=${custom.hd.fs}
+</yarn:configuration>     
+
+...
+]]></programlisting>     
+
+    <para>Make sure though you specify a different name since otherwise, since
+	both definitions will have the same name, the Spring container will interpret
+	this as being the same definition (and will usually consider the last one found).</para>
+          
+    <para>Last but not least a reminder that one can mix and match all these
+	options to her preference. In general, consider externalizing configuration
+	since it allows easier updates without interfering with the application
+	configuration. When dealing with multiple, similar configuration use
+	configuration <emphasis>composition</emphasis> as it tends to keep the
+	definitions concise, in sync and easy to update.</para>
+	
+  </section>
+
+  <section id="yarn:localresources">
+  
+    <title>Local Resources</title>
+	
+    <para>When <emphasis>Application Master</emphasis> or any other
+	<emphasis>Container</emphasis> is run in a hadoop cluster, there
+	are usually dependencies to various application and configuration files.
+	These files needs to be localized into
+	a running <emphasis>Container</emphasis> by making a physical copy.
+	Localization is a process where dependent files are copied into node's
+	directory structure and thus can be used within the <emphasis>Container</emphasis>
+	itself. Yarn itself tries to provide isolation in a way that multiple
+	containers and applications would not clash.</para>
+
+    <para>In order to use local resources, one needs to create an implementation
+	of <interfacename>ResourceLocalizer</interfacename> interface. In its
+	simplest form, resource localizer can be defined as:</para>
+
+    <programlisting language="xml"><![CDATA[<yarn:localresources>
+  <yarn:hdfs path="/path/in/hdfs/my.jar"/>
+</yarn:localresources>
+]]></programlisting>
+
+    <para>The declaration above defines a <interfacename>ResourceLocalizer</interfacename>
+	bean (to be precise a factory bean of type 
+	<classname>LocalResourcesFactoryBean</classname>) named, by default,
+	<emphasis>yarnLocalresources</emphasis>. The default name is used, by
+	conventions, by the other elements that require a reference to a
+	resource localizer. It's explained later how this reference
+	is used when container launch context is defined.</para>
+
+    <para>It is also possible to define path as pattern. This makes it
+	easier to pick up all or subset of files from a directory.</para>
+
+    <programlisting language="xml"><![CDATA[<yarn:localresources>
+  <yarn:hdfs path="/path/in/hdfs/*.jar"/>
+</yarn:localresources>
+]]></programlisting>
+	
+    <para>Behind the scenes it's not enough to simple have a reference
+	to file in a hdfs file system. Yarn itself when localizing resources into
+	container needs to do a consistency check for copied files. This is done
+	by checking file size and timestamp. This information needs to passed
+	to yarn together with a file path. Order to do this the one who
+	defines these beans needs to ask this information from hdfs prior to
+	sending out resouce localizer request. This kind of behaviour exists to
+	make sure that once localization is defined, <emphasis>Container</emphasis> will
+	fail fast if dependant files were replaced during the process.</para>
+
+    <para>On default the hdfs base address is coming from a Yarn configuration and
+	<interfacename>ResourceLocalizer</interfacename> bean will use configuration named
+	<emphasis>yarnLocalresources</emphasis>. If there is a need to use something else
+	than the default bean, <emphasis>configuration</emphasis> parameter
+	can be used to make a reference to other defined configurations.</para>
+	
+    <programlisting language="xml"><![CDATA[<yarn:localresources configuration="yarnConfiguration">
+  <yarn:hdfs path="/path/in/hdfs/my.jar"/>
+</yarn:localresources>
+]]></programlisting>     
+
+    <para>For example, client defining a launch context for
+	<emphasis>Application Master</emphasis> needs to access dependent hdfs entries. The one
+	defining and using <interfacename>ResourceLocalizer</interfacename> bean
+	may have a different hdfs address than the Node Manager preparing the
+	Container. Effectively hdfs entry given to resource localizer needs to be
+	accessed from a <emphasis>Node Manager</emphasis>.</para>
+	
+    <para>To overcome this problem, parameters <emphasis>local</emphasis> and
+	<emphasis>remote</emphasis> can be used to define a different hdfs base entries.</para>
+	
+    <programlisting language="xml"><![CDATA[<yarn:localresources local="hdfs://0.0.0.0:9000" remote="hdfs://10.10.10.10:9000">
+  <yarn:hdfs path="/app/multi-context/multi-context-1.0.0.M1.jar"/>
+  <yarn:hdfs path="/app/spring-yarn-core-1.0.0.BUILD-SNAPSHOT.jar"/>
+</yarn:localresources>
+]]></programlisting>     
+
+    <para>Yarn resource localizer is using additional parameters to define entry type
+	and visibility. Usage is described below:</para>
+	
+    <programlisting language="xml"><![CDATA[<yarn:localresources>
+  <yarn:hdfs path="/path/in/hdfs/my.jar" type="FILE" visibility="APPLICATION"/>
+</yarn:localresources>
+]]></programlisting>
+
+    <para>For convenience it is possible to copy files into hdfs during the
+	localization process using a <emphasis>yarn:copy</emphasis> tag. Currently
+	base staging directory is <emphasis>/syarn/staging/xx</emphasis> where 
+	<emphasis>xx</emphasis> is a unique identifier per application instance.</para>
+
+    <programlisting language="xml"><![CDATA[<yarn:localresources>
+  <yarn:copy src="file:/local/path/to/files/*jar" staging="true"/>
+  <yarn:hdfs path="/*" staging="true"/>
+</yarn:localresources>
+]]></programlisting>
+
+    <table id="yarn:localresources:localresourcesflags" pgwide="1" align="center">
+        <title><literal>yarn:localresources</literal> attributes</title>
+        <tgroup cols="3">
+            <colspec colname="c1" colwidth="1*"/>
+            <colspec colname="c2" colwidth="1*"/>
+            <colspec colname="c3" colwidth="4*"/>
+            <spanspec spanname="description" namest="c2" nameend="c3" align="center"/>
+            <thead>
+                <row>
+                    <entry>Name</entry>
+                    <entry>Values</entry>
+                    <entry align="center">Description</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row>
+                    <entry><literal>configuration</literal></entry>
+                    <entry>Bean Reference</entry>
+                    <entry>A reference to configuration bean name, default is
+					<emphasis>yarnConfiguration</emphasis></entry>
+                </row>
+                <row>
+                    <entry><literal>local</literal></entry>
+                    <entry>HDFS Base URL</entry>
+                    <entry>Global default if not defined in entry level</entry>
+                </row>
+                <row>
+                    <entry><literal>remote</literal></entry>
+                    <entry>HDFS Base URL</entry>
+                    <entry>Global default if not defined in entry level</entry>
+                </row>
+                <row>
+                    <entry><literal>type</literal></entry>
+                    <entry><literal>ARCHIVE</literal>, <literal>FILE</literal>, <literal>PATTERN</literal></entry>
+                    <entry>Global default if not defined in entry level</entry>
+                </row>
+                <row>
+                    <entry><literal>visibility</literal></entry>
+                    <entry><literal>PUBLIC</literal>, <literal>PRIVATE</literal>, <literal>APPLICATION</literal></entry>
+                    <entry>Global default if not defined in entry level</entry>
+                </row>
+            </tbody>
+        </tgroup>  
+    </table>
+
+    <table id="yarn:localresources:hdfsflags" pgwide="1" align="center">
+        <title><literal>yarn:hdfs</literal> attributes</title>
+        <tgroup cols="3">
+            <colspec colname="c1" colwidth="1*"/>
+            <colspec colname="c2" colwidth="1*"/>
+            <colspec colname="c3" colwidth="4*"/>
+            <spanspec spanname="description" namest="c2" nameend="c3" align="center"/>
+            <thead>
+                <row>
+                    <entry>Name</entry>
+                    <entry>Values</entry>
+                    <entry align="center">Description</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row>
+                    <entry><literal>path</literal></entry>
+                    <entry>HDFS Path</entry>
+                    <entry>Path in hdfs</entry>
+                </row>
+                <row>
+                    <entry><literal>local</literal></entry>
+                    <entry>HDFS Base URL</entry>
+                    <entry>Path accessible by a running container</entry>
+                </row>
+                <row>
+                    <entry><literal>remote</literal></entry>
+                    <entry>HDFS Base URL</entry>
+                    <entry>Path accessible by a client</entry>
+                </row>
+                <row>
+                    <entry><literal>type</literal></entry>
+                    <entry><literal>ARCHIVE</literal>, <literal>FILE</literal>(default), <literal>PATTERN</literal></entry>
+                    <entry><literal>ARCHIVE</literal> - automatically unarchived by the Node Manager, <literal>FILE</literal> - regular file, <literal>PATTERN</literal> - hybrid between archive and file.</entry>
+                </row>
+                <row>
+                    <entry><literal>visibility</literal></entry>
+                    <entry><literal>PUBLIC</literal>, <literal>PRIVATE</literal>, <literal>APPLICATION</literal>(default)</entry>
+                    <entry><literal>PUBLIC</literal> - Shared by all users on the node, <literal>PRIVATE</literal> - Shared among all applications of the <emphasis>same user</emphasis> on the node, <literal>APPLICATION</literal> - Shared only among containers of the <emphasis>same application</emphasis> on the node</entry>
+                </row>
+                <row>
+                    <entry><literal>staging</literal></entry>
+                    <entry><literal>true</literal>, <literal>false</literal>(default)</entry>
+                    <entry>Internal temporary stagind directory.</entry>
+                </row>
+            </tbody>
+        </tgroup>  
+    </table>
+
+    <table id="yarn:localresources:copyflags" pgwide="1" align="center">
+        <title><literal>yarn:copy</literal> attributes</title>
+        <tgroup cols="3">
+            <colspec colname="c1" colwidth="1*"/>
+            <colspec colname="c2" colwidth="1*"/>
+            <colspec colname="c3" colwidth="4*"/>
+            <spanspec spanname="description" namest="c2" nameend="c3" align="center"/>
+            <thead>
+                <row>
+                    <entry>Name</entry>
+                    <entry>Values</entry>
+                    <entry align="center">Description</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row>
+                    <entry><literal>src</literal></entry>
+                    <entry>Copy sources</entry>
+                    <entry>Comma delimited list of resource patterns</entry>
+                </row>
+                <row>
+                    <entry><literal>staging</literal></entry>
+                    <entry><literal>true</literal>, <literal>false</literal>(default)</entry>
+                    <entry>Internal temporary stagind directory.</entry>
+                </row>
+            </tbody>
+        </tgroup>  
+    </table>
+	
+  </section>
+
+  <section id="yarn:containerenvironment">
+    <title>Container Environment</title>
+
+    <para>One central concept in Yarn is to use environment variables
+	which then can be read from a container. While it's possible to
+	read those variable at any time it is considered bad design if
+	one chooce to do so. Spring Yarn will pass variable into application
+	before any business methods are executed, which makes things more
+	clearly and testing becomes much more easier.</para>
+	
+    <programlisting language="xml"><![CDATA[<yarn:environment/>]]></programlisting>	
+	
+    <para>The declaration above defines a <interfacename>Map</interfacename>
+	bean (to be precise a factory bean of type 
+	<classname>EnvironmentFactoryBean</classname>) named, by default,
+	<emphasis>yarnEnvironment</emphasis>. The default name is used, by
+	conventions, by the other elements that require a reference to a
+	environment variables.</para>	
+
+    <para>For conveniance it is possible to define a classpath
+	entry directly into an environment. Most likely one is about
+	to run some java code with libraries so classpath needs to
+	be defined anyway.</para>
+	
+    <programlisting language="xml"><![CDATA[<yarn:environment include-system-env="false">
+  <yarn:classpath default-yarn-app-classpath="true" delimiter=":">
+    ./*
+  </yarn:classpath>
+</yarn:environment>]]></programlisting>     
+	
+    <para>If <emphasis>default-yarn-app-classpath</emphasis> parameter is set to
+    <emphasis>true</emphasis>(default value) a default yarn entries will be added to classpath
+	automatically. Resulting entries are shown below:</para>
+
+    <programlisting language="xml"><![CDATA[$HADOOP_CONF_DIR:
+$HADOOP_COMMON_HOME/*:
+$HADOOP_COMMON_HOME/lib/*:
+$HADOOP_COMMON_HOME/share/hadoop/common/*:
+$HADOOP_COMMON_HOME/share/hadoop/common/lib/*:
+$HADOOP_HDFS_HOME/*:
+$HADOOP_HDFS_HOME/lib/*:
+$HADOOP_HDFS_HOME/share/hadoop/hdfs/*:
+$HADOOP_HDFS_HOME/share/hadoop/hdfs/lib/*:
+$YARN_HOME/*:
+$YARN_HOME/lib/*:
+$HADOOP_YARN_HOME/share/hadoop/yarn/*:
+$HADOOP_YARN_HOME/share/hadoop/yarn/lib/*]]></programlisting>	
+	
+    <note>
+      <para>Be carefull if passing environment variables between different systems.
+	  For example if running a client on Windows and passing variables to
+	  Application Master running on Linux, execution wrapper in Yarn may
+	  silently fail.</para>
+    </note>
+	
+    <table id="yarn:environment:environmentflags" pgwide="1" align="center">
+        <title><literal>yarn:environment</literal> attributes</title>
+        <tgroup cols="3">
+            <colspec colname="c1" colwidth="1*"/>
+            <colspec colname="c2" colwidth="1*"/>
+            <colspec colname="c3" colwidth="4*"/>
+            <spanspec spanname="description" namest="c2" nameend="c3" align="center"/>
+            <thead>
+                <row>
+                    <entry>Name</entry>
+                    <entry>Values</entry>
+                    <entry align="center">Description</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row>
+                    <entry><literal>include-system-env</literal></entry>
+                    <entry><literal>true</literal>(default), <literal>false</literal></entry>
+                    <entry>Defines whether system environment variables are
+					actually added to this bean.</entry>
+                </row>
+            </tbody>
+        </tgroup>  
+    </table>
+	
+    <table id="yarn:environment:classpathflags" pgwide="1" align="center">
+        <title><literal>classpath</literal> attributes</title>
+        <tgroup cols="3">
+            <colspec colname="c1" colwidth="1*"/>
+            <colspec colname="c2" colwidth="1*"/>
+            <colspec colname="c3" colwidth="4*"/>
+            <spanspec spanname="description" namest="c2" nameend="c3" align="center"/>
+            <thead>
+                <row>
+                    <entry>Name</entry>
+                    <entry>Values</entry>
+                    <entry align="center">Description</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row>
+                    <entry><literal>default-yarn-app-classpath</literal></entry>
+                    <entry><literal>true</literal>(default), <literal>false</literal></entry>
+                    <entry>Defines whether default yarn entries are added
+					to classpath.</entry>
+                </row>
+                <row>
+                    <entry><literal>delimiter</literal></entry>
+                    <entry>Delimiter string, default is ":"</entry>
+                    <entry>Defines delimiter used in a classpath string</entry>
+                </row>
+            </tbody>
+        </tgroup>  
+    </table>
+	
+	
+  </section>
+
+  <section id="yarn:client">
+  
+    <title>Application Client</title>
+	
+  	<para>Client is always your entry point when interacting with
+	a Yarn system whether one is about to submit a new application
+	instance or just querying <emphasis>Resource Manager</emphasis>
+	for running application(s) status.
+	Currently support for client is very limited and a simple
+	command to start <emphasis>Application Master</emphasis>
+	can be defined. If there is just a need to query
+	<emphasis>Resource Manager</emphasis>, command
+	definition is not needed.</para>
+	
+    <programlisting language="xml"><![CDATA[<yarn:client app-name="customAppName">
+  <yarn:master-command>
+    <![CDATA[
+      /usr/local/java/bin/java
+      org.springframework.yarn.am.CommandLineAppmasterRunner
+      appmaster-context.xml
+      yarnAppmaster
+      container-count=2
+      1><LOG_DIR>/AppMaster.stdout
+      2><LOG_DIR>/AppMaster.stderr
+    ]]]]><![CDATA[>
+  </yarn:master-command>
+</yarn:client>]]></programlisting>     
+
+    <para>The declaration above defines a <interfacename>YarnClient</interfacename>
+	bean (to be precise a factory bean of type 
+	<classname>YarnClientFactoryBean</classname>) named, by default,
+	<emphasis>yarnClient</emphasis>. It also defines a command launching
+	an <emphasis>Application Master</emphasis> using
+	<literal>&lt;master-command&gt;</literal> entry which is also a way
+	to define the raw commands. If this <emphasis>yarnClient</emphasis>
+	instance is used to submit an application, its name would come from
+	a <emphasis>app-name</emphasis> attribute.</para>
+
+    <programlisting language="xml"><![CDATA[<yarn:client app-name="customAppName">
+  <yarn:master-runner/>
+</yarn:client>]]></programlisting>     
+
+    <para>For a convinience entry <literal>&lt;master-runner&gt;</literal>
+	can be used to define same command entries.</para>
+
+    <programlisting language="xml"><![CDATA[<yarn:client app-name="customAppName">
+  <util:properties id="customArguments">
+    container-count=2
+  </util:properties>
+  <yarn:master-runner
+    command="java"
+    context-file="appmaster-context.xml"
+    bean-name="yarnAppmaster"
+    arguments="customArguments"
+    stdout="<LOG_DIR>/AppMaster.stdout"
+    stderr="<LOG_DIR>/AppMaster.stderr" />
+</yarn:client>]]></programlisting>     
+
+    <para>All previous three examples are effectively identical from
+	Spring Yarn point of view.</para>
+	
+	<note>
+	  <para>The &lt;LOG_DIR&gt; refers to Hadoop's dedicated log directory
+	  for the running container.</para>
+	</note>
+
+    <programlisting language="xml"><![CDATA[<yarn:client app-name="customAppName"
+  configuration="customConfiguration"
+  resource-localizer="customResources"
+  environment="customEnv"
+  priority="1"
+  virtualcores="2"
+  memory="11"
+  queue="customqueue">
+  <yarn:master-runner/>
+</yarn:client>]]></programlisting>     
+
+    <para>If there is a need to change some of the parameters for the
+	<emphasis>Application Master</emphasis> submission, <literal>memory</literal>
+	and <literal>virtualcores</literal> defines the container settings.
+	For submission, <literal>queue</literal> and <literal>priority</literal>
+	defines how submission is actually done.</para>
+
+    <table id="yarn:client:clientflags" pgwide="1" align="center">
+        <title><literal>yarn:client</literal> attributes</title>
+        <tgroup cols="3">
+            <colspec colname="c1" colwidth="1*"/>
+            <colspec colname="c2" colwidth="1*"/>
+            <colspec colname="c3" colwidth="4*"/>
+            <spanspec spanname="description" namest="c2" nameend="c3" align="center"/>
+            <thead>
+                <row>
+                    <entry>Name</entry>
+                    <entry>Values</entry>
+                    <entry align="center">Description</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row>
+                    <entry><literal>app-name</literal></entry>
+                    <entry>Name as string, default is empty</entry>
+                    <entry>Yarn submitted application name</entry>
+                </row>
+                <row>
+                    <entry><literal>configuration</literal></entry>
+                    <entry>Bean Reference</entry>
+                    <entry>A reference to configuration bean name, default is
+					<emphasis>yarnConfiguration</emphasis></entry>
+                </row>
+                <row>
+                    <entry><literal>resourcelocalizer</literal></entry>
+                    <entry>Bean Reference</entry>
+                    <entry>A reference to resource localizer bean name, default is
+					<emphasis>yarnLocalresources</emphasis></entry>
+                </row>
+                <row>
+                    <entry><literal>environment</literal></entry>
+                    <entry>Bean Reference</entry>
+                    <entry>A reference to environment bean name, default is
+					<emphasis>yarnEnvironment</emphasis></entry>
+                </row>
+                <row>
+                    <entry><literal>template</literal></entry>
+                    <entry>Bean Reference</entry>
+                    <entry>A reference to a bean implementing
+					<interfacename>ClientRmOperations</interfacename></entry>
+                </row>
+                <row>
+                    <entry><literal>memory</literal></entry>
+                    <entry>Memory as integer, default is "64"</entry>
+                    <entry>Amount of memory for appmaster resource</entry>
+                </row>
+                <row>
+                    <entry><literal>virtualcores</literal></entry>
+                    <entry>Cores as integer, default is "1"</entry>
+                    <entry>Number of appmaster resource virtual cores</entry>
+                </row>
+                <row>
+                    <entry><literal>priority</literal></entry>
+                    <entry>Priority as integer, default is "0"</entry>
+                    <entry>Submission priority</entry>
+                </row>
+                <row>
+                    <entry><literal>queue</literal></entry>
+                    <entry>Queue string, default is "default"</entry>
+                    <entry>Submission queue</entry>
+                </row>
+            </tbody>
+        </tgroup>  
+    </table>
+
+    <table id="yarn:client:mastercommandflags" pgwide="1" align="center">
+        <title><literal>yarn:master-command</literal></title>
+        <tgroup cols="3">
+            <colspec colname="c1" colwidth="1*"/>
+            <colspec colname="c2" colwidth="1*"/>
+            <colspec colname="c3" colwidth="4*"/>
+            <spanspec spanname="description" namest="c2" nameend="c3" align="center"/>
+            <thead>
+                <row>
+                    <entry>Name</entry>
+                    <entry>Values</entry>
+                    <entry align="center">Description</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row>
+                    <entry>Entry content</entry>
+                    <entry>List of commands</entry>
+                    <entry>Commands defined in this entry are aggregated into a single command line</entry>
+                </row>
+            </tbody>
+        </tgroup>  
+    </table>
+
+    <table id="yarn:client:masterrunnerflags" pgwide="1" align="center">
+        <title><literal>yarn:master-runner</literal> attributes</title>
+        <tgroup cols="3">
+            <colspec colname="c1" colwidth="1*"/>
+            <colspec colname="c2" colwidth="1*"/>
+            <colspec colname="c3" colwidth="4*"/>
+            <spanspec spanname="description" namest="c2" nameend="c3" align="center"/>
+            <thead>
+                <row>
+                    <entry>Name</entry>
+                    <entry>Values</entry>
+                    <entry align="center">Description</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row>
+                    <entry><literal>command</literal></entry>
+                    <entry>Main command as string, default is "java"</entry>
+                    <entry>Command line first entry</entry>
+                </row>
+                <row>
+                    <entry><literal>context-file</literal></entry>
+                    <entry>Name of the Spring context file, default is "appmaster-context.xml"</entry>
+                    <entry>Command line second entry</entry>
+                </row>
+                <row>
+                    <entry><literal>bean-name</literal></entry>
+                    <entry>Name of the Spring bean, default is "yarnAppmaster"</entry>
+                    <entry>Command line third entry</entry>
+                </row>
+                <row>
+                    <entry><literal>arguments</literal></entry>
+                    <entry>Reference to Java's Properties</entry>
+                    <entry>Added to command line parameters as key/value pairs separated by '='</entry>
+                </row>
+                <row>
+                    <entry><literal>stdout</literal></entry>
+                    <entry>Stdout, default is "&lt;LOG_DIR&gt;/AppMaster.stdout"</entry>
+                    <entry>Appended with 1></entry>
+                </row>
+                <row>
+                    <entry><literal>stderr</literal></entry>
+                    <entry>Stderr, default is "&lt;LOG_DIR&gt;/AppMaster.stderr"</entry>
+                    <entry>Appended with 2></entry>
+                </row>
+            </tbody>
+        </tgroup>  
+    </table>
+		
+  </section>
+
+  <section id="yarn:master">
+  
+    <title>Application Master</title>
+	
+  	<para>Application master is responsible for container allocation,
+	launching and monitoring.</para>
+	
+    <programlisting language="xml"><![CDATA[<yarn:master>
+  <yarn:container-allocator hosts="host1,host2" racks="rack1,rack2" virtualcores="1" memory="64" priority="0"/>    
+  <yarn:container-launcher username="whoami"/>    
+  <yarn:container-command>
+    <![CDATA[
+      /usr/local/java/bin/java
+      org.springframework.yarn.container.CommandLineContainerRunner
+      container-context.xml
+      1><LOG_DIR>/Container.stdout
+      2><LOG_DIR>/Container.stderr
+    ]]]]><![CDATA[>
+  </yarn:container-command>
+</yarn:master>
+]]></programlisting>     
+
+    <para>The declaration above defines a <interfacename>YarnAppmaster</interfacename>
+	bean (to be precise a bean of type 
+	<classname>StaticAppmaster</classname>) named, by default,
+	<emphasis>yarnAppmaster</emphasis>. It also defines a command launching
+	a <emphasis>Container(s)</emphasis> using
+	<literal>&lt;container-command&gt;</literal> entry, parameters
+	for allocation using <literal>&lt;container-allocator&gt;</literal>
+	entry and finally a launcher parameter using
+	<literal>&lt;container-launcher&gt;</literal> entry.</para>
+	
+	<para>Currently there is a simple implementation of
+	<classname>StaticAppmaster</classname> which is able to allocate and
+	launch a number of containers. These containers are monitored
+	by querying resource manager for container execution completion.</para>
+
+    <programlisting language="xml"><![CDATA[<yarn:master>
+  <yarn:container-runner/>
+</yarn:master>]]></programlisting>     
+
+    <para>For a convinience entry <literal>&lt;container-runner&gt;</literal>
+	can be used to define same command entries.</para>
+
+    <programlisting language="xml"><![CDATA[<yarn:master>
+  <util:properties id="customArguments">
+    some-argument=myvalue
+  </util:properties>
+  <yarn:container-runner
+    command="java"
+    context-file="container-context.xml"
+    bean-name="yarnContainer"
+    arguments="customArguments"
+    stdout="<LOG_DIR>/Container.stdout"
+    stderr="<LOG_DIR>/Container.stderr" />
+</yarn:master>]]></programlisting>     
+
+	
+    <table id="yarn:master:masterflags" pgwide="1" align="center">
+        <title><literal>yarn:master</literal> attributes</title>
+        <tgroup cols="3">
+            <colspec colname="c1" colwidth="1*"/>
+            <colspec colname="c2" colwidth="1*"/>
+            <colspec colname="c3" colwidth="4*"/>
+            <spanspec spanname="description" namest="c2" nameend="c3" align="center"/>
+            <thead>
+                <row>
+                    <entry>Name</entry>
+                    <entry>Values</entry>
+                    <entry align="center">Description</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row>
+                    <entry><literal>configuration</literal></entry>
+                    <entry>Bean Reference</entry>
+                    <entry>A reference to configuration bean name, default is
+					<emphasis>yarnConfiguration</emphasis></entry>
+                </row>
+                <row>
+                    <entry><literal>resourcelocalizer</literal></entry>
+                    <entry>Bean Reference</entry>
+                    <entry>A reference to resource localizer bean name, default is
+					<emphasis>yarnLocalresources</emphasis></entry>
+                </row>
+                <row>
+                    <entry><literal>environment</literal></entry>
+                    <entry>Bean Reference</entry>
+                    <entry>A reference to environment bean name, default is
+					<emphasis>yarnEnvironment</emphasis></entry>
+                </row>
+            </tbody>
+        </tgroup>  
+    </table>
+
+    <table id="yarn:master:containerallocatorflags" pgwide="1" align="center">
+        <title><literal>yarn:container-allocator</literal> attributes</title>
+        <tgroup cols="3">
+            <colspec colname="c1" colwidth="1*"/>
+            <colspec colname="c2" colwidth="1*"/>
+            <colspec colname="c3" colwidth="4*"/>
+            <spanspec spanname="description" namest="c2" nameend="c3" align="center"/>
+            <thead>
+                <row>
+                    <entry>Name</entry>
+                    <entry>Values</entry>
+                    <entry align="center">Description</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row>
+                    <entry><literal>hosts</literal></entry>
+                    <entry>List of hosts</entry>
+                    <entry>Preferred hostname of nodes for allocation.</entry>
+                </row>
+                <row>
+                    <entry><literal>racks</literal></entry>
+                    <entry>List of racks</entry>
+                    <entry>Preferred name of racks for allocation.</entry>
+                </row>
+                <row>
+                    <entry><literal>virtualcores</literal></entry>
+                    <entry>Integer</entry>
+                    <entry><emphasis>number of virtual cpu cores</emphasis> of the resource.</entry>
+                </row>
+                <row>
+                    <entry><literal>memory</literal></entry>
+                    <entry>Integer, as of MBs.</entry>
+                    <entry><emphasis>memory</emphasis> of the resource.</entry>
+                </row>
+                <row>
+                    <entry><literal>priority</literal></entry>
+                    <entry>Integer</entry>
+                    <entry>Assigned priority of a request.</entry>
+                </row>
+            </tbody>
+        </tgroup>  
+    </table>
+
+    <table id="yarn:master:containerlauncherflags" pgwide="1" align="center">
+        <title><literal>yarn:container-launcher</literal> attributes</title>
+        <tgroup cols="3">
+            <colspec colname="c1" colwidth="1*"/>
+            <colspec colname="c2" colwidth="1*"/>
+            <colspec colname="c3" colwidth="4*"/>
+            <spanspec spanname="description" namest="c2" nameend="c3" align="center"/>
+            <thead>
+                <row>
+                    <entry>Name</entry>
+                    <entry>Values</entry>
+                    <entry align="center">Description</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row>
+                    <entry><literal>username</literal></entry>
+                    <entry>String</entry>
+                    <entry>Set the <emphasis>user</emphasis> to whom the
+					container has been allocated.</entry>
+                </row>
+            </tbody>
+        </tgroup>  
+    </table>
+
+    <table id="yarn:master::containerrunnerflags" pgwide="1" align="center">
+        <title><literal>yarn:container-runner</literal> attributes</title>
+        <tgroup cols="3">
+            <colspec colname="c1" colwidth="1*"/>
+            <colspec colname="c2" colwidth="1*"/>
+            <colspec colname="c3" colwidth="4*"/>
+            <spanspec spanname="description" namest="c2" nameend="c3" align="center"/>
+            <thead>
+                <row>
+                    <entry>Name</entry>
+                    <entry>Values</entry>
+                    <entry align="center">Description</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row>
+                    <entry><literal>command</literal></entry>
+                    <entry>Main command as string, default is "java"</entry>
+                    <entry>Command line first entry</entry>
+                </row>
+                <row>
+                    <entry><literal>context-file</literal></entry>
+                    <entry>Name of the Spring context file, default is "container-context.xml"</entry>
+                    <entry>Command line second entry</entry>
+                </row>
+                <row>
+                    <entry><literal>bean-name</literal></entry>
+                    <entry>Name of the Spring bean, default is "yarnContainer"</entry>
+                    <entry>Command line third entry</entry>
+                </row>
+                <row>
+                    <entry><literal>arguments</literal></entry>
+                    <entry>Reference to Java's Properties</entry>
+                    <entry>Added to command line parameters as key/value pairs separated by '='</entry>
+                </row>
+                <row>
+                    <entry><literal>stdout</literal></entry>
+                    <entry>Stdout, default is "&lt;LOG_DIR&gt;/Container.stdout"</entry>
+                    <entry>Appended with 1></entry>
+                </row>
+                <row>
+                    <entry><literal>stderr</literal></entry>
+                    <entry>Stderr, default is "&lt;LOG_DIR&gt;/Container.stderr"</entry>
+                    <entry>Appended with 2></entry>
+                </row>
+            </tbody>
+        </tgroup>  
+    </table>
+	
+  </section>
+
+  <section id="yarn:container">
+  
+    <title>Application Container</title>
+	
+    <para>There is very little what Spring Yarn needs
+	to know about the Container in terms of its configuration.
+	There is a simple contract
+	between <classname>org.springframework.yarn.container.CommandLineContainerRunner</classname>
+	and a bean it's trying to run on default. Default bean name
+	is <emphasis>yarnContainer</emphasis>.</para>
+	
+	<para>There is a simple interface
+	<interfacename>org.springframework.yarn.container.YarnContainer</interfacename>
+	which container needs to implement.</para>
+
+    <programlisting language="java"><![CDATA[public interface YarnContainer {
+  void run();
+  void setEnvironment(Map<String, String> environment);
+  void setParameters(Properties parameters);
+}]]></programlisting>
+
+    <para>There are few different ways how Container can be defined in Spring
+	xml configuration. Natively without using namespaces bean can be defined with
+	a correct name:</para>
+
+    <programlisting language="xml"><![CDATA[<bean id="yarnContainer" class="org.springframework.yarn.container.TestContainer">	
+]]></programlisting>
+		
+    <para>Spring Yarn namespace will make it even more simpler. Below example
+	just defines class which implements needed interface.</para>
+
+    <programlisting language="xml"><![CDATA[
+<yarn:container container-class="org.springframework.yarn.container.TestContainer"/>
+]]></programlisting>
+
+    <para>It's possible to make a reference to existing bean. This is 
+	usefull if bean cannot be instantiated with default constructor.</para>
+
+    <programlisting language="xml"><![CDATA[
+<bean id="testContainer" class="org.springframework.yarn.container.TestContainer"/>
+<yarn:container container-ref="testContainer"/>
+]]></programlisting>
+
+    <para>It's also possible to inline the bean definition.</para>
+
+    <programlisting language="xml"><![CDATA[
+<yarn:container>
+  <bean class="org.springframework.yarn.container.TestContainer"/>
+</yarn:container>
+]]></programlisting>
+	
+	
+  </section>
+
+  <section id="yarn:appmasterservices">
+  
+    <title>Application Master Services</title>
+
+    <para>It is fairly easy to create an application which launches a few
+    containers and then leave those to do their tasks. This is pretty much
+    what <emphasis>Distributed Shell</emphasis> example application in
+    Yarn is doing. In that example a container is configured to run
+    a simple shell command and <emphasis>Application Master</emphasis>
+    only tracks when containers have finished. If only need from a
+    framework is to be able to fire and forget then that's all you need, but
+    most likely a real-world Yarn application will need some sort of
+    collaboration with <emphasis>Application Master</emphasis>. This 
+    communication is initiated either from <emphasis>Application Client</emphasis>
+    or <emphasis>Application Container</emphasis>.</para>
+
+    <para>Yarn framework itself doesn't define any kind of general
+    communication API for <emphasis>Application Master</emphasis>. 
+    There are APIs for communicating with <emphasis>Container Manager</emphasis>
+    and <emphasis>Resource Manager</emphasis> which are used on within
+    a layer not necessarily exposed to a user. Spring Yarn defines
+    a general framework to talk to <emphasis>Application Master</emphasis>
+    through an abstraction and currently a JSON based rpc system exists.</para>
+
+    <para>This chapter concentrates on developer concepts to create a custom
+    services for <emphasis>Application Master</emphasis>, configuration
+    options for built-in services can be found from sections below -  
+    <link linkend="yarn:masterservice">Appmaster Service</link> and 
+    <link linkend="yarn:masterserviceclient">Appmaster Service Client</link>.</para>
+  
+    <section id="yarn:appmasterservicesconcepts">
+
+      <title>Basic Concepts</title>
+
+      <para>Having a communication framework between 
+      <emphasis>Application Master</emphasis> and
+      <emphasis>Container/Client</emphasis> involves few moving parts.
+      Firstly there has to be some sort of service running on an
+      <emphasis>Application Master</emphasis>. Secondly user of this
+      service needs to know where it is and how to connect to it.
+      Thirtly, if not creating these services from scratch, it'd be
+      nice if some sort of abstraction already exist.</para>
+      
+      <para>Contract for appmaster service is very simple,
+      <emphasis>Application Master Service</emphasis> needs to implement
+      <interfacename>AppmasterService</interfacename> interface be registered
+      with Spring application context. Actual appmaster instance will then
+      pick it up from a bean factory.</para>
+
+      <programlisting language="java"><![CDATA[public interface AppmasterService {
+  int getPort();
+  boolean hasPort();
+  String getHost();
+}]]></programlisting>
+
+      <para><emphasis>Application Master Service</emphasis> framework
+      currently provides integration for services acting as service
+      for a <emphasis>Client</emphasis> or a <emphasis>Container</emphasis>.
+      Only difference between these two roles is how the <emphasis>Service Client</emphasis>
+      gets notified about the address of the service. For the <emphasis>Client</emphasis>
+      this information is stored within the Hadoop Yarn resource manager. For the
+      <emphasis>Container</emphasis> this information is passed via environment within
+      the launch context.</para>
+
+      <programlisting language="xml"><![CDATA[<bean id="yarnAmservice" class="AppmasterServiceImpl" />
+<bean id="yarnClientAmservice" class="AppmasterClientServiceImpl" />]]></programlisting>
+
+      <para>Example above shows a default bean names, <emphasis>yarnAmservice</emphasis>
+      and <emphasis>yarnClientAmservice</emphasis> respectively recognised by
+      Spring Yarn.</para>
+	
+      <para>Interface <interfacename>AppmasterServiceClient</interfacename> is
+      currently an empty interface just marking class to be
+      a appmaster service client.</para>
+
+      <programlisting language="java"><![CDATA[public interface AppmasterServiceClient {
+}]]></programlisting>
+	
+	
+    </section>
+
+    <section id="yarn:appmasterservicesjson">
+  
+      <title>Using JSON</title>
+	
+      <para>Default implementations can be used to exchange messages using
+      a simple domain classes and actual messages are converted into json
+      and send over the transport.</para>
+
+
+      <programlisting language="xml"><![CDATA[<yarn-int:amservice
+  service-impl="org.springframework.yarn.integration.ip.mind.TestService"
+  default-port="1234"/>
+<yarn-int:amservice-client
+  service-impl="org.springframework.yarn.integration.ip.mind.DefaultMindAppmasterServiceClient"
+  host="localhost"
+  port="1234"/>]]></programlisting>
+
+      <programlisting language="java"><![CDATA[@Autowired
+AppmasterServiceClient appmasterServiceClient;
+
+@Test
+public void testServiceInterfaces() throws Exception {
+  SimpleTestRequest request = new SimpleTestRequest();
+  SimpleTestResponse response =
+  (SimpleTestResponse) ((MindAppmasterServiceClient)appmasterServiceClient).
+    doMindRequest(request);
+  assertThat(response.stringField, is("echo:stringFieldValue"));
+}]]></programlisting>
+	
+    </section>
+
+    <section id="yarn:appmasterservicesconversion">
+  
+      <title>Converters</title>
+	
+      <para>When default implementations for Application master services are
+      exchanging messages, converters are net registered automatically. There
+      is a namespace tag <emphasis>converters</emphasis> to ease
+      this configuration.</para>
+
+      <programlisting language="xml"><![CDATA[<bean id="mapper" 
+  class="org.springframework.yarn.integration.support.Jackson2ObjectMapperFactoryBean" />	
+	
+<yarn-int:converter>
+  <bean class="org.springframework.yarn.integration.convert.MindObjectToHolderConverter">
+    <constructor-arg ref="mapper"/>
+  </bean>
+</yarn-int:converter>
+
+<yarn-int:converter>
+  <bean class="org.springframework.yarn.integration.convert.MindHolderToObjectConverter">
+    <constructor-arg ref="mapper"/>
+    <constructor-arg value="org.springframework.yarn.batch.repository.bindings"/>
+  </bean>
+</yarn-int:converter>
+]]></programlisting>
+  
+    </section>
+	
+  </section>
+
+
+  
+  <section id="yarn:masterservice">
+  
+    <title>Application Master Service</title>
+	
+    <para>This section of this document is about configuration, more about
+    general concepts for see a <xref linkend="yarn:appmasterservices"/>.</para>
+	
+    <para>Currently Spring Yarn have support for services using Spring
+    Integration tcp channels as a transport.</para>
+		
+    <programlisting language="xml"><![CDATA[<bean id="mapper" 
+  class="org.springframework.yarn.integration.support.Jackson2ObjectMapperFactoryBean" />
+	
+<yarn-int:converter>
+  <bean class="org.springframework.yarn.integration.convert.MindObjectToHolderConverter">
+    <constructor-arg ref="mapper"/>
+  </bean>
+</yarn-int:converter>
+
+<yarn-int:converter>
+  <bean class="org.springframework.yarn.integration.convert.MindHolderToObjectConverter">
+    <constructor-arg ref="mapper"/>
+    <constructor-arg value="org.springframework.yarn.integration.ip.mind"/>
+  </bean>
+</yarn-int:converter>
+	
+<yarn-int:amservice
+  service-impl="org.springframework.yarn.integration.ip.mind.TestService"/>
+]]></programlisting>
+
+    <para>If there is a need to manually configure the server
+	side dispatch channel, a little bit more configuration
+	is needed.</para>
+
+    <programlisting language="xml"><![CDATA[
+<bean id="serializer"
+  class="org.springframework.yarn.integration.ip.mind.MindRpcSerializer" />
+<bean id="deserializer"
+  class="org.springframework.yarn.integration.ip.mind.MindRpcSerializer" />
+<bean id="socketSupport"
+  class="org.springframework.yarn.integration.support.DefaultPortExposingTcpSocketSupport" />
+
+<ip:tcp-connection-factory id="serverConnectionFactory"
+  type="server"
+  port="0"
+  socket-support="socketSupport"
+  serializer="serializer"
+  deserializer="deserializer"/>
+
+<ip:tcp-inbound-gateway id="inboundGateway"
+  connection-factory="serverConnectionFactory"
+  request-channel="serverChannel" />
+  
+<int:channel id="serverChannel" />
+  
+<yarn-int:amservice
+  service-impl="org.springframework.yarn.integration.ip.mind.TestService"
+  channel="serverChannel"
+  socket-support="socketSupport"/>
+]]></programlisting>
+
+    <table id="yarn:masterservice:amserviceflags" pgwide="1" align="center">
+        <title><literal>yarn-int:amservice</literal> attributes</title>
+        <tgroup cols="3">
+            <colspec colname="c1" colwidth="1*"/>
+            <colspec colname="c2" colwidth="1*"/>
+            <colspec colname="c3" colwidth="4*"/>
+            <spanspec spanname="description" namest="c2" nameend="c3" align="center"/>
+            <thead>
+                <row>
+                    <entry>Name</entry>
+                    <entry>Values</entry>
+                    <entry align="center">Description</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row>
+                    <entry><literal>service-impl</literal></entry>
+                    <entry>Class Name</entry>
+                    <entry>Full name of the class implementing a service</entry>
+                </row>
+                <row>
+                    <entry><literal>service-ref</literal></entry>
+                    <entry>Bean Reference</entry>
+                    <entry>Reference to a bean name implementing a service</entry>
+                </row>
+                <row>
+                    <entry><literal>channel</literal></entry>
+                    <entry>Spring Int channel</entry>
+                    <entry>Custom message dispatching channel</entry>
+                </row>
+                <row>
+                    <entry><literal>socket-support</literal></entry>
+                    <entry>Socket support reference</entry>
+                    <entry>Custom socket support class</entry>
+                </row>
+            </tbody>
+        </tgroup>  
+    </table>
+
+	
+  </section>
+
+  <section id="yarn:masterserviceclient">
+  
+    <title>Application Master Service Client</title>
+	
+    <para>This section of this document is about configuration, more about
+    general concepts for see a <xref linkend="yarn:appmasterservices"/>.</para>
+	
+    <para>Currently Spring Yarn have support for services using Spring
+    Integration tcp channels as a transport.</para>
+		
+    <programlisting language="xml"><![CDATA[<bean id="mapper" 
+  class="org.springframework.yarn.integration.support.Jackson2ObjectMapperFactoryBean" />
+	
+<yarn-int:converter>
+  <bean class="org.springframework.yarn.integration.convert.MindObjectToHolderConverter">
+    <constructor-arg ref="mapper"/>
+  </bean>
+</yarn-int:converter>
+
+<yarn-int:converter>
+  <bean class="org.springframework.yarn.integration.convert.MindHolderToObjectConverter">
+    <constructor-arg ref="mapper"/>
+    <constructor-arg value="org.springframework.yarn.integration.ip.mind"/>
+  </bean>
+</yarn-int:converter>
+	
+<yarn-int:amservice-client
+  service-impl="org.springframework.yarn.integration.ip.mind.DefaultMindAppmasterServiceClient"
+  host="${syarn.amservice.host}"
+  port="${syarn.amservice.port}"/>
+]]></programlisting>
+
+    <para>If there is a need to manually configure the server
+	side dispatch channel, a little bit more configuration
+	is needed.</para>
+
+    <programlisting language="xml"><![CDATA[
+<bean id="serializer"
+  class="org.springframework.yarn.integration.ip.mind.MindRpcSerializer" />
+<bean id="deserializer"
+  class="org.springframework.yarn.integration.ip.mind.MindRpcSerializer" />
+
+<ip:tcp-connection-factory id="clientConnectionFactory"
+  type="client"
+  host="localhost"
+  port="${syarn.amservice.port}"
+  serializer="serializer"
+  deserializer="deserializer"/>
+
+<ip:tcp-outbound-gateway id="outboundGateway"
+  connection-factory="clientConnectionFactory"
+  request-channel="clientRequestChannel"
+  reply-channel="clientResponseChannel" />
+
+<int:channel id="clientRequestChannel" />
+<int:channel id="clientResponseChannel" >
+  <int:queue />
+</int:channel>
+		
+<yarn-int:amservice-client
+  service-impl="org.springframework.yarn.integration.ip.mind.DefaultMindAppmasterServiceClient"
+  request-channel="clientRequestChannel"
+  response-channel="clientResponseChannel"/>
+]]></programlisting>
+
+    <table id="yarn:masterserviceclient:amserviceclientflags" pgwide="1" align="center">
+        <title><literal>yarn-int:amservice-client</literal> attributes</title>
+        <tgroup cols="3">
+            <colspec colname="c1" colwidth="1*"/>
+            <colspec colname="c2" colwidth="1*"/>
+            <colspec colname="c3" colwidth="4*"/>
+            <spanspec spanname="description" namest="c2" nameend="c3" align="center"/>
+            <thead>
+                <row>
+                    <entry>Name</entry>
+                    <entry>Values</entry>
+                    <entry align="center">Description</entry>
+                </row>
+            </thead>
+            <tbody>
+                <row>
+                    <entry><literal>service-impl</literal></entry>
+                    <entry>Class Name</entry>
+                    <entry>Full name of the class implementing a service client</entry>
+                </row>
+                <row>
+                    <entry><literal>host</literal></entry>
+                    <entry>Hostname</entry>
+                    <entry>Host of the running appmaster service</entry>
+                </row>
+                <row>
+                    <entry><literal>port</literal></entry>
+                    <entry>Port</entry>
+                    <entry>Port of the running appmaster service</entry>
+                </row>
+                <row>
+                    <entry><literal>request-channel</literal></entry>
+                    <entry>Reference to Spring Int request channel</entry>
+                    <entry>Custom channel</entry>
+                </row>
+                <row>
+                    <entry><literal>response-channel</literal></entry>
+                    <entry>Reference to Spring Int response channel</entry>
+                    <entry>Custom channel</entry>
+                </row>
+            </tbody>
+        </tgroup>  
+    </table>
+	
+  </section>
+  
+
+  <section id="yarn:batch">
+
+    <title>Using Spring Batch</title>
+
+    <para>In this chapter we assume you are fairly familiar with
+    concepts using <emphasis>Spring Batch</emphasis>. Many batch processing problems
+    can be solved with single threaded, single process jobs, so it is always a good
+    idea to properly check if that meets your needs before thinking about more
+    complex implementations. When you are ready to start implementing a job with some
+    parallel processing, Spring Batch offers a range of options. At a high level
+    there are two modes of parallel processing: single process, multi-threaded;
+    and multi-process.</para>
+
+    <para>Spring Hadoop contains a support for running Spring Batch jobs on a
+	Hadoop cluster. For better parallel processing Spring Batch partitioned
+	steps can be executed on a Hadoop cluster as remote steps.</para>
+
+    <section id="yarn:batchintro">
+  
+      <title>Batch Jobs</title>
+	  
+	  <para>Starting point running a <emphasis>Spring Batch Job</emphasis>
+	  is always the <emphasis>Application Master</emphasis> whether
+	  a job is just simple job with or without partitioning. In case
+	  partitioning is not used the whole job would be run within the
+	  <emphasis>Application Master</emphasis> and no
+	  <emphasis>Containers</emphasis> would be launched. This may seem
+	  a bit odd to run something on Hadoop without using
+	  <emphasis>Containers</emphasis> but one should remember that
+	  <emphasis>Application Master</emphasis> is also just
+	  a resource allocated from a Hadoop cluster.</para>
+
+      <para>Order to run Spring Batch jobs on a Hadoop
+      cluster, few constraints exists:</para>
+	
+      <itemizedlist>
+        <listitem>
+          <para><emphasis>Job Context</emphasis> - Application Master is the main
+  	      entry point of running the job.</para>
+        </listitem>
+        <listitem>
+          <para><emphasis>Job Repository</emphasis> - Application Master needs to have
+          access to a repository which is located either in-memory or in a database. These
+          are the two type natively supported by Spring Batch.</para>
+        </listitem>
+        <listitem>
+  	      <para><emphasis>Remote Steps</emphasis> - Due to nature how Spring Batch
+  	      partitioning works, remote step needs an access to a job repository.</para>
+        </listitem>
+      </itemizedlist>
+
+	  <para>Configuration for Spring Batch Jobs is very similar
+      what is needed for normal batch configuration because effectively
+      that's what we are doing. Only difference is a way a job is
+      launched which in this case is automatically handled by
+      <emphasis>Application Master</emphasis>. Implementation of
+      a job launching logic is very similar compared to
+      <classname>CommandLineJobRunner</classname> found from a
+      Spring Batch.</para>
+
+      <programlisting language="xml"><![CDATA[<bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager"/>
+
+<bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">
+  <property name="transactionManager" ref="transactionManager"/>
+</bean>
+
+<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+  <property name="jobRepository" ref="jobRepository"/>
+</bean>]]></programlisting>
+
+	  <para>The declaration above define beans for
+      <classname>JobRepository</classname> and
+      <classname>JobLauncher</classname>. For simplisity
+      we used in-memory repository while it would be possible
+      to switch into repository working with a database if
+      persistence is needed. A bean named <literal>jobLauncher</literal>
+      is later used within the <emphasis>Application Master</emphasis>
+      to launch jobs.</para>
+
+      <programlisting language="xml"><![CDATA[<bean id="yarnEventPublisher" class="org.springframework.yarn.event.DefaultYarnEventPublisher"/>
+	  
+<yarn-batch:master/>]]></programlisting>     
+
+	  <para>The declaration above defines <classname>BatchAppmaster</classname>
+      bean named, by default, <literal>yarnAppmaster</literal> and 
+      <classname>YarnEventPublisher</classname>
+      bean named <literal>yarnEventPublisher</literal> which is not
+      created automatically.</para>
+
+      <para>Final step to finalize our very simple batch configuration
+      is to define the actual batch job.</para>
+
+      <programlisting language="xml"><![CDATA[<bean id="hello" class="org.springframework.yarn.examples.PrintTasklet">
+  <property name="message" value="Hello"/>
+</bean>
+
+<batch:job id="job">
+  <batch:step id="master">
+    <batch:tasklet transaction-manager="transactionManager" ref="hello"/>
+  </batch:step>
+</batch:job>]]></programlisting>     
+
+      <para>The declaration above defines a simple job and tasklet.
+      Job is named as <literal>job</literal> which is the default job
+      name searched by <emphasis>Application Master</emphasis>. It
+      is possible to use different name by changing the launch
+      configuration.</para>
+
+      <table id="yarn:batchintro:masterflags" pgwide="1" align="center">
+          <title><literal>yarn-batch:master</literal> attributes</title>
+          <tgroup cols="3">
+              <colspec colname="c1" colwidth="1*"/>
+              <colspec colname="c2" colwidth="1*"/>
+              <colspec colname="c3" colwidth="4*"/>
+              <spanspec spanname="description" namest="c2" nameend="c3" align="center"/>
+              <thead>
+                  <row>
+                      <entry>Name</entry>
+                      <entry>Values</entry>
+                      <entry align="center">Description</entry>
+                  </row>
+              </thead>
+              <tbody>
+                  <row>
+                      <entry><literal>configuration</literal></entry>
+                      <entry>Bean Reference</entry>
+                      <entry>A reference to configuration bean name, default is
+                      <emphasis>yarnConfiguration</emphasis></entry>
+                  </row>
+                  <row>
+                      <entry><literal>resourcelocalizer</literal></entry>
+                      <entry>Bean Reference</entry>
+                      <entry>A reference to resource localizer bean name, default is
+                      <emphasis>yarnLocalresources</emphasis></entry>
+                  </row>
+                  <row>
+                      <entry><literal>environment</literal></entry>
+                      <entry>Bean Reference</entry>
+                      <entry>A reference to environment bean name, default is
+                      <emphasis>yarnEnvironment</emphasis></entry>
+                  </row>
+                  <row>
+                      <entry><literal>job-name</literal></entry>
+                      <entry>Bean Name Reference</entry>
+                      <entry>A name reference to Spring Batch job, default is
+                      <emphasis>job</emphasis></entry>
+                  </row>
+                  <row>
+                      <entry><literal>job-launcher</literal></entry>
+                      <entry>Bean Reference</entry>
+                      <entry>A reference to job launcher bean name, default is
+  					  <emphasis>jobLauncher</emphasis>. Target is a normal
+					  Spring Batch bean implementing
+					  <interfacename>JobLauncher</interfacename>.</entry>
+                  </row>
+              </tbody>
+          </tgroup>  
+      </table>
+	  
+    </section>
+	
+    <section id="yarn:batchpartitionintro">
+  
+      <title>Partitioning</title>
+	
+      <para>Let's take a quick look how Spring Batch partitioning is
+      handled. Concept of running a partitioned job involves three things,
+      <emphasis>Remote steps</emphasis>, <emphasis>Partition Handler</emphasis>
+      and a <emphasis>Partitioner</emphasis>. If we do a little bit of
+      oversimplification a remote step is like any other step from a user
+      point of view. Spring Batch itself does not contain implementations for 
+      any proprietary grid or remoting fabrics. Spring Batch does however
+      provide a useful implementation of <interfacename>PartitionHandler</interfacename>
+      that executes Steps locally in separate threads of execution,
+      using the <interfacename>TaskExecutor</interfacename> strategy from Spring.
+      Spring Hadoop provides implementation to execute Steps remotely
+      on a Hadoop cluster.</para>
+   	 
+      <note>
+        <para>For more background information about the Spring
+        Batch Partitioning, read the Spring Batch
+        reference documentation.</para>
+      </note>
+	
+
+      <section id="yarn:batchmasterconfig">
+  
+        <title>Configuring Master</title>
+	
+        <para>As we previously mentioned a step executed on a remote
+        host also need to access a job repository. If job repository would be
+        based on a database instance, configuration could be similar on a container
+        compared to application master. In our configuration example the job
+        repository is in-memory based and remote steps needs access for it.
+        Spring Yarn Batch contains implementation of a job repository which
+        is able to proxy request via json requests. Order to use that we need
+        to enable application client service which is exposing this service.</para>
+
+        <programlisting language="xml"><![CDATA[<bean id="jobRepositoryRemoteService" class="org.springframework.yarn.batch.repository.JobRepositoryRemoteService" >
+  <property name="mapJobRepositoryFactoryBean" ref="&amp;jobRepository"/>
+</bean>
+
+<bean id="batchService" class="org.springframework.yarn.batch.repository.BatchAppmasterService" >
+  <property name="jobRepositoryRemoteService" ref="jobRepositoryRemoteService"/>
+</bean>
+
+<yarn-int:amservice service-ref="batchService"/>]]></programlisting>
+
+        <para>he declaration above defines <classname>JobRepositoryRemoteService</classname>
+        bean named <literal>jobRepositoryRemoteService</literal> which is then
+        connected into <emphasis>Application Master Service</emphasis>
+        exposing job repository via Spring Integration Tcp channels.</para>
+
+        <para>As job repository communication messages are
+        exchanged via custom json messages, converters needs to be defined.</para>
+
+        <programlisting language="xml"><![CDATA[<bean id="mapper" class="org.springframework.yarn.integration.support.Jackson2ObjectMapperFactoryBean" />
+
+<yarn-int:converter>
+  <bean class="org.springframework.yarn.integration.convert.MindObjectToHolderConverter">
+    <constructor-arg ref="mapper"/>
+  </bean>
+</yarn-int:converter>
+
+<yarn-int:converter>
+  <bean class="org.springframework.yarn.integration.convert.MindHolderToObjectConverter">
+    <constructor-arg ref="mapper"/>
+    <constructor-arg value="org.springframework.yarn.batch.repository.bindings"/>
+  </bean>
+</yarn-int:converter>]]></programlisting>
+	
+      </section>
+  
+      <section id="yarn:batchcontainerconfig">
+    
+        <title>Configuring Container</title>
+  	  
+        <para>Previously we made a choice to use in-memore job repository
+        running inside the application master. Now we need to talk to this
+        repository via client service. We start by adding same converters as
+        in application master.</para>
+
+        <programlisting language="xml"><![CDATA[<bean id="mapper" class="org.springframework.yarn.integration.support.Jackson2ObjectMapperFactoryBean" />
+
+<yarn-int:converter>
+  <bean class="org.springframework.yarn.integration.convert.MindObjectToHolderConverter">
+    <constructor-arg ref="mapper"/>
+  </bean>
+</yarn-int:converter>
+
+<yarn-int:converter>
+  <bean class="org.springframework.yarn.integration.convert.MindHolderToObjectConverter">
+    <constructor-arg ref="mapper"/>
+    <constructor-arg value="org.springframework.yarn.batch.repository.bindings"/>
+  </bean>
+</yarn-int:converter>]]></programlisting>
+	
+
+        <para>We use general client implementation able to communicate
+        with a service running on <emphasis>Application Master</emphasis>.</para>
+
+        <programlisting language="xml"><![CDATA[<yarn-int:amservice-client
+  service-impl="org.springframework.yarn.integration.ip.mind.DefaultMindAppmasterServiceClient"
+  host="${syarn.amservice.host}"
+  port="${syarn.amservice.port}" />]]></programlisting>
+	  
+        <para>Remote step is just like any other step.</para>
+
+        <programlisting language="xml"><![CDATA[<bean id="hello" class="org.springframework.yarn.examples.PrintTasklet">
+  <property name="message" value="Hello"/>
+</bean>
+
+<batch:step id="remoteStep">
+  <batch:tasklet transaction-manager="transactionManager" start-limit="100" ref="hello"/>
+</batch:step>]]></programlisting>
+	
+        <para>We need to have a way to locate the step from an application
+        context. For this we can define a step locator which is later
+        configured into running container.</para>
+
+        <programlisting language="xml"><![CDATA[<bean id="stepLocator" class="org.springframework.yarn.batch.partition.BeanFactoryStepLocator"/>]]></programlisting>
+	
+        <para>Spring Hadoop contains a custom job repository implementation
+        which is able to talk back to a remote instance via custom json protocol.</para>
+
+        <programlisting language="xml"><![CDATA[<bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager"/>
+
+<bean id="jobRepository" class="org.springframework.yarn.batch.repository.RemoteJobRepositoryFactoryBean">
+  <property name="transactionManager" ref="transactionManager"/>
+  <property name="appmasterScOperations" ref="yarnAmserviceClient"/>
+</bean>
+
+<bean id="jobExplorer" class="org.springframework.yarn.batch.repository.RemoteJobExplorerFactoryBean">
+  <property name="repositoryFactory" ref="&amp;jobRepository" />
+</bean>]]></programlisting>
+	
+        <para>Finally we define a <emphasis>Container</emphasis> understanding
+        how to work with a remote steps.</para>
+
+        <programlisting language="xml"><![CDATA[<bean id="yarnContainer" class="org.springframework.yarn.batch.container.DefaultBatchYarnContainer">
+  <property name="stepLocator" ref="stepLocator"/>
+  <property name="jobExplorer" ref="jobExplorer"/>
+  <property name="integrationServiceClient" ref="yarnAmserviceClient"/>
+</bean>]]></programlisting>
+	
+      </section>
+
+    </section>
+  
+  </section>
+
+  <section id="yarn:testing">
+
+    <title>Testing</title>
+
+
+    <para>Hadoop testing has always been a cumbersome process especially if you
+    try to do testing phase during the normal project build process.
+    Traditionally developers have had few options like running Hadoop cluster
+    either as a local or pseudo-distributed mode and then utilise that to
+    run MapReduce jobs. Hadoop project itself is using a lot of mini clusters
+    during the tests which provides better tools to run your code in an isolated
+    environment.</para>
+
+    <para>Spring Hadoop and especially its Yarn module faced similar testing problems.
+    Spring Hadoop provides testing facilities order to make testing on Hadoop much easier
+    especially if code relies on Spring Hadoop itself. These testing facilities are also used
+    internally to test Spring Hadoop, although some test cases still rely on a running Hadoop
+    instance on a host where project build is executed.</para>
+
+    <para>Two central concepts of testing using Spring Hadoop is, firstly fire up the mini
+    cluster and secondly use the configuration prepared by the mini cluster to talk to the
+    Hadoop components. Now let's go through the general testing facilities offered by Spring Hadoop.</para>
+
+    <section id="yarn:testingminicluster">
+      <title>Mini Clusters</title>
+
+      <para>Mini cluster usually contain testing components from a Hadoop project itself.
+      These are MiniYARNCluster for Resource Manager and MiniDFSCluster for Datanode and Namenode
+      which are all run within a same process. In Spring Hadoop mini clusters are implementing
+      interface YarnCluster which provides methods for lifecycle and configuration. </para>
+
+      <programlisting language="java"><![CDATA[public interface YarnCluster {
+  Configuration getConfiguration();
+  void start() throws Exception;
+  void stop();
+  File getYarnWorkDir();
+}]]></programlisting>
+
+      <para>Currently one implementation named StandaloneYarnCluster exists which supports simple cluster type where a number of nodes can be defined and then all the nodes will have Yarn Node Manager and Hdfs Datanode,  additionally a Yarn Resource Manager and Hdfs Namenode components are started.</para>
+
+      <para>There are few ways how this cluster can be started depending on a use case. It is possible to use StandaloneYarnCluster directly or configure and start it through YarnClusterFactoryBean. Existing YarnClusterManager is used in unit tests to cache running clusters.</para>
+
+      <note><para>It's advisable not to use YarnClusterManager outside of tests because literally it is using static fields to cache cluster references. This is a same concept used in Spring Test order to cache application contexts between the unit tests within a jvm.</para></note>
+
+      <programlisting language="xml"><![CDATA[<bean id="yarnCluster" class="org.springframework.yarn.test.support.YarnClusterFactoryBean">
+  <property name="clusterId" value="YarnClusterTests"/>
+  <property name="autoStart" value="true"/>
+  <property name="nodes" value="1"/>
+</bean>]]></programlisting>
+
+      <para>Example above defines a bean named yarnCluster using a factory bean YarnClusterFactoryBean. It defines a simple one node cluster which is started automatically. Cluster working directories would then exist under below paths:</para>
+
+      <programlisting language="xml"><![CDATA[target/YarnClusterTests/
+target/YarnClusterTests-dfs/]]></programlisting>
+
+      <note><para>We rely on base classes from a Hadoop distribution and target base directory is hardcoded in Hadoop and is not configurable.</para></note>
+
+    </section>
+
+    <section id="yarn:testingconfiguration">
+      <title>Configuration</title>
+
+      <para>Spring Yarn components usually depend on Hadoop configuration which is then wired into these components during the application context startup phase. This was explained in previous chapters so we don't go through it again. However this is now a catch-22 because we need the configuration for the context but it is not known until mini cluster has done its startup magic and prepared the configuration with correct values reflecting current runtime status of the cluster itself. Solution for this is to use other bean named ConfigurationDelegatingFactoryBean which will simple delegate the configuration request into the running cluster.</para>
+
+      <programlisting language="xml"><![CDATA[<bean id="yarnConfiguredConfiguration" class="org.springframework.yarn.test.support.ConfigurationDelegatingFactoryBean">
+  <property name="cluster" ref="yarnCluster"/>
+</bean>
+
+<yarn:configuration id="yarnConfiguration" configuration-ref="yarnConfiguredConfiguration"/>]]></programlisting>
+
+      <para>In the above example we created a bean named yarnConfiguredConfiguration using ConfigurationDelegatingFactoryBean which simple delegates to yarnCluster bean. Returned bean yarnConfiguredConfiguration is type of Hadoop's Configuration object so it could be used as it is.</para>
+
+      <para>Latter part of the example show how Spring Yarn namespace is used to create another Configuration object which is using yarnConfiguredConfiguration as a reference. This scenario would make sense if there is a need to add additional configuration options into running configuration used by other components. Usually it is suiteable to use cluster prepared configuration as it is.</para>
+
+    </section>
+
+    <section id="yarn:testinsimplified">
+      <title>Simplified Testing</title>
+
+
+      <para>It is perfecly all right to create your tests from scratch and for example create the cluster manually and then get the runtime configuration from there. This just needs some boilerplate code in your context configuration and unit test lifecycle.</para>
+
+      <para>Spring Hadoop adds additional facilities for the testing to make all this even easier. </para>
+
+      <programlisting language="java"><![CDATA[@RunWith(SpringJUnit4ClassRunner.class)
+public abstract class AbstractYarnClusterTests implements ApplicationContextAware {
+  ...
+}
+
+@ContextConfiguration(loader=YarnDelegatingSmartContextLoader.class)
+@MiniYarnCluster
+public class ClusterBaseTestClassTests extends AbstractYarnClusterTests {
+  ...
+}]]></programlisting>
+
+      <para>Above example shows the AbstractYarnClusterTests and how ClusterBaseTestClassTests is prepared to be aware of a mini cluster. YarnDelegatingSmartContextLoader offers same base functionality as the default DelegatingSmartContextLoader in a spring-test package. One additional thing what YarnDelegatingSmartContextLoader does is to automatically handle running clusters and inject Configuration into the application context.</para>
+
+      <programlisting language="java"><![CDATA[@MiniYarnCluster(configName="yarnConfiguration", clusterName="yarnCluster", nodes=1, id="default")]]></programlisting>
+
+      <para>Generally @MiniYarnCluster annotation allows you to define injected bean names for mini cluster, its Configurations and a number of nodes you like to have in a cluster.</para>
+
+      <para>Spring Hadoop Yarn testing is dependant of general facilities of Spring Test framework meaning that everything what is cached during the test are reuseable withing other tests. One need to understand that if Hadoop mini cluster and its Configuration is injected into an Application Context, caching happens on a mercy of a Spring Testing meaning if a test Application Context is cached also mini cluster instance is cached. While caching is always prefered, one needs to understant that if tests are expecting vanilla environment to be present, test context should be dirtied using @DirtiesContext annotation.</para>
+
+    </section>
+
+    <section id="yarn:testingmulticontextexample">
+      <title>Multi Context Example</title>
+
+      <para>Let's study a proper example of existing Spring Yarn application and how this is tested during the build process. Multi Context Example is a simple Spring Yarn based application which simply launches Application Master and four Containers and withing those containers a custom code is executed. In this case simply a log message is written.</para>
+
+      <para>In real life there are different ways to test whether Hadoop Yarn application execution has been succesful or not. The obvious method would be to check the application instance execution status reported by Hadoop Yarn. Status of the execution doesn't always tell the whole truth so i.e. if application is about to write something into HDFS as an output that could be used to check the proper outcome of an execution.</para>
+
+      <para>This example doesn't write anything into HDFS and anyway it would be out of scope of this document for obvious reason. It is fairly straightforward to check file content from HDFS. One other interesting method is simply to check to application log files that being the Application Master and Container logs. Test methods can check exceptions or expected log entries from a log files to determine whether test is succesful or not.</para>
+
+      <para>In this chapter we don't go through how Multi Context Example is configured and what it actually does, for that read the documentation about the examples. However we go through what needs to be done order to test this example application using testing support offered by Spring Hadoop.</para>
+
+      <para>In this example we gave instructions to copy library dependencies into Hdfs and then those entries were used within resouce localizer to tell Yarn to copy those files into Container working directory. During the unit testing when mini cluster is launched there are no files present in Hdfs because cluster is initialized from scratch. Furtunalety Spring Hadoop allows you to copy files into Hdfs during the localization process from a local file system where Application Context is executed. Only thing we need is the actual library files which can be assembled during the build process. Spring Hadoop Examples build system rely on Gradle so collecting dependencies is an easy task.</para>
+
+      <programlisting language="xml"><![CDATA[<yarn:localresources>
+  <yarn:hdfs path="/app/multi-context/*.jar"/>
+  <yarn:hdfs path="/lib/*.jar"/>
+</yarn:localresources>]]></programlisting>
+
+      <para>Above configuration exists in application-context.xml and appmaster-context.xml files. This is a normal application configuration expecting static files already be present in Hdfs. This is usually done to minimize latency during the application submission and execution.</para>
+
+      <programlisting language="xml"><![CDATA[<yarn:localresources>
+  <yarn:copy src="file:build/dependency-libs/*" dest="/lib/"/>
+  <yarn:copy src="file:build/libs/*" dest="/app/multi-context/"/>
+  <yarn:hdfs path="/app/multi-context/*.jar"/>
+  <yarn:hdfs path="/lib/*.jar"/>
+</yarn:localresources>]]></programlisting>
+
+      <para>Above example is from MultiContextTest-context.xml which provides the runtime context configuration talking with mini cluster during the test phase.</para>
+
+      <para>When we do context configuration for YarnClient during the testing phase all we need to do is to add copy elements which will transfer needed libraries into Hdfs before the actual localization process will fire up. When those files are copied into Hdfs running in a mini cluster we're basically in a same point if using a real Hadoop cluster with existing files.</para>
+
+      <note><para>Running tests which depends on copying files into Hdfs it is mandatory to use build system which is able to prepare these files for you. You can't do this within IDE's which have its own ways to execute unit tests.</para></note>
+
+      <para>The complete example of running the test, checking the application execution status and finally checking the expected state of log files:</para>
+
+      <programlisting language="java"><![CDATA[@ContextConfiguration(loader=YarnDelegatingSmartContextLoader.class)
+@MiniYarnCluster
+public class MultiContextTests extends AbstractYarnClusterTests {
+  @Test
+  @Timed(millis=70000)
+  public void testAppSubmission() throws Exception {
+    YarnApplicationState state = submitApplicationAndWait();
+    assertNotNull(state);
+    assertTrue(state.equals(YarnApplicationState.FINISHED));
+  	
+    File workDir = getYarnCluster().getYarnWorkDir();
+  		
+    PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+    String locationPattern = "file:" + workDir.getAbsolutePath() + "/**/*.std*";
+    Resource[] resources = resolver.getResources(locationPattern);
+  		
+    // appmaster and 4 containers should
+    // make it 10 log files
+    assertThat(resources, notNullValue());
+    assertThat(resources.length, is(10));
+  		
+    for (Resource res : resources) {
+      File file = res.getFile();		
+      if (file.getName().endsWith("stdout")) {
+        // there has to be some content in stdout file
+        assertThat(file.length(), greaterThan(0l));
+        if (file.getName().equals("Container.stdout")) {
+          Scanner scanner = new Scanner(file);
+          String content = scanner.useDelimiter("\\A").next();
+          scanner.close();
+          // this is what container will log in stdout
+          assertThat(content, containsString("Hello from MultiContextBeanExample"));
+        }
+      } else if (file.getName().endsWith("stderr")) {
+        // can't have anything in stderr files
+        assertThat(file.length(), is(0l));
+      }
+    }		
+  }
+}]]></programlisting>
+
+    </section>
+
+  </section>
+
+</chapter>
