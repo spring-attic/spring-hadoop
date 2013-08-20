@@ -52,6 +52,7 @@
       <xi:include href="reference/cascading.xml"/>
       <xi:include href="reference/runners.xml"/>
       <xi:include href="reference/security.xml"/>
+      <xi:include href="reference/yarn.xml"/>
   </part>
   <part id="dev">
       <title>Developing Spring for Apache Hadoop Applications</title>
