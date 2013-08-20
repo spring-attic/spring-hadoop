@@ -1,15 +1,64 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="links">
-	<title>Useful Links</title>
+<chapter version="5.0" xml:id="links" xmlns="http://docbook.org/ns/docbook"
+         xmlns:ns6="http://www.w3.org/1999/xlink"
+         xmlns:ns5="http://www.w3.org/2000/svg"
+         xmlns:ns4="http://www.w3.org/1999/xhtml"
+         xmlns:ns3="http://www.w3.org/1998/Math/MathML"
+         xmlns:ns="http://docbook.org/ns/docbook">
+  <title>Useful Links</title>
 
-	<itemizedlist>
+  <itemizedlist>
+    <listitem>
+      <emphasis>Spring for Apache Hadoop</emphasis>
 
-    <listitem><emphasis>Spring for Apache Hadoop</emphasis> - <ulink url="http://www.springframework.org/spring-data/hadoop">Home Page</ulink></listitem>
-    <listitem><emphasis>Spring Data</emphasis> - <ulink url="http://www.springframework.org/spring-data">Home Page</ulink></listitem>
-	<listitem><emphasis>Spring Data Book</emphasis> - <ulink url="http://shop.oreilly.com/product/0636920024767.do">Home Page</ulink></listitem>
-    <listitem><emphasis>SpringSource</emphasis> - <ulink url="http://blog.springsource.com/">Blog</ulink></listitem>
-    <listitem><emphasis>Apache Hadoop</emphasis> - <ulink url="http://hadoop.apache.org/">Home Page</ulink></listitem>
-	<listitem><emphasis>Greenplum/Pivotal HD</emphasis> - <ulink url="http://www.greenplum.com/products/pivotal-hd/">Home Page</ulink></listitem>
-	<listitem><emphasis>Spring Hadoop Team on Twitter</emphasis> - <ulink url="http://twitter.com/costinl">Costin</ulink></listitem>
-	</itemizedlist>
+       - 
+
+      <ulink
+      url="http://www.springframework.org/spring-data/hadoop">http://www.springframework.org/spring-data/hadoop</ulink>
+    </listitem>
+
+    <listitem>
+      <emphasis>Spring Data</emphasis>
+
+       - 
+
+      <ulink
+      url="http://www.springframework.org/spring-data">http://www.springframework.org/spring-data</ulink>
+    </listitem>
+
+    <listitem>
+      <emphasis>Spring Data Book</emphasis>
+
+       - 
+
+      <ulink
+      url="http://shop.oreilly.com/product/0636920024767.do">http://shop.oreilly.com/product/0636920024767.do</ulink>
+    </listitem>
+
+    <listitem>
+      <emphasis>SpringSource</emphasis>
+
+       - 
+
+      <ulink
+      url="http://blog.springsource.com/">http://blog.springsource.com/</ulink>
+    </listitem>
+
+    <listitem>
+      <emphasis>Apache Hadoop</emphasis>
+
+       - 
+
+      <ulink url="http://hadoop.apache.org/">http://hadoop.apache.org/</ulink>
+    </listitem>
+
+    <listitem>
+      <emphasis>Pivotal HD</emphasis>
+
+       - 
+
+      <ulink
+      url="http://gopivotal.com/pivotal-products/pivotal-data-fabric/pivotal-hd">http://gopivotal.com/pivotal-products/pivotal-data-fabric/pivotal-hd</ulink>
+    </listitem>
+  </itemizedlist>
 </chapter>
