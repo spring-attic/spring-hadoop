@@ -277,8 +277,29 @@
 
 	<xsd:complexType name="classpathType" mixed="true">
 		<xsd:attribute name="default-yarn-app-classpath" type="xsd:boolean" default="true">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				Configures whether default Hadoop Yarn app classpath entries will be added to a classpath.
+				]]>
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="include-base-directory" type="xsd:boolean" default="true">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				Configures whether the base directory entry will be added to a classpath.
+				This will simply be a "./*" entry.
+				]]>
+				</xsd:documentation>
+			</xsd:annotation>
 		</xsd:attribute>
 		<xsd:attribute name="delimiter" type="xsd:string" default=":">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				Configures delimiter used in a classpath.
+				]]>
+				</xsd:documentation>
+			</xsd:annotation>
 		</xsd:attribute>
 	</xsd:complexType>
 

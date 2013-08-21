@@ -55,6 +55,13 @@ public class EnvironmentFactoryBean implements InitializingBean, FactoryBean<Map
 	 */
 	private boolean defaultYarnAppClasspath;
 
+	/**
+	 * Flag indicating if base directory should included
+	 * when building classpath. Entry in a classpath will
+	 * simply be "./*".
+	 */
+	private boolean includeBaseDirectory;
+
 	/** Delimiter used in a classpath string */
 	private String delimiter;
 
@@ -91,8 +98,13 @@ public class EnvironmentFactoryBean implements InitializingBean, FactoryBean<Map
 			addDelimiter = true;
 		}
 
-		if(defaultYarnAppClasspath) {
-			ArrayList<String> paths = new ArrayList<String>();
+		ArrayList<String> paths = new ArrayList<String>();
+
+		if (includeBaseDirectory) {
+			paths.add("./*");
+		}
+
+		if (defaultYarnAppClasspath) {
 			paths.add("$" + ApplicationConstants.Environment.HADOOP_CONF_DIR);
 			paths.add("$" + ApplicationConstants.Environment.HADOOP_COMMON_HOME + "/*");
 			paths.add("$" + ApplicationConstants.Environment.HADOOP_COMMON_HOME + "/lib/*");
@@ -106,19 +118,17 @@ public class EnvironmentFactoryBean implements InitializingBean, FactoryBean<Map
 			paths.add("$YARN_HOME/lib*");
 			paths.add("$HADOOP_YARN_HOME/share/hadoop/yarn/*");
 			paths.add("$HADOOP_YARN_HOME/share/hadoop/yarn/lib*");
+		}
 
-			Iterator<String> iterator = paths.iterator();
-
-			// add delimiter if we're about to add something
+		Iterator<String> iterator = paths.iterator();
+		// add delimiter if we're about to add something
+		if(iterator.hasNext()) {
+			classPathEnv.append(addDelimiter ? delimiter : "");
+		}
+		while(iterator.hasNext()) {
+			classPathEnv.append(iterator.next());
 			if(iterator.hasNext()) {
-				classPathEnv.append(addDelimiter ? delimiter : "");
-			}
-
-			while(iterator.hasNext()) {
-				classPathEnv.append(iterator.next());
-				if(iterator.hasNext()) {
-					classPathEnv.append(delimiter);
-				}
+				classPathEnv.append(delimiter);
 			}
 		}
 
@@ -178,6 +188,17 @@ public class EnvironmentFactoryBean implements InitializingBean, FactoryBean<Map
 	 */
 	public void setDefaultYarnAppClasspath(boolean defaultYarnAppClasspath) {
 		this.defaultYarnAppClasspath = defaultYarnAppClasspath;
+	}
+
+	/**
+	 * If set to true a base directory entry will be added to
+	 * a 'CLASSPATH' environment variable.
+	 *
+	 * @param includeBaseDirectory Flag telling if base directory entry
+	 *                             should be added to classpath
+	 */
+	public void setIncludeBaseDirectory(boolean includeBaseDirectory) {
+		this.includeBaseDirectory = includeBaseDirectory;
 	}
 
 	/**

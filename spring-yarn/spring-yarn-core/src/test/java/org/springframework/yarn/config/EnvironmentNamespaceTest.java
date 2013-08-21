@@ -16,7 +16,10 @@
 package org.springframework.yarn.config;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.hasItemInArray;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -59,6 +62,12 @@ public class EnvironmentNamespaceTest {
 	@Resource(name = "&defClasspathEnvMixed")
 	private EnvironmentFactoryBean environmentFactoryBeanDefClasspathEnvMixed;
 
+	@Resource(name = "defClasspathEnvNoBaseIncluded")
+	private Map<String, String> defClasspathEnvironmentNoBaseIncluded;
+
+	@Resource(name = "&defClasspathEnvNoBaseIncluded")
+	private EnvironmentFactoryBean environmentFactoryBeanDefClasspathEnvNoBaseIncluded;
+
 	@Test
 	public void testDefaultEnvironment() throws Exception {
 		assertNotNull(defaultEnvironment);
@@ -88,6 +97,11 @@ public class EnvironmentNamespaceTest {
 		String classpath = defClasspathEnvironment.get("CLASSPATH");
 		assertNotNull(classpath);
 
+		String[] entries = classpath.split(":");
+		assertNotNull(entries);
+		assertThat(entries.length, greaterThan(0));
+		assertThat(entries, hasItemInArray("./*"));
+
 		// check that there's no extra or empty elements
 		assertThat(false, is(classpath.contains("::")));
 		assertThat(true, is(classpath.charAt(0) != ':'));
@@ -101,6 +115,18 @@ public class EnvironmentNamespaceTest {
 		assertNotNull(classpath);
 		assertEquals("myvalue1", defClasspathEnvironmentMixed.get("test-myvar1"));
 		assertEquals("jee", defClasspathEnvironmentMixed.get("foo"));
+	}
+
+	@Test
+	public void testEnvironmentWithBaseDirNotIncludedClasspath() throws Exception {
+		assertNotNull(defClasspathEnvironmentNoBaseIncluded);
+		String classpath = defClasspathEnvironmentNoBaseIncluded.get("CLASSPATH");
+		assertNotNull(classpath);
+
+		String[] entries = classpath.split(":");
+		assertNotNull(entries);
+		assertThat(entries.length, greaterThan(0));
+		assertThat(entries, not(hasItemInArray("./*")));
 	}
 
 }
