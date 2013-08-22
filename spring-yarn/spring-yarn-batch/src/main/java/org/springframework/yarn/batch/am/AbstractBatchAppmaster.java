@@ -28,11 +28,13 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.hadoop.fs.CommonConfigurationKeysPublic;
 import org.apache.hadoop.yarn.api.records.Container;
 import org.apache.hadoop.yarn.api.records.ContainerId;
 import org.apache.hadoop.yarn.api.records.ContainerLaunchContext;
 import org.apache.hadoop.yarn.api.records.ContainerStatus;
 import org.apache.hadoop.yarn.api.records.FinalApplicationStatus;
+import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.apache.hadoop.yarn.util.RackResolver;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
@@ -213,6 +215,7 @@ public abstract class AbstractBatchAppmaster extends AbstractEventingAppmaster i
 			int port = service.getPort();
 			String address = service.getHost();
 			Map<String, String> env = new HashMap<String, String>(context.getEnvironment());
+			env.put(YarnSystemConstants.FS_ADDRESS, getConfiguration().get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY));
 			env.put(YarnSystemConstants.AMSERVICE_PORT, Integer.toString(port));
 			env.put(YarnSystemConstants.AMSERVICE_HOST, address);
 			env.put(YarnSystemConstants.AMSERVICE_BATCH_STEPNAME, jobName);
