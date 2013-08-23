@@ -18,7 +18,6 @@ package org.springframework.yarn.am;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.yarn.api.records.Container;
-import org.apache.hadoop.yarn.api.records.ContainerId;
 import org.apache.hadoop.yarn.api.records.ContainerStatus;
 import org.apache.hadoop.yarn.api.records.FinalApplicationStatus;
 import org.springframework.yarn.am.allocate.AbstractAllocator;
@@ -48,6 +47,7 @@ public class StaticEventingAppmaster extends AbstractEventingAppmaster implement
 		if(getAllocator() instanceof AbstractAllocator) {
 			((AbstractAllocator)getAllocator()).setApplicationAttemptId(getApplicationAttemptId());
 		}
+		// TODO: do exception safe parse
 		containerCount = Integer.parseInt(getParameters().getProperty(AppmasterConstants.CONTAINER_COUNT, "1"));
 		log.info("count: " + containerCount);
 		getAllocator().allocateContainers(containerCount);
@@ -55,7 +55,7 @@ public class StaticEventingAppmaster extends AbstractEventingAppmaster implement
 
 	@Override
 	protected void onContainerAllocated(Container container) {
-		getMonitor().addContainer(container);
+		getMonitor().reportContainer(container);
 		getLauncher().launchContainer(container, getCommands());
 	}
 
@@ -68,20 +68,17 @@ public class StaticEventingAppmaster extends AbstractEventingAppmaster implement
 	protected void onContainerCompleted(ContainerStatus status) {
 		super.onContainerCompleted(status);
 
-		getMonitor().monitorContainer(status);
+		getMonitor().reportContainerStatus(status);
 
 		int exitStatus = status.getExitStatus();
-		ContainerId containerId = status.getContainerId();
 
-		boolean handled = false;
-		if (exitStatus > 0) {
-			handled = onContainerFailed(containerId);
-			if (!handled) {
-				setFinalApplicationStatus(FinalApplicationStatus.FAILED);
+		if (exitStatus == 0) {
+			if (isComplete()) {
 				notifyCompleted();
 			}
 		} else {
-			if (isComplete()) {
+			if (!onContainerFailed(status)) {
+				setFinalApplicationStatus(FinalApplicationStatus.FAILED);
 				notifyCompleted();
 			}
 		}
@@ -90,13 +87,16 @@ public class StaticEventingAppmaster extends AbstractEventingAppmaster implement
 	/**
 	 * Called if completed container has failed. User
 	 * may override this method to process failed container,
-	 * i.e. making a request to re-allocate new container istead
+	 * i.e. making a request to re-allocate new container instead
 	 * of failing the application.
+	 * <p>
+	 * Default implementation doesn't do anything and just
+	 * returns that failed container wasn't handled.
 	 *
-	 * @param containerId the container id
+	 * @param containerStatus the container status
 	 * @return true, if container was handled.
 	 */
-	protected boolean onContainerFailed(ContainerId containerId) {
+	protected boolean onContainerFailed(ContainerStatus containerStatus) {
 		return false;
 	}
 
@@ -105,10 +105,10 @@ public class StaticEventingAppmaster extends AbstractEventingAppmaster implement
 	 * as complete. Default implementation is delegating
 	 * call to container monitor.
 	 *
-	 * @return True if application is complete
+	 * @return true if application is complete
 	 */
 	protected boolean isComplete() {
-		return getMonitor().hasRunning();
+		return (getMonitor().completedCount() - getMonitor().failedCount()) >= containerCount;
 	}
 
 }

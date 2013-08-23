@@ -57,7 +57,7 @@ public class StaticAppmaster extends AbstractProcessingAppmaster implements Yarn
 		getMonitor().addContainerMonitorStateListener(new ContainerMonitorListener() {
 			@Override
 			public void state(ContainerMonitorState state) {
-				if (!getMonitor().hasRunning()) {
+				if (getMonitor().freeCount() == 0) {
 					int completed = state.getCompleted();
 					int failed = state.getFailed();
 					if (completed + failed >= containerCount) {

@@ -31,53 +31,53 @@ import org.springframework.yarn.listener.ContainerMonitorListener;
 public interface ContainerMonitor {
 
 	/**
-	 * Adds a container into monitor.
+	 * Notifies monitor for new {@link ContainerStatus}.
 	 *
-	 * @param container the container
+	 * @param containerStatuses the container statuses
 	 */
-	void addContainer(Container container);
+	void reportContainerStatus(List<ContainerStatus> containerStatuses);
 
 	/**
-	 * Notifies monitor for completed containers.
+	 * Notifies monitor for new {@link ContainerStatus}.
 	 *
-	 * @param completedContainers the completed containers
+	 * @param containerStatus the container status
 	 */
-	void monitorContainer(List<ContainerStatus> completedContainers);
+	void reportContainerStatus(ContainerStatus containerStatus);
 
 	/**
-	 * Notifies monitor for completed container.
-	 *
-	 * @param completedContainer the completed container
-	 */
-	void monitorContainer(ContainerStatus completedContainer);
-
-	/**
-	 * Report container.
+	 * Notifies monitor of {@link Container}.
 	 *
 	 * @param container the container
 	 */
 	void reportContainer(Container container);
 
 	/**
-	 * Checks for running containers.
+	 * Gets a count of free containers.
 	 *
-	 * @return true, if running containers exist
+	 * @return count of free containers
 	 */
-	boolean hasRunning();
+	int freeCount();
 
 	/**
-	 * Checks for failed containers.
+	 * Gets a count of running containers.
 	 *
-	 * @return true, if failed containers exist
+	 * @return count of running containers
 	 */
-	boolean hasFailed();
+	int runningCount();
 
 	/**
-	 * Checks for free allocated containers.
+	 * Gets a count of failed containers.
 	 *
-	 * @return true, if free allocated containers exist
+	 * @return count of failed containers
 	 */
-	boolean hasFree();
+	int failedCount();
+
+	/**
+	 * Gets a count of completed containers.
+	 *
+	 * @return count of completed containers
+	 */
+	int completedCount();
 
 	/**
 	 * Adds the container monitor state listener.
