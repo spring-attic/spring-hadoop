@@ -21,13 +21,13 @@ import java.util.Map;
 import org.apache.hadoop.yarn.api.records.ContainerId;
 
 /**
- * Default {@link ContainerAssing} implementation using
+ * Default {@link ContainerAssign} implementation using
  * {@link Object}s as assigned data.
  *
  * @author Janne Valkealahti
  *
  */
-public class DefaultContainerAssing implements ContainerAssing<Object> {
+public class DefaultContainerAssign implements ContainerAssign<Object> {
 
 	/** container to data map */
 	private Map<ContainerId, Object> containerMap = new HashMap<ContainerId, Object>();

@@ -30,8 +30,8 @@ import org.apache.hadoop.yarn.api.records.ApplicationAttemptId;
 import org.apache.hadoop.yarn.api.records.FinalApplicationStatus;
 import org.apache.hadoop.yarn.util.Records;
 import org.springframework.util.Assert;
-import org.springframework.yarn.am.assign.ContainerAssing;
-import org.springframework.yarn.am.assign.DefaultContainerAssing;
+import org.springframework.yarn.am.assign.ContainerAssign;
+import org.springframework.yarn.am.assign.DefaultContainerAssign;
 import org.springframework.yarn.fs.ResourceLocalizer;
 import org.springframework.yarn.listener.AppmasterStateListener;
 import org.springframework.yarn.listener.AppmasterStateListener.AppmasterState;
@@ -91,7 +91,7 @@ public abstract class AbstractAppmaster extends LifecycleObjectSupport {
 	private CompositeAppmasterStateListener stateListener = new CompositeAppmasterStateListener();
 
 	/** Holder for container assigned data */
-	private ContainerAssing<Object> containerAssing = new DefaultContainerAssing();
+	private ContainerAssign<Object> containerAssign = new DefaultContainerAssign();
 
 	/**
 	 * Global application master instance specific {@link ApplicationAttemptId}
@@ -249,21 +249,21 @@ public abstract class AbstractAppmaster extends LifecycleObjectSupport {
 	}
 
 	/**
-	 * Gets the container assing.
+	 * Gets the container assign.
 	 *
-	 * @return the container assing
+	 * @return the container assign
 	 */
-	public ContainerAssing<Object> getContainerAssing() {
-		return containerAssing;
+	public ContainerAssign<Object> getContainerAssign() {
+		return containerAssign;
 	}
 
 	/**
-	 * Sets the container assing.
+	 * Sets the container assign.
 	 *
-	 * @param containerAssing the new container assing
+	 * @param containerAssign the new container assign
 	 */
-	public void setContainerAssing(ContainerAssing<Object> containerAssing) {
-		this.containerAssing = containerAssing;
+	public void setContainerAssign(ContainerAssign<Object> containerAssign) {
+		this.containerAssign = containerAssign;
 	}
 
 	/**
