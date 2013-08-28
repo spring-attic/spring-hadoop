@@ -28,7 +28,7 @@ import org.apache.hadoop.yarn.api.records.ContainerId;
  * @param <E> the type of data assigned
  *
  */
-public interface ContainerAssing<E> {
+public interface ContainerAssign<E> {
 
 	/**
 	 * Assign data with container.
