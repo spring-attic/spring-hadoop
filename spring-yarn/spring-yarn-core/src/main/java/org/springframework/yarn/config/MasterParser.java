@@ -28,7 +28,6 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
 import org.springframework.yarn.YarnSystemConstants;
-import org.springframework.yarn.am.CommandLineAppmasterRunner;
 import org.springframework.yarn.am.StaticAppmaster;
 import org.springframework.yarn.am.StaticEventingAppmaster;
 import org.springframework.yarn.am.allocate.DefaultContainerAllocator;
@@ -80,10 +79,10 @@ public class MasterParser extends AbstractBeanDefinitionParser {
 			BeanDefinitionBuilder defBuilder = BeanDefinitionBuilder.genericBeanDefinition(LaunchCommandsFactoryBean.class);
 			YarnNamespaceUtils.setValueIfAttributeDefined(defBuilder, containerRunnerElement, "command");
 			if (containerRunnerElement.hasAttribute("runner")) {
-				defBuilder.addPropertyValue("runner", containerRunnerElement.getAttribute("runner"));								
+				defBuilder.addPropertyValue("runner", containerRunnerElement.getAttribute("runner"));
 			} else {
-				defBuilder.addPropertyValue("runner", CommandLineContainerRunner.class);				
-			}			
+				defBuilder.addPropertyValue("runner", CommandLineContainerRunner.class);
+			}
 			YarnNamespaceUtils.setValueIfAttributeDefined(defBuilder, containerRunnerElement, "context-file", false, "container-context.xml");
 			YarnNamespaceUtils.setValueIfAttributeDefined(defBuilder, containerRunnerElement, "bean-name", false, YarnSystemConstants.DEFAULT_ID_CONTAINER);
 			YarnNamespaceUtils.setReferenceIfAttributeDefined(defBuilder, containerRunnerElement, "arguments");
