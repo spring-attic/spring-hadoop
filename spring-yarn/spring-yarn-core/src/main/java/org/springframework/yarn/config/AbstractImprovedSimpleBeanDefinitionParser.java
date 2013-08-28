@@ -51,7 +51,7 @@ abstract class AbstractImprovedSimpleBeanDefinitionParser extends AbstractSimple
 		String depends = element.getAttribute(BeanDefinitionParserDelegate.DEPENDS_ON_ATTRIBUTE);
 		if (StringUtils.hasText(depends)) {
 			builder.getRawBeanDefinition().setDependsOn(
-					StringUtils.tokenizeToStringArray(depends, BeanDefinitionParserDelegate.BEAN_NAME_DELIMITERS));
+					StringUtils.tokenizeToStringArray(depends, BeanDefinitionParserDelegate.MULTI_VALUE_ATTRIBUTE_DELIMITERS));
 		}
 
 		NamedNodeMap attributes = element.getAttributes();

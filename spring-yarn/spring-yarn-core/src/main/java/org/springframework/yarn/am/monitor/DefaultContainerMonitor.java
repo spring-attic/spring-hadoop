@@ -15,14 +15,18 @@
  */
 package org.springframework.yarn.am.monitor;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.yarn.api.records.Container;
 import org.apache.hadoop.yarn.api.records.ContainerId;
 import org.apache.hadoop.yarn.api.records.ContainerState;
 import org.apache.hadoop.yarn.api.records.ContainerStatus;
+import org.apache.hadoop.yarn.util.ConverterUtils;
 import org.springframework.yarn.listener.ContainerMonitorListener.ContainerMonitorState;
 
 /**
@@ -34,89 +38,153 @@ import org.springframework.yarn.listener.ContainerMonitorListener.ContainerMonit
  */
 public class DefaultContainerMonitor extends AbstractMonitor implements ContainerMonitor {
 
-	/** Containers which has been allocated */
-	private Set<ContainerId> allocated = new HashSet<ContainerId>();
+	private final static Log log = LogFactory.getLog(DefaultContainerMonitor.class);
 
-	/** Containers are currently running */
-	private Set<ContainerId> running = new HashSet<ContainerId>();
+	/**
+	 * Containers which has been allocated. These are considered as free and
+	 * we don't know if container is running or completed.
+	 */
+	private Set<String> allocated = new HashSet<String>();
+
+	/** Containers which are currently running */
+	private Set<String> running = new HashSet<String>();
 
 	/** Containers which has been completed */
-	private Set<ContainerId> completed = new HashSet<ContainerId>();
+	private Set<String> completed = new HashSet<String>();
 
 	/** Containers which has been completed with failed status */
-	private Set<ContainerId> failed = new HashSet<ContainerId>();
+	private Set<String> failed = new HashSet<String>();
+
+	/** Lock for sets updates */
+	private final Object lock = new Object();
 
 	@Override
-	public void monitorContainer(List<ContainerStatus> completedContainers) {
-		for (ContainerStatus status : completedContainers) {
-			ContainerId containerId = status.getContainerId();
-			int exitStatus = status.getExitStatus();
-			ContainerState state = status.getState();
-
-			if (state.equals(ContainerState.COMPLETE)) {
-				if (exitStatus > 0) {
-					failed.add(containerId);
-				} else {
-					completed.add(containerId);
-				}
-			}
-			running.remove(containerId);
-		}
-		int total = allocated.size();
-		int fail = failed.size();
-		int comp = completed.size()+fail;
-		notifyState(new ContainerMonitorState(total, comp, fail, comp/(double)total));
+	public void reportContainerStatus(List<ContainerStatus> containerStatuses) {
+		handleContainerStatus(containerStatuses, false);
 	}
 
 	@Override
-	public void monitorContainer(ContainerStatus completedContainer) {
-		ContainerId containerId = completedContainer.getContainerId();
-		int exitStatus = completedContainer.getExitStatus();
-		ContainerState state = completedContainer.getState();
-
-		if (state.equals(ContainerState.COMPLETE)) {
-			if (exitStatus > 0) {
-				failed.add(containerId);
-			} else {
-				completed.add(containerId);
-			}
-		}
-		running.remove(containerId);
-		int total = allocated.size();
-		int fail = failed.size();
-		int comp = completed.size()+fail;
-		notifyState(new ContainerMonitorState(total, comp, fail, comp/(double)total));
+	public void reportContainerStatus(ContainerStatus containerStatus) {
+		List<ContainerStatus> containerStatuses = new ArrayList<ContainerStatus>();
+		containerStatuses.add(containerStatus);
+		handleContainerStatus(containerStatuses, false);
 	}
 
 	@Override
 	public void reportContainer(Container container) {
-		if (container.getState().equals(ContainerState.NEW)) {
-			allocated.add(container.getId());
+		if (log.isDebugEnabled()) {
+			log.debug("Reporting container=" + container);
 		}
-		if (container.getState().equals(ContainerState.RUNNING)) {
-			running.add(container.getId());
-			allocated.remove(container.getId());
+		String cid = ConverterUtils.toString(container.getId());
+		synchronized (lock) {
+			if (container.getState().equals(ContainerState.NEW)) {
+				allocated.add(cid);
+			} else if (container.getState().equals(ContainerState.RUNNING)) {
+				running.add(cid);
+				allocated.remove(cid);
+			} else if (container.getState().equals(ContainerState.COMPLETE)) {
+				running.remove(cid);
+			} else {
+				log.warn("Got unknown ContainerState=" + container.getState());
+			}
+		}
+		if (log.isDebugEnabled()) {
+			log.debug("State after reportContainer: " + toDebugString());
 		}
 	}
 
 	@Override
-	public void addContainer(Container container) {
-		allocated.add(container.getId());
+	public int freeCount() {
+		return allocated.size();
 	}
 
 	@Override
-	public boolean hasRunning() {
-		return !running.isEmpty();
+	public int runningCount() {
+		return running.size();
 	}
 
 	@Override
-	public boolean hasFailed() {
-		return !failed.isEmpty();
+	public int failedCount() {
+		return failed.size();
 	}
 
 	@Override
-	public boolean hasFree() {
-		return !allocated.isEmpty();
+	public int completedCount() {
+		return completed.size();
+	}
+
+	private void handleContainerStatus(List<ContainerStatus> containerStatuses, boolean notifyIntermediates) {
+		for (ContainerStatus status : containerStatuses) {
+
+			if (log.isDebugEnabled()) {
+				log.debug("Reporting containerStatus=" + status);
+			}
+
+			ContainerId containerId = status.getContainerId();
+			int exitStatus = status.getExitStatus();
+			ContainerState state = status.getState();
+			String cid = ConverterUtils.toString(containerId);
+
+			synchronized (lock) {
+				if (state.equals(ContainerState.COMPLETE)) {
+					if (exitStatus > 0) {
+						failed.add(cid);
+					} else {
+						completed.add(cid);
+					}
+				}
+				allocated.remove(cid);
+				running.remove(cid);
+			}
+
+			if (notifyIntermediates) {
+				dispatchCurrentContainerMonitorState();
+			}
+		}
+		if (!notifyIntermediates) {
+			dispatchCurrentContainerMonitorState();
+		}
+		if (log.isDebugEnabled()) {
+			log.debug("State after handleContainerStatus: " + toDebugString());
+		}
+	}
+
+	/**
+	 * Dispatches current {@link ContainerMonitorState} into event listener.
+	 */
+	private void dispatchCurrentContainerMonitorState() {
+		int total = allocated.size();
+		int fail = failed.size();
+		int comp = completed.size()+fail;
+		notifyState(new ContainerMonitorState(total, comp, fail, comp/(double)total));
+	}
+
+	/**
+	 * Gets this class description as a debug string.
+	 *
+	 * @return class description as a debug string
+	 */
+	public String toDebugString() {
+		return "DefaultContainerMonitor [allocated=" + toDebugStringContainerSet(allocated) + ", running="
+				+ toDebugStringContainerSet(running) + ", completed=" + toDebugStringContainerSet(completed)
+				+ ", failed=" + toDebugStringContainerSet(failed) + "]";
+	}
+
+	/**
+	 * Helper method to debug content of sets in this class.
+	 *
+	 * @param set the set used in this class
+	 * @return Set as debug string
+	 */
+	private String toDebugStringContainerSet(Set<String> set) {
+		StringBuilder buf = new StringBuilder();
+		buf.append('[');
+		for (String containerId : set) {
+			buf.append(containerId);
+			buf.append(',');
+		}
+		buf.append(']');
+		return buf.toString();
 	}
 
 }

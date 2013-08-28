@@ -66,14 +66,14 @@ public abstract class AbstractProcessingAppmaster extends AbstractServicesAppmas
 			@Override
 			public void allocated(List<Container> allocatedContainers) {
 				for (Container container : allocatedContainers) {
-					getMonitor().addContainer(container);
+					getMonitor().reportContainer(container);
 					getLauncher().launchContainer(container, getCommands());
 					onContainerAllocated(container);
 				}
 			}
 			@Override
 			public void completed(List<ContainerStatus> completedContainers) {
-				getMonitor().monitorContainer(completedContainers);
+				getMonitor().reportContainerStatus(completedContainers);
 				for (ContainerStatus status : completedContainers) {
 					onContainerCompleted(status);
 				}
