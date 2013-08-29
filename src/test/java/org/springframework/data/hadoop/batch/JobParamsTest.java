@@ -27,6 +27,8 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.hadoop.TestUtils;
@@ -71,10 +73,22 @@ public class JobParamsTest {
 
 		// check records
 		Collection<StepExecution> steps = startJobs.get(0).getStepExecutions();
+		StepExecution mrStep = null;
 		for (StepExecution stepExecution : steps) {
 			if ("do-mr".equals(stepExecution.getStepName())) {
 				assertTrue(stepExecution.getReadCount() > 0);
+				mrStep = stepExecution;
 			}
 		}
+		//Check JobRepository
+		MapJobRepositoryFactoryBean repo = ctx.getBean(MapJobRepositoryFactoryBean.class);
+		ExecutionContext ec =
+				repo.getExecutionContextDao().getExecutionContext(mrStep);
+		assertTrue("Looking for Job ID", ec.containsKey("Job Status::ID"));
+		assertTrue("Looking for Job Name", ec.containsKey("Job Status::Name"));
+		assertTrue("Looking for Job State", ec.containsKey("Job Status::State"));
+		assertTrue("Looking for File System Counters",
+				(ec.containsKey("File System Counters::FILE: Number of bytes read")) ||
+						ec.containsKey("FileSystemCounters::FILE_BYTES_READ"));
 	}
 }
