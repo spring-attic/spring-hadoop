@@ -56,6 +56,15 @@ public class YarnSystemConstants {
 	/** Default bean id for appmaster client service. */
 	public static final String DEFAULT_ID_CLIENT_AMSERVICE = "yarnClientAmservice";
 
+	/** Default name of client context file. */
+	public static final String DEFAULT_CONTEXT_FILE_CLIENT = "application-context.xml";
+
+	/** Default name of appmaster context file. */
+	public static final String DEFAULT_CONTEXT_FILE_APPMASTER = "appmaster-context.xml";
+
+	/** Default name of container context file. */
+	public static final String DEFAULT_CONTEXT_FILE_CONTAINER = "container-context.xml";
+
 	/** Default env variable for amservice port. */
 	public static final String AMSERVICE_PORT = "syarn.amservice.port";
 
