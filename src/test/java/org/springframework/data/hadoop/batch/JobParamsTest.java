@@ -36,6 +36,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -80,6 +81,7 @@ public class JobParamsTest {
 				mrStep = stepExecution;
 			}
 		}
+		assertNotNull("MR step not found", mrStep);
 		//Check JobRepository
 		MapJobRepositoryFactoryBean repo = ctx.getBean(MapJobRepositoryFactoryBean.class);
 		ExecutionContext ec =
