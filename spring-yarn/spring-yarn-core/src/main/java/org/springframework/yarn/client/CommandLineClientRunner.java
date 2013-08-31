@@ -146,5 +146,8 @@ public class CommandLineClientRunner extends AbstractCommandLineRunner<YarnClien
 		return table;
 	}
 
+	public static void main(String[] args) {
+		new CommandLineClientRunner().doMain(args);
+	}
 
 }
