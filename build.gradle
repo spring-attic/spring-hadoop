@@ -130,6 +130,31 @@ switch (hadoopDistro) {
 
   break;
 
+  // Hadoop 2.1 Beta
+  case "hadoop21":
+    hadoopVersion = hd21Version
+    println "Using Apache Hadoop 2.1 - [$hadoopVersion]"
+
+    hadoop = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
+              "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
+              "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
+              "org.apache.hadoop:hadoop-streaming:$hadoopVersion",
+              "org.apache.hadoop:hadoop-distcp:$hadoopVersion"]
+
+    dependencies {
+        testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
+        testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
+        testRuntime "dk.brics.automaton:automaton:1.11-8"
+    }
+
+    hbaseVersion = hd21HbaseVersion
+    hiveVersion = hd21HiveVersion
+    pigVersion = hd21PigVersion
+    pigQualifier = ':h2'
+    thriftVersion = hd21ThriftVersion
+
+  break;
+
   // Hadoop 2.0 Alpha
   case "hadoop20":
     hadoopVersion = hd20Version
