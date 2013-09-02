@@ -12,9 +12,9 @@
 	<context:property-placeholder/>
 
 	<yarn:configuration>
-		fs.defaultFS=${syarn.hd.fs}
-		yarn.resourcemanager.address=${syarn.hd.rm}
-		yarn.resourcemanager.scheduler.address=${syarn.hd.scheduler}
+		fs.defaultFS=${SHDP_HD_FS}
+		yarn.resourcemanager.address=${SHDP_HD_RM}
+		yarn.resourcemanager.scheduler.address=${SHDP_HD_SCHEDULER}
 	</yarn:configuration>
 
 	<yarn:localresources>
