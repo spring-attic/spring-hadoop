@@ -208,7 +208,9 @@ public abstract class AbstractBatchAppmaster extends AbstractEventingAppmaster i
 			log.debug("Intercept launch context: " + context);
 		}
 
-		StepExecution stepExecution = containerToStepMap.get(context.getContainerId());
+		// TODO: 210 container not in context anymore
+		StepExecution stepExecution = null;
+//		StepExecution stepExecution = containerToStepMap.get(context.getContainerId());
 		String jobName = remoteStepNames.get(stepExecution);
 
 		if(service != null) {

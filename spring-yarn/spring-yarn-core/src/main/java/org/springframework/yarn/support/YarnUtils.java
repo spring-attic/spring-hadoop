@@ -22,12 +22,12 @@ import java.util.Map;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.ipc.RemoteException;
 import org.apache.hadoop.security.SecurityUtil;
-import org.apache.hadoop.yarn.YarnException;
 import org.apache.hadoop.yarn.api.ApplicationConstants;
 import org.apache.hadoop.yarn.api.records.ApplicationAttemptId;
 import org.apache.hadoop.yarn.api.records.ContainerId;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
-import org.apache.hadoop.yarn.exceptions.YarnRemoteException;
+import org.apache.hadoop.yarn.exceptions.YarnException;
+import org.apache.hadoop.yarn.exceptions.YarnRuntimeException;
 import org.apache.hadoop.yarn.util.ConverterUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.util.Assert;
@@ -42,12 +42,12 @@ import org.springframework.yarn.YarnSystemException;
 public class YarnUtils {
 
 	/**
-	 * Converts {@link YarnRemoteException} to a Spring dao exception.
+	 * Converts {@link YarnRuntimeException} to a Spring dao exception.
 	 *
-	 * @param e the {@link YarnRemoteException}
+	 * @param e the {@link YarnRuntimeException}
 	 * @return a wrapped native exception into {@link DataAccessException}
 	 */
-	public static DataAccessException convertYarnAccessException(YarnRemoteException e) {
+	public static DataAccessException convertYarnAccessException(YarnRuntimeException e) {
 		return new YarnSystemException(e);
 	}
 
@@ -57,9 +57,12 @@ public class YarnUtils {
 	 * @param e the {@link RemoteException}
 	 * @return a wrapped native exception into {@link DataAccessException}
 	 */
-	public static DataAccessException convertYarnAccessException(RemoteException e) {
+	public static DataAccessException convertYarnAccessException(IOException e) {
 		return new YarnSystemException(e);
 	}
+//	public static DataAccessException convertYarnAccessException(RemoteException e) {
+//		return new YarnSystemException(e);
+//	}
 
 	/**
 	 * Converts {@link YarnException} to a Spring dao exception.
@@ -78,7 +81,9 @@ public class YarnUtils {
 	 * @return the {@link ApplicationAttemptId}
 	 */
 	public static ApplicationAttemptId getApplicationAttemptId(Map<String, String> environment) {
-		String amContainerId = environment.get(ApplicationConstants.AM_CONTAINER_ID_ENV);
+		// TODO: 210 check container id env access
+//		String amContainerId = environment.get(ApplicationConstants.AM_CONTAINER_ID_ENV);
+		String amContainerId = environment.get(ApplicationConstants.Environment.CONTAINER_ID.name());
 		Assert.notNull(amContainerId, "AM_CONTAINER_ID env variable has to exist to build appAttemptId");
 		ContainerId containerId = ConverterUtils.toContainerId(amContainerId);
 		return containerId.getApplicationAttemptId();

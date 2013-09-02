@@ -376,12 +376,13 @@ public abstract class AbstractAppmaster extends LifecycleObjectSupport {
 					applicationAttemptId + " status=" + FinalApplicationStatus.SUCCEEDED);
 		}
 		FinishApplicationMasterRequest finishReq = Records.newRecord(FinishApplicationMasterRequest.class);
-		finishReq.setAppAttemptId(applicationAttemptId);
+		// TODO: 210 setAppAttemptId removed
+//		finishReq.setAppAttemptId(applicationAttemptId);
 
 		// assume succeed if not set
 		FinalApplicationStatus status = finalApplicationStatus != null ?
 				finalApplicationStatus : FinalApplicationStatus.SUCCEEDED;
-		finishReq.setFinishApplicationStatus(status);
+		finishReq.setFinalApplicationStatus(status);
 		return rmTemplate.finish(finishReq);
 	}
 

@@ -29,7 +29,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.yarn.api.protocolrecords.AllocateRequest;
 import org.apache.hadoop.yarn.api.protocolrecords.AllocateResponse;
-import org.apache.hadoop.yarn.api.records.AMResponse;
 import org.apache.hadoop.yarn.api.records.Container;
 import org.apache.hadoop.yarn.api.records.ContainerId;
 import org.apache.hadoop.yarn.api.records.ContainerStatus;
@@ -132,7 +131,7 @@ public class DefaultContainerAllocator extends AbstractPollingAllocator implemen
 	}
 
 	@Override
-	protected AMResponse doContainerRequest() {
+	protected AllocateResponse doContainerRequest() {
 		List<ResourceRequest> requestedContainers = new ArrayList<ResourceRequest>();
 		Map<String, Integer> allocateCounts = allocateCountTracker.getAllocateCounts();
 
@@ -151,7 +150,7 @@ public class DefaultContainerAllocator extends AbstractPollingAllocator implemen
 			log.debug("Requesting containers using " + requestedContainers.size() + " requests.");
 			for (ResourceRequest resourceRequest : requestedContainers) {
 				log.debug("ResourceRequest: " + resourceRequest + " with count=" +
-						resourceRequest.getNumContainers() + " with hostName=" + resourceRequest.getHostName());
+						resourceRequest.getNumContainers() + " with hostName=" + resourceRequest.getResourceName());
 			}
 			log.debug("Releasing containers " + release.size());
 			for (ContainerId cid : release) {
@@ -160,18 +159,28 @@ public class DefaultContainerAllocator extends AbstractPollingAllocator implemen
 			log.debug("Request id will be: " + requestId.get());
 		}
 
+		// TODO: 210 AMResponse kinda changed to AllocateResponse
+		
 		// build the allocation request
 		AllocateRequest request = Records.newRecord(AllocateRequest.class);
 		request.setResponseId(requestId.get());
-		request.setApplicationAttemptId(getApplicationAttemptId());
-		request.addAllAsks(requestedContainers);
-		request.addAllReleases(release);
+		// TODO: 210 app attempd id remove
+//		request.setApplicationAttemptId(getApplicationAttemptId());
+	
+		request.setAskList(requestedContainers);
+//		request.addAllAsks(requestedContainers);
+	
+		request.setReleaseList(release);
+//		request.addAllReleases(release);
 		request.setProgress(applicationProgress);
 
 		// do request and return response
 		AllocateResponse allocate = getRmTemplate().allocate(request);
-		requestId.set(allocate.getAMResponse().getResponseId());
-		return allocate.getAMResponse();
+	
+		requestId.set(allocate.getResponseId());
+//		requestId.set(allocate.getAMResponse().getResponseId());
+		return allocate;
+//		return allocate.getAMResponse();
 	}
 
 	@Override
@@ -333,7 +342,9 @@ public class DefaultContainerAllocator extends AbstractPollingAllocator implemen
 	 */
 	private ResourceRequest getContainerResourceRequest(int numContainers, String hostName) {
 		ResourceRequest request = Records.newRecord(ResourceRequest.class);
-		request.setHostName(hostName);
+		// TODO: 210 hostname to resourcename
+		request.setResourceName(hostName);
+//		request.setHostName(hostName);
 		request.setNumContainers(numContainers);
 		Priority pri = Records.newRecord(Priority.class);
 		pri.setPriority(priority);

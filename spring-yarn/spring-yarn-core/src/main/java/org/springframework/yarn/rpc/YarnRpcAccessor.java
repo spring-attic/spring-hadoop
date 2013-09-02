@@ -15,6 +15,7 @@
  */
 package org.springframework.yarn.rpc;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.security.PrivilegedAction;
 
@@ -22,8 +23,8 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.ipc.RPC;
 import org.apache.hadoop.ipc.RemoteException;
 import org.apache.hadoop.security.UserGroupInformation;
-import org.apache.hadoop.yarn.YarnException;
-import org.apache.hadoop.yarn.exceptions.YarnRemoteException;
+import org.apache.hadoop.yarn.exceptions.YarnException;
+import org.apache.hadoop.yarn.exceptions.YarnRuntimeException;
 import org.apache.hadoop.yarn.ipc.YarnRPC;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -107,9 +108,9 @@ public abstract class YarnRpcAccessor<P> implements InitializingBean, Disposable
 			return result;
 		} catch (YarnException e) {
 			throw YarnUtils.convertYarnAccessException(e);
-		} catch (YarnRemoteException e) {
+		} catch (YarnRuntimeException e) {
 			throw YarnUtils.convertYarnAccessException(e);
-		} catch (RemoteException e) {
+		} catch (IOException e) {
 			throw YarnUtils.convertYarnAccessException(e);
 		} catch (RuntimeException e) {
 			throw e;

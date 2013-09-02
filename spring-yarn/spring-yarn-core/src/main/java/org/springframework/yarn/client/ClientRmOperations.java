@@ -23,7 +23,7 @@ import org.apache.hadoop.yarn.api.protocolrecords.SubmitApplicationResponse;
 import org.apache.hadoop.yarn.api.records.ApplicationId;
 import org.apache.hadoop.yarn.api.records.ApplicationReport;
 import org.apache.hadoop.yarn.api.records.ApplicationSubmissionContext;
-import org.apache.hadoop.yarn.api.records.DelegationToken;
+import org.apache.hadoop.yarn.api.records.Token;
 
 /**
  * Interface for client to resource manager communication.
@@ -75,7 +75,7 @@ public interface ClientRmOperations {
 	 * @param renewer the renewer as kerberos principal
 	 * @return the delegation token
 	 */
-	DelegationToken getDelegationToken(String renewer);
+	Token getDelegationToken(String renewer);
 
 	/**
 	 * Gets a report of the application.

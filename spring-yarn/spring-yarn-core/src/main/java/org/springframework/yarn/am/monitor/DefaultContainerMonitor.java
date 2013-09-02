@@ -76,18 +76,19 @@ public class DefaultContainerMonitor extends AbstractMonitor implements Containe
 			log.debug("Reporting container=" + container);
 		}
 		String cid = ConverterUtils.toString(container.getId());
-		synchronized (lock) {
-			if (container.getState().equals(ContainerState.NEW)) {
-				allocated.add(cid);
-			} else if (container.getState().equals(ContainerState.RUNNING)) {
-				running.add(cid);
-				allocated.remove(cid);
-			} else if (container.getState().equals(ContainerState.COMPLETE)) {
-				running.remove(cid);
-			} else {
-				log.warn("Got unknown ContainerState=" + container.getState());
-			}
-		}
+		// TODO: 210 state moved to different place
+//		synchronized (lock) {
+//			if (container.getState().equals(ContainerState.NEW)) {
+//				allocated.add(cid);
+//			} else if (container.getState().equals(ContainerState.RUNNING)) {
+//				running.add(cid);
+//				allocated.remove(cid);
+//			} else if (container.getState().equals(ContainerState.COMPLETE)) {
+//				running.remove(cid);
+//			} else {
+//				log.warn("Got unknown ContainerState=" + container.getState());
+//			}
+//		}
 		if (log.isDebugEnabled()) {
 			log.debug("State after reportContainer: " + toDebugString());
 		}

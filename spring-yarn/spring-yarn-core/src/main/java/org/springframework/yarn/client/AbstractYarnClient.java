@@ -315,9 +315,10 @@ public abstract class AbstractYarnClient implements YarnClient, InitializingBean
 		context.setApplicationId(applicationId);
 		context.setApplicationName(appName);
 		context.setAMContainerSpec(getMasterContainerLaunchContext());
-		if(user != null) {
-			context.setUser(user);
-		}
+		// TODO: 210 user removed
+//		if(user != null) {
+//			context.setUser(user);
+//		}
 		Priority record = Records.newRecord(Priority.class);
 		record.setPriority(priority);
 		context.setPriority(record);
@@ -338,21 +339,23 @@ public abstract class AbstractYarnClient implements YarnClient, InitializingBean
 		Resource capability = Records.newRecord(Resource.class);
 		capability.setMemory(memory);
 		ResourceCompat.setVirtualCores(capability, virtualcores);
-		context.setResource(capability);
+		// TODO: 210 resource removed
+//		context.setResource(capability);
 
-		try {
-			// TODO: this still looks a bit dodgy!!
-			if (UserGroupInformation.isSecurityEnabled()) {
-				Credentials credentials = new Credentials();
-				final FileSystem fs = FileSystem.get(configuration);
-				fs.addDelegationTokens(YarnUtils.getPrincipal(configuration), credentials);
-				DataOutputBuffer dob = new DataOutputBuffer();
-				credentials.writeTokenStorageToStream(dob);
-				ByteBuffer containerToken  = ByteBuffer.wrap(dob.getData(), 0, dob.getLength());
-				context.setContainerTokens(containerToken);
-			}
-		} catch (IOException e) {
-		}
+		// TODO: 210 fix user stuff
+//		try {
+//			// TODO: this still looks a bit dodgy!!
+//			if (UserGroupInformation.isSecurityEnabled()) {
+//				Credentials credentials = new Credentials();
+//				final FileSystem fs = FileSystem.get(configuration);
+//				fs.addDelegationTokens(YarnUtils.getPrincipal(configuration), credentials);
+//				DataOutputBuffer dob = new DataOutputBuffer();
+//				credentials.writeTokenStorageToStream(dob);
+//				ByteBuffer containerToken  = ByteBuffer.wrap(dob.getData(), 0, dob.getLength());
+//				context.setContainerTokens(containerToken);
+//			}
+//		} catch (IOException e) {
+//		}
 
 		return context;
 	}

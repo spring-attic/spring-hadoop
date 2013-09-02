@@ -15,6 +15,7 @@
  */
 package org.springframework.yarn.am.container;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -26,6 +27,7 @@ import java.util.concurrent.ScheduledFuture;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.yarn.api.protocolrecords.StartContainerRequest;
+import org.apache.hadoop.yarn.api.protocolrecords.StartContainersRequest;
 import org.apache.hadoop.yarn.api.records.Container;
 import org.apache.hadoop.yarn.api.records.ContainerLaunchContext;
 import org.apache.hadoop.yarn.api.records.ContainerState;
@@ -91,9 +93,10 @@ public class DefaultContainerLauncher extends AbstractLauncher implements Contai
 		}
 
 		ContainerLaunchContext ctx = Records.newRecord(ContainerLaunchContext.class);
-		ctx.setContainerId(container.getId());
-		ctx.setResource(container.getResource());
-		ctx.setUser(getUsername());
+		// TODO: 210 stuff moved place
+//		ctx.setContainerId(container.getId());
+//		ctx.setResource(container.getResource());
+//		ctx.setUser(getUsername());
 		String stagingId = Integer.toString(container.getId().getApplicationAttemptId().getApplicationId().getId());
 		getResourceLocalizer().setStagingId(stagingId);
 		ctx.setLocalResources(getResourceLocalizer().getResources());
@@ -106,9 +109,16 @@ public class DefaultContainerLauncher extends AbstractLauncher implements Contai
 		ctx.setEnvironment(env);
 		ctx = getInterceptors().preLaunch(ctx);
 
+		// TODO: 210 StartContainerRequest / StartContainersRequest
 		StartContainerRequest request = Records.newRecord(StartContainerRequest.class);
 		request.setContainerLaunchContext(ctx);
-		getCmTemplate(container).startContainer(request);
+		
+		StartContainersRequest rr = Records.newRecord(StartContainersRequest.class);
+		ArrayList<StartContainerRequest> scrs = new ArrayList<StartContainerRequest>();
+		scrs.add(request);
+		rr.setStartContainerRequests(scrs);
+		
+		getCmTemplate(container).startContainers(rr);
 
 		// notify interested parties of new launched container
 		if(getYarnEventPublisher() != null) {

@@ -15,9 +15,9 @@
  */
 package org.springframework.yarn.am;
 
-import org.apache.hadoop.yarn.api.protocolrecords.StartContainerRequest;
-import org.apache.hadoop.yarn.api.protocolrecords.StartContainerResponse;
-import org.apache.hadoop.yarn.api.protocolrecords.StopContainerResponse;
+import org.apache.hadoop.yarn.api.protocolrecords.StartContainersRequest;
+import org.apache.hadoop.yarn.api.protocolrecords.StartContainersResponse;
+import org.apache.hadoop.yarn.api.protocolrecords.StopContainersResponse;
 import org.apache.hadoop.yarn.api.records.ContainerStatus;
 
 /**
@@ -36,14 +36,14 @@ public interface AppmasterCmOperations {
 	 * @param request the request
 	 * @return the start container response
 	 */
-	StartContainerResponse startContainer(StartContainerRequest request);
+	StartContainersResponse startContainers(StartContainersRequest request);
 
 	/**
 	 * Stop container.
 	 *
 	 * @return the stop container response
 	 */
-	StopContainerResponse stopContainer();
+	StopContainersResponse stopContainers();
 
 	/**
 	 * Gets the container status.

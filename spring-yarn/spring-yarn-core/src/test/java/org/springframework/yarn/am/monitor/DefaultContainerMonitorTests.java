@@ -179,7 +179,8 @@ public class DefaultContainerMonitorTests {
 		when(container.getNodeId()).thenReturn(nodeId);
 		when(container.getResource()).thenReturn(resource);
 		when(container.getPriority()).thenReturn(priority);
-		when(container.getState()).thenReturn(state);
+		// TODO: 210 state removed / moved
+//		when(container.getState()).thenReturn(state);
 		return container;
 	}
 

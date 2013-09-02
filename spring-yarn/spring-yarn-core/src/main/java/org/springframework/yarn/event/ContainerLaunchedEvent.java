@@ -51,10 +51,11 @@ public class ContainerLaunchedEvent extends AbstractYarnEvent {
 
 	@Override
 	public String toString() {
+		// TODO: 210 state status removed
 		return "ContainerLaunchedEvent [containerId=" + container.getId()
 				+ ", nodeId=" + container.getNodeId()
-				+ ", containerState=" + container.getState()
-				+ ", containerStatus=" + container.getContainerStatus()
+//				+ ", containerState=" + container.getState()
+//				+ ", containerStatus=" + container.getContainerStatus()
 				+ "]";
 	}
 

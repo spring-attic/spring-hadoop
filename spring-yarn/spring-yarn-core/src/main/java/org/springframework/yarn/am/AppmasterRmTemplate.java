@@ -25,9 +25,8 @@ import org.apache.hadoop.security.SecurityUtil;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.security.token.Token;
 import org.apache.hadoop.security.token.TokenIdentifier;
-import org.apache.hadoop.yarn.YarnException;
-import org.apache.hadoop.yarn.api.AMRMProtocol;
 import org.apache.hadoop.yarn.api.ApplicationConstants;
+import org.apache.hadoop.yarn.api.ApplicationMasterProtocol;
 import org.apache.hadoop.yarn.api.protocolrecords.AllocateRequest;
 import org.apache.hadoop.yarn.api.protocolrecords.AllocateResponse;
 import org.apache.hadoop.yarn.api.protocolrecords.FinishApplicationMasterRequest;
@@ -36,34 +35,35 @@ import org.apache.hadoop.yarn.api.protocolrecords.RegisterApplicationMasterReque
 import org.apache.hadoop.yarn.api.protocolrecords.RegisterApplicationMasterResponse;
 import org.apache.hadoop.yarn.api.records.ApplicationAttemptId;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
-import org.apache.hadoop.yarn.exceptions.YarnRemoteException;
+import org.apache.hadoop.yarn.exceptions.YarnException;
 import org.apache.hadoop.yarn.util.Records;
 import org.springframework.yarn.rpc.YarnRpcAccessor;
 import org.springframework.yarn.rpc.YarnRpcCallback;
 
 /**
  * Template implementation for {@link AppmasterRmOperations} wrapping
- * communication using {@link AMRMProtocol}. Methods for this
+ * communication using {@link ApplicationMasterProtocol}. Methods for this
  * template wraps possible exceptions into Spring Dao exception hierarchy.
  *
  * @author Janne Valkealahti
  *
  */
-public class AppmasterRmTemplate extends YarnRpcAccessor<AMRMProtocol> implements AppmasterRmOperations {
+public class AppmasterRmTemplate extends YarnRpcAccessor<ApplicationMasterProtocol> implements AppmasterRmOperations {
 
 	private static final Log log = LogFactory.getLog(AppmasterCmTemplate.class);
 
 	public AppmasterRmTemplate(Configuration config) {
-		super(AMRMProtocol.class, config);
+		super(ApplicationMasterProtocol.class, config);
 	}
 
 	@Override
 	public RegisterApplicationMasterResponse registerApplicationMaster(final ApplicationAttemptId appAttemptId, final String host, final Integer rpcPort, final String trackUrl) {
-		return execute(new YarnRpcCallback<RegisterApplicationMasterResponse, AMRMProtocol>() {
+		return execute(new YarnRpcCallback<RegisterApplicationMasterResponse, ApplicationMasterProtocol>() {
 			@Override
-			public RegisterApplicationMasterResponse doInYarn(AMRMProtocol proxy) throws YarnRemoteException {
+			public RegisterApplicationMasterResponse doInYarn(ApplicationMasterProtocol proxy) throws YarnException, IOException {
 				RegisterApplicationMasterRequest appMasterRequest = Records.newRecord(RegisterApplicationMasterRequest.class);
-				appMasterRequest.setApplicationAttemptId(appAttemptId);
+				// TODO: 210 setApplicationAttemptId removed
+//				appMasterRequest.setApplicationAttemptId(appAttemptId);
 				appMasterRequest.setHost(host != null ? host : "");
 				appMasterRequest.setRpcPort(rpcPort != null ? rpcPort : 0);
 				appMasterRequest.setTrackingUrl(trackUrl != null ? trackUrl : "");
@@ -74,9 +74,9 @@ public class AppmasterRmTemplate extends YarnRpcAccessor<AMRMProtocol> implement
 
 	@Override
 	public AllocateResponse allocate(final AllocateRequest request) {
-		return execute(new YarnRpcCallback<AllocateResponse, AMRMProtocol>() {
+		return execute(new YarnRpcCallback<AllocateResponse, ApplicationMasterProtocol>() {
 			@Override
-			public AllocateResponse doInYarn(AMRMProtocol proxy) throws YarnRemoteException {
+			public AllocateResponse doInYarn(ApplicationMasterProtocol proxy) throws YarnException, IOException {
 				return proxy.allocate(request);
 			}
 		});
@@ -84,9 +84,9 @@ public class AppmasterRmTemplate extends YarnRpcAccessor<AMRMProtocol> implement
 
 	@Override
 	public FinishApplicationMasterResponse finish(final FinishApplicationMasterRequest request) {
-		return execute(new YarnRpcCallback<FinishApplicationMasterResponse, AMRMProtocol>() {
+		return execute(new YarnRpcCallback<FinishApplicationMasterResponse, ApplicationMasterProtocol>() {
 			@Override
-			public FinishApplicationMasterResponse doInYarn(AMRMProtocol proxy) throws YarnRemoteException {
+			public FinishApplicationMasterResponse doInYarn(ApplicationMasterProtocol proxy) throws YarnException, IOException  {
 				return proxy.finishApplicationMaster(request);
 			}
 		});
@@ -98,29 +98,30 @@ public class AppmasterRmTemplate extends YarnRpcAccessor<AMRMProtocol> implement
 				YarnConfiguration.DEFAULT_RM_SCHEDULER_ADDRESS, YarnConfiguration.DEFAULT_RM_SCHEDULER_PORT);
 
 		UserGroupInformation currentUser;
-		try {
-			currentUser = UserGroupInformation.getCurrentUser();
-		} catch (IOException e) {
-			throw new YarnException(e);
-		}
+//		try {
+//			currentUser = UserGroupInformation.getCurrentUser();
+//		} catch (IOException e) {
+//			throw new YarnException(e);
+//		}
 
-		if (UserGroupInformation.isSecurityEnabled()) {
-			String tokenURLEncodedStr = System.getenv().get(
-				ApplicationConstants.APPLICATION_MASTER_TOKEN_ENV_NAME);
-			Token<? extends TokenIdentifier> token = new Token<TokenIdentifier>();
-
-			try {
-			token.decodeFromUrlString(tokenURLEncodedStr);
-			} catch (IOException e) {
-			throw new YarnException(e);
-			}
-
-			SecurityUtil.setTokenService(token, addr);
-			if (log.isDebugEnabled()) {
-				log.debug("AppMasterToken is " + token);
-			}
-			currentUser.addToken(token);
-		}
+		// TODO: 210 APPLICATION_MASTER_TOKEN_ENV_NAME removed
+//		if (UserGroupInformation.isSecurityEnabled()) {
+//			String tokenURLEncodedStr = System.getenv().get(
+//				ApplicationConstants.APPLICATION_MASTER_TOKEN_ENV_NAME);
+//			Token<? extends TokenIdentifier> token = new Token<TokenIdentifier>();
+//
+//			try {
+//			token.decodeFromUrlString(tokenURLEncodedStr);
+//			} catch (IOException e) {
+//			throw new YarnException(e);
+//			}
+//
+//			SecurityUtil.setTokenService(token, addr);
+//			if (log.isDebugEnabled()) {
+//				log.debug("AppMasterToken is " + token);
+//			}
+//			currentUser.addToken(token);
+//		}
 		return addr;
 	}
 
