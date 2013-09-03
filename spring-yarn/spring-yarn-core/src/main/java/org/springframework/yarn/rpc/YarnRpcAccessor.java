@@ -133,9 +133,10 @@ public abstract class YarnRpcAccessor<P> implements InitializingBean, Disposable
 	 * a {@link PrivilegedAction}.
 	 *
 	 * @return the proxy
+	 * @throws IOException
 	 */
 	@SuppressWarnings("unchecked")
-	protected P createProxy() {
+	protected P createProxy() throws IOException {
 		final YarnRPC rpc = YarnRPC.create(configuration);
 		UserGroupInformation user = getUser();
 		if (user != null) {
@@ -146,6 +147,14 @@ public abstract class YarnRpcAccessor<P> implements InitializingBean, Disposable
 				}
 			});
 		} else {
+
+//			return UserGroupInformation.getCurrentUser().doAs(new PrivilegedAction<P>() {
+//				@Override
+//				public P run() {
+//					return (P) YarnRPC.create(configuration).getProxy(protocolClazz, address, configuration);
+//				}
+//			});
+
 			return (P) rpc.getProxy(protocolClazz, address, configuration);
 		}
 	}

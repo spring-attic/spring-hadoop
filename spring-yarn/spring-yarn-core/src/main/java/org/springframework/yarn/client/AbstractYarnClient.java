@@ -48,7 +48,7 @@ import org.springframework.yarn.support.compat.ResourceCompat;
  *
  */
 public abstract class AbstractYarnClient implements YarnClient, InitializingBean {
-	
+
 	private final static Log log = LogFactory.getLog(AbstractYarnClient.class);
 
 	/** Template communicating for resource manager */
@@ -121,11 +121,11 @@ public abstract class AbstractYarnClient implements YarnClient, InitializingBean
 		resourceLocalizer.distribute();
 
 		ApplicationSubmissionContext submissionContext = getSubmissionContext(applicationId);
-		
+
 		if (log.isDebugEnabled()) {
 			log.debug("Using ApplicationSubmissionContext=" + submissionContext);
 		}
-		
+
 		clientRmOperations.submitApplication(submissionContext);
 		return applicationId;
 	}
@@ -165,14 +165,14 @@ public abstract class AbstractYarnClient implements YarnClient, InitializingBean
 	}
 
 	/**
-	 * Gets the environment variables. 
-	 * 
+	 * Gets the environment variables.
+	 *
 	 * @return the map of environment variables
 	 */
 	public Map<String, String> getEnvironment() {
 		return environment;
 	}
-	
+
 	/**
 	 * Sets the environment for appmaster.
 	 *
@@ -195,13 +195,13 @@ public abstract class AbstractYarnClient implements YarnClient, InitializingBean
 	 * Get the {@link Configuration} of this client. Internally
 	 * this method is called to get the configuration which
 	 * allows sub-classes to override and add additional settings.
-	 * 
+	 *
 	 * @return the {@link Configuration}
 	 */
 	public Configuration getConfiguration() {
 		return configuration;
 	}
-	
+
 	/**
 	 * Sets the Yarn configuration.
 	 *
@@ -315,6 +315,12 @@ public abstract class AbstractYarnClient implements YarnClient, InitializingBean
 		context.setApplicationId(applicationId);
 		context.setApplicationName(appName);
 		context.setAMContainerSpec(getMasterContainerLaunchContext());
+
+		Resource capability = Records.newRecord(Resource.class);
+		capability.setMemory(memory);
+		ResourceCompat.setVirtualCores(capability, virtualcores);
+		context.setResource(capability);
+
 		// TODO: 210 user removed
 //		if(user != null) {
 //			context.setUser(user);
@@ -336,9 +342,9 @@ public abstract class AbstractYarnClient implements YarnClient, InitializingBean
 		context.setLocalResources(resourceLocalizer.getResources());
 		context.setEnvironment(getEnvironment());
 		context.setCommands(commands);
-		Resource capability = Records.newRecord(Resource.class);
-		capability.setMemory(memory);
-		ResourceCompat.setVirtualCores(capability, virtualcores);
+//		Resource capability = Records.newRecord(Resource.class);
+//		capability.setMemory(memory);
+//		ResourceCompat.setVirtualCores(capability, virtualcores);
 		// TODO: 210 resource removed
 //		context.setResource(capability);
 

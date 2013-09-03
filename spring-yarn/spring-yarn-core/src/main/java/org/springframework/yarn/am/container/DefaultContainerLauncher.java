@@ -112,12 +112,13 @@ public class DefaultContainerLauncher extends AbstractLauncher implements Contai
 		// TODO: 210 StartContainerRequest / StartContainersRequest
 		StartContainerRequest request = Records.newRecord(StartContainerRequest.class);
 		request.setContainerLaunchContext(ctx);
-		
+		request.setContainerToken(container.getContainerToken());
+
 		StartContainersRequest rr = Records.newRecord(StartContainersRequest.class);
 		ArrayList<StartContainerRequest> scrs = new ArrayList<StartContainerRequest>();
 		scrs.add(request);
 		rr.setStartContainerRequests(scrs);
-		
+
 		getCmTemplate(container).startContainers(rr);
 
 		// notify interested parties of new launched container

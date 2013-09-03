@@ -36,6 +36,7 @@ import org.apache.hadoop.yarn.api.protocolrecords.RegisterApplicationMasterRespo
 import org.apache.hadoop.yarn.api.records.ApplicationAttemptId;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.apache.hadoop.yarn.exceptions.YarnException;
+import org.apache.hadoop.yarn.security.AMRMTokenIdentifier;
 import org.apache.hadoop.yarn.util.Records;
 import org.springframework.yarn.rpc.YarnRpcAccessor;
 import org.springframework.yarn.rpc.YarnRpcCallback;
@@ -57,13 +58,16 @@ public class AppmasterRmTemplate extends YarnRpcAccessor<ApplicationMasterProtoc
 	}
 
 	@Override
-	public RegisterApplicationMasterResponse registerApplicationMaster(final ApplicationAttemptId appAttemptId, final String host, final Integer rpcPort, final String trackUrl) {
+	public RegisterApplicationMasterResponse registerApplicationMaster(final ApplicationAttemptId appAttemptId,
+			final String host, final Integer rpcPort, final String trackUrl) {
 		return execute(new YarnRpcCallback<RegisterApplicationMasterResponse, ApplicationMasterProtocol>() {
 			@Override
-			public RegisterApplicationMasterResponse doInYarn(ApplicationMasterProtocol proxy) throws YarnException, IOException {
-				RegisterApplicationMasterRequest appMasterRequest = Records.newRecord(RegisterApplicationMasterRequest.class);
+			public RegisterApplicationMasterResponse doInYarn(ApplicationMasterProtocol proxy) throws YarnException,
+					IOException {
+				RegisterApplicationMasterRequest appMasterRequest = Records
+						.newRecord(RegisterApplicationMasterRequest.class);
 				// TODO: 210 setApplicationAttemptId removed
-//				appMasterRequest.setApplicationAttemptId(appAttemptId);
+				// appMasterRequest.setApplicationAttemptId(appAttemptId);
 				appMasterRequest.setHost(host != null ? host : "");
 				appMasterRequest.setRpcPort(rpcPort != null ? rpcPort : 0);
 				appMasterRequest.setTrackingUrl(trackUrl != null ? trackUrl : "");
@@ -86,7 +90,8 @@ public class AppmasterRmTemplate extends YarnRpcAccessor<ApplicationMasterProtoc
 	public FinishApplicationMasterResponse finish(final FinishApplicationMasterRequest request) {
 		return execute(new YarnRpcCallback<FinishApplicationMasterResponse, ApplicationMasterProtocol>() {
 			@Override
-			public FinishApplicationMasterResponse doInYarn(ApplicationMasterProtocol proxy) throws YarnException, IOException  {
+			public FinishApplicationMasterResponse doInYarn(ApplicationMasterProtocol proxy) throws YarnException,
+					IOException {
 				return proxy.finishApplicationMaster(request);
 			}
 		});
@@ -98,11 +103,14 @@ public class AppmasterRmTemplate extends YarnRpcAccessor<ApplicationMasterProtoc
 				YarnConfiguration.DEFAULT_RM_SCHEDULER_ADDRESS, YarnConfiguration.DEFAULT_RM_SCHEDULER_PORT);
 
 		UserGroupInformation currentUser;
-//		try {
-//			currentUser = UserGroupInformation.getCurrentUser();
-//		} catch (IOException e) {
+		try {
+			currentUser = UserGroupInformation.getCurrentUser();
+		} catch (IOException e) {
+			log.error("Error getting current user", e);
 //			throw new YarnException(e);
-//		}
+		}
+
+		log.info("XXXX: UserGroupInformation.isSecurityEnabled() = " + UserGroupInformation.isSecurityEnabled());
 
 		// TODO: 210 APPLICATION_MASTER_TOKEN_ENV_NAME removed
 //		if (UserGroupInformation.isSecurityEnabled()) {
@@ -122,7 +130,26 @@ public class AppmasterRmTemplate extends YarnRpcAccessor<ApplicationMasterProtoc
 //			}
 //			currentUser.addToken(token);
 //		}
+		try {
+			setupTokens(addr);
+		} catch (IOException e) {
+			log.error("Error setting up tokens", e);
+		}
 		return addr;
+	}
+
+	private static void setupTokens(InetSocketAddress resourceManagerAddress) throws IOException {
+		// It is assumed for now that the only AMRMToken in AM's UGI is for this
+		// cluster/RM. TODO: Fix later when we have some kind of cluster-ID as
+		// default service-address, see YARN-986.
+		for (Token<? extends TokenIdentifier> token : UserGroupInformation.getCurrentUser().getTokens()) {
+			if (token.getKind().equals(AMRMTokenIdentifier.KIND_NAME)) {
+				// This token needs to be directly provided to the AMs, so set
+				// the appropriate service-name. We'll need more infrastructure when
+				// we need to set it in HA case.
+				SecurityUtil.setTokenService(token, resourceManagerAddress);
+			}
+		}
 	}
 
 }

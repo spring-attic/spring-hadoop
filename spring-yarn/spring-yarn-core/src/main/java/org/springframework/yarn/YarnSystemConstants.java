@@ -66,22 +66,22 @@ public class YarnSystemConstants {
 	public static final String DEFAULT_CONTEXT_FILE_CONTAINER = "container-context.xml";
 
 	/** Default env variable for amservice port. */
-	public static final String AMSERVICE_PORT = "syarn.amservice.port";
+	public static final String AMSERVICE_PORT = "SHDP_AMSERVICE_PORT";
 
 	/** Default env variable for amservice host. */
-	public static final String AMSERVICE_HOST = "syarn.amservice.host";
+	public static final String AMSERVICE_HOST = "SHDP_AMSERVICE_HOST";
 
 	/** Default env variable for amservice batch step name. */
-	public static final String AMSERVICE_BATCH_STEPNAME = "syarn.amservice.batch.stepname";
+	public static final String AMSERVICE_BATCH_STEPNAME = "SHDP_AMSERVICE_BATCH_STEPNAME";
 
 	/** Default env variable for amservice batch job execution id. */
-	public static final String AMSERVICE_BATCH_JOBEXECUTIONID = "syarn.amservice.batch.jobexecutionid";
+	public static final String AMSERVICE_BATCH_JOBEXECUTIONID = "SHDP_AMSERVICE_BATCH_JOBEXECUTIONID";
 
 	/** Default env variable for amservice batch step execution id. */
-	public static final String AMSERVICE_BATCH_STEPEXECUTIONID = "syarn.amservice.batch.stepexecutionid";
+	public static final String AMSERVICE_BATCH_STEPEXECUTIONID = "SHDP_AMSERVICE_BATCH_STEPEXECUTIONID";
 
 	/** Env variable for container id. */
-	public static final String SYARN_CONTAINER_ID = "syarn.containerid";
+	public static final String SYARN_CONTAINER_ID = "SHDP_CONTAINERID";
 
 	/** Default staging directory base name. */
 	public static final String DEFAULT_STAGING_BASE_DIR_NAME = "syarn";
@@ -90,12 +90,12 @@ public class YarnSystemConstants {
 	public static final String DEFAULT_STAGING_DIR_NAME = "staging";
 
 	/** Default env variable for resource manager address. */
-	public static final String RM_ADDRESS = "syarn.hd.rm";
+	public static final String RM_ADDRESS = "SHDP_HD_RM";
 
 	/** Default env variable for hdfs address. */
-	public static final String FS_ADDRESS = "syarn.hd.fs";
+	public static final String FS_ADDRESS = "SHDP_HD_FS";
 
 	/** Default env variable for resource manager scheduler address. */
-	public static final String SCHEDULER_ADDRESS = "syarn.hd.scheduler";
+	public static final String SCHEDULER_ADDRESS = "SHDP_HD_SCHEDULER";
 
 }

@@ -52,17 +52,24 @@ public class YarnUtils {
 	}
 
 	/**
-	 * Converts {@link RemoteException} to a Spring dao exception.
+	 * Converts {@link IOException} to a Spring dao exception.
 	 *
-	 * @param e the {@link RemoteException}
+	 * @param e the {@link IOException}
 	 * @return a wrapped native exception into {@link DataAccessException}
 	 */
 	public static DataAccessException convertYarnAccessException(IOException e) {
 		return new YarnSystemException(e);
 	}
-//	public static DataAccessException convertYarnAccessException(RemoteException e) {
-//		return new YarnSystemException(e);
-//	}
+
+	/**
+	 * Converts {@link RemoteException} to a Spring dao exception.
+	 *
+	 * @param e the {@link RemoteException}
+	 * @return a wrapped native exception into {@link DataAccessException}
+	 */
+	public static DataAccessException convertYarnAccessException(RemoteException e) {
+		return new YarnSystemException(e);
+	}
 
 	/**
 	 * Converts {@link YarnException} to a Spring dao exception.
@@ -84,7 +91,7 @@ public class YarnUtils {
 		// TODO: 210 check container id env access
 //		String amContainerId = environment.get(ApplicationConstants.AM_CONTAINER_ID_ENV);
 		String amContainerId = environment.get(ApplicationConstants.Environment.CONTAINER_ID.name());
-		Assert.notNull(amContainerId, "AM_CONTAINER_ID env variable has to exist to build appAttemptId");
+		Assert.notNull(amContainerId, "CONTAINER_ID env variable has to exist to build appAttemptId");
 		ContainerId containerId = ConverterUtils.toContainerId(amContainerId);
 		return containerId.getApplicationAttemptId();
 	}

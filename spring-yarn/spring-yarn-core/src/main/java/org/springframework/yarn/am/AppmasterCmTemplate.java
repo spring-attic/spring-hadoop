@@ -19,8 +19,11 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.net.NetUtils;
+import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.yarn.api.ContainerManagementProtocol;
 import org.apache.hadoop.yarn.api.protocolrecords.GetContainerStatusesRequest;
 import org.apache.hadoop.yarn.api.protocolrecords.StartContainersRequest;
@@ -30,7 +33,11 @@ import org.apache.hadoop.yarn.api.protocolrecords.StopContainersResponse;
 import org.apache.hadoop.yarn.api.records.Container;
 import org.apache.hadoop.yarn.api.records.ContainerId;
 import org.apache.hadoop.yarn.api.records.ContainerStatus;
+import org.apache.hadoop.yarn.api.records.Token;
+import org.apache.hadoop.yarn.client.api.NMTokenCache;
 import org.apache.hadoop.yarn.exceptions.YarnException;
+import org.apache.hadoop.yarn.security.NMTokenIdentifier;
+import org.apache.hadoop.yarn.util.ConverterUtils;
 import org.apache.hadoop.yarn.util.Records;
 import org.springframework.yarn.rpc.YarnRpcAccessor;
 import org.springframework.yarn.rpc.YarnRpcCallback;
@@ -44,6 +51,10 @@ import org.springframework.yarn.rpc.YarnRpcCallback;
  *
  */
 public class AppmasterCmTemplate extends YarnRpcAccessor<ContainerManagementProtocol> implements AppmasterCmOperations {
+
+	private final static Log log = LogFactory.getLog(AppmasterCmTemplate.class);
+
+
 
 	/** Container we're working for */
 	private final Container container;
@@ -104,11 +115,24 @@ public class AppmasterCmTemplate extends YarnRpcAccessor<ContainerManagementProt
 	}
 
 	// TODO: 210 fix user auth
-//	@Override
-//	protected UserGroupInformation getUser() {
-//		UserGroupInformation user = null;
+	@Override
+	protected UserGroupInformation getUser() {
+		UserGroupInformation user = null;
 //		try {
 //			user = UserGroupInformation.getCurrentUser();
+			InetSocketAddress rpcAddress = getRpcAddress(getConfiguration());
+
+			Token token = NMTokenCache.getNMToken(container.getNodeId().toString());
+			log.info("XXXX: from cache token="+token);
+			user = UserGroupInformation.createRemoteUser(container.getId().getApplicationAttemptId().toString());
+
+			log.info("XXXX: user=" + user);
+
+		org.apache.hadoop.security.token.Token<NMTokenIdentifier> nmToken = ConverterUtils.convertFromYarn(token,
+				rpcAddress);
+		log.info("XXXX: from nmToken="+nmToken);
+		user.addToken(nmToken);
+
 //			if (UserGroupInformation.isSecurityEnabled()) {
 //				ContainerToken containerToken = container.getContainerToken();
 //				Token<ContainerTokenIdentifier> token = null;
@@ -122,8 +146,8 @@ public class AppmasterCmTemplate extends YarnRpcAccessor<ContainerManagementProt
 //			}
 //		} catch (IOException e) {
 //		}
-//		return user;
-//	}
+		return user;
+	}
 
 	/**
 	 * Convert token identifier from a proto format.
