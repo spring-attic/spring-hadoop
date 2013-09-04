@@ -5,6 +5,17 @@ http://www.springsource.org/spring-data/hadoop
 Commit changelog: http://github.com/SpringSource/spring-hadoop/tree/v[version]
 Issues changelog: http://jira.springsource.org/secure/ReleaseNote.jspa?projectId=10801
 
+Changes in version 1.0.1 RELEASE (2013-09-04)
+---------------------------------------------
+
+General
+* Making Apache Hadoop version 1.2.1 the default version
+* Upgrading build to recent versions for CDH 4.3.1, HDP 1.3 and Hadoop 2.0.6-alpha
+* Adding Hadoop 2.1.0-beta as new version for build
+* Storing Hadoop counters and job status for MR JobTasklet [SHDP-165]
+* Changing DistributedCacheFactoryBean to use fs instead of conf for HdfsResourceLoader [SHDP-130]
+
+
 Changes in version 1.0.1 RC1 (2013-07-11)
 -----------------------------------------
 
