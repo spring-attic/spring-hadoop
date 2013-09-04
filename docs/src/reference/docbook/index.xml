@@ -61,9 +61,6 @@
   <part id="samples">
       <title>Spring for Apache Hadoop sample applications</title>
       <xi:include href="samples/introduction.xml"/>
-      <xi:include href="samples/sample-prerequisites.xml"/>
-      <xi:include href="samples/spring-wordcount.xml"/>
-      <xi:include href="samples/spring-batch-wordcount.xml"/>
   </part>
 
   <part id="resources">
