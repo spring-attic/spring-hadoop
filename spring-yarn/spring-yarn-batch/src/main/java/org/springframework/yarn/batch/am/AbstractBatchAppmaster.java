@@ -201,7 +201,7 @@ public abstract class AbstractBatchAppmaster extends AbstractEventingAppmaster i
 	}
 
 	@Override
-	public ContainerLaunchContext preLaunch(ContainerLaunchContext context) {
+	public ContainerLaunchContext preLaunch(Container container, ContainerLaunchContext context) {
 		AppmasterService service = getAppmasterService();
 
 		if(log.isDebugEnabled()) {

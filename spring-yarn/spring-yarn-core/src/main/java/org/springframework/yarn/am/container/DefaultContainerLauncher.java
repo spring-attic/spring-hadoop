@@ -30,9 +30,11 @@ import org.apache.hadoop.yarn.api.protocolrecords.StartContainerRequest;
 import org.apache.hadoop.yarn.api.protocolrecords.StartContainersRequest;
 import org.apache.hadoop.yarn.api.protocolrecords.StartContainersResponse;
 import org.apache.hadoop.yarn.api.records.Container;
+import org.apache.hadoop.yarn.api.records.ContainerId;
 import org.apache.hadoop.yarn.api.records.ContainerLaunchContext;
 import org.apache.hadoop.yarn.api.records.ContainerState;
 import org.apache.hadoop.yarn.api.records.ContainerStatus;
+import org.apache.hadoop.yarn.api.records.SerializedException;
 import org.apache.hadoop.yarn.util.ConverterUtils;
 import org.apache.hadoop.yarn.util.Records;
 import org.springframework.scheduling.Trigger;
@@ -108,19 +110,21 @@ public class DefaultContainerLauncher extends AbstractLauncher implements Contai
 		Map<String, String> env = getEnvironment();
 		env.put(YarnSystemConstants.SYARN_CONTAINER_ID, ConverterUtils.toString(container.getId()));
 		ctx.setEnvironment(env);
-		ctx = getInterceptors().preLaunch(ctx);
+		ctx = getInterceptors().preLaunch(container, ctx);
 
 		// TODO: 210 StartContainerRequest / StartContainersRequest
-		StartContainerRequest request = Records.newRecord(StartContainerRequest.class);
-		request.setContainerLaunchContext(ctx);
-		request.setContainerToken(container.getContainerToken());
+		StartContainerRequest startContainerRequest = Records.newRecord(StartContainerRequest.class);
+		startContainerRequest.setContainerLaunchContext(ctx);
+		startContainerRequest.setContainerToken(container.getContainerToken());
 
-		StartContainersRequest rr = Records.newRecord(StartContainersRequest.class);
-		ArrayList<StartContainerRequest> scrs = new ArrayList<StartContainerRequest>();
-		scrs.add(request);
-		rr.setStartContainerRequests(scrs);
+		StartContainersRequest startContainersRequest = Records.newRecord(StartContainersRequest.class);
+		ArrayList<StartContainerRequest> startContainerRequestList = new ArrayList<StartContainerRequest>();
+		startContainerRequestList.add(startContainerRequest);
+		startContainersRequest.setStartContainerRequests(startContainerRequestList);
 
-		StartContainersResponse startContainersResponse = getCmTemplate(container).startContainers(rr);
+		StartContainersResponse startContainersResponse = getCmTemplate(container).startContainers(startContainersRequest);
+		Map<ContainerId, SerializedException> failedRequests = startContainersResponse.getFailedRequests();
+		List<ContainerId> successfullyStartedContainers = startContainersResponse.getSuccessfullyStartedContainers();
 
 		// notify interested parties of new launched container
 		if(getYarnEventPublisher() != null) {

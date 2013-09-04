@@ -82,7 +82,7 @@ public abstract class AbstractProcessingAppmaster extends AbstractServicesAppmas
 	}
 
 	@Override
-	public ContainerLaunchContext preLaunch(ContainerLaunchContext context) {
+	public ContainerLaunchContext preLaunch(Container container, ContainerLaunchContext context) {
 		return context;
 	}
 
