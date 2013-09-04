@@ -76,6 +76,8 @@ public class DefaultContainerMonitor extends AbstractMonitor implements Containe
 			log.debug("Reporting container=" + container);
 		}
 		String cid = ConverterUtils.toString(container.getId());
+		allocated.add(cid);
+
 		// TODO: 210 state moved to different place
 //		synchronized (lock) {
 //			if (container.getState().equals(ContainerState.NEW)) {

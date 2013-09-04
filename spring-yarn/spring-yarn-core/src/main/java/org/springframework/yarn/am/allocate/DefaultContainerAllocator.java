@@ -87,7 +87,7 @@ public class DefaultContainerAllocator extends AbstractPollingAllocator implemen
 
 	@Override
 	public void allocateContainers(int count) {
-		if(log.isDebugEnabled()) {
+		if (log.isDebugEnabled()) {
 			log.debug("Incoming count: " + count);
 		}
 		allocateCountTracker.addContainers(count);
@@ -100,17 +100,17 @@ public class DefaultContainerAllocator extends AbstractPollingAllocator implemen
 
 	@Override
 	public void allocateContainers(ContainerAllocateData containerAllocateData) {
-		if(log.isDebugEnabled()) {
+		if (log.isDebugEnabled()) {
 			log.debug("Incoming containerAllocateData: " + containerAllocateData);
 		}
 
-		if(log.isDebugEnabled()) {
+		if (log.isDebugEnabled()) {
 			log.debug("State allocateCountTracker before adding allocation data: " + allocateCountTracker);
 		}
 
 		allocateCountTracker.addContainers(containerAllocateData);
 
-		if(log.isDebugEnabled()) {
+		if (log.isDebugEnabled()) {
 			log.debug("State allocateCountTracker after adding allocation data: " + allocateCountTracker);
 		}
 	}
@@ -146,7 +146,7 @@ public class DefaultContainerAllocator extends AbstractPollingAllocator implemen
 			release.add(element);
 		}
 
-		if(log.isDebugEnabled()) {
+		if (log.isDebugEnabled()) {
 			log.debug("Requesting containers using " + requestedContainers.size() + " requests.");
 			for (ResourceRequest resourceRequest : requestedContainers) {
 				log.debug("ResourceRequest: " + resourceRequest + " with count=" +
@@ -160,27 +160,23 @@ public class DefaultContainerAllocator extends AbstractPollingAllocator implemen
 		}
 
 		// TODO: 210 AMResponse kinda changed to AllocateResponse
-		
+
 		// build the allocation request
 		AllocateRequest request = Records.newRecord(AllocateRequest.class);
 		request.setResponseId(requestId.get());
 		// TODO: 210 app attempd id remove
 //		request.setApplicationAttemptId(getApplicationAttemptId());
-	
+
 		request.setAskList(requestedContainers);
-//		request.addAllAsks(requestedContainers);
-	
+
 		request.setReleaseList(release);
-//		request.addAllReleases(release);
 		request.setProgress(applicationProgress);
 
 		// do request and return response
 		AllocateResponse allocate = getRmTemplate().allocate(request);
-	
+
 		requestId.set(allocate.getResponseId());
-//		requestId.set(allocate.getAMResponse().getResponseId());
 		return allocate;
-//		return allocate.getAMResponse();
 	}
 
 	@Override
@@ -191,7 +187,7 @@ public class DefaultContainerAllocator extends AbstractPollingAllocator implemen
 		// processed by the listener and eventually send back
 		// to us as a released container.
 
-		if(log.isDebugEnabled()) {
+		if (log.isDebugEnabled()) {
 			log.debug("State allocateCountTracker before handling allocated container: " + allocateCountTracker);
 		}
 
@@ -206,7 +202,7 @@ public class DefaultContainerAllocator extends AbstractPollingAllocator implemen
 			}
 		}
 
-		if(log.isDebugEnabled()) {
+		if (log.isDebugEnabled()) {
 			log.debug("State allocateCountTracker after handling allocated container: " + allocateCountTracker);
 		}
 

@@ -188,7 +188,7 @@ public abstract class AbstractPollingAllocator extends AbstractAllocator {
 
 		List<ContainerStatus> containerStatuses = response.getCompletedContainersStatuses();
 		if(containerStatuses != null && containerStatuses.size() > 0) {
-			if (log.isDebugEnabled()){
+			if (log.isDebugEnabled()) {
 				log.debug("response has " + containerStatuses.size() + " completed containers");
 				for (ContainerStatus cs : containerStatuses) {
 					log.debug("completed container: " + cs.getContainerId() + " with status=" + cs);

@@ -28,6 +28,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.yarn.api.protocolrecords.StartContainerRequest;
 import org.apache.hadoop.yarn.api.protocolrecords.StartContainersRequest;
+import org.apache.hadoop.yarn.api.protocolrecords.StartContainersResponse;
 import org.apache.hadoop.yarn.api.records.Container;
 import org.apache.hadoop.yarn.api.records.ContainerLaunchContext;
 import org.apache.hadoop.yarn.api.records.ContainerState;
@@ -119,7 +120,7 @@ public class DefaultContainerLauncher extends AbstractLauncher implements Contai
 		scrs.add(request);
 		rr.setStartContainerRequests(scrs);
 
-		getCmTemplate(container).startContainers(rr);
+		StartContainersResponse startContainersResponse = getCmTemplate(container).startContainers(rr);
 
 		// notify interested parties of new launched container
 		if(getYarnEventPublisher() != null) {
