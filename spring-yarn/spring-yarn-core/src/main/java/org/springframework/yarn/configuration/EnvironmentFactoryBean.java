@@ -116,6 +116,10 @@ public class EnvironmentFactoryBean implements InitializingBean, FactoryBean<Map
 			paths.add("$" + ApplicationConstants.Environment.HADOOP_HDFS_HOME + "/share/hadoop/hdfs/lib/*");
 			paths.add("$YARN_HOME/*");
 			paths.add("$YARN_HOME/lib*");
+			//phd
+			paths.add("$HADOOP_YARN_HOME/*");
+			paths.add("$HADOOP_YARN_HOME/lib/*");
+			//vanilla
 			paths.add("$HADOOP_YARN_HOME/share/hadoop/yarn/*");
 			paths.add("$HADOOP_YARN_HOME/share/hadoop/yarn/lib*");
 		}
