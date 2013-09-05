@@ -1,10 +1,14 @@
 <partintro>
    <title>Document structure</title>
 
-   <para>The sample applications have been moved into their own repository so they
-   can be developed independently of the Spring for Apache Hadoop release cycle.
-   They can be found on github
-   <ulink url="https://github.com/SpringSource/spring-hadoop-samples">https://github.com/SpringSource/spring-hadoop-samples</ulink>.
-   Documentation and instructions for samples can be found from <emphasis>README</emphasis> files.</para>
+	<para>The sample applications have been moved into their own repository so they can be developed independently of the 
+	Spring for Apache Hadoop release cycle.  They can be found on GitHub 
+	<ulink url="https://github.com/SpringSource/spring-hadoop-samples">https://github.com/SpringSource/spring-hadoop-samples</ulink>.
+	</para>
+
+	<para>The <ulink url="https://github.com/SpringSource/spring-hadoop/wiki/Sample-Projects">wiki page</ulink> for the Spring for Apache Hadoop 
+	project has more documentation for building and running the examples and there is also some instructions in the <emphasis>README</emphasis> 
+	file of each example.
+	</para>
 
 </partintro>
