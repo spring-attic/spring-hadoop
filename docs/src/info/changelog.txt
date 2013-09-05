@@ -5,14 +5,32 @@ http://www.springsource.org/spring-data/hadoop
 Commit changelog: http://github.com/SpringSource/spring-hadoop/tree/v[version]
 Issues changelog: http://jira.springsource.org/secure/ReleaseNote.jspa?projectId=10801
 
-Changes in version 1.0.1 RC1 (2013-07-11)
+Changes in version 2.0.0 M1 (2013-09-05)
 -----------------------------------------
 
+Project Organization
+* We have broken the project code into separate sub-projects:
+  - spring-hadoop-core - Core M/R, FSShell, Hive, Pig etc. and basic configuration
+  - spring-hadoop-config - namespace support
+  - spring-hadoop-batch - Batch is separate with separate namespace
+  - spring-cascading - Cascading also separate with separate namespace
+  - spring-hadoop-test - Test sub-project for integration testing
+  - spring-yarn - New features for YARN applications (active for Apache Hadoop v2 based builds)
+
 General
-* Adding support to test against Hadoop version 1.1.2
-* Adding initial support for Hadoop alpha version 2.0.3
+* Adding support for running with Hadoop version 2
+* Making Apache Hadoop version 1.2.1 the default version
+* Upgrading build to recent versions for CDH 4.3.1, HDP 1.3 and Hadoop 2.0.6-alpha
 * Adding Pivotal HD 1.0 as a supported distribution
 
+Core
+* Changing DistributedCacheFactoryBean to use fs instead of conf for HdfsResourceLoader [SHDP-130]
+
+Batch
+* Storing Hadoop counters and job status for MR JobTasklet [SHDP-165]
+
+YARN
+* Adding support for YARN applications with Hadoop version 2
 
 Changes in version 1.0 GA (2013-02-26)
 --------------------------------------
