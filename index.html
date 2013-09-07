@@ -1,0 +1,89 @@
+---
+# The name of your project
+title: Spring for Apache Hadoop
+
+badges:
+
+  # Specify your project's twitter handle, if any. Delete if none.
+  twitter: SpringData
+
+  # Customize your project's badges. Delete any entries that do not apply.
+  custom:
+    - name: Source (GitHub)
+      url:  https://github.com/spring-projects/spring-hadoop
+      icon: github
+
+    - name: Issues (JIRA)
+      url:  https://jira.springsource.org/browse/SHDP
+      icon: tracking
+
+    - name: CI (Bamboo)
+      url:  https://build.springsource.org/browse/SPRINGDATA-DATAHADOOP
+      icon: ci
+
+    - name: Forum
+      url:  http://forum.spring.io/forum/spring-projects/data
+      icon: forum
+
+    - name: StackOverflow
+      url:  http://stackoverflow.com/questions/tagged/spring+hadoop
+      icon: stackoverflow
+
+ 
+
+---
+<!DOCTYPE HTML>
+<html lang="en-US">
+
+<!-- Specify the parent of this project (or delete if none) to influence the rendering of the breadcrumb -->
+{% capture parent_link %}
+[Spring Data]({{ site.projects_site_url }}/spring-data)
+{% endcapture %}
+
+
+{% capture billboard_description %}
+
+Simplifies Apache Hadoop by providing a unified configuration model and easy to use APIs for using HDFS, MapReduce, Pig, and Hive. Also provides integration with other Spring ecosystem project such as Spring Integration and Spring Batch.
+
+{% endcapture %}
+
+{% capture main_content %}
+
+## Introduction 
+Spring for Apache Hadoop simplifies developing Apache Hadoop by providing a unified configuration model and easy to use APIs for using HDFS, MapReduce, Pig, and Hive. It also provides integration with other Spring ecosystem project such as Spring Integration and Spring Batch enabling you to develop solutions for big data ingest/export and Hadoop workflow orchestration.
+
+Check out the new book from O'Reilly Media [Spring Data: Modern Data Access for Enterprise Java](http://shop.oreilly.com/product/0636920024767.do#) that contains several chapters on using Spring for Apache Hadoop. Sample code for the book is also available on github [here](https://github.com/SpringSource/spring-data-book).
+
+
+## Features
+
+* Support to create Hadoop applications that are configured using Dependency Injection and run as standard Java applications vs. using Hadoop command line utilities.
+* Create and configure applications that use Java MapReduce, Streaming, Hive, Pig, Cascading, or HBase
+* Extensions to Spring Batch to support creating Hadoop based workflows for any type of Hadoop Job or HDFS operation.
+* Script HDFS operations using any JVM based scripting language
+* DAO support (Template & Callbacks) for HBase
+* Cascading Taps for Spring & Spring Integration
+* Support for Hadoop Security
+
+<span id="quick-start"></span>
+## Quick Start
+
+{% include download_widget.md %}
+
+
+
+{% endcapture %}
+
+{% capture related_resources %}
+
+### Sample Projects
+
+* [Spring for Hadoop Samples](https://github.com/SpringSource/spring-hadoop-samples)
+
+
+
+{% endcapture %}
+
+
+{% include project_page.html %}
+</html>
