@@ -1438,8 +1438,8 @@ public void testServiceInterfaces() throws Exception {
 	
 <yarn-int:amservice-client
   service-impl="org.springframework.yarn.integration.ip.mind.DefaultMindAppmasterServiceClient"
-  host="${syarn.amservice.host}"
-  port="${syarn.amservice.port}"/>
+  host="${SHDP_AMSERVICE_HOST}"
+  port="${SHDP_AMSERVICE_PORT}"/>
 ]]></programlisting>
 
     <para>If there is a need to manually configure the server
@@ -1455,7 +1455,7 @@ public void testServiceInterfaces() throws Exception {
 <ip:tcp-connection-factory id="clientConnectionFactory"
   type="client"
   host="localhost"
-  port="${syarn.amservice.port}"
+  port="${SHDP_AMSERVICE_PORT}"
   serializer="serializer"
   deserializer="deserializer"/>
 
@@ -1785,8 +1785,8 @@ public void testServiceInterfaces() throws Exception {
 
         <programlisting language="xml"><![CDATA[<yarn-int:amservice-client
   service-impl="org.springframework.yarn.integration.ip.mind.DefaultMindAppmasterServiceClient"
-  host="${syarn.amservice.host}"
-  port="${syarn.amservice.port}" />]]></programlisting>
+  host="${SHDP_AMSERVICE_HOST}"
+  port="${SHDP_AMSERVICE_PORT}" />]]></programlisting>
 	  
         <para>Remote step is just like any other step.</para>
 

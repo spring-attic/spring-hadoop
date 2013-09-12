@@ -484,7 +484,7 @@ configure(rootProject) {
 
 	task schemaZip(type: Zip) {
 		group = "Distribution"
-		baseName = "spring-framework"
+		baseName = "spring-data-hadoop"
 		classifier = "schema"
 		description = "Builds -${classifier} archive containing all " +
 			"XSDs for deployment at http://springframework.org/schema."
@@ -512,7 +512,7 @@ configure(rootProject) {
 
 	task distZip(type: Zip, dependsOn: [docsZip, schemaZip]) {
 		group = "Distribution"
-		baseName = "spring-framework"
+		baseName = "spring-data-hadoop"
 		classifier = "dist"
 		description = "Builds -${classifier} archive, containing all jars and docs, " +
 					"suitable for community download page."
