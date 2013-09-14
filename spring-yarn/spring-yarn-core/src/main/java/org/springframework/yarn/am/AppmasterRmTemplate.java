@@ -25,7 +25,6 @@ import org.apache.hadoop.security.SecurityUtil;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.security.token.Token;
 import org.apache.hadoop.security.token.TokenIdentifier;
-import org.apache.hadoop.yarn.api.ApplicationConstants;
 import org.apache.hadoop.yarn.api.ApplicationMasterProtocol;
 import org.apache.hadoop.yarn.api.protocolrecords.AllocateRequest;
 import org.apache.hadoop.yarn.api.protocolrecords.AllocateResponse;
@@ -33,7 +32,6 @@ import org.apache.hadoop.yarn.api.protocolrecords.FinishApplicationMasterRequest
 import org.apache.hadoop.yarn.api.protocolrecords.FinishApplicationMasterResponse;
 import org.apache.hadoop.yarn.api.protocolrecords.RegisterApplicationMasterRequest;
 import org.apache.hadoop.yarn.api.protocolrecords.RegisterApplicationMasterResponse;
-import org.apache.hadoop.yarn.api.records.ApplicationAttemptId;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.apache.hadoop.yarn.exceptions.YarnException;
 import org.apache.hadoop.yarn.security.AMRMTokenIdentifier;
@@ -49,25 +47,29 @@ import org.springframework.yarn.rpc.YarnRpcCallback;
  * @author Janne Valkealahti
  *
  */
-public class AppmasterRmTemplate extends YarnRpcAccessor<ApplicationMasterProtocol> implements AppmasterRmOperations {
+public class AppmasterRmTemplate extends YarnRpcAccessor<ApplicationMasterProtocol>
+		implements AppmasterRmOperations {
 
 	private static final Log log = LogFactory.getLog(AppmasterCmTemplate.class);
 
+	/**
+	 * Instantiates a new AppmasterRmTemplate.
+	 *
+	 * @param config the hadoop configuration
+	 */
 	public AppmasterRmTemplate(Configuration config) {
 		super(ApplicationMasterProtocol.class, config);
 	}
 
 	@Override
-	public RegisterApplicationMasterResponse registerApplicationMaster(final ApplicationAttemptId appAttemptId,
-			final String host, final Integer rpcPort, final String trackUrl) {
+	public RegisterApplicationMasterResponse registerApplicationMaster(final String host,
+			final Integer rpcPort, final String trackUrl) {
 		return execute(new YarnRpcCallback<RegisterApplicationMasterResponse, ApplicationMasterProtocol>() {
 			@Override
 			public RegisterApplicationMasterResponse doInYarn(ApplicationMasterProtocol proxy) throws YarnException,
 					IOException {
 				RegisterApplicationMasterRequest appMasterRequest = Records
 						.newRecord(RegisterApplicationMasterRequest.class);
-				// TODO: 210 setApplicationAttemptId removed
-				// appMasterRequest.setApplicationAttemptId(appAttemptId);
 				appMasterRequest.setHost(host != null ? host : "");
 				appMasterRequest.setRpcPort(rpcPort != null ? rpcPort : 0);
 				appMasterRequest.setTrackingUrl(trackUrl != null ? trackUrl : "");
@@ -101,35 +103,6 @@ public class AppmasterRmTemplate extends YarnRpcAccessor<ApplicationMasterProtoc
 	protected InetSocketAddress getRpcAddress(Configuration config) {
 		InetSocketAddress addr = config.getSocketAddr(YarnConfiguration.RM_SCHEDULER_ADDRESS,
 				YarnConfiguration.DEFAULT_RM_SCHEDULER_ADDRESS, YarnConfiguration.DEFAULT_RM_SCHEDULER_PORT);
-
-		UserGroupInformation currentUser;
-		try {
-			currentUser = UserGroupInformation.getCurrentUser();
-		} catch (IOException e) {
-			log.error("Error getting current user", e);
-//			throw new YarnException(e);
-		}
-
-		log.info("XXXX: UserGroupInformation.isSecurityEnabled() = " + UserGroupInformation.isSecurityEnabled());
-
-		// TODO: 210 APPLICATION_MASTER_TOKEN_ENV_NAME removed
-//		if (UserGroupInformation.isSecurityEnabled()) {
-//			String tokenURLEncodedStr = System.getenv().get(
-//				ApplicationConstants.APPLICATION_MASTER_TOKEN_ENV_NAME);
-//			Token<? extends TokenIdentifier> token = new Token<TokenIdentifier>();
-//
-//			try {
-//			token.decodeFromUrlString(tokenURLEncodedStr);
-//			} catch (IOException e) {
-//			throw new YarnException(e);
-//			}
-//
-//			SecurityUtil.setTokenService(token, addr);
-//			if (log.isDebugEnabled()) {
-//				log.debug("AppMasterToken is " + token);
-//			}
-//			currentUser.addToken(token);
-//		}
 		try {
 			setupTokens(addr);
 		} catch (IOException e) {

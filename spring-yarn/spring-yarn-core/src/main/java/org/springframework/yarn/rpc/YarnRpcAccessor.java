@@ -21,7 +21,6 @@ import java.security.PrivilegedAction;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.ipc.RPC;
-import org.apache.hadoop.ipc.RemoteException;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.yarn.exceptions.YarnException;
 import org.apache.hadoop.yarn.exceptions.YarnRuntimeException;
@@ -137,38 +136,25 @@ public abstract class YarnRpcAccessor<P> implements InitializingBean, Disposable
 	 */
 	@SuppressWarnings("unchecked")
 	protected P createProxy() throws IOException {
-		final YarnRPC rpc = YarnRPC.create(configuration);
-		UserGroupInformation user = getUser();
-		if (user != null) {
-			return user.doAs(new PrivilegedAction<P>() {
-				@Override
-				public P run() {
-					return (P) rpc.getProxy(protocolClazz, address, configuration);
-				}
-			});
-		} else {
-
-//			return UserGroupInformation.getCurrentUser().doAs(new PrivilegedAction<P>() {
-//				@Override
-//				public P run() {
-//					return (P) YarnRPC.create(configuration).getProxy(protocolClazz, address, configuration);
-//				}
-//			});
-
-			return (P) rpc.getProxy(protocolClazz, address, configuration);
-		}
+		return getUser().doAs(new PrivilegedAction<P>() {
+			@Override
+			public P run() {
+				return (P) YarnRPC.create(configuration).getProxy(protocolClazz, address, configuration);
+			}
+		});
 	}
 
 	/**
 	 * Gets the {@link UserGroupInformation user} used to
-	 * create the proxy. Default implementation returns {@code null}
-	 * which means no security is used.
+	 * create the proxy. Default implementation delegates into
+	 * {@link UserGroupInformation#getCurrentUser()}.
 	 *
 	 * @return the user
+	 * @throws IOException if login fails
 	 * @see #createProxy()
 	 */
-	protected UserGroupInformation getUser() {
-		return null;
+	protected UserGroupInformation getUser() throws IOException {
+		return UserGroupInformation.getCurrentUser();
 	}
 
 	/**

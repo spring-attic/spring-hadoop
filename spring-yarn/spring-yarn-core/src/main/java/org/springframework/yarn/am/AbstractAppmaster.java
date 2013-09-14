@@ -349,7 +349,7 @@ public abstract class AbstractAppmaster extends LifecycleObjectSupport {
 				" trackUrl=" + trackUrl + " rpcHost=" + rpcHost + " rpcPort=" + rpcPort);
 
 		RegisterApplicationMasterResponse response =
-				rmTemplate.registerApplicationMaster(applicationAttemptId, rpcHost, rpcPort, trackUrl);
+				rmTemplate.registerApplicationMaster(rpcHost, rpcPort, trackUrl);
 		applicationRegistered = true;
 		return response;
 	}
