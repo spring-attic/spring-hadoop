@@ -81,9 +81,6 @@ public abstract class AbstractYarnClient implements YarnClient, InitializingBean
 	/** Name of the application */
 	private String appName = "";
 
-	/** User of the application */
-	private String user;
-
 	/** Base path for app staging directory */
 	private String stagingDirPath;
 
@@ -266,15 +263,6 @@ public abstract class AbstractYarnClient implements YarnClient, InitializingBean
 	}
 
 	/**
-	 * Sets the user.
-	 *
-	 * @param user the new user
-	 */
-	public void setUser(String user) {
-		this.user = user;
-	}
-
-	/**
 	 * Sets the staging dir path.
 	 *
 	 * @param stagingDirPath the new staging dir path
@@ -321,10 +309,6 @@ public abstract class AbstractYarnClient implements YarnClient, InitializingBean
 		ResourceCompat.setVirtualCores(capability, virtualcores);
 		context.setResource(capability);
 
-		// TODO: 210 user removed
-//		if(user != null) {
-//			context.setUser(user);
-//		}
 		Priority record = Records.newRecord(Priority.class);
 		record.setPriority(priority);
 		context.setPriority(record);
@@ -342,26 +326,20 @@ public abstract class AbstractYarnClient implements YarnClient, InitializingBean
 		context.setLocalResources(resourceLocalizer.getResources());
 		context.setEnvironment(getEnvironment());
 		context.setCommands(commands);
-//		Resource capability = Records.newRecord(Resource.class);
-//		capability.setMemory(memory);
-//		ResourceCompat.setVirtualCores(capability, virtualcores);
-		// TODO: 210 resource removed
-//		context.setResource(capability);
 
-		// TODO: 210 fix user stuff
-//		try {
-//			// TODO: this still looks a bit dodgy!!
-//			if (UserGroupInformation.isSecurityEnabled()) {
-//				Credentials credentials = new Credentials();
-//				final FileSystem fs = FileSystem.get(configuration);
-//				fs.addDelegationTokens(YarnUtils.getPrincipal(configuration), credentials);
-//				DataOutputBuffer dob = new DataOutputBuffer();
-//				credentials.writeTokenStorageToStream(dob);
-//				ByteBuffer containerToken  = ByteBuffer.wrap(dob.getData(), 0, dob.getLength());
-//				context.setContainerTokens(containerToken);
-//			}
-//		} catch (IOException e) {
-//		}
+		try {
+			// TODO: this still looks a bit dodgy!!
+			if (UserGroupInformation.isSecurityEnabled()) {
+				Credentials credentials = new Credentials();
+				final FileSystem fs = FileSystem.get(configuration);
+				fs.addDelegationTokens(YarnUtils.getPrincipal(configuration), credentials);
+				DataOutputBuffer dob = new DataOutputBuffer();
+				credentials.writeTokenStorageToStream(dob);
+				ByteBuffer containerToken  = ByteBuffer.wrap(dob.getData(), 0, dob.getLength());
+				context.setTokens(containerToken);
+			}
+		} catch (IOException e) {
+		}
 
 		return context;
 	}
