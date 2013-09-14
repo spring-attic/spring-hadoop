@@ -17,7 +17,7 @@
 	<yarn:localresources/>
 
 	<yarn:environment>
-		AM_CONTAINER_ID=container_1360089121174_0011_01_000001
+		CONTAINER_ID=container_1360089121174_0011_01_000001
 	</yarn:environment>
 
 	<yarn:master>

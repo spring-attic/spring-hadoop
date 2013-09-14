@@ -88,8 +88,6 @@ public class YarnUtils {
 	 * @return the {@link ApplicationAttemptId}
 	 */
 	public static ApplicationAttemptId getApplicationAttemptId(Map<String, String> environment) {
-		// TODO: 210 check container id env access
-//		String amContainerId = environment.get(ApplicationConstants.AM_CONTAINER_ID_ENV);
 		String amContainerId = environment.get(ApplicationConstants.Environment.CONTAINER_ID.name());
 		Assert.notNull(amContainerId, "CONTAINER_ID env variable has to exist to build appAttemptId");
 		ContainerId containerId = ConverterUtils.toContainerId(amContainerId);
