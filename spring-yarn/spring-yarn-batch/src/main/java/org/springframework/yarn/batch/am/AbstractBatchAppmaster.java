@@ -34,7 +34,6 @@ import org.apache.hadoop.yarn.api.records.ContainerId;
 import org.apache.hadoop.yarn.api.records.ContainerLaunchContext;
 import org.apache.hadoop.yarn.api.records.ContainerStatus;
 import org.apache.hadoop.yarn.api.records.FinalApplicationStatus;
-import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.apache.hadoop.yarn.util.RackResolver;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
@@ -208,9 +207,7 @@ public abstract class AbstractBatchAppmaster extends AbstractEventingAppmaster i
 			log.debug("Intercept launch context: " + context);
 		}
 
-		// TODO: 210 container not in context anymore
-		StepExecution stepExecution = null;
-//		StepExecution stepExecution = containerToStepMap.get(context.getContainerId());
+		StepExecution stepExecution = containerToStepMap.get(container.getId());
 		String jobName = remoteStepNames.get(stepExecution);
 
 		if(service != null) {
