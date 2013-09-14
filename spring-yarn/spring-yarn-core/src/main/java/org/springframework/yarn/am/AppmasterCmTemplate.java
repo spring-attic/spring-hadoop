@@ -19,8 +19,6 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.net.NetUtils;
 import org.apache.hadoop.security.UserGroupInformation;
@@ -44,7 +42,7 @@ import org.springframework.yarn.rpc.YarnRpcCallback;
 
 /**
  * Template implementation for {@link AppmasterCmOperations} wrapping
- * communication using {@link ContainerManager}. Methods for this
+ * communication using {@link ContainerManagementProtocol}. Methods for this
  * template wraps possible exceptions into Spring Dao exception hierarchy.
  *
  * @author Janne Valkealahti
@@ -52,13 +50,15 @@ import org.springframework.yarn.rpc.YarnRpcCallback;
  */
 public class AppmasterCmTemplate extends YarnRpcAccessor<ContainerManagementProtocol> implements AppmasterCmOperations {
 
-	private final static Log log = LogFactory.getLog(AppmasterCmTemplate.class);
-
-
-
 	/** Container we're working for */
 	private final Container container;
 
+	/**
+	 * Instantiates a new AppmasterCmTemplate.
+	 *
+	 * @param config the hadoop configation
+	 * @param container the {@link Container}
+	 */
 	public AppmasterCmTemplate(Configuration config, Container container) {
 		super(ContainerManagementProtocol.class, config);
 		this.container = container;
@@ -83,10 +83,7 @@ public class AppmasterCmTemplate extends YarnRpcAccessor<ContainerManagementProt
 				ArrayList<ContainerId> ids = new ArrayList<ContainerId>();
 				ids.add(container.getId());
 				request.setContainerIds(ids);
-				// TODO: 210 now using list
 				return proxy.stopContainers(request);
-//				request.setContainerId(container.getId());
-//				return proxy.stopContainer(request);
 			}
 		});
 	}
@@ -100,10 +97,7 @@ public class AppmasterCmTemplate extends YarnRpcAccessor<ContainerManagementProt
 				ArrayList<ContainerId> ids = new ArrayList<ContainerId>();
 				ids.add(container.getId());
 				request.setContainerIds(ids);
-				// TODO: 210 now using list
 				return proxy.getContainerStatuses(request).getContainerStatuses().get(0);
-//				request.setContainerId(container.getId());
-//				return proxy.getContainerStatuses(request).getStatus();
 			}
 		});
 	}
@@ -114,61 +108,21 @@ public class AppmasterCmTemplate extends YarnRpcAccessor<ContainerManagementProt
 		return NetUtils.createSocketAddr(cmIpPortStr);
 	}
 
-	// TODO: 210 fix user auth
 	@Override
 	protected UserGroupInformation getUser() {
-		UserGroupInformation user = null;
-//		try {
-//			user = UserGroupInformation.getCurrentUser();
-			InetSocketAddress rpcAddress = getRpcAddress(getConfiguration());
+		InetSocketAddress rpcAddress = getRpcAddress(getConfiguration());
 
-			Token token = NMTokenCache.getNMToken(container.getNodeId().toString());
-			log.info("XXXX: from cache token="+token);
-			user = UserGroupInformation.createRemoteUser(container.getId().getApplicationAttemptId().toString());
+		// TODO: at some point remove static cache
+		Token token = NMTokenCache.getNMToken(container.getNodeId().toString());
 
-			log.info("XXXX: user=" + user);
-
-		org.apache.hadoop.security.token.Token<NMTokenIdentifier> nmToken = ConverterUtils.convertFromYarn(token,
-				rpcAddress);
-		log.info("XXXX: from nmToken="+nmToken);
+		// this is what node manager requires for auth
+		UserGroupInformation user =
+				UserGroupInformation.createRemoteUser(container.getId().getApplicationAttemptId().toString());
+		org.apache.hadoop.security.token.Token<NMTokenIdentifier> nmToken =
+				ConverterUtils.convertFromYarn(token, rpcAddress);
 		user.addToken(nmToken);
 
-//			if (UserGroupInformation.isSecurityEnabled()) {
-//				ContainerToken containerToken = container.getContainerToken();
-//				Token<ContainerTokenIdentifier> token = null;
-//				if (containerToken instanceof DelegationToken) {
-//					token = convertFromProtoFormat((DelegationToken) container.getContainerToken(),
-//							getRpcAddress(getConfiguration()));
-//				}
-//				// remote user needs to be a container id
-//				user = UserGroupInformation.createRemoteUser(container.getId().toString());
-//				user.addToken(token);
-//			}
-//		} catch (IOException e) {
-//		}
 		return user;
 	}
-
-	/**
-	 * Convert token identifier from a proto format.
-	 * <p>
-	 * This function is a copy for way it was pre hadoop-2.0.3. Helps
-	 * to work with api changes.
-	 *
-	 * @param <T> the generic type
-	 * @param protoToken the proto token
-	 * @param serviceAddr the service addr
-	 * @return the token identifier
-	 */
-//	private static <T extends TokenIdentifier> Token<T> convertFromProtoFormat(DelegationToken protoToken,
-//			InetSocketAddress serviceAddr) {
-//		// TODO: remove this method when api's are compatible
-//		Token<T> token = new Token<T>(protoToken.getIdentifier().array(), protoToken.getPassword().array(),
-//				new Text(protoToken.getKind()), new Text(protoToken.getService()));
-//		if (serviceAddr != null) {
-//			SecurityUtil.setTokenService(token, serviceAddr);
-//		}
-//		return token;
-//	}
 
 }
