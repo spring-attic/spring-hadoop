@@ -17,16 +17,23 @@ package org.springframework.yarn.client;
 
 import static org.junit.Assert.assertNotNull;
 
+import java.io.IOException;
 import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.apache.hadoop.yarn.api.ApplicationClientProtocol;
+import org.apache.hadoop.yarn.api.protocolrecords.GetApplicationsRequest;
+import org.apache.hadoop.yarn.api.protocolrecords.GetApplicationsResponse;
 import org.apache.hadoop.yarn.api.protocolrecords.GetNewApplicationResponse;
 import org.apache.hadoop.yarn.api.records.ApplicationReport;
+import org.apache.hadoop.yarn.exceptions.YarnException;
+import org.apache.hadoop.yarn.util.Records;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.yarn.rpc.YarnRpcCallback;
 
 /**
  * Tests for {@link ClientRmTemplate}.
@@ -55,18 +62,17 @@ public class ClientRmTemplateTests {
 		assertNotNull(applications);
 	}
 
-	// TODO: 210 disabled test
-//	@Test
-//	public void testExecuteCallback() {
-//		List<ApplicationReport> applications = template.execute(new YarnRpcCallback<List<ApplicationReport>, ClientRMProtocol>() {
-//			@Override
-//			public List<ApplicationReport> doInYarn(ClientRMProtocol proxy) throws YarnRemoteException {
-//				GetAllApplicationsRequest request = Records.newRecord(GetAllApplicationsRequest.class);
-//				GetAllApplicationsResponse response = proxy.getAllApplications(request);
-//				return response.getApplicationList();
-//			}
-//		});
-//		assertNotNull(applications);
-//	}
+	@Test
+	public void testExecuteCallback() {
+		List<ApplicationReport> applications = template.execute(new YarnRpcCallback<List<ApplicationReport>, ApplicationClientProtocol>() {
+			@Override
+			public List<ApplicationReport> doInYarn(ApplicationClientProtocol proxy) throws YarnException, IOException {
+				GetApplicationsRequest request = Records.newRecord(GetApplicationsRequest.class);
+				GetApplicationsResponse response = proxy.getApplications(request);
+				return response.getApplicationList();
+			}
+		});
+		assertNotNull(applications);
+	}
 
 }

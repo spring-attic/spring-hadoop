@@ -106,8 +106,7 @@ public class ClientRmTemplate extends YarnRpcAccessor<ApplicationClientProtocol>
 			}
 		});
 	}
-	
-	// TODO: 210 DelegationToken changed to Token
+
 	@Override
 	public Token getDelegationToken(final String renewer) {
 		return execute(new YarnRpcCallback<Token, ApplicationClientProtocol>() {
@@ -119,7 +118,7 @@ public class ClientRmTemplate extends YarnRpcAccessor<ApplicationClientProtocol>
 			}
 		});
 	}
-	
+
 	@Override
 	public ApplicationReport getApplicationReport(final ApplicationId applicationId) {
 		return execute(new YarnRpcCallback<ApplicationReport, ApplicationClientProtocol>() {
@@ -129,7 +128,7 @@ public class ClientRmTemplate extends YarnRpcAccessor<ApplicationClientProtocol>
 				request.setApplicationId(applicationId);
 				return proxy.getApplicationReport(request).getApplicationReport();
 			}
-		});		
+		});
 	}
 
 	@Override
