@@ -159,22 +159,15 @@ public class DefaultContainerAllocator extends AbstractPollingAllocator implemen
 			log.debug("Request id will be: " + requestId.get());
 		}
 
-		// TODO: 210 AMResponse kinda changed to AllocateResponse
-
 		// build the allocation request
 		AllocateRequest request = Records.newRecord(AllocateRequest.class);
 		request.setResponseId(requestId.get());
-		// TODO: 210 app attempd id remove
-//		request.setApplicationAttemptId(getApplicationAttemptId());
-
 		request.setAskList(requestedContainers);
-
 		request.setReleaseList(release);
 		request.setProgress(applicationProgress);
 
 		// do request and return response
 		AllocateResponse allocate = getRmTemplate().allocate(request);
-
 		requestId.set(allocate.getResponseId());
 		return allocate;
 	}
@@ -338,9 +331,7 @@ public class DefaultContainerAllocator extends AbstractPollingAllocator implemen
 	 */
 	private ResourceRequest getContainerResourceRequest(int numContainers, String hostName) {
 		ResourceRequest request = Records.newRecord(ResourceRequest.class);
-		// TODO: 210 hostname to resourcename
 		request.setResourceName(hostName);
-//		request.setHostName(hostName);
 		request.setNumContainers(numContainers);
 		Priority pri = Records.newRecord(Priority.class);
 		pri.setPriority(priority);

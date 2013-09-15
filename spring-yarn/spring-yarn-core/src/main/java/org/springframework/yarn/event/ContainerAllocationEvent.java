@@ -51,11 +51,8 @@ public class ContainerAllocationEvent extends AbstractYarnEvent {
 
 	@Override
 	public String toString() {
-		// TODO: 210 state status removed
 		return "ContainerAllocationEvent [containerId=" + container.getId()
 				+ ", nodeId=" + container.getNodeId()
-//				+ ", containerState=" + container.getState()
-//				+ ", containerStatus=" + container.getContainerStatus()
 				+ ", containerToken=" + container.getContainerToken()
 				+ "]";
 	}

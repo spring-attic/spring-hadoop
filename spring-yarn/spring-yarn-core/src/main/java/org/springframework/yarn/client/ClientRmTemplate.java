@@ -43,7 +43,7 @@ import org.springframework.yarn.rpc.YarnRpcCallback;
 
 /**
  * Template implementation for {@link ClientRmOperations} wrapping
- * communication using {@link ClientRMProtocol}. Methods for this
+ * communication using {@link ApplicationClientProtocol}. Methods for this
  * template wraps possible exceptions into Spring Dao exception hierarchy.
  *
  * @author Janne Valkealahti

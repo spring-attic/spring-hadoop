@@ -40,7 +40,6 @@ public class DefaultContainerMonitorTests {
 	@Test
 	public void testInitialStatus() throws Exception {
 		DefaultContainerMonitor monitor = new DefaultContainerMonitor();
-//		assertMonitorState(monitor, false, false, false);
 		assertMonitorState(monitor, 0, 0, 0, 0);
 	}
 
@@ -51,7 +50,7 @@ public class DefaultContainerMonitorTests {
 		ApplicationAttemptId applicationAttemptId = getMockApplicationAttemptId(1, 1);
 
 		ContainerId containerId1 = getMockContainerId(applicationAttemptId, 1);
-		Container container1 = getMockContainer(containerId1, null, null, null, ContainerState.NEW);
+		Container container1 = getMockContainer(containerId1, null, null, null);
 
 		// container 1
 		// failed free running
@@ -70,9 +69,9 @@ public class DefaultContainerMonitorTests {
 		ApplicationAttemptId applicationAttemptId = getMockApplicationAttemptId(1, 1);
 
 		ContainerId containerId1 = getMockContainerId(applicationAttemptId, 1);
-		Container container1 = getMockContainer(containerId1, null, null, null, ContainerState.NEW);
+		Container container1 = getMockContainer(containerId1, null, null, null);
 		ContainerId containerId2 = getMockContainerId(applicationAttemptId, 2);
-		Container container2 = getMockContainer(containerId2, null, null, null, ContainerState.NEW);
+		Container container2 = getMockContainer(containerId2, null, null, null);
 
 		// container 1
 		// failed free running
@@ -97,9 +96,9 @@ public class DefaultContainerMonitorTests {
 		ApplicationAttemptId applicationAttemptId = getMockApplicationAttemptId(1, 1);
 
 		ContainerId containerId1 = getMockContainerId(applicationAttemptId, 1);
-		Container container1 = getMockContainer(containerId1, null, null, null, ContainerState.NEW);
+		Container container1 = getMockContainer(containerId1, null, null, null);
 		ContainerId containerId2 = getMockContainerId(applicationAttemptId, 2);
-		Container container2 = getMockContainer(containerId2, null, null, null, ContainerState.NEW);
+		Container container2 = getMockContainer(containerId2, null, null, null);
 		ContainerId containerId3 = getMockContainerId(applicationAttemptId, 3);
 		//Container container3 = getMockContainer(containerId3, null, null, null, ContainerState.NEW);
 
@@ -173,14 +172,12 @@ public class DefaultContainerMonitorTests {
 	 * @return mocked {@link Container}
 	 */
 	public static Container getMockContainer(ContainerId containerId, NodeId nodeId, Resource resource,
-			Priority priority, ContainerState state) {
+			Priority priority) {
 		Container container = mock(Container.class);
 		when(container.getId()).thenReturn(containerId);
 		when(container.getNodeId()).thenReturn(nodeId);
 		when(container.getResource()).thenReturn(resource);
 		when(container.getPriority()).thenReturn(priority);
-		// TODO: 210 state removed / moved
-//		when(container.getState()).thenReturn(state);
 		return container;
 	}
 

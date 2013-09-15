@@ -96,10 +96,6 @@ public class DefaultContainerLauncher extends AbstractLauncher implements Contai
 		}
 
 		ContainerLaunchContext ctx = Records.newRecord(ContainerLaunchContext.class);
-		// TODO: 210 stuff moved place
-//		ctx.setContainerId(container.getId());
-//		ctx.setResource(container.getResource());
-//		ctx.setUser(getUsername());
 		String stagingId = Integer.toString(container.getId().getApplicationAttemptId().getApplicationId().getId());
 		getResourceLocalizer().setStagingId(stagingId);
 		ctx.setLocalResources(getResourceLocalizer().getResources());
@@ -112,7 +108,6 @@ public class DefaultContainerLauncher extends AbstractLauncher implements Contai
 		ctx.setEnvironment(env);
 		ctx = getInterceptors().preLaunch(container, ctx);
 
-		// TODO: 210 StartContainerRequest / StartContainersRequest
 		StartContainerRequest startContainerRequest = Records.newRecord(StartContainerRequest.class);
 		startContainerRequest.setContainerLaunchContext(ctx);
 		startContainerRequest.setContainerToken(container.getContainerToken());
@@ -125,6 +120,7 @@ public class DefaultContainerLauncher extends AbstractLauncher implements Contai
 		StartContainersResponse startContainersResponse = getCmTemplate(container).startContainers(startContainersRequest);
 		Map<ContainerId, SerializedException> failedRequests = startContainersResponse.getFailedRequests();
 		List<ContainerId> successfullyStartedContainers = startContainersResponse.getSuccessfullyStartedContainers();
+		// TODO: handle failed/success
 
 		// notify interested parties of new launched container
 		if(getYarnEventPublisher() != null) {
