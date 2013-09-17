@@ -33,11 +33,16 @@ def yarnProjects() {
 	subprojects.findAll { project -> project.name.contains('-yarn-') }
 }
 
-// 
-//  Select the Hadoop distribution used for building the binaries
-// 
-def List hadoop = []
+//
+// Select the Spring version used for building and testing
+//
+def springVersion = project.hasProperty("spring4") ? spring4Version : spring3Version
+println "Using Spring Framework version: [$springVersion]"
 
+//
+//  Select the Hadoop distribution used for building the binaries
+//
+def List hadoop = []
 def hadoopDefault = "hadoop12"
 def hadoopDistro = project.hasProperty("distro") ? project.getProperty("distro") : hadoopDefault
 def hadoopVersion = hd12Version

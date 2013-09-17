@@ -41,7 +41,7 @@
 	<bean id="no-wait" class="org.springframework.data.hadoop.mapreduce.JobRunner" depends-on="script">
 		<property name="jobs">
 			<list>
-				<ref local="ns-job"/>
+				<ref bean="ns-job"/>
 				<hdp:job id="nested-job" 
 	   	input-path="/ide-test/input/word/" output-path="/ide-test/runner/output-2/"
 		mapper="org.apache.hadoop.examples.WordCount.TokenizerMapper"
