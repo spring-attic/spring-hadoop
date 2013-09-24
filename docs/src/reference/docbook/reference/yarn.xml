@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter xmlns="http://docbook.org/ns/docbook" version="5.0"  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" xml:id="yarn">
   
-  <title>Yarn Support</title>
+  <title>YARN Support</title>
 
-  <para>You've propbably seen a lot of topics around Yarn and next version of
+  <para>You've propbably seen a lot of topics around YARN and next version of
   Hadoop's Map Reduce called <emphasis>MapReduce Version 2</emphasis>.
-  Originally Yarn was a component of MapReduce itself created to overcome
+  Originally YARN was a component of MapReduce itself created to overcome
   some performance issues in Hadoop's original design. The fundamental idea of
   MapReduce v2 is to split up the two major functionalities of the JobTracker,
   resource management and job scheduling/monitoring, into separate daemons.
@@ -23,32 +23,33 @@
   reporting back the status of the tasks. Naturally there is a much
   more going on behind the scenes but the main point of this is that the
   <emphasis>Job Tracker</emphasis> has always been a bottleneck in terms
-  of scalability. This is where Yarn steps in by splitting the load
+  of scalability. This is where YARN steps in by splitting the load
   away from a global resource management and job tracking into per
   application masters. Global resource manager can then concentrate in
   its main task of handling the management of resources.</para>
   
-  <note>Yarn is usually referred as a synonym for
+  <note>YARN is usually referred as a synonym for
   <emphasis>MapReduce Version 2</emphasis>. This is not exactly true
   and it's easier to understand the relationship between those two
   by saying that <emphasis>MapReduce Version 2</emphasis> is an
-  application running on top of <emphasis>Yarn</emphasis>.</note>
+  application running on top of <emphasis>YARN</emphasis>.</note>
   
-  <para>As we just mentioned <emphasis>MapReduce Version 2</emphasis>
-  is an application running of top of <emphasis>Yarn</emphasis>. It is
-  possible to make similar custom <emphasis>Yarn</emphasis> based
+  <para>Just as <emphasis>MapReduce Version 2</emphasis>
+  is based on <emphasis>YARN</emphasis>, It is
+  possible to make similar custom <emphasis>YARN</emphasis> based
   application which have nothing to do with <emphasis>MapReduce</emphasis>.
-  <emphasis>Yarn</emphasis> itself doesn't know that it is
+  <emphasis>YARN</emphasis> itself doesn't know that it is
   running <emphasis>MapReduce Version 2</emphasis>.
-  While there's nothing wrong to do everything from scratch one
-  will soon realise that steps to learn how to work with
-  <emphasis>Yarn</emphasis> are rather deep. This is where
-  Spring Hadoop support for Yarn steps in by trying to make
-  things easier so that user could concentrate on his own code
+  The <emphasis>YARN</emphasis> API is quite complex, and while 
+  it is certainly possible to develop applications from scratch
+  it is advantageous to have a framework handle most of the low-level
+  work for you. This is where
+  Spring Hadoop support for YARN steps in by trying to make
+  things easier so that a developer can concentrate on his/her own code
   and not having to worry about framework internals.</para>
   
   <section id="yarn:ns">
-  	<title>Using the Spring for Apache Yarn Namespace</title>  	
+  	<title>Using the Spring for Apache YARN Namespace</title>  	
 
   	<para>To simplify configuration, SHDP provides a dedicated namespace for
 	<emphasis>Yarn</emphasis> components. However, one can opt to configure the beans
@@ -83,7 +84,7 @@
 
     <calloutlist>
       <callout arearefs="yarn-ns-prefix">
-        <para>Spring for Apache Hadoop Yarn namespace prefix for core package.
+        <para>Spring for Apache Hadoop YARN namespace prefix for core package.
         Any name can do but through out the reference documentation, the <literal>yarn</literal>
         will be used.</para>
       </callout>
@@ -91,7 +92,7 @@
         <para>The namespace URI.</para>
       </callout>
       <callout arearefs="yarn-ns-int-prefix">
-        <para>Spring for Apache Hadoop Yarn namespace prefix for integration package.
+        <para>Spring for Apache Hadoop YARN namespace prefix for integration package.
         Any name can do but through out the reference documentation, the <literal>yarn-int</literal>
         will be used.</para>
       </callout>
@@ -99,7 +100,7 @@
         <para>The namespace URI.</para>
       </callout>
       <callout arearefs="yarn-ns-batch-prefix">
-        <para>Spring for Apache Hadoop Yarn namespace prefix for batch package.
+        <para>Spring for Apache Hadoop YARN namespace prefix for batch package.
         Any name can do but through out the reference documentation, the <literal>yarn-batch</literal>
         will be used.</para>
       </callout>
@@ -110,7 +111,7 @@
         <para>The namespace URI location. Note that even though the location
 		points to an external address (which exists and is valid), Spring
 		will resolve the schema locally as it is included in the Spring
-		for Apache Hadoop Yarn library.</para>
+		for Apache Hadoop YARN library.</para>
       </callout>
       <callout arearefs="yarn-ns-int-uri-loc">
         <para>The namespace URI location.</para>
@@ -119,7 +120,7 @@
         <para>The namespace URI location.</para>
       </callout>
       <callout arearefs="yarn-ns-example">
-        <para>Declaration example for the Yarn namespace.
+        <para>Declaration example for the YARN namespace.
 		Notice the prefix usage.</para>
       </callout>
     </calloutlist>
@@ -150,7 +151,7 @@
     <calloutlist>
       <callout arearefs="yarn-def-ns-prefix">
         <para>The default namespace declaration for this XML file points
-		to the Spring for Apache Yarn namespace.</para>
+		to the Spring for Apache YARN namespace.</para>
       </callout>
       <callout arearefs="yarn-def-ns-beans-prefix">
         <para>The beans namespace prefix declaration.</para>
@@ -170,15 +171,15 @@
 
   <section id="yarn:config">
   
-    <title>Configuring Yarn</title>
+    <title>Configuring YARN</title>
 	
-    <para>In order to use Hadoop and Yarn, one needs to first configure it namely by
+    <para>In order to use Hadoop and YARN, one needs to first configure it namely by
 	creating a <literal>YarnConfiguration</literal> object. The configuration holds
-	information about the various parameters of the Yarn system.</para>
+	information about the various parameters of the YARN system.</para>
 
     <note>
       <para>Configuration for <literal>&lt;yarn:configuration&gt;</literal> looks
-	  very similar than <literal>&lt;hdp:configuration&gt;</literal>. Reason for
+	  very similar than <literal>&lt;hdp:configuration&gt;</literal>. The reason for
 	  this is a simple separation for Hadoop's <classname>YarnConfiguration</classname>
 	  and <classname>JobConf</classname> classes.</para>
     </note>
@@ -208,10 +209,10 @@
       url="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/resources.html"><interfacename>Resource</interfacename></ulink>
       abstraction to locate the file. This allows various search patterns
 	  to be used, depending on the running environment or the prefix
-	  specified(if any) by the value - in this example the classpath is used.</para>
+	  specified (if any) by the value - in this example the classpath is used.</para>
     </note>
 
-    <para>In addition to referencing configuration resources, one can tweak
+    <para>In addition to referencing configuration resources, one can adjust
 	Hadoop settings directly through Java <classname>Properties</classname>. 
     This can be quite handy when just a few options need to be changed:</para>
     
@@ -254,7 +255,7 @@
      
     <para>Through Spring's property placeholder <ulink url="http://static.springsource.org/spring/docs/3.0.x/reference/beans.html#beans-factory-placeholderconfigurer">support</ulink>, <ulink url="http://static.springsource.org/spring/docs/3.0.x/reference/expressions.html">SpEL</ulink> and the <ulink url="http://blog.springsource.com/2011/06/09/spring-framework-3-1-m2-released/">environment 
     abstraction</ulink> (available in Spring 3.1). one can externalize
-	environment specific properties from the main code base easing the
+	environment specific properties from the main code base, easing the
 	deployment across multiple machines. In the example above, the default
 	file system is replaced based on the properties available in
 	<literal>hadoop.properties</literal> while the temp dir is determined
@@ -290,7 +291,7 @@
   <util:properties id="props" location="props.properties"/>     
 </beans>]]></programlisting>
      
-    <para>When merging several properties, ones defined locally win. In the example
+    <para>When merging several properties, those defined locally win. In the example
 	above the configuration properties are the primary source, followed by
 	the <literal>props</literal> bean followed by the external properties
 	file based on their defined order. While it's not typical for a configuration
@@ -299,7 +300,7 @@
     <note>For more properties utilities, including using the System as a source or
 	fallback, or control over the merging order, consider using Spring's <literal>
     <ulink url="http://static.springsource.org/spring/docs/3.0.x/api/org/springframework/beans/factory/config/PropertiesFactoryBean.html">PropertiesFactoryBean</ulink></literal> (which is what Spring for
-	Apache Hadoop Yarn and <literal>util:properties</literal> use underneath).</note>
+	Apache Hadoop YARN and <literal>util:properties</literal> use underneath).</note>
      
     <para><anchor id="yarn:config:inherit"/>It is possible to create configuration
 	based on existing ones - this allows one to create dedicated configurations, slightly
@@ -346,7 +347,7 @@
 	a running <emphasis>Container</emphasis> by making a physical copy.
 	Localization is a process where dependent files are copied into node's
 	directory structure and thus can be used within the <emphasis>Container</emphasis>
-	itself. Yarn itself tries to provide isolation in a way that multiple
+	itself. YARN itself tries to provide isolation in a way that multiple
 	containers and applications would not clash.</para>
 
     <para>In order to use local resources, one needs to create an implementation
@@ -375,16 +376,16 @@
 ]]></programlisting>
 	
     <para>Behind the scenes it's not enough to simple have a reference
-	to file in a hdfs file system. Yarn itself when localizing resources into
-	container needs to do a consistency check for copied files. This is done
-	by checking file size and timestamp. This information needs to passed
-	to yarn together with a file path. Order to do this the one who
-	defines these beans needs to ask this information from hdfs prior to
-	sending out resouce localizer request. This kind of behaviour exists to
+	to file in a HDFS file system. When localizing resources into
+	container, YARN itself needs to perform consistency checks for copied files. These are done
+	by checking file size and timestamp. This information needs to be passed
+	to YARN together with a file path. Order to do this, the provider of
+	these beans needs to obtain this information from HDFS prior to
+	sending out resouce localizer requests. This kind of behaviour exists to
 	make sure that once localization is defined, <emphasis>Container</emphasis> will
 	fail fast if dependant files were replaced during the process.</para>
 
-    <para>On default the hdfs base address is coming from a Yarn configuration and
+    <para>By default, the HDFS base address is coming from a YARN configuration and
 	<interfacename>ResourceLocalizer</interfacename> bean will use configuration named
 	<emphasis>yarnLocalresources</emphasis>. If there is a need to use something else
 	than the default bean, <emphasis>configuration</emphasis> parameter
@@ -395,15 +396,15 @@
 </yarn:localresources>
 ]]></programlisting>     
 
-    <para>For example, client defining a launch context for
-	<emphasis>Application Master</emphasis> needs to access dependent hdfs entries. The one
+    <para>For example, a client defining a launch context for
+	<emphasis>Application Master</emphasis> needs to access dependent HDFS entries. The one
 	defining and using <interfacename>ResourceLocalizer</interfacename> bean
-	may have a different hdfs address than the Node Manager preparing the
-	Container. Effectively hdfs entry given to resource localizer needs to be
+	may have a different HDFS address than the Node Manager preparing the
+	Container. Effectively HDFS entry given to resource localizer needs to be
 	accessed from a <emphasis>Node Manager</emphasis>.</para>
 	
     <para>To overcome this problem, parameters <emphasis>local</emphasis> and
-	<emphasis>remote</emphasis> can be used to define a different hdfs base entries.</para>
+	<emphasis>remote</emphasis> can be used to define a different HDFS base entries.</para>
 	
     <programlisting language="xml"><![CDATA[<yarn:localresources local="hdfs://0.0.0.0:9000" remote="hdfs://10.10.10.10:9000">
   <yarn:hdfs path="/app/multi-context/multi-context-1.0.0.M1.jar"/>
@@ -411,7 +412,7 @@
 </yarn:localresources>
 ]]></programlisting>     
 
-    <para>Yarn resource localizer is using additional parameters to define entry type
+    <para>YARN resource localizer is using additional parameters to define entry type
 	and visibility. Usage is described below:</para>
 	
     <programlisting language="xml"><![CDATA[<yarn:localresources>
@@ -419,7 +420,7 @@
 </yarn:localresources>
 ]]></programlisting>
 
-    <para>For convenience it is possible to copy files into hdfs during the
+    <para>For convenience it is possible to copy files into HDFS during the
 	localization process using a <emphasis>yarn:copy</emphasis> tag. Currently
 	base staging directory is <emphasis>/syarn/staging/xx</emphasis> where 
 	<emphasis>xx</emphasis> is a unique identifier per application instance.</para>
@@ -493,7 +494,7 @@
                 <row>
                     <entry><literal>path</literal></entry>
                     <entry>HDFS Path</entry>
-                    <entry>Path in hdfs</entry>
+                    <entry>Path in HDFS</entry>
                 </row>
                 <row>
                     <entry><literal>local</literal></entry>
@@ -558,12 +559,13 @@
   <section id="yarn:containerenvironment">
     <title>Container Environment</title>
 
-    <para>One central concept in Yarn is to use environment variables
-	which then can be read from a container. While it's possible to
-	read those variable at any time it is considered bad design if
-	one chooce to do so. Spring Yarn will pass variable into application
-	before any business methods are executed, which makes things more
-	clearly and testing becomes much more easier.</para>
+    <para>One central concept in YARN is to use environment variables
+	which then can be read by a container. While it's possible to
+	read these variables at any time, it is considered best to obtain the
+	values once up-front before any processing is started. Spring YARN will 
+	pass variables into the application
+	before any business methods are executed, which clarifies processing
+	and makes testing much easier.</para>
 	
     <programlisting language="xml"><![CDATA[<yarn:environment/>]]></programlisting>	
 	
@@ -576,8 +578,8 @@
 
     <para>For conveniance it is possible to define a classpath
 	entry directly into an environment. Most likely one is about
-	to run some java code with libraries so classpath needs to
-	be defined anyway.</para>
+	to run some java code with libraries dependencies, so classpath 
+	definition is common practice.</para>
 	
     <programlisting language="xml"><![CDATA[<yarn:environment include-system-env="false">
   <yarn:classpath default-yarn-app-classpath="true" delimiter=":">
@@ -586,7 +588,7 @@
 </yarn:environment>]]></programlisting>     
 	
     <para>If <emphasis>default-yarn-app-classpath</emphasis> parameter is set to
-    <emphasis>true</emphasis>(default value) a default yarn entries will be added to classpath
+    <emphasis>true</emphasis>(default value) a default YARN entries will be added to classpath
 	automatically. Resulting entries are shown below:</para>
 
     <programlisting language="xml"><![CDATA[$HADOOP_CONF_DIR:
@@ -606,7 +608,7 @@ $HADOOP_YARN_HOME/share/hadoop/yarn/lib/*]]></programlisting>
     <note>
       <para>Be carefull if passing environment variables between different systems.
 	  For example if running a client on Windows and passing variables to
-	  Application Master running on Linux, execution wrapper in Yarn may
+	  Application Master running on Linux, execution wrapper in YARN may
 	  silently fail.</para>
     </note>
 	
@@ -653,7 +655,7 @@ $HADOOP_YARN_HOME/share/hadoop/yarn/lib/*]]></programlisting>
                 <row>
                     <entry><literal>default-yarn-app-classpath</literal></entry>
                     <entry><literal>true</literal>(default), <literal>false</literal></entry>
-                    <entry>Defines whether default yarn entries are added
+                    <entry>Defines whether default YARN entries are added
 					to classpath.</entry>
                 </row>
                 <row>
@@ -673,7 +675,7 @@ $HADOOP_YARN_HOME/share/hadoop/yarn/lib/*]]></programlisting>
     <title>Application Client</title>
 	
   	<para>Client is always your entry point when interacting with
-	a Yarn system whether one is about to submit a new application
+	a YARN system, whether one is about to submit a new application
 	instance or just querying <emphasis>Resource Manager</emphasis>
 	for running application(s) status.
 	Currently support for client is very limited and a simple
@@ -711,7 +713,7 @@ $HADOOP_YARN_HOME/share/hadoop/yarn/lib/*]]></programlisting>
 </yarn:client>]]></programlisting>     
 
     <para>For a convinience entry <literal>&lt;master-runner&gt;</literal>
-	can be used to define same command entries.</para>
+	can be used to define the same command entries.</para>
 
     <programlisting language="xml"><![CDATA[<yarn:client app-name="customAppName">
   <util:properties id="customArguments">
@@ -727,7 +729,7 @@ $HADOOP_YARN_HOME/share/hadoop/yarn/lib/*]]></programlisting>
 </yarn:client>]]></programlisting>     
 
     <para>All previous three examples are effectively identical from
-	Spring Yarn point of view.</para>
+	Spring YARN point of view.</para>
 	
 	<note>
 	  <para>The &lt;LOG_DIR&gt; refers to Hadoop's dedicated log directory
@@ -769,7 +771,7 @@ $HADOOP_YARN_HOME/share/hadoop/yarn/lib/*]]></programlisting>
                 <row>
                     <entry><literal>app-name</literal></entry>
                     <entry>Name as string, default is empty</entry>
-                    <entry>Yarn submitted application name</entry>
+                    <entry>YARN submitted application name</entry>
                 </row>
                 <row>
                     <entry><literal>configuration</literal></entry>
@@ -1113,7 +1115,7 @@ $HADOOP_YARN_HOME/share/hadoop/yarn/lib/*]]></programlisting>
   
     <title>Application Container</title>
 	
-    <para>There is very little what Spring Yarn needs
+    <para>There is very little what Spring YARN needs
 	to know about the Container in terms of its configuration.
 	There is a simple contract
 	between <classname>org.springframework.yarn.container.CommandLineContainerRunner</classname>
@@ -1137,15 +1139,15 @@ $HADOOP_YARN_HOME/share/hadoop/yarn/lib/*]]></programlisting>
     <programlisting language="xml"><![CDATA[<bean id="yarnContainer" class="org.springframework.yarn.container.TestContainer">	
 ]]></programlisting>
 		
-    <para>Spring Yarn namespace will make it even more simpler. Below example
-	just defines class which implements needed interface.</para>
+    <para>Spring YARN namespace will make it even simpler. The example below simply
+	 defines a class which implements needed interface.</para>
 
     <programlisting language="xml"><![CDATA[
 <yarn:container container-class="org.springframework.yarn.container.TestContainer"/>
 ]]></programlisting>
 
     <para>It's possible to make a reference to existing bean. This is 
-	usefull if bean cannot be instantiated with default constructor.</para>
+	useful if bean cannot be instantiated with default constructor.</para>
 
     <programlisting language="xml"><![CDATA[
 <bean id="testContainer" class="org.springframework.yarn.container.TestContainer"/>
@@ -1169,23 +1171,23 @@ $HADOOP_YARN_HOME/share/hadoop/yarn/lib/*]]></programlisting>
 
     <para>It is fairly easy to create an application which launches a few
     containers and then leave those to do their tasks. This is pretty much
-    what <emphasis>Distributed Shell</emphasis> example application in
-    Yarn is doing. In that example a container is configured to run
+    what the <emphasis>Distributed Shell</emphasis> example application in
+    YARN is doing. In that example a container is configured to run
     a simple shell command and <emphasis>Application Master</emphasis>
-    only tracks when containers have finished. If only need from a
-    framework is to be able to fire and forget then that's all you need, but
-    most likely a real-world Yarn application will need some sort of
+    only tracks when containers have finished. For cases where fire-and-forget
+    style processing is desired then that's all you need, but
+    most likely a real-world YARN application will need some sort of
     collaboration with <emphasis>Application Master</emphasis>. This 
     communication is initiated either from <emphasis>Application Client</emphasis>
     or <emphasis>Application Container</emphasis>.</para>
 
-    <para>Yarn framework itself doesn't define any kind of general
+    <para>The YARN framework itself doesn't define any kind of general
     communication API for <emphasis>Application Master</emphasis>. 
     There are APIs for communicating with <emphasis>Container Manager</emphasis>
-    and <emphasis>Resource Manager</emphasis> which are used on within
-    a layer not necessarily exposed to a user. Spring Yarn defines
+    and <emphasis>Resource Manager</emphasis> which are used within
+    a layer not necessarily exposed to a user. Spring YARN defines
     a general framework to talk to <emphasis>Application Master</emphasis>
-    through an abstraction and currently a JSON based rpc system exists.</para>
+    through an abstraction and currently a JSON based RPC system exists.</para>
 
     <para>This chapter concentrates on developer concepts to create a custom
     services for <emphasis>Application Master</emphasis>, configuration
@@ -1200,10 +1202,10 @@ $HADOOP_YARN_HOME/share/hadoop/yarn/lib/*]]></programlisting>
       <para>Having a communication framework between 
       <emphasis>Application Master</emphasis> and
       <emphasis>Container/Client</emphasis> involves few moving parts.
-      Firstly there has to be some sort of service running on an
-      <emphasis>Application Master</emphasis>. Secondly user of this
+      First there has to be some sort of service running on an
+      <emphasis>Application Master</emphasis>. Second, the user of this
       service needs to know where it is and how to connect to it.
-      Thirtly, if not creating these services from scratch, it'd be
+      Third, if not creating these services from scratch, it would be
       nice if some sort of abstraction already exist.</para>
       
       <para>Contract for appmaster service is very simple,
@@ -1221,16 +1223,16 @@ $HADOOP_YARN_HOME/share/hadoop/yarn/lib/*]]></programlisting>
       <para><emphasis>Application Master Service</emphasis> framework
       currently provides integration for services acting as service
       for a <emphasis>Client</emphasis> or a <emphasis>Container</emphasis>.
-      Only difference between these two roles is how the <emphasis>Service Client</emphasis>
+      The only difference between these two roles is how the <emphasis>Service Client</emphasis>
       gets notified about the address of the service. For the <emphasis>Client</emphasis>
-      this information is stored within the Hadoop Yarn resource manager. For the
+      this information is stored within the Hadoop YARN resource manager. For the
       <emphasis>Container</emphasis> this information is passed via environment within
       the launch context.</para>
 
       <programlisting language="xml"><![CDATA[<bean id="yarnAmservice" class="AppmasterServiceImpl" />
 <bean id="yarnClientAmservice" class="AppmasterClientServiceImpl" />]]></programlisting>
 
-      <para>Example above shows a default bean names, <emphasis>yarnAmservice</emphasis>
+      <para>Example above shows a default bean named <emphasis>yarnAmservice</emphasis>
       and <emphasis>yarnClientAmservice</emphasis> respectively recognised by
       Spring Yarn.</para>
 	
@@ -1249,7 +1251,7 @@ $HADOOP_YARN_HOME/share/hadoop/yarn/lib/*]]></programlisting>
       <title>Using JSON</title>
 	
       <para>Default implementations can be used to exchange messages using
-      a simple domain classes and actual messages are converted into json
+      a simple domain classes and actual messages are converted into JSON
       and send over the transport.</para>
 
 
@@ -1280,7 +1282,7 @@ public void testServiceInterfaces() throws Exception {
       <title>Converters</title>
 	
       <para>When default implementations for Application master services are
-      exchanging messages, converters are net registered automatically. There
+      exchanging messages, converters are not registered automatically. There
       is a namespace tag <emphasis>converters</emphasis> to ease
       this configuration.</para>
 
@@ -1311,11 +1313,11 @@ public void testServiceInterfaces() throws Exception {
   
     <title>Application Master Service</title>
 	
-    <para>This section of this document is about configuration, more about
-    general concepts for see a <xref linkend="yarn:appmasterservices"/>.</para>
+    <para>This section of this document is about configuration, for
+    general concepts see <xref linkend="yarn:appmasterservices"/>.</para>
 	
-    <para>Currently Spring Yarn have support for services using Spring
-    Integration tcp channels as a transport.</para>
+    <para>Currently Spring YARN has support for services using Spring
+    Integration TCP channels as a transport.</para>
 		
     <programlisting language="xml"><![CDATA[<bean id="mapper" 
   class="org.springframework.yarn.integration.support.Jackson2ObjectMapperFactoryBean" />
@@ -1414,11 +1416,11 @@ public void testServiceInterfaces() throws Exception {
   
     <title>Application Master Service Client</title>
 	
-    <para>This section of this document is about configuration, more about
-    general concepts for see a <xref linkend="yarn:appmasterservices"/>.</para>
+    <para>This section is about configuration, for
+    general concepts see <xref linkend="yarn:appmasterservices"/>.</para>
 	
-    <para>Currently Spring Yarn have support for services using Spring
-    Integration tcp channels as a transport.</para>
+    <para>Currently Spring YARN has support for services using Spring
+    Integration TCP channels as a transport.</para>
 		
     <programlisting language="xml"><![CDATA[<bean id="mapper" 
   class="org.springframework.yarn.integration.support.Jackson2ObjectMapperFactoryBean" />
@@ -1527,7 +1529,7 @@ public void testServiceInterfaces() throws Exception {
     <title>Using Spring Batch</title>
 
     <para>In this chapter we assume you are fairly familiar with
-    concepts using <emphasis>Spring Batch</emphasis>. Many batch processing problems
+    <emphasis>Spring Batch</emphasis>. Many batch processing problems
     can be solved with single threaded, single process jobs, so it is always a good
     idea to properly check if that meets your needs before thinking about more
     complex implementations. When you are ready to start implementing a job with some
@@ -1535,7 +1537,7 @@ public void testServiceInterfaces() throws Exception {
     there are two modes of parallel processing: single process, multi-threaded;
     and multi-process.</para>
 
-    <para>Spring Hadoop contains a support for running Spring Batch jobs on a
+    <para>Spring Hadoop contains support for running Spring Batch jobs on a
 	Hadoop cluster. For better parallel processing Spring Batch partitioned
 	steps can be executed on a Hadoop cluster as remote steps.</para>
 
@@ -1545,7 +1547,7 @@ public void testServiceInterfaces() throws Exception {
 	  
 	  <para>Starting point running a <emphasis>Spring Batch Job</emphasis>
 	  is always the <emphasis>Application Master</emphasis> whether
-	  a job is just simple job with or without partitioning. In case
+	  a job is just simple job or partitioned. In case
 	  partitioning is not used the whole job would be run within the
 	  <emphasis>Application Master</emphasis> and no
 	  <emphasis>Containers</emphasis> would be launched. This may seem
@@ -1574,8 +1576,8 @@ public void testServiceInterfaces() throws Exception {
       </itemizedlist>
 
 	  <para>Configuration for Spring Batch Jobs is very similar
-      what is needed for normal batch configuration because effectively
-      that's what we are doing. Only difference is a way a job is
+      to what is needed for normal batch configuration because effectively
+      that is what is being done. The only difference is a way a job is
       launched which in this case is automatically handled by
       <emphasis>Application Master</emphasis>. Implementation of
       a job launching logic is very similar compared to
@@ -1687,11 +1689,10 @@ public void testServiceInterfaces() throws Exception {
   
       <title>Partitioning</title>
 	
-      <para>Let's take a quick look how Spring Batch partitioning is
-      handled. Concept of running a partitioned job involves three things,
+      <para>The concept of running a partitioned batch job involves three things,
       <emphasis>Remote steps</emphasis>, <emphasis>Partition Handler</emphasis>
-      and a <emphasis>Partitioner</emphasis>. If we do a little bit of
-      oversimplification a remote step is like any other step from a user
+      and a <emphasis>Partitioner</emphasis>. Speaking simplistically, 
+      a remote step is like any other step from a user
       point of view. Spring Batch itself does not contain implementations for 
       any proprietary grid or remoting fabrics. Spring Batch does however
       provide a useful implementation of <interfacename>PartitionHandler</interfacename>
@@ -1702,7 +1703,7 @@ public void testServiceInterfaces() throws Exception {
    	 
       <note>
         <para>For more background information about the Spring
-        Batch Partitioning, read the Spring Batch
+        Batch Partitioning, refer to the Spring Batch
         reference documentation.</para>
       </note>
 	
@@ -1711,14 +1712,14 @@ public void testServiceInterfaces() throws Exception {
   
         <title>Configuring Master</title>
 	
-        <para>As we previously mentioned a step executed on a remote
-        host also need to access a job repository. If job repository would be
+        <para>As mentioned previously, a step executed on a remote
+        host requires access a job repository. If a job repository is
         based on a database instance, configuration could be similar on a container
         compared to application master. In our configuration example the job
         repository is in-memory based and remote steps needs access for it.
-        Spring Yarn Batch contains implementation of a job repository which
-        is able to proxy request via json requests. Order to use that we need
-        to enable application client service which is exposing this service.</para>
+        Spring YARN Batch contains implementation of a job repository which
+        is able to proxy request via JSON requests. Order to use this we must
+        enable the application client service which is exposing this service.</para>
 
         <programlisting language="xml"><![CDATA[<bean id="jobRepositoryRemoteService" class="org.springframework.yarn.batch.repository.JobRepositoryRemoteService" >
   <property name="mapJobRepositoryFactoryBean" ref="&amp;jobRepository"/>
@@ -1730,13 +1731,13 @@ public void testServiceInterfaces() throws Exception {
 
 <yarn-int:amservice service-ref="batchService"/>]]></programlisting>
 
-        <para>he declaration above defines <classname>JobRepositoryRemoteService</classname>
+        <para>The declaration above defines <classname>JobRepositoryRemoteService</classname>
         bean named <literal>jobRepositoryRemoteService</literal> which is then
         connected into <emphasis>Application Master Service</emphasis>
-        exposing job repository via Spring Integration Tcp channels.</para>
+        exposing job repository via Spring Integration TCP channels.</para>
 
         <para>As job repository communication messages are
-        exchanged via custom json messages, converters needs to be defined.</para>
+        exchanged via custom JSON messages, converters needs to be defined.</para>
 
         <programlisting language="xml"><![CDATA[<bean id="mapper" class="org.springframework.yarn.integration.support.Jackson2ObjectMapperFactoryBean" />
 
@@ -1805,7 +1806,7 @@ public void testServiceInterfaces() throws Exception {
         <programlisting language="xml"><![CDATA[<bean id="stepLocator" class="org.springframework.yarn.batch.partition.BeanFactoryStepLocator"/>]]></programlisting>
 	
         <para>Spring Hadoop contains a custom job repository implementation
-        which is able to talk back to a remote instance via custom json protocol.</para>
+        which is able to talk back to a remote instance via custom JSON protocol.</para>
 
         <programlisting language="xml"><![CDATA[<bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager"/>
 
@@ -1842,21 +1843,21 @@ public void testServiceInterfaces() throws Exception {
     try to do testing phase during the normal project build process.
     Traditionally developers have had few options like running Hadoop cluster
     either as a local or pseudo-distributed mode and then utilise that to
-    run MapReduce jobs. Hadoop project itself is using a lot of mini clusters
+    run MapReduce jobs. The Apache Hadoop project itself utilizes "mini clusters"
     during the tests which provides better tools to run your code in an isolated
     environment.</para>
 
-    <para>Spring Hadoop and especially its Yarn module faced similar testing problems.
-    Spring Hadoop provides testing facilities order to make testing on Hadoop much easier
+    <para>Spring Hadoop, and especially its YARN module, face similar testing problems.
+    Spring Hadoop provides testing facilities in order to make testing on Hadoop much easier
     especially if code relies on Spring Hadoop itself. These testing facilities are also used
     internally to test Spring Hadoop, although some test cases still rely on a running Hadoop
     instance on a host where project build is executed.</para>
 
-    <para>Two central concepts of testing using Spring Hadoop is, firstly fire up the mini
-    cluster and secondly use the configuration prepared by the mini cluster to talk to the
+    <para>The two central concepts of testing using Spring Hadoop are 1) launch the mini
+    cluster and 2) use the configuration prepared by the mini cluster to talk to the
     Hadoop components. Now let's go through the general testing facilities offered by Spring Hadoop.</para>
 
-    <section id="yarn:testingminicluster">
+    <section id="YARN:testingminicluster">
       <title>Mini Clusters</title>
 
       <para>Mini cluster usually contain testing components from a Hadoop project itself.
@@ -1871,7 +1872,7 @@ public void testServiceInterfaces() throws Exception {
   File getYarnWorkDir();
 }]]></programlisting>
 
-      <para>Currently one implementation named StandaloneYarnCluster exists which supports simple cluster type where a number of nodes can be defined and then all the nodes will have Yarn Node Manager and Hdfs Datanode,  additionally a Yarn Resource Manager and Hdfs Namenode components are started.</para>
+      <para>Currently one implementation named StandaloneYarnCluster exists which supports simple cluster type where a number of nodes can be defined and then all the nodes will have YARN Node Manager and HDFS Datanode,  additionally a YARN Resource Manager and HDFS Namenode components are started.</para>
 
       <para>There are few ways how this cluster can be started depending on a use case. It is possible to use StandaloneYarnCluster directly or configure and start it through YarnClusterFactoryBean. Existing YarnClusterManager is used in unit tests to cache running clusters.</para>
 
@@ -1895,7 +1896,7 @@ target/YarnClusterTests-dfs/]]></programlisting>
     <section id="yarn:testingconfiguration">
       <title>Configuration</title>
 
-      <para>Spring Yarn components usually depend on Hadoop configuration which is then wired into these components during the application context startup phase. This was explained in previous chapters so we don't go through it again. However this is now a catch-22 because we need the configuration for the context but it is not known until mini cluster has done its startup magic and prepared the configuration with correct values reflecting current runtime status of the cluster itself. Solution for this is to use other bean named ConfigurationDelegatingFactoryBean which will simple delegate the configuration request into the running cluster.</para>
+      <para>Spring YARN components usually depend on Hadoop configuration which is then wired into these components during the application context startup phase. This was explained in previous chapters so we don't go through it again. However this is now a catch-22 because we need the configuration for the context but it is not known until mini cluster has done its startup magic and prepared the configuration with correct values reflecting current runtime status of the cluster itself. Solution for this is to use other bean named ConfigurationDelegatingFactoryBean which will simple delegate the configuration request into the running cluster.</para>
 
       <programlisting language="xml"><![CDATA[<bean id="yarnConfiguredConfiguration" class="org.springframework.yarn.test.support.ConfigurationDelegatingFactoryBean">
   <property name="cluster" ref="yarnCluster"/>
@@ -1905,7 +1906,7 @@ target/YarnClusterTests-dfs/]]></programlisting>
 
       <para>In the above example we created a bean named yarnConfiguredConfiguration using ConfigurationDelegatingFactoryBean which simple delegates to yarnCluster bean. Returned bean yarnConfiguredConfiguration is type of Hadoop's Configuration object so it could be used as it is.</para>
 
-      <para>Latter part of the example show how Spring Yarn namespace is used to create another Configuration object which is using yarnConfiguredConfiguration as a reference. This scenario would make sense if there is a need to add additional configuration options into running configuration used by other components. Usually it is suiteable to use cluster prepared configuration as it is.</para>
+      <para>Latter part of the example show how Spring YARN namespace is used to create another Configuration object which is using yarnConfiguredConfiguration as a reference. This scenario would make sense if there is a need to add additional configuration options into running configuration used by other components. Usually it is suiteable to use cluster prepared configuration as it is.</para>
 
     </section>
 
@@ -1934,29 +1935,29 @@ public class ClusterBaseTestClassTests extends AbstractYarnClusterTests {
 
       <para>Generally @MiniYarnCluster annotation allows you to define injected bean names for mini cluster, its Configurations and a number of nodes you like to have in a cluster.</para>
 
-      <para>Spring Hadoop Yarn testing is dependant of general facilities of Spring Test framework meaning that everything what is cached during the test are reuseable withing other tests. One need to understand that if Hadoop mini cluster and its Configuration is injected into an Application Context, caching happens on a mercy of a Spring Testing meaning if a test Application Context is cached also mini cluster instance is cached. While caching is always prefered, one needs to understant that if tests are expecting vanilla environment to be present, test context should be dirtied using @DirtiesContext annotation.</para>
+      <para>Spring Hadoop YARN testing is dependant of general facilities of Spring Test framework meaning that everything what is cached during the test are reuseable withing other tests. One need to understand that if Hadoop mini cluster and its Configuration is injected into an Application Context, caching happens on a mercy of a Spring Testing meaning if a test Application Context is cached also mini cluster instance is cached. While caching is always prefered, one needs to understant that if tests are expecting vanilla environment to be present, test context should be dirtied using @DirtiesContext annotation.</para>
 
     </section>
 
     <section id="yarn:testingmulticontextexample">
       <title>Multi Context Example</title>
 
-      <para>Let's study a proper example of existing Spring Yarn application and how this is tested during the build process. Multi Context Example is a simple Spring Yarn based application which simply launches Application Master and four Containers and withing those containers a custom code is executed. In this case simply a log message is written.</para>
+      <para>Let's study a proper example of existing Spring YARN application and how this is tested during the build process. Multi Context Example is a simple Spring YARN based application which simply launches Application Master and four Containers and withing those containers a custom code is executed. In this case simply a log message is written.</para>
 
-      <para>In real life there are different ways to test whether Hadoop Yarn application execution has been succesful or not. The obvious method would be to check the application instance execution status reported by Hadoop Yarn. Status of the execution doesn't always tell the whole truth so i.e. if application is about to write something into HDFS as an output that could be used to check the proper outcome of an execution.</para>
+      <para>In real life there are different ways to test whether Hadoop YARN application execution has been succesful or not. The obvious method would be to check the application instance execution status reported by Hadoop YARN. Status of the execution doesn't always tell the whole truth so i.e. if application is about to write something into HDFS as an output that could be used to check the proper outcome of an execution.</para>
 
       <para>This example doesn't write anything into HDFS and anyway it would be out of scope of this document for obvious reason. It is fairly straightforward to check file content from HDFS. One other interesting method is simply to check to application log files that being the Application Master and Container logs. Test methods can check exceptions or expected log entries from a log files to determine whether test is succesful or not.</para>
 
       <para>In this chapter we don't go through how Multi Context Example is configured and what it actually does, for that read the documentation about the examples. However we go through what needs to be done order to test this example application using testing support offered by Spring Hadoop.</para>
 
-      <para>In this example we gave instructions to copy library dependencies into Hdfs and then those entries were used within resouce localizer to tell Yarn to copy those files into Container working directory. During the unit testing when mini cluster is launched there are no files present in Hdfs because cluster is initialized from scratch. Furtunalety Spring Hadoop allows you to copy files into Hdfs during the localization process from a local file system where Application Context is executed. Only thing we need is the actual library files which can be assembled during the build process. Spring Hadoop Examples build system rely on Gradle so collecting dependencies is an easy task.</para>
+      <para>In this example we gave instructions to copy library dependencies into HDFS and then those entries were used within resouce localizer to tell YARN to copy those files into Container working directory. During the unit testing when mini cluster is launched there are no files present in HDFS because cluster is initialized from scratch. Furtunalety Spring Hadoop allows you to copy files into HDFS during the localization process from a local file system where Application Context is executed. Only thing we need is the actual library files which can be assembled during the build process. Spring Hadoop Examples build system rely on Gradle so collecting dependencies is an easy task.</para>
 
       <programlisting language="xml"><![CDATA[<yarn:localresources>
   <yarn:hdfs path="/app/multi-context/*.jar"/>
   <yarn:hdfs path="/lib/*.jar"/>
 </yarn:localresources>]]></programlisting>
 
-      <para>Above configuration exists in application-context.xml and appmaster-context.xml files. This is a normal application configuration expecting static files already be present in Hdfs. This is usually done to minimize latency during the application submission and execution.</para>
+      <para>Above configuration exists in application-context.xml and appmaster-context.xml files. This is a normal application configuration expecting static files already be present in HDFS. This is usually done to minimize latency during the application submission and execution.</para>
 
       <programlisting language="xml"><![CDATA[<yarn:localresources>
   <yarn:copy src="file:build/dependency-libs/*" dest="/lib/"/>
@@ -1967,9 +1968,9 @@ public class ClusterBaseTestClassTests extends AbstractYarnClusterTests {
 
       <para>Above example is from MultiContextTest-context.xml which provides the runtime context configuration talking with mini cluster during the test phase.</para>
 
-      <para>When we do context configuration for YarnClient during the testing phase all we need to do is to add copy elements which will transfer needed libraries into Hdfs before the actual localization process will fire up. When those files are copied into Hdfs running in a mini cluster we're basically in a same point if using a real Hadoop cluster with existing files.</para>
+      <para>When we do context configuration for YarnClient during the testing phase all we need to do is to add copy elements which will transfer needed libraries into HDFS before the actual localization process will fire up. When those files are copied into HDFS running in a mini cluster we're basically in a same point if using a real Hadoop cluster with existing files.</para>
 
-      <note><para>Running tests which depends on copying files into Hdfs it is mandatory to use build system which is able to prepare these files for you. You can't do this within IDE's which have its own ways to execute unit tests.</para></note>
+      <note><para>Running tests which depends on copying files into HDFS it is mandatory to use build system which is able to prepare these files for you. You can't do this within IDE's which have its own ways to execute unit tests.</para></note>
 
       <para>The complete example of running the test, checking the application execution status and finally checking the expected state of log files:</para>
 
