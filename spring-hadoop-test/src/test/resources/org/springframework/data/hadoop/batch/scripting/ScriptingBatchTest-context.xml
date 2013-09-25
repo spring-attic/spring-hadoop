@@ -27,14 +27,15 @@
 	<bean id="tasklet" class="org.springframework.batch.core.step.tasklet.MethodInvokingTaskletAdapter" p:target-object-ref="script" p:target-method="toString"/>
 
 	<hdp:script id="script" language="javascript" configuration-ref="hadoopConfiguration" scope="singleton">
+try {load("nashorn:mozilla_compat.js");} catch (e) {} // for Java 8
 importPackage(java.util);
 importPackage(org.apache.hadoop.fs);
 
-println("${hadoop.fs}")
+print("${hadoop.fs}")
 name = UUID.randomUUID().toString()
 scriptName = "src/test/resources/test.properties"
 fs.copyFromLocalFile(scriptName, name)
-println("Created file " + name)
+print("Created file " + name)
 
 // use the shell
 dir = "script-dir"
@@ -42,9 +43,9 @@ if (!fsh.test(dir)) {
    fsh.mkdir(dir)
    fs.copyFromLocalFile(scriptName, dir+"/"+name) 
    fsh.chmodr(700, dir)
-   println("File content is " + fsh.cat(dir +"/"+ name))
+   print("File content is " + fsh.cat(dir +"/"+ name))
 }
-println(fsh.ls(dir))
+print(fsh.ls(dir))
 fsh.rmr(dir)
 
 // return the file length 
@@ -55,7 +56,7 @@ fs.getLength(name)
 	
 	<hdpb:script-tasklet id="nested-script-tasklet">
 		<hdpb:script language="javascript">
-println(fsh.ls("/"))			
+print(fsh.ls("/"))
 		</hdpb:script>
 	</hdpb:script-tasklet>
 </beans>

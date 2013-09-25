@@ -56,7 +56,7 @@
 	<hdp:script language="javascript" id="script" scope="step" pre-action="">
 streamoutput = output + "stream"
 if (fsh.test(streamoutput)) fsh.rmr(streamoutput)
-println("Staged resources 2")
+print("Staged resources 2")
 		<hdp:property name="input" value="#{jobParameters['mr.input']}"/>			
 		<hdp:property name="output" value="#{jobParameters['mr.output']}"/>
 	</hdp:script>
@@ -67,7 +67,7 @@ if (fsh.test(input)) fsh.rmr(input)
 if (fsh.test(output)) fsh.rmr(output)
 fsh.mkdir(input);
 fsh.put("src/test/resources/input/word/input.txt", input)
-println("Staged resources 1")
+print("Staged resources 1")
 
 			<hdp:property name="input" value="#{jobParameters['mr.input']}"/>
 			<hdp:property name="output" value="#{jobParameters['mr.output']}"/>

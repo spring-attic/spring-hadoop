@@ -17,11 +17,12 @@
 	
 	<hdp:script id="inlined-js" language="javascript">
 		<hdp:property name="foo" value="bar"/>
+try {load("nashorn:mozilla_compat.js");} catch (e) {} // for Java 8
 importPackage(java.util);
 importPackage(org.apache.hadoop.fs);
 
-println("${hadoop.fs}")
-println(foo)
+print("${hadoop.fs}")
+print(foo)
 name = UUID.randomUUID().toString()
 scriptName = "src/test/resources/test.properties"
 fs.copyFromLocalFile(scriptName, name)
