@@ -9,7 +9,7 @@
 		http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd
 		http://www.springframework.org/schema/hadoop-batch http://www.springframework.org/schema/hadoop/spring-hadoop-batch.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
-		http://www.springframework.org/schema/batch	http://www.springframework.org/schema/batch/spring-batch-2.1.xsd">
+		http://www.springframework.org/schema/batch	http://www.springframework.org/schema/batch/spring-batch.xsd">
 
 	<import resource="../hadoop-ctx.xml"/>
 	<import resource="../batch-common.xml"/>
