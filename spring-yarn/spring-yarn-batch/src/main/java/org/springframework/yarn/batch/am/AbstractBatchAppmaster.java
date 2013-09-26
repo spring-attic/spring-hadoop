@@ -34,7 +34,6 @@ import org.apache.hadoop.yarn.api.records.ContainerId;
 import org.apache.hadoop.yarn.api.records.ContainerLaunchContext;
 import org.apache.hadoop.yarn.api.records.ContainerStatus;
 import org.apache.hadoop.yarn.api.records.FinalApplicationStatus;
-import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.apache.hadoop.yarn.util.RackResolver;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
@@ -179,12 +178,15 @@ public abstract class AbstractBatchAppmaster extends AbstractEventingAppmaster i
 
 		if (stepExecution != null) {
 			for (Entry<StepExecution, Set<StepExecution>> entry : masterExecutions.entrySet()) {
-				Set<StepExecution> stepExecutions = entry.getValue();
-				if (stepExecutions.remove(stepExecution)) {
+				Set<StepExecution> set = entry.getValue();
+				if (set.remove(stepExecution)) {
+					if (log.isDebugEnabled()) {
+						log.debug("stepExecution=" + stepExecution + " removed");
+					}
 					// modified, but it back
-					masterExecutions.put(entry.getKey(), stepExecutions);
+					masterExecutions.put(entry.getKey(), set);
 				}
-				if (stepExecutions.size() == 0) {
+				if (set.size() == 0) {
 					// we consumed all executions, send complete event
 					// TODO: we could track failures
 					getYarnEventPublisher().publishEvent(new PartitionedStepExecutionEvent(this, entry.getKey()));
@@ -351,10 +353,17 @@ public abstract class AbstractBatchAppmaster extends AbstractEventingAppmaster i
 			}
 		}
 
-		masterExecutions.put(masterStepExecution, stepExecutions);
+		if (log.isDebugEnabled()) {
+			log.debug("Adding " + stepExecutions.size() + " split steps into masterStepExecution=" + masterStepExecution);
+		}
+
+		// Create new set due to SHDP-188
+		HashSet<StepExecution> set = new HashSet<StepExecution>(stepExecutions.size());
+		set.addAll(stepExecutions);
+		masterExecutions.put(masterStepExecution, set);
 
 		int remaining = stepExecutions.size() - resourceRequests.size();
-		for (StepExecution execution : stepExecutions) {
+		for (StepExecution execution : set) {
 			if (!requestData.containsKey(execution)) {
 				requestData.put(execution, null);
 			}

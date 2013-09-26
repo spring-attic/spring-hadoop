@@ -403,7 +403,7 @@ public class JobRepositoryRpcFactory {
 		}
 
 		type.executionContext = convertExecutionContext(jobExecution.getExecutionContext());
-
+		type.jobParameters = convertJobParameters(jobExecution.getJobParameters());
 		return type;
 	}
 
@@ -415,7 +415,9 @@ public class JobRepositoryRpcFactory {
 	 */
 	public static JobExecution convertJobExecutionType(JobExecutionType type) {
 		JobInstance jobInstance = convertJobInstanceType(type.jobInstance);
-		JobExecution jobExecution = new JobExecution(jobInstance, type.id);
+		JobParameters jobParameters = convertJobParametersType(type.jobParameters);
+		JobExecution jobExecution = new JobExecution(jobInstance, type.id, jobParameters);
+
 		jobExecution.setVersion(type.version);
 		jobExecution.setStatus(type.status);
 		jobExecution.setStartTime(nullsafeToDate(type.startTime));
@@ -448,7 +450,6 @@ public class JobRepositoryRpcFactory {
 		JobInstanceType type = new JobInstanceType();
 		type.id = jobInstance.getId();
 		type.version = jobInstance.getVersion();
-		type.jobParameters = convertJobParameters(jobInstance.getJobParameters());
 		type.jobName = jobInstance.getJobName();
 		return type;
 	}
@@ -460,8 +461,7 @@ public class JobRepositoryRpcFactory {
 	 * @return converted job instance
 	 */
 	public static JobInstance convertJobInstanceType(JobInstanceType type) {
-		JobParameters jobParameters = convertJobParametersType(type.jobParameters);
-		JobInstance jobInstance = new JobInstance(type.id, jobParameters, type.jobName);
+		JobInstance jobInstance = new JobInstance(type.id, type.jobName);
 		jobInstance.setVersion(type.version);
 		return jobInstance;
 	}

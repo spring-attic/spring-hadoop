@@ -39,6 +39,7 @@ public class JobExecutionType extends BaseObject {
 	public Long lastUpdated;
 	public String exitStatus;
 	public ExecutionContextType executionContext;
+	public JobParametersType jobParameters;
 
 	public JobExecutionType() {
 		super("JobExecutionType");

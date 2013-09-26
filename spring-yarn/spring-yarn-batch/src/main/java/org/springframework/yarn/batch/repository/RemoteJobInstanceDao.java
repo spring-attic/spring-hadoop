@@ -106,8 +106,7 @@ public class RemoteJobInstanceDao extends AbstractRemoteDao implements JobInstan
 
 	@Override
 	public JobInstance getJobInstance(JobExecution jobExecution) {
-		// TODO implement getJobInstance(JobExecution jobExecution)
-		return null;
+		return jobExecution.getJobInstance();
 	}
 
 	@Override
