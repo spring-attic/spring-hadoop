@@ -15,10 +15,13 @@
  */
 package org.springframework.yarn.batch.repository;
 
+import java.util.Collection;
+
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.dao.ExecutionContextDao;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.util.Assert;
 import org.springframework.yarn.am.RpcMessage;
 import org.springframework.yarn.batch.repository.bindings.GetExecutionContextReq;
 import org.springframework.yarn.batch.repository.bindings.GetExecutionContextRes;
@@ -91,6 +94,15 @@ public class RemoteExecutionContextDao extends AbstractRemoteDao implements Exec
 			checkResponseMayThrow(response);
 		} catch (Exception e) {
 			throw convertException(e);
+		}
+	}
+
+	@Override
+	public void saveExecutionContexts(Collection<StepExecution> stepExecutions) {
+		Assert.notNull(stepExecutions, "Attempt to save a nulk collection of step executions");
+		for (StepExecution stepExecution : stepExecutions) {
+			saveExecutionContext(stepExecution);
+			saveExecutionContext(stepExecution.getJobExecution());
 		}
 	}
 

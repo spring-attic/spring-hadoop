@@ -53,7 +53,7 @@ public abstract class AbstractRemoteJobExecutionDaoTests {
 		stepExecutionDao = getRemoteStepExecutionDao();
 		JobInstanceDao jobInstanceDao = getRemoteJobInstanceDao();
 		jobInstance = jobInstanceDao.createJobInstance("execTestJob", jobParameters);
-		execution = new JobExecution(jobInstance);
+		execution = new JobExecution(jobInstance, new JobParameters());
 	}
 
 	protected abstract RemoteJobInstanceDao getRemoteJobInstanceDao();
@@ -81,8 +81,7 @@ public abstract class AbstractRemoteJobExecutionDaoTests {
 		List<JobExecution> execs = new ArrayList<JobExecution>();
 
 		for (int i = 0; i < 10; i++) {
-//            JobExecution exec = new JobExecution(jobInstance, jobParameters);
-			JobExecution exec = new JobExecution(jobInstance);
+            JobExecution exec = new JobExecution(jobInstance, jobParameters);
 			exec.setCreateTime(new Date(i));
 			execs.add(exec);
 			dao.saveJobExecution(exec);
@@ -142,10 +141,10 @@ public abstract class AbstractRemoteJobExecutionDaoTests {
 	 */
 	@Test
 	public void testGetLastExecution() {
-		JobExecution exec1 = new JobExecution(jobInstance);
+		JobExecution exec1 = new JobExecution(jobInstance, jobParameters);
 		exec1.setCreateTime(new Date(0));
 
-		JobExecution exec2 = new JobExecution(jobInstance);
+		JobExecution exec2 = new JobExecution(jobInstance, jobParameters);
 		exec2.setCreateTime(new Date(1));
 
 		dao.saveJobExecution(exec1);
@@ -169,13 +168,13 @@ public abstract class AbstractRemoteJobExecutionDaoTests {
 	 */
 	@Test
 	public void testFindRunningExecutions() {
-		JobExecution exec = new JobExecution(jobInstance);
+		JobExecution exec = new JobExecution(jobInstance, jobParameters);
 		exec.setCreateTime(new Date(0));
 		exec.setEndTime(new Date(1L));
 		exec.setLastUpdated(new Date(5L));
 		dao.saveJobExecution(exec);
 
-		exec = new JobExecution(jobInstance);
+		exec = new JobExecution(jobInstance, jobParameters);
 		exec.setLastUpdated(new Date(5L));
 		exec.createStepExecution("step");
 		dao.saveJobExecution(exec);
@@ -209,7 +208,7 @@ public abstract class AbstractRemoteJobExecutionDaoTests {
 	 */
 	@Test
 	public void testGetExecution() {
-		JobExecution exec = new JobExecution(jobInstance);
+		JobExecution exec = new JobExecution(jobInstance, jobParameters);
 		exec.setCreateTime(new Date(0));
 		exec.createStepExecution("step");
 
@@ -271,11 +270,11 @@ public abstract class AbstractRemoteJobExecutionDaoTests {
 	@Test
 	public void testSynchronizeStatusUpgrade() {
 
-		JobExecution exec1 = new JobExecution(jobInstance);
+		JobExecution exec1 = new JobExecution(jobInstance, jobParameters);
 		exec1.setStatus(BatchStatus.STOPPING);
 		dao.saveJobExecution(exec1);
 
-		JobExecution exec2 = new JobExecution(jobInstance);
+		JobExecution exec2 = new JobExecution(jobInstance, jobParameters);
 		Assert.state(exec1.getId() != null);
 		exec2.setId(exec1.getId());
 
@@ -297,11 +296,11 @@ public abstract class AbstractRemoteJobExecutionDaoTests {
 	@Test
 	public void testSynchronizeStatusDowngrade() {
 
-		JobExecution exec1 = new JobExecution(jobInstance);
+		JobExecution exec1 = new JobExecution(jobInstance, jobParameters);
 		exec1.setStatus(BatchStatus.STARTED);
 		dao.saveJobExecution(exec1);
 
-		JobExecution exec2 = new JobExecution(jobInstance);
+		JobExecution exec2 = new JobExecution(jobInstance, jobParameters);
 		Assert.state(exec1.getId() != null);
 		exec2.setId(exec1.getId());
 

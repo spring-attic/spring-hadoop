@@ -34,7 +34,6 @@ import org.apache.hadoop.yarn.api.records.ContainerId;
 import org.apache.hadoop.yarn.api.records.ContainerLaunchContext;
 import org.apache.hadoop.yarn.api.records.ContainerStatus;
 import org.apache.hadoop.yarn.api.records.FinalApplicationStatus;
-import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.apache.hadoop.yarn.util.RackResolver;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
@@ -177,19 +176,51 @@ public abstract class AbstractBatchAppmaster extends AbstractEventingAppmaster i
 		ContainerId containerId = status.getContainerId();
 		StepExecution stepExecution = containerToStepMap.get(containerId);
 
+		// TODO: batch22
+		log.info("XXX containerId=" + containerId + " to stepExecution=" + stepExecution);
 		if (stepExecution != null) {
+			log.info("XXX masterExecutions size=" + masterExecutions.size());
 			for (Entry<StepExecution, Set<StepExecution>> entry : masterExecutions.entrySet()) {
-				Set<StepExecution> stepExecutions = entry.getValue();
-				if (stepExecutions.remove(stepExecution)) {
-					// modified, but it back
-					masterExecutions.put(entry.getKey(), stepExecutions);
+				ArrayList<StepExecution> list = new ArrayList<StepExecution>();
+				Set<StepExecution> set = new HashSet<StepExecution>();
+				Set<StepExecution> stepExecutions2 = entry.getValue();
+				log.info("XXX 1 stepExecutions size=" + stepExecutions2.size());
+				for (StepExecution s : stepExecutions2) {
+					list.add(s);
+					set.add(s);
+					log.info("XXX 1s stepExecution=" + s + " jobExecutionid=" + s.getJobExecutionId() + " id=" + s.getId());
+					log.info("XXX equal=" + s.equals(stepExecution));
+					log.info("XXX hash equal=" + s.hashCode() + "/" + stepExecution.hashCode());
 				}
-				if (stepExecutions.size() == 0) {
+				log.info("XXX 1 stepExecution=" + stepExecution  + " jobExecutionid=" + stepExecution.getJobExecutionId()  + " id=" + stepExecution.getId());
+				log.info("XXX contains=" + stepExecutions2.contains(stepExecution) + " obj=" + stepExecutions2 + " class="+stepExecutions2.getClass());
+				log.info("XXX list contains=" + list.contains(stepExecution) + " obj=" + list + " class="+list.getClass());
+				log.info("XXX set contains=" + set.contains(stepExecution) + " obj=" + set + " class="+set.getClass());
+
+				if (set.remove(stepExecution)) {
+					log.info("XXX stepExecution=" + stepExecution + " removed");
+					// modified, but it back
+					masterExecutions.put(entry.getKey(), set);
+				}
+				if (set.size() == 0) {
 					// we consumed all executions, send complete event
 					// TODO: we could track failures
 					getYarnEventPublisher().publishEvent(new PartitionedStepExecutionEvent(this, entry.getKey()));
 					stepExecutionStateListener.state(PartitionedStepExecutionState.COMPLETED, entry.getKey());
 				}
+
+//				if (stepExecutions2.remove(stepExecution)) {
+//					log.info("XXX stepExecution=" + stepExecution + " removed");
+//					// modified, but it back
+//					masterExecutions.put(entry.getKey(), stepExecutions2);
+//				}
+//				log.info("XXX 2 stepExecutions size=" + stepExecutions2.size());
+//				if (stepExecutions2.size() == 0) {
+//					// we consumed all executions, send complete event
+//					// TODO: we could track failures
+//					getYarnEventPublisher().publishEvent(new PartitionedStepExecutionEvent(this, entry.getKey()));
+//					stepExecutionStateListener.state(PartitionedStepExecutionState.COMPLETED, entry.getKey());
+//				}
 			}
 		} else {
 			log.warn("No assigned step execution for containerId=" + containerId);
@@ -351,6 +382,9 @@ public abstract class AbstractBatchAppmaster extends AbstractEventingAppmaster i
 			}
 		}
 
+		if (log.isDebugEnabled()) {
+			log.debug("Adding " + stepExecutions.size() + " split steps into masterStepExecution=" + masterStepExecution);
+		}
 		masterExecutions.put(masterStepExecution, stepExecutions);
 
 		int remaining = stepExecutions.size() - resourceRequests.size();
