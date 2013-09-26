@@ -176,29 +176,13 @@ public abstract class AbstractBatchAppmaster extends AbstractEventingAppmaster i
 		ContainerId containerId = status.getContainerId();
 		StepExecution stepExecution = containerToStepMap.get(containerId);
 
-		// TODO: batch22
-		log.info("XXX containerId=" + containerId + " to stepExecution=" + stepExecution);
 		if (stepExecution != null) {
-			log.info("XXX masterExecutions size=" + masterExecutions.size());
 			for (Entry<StepExecution, Set<StepExecution>> entry : masterExecutions.entrySet()) {
-				ArrayList<StepExecution> list = new ArrayList<StepExecution>();
-				Set<StepExecution> set = new HashSet<StepExecution>();
-				Set<StepExecution> stepExecutions2 = entry.getValue();
-				log.info("XXX 1 stepExecutions size=" + stepExecutions2.size());
-				for (StepExecution s : stepExecutions2) {
-					list.add(s);
-					set.add(s);
-					log.info("XXX 1s stepExecution=" + s + " jobExecutionid=" + s.getJobExecutionId() + " id=" + s.getId());
-					log.info("XXX equal=" + s.equals(stepExecution));
-					log.info("XXX hash equal=" + s.hashCode() + "/" + stepExecution.hashCode());
-				}
-				log.info("XXX 1 stepExecution=" + stepExecution  + " jobExecutionid=" + stepExecution.getJobExecutionId()  + " id=" + stepExecution.getId());
-				log.info("XXX contains=" + stepExecutions2.contains(stepExecution) + " obj=" + stepExecutions2 + " class="+stepExecutions2.getClass());
-				log.info("XXX list contains=" + list.contains(stepExecution) + " obj=" + list + " class="+list.getClass());
-				log.info("XXX set contains=" + set.contains(stepExecution) + " obj=" + set + " class="+set.getClass());
-
+				Set<StepExecution> set = entry.getValue();
 				if (set.remove(stepExecution)) {
-					log.info("XXX stepExecution=" + stepExecution + " removed");
+					if (log.isDebugEnabled()) {
+						log.debug("stepExecution=" + stepExecution + " removed");
+					}
 					// modified, but it back
 					masterExecutions.put(entry.getKey(), set);
 				}
@@ -208,19 +192,6 @@ public abstract class AbstractBatchAppmaster extends AbstractEventingAppmaster i
 					getYarnEventPublisher().publishEvent(new PartitionedStepExecutionEvent(this, entry.getKey()));
 					stepExecutionStateListener.state(PartitionedStepExecutionState.COMPLETED, entry.getKey());
 				}
-
-//				if (stepExecutions2.remove(stepExecution)) {
-//					log.info("XXX stepExecution=" + stepExecution + " removed");
-//					// modified, but it back
-//					masterExecutions.put(entry.getKey(), stepExecutions2);
-//				}
-//				log.info("XXX 2 stepExecutions size=" + stepExecutions2.size());
-//				if (stepExecutions2.size() == 0) {
-//					// we consumed all executions, send complete event
-//					// TODO: we could track failures
-//					getYarnEventPublisher().publishEvent(new PartitionedStepExecutionEvent(this, entry.getKey()));
-//					stepExecutionStateListener.state(PartitionedStepExecutionState.COMPLETED, entry.getKey());
-//				}
 			}
 		} else {
 			log.warn("No assigned step execution for containerId=" + containerId);
@@ -385,10 +356,14 @@ public abstract class AbstractBatchAppmaster extends AbstractEventingAppmaster i
 		if (log.isDebugEnabled()) {
 			log.debug("Adding " + stepExecutions.size() + " split steps into masterStepExecution=" + masterStepExecution);
 		}
-		masterExecutions.put(masterStepExecution, stepExecutions);
+
+		// Create new set due to SHDP-188
+		HashSet<StepExecution> set = new HashSet<StepExecution>(stepExecutions.size());
+		set.addAll(stepExecutions);
+		masterExecutions.put(masterStepExecution, set);
 
 		int remaining = stepExecutions.size() - resourceRequests.size();
-		for (StepExecution execution : stepExecutions) {
+		for (StepExecution execution : set) {
 			if (!requestData.containsKey(execution)) {
 				requestData.put(execution, null);
 			}
