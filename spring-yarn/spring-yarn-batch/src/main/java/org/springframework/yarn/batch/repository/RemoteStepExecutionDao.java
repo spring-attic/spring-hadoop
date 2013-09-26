@@ -16,6 +16,7 @@
 package org.springframework.yarn.batch.repository;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
@@ -63,6 +64,14 @@ public class RemoteStepExecutionDao extends AbstractRemoteDao implements StepExe
 			stepExecution.setVersion(response.getVersion());
 		} catch (Exception e) {
 			throw convertException(e);
+		}
+	}
+
+	@Override
+	public void saveStepExecutions(Collection<StepExecution> stepExecutions) {
+		Assert.notNull(stepExecutions, "Attempt to save an null collect of step executions");
+		for (StepExecution stepExecution : stepExecutions) {
+			saveStepExecution(stepExecution);
 		}
 	}
 
