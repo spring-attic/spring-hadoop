@@ -12,8 +12,8 @@
 	<context:property-placeholder location="hadoop-fake.properties"/>
 
 	<yarn:configuration>
-		fs.default.name=${hd.fs}
-		yarn.resourcemanager.address=${hd.rm}
+		fs.default.name=${fake.fs}
+		yarn.resourcemanager.address=${fake.rm}
 		test.foo=jee
 	</yarn:configuration>
 

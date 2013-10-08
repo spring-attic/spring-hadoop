@@ -68,10 +68,21 @@ switch (hadoopDistro) {
 		pigVersion = cdh3PigVersion
 		break;	
 
-	// Cloudera CDH4
+	// Cloudera CDH4 YARN
+	case "cdh4yarn":
+		hadoopVersion = cdh4YARNVersion
+		println "Using Cloudera CDH4 YARN [$hadoopVersion]"
+		hbaseVersion = cdh4HbaseVersion
+		hiveVersion = cdh4HiveVersion
+		pigVersion = cdh4PigVersion
+		thriftVersion = cdh4ThriftVersion
+		break;	
+
+	// Cloudera CDH4 MR1
+	case "cdh4mr1":
 	case "cdh4":
 		hadoopVersion = cdh4MR1Version
-		println "Using Cloudera CDH4 [$hadoopVersion]"
+		println "Using Cloudera CDH4 MR1 [$hadoopVersion]"
 		hbaseVersion = cdh4HbaseVersion
 		hiveVersion = cdh4HiveVersion
 		pigVersion = cdh4PigVersion
@@ -307,12 +318,26 @@ configure(hadoopProjects()) {
 			}
 			break;	
 
-		// Cloudera CDH4
-		case "cdh4":
+		// Cloudera CDH4 YARN
+		case "cdh4yarn":
 			dependencies {
+				compile("org.apache.hadoop:hadoop-common:$cdh4Version")
+				compile("org.apache.hadoop:hadoop-mapreduce-client-core:$cdh4Version")
+				compile("org.apache.hadoop:hadoop-distcp:$cdh4Version")
+				optional("org.apache.hadoop:hadoop-streaming:$cdh4YARNVersion") 
+				optional("org.apache.hadoop:hadoop-hdfs:$cdh4Version")
+				testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
+				testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
+			}
+			break;	
+
+		// Cloudera CDH4 MR1
+		case "cdh4":
+		case "cdh4mr1":
+			dependencies {
+				compile("org.apache.hadoop:hadoop-common:$cdh4Version")
 				optional("org.apache.hadoop:hadoop-streaming:$cdh4MR1Version") 
 				optional("org.apache.hadoop:hadoop-tools:$cdh4MR1Version")
-				optional("org.apache.hadoop:hadoop-common:$cdh4Version")
 				optional("org.apache.hadoop:hadoop-hdfs:$cdh4Version")
 				testCompile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
 			}
@@ -799,6 +824,30 @@ if (gradle.ext.mr2) {
 			testCompile("org.mockito:mockito-core:$mockitoVersion") { dep ->
 				exclude group: "org.hamcrest"
 			}
+		}
+
+		test {
+
+			doFirst() {
+				// check prefix for hd.fs
+				// first copy the properties since we can't change them
+				ext.projProps = project.properties
+	
+				if (projProps.containsKey("hd.fs")) {
+						String hdfs = projProps["hd.fs"].toString()
+						if (!hdfs.contains("://")) {
+							projProps.put("hd.fs", "hdfs://" + hdfs)
+						}
+				}
+			
+				// due to GRADLE-2475, set the system properties manually
+				projProps.each { k,v ->
+						if (k.toString().startsWith("hd.")) {
+							systemProperties[k] = projProps[k]
+						}
+				}
+			}
+
 		}
 	}
 
