@@ -14,11 +14,11 @@
 	
 	<job id="mainJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="prep" next="import">
-			<hdp:script-tasklet id="script-tasklet-prep">
-				<hdp:script language="javascript">
+			<hdpb:script-tasklet id="script-tasklet-prep">
+				<hdpb:script language="javascript">
 					if (fsh.test("/test/word/output")) fsh.rmr("/test/word/output")
-				</hdp:script>
-			</hdp:script-tasklet>
+				</hdpb:script>
+			</hdpb:script-tasklet>
 		</step>
 		<step id="import" next="do">
 			<tasklet>
