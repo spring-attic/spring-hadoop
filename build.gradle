@@ -130,10 +130,10 @@ switch (hadoopDistro) {
 
   break;
 
-  // Hadoop 2.1 Beta
-  case "hadoop21":
-    hadoopVersion = hd21Version
-    println "Using Apache Hadoop 2.1 - [$hadoopVersion]"
+  // Hadoop 2.2
+  case "hadoop22":
+    hadoopVersion = hd22Version
+    println "Using Apache Hadoop 2.2 - [$hadoopVersion]"
 
     hadoop = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
               "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
@@ -147,11 +147,11 @@ switch (hadoopDistro) {
         testRuntime "dk.brics.automaton:automaton:1.11-8"
     }
 
-    hbaseVersion = hd21HbaseVersion
-    hiveVersion = hd21HiveVersion
-    pigVersion = hd21PigVersion
+    hbaseVersion = hd22HbaseVersion
+    hiveVersion = hd22HiveVersion
+    pigVersion = hd22PigVersion
     pigQualifier = ':h2'
-    thriftVersion = hd21ThriftVersion
+    thriftVersion = hd22ThriftVersion
 
   break;
 
