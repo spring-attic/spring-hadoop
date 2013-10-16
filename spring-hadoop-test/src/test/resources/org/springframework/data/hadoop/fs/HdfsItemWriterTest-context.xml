@@ -5,21 +5,21 @@
 	xmlns:hdpb="http://www.springframework.org/schema/hadoop-batch"
 	xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-      	http://www.springframework.org/schema/batch	http://www.springframework.org/schema/batch/spring-batch.xsd
-      	http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd
-      	http://www.springframework.org/schema/hadoop-batch http://www.springframework.org/schema/hadoop/spring-hadoop-batch.xsd">
+	  	http://www.springframework.org/schema/batch	http://www.springframework.org/schema/batch/spring-batch.xsd
+	  	http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd
+	  	http://www.springframework.org/schema/hadoop-batch http://www.springframework.org/schema/hadoop/spring-hadoop-batch.xsd">
 
 	<import resource="../batch-common.xml"/>
 	<import resource="../hadoop-ctx.xml"/>
 	
 	<job id="mainJob" xmlns="http://www.springframework.org/schema/batch">
-        <step id="prep" next="import">
-            <hdp:script-tasklet id="script-tasklet-prep">
-                <hdp:script language="javascript">
-                    if (fsh.test("/test/word/output")) fsh.rmr("/test/word/output")
-                </hdp:script>
-            </hdp:script-tasklet>
-        </step>
+		<step id="prep" next="import">
+			<hdp:script-tasklet id="script-tasklet-prep">
+				<hdp:script language="javascript">
+					if (fsh.test("/test/word/output")) fsh.rmr("/test/word/output")
+				</hdp:script>
+			</hdp:script-tasklet>
+		</step>
 		<step id="import" next="do">
 			<tasklet>
 				<chunk reader="itemReader" writer="hdfsItemWriter" commit-interval="100"/>
@@ -31,7 +31,7 @@
 		<step id="clean">
 			<hdpb:script-tasklet id="script-tasklet-clean">
 				<hdpb:script language="javascript">
-if (fsh.test("/test/word/")) fsh.rmr("/test/word/")
+					if (fsh.test("/test/word/")) fsh.rmr("/test/word/")
 				</hdpb:script>
 			</hdpb:script-tasklet>
 		</step>
