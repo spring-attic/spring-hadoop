@@ -64,7 +64,7 @@ from the project root folder. This will compile the sources, run the tests and c
 
 ## Supported distros
 
-By default Spring for Apache Hadoop compiles against Apache Hadoop 1.0.x. Apache Hadoop 1.1.x (hadoop11) Apache Hadoop 1.2.x (hadoop12), Apache Hadoop 2.0.x Alpha (hadoop20), Cloudera CDH3 (cdh3), Cloudera CDH4 (cdh4), Hortonworks HDP 1.3 (hdp13) and Pivotal HD 1.0 (phd1) are also supported; to compile against them pass the `-Pdistro=<label>` project property, like so:
+By default Spring for Apache Hadoop compiles against Apache Hadoop 1.0.x. Apache Hadoop 1.1.x (hadoop11) Apache Hadoop 1.2.x (hadoop12), Apache Hadoop 2.0.x Alpha (hadoop20), Apache Hadoop 2.2.x (hadoop22), Cloudera CDH3 (cdh3), Cloudera CDH4 (cdh4), Hortonworks HDP 1.3 (hdp13) and Pivotal HD 1.0 (phd1) are also supported; to compile against them pass the `-Pdistro=<label>` project property, like so:
 
     gradlew -Pdistro=hadoop11 build
     
