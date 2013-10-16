@@ -13,6 +13,13 @@
 	<import resource="../hadoop-ctx.xml"/>
 	
 	<job id="mainJob" xmlns="http://www.springframework.org/schema/batch">
+        <step id="prep" next="import">
+            <hdp:script-tasklet id="script-tasklet-prep">
+                <hdp:script language="javascript">
+                    if (fsh.test("/test/word/output")) fsh.rmr("/test/word/output")
+                </hdp:script>
+            </hdp:script-tasklet>
+        </step>
 		<step id="import" next="do">
 			<tasklet>
 				<chunk reader="itemReader" writer="hdfsItemWriter" commit-interval="100"/>
@@ -22,7 +29,7 @@
 			<tasklet ref="hadoop-tasklet"/>
 		</step>
 		<step id="clean">
-			<hdpb:script-tasklet id="script-tasklet">
+			<hdpb:script-tasklet id="script-tasklet-clean">
 				<hdpb:script language="javascript">
 if (fsh.test("/test/word/")) fsh.rmr("/test/word/")
 				</hdpb:script>
