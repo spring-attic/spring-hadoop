@@ -124,7 +124,7 @@ public abstract class AbstractYarnClusterTests implements ApplicationContextAwar
 	 * Submits application and wait state. On default
 	 * waits 60 seconds.
 	 * 
-	 * @return Last knows application state 
+	 * @return Last known application state or <code>NULL</code> if timeout
 	 * @throws Exception if exception occurred
 	 * @see #submitApplicationAndWaitState(long, TimeUnit, YarnApplicationState...)
 	 */
@@ -137,7 +137,7 @@ public abstract class AbstractYarnClusterTests implements ApplicationContextAwar
 	 * 
 	 * @param timeout the timeout for wait
 	 * @param unit the unit for timeout
-	 * @return Last knows application state 
+	 * @return Last known application state or <code>NULL</code> if timeout
 	 * @throws Exception if exception occurred
 	 * @see #submitApplicationAndWaitState(long, TimeUnit, YarnApplicationState...)
 	 */
@@ -154,7 +154,7 @@ public abstract class AbstractYarnClusterTests implements ApplicationContextAwar
 	 * @param timeout the timeout for wait
 	 * @param unit the unit for timeout
 	 * @param applicationStates the application states to wait
-	 * @return Last knows application state 
+	 * @return Last known application state or <code>NULL</code> if timeout
 	 * @throws Exception if exception occurred
 	 */
 	protected YarnApplicationState submitApplicationAndWaitState(long timeout, TimeUnit unit, YarnApplicationState... applicationStates) throws Exception {
@@ -166,6 +166,9 @@ public abstract class AbstractYarnClusterTests implements ApplicationContextAwar
 		Assert.notNull(applicationId, "Failed to get application id from submit");
 
 		long end = System.currentTimeMillis() + unit.toMillis(timeout);		
+		
+		// break label for inner loop
+		done:
 		do {
 			state = findState(yarnClient, applicationId);
 			if (state == null) {
@@ -173,7 +176,7 @@ public abstract class AbstractYarnClusterTests implements ApplicationContextAwar
 			}
 			for (YarnApplicationState stateCheck : applicationStates) {
 				if (state.equals(stateCheck)) {
-					break;
+					break done;
 				}
 			}
 			Thread.sleep(1000);			
@@ -203,7 +206,7 @@ public abstract class AbstractYarnClusterTests implements ApplicationContextAwar
 	 * @param timeout the timeout for wait
 	 * @param unit the unit for timeout
 	 * @param applicationStates the application states to wait
-	 * @return Last knows application state 
+	 * @return Last known application state or <code>NULL</code> if timeout
 	 * @throws Exception if exception occurred
 	 */
 	protected YarnApplicationState waitState(ApplicationId applicationId, long timeout, TimeUnit unit, YarnApplicationState... applicationStates) throws Exception {
@@ -212,6 +215,9 @@ public abstract class AbstractYarnClusterTests implements ApplicationContextAwar
 		
 		YarnApplicationState state = null;		
 		long end = System.currentTimeMillis() + unit.toMillis(timeout);		
+		
+		// break label for inner loop
+		done:
 		do {
 			state = findState(yarnClient, applicationId);
 			if (state == null) {
@@ -219,7 +225,7 @@ public abstract class AbstractYarnClusterTests implements ApplicationContextAwar
 			}
 			for (YarnApplicationState stateCheck : applicationStates) {
 				if (state.equals(stateCheck)) {
-					break;
+					break done;
 				}
 			}
 			Thread.sleep(1000);			
