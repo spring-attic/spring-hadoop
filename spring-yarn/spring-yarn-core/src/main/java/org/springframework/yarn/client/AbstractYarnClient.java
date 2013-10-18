@@ -48,7 +48,7 @@ import org.springframework.yarn.support.compat.ResourceCompat;
  *
  */
 public abstract class AbstractYarnClient implements YarnClient, InitializingBean {
-	
+
 	private final static Log log = LogFactory.getLog(AbstractYarnClient.class);
 
 	/** Template communicating for resource manager */
@@ -87,7 +87,7 @@ public abstract class AbstractYarnClient implements YarnClient, InitializingBean
 	/** Base path for app staging directory */
 	private String stagingDirPath;
 
-	/** Name of the app specific dir name under staging dir */
+	/** App specific dir name under staging dir */
 	private String applicationDirName;
 
 	/**
@@ -112,20 +112,15 @@ public abstract class AbstractYarnClient implements YarnClient, InitializingBean
 		// localizer distribute will kick off too early
 		ApplicationId applicationId = clientRmOperations.getNewApplication().getApplicationId();
 
-		// if not already set, get it from application id
-		if (applicationDirName == null) {
-			applicationDirName = Integer.toString(applicationId.getId());
-		}
-
-		resourceLocalizer.setStagingId(applicationDirName);
+		resourceLocalizer.setStagingId(applicationId.toString());
 		resourceLocalizer.distribute();
 
 		ApplicationSubmissionContext submissionContext = getSubmissionContext(applicationId);
-		
+
 		if (log.isDebugEnabled()) {
 			log.debug("Using ApplicationSubmissionContext=" + submissionContext);
 		}
-		
+
 		clientRmOperations.submitApplication(submissionContext);
 		return applicationId;
 	}
@@ -165,14 +160,14 @@ public abstract class AbstractYarnClient implements YarnClient, InitializingBean
 	}
 
 	/**
-	 * Gets the environment variables. 
-	 * 
+	 * Gets the environment variables.
+	 *
 	 * @return the map of environment variables
 	 */
 	public Map<String, String> getEnvironment() {
 		return environment;
 	}
-	
+
 	/**
 	 * Sets the environment for appmaster.
 	 *
@@ -195,13 +190,13 @@ public abstract class AbstractYarnClient implements YarnClient, InitializingBean
 	 * Get the {@link Configuration} of this client. Internally
 	 * this method is called to get the configuration which
 	 * allows sub-classes to override and add additional settings.
-	 * 
+	 *
 	 * @return the {@link Configuration}
 	 */
 	public Configuration getConfiguration() {
 		return configuration;
 	}
-	
+
 	/**
 	 * Sets the Yarn configuration.
 	 *

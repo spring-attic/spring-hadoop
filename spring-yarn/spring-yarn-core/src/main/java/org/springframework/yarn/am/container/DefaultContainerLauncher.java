@@ -94,7 +94,7 @@ public class DefaultContainerLauncher extends AbstractLauncher implements Contai
 		ctx.setContainerId(container.getId());
 		ctx.setResource(container.getResource());
 		ctx.setUser(getUsername());
-		String stagingId = Integer.toString(container.getId().getApplicationAttemptId().getApplicationId().getId());
+		String stagingId = container.getId().getApplicationAttemptId().getApplicationId().toString();
 		getResourceLocalizer().setStagingId(stagingId);
 		ctx.setLocalResources(getResourceLocalizer().getResources());
 		ctx.setCommands(commands);
