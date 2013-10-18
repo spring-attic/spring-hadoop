@@ -120,11 +120,21 @@ public class DefaultResourceLocalizer implements ResourceLocalizer {
 
 	@Override
 	public void setStagingDirectory(Path stagingDirectory) {
+		log.info("Setting stagingDirectory=" + stagingDirectory);
+		if (!ObjectUtils.nullSafeEquals(this.stagingDirectory, stagingDirectory)) {
+			log.info("Marking distributed state false");
+			distributed = false;
+		}
 		this.stagingDirectory = stagingDirectory;
 	}
 
 	@Override
 	public void setStagingId(String stagingId) {
+		log.info("Setting stagingId=" + stagingId);
+		if (!ObjectUtils.nullSafeEquals(this.stagingId, stagingId)) {
+			log.info("Marking distributed state false");
+			distributed = false;
+		}
 		this.stagingId = stagingId;
 	}
 
@@ -134,10 +144,13 @@ public class DefaultResourceLocalizer implements ResourceLocalizer {
 		distributeLock.lock();
 		try {
 			if (!distributed) {
+				log.info("About to distribute localized files");
 				FileSystem fs = FileSystem.get(configuration);
 				doFileCopy(fs);
 				resources = doFileTransfer(fs);
 				distributed = true;
+			} else {
+				log.info("Files already distributed");
 			}
 		} catch (IOException e) {
 			log.error("Error distributing files", e);
@@ -274,9 +287,13 @@ public class DefaultResourceLocalizer implements ResourceLocalizer {
 		try {
 			FileSystem fs = FileSystem.get(configuration);
 			Path resolvedStagingDirectory = resolveStagingDirectory();
+			log.info("About to delete staging entries for path=" + resolvedStagingDirectory);
 			return fs.delete(resolvedStagingDirectory, true);
 		} catch (IOException e) {
+			log.error("Error deleting staging entries", e);
 			return false;
+		} finally {
+			distributed = false;
 		}
 	}
 
