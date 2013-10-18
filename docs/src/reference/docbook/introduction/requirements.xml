@@ -15,28 +15,27 @@
   url="http://hadoop.apache.org/">Apache Hadoop</ulink> 1.2.1. SHDP supports
   and is <ulink
   url="https://build.springsource.org/browse/SPRINGDATAHADOOP">tested</ulink>
-  daily against Apache Hadoop 1.2.1 and also against 1.0.4, 1.1.2 and
-  2.0.6-alpha as well as against various Hadoop distributions: <itemizedlist>
+  daily against Apache Hadoop 1.2.1 and also against 1.1.2 and
+  2.0.x alpha as well as against various Hadoop distributions: <itemizedlist>
       <listitem>
-        <para><ulink url="http://www.cloudera.com/">Cloudera</ulink> CDH3
-        (cdh3u5), CDH4 (cdh4.3.1 MRv1) distributions</para>
+        <para><ulink url="http://www.gopivotal.com/">Pivotal</ulink> HD
+        1.1</para>
+      </listitem>
+
+      <listitem>
+        <para><ulink url="http://www.cloudera.com/">Cloudera</ulink> CDH4 (cdh4.3.1 MRv1) distributions</para>
       </listitem>
 
       <listitem>
         <para><ulink url="http://www.hortonworks.com/">Hortonworks</ulink>
         Data Platform 1.3</para>
       </listitem>
-
-      <listitem>
-        <para><ulink url="http://www.gopivotal.com/">Pivotal</ulink> HD
-        1.0</para>
-      </listitem>
-    </itemizedlist>Any distro compatible with Apache Hadoop 1.x should be
+    </itemizedlist>Any distro compatible with Apache Hadoop 1.x stable should be
   supported.</para>
 
-  <para>We have recently added support to allow 2.0.x based distributions to
+  <para>We have recently added support to allow Hadoop 2.x based distributions to
   be used with the current functionality. We are running test builds against
-  Apache Hadoop 2.0.6-alpha, Pivotal HD 1.0 and Hortonworks Data Platform
+  Apache Hadoop 2.0.x alpha, Pivotal HD 1.1 and Hortonworks Data Platform
   2.0.</para>
 
   <note>
@@ -45,7 +44,7 @@
   </note>
 
   <para>Spring Data Hadoop is provided out of the box and it is certified to
-  work on Greenplum HD 1.2 and Pivotal HD 1.0 distributions. It is also
+  work on Greenplum HD 1.2 and Pivotal HD 1.0 and 1.1 distributions. It is also
   certified to run against Hortonworks HDP 1.3.</para>
 
   <para>Instructions for setting up project builds using various supported
