@@ -20,12 +20,11 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.lessThan;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.hadoop.yarn.api.records.YarnApplicationState;
 import org.junit.Test;
@@ -49,52 +48,48 @@ import org.springframework.yarn.test.support.ContainerLogUtils;
 public class ClusterBaseTestClassSubmitTests extends AbstractYarnClusterTests {
 
 	@Test
-	@Timed(millis = 120000)
+	@Timed(millis = 130000)
 	public void testAppSubmission1() throws Exception {
 		doSubmitAndAssert();
 	}
 
 	@Test
-	@Timed(millis = 120000)
+	@Timed(millis = 130000)
 	public void testAppSubmission2() throws Exception {
 		doSubmitAndAssert();
 	}
 
 	private void doSubmitAndAssert() throws Exception {
-		ApplicationInfo info = submitApplicationAndWait();
-		assertNotNull(info);
-		assertNotNull(info.getYarnApplicationState());
-		assertNotNull(info.getApplicationId());
-		assertTrue(info.getYarnApplicationState().equals(YarnApplicationState.FINISHED));
+		ApplicationInfo info = submitApplicationAndWait(120, TimeUnit.SECONDS);
+		assertThat(info, notNullValue());
+		assertThat(info.getYarnApplicationState(), notNullValue());
+		assertThat(info.getApplicationId(), notNullValue());
+		assertThat(info.getYarnApplicationState(), is(YarnApplicationState.FINISHED));
 
 		List<Resource> resources = ContainerLogUtils.queryContainerLogs(getYarnCluster(),
 				info.getApplicationId());
-//		List<Resource> resources = ContainerLogUtils.queryContainerLogs(getYarnCluster(),
-//				info.getApplicationId(), "*.std*");
-//		List<Resource> resources = ContainerLogUtils.queryContainerLogs(getYarnCluster(),
-//				info.getApplicationId(), ".std");
 
 		// appmaster and 4 containers should
 		// make it 10 log files
 		assertThat(resources, notNullValue());
-		assertThat(resources.size(), is(10));
+		assertThat("expecting 10 log files", resources.size(), is(10));
 
 		for (Resource res : resources) {
 			File file = res.getFile();
 			if (file.getName().endsWith("stdout")) {
 				// there has to be some content in stdout file
-				assertThat(file.length(), greaterThan(0l));
+				assertThat("there has to be content in stdout file", file.length(), greaterThan(0l));
 				if (file.getName().equals("Container.stdout")) {
 					Scanner scanner = new Scanner(file);
 					String content = scanner.useDelimiter("\\A").next();
 					scanner.close();
 					// check that we have a simple timestamp
-					assertThat(content.length(), greaterThan(10));
-					assertThat(content.length(), lessThan(40));
+					assertThat("content doesn't look like timestamp", content.length(), greaterThan(10));
+					assertThat("content doesn't look like timestamp", content.length(), lessThan(40));
 				}
 			} else if (file.getName().endsWith("stderr")) {
 				// can't have anything in stderr files
-				assertThat(file.length(), is(0l));
+				assertThat("stderr file is not empty", file.length(), is(0l));
 			}
 		}
 
