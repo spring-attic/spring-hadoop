@@ -88,8 +88,14 @@ public class ClusterBaseTestClassSubmitTests extends AbstractYarnClusterTests {
 					assertThat("content doesn't look like timestamp", content.length(), lessThan(40));
 				}
 			} else if (file.getName().endsWith("stderr")) {
+				String content = "";
+				if (file.length() > 0) {
+					Scanner scanner = new Scanner(file);
+					content = scanner.useDelimiter("\\A").next();
+					scanner.close();
+				}
 				// can't have anything in stderr files
-				assertThat("stderr file is not empty", file.length(), is(0l));
+				assertThat("stderr file is not empty: " + content, file.length(), is(0l));
 			}
 		}
 
