@@ -15,8 +15,9 @@
 		<yarn:hdfs path="/*" staging="true"/>
 	</yarn:localresources>
 
+	<!-- do not rely on default classpath, instead use all dependencies -->
 	<yarn:environment include-system-env="false">
-		<yarn:classpath/>
+		<yarn:classpath default-yarn-app-classpath="false"/>
 	</yarn:environment>
 
 	<util:properties id="arguments">
