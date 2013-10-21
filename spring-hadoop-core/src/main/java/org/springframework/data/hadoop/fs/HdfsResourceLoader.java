@@ -28,8 +28,11 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.compress.CompressionCodecFactory;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.PriorityOrdered;
+import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.Assert;
@@ -39,18 +42,28 @@ import org.springframework.util.StringUtils;
 
 /**
  * Spring ResourceLoader over Hadoop FileSystem.
- * 
+ *
  * @author Costin Leau
+ * @author Janne Valkealahti
+ *
  */
-public class HdfsResourceLoader implements ResourcePatternResolver, PriorityOrdered, Closeable, DisposableBean {
+public class HdfsResourceLoader extends DefaultResourceLoader implements ResourcePatternResolver,
+		PriorityOrdered, Closeable, DisposableBean, InitializingBean {
 
-	private static final String PREFIX_DELIMITER = ":";
+	/** Pseudo URL prefix for loading from the hdfs path: "hdfs:" */
+	private static final String HDFS_URL_PREFIX = "hdfs:";
 
 	private final FileSystem fs;
 	private final PathMatcher pathMatcher = new AntPathMatcher();
+
+	/** Flag telling if fs is created in this class */
 	private final boolean internalFS;
+
 	private volatile boolean useCodecs = true;
 	private volatile CompressionCodecFactory codecsFactory;
+	private String impersonatedUser = null;
+
+	private ResourcePatternResolver resourcePatternResolver;
 
 	/**
 	 * Constructs a new <code>HdfsResourceLoader</code> instance.
@@ -68,9 +81,11 @@ public class HdfsResourceLoader implements ResourcePatternResolver, PriorityOrde
 	 * @param uri Hadoop file system URI.
 	 * @param user Hadoop user for accessing the file system.
 	 */
+	@SuppressWarnings("resource")
 	public HdfsResourceLoader(Configuration config, URI uri, String user) {
 		Assert.notNull(config, "a valid configuration is required");
 
+		impersonatedUser = user;
 		internalFS = true;
 		FileSystem tempFS = null;
 		codecsFactory = new CompressionCodecFactory(config);
@@ -79,7 +94,7 @@ public class HdfsResourceLoader implements ResourcePatternResolver, PriorityOrde
 			if (uri == null) {
 				uri = FileSystem.getDefaultUri(config);
 			}
-			tempFS = (StringUtils.hasText(user) ? FileSystem.get(uri, config, user) : FileSystem.get(uri, config));
+			tempFS = (StringUtils.hasText(impersonatedUser) ? FileSystem.get(uri, config, impersonatedUser) : FileSystem.get(uri, config));
 		} catch (Exception ex) {
 			tempFS = null;
 			throw new IllegalStateException("Cannot create filesystem", ex);
@@ -110,9 +125,73 @@ public class HdfsResourceLoader implements ResourcePatternResolver, PriorityOrde
 		codecsFactory = new CompressionCodecFactory(fs.getConf());
 	}
 
+	@Override
+	protected Resource getResourceByPath(String path) {
+		return new HdfsResource(path, fs, codecs());
+	}
+
+	@Override
+	public Resource getResource(String location) {
+		// it looks like spring DefaultResourceLoader will rely java.net.URL to throw
+		// exception before if fall back to getResourceByPath. This is not reliable
+		// so do explicit check if location starts with 'hdfs'.
+		if (location.startsWith(HDFS_URL_PREFIX)) {
+			return getResourceByPath(location);
+		} else {
+			return super.getResource(location);
+		}
+	}
+
+	@Override
+	public Resource[] getResources(String locationPattern) throws IOException {
+		Assert.notNull(locationPattern, "Location pattern must not be null");
+
+		if (locationPattern.startsWith(HDFS_URL_PREFIX) || locationPattern.indexOf(':') < 0) {
+			// Only look for a pattern after a prefix here
+			// (to not get fooled by a pattern symbol in a strange prefix).
+			if (pathMatcher.isPattern(stripPrefix(locationPattern))) {
+				// a resource pattern
+				return findPathMatchingResources(locationPattern);
+			} else {
+				// a single resource with the given name
+				return new Resource[] { getResource(stripPrefix(locationPattern)) };
+			}
+		} else {
+			return resourcePatternResolver.getResources(locationPattern);
+		}
+	}
+
+	@Override
+	public int getOrder() {
+		return PriorityOrdered.HIGHEST_PRECEDENCE;
+	}
+
+	@Override
+	public void destroy() throws IOException {
+		close();
+	}
+
+	@Override
+	public void close() throws IOException {
+		if (fs != null && internalFS) {
+			try {
+				fs.close();
+				// swallow bug in FS closing too early - HADOOP-4829
+			} catch (NullPointerException npe) {
+			}
+		}
+	}
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		if (resourcePatternResolver == null) {
+			resourcePatternResolver = new PathMatchingResourcePatternResolver(this);
+		}
+	}
+
 	/**
 	 * Returns the Hadoop file system used by this resource loader.
-	 * 
+	 *
 	 * @return the Hadoop file system in use.
 	 */
 	public FileSystem getFileSystem() {
@@ -123,28 +202,30 @@ public class HdfsResourceLoader implements ResourcePatternResolver, PriorityOrde
 		return fs.getConf().getClassLoader();
 	}
 
-	public Resource getResource(String location) {
-		return new HdfsResource(location, fs, codecs());
+	/**
+	 * Indicates whether to use (or not) the codecs found inside the Hadoop
+	 * configuration. This affects the content of the streams backing this
+	 * resource - whether the raw content is delivered as is
+	 * or decompressed on the fly (if the configuration allows it so).
+	 * The latter is the default.
+	 *
+	 * @param useCodecs whether to use any codecs defined in the Hadoop configuration
+	 */
+	public void setUseCodecs(boolean useCodecs) {
+		this.useCodecs = useCodecs;
 	}
 
-	private CompressionCodecFactory codecs() {
-		return (useCodecs ? codecsFactory : null);
-	}
-
-	public Resource[] getResources(String locationPattern) throws IOException {
-		// Only look for a pattern after a prefix here
-		// (to not get fooled by a pattern symbol in a strange prefix).
-		if (pathMatcher.isPattern(stripPrefix(locationPattern))) {
-			// a resource pattern
-			return findPathMatchingResources(locationPattern);
-		}
-		else {
-			// a single resource with the given name
-			return new Resource[] { getResource(locationPattern) };
-		}
+	/**
+	 * Sets the resource pattern resolver.
+	 *
+	 * @param resourcePatternResolver the new resource pattern resolver
+	 */
+	public void setResourcePatternResolver(ResourcePatternResolver resourcePatternResolver) {
+		this.resourcePatternResolver = resourcePatternResolver;
 	}
 
 	protected Resource[] findPathMatchingResources(String locationPattern) throws IOException {
+		locationPattern = stripPrefix(locationPattern);
 		// replace ~/ shortcut
 		if (locationPattern.startsWith("~/")) {
 			locationPattern = locationPattern.substring(2);
@@ -164,16 +245,15 @@ public class HdfsResourceLoader implements ResourcePatternResolver, PriorityOrde
 	}
 
 	protected String determineRootDir(String location) {
-		int prefixEnd = location.indexOf(PREFIX_DELIMITER) + 1;
 		int rootDirEnd = location.length();
-
-		while (rootDirEnd > prefixEnd && pathMatcher.isPattern(location.substring(prefixEnd, rootDirEnd))) {
+		while (rootDirEnd > 0 && pathMatcher.isPattern(location.substring(0,rootDirEnd))) {
 			rootDirEnd = location.lastIndexOf('/', rootDirEnd - 2) + 1;
 		}
-		if (rootDirEnd == 0) {
-			rootDirEnd = prefixEnd;
-		}
 		return location.substring(0, rootDirEnd);
+	}
+
+	private CompressionCodecFactory codecs() {
+		return (useCodecs ? codecsFactory : null);
 	}
 
 	private Set<Resource> doFindPathMatchingPathResources(Resource rootDirResource, String subPattern)
@@ -196,6 +276,7 @@ public class HdfsResourceLoader implements ResourcePatternResolver, PriorityOrde
 		return results;
 	}
 
+	@SuppressWarnings("deprecation")
 	private void doRetrieveMatchingResources(Path rootDir, String subPattern, Set<Resource> results) throws IOException {
 		if (!fs.isFile(rootDir)) {
 			FileStatus[] statuses = null;
@@ -231,38 +312,19 @@ public class HdfsResourceLoader implements ResourcePatternResolver, PriorityOrde
 	}
 
 	private static String stripPrefix(String path) {
-		// strip prefix
-		int index = path.indexOf(PREFIX_DELIMITER);
-		return (index > -1 ? path.substring(index + 1) : path);
-	}
-
-	public int getOrder() {
-		return PriorityOrdered.HIGHEST_PRECEDENCE;
-	}
-
-	public void destroy() throws IOException {
-		close();
-	}
-
-	@Override
-	public void close() throws IOException {
-		if (fs != null && internalFS) {
-			try {
-				fs.close();
-				// swallow bug in FS closing too early - HADOOP-4829
-			} catch (NullPointerException npe) {
-			}
+		String ret = null;
+		try {
+			ret = new Path(path).toUri().getPath();
+		} catch (Exception e) {}
+		if (ret == null && path.startsWith("hdfs:") && !path.startsWith("hdfs://")) {
+			// check if path is 'hdfs:myfile.txt', strip prefix and colon
+			ret = path.substring(5);
 		}
+		if (ret == null) {
+			// fall back to given path
+			ret = path;
+		}
+		return ret;
 	}
 
-	/**
-	 * Indicates whether to use (or not) the codecs found inside the Hadoop configuration.
-	 * This affects the content of the streams backing this resource - whether the raw content is delivered as is
-	 * or decompressed on the fly (if the configuration allows it so). The latter is the default.
-	 * 
-	 * @param useCodecs whether to use any codecs defined in the Hadoop configuration
-	 */
-	public void setUseCodecs(boolean useCodecs) {
-		this.useCodecs = useCodecs;
-	}
 }

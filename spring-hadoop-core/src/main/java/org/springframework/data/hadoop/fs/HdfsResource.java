@@ -1,12 +1,12 @@
 /*
  * Copyright 2011 the original author or authors.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,22 +27,20 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.LocalFileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.RawLocalFileSystem;
-import org.apache.hadoop.io.compress.CodecPool;
 import org.apache.hadoop.io.compress.CompressionCodec;
 import org.apache.hadoop.io.compress.CompressionCodecFactory;
-import org.apache.hadoop.io.compress.Decompressor;
 import org.springframework.core.io.ContextResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.WritableResource;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
  * Resource abstraction over HDFS {@link Path}s.
- *  
+ *
  * @author Costin Leau
  */
-class HdfsResource implements ContextResource {
-	//implements WritableResource,
+class HdfsResource implements ContextResource, WritableResource {
 
 	private final String location;
 	private final Path path;
@@ -51,14 +49,37 @@ class HdfsResource implements ContextResource {
 	private final FileStatus status;
 	private final CompressionCodecFactory codecsFactory;
 
+	/**
+	 * Instantiates a new hdfs resource.
+	 *
+	 * @param location the location
+	 * @param fs the fs
+	 * @param codecsFactory the codecs factory
+	 */
 	HdfsResource(String location, FileSystem fs, CompressionCodecFactory codecsFactory) {
 		this(location, null, fs, codecsFactory);
 	}
 
+	/**
+	 * Instantiates a new hdfs resource.
+	 *
+	 * @param parent the parent
+	 * @param child the child
+	 * @param fs the fs
+	 * @param codecsFactory the codecs factory
+	 */
 	HdfsResource(String parent, String child, FileSystem fs, CompressionCodecFactory codecsFactory) {
 		this(StringUtils.hasText(child) ? new Path(new Path(URI.create(parent)), new Path(URI.create(child))) : new Path(URI.create(parent)), fs, codecsFactory);
 	}
 
+	/**
+	 * Instantiates a new hdfs resource.
+	 *
+	 * @param path the path
+	 * @param fs the fs
+	 * @param codecsFactory the codecs factory
+	 */
+	@SuppressWarnings("deprecation")
 	HdfsResource(Path path, FileSystem fs, CompressionCodecFactory codecsFactory) {
 		Assert.notNull(path, "a valid path is required");
 		Assert.notNull(fs, "non null file system required");
@@ -158,7 +179,7 @@ class HdfsResource implements ContextResource {
 					// it's also unclear whether the pool is actually useful or not
 					// Decompressor decompressor = CodecPool.getDecompressor(codec);
 					// stream = (decompressor != null ? codec.createInputStream(stream, decompressor) : codec.createInputStream(stream));
-					
+
 					stream = codec.createInputStream(stream);
 				}
 			}
@@ -198,6 +219,7 @@ class HdfsResource implements ContextResource {
 		return path.toUri().getPath();
 	}
 
+	@Override
 	public OutputStream getOutputStream() throws IOException {
 		try {
 			return fs.create(path, true);
@@ -206,6 +228,7 @@ class HdfsResource implements ContextResource {
 		}
 	}
 
+	@Override
 	public boolean isWritable() {
 		try {
 			return ((exists && fs.isFile(path)) || (!exists));
