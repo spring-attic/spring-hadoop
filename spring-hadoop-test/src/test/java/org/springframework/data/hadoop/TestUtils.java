@@ -1,12 +1,12 @@
 /*
  * Copyright 2011 the original author or authors.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,6 +18,7 @@ package org.springframework.data.hadoop;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
 import java.util.Properties;
 
 import org.apache.hadoop.conf.Configuration;
@@ -32,9 +33,13 @@ import org.springframework.data.hadoop.util.PermissionUtils;
 import org.springframework.util.ClassUtils;
 
 /**
+ * Testing utilities.
+ *
  * @author Costin Leau
+ * @author Janne Valkealahti
+ *
  */
-public class TestUtils {
+public abstract class TestUtils {
 
 	/**
 	 * Hack to allow Hadoop client to run on windows.
@@ -44,15 +49,15 @@ public class TestUtils {
 	 * and the server are different.
 	 * The error message however doesn't properly shows that (it actually points to the permissions available on the server though it uses
 	 * the client ones). The solution is to _not_ use the hacked permissions but rather the original set.
-	 * 
+	 *
 	 * Note that if the client has created a folder already with the hacked set, Hadoop will complain - the solution is to remove the folder.
 	 *
-	 * 
+	 *
 	 * This method tries to address this by enabling the permissions only if the 'hadoop.jt' property is non-local. Additionally the boostrapping hadoop-context
 	 * features a script which removes the staging folder to avoid permissions mismatches.
 	 */
 	public static void hackHadoopStagingOnWin() {
-		// check test properties 
+		// check test properties
 		try {
 			Properties testProperties = PropertiesLoaderUtils.loadProperties(new ClassPathResource("/test.properties"));
 			if (testProperties != null && "local".equals(testProperties.get("hadoop.jt"))) {
@@ -137,6 +142,26 @@ public class TestUtils {
 
 	public static boolean isHadoop1X() {
 		return !isHadoop2X();
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T> T readField(String name, Object target) throws Exception {
+		Field field = null;
+		Class<?> clazz = target.getClass();
+		do {
+			try {
+				field = clazz.getDeclaredField(name);
+			} catch (Exception ex) {
+			}
+
+			clazz = clazz.getSuperclass();
+		} while (field == null && !clazz.equals(Object.class));
+
+		if (field == null)
+			throw new IllegalArgumentException("Cannot find field '" + name + "' in the class hierarchy of "
+					+ target.getClass());
+		field.setAccessible(true);
+		return (T) field.get(target);
 	}
 
 }
