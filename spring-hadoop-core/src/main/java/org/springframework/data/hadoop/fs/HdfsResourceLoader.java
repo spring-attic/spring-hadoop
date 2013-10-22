@@ -17,11 +17,15 @@
 package org.springframework.data.hadoop.fs;
 
 import java.io.Closeable;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
@@ -31,12 +35,12 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.PriorityOrdered;
 import org.springframework.core.io.DefaultResourceLoader;
+//import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.Assert;
-import org.springframework.util.ObjectUtils;
 import org.springframework.util.PathMatcher;
 import org.springframework.util.StringUtils;
 
@@ -49,6 +53,8 @@ import org.springframework.util.StringUtils;
  */
 public class HdfsResourceLoader extends DefaultResourceLoader implements ResourcePatternResolver,
 		PriorityOrdered, Closeable, DisposableBean, InitializingBean {
+
+	private static final Log log = LogFactory.getLog(HdfsResourceLoader.class);
 
 	/** Pseudo URL prefix for loading from the hdfs path: "hdfs:" */
 	private static final String HDFS_URL_PREFIX = "hdfs:";
@@ -228,23 +234,164 @@ public class HdfsResourceLoader extends DefaultResourceLoader implements Resourc
 		this.resourcePatternResolver = resourcePatternResolver;
 	}
 
+	/**
+	 * Find all resources that match the given location pattern via the
+	 * Ant-style PathMatcher.
+	 *
+	 * @param locationPattern the location pattern to match
+	 * @return the result as Resource array
+	 * @throws IOException in case of I/O errors
+	 */
 	protected Resource[] findPathMatchingResources(String locationPattern) throws IOException {
-		locationPattern = stripLeadingTilde(locationPattern);
-		locationPattern = stripPrefix(locationPattern);
-
 		String rootDirPath = determineRootDir(locationPattern);
 		String subPattern = locationPattern.substring(rootDirPath.length());
-		if (rootDirPath.isEmpty()) {
-			rootDirPath = ".";
-		}
-		Resource rootDirResource = getResource(rootDirPath);
-
+		Resource[] rootDirResources = getResources(rootDirPath);
 		Set<Resource> result = new LinkedHashSet<Resource>(16);
-		result.addAll(doFindPathMatchingPathResources(rootDirResource, subPattern));
-
+		for (Resource rootDirResource : rootDirResources) {
+			result.addAll(doFindPathMatchingFileResources(rootDirResource, subPattern));
+		}
+		if (log.isDebugEnabled()) {
+			log.debug("Resolved location pattern [" + locationPattern + "] to resources " + result);
+		}
 		return result.toArray(new Resource[result.size()]);
 	}
 
+	/**
+	 * Find all resources in the hdfs file system that match the given location pattern
+	 * via the Ant-style PathMatcher.
+	 *
+	 * @param rootDirResource the root directory as Resource
+	 * @param subPattern the sub pattern to match (below the root directory)
+	 * @return the Set of matching Resource instances
+	 * @throws IOException in case of I/O errors
+	 */
+	protected Set<Resource> doFindPathMatchingFileResources(Resource rootDirResource, String subPattern)
+			throws IOException {
+
+		Path rootDir;
+		try {
+			rootDir = (rootDirResource instanceof HdfsResource ?
+					((HdfsResource) rootDirResource).getPath() :
+					new Path(rootDirResource.getURI().toString()));
+		} catch (IOException ex) {
+			if (log.isWarnEnabled()) {
+				log.warn("Cannot search for matching files underneath " + rootDirResource +
+						" because it does not correspond to a directory in the file system", ex);
+			}
+			return Collections.emptySet();
+		}
+		return doFindMatchingFileSystemResources(rootDir, subPattern);
+	}
+
+	/**
+	 * Find all resources in the file system that match the given location pattern
+	 * via the Ant-style PathMatcher.
+	 *
+	 * @param rootDir the root directory in the file system
+	 * @param subPattern the sub pattern to match (below the root directory)
+	 * @return the Set of matching Resource instances
+	 * @throws IOException in case of I/O errors
+	 * @see org.springframework.util.PathMatcher
+	 */
+	protected Set<Resource> doFindMatchingFileSystemResources(Path rootDir, String subPattern) throws IOException {
+		if (log.isDebugEnabled()) {
+			log.debug("Looking for matching resources in directory tree [" + rootDir.toUri().getPath() + "]");
+		}
+		Set<Path> matchingFiles = retrieveMatchingFiles(rootDir, subPattern);
+		Set<Resource> result = new LinkedHashSet<Resource>(matchingFiles.size());
+		for (Path path : matchingFiles) {
+			result.add(new HdfsResource(path, fs, codecs()));
+		}
+		return result;
+	}
+
+	/**
+	 * Retrieve files that match the given path pattern,
+	 * checking the given directory and its subdirectories.
+	 *
+	 * @param rootDir the directory to start from
+	 * @param pattern the pattern to match against,  * relative to the root directory
+	 * @return the Set of matching Path instances
+	 * @throws IOException if directory contents could not be retrieved
+	 */
+	protected Set<Path> retrieveMatchingFiles(Path rootDir, String pattern) throws IOException {
+		FileStatus fileStatus = fs.getFileStatus(rootDir);
+		boolean exists = fs.exists(rootDir);
+		if (!exists) {
+			// Silently skip non-existing directories.
+			if (log.isDebugEnabled()) {
+				log.debug("Skipping [" + rootDir.toUri().getPath() + "] because it does not exist");
+			}
+			return Collections.emptySet();
+		}
+		if (!fileStatus.isDirectory()) {
+			// Complain louder if it exists but is no directory.
+			if (log.isWarnEnabled()) {
+				log.warn("Skipping [" + rootDir.toUri().getPath() + "] because it does not denote a directory");
+			}
+			return Collections.emptySet();
+		}
+		String fullPattern = StringUtils.replace(rootDir.toUri().getPath(), File.separator, "/");
+		if (!pattern.startsWith("/")) {
+			fullPattern += "/";
+		}
+		fullPattern = fullPattern + StringUtils.replace(pattern, File.separator, "/");
+		Set<Path> result = new LinkedHashSet<Path>(8);
+		doRetrieveMatchingFiles(fullPattern, rootDir, result);
+		return result;
+	}
+
+	/**
+	 * Recursively retrieve files that match the given pattern,
+	 * adding them to the given result list.
+	 *
+	 * @param fullPattern the pattern to match against, with prepended root directory path
+	 * @param dir the current directory
+	 * @param result the Set of matching File instances to add to
+	 * @throws IOException if directory contents could not be retrieved
+	 */
+	protected void doRetrieveMatchingFiles(String fullPattern, Path dir, Set<Path> result) throws IOException {
+		if (log.isDebugEnabled()) {
+			log.debug("Searching directory [" + dir.toUri().getPath() +
+					"] for files matching pattern [" + fullPattern + "]");
+		}
+
+		FileStatus[] dirContents = null;
+		try {
+			dirContents = fs.listStatus(dir);
+		} catch (IOException ex) {
+			// ignore (likely security exception)
+		}
+
+		if (dirContents == null) {
+			if (log.isWarnEnabled()) {
+				log.warn("Could not retrieve contents of directory [" + dir.toUri().getPath() + "]");
+			}
+			return;
+		}
+		for (FileStatus content : dirContents) {
+			String currPath = StringUtils.replace(content.getPath().toUri().getPath(), File.separator, "/");
+			if (content.isDirectory() && pathMatcher.matchStart(fullPattern, currPath + "/")) {
+				doRetrieveMatchingFiles(fullPattern, content.getPath(), result);
+			}
+			if (pathMatcher.match(fullPattern, currPath)) {
+				result.add(content.getPath());
+			}
+		}
+	}
+
+	/**
+	 * Determine the root directory for the given location.
+	 * <p>Used for determining the starting point for file matching,
+	 * resolving the root directory location and passing it
+	 * into {@code doFindPathMatchingPathResources}, with the
+	 * remainder of the location as pattern.
+	 * <p>Will return "/dir/" for the pattern "/dir/*.xml",
+	 * for example.
+	 *
+	 * @param location the location to check
+	 * @return the part of the location that denotes the root directory
+	 */
 	protected String determineRootDir(String location) {
 		int rootDirEnd = location.length();
 		while (rootDirEnd > 0 && pathMatcher.isPattern(location.substring(0,rootDirEnd))) {
@@ -265,61 +412,6 @@ public class HdfsResourceLoader extends DefaultResourceLoader implements Resourc
 
 	private CompressionCodecFactory codecs() {
 		return (useCodecs ? codecsFactory : null);
-	}
-
-	private Set<Resource> doFindPathMatchingPathResources(Resource rootDirResource, String subPattern)
-			throws IOException {
-
-		Path rootDir;
-
-		rootDir = (rootDirResource instanceof HdfsResource ? ((HdfsResource) rootDirResource).getPath() : new Path(
-				rootDirResource.getURI().toString()));
-
-		Set<Resource> results = new LinkedHashSet<Resource>();
-		String pattern = subPattern;
-
-		if (!pattern.startsWith("/")) {
-			pattern = "/".concat(pattern);
-		}
-
-		doRetrieveMatchingResources(rootDir, pattern, results);
-
-		return results;
-	}
-
-	@SuppressWarnings("deprecation")
-	private void doRetrieveMatchingResources(Path rootDir, String subPattern, Set<Resource> results) throws IOException {
-		if (!fs.isFile(rootDir)) {
-			FileStatus[] statuses = null;
-			try {
-				statuses = fs.listStatus(rootDir);
-			} catch (IOException ex) {
-				// ignore (likely security exception)
-			}
-
-			if (!ObjectUtils.isEmpty(statuses)) {
-				String root = rootDir.toUri().getPath();
-				for (FileStatus fileStatus : statuses) {
-					Path p = fileStatus.getPath();
-					String location = p.toUri().getPath();
-					if (location.startsWith(root)) {
-						location = location.substring(root.length());
-					}
-					if (fileStatus.isDir() && pathMatcher.matchStart(subPattern, location)) {
-						doRetrieveMatchingResources(p, subPattern, results);
-					}
-
-					else if (pathMatcher.match(subPattern, location)) {
-						results.add(new HdfsResource(p, fs, codecs()));
-					}
-				}
-			}
-		}
-
-		// Remove "if" to allow folders to be added as well
-		else if (pathMatcher.match(subPattern, stripPrefix(rootDir.toUri().getPath()))) {
-			results.add(new HdfsResource(rootDir, fs, codecs()));
-		}
 	}
 
 	/**

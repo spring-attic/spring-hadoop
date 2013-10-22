@@ -79,6 +79,46 @@ public class HdfsResourceLoaderTests {
 		assertFileViaLoader(loader, "~/" + userFileName1, true);
 	}
 
+	@Test
+	public void testFilesWithComplexPaths() throws Exception {
+		String filePath1 = "/test/HdfsResourceLoaderTests/file1.txt";
+		String filePath2 = "/test/HdfsResourceLoaderTests/dir1/file1.txt";
+		String filePath3 = "/test/HdfsResourceLoaderTests/dir1/dir2/file1.txt";
+		String filePath4 = "/test/HdfsResourceLoaderTests/file2.txt";
+		String filePath5 = "/test/HdfsResourceLoaderTests/dir2/file2.txt";
+		String filePath6 = "/test/HdfsResourceLoaderTests/dir2/dir2/file2.txt";
+
+		TestUtils.writeToFS(loader, filePath1);
+		TestUtils.writeToFS(loader, filePath2);
+		TestUtils.writeToFS(loader, filePath3);
+		TestUtils.writeToFS(loader, filePath4);
+		TestUtils.writeToFS(loader, filePath5);
+		TestUtils.writeToFS(loader, filePath6);
+
+		assertFileCountViaLoaderWithPatter(loader, "/test/HdfsResourceLoaderTests/file1*.txt", 1);
+		assertFileCountViaLoaderWithPatter(loader, "/test/HdfsResourceLoaderTests/*.txt", 2);
+
+		assertFileCountViaLoaderWithPatter(loader, "/test/HdfsResourceLoaderTests/*", 4);
+		assertFileCountViaLoaderWithPatter(loader, "/test/HdfsResourceLoaderTests/*txt", 2);
+		assertFileCountViaLoaderWithPatter(loader, "/test/HdfsResourceLoaderTests/**/*", 10);
+		assertFileCountViaLoaderWithPatter(loader, "/test/HdfsResourceLoaderTests/dir1/*", 2);
+		assertFileCountViaLoaderWithPatter(loader, "/test/HdfsResourceLoaderTests/dir1/file1.txt", 1);
+		assertFileCountViaLoaderWithPatter(loader, "/test/HdfsResourceLoaderTests/dir1/file?.txt", 1);
+		assertFileCountViaLoaderWithPatter(loader, "/test/HdfsResourceLoaderTests/dir1/?ile?.txt", 1);
+		assertFileCountViaLoaderWithPatter(loader, "/test/HdfsResourceLoaderTests/dir1/ile?.txt", 0);
+		assertFileCountViaLoaderWithPatter(loader, "/test/HdfsResourceLoaderTests/dir1/*.*", 1);
+		assertFileCountViaLoaderWithPatter(loader, "/test/HdfsResourceLoaderTests/dir1/foo*", 0);
+		assertFileCountViaLoaderWithPatter(loader, "/test/HdfsResourceLoaderTests/dir1/**/*", 3);
+
+		assertFileCountViaLoaderWithPatter(loader, "/test/HdfsResourceLoaderTests/????/*", 4);
+}
+
+	private static void assertFileCountViaLoaderWithPatter(HdfsResourceLoader loader, String path, int count) throws IOException {
+		Resource[] resources = loader.getResources(path);
+		assertThat(resources, notNullValue());
+		assertThat(resources.length, is(count));
+	}
+
 	private static void assertFileViaLoader(HdfsResourceLoader loader, String path, boolean shouldExist) throws IOException {
 		Resource[] resources = loader.getResources(path);
 		assertThat(resources, notNullValue());
