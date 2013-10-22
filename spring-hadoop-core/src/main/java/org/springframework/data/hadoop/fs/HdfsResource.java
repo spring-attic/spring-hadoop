@@ -36,9 +36,11 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * Resource abstraction over HDFS {@link Path}s.
+ * {@link Resource} implementation over HDFS {@link Path}s.
  *
  * @author Costin Leau
+ * @author Janne Valkealahti
+ *
  */
 class HdfsResource implements ContextResource, WritableResource {
 
@@ -69,7 +71,20 @@ class HdfsResource implements ContextResource, WritableResource {
 	 * @param codecsFactory the codecs factory
 	 */
 	HdfsResource(String parent, String child, FileSystem fs, CompressionCodecFactory codecsFactory) {
-		this(StringUtils.hasText(child) ? new Path(new Path(URI.create(parent)), new Path(URI.create(child))) : new Path(URI.create(parent)), fs, codecsFactory);
+		this(StringUtils.hasText(child) ? new Path(new Path(URI.create(parent)), new Path(URI.create(child)))
+			: new Path(URI.create(parent)), fs, codecsFactory);
+	}
+
+	/**
+	 * Instantiates a new hdfs resource.
+	 *
+	 * @param parent the parent
+	 * @param child the child
+	 * @param fs the fs
+	 * @param codecsFactory the codecs factory
+	 */
+	HdfsResource(Path parent, Path child, FileSystem fs, CompressionCodecFactory codecsFactory) {
+		this(new Path(parent, child), fs, codecsFactory);
 	}
 
 	/**
@@ -106,6 +121,7 @@ class HdfsResource implements ContextResource, WritableResource {
 	}
 
 
+	@Override
 	public long contentLength() throws IOException {
 		if (exists) {
 			if (status != null) {
@@ -115,18 +131,22 @@ class HdfsResource implements ContextResource, WritableResource {
 		throw new IOException("Cannot access the status for " + getDescription());
 	}
 
+	@Override
 	public Resource createRelative(String relativePath) throws IOException {
 		return new HdfsResource(location, relativePath, fs, codecsFactory);
 	}
 
+	@Override
 	public boolean exists() {
 		return exists;
 	}
 
+	@Override
 	public String getDescription() {
 		return "HDFS Resource for [" + location + "]";
 	}
 
+	@Override
 	public File getFile() throws IOException {
 		// check for out-of-the-box localFS
 		if (fs instanceof RawLocalFileSystem) {
@@ -140,26 +160,32 @@ class HdfsResource implements ContextResource, WritableResource {
 		throw new UnsupportedOperationException("Cannot resolve File object for " + getDescription());
 	}
 
+	@Override
 	public String getFilename() {
 		return path.getName();
 	}
 
+	@Override
 	public URI getURI() throws IOException {
 		return path.toUri();
 	}
 
+	@Override
 	public URL getURL() throws IOException {
 		return path.toUri().toURL();
 	}
 
+	@Override
 	public boolean isOpen() {
 		return (exists ? true : false);
 	}
 
+	@Override
 	public boolean isReadable() {
 		return (exists ? true : false);
 	}
 
+	@Override
 	public long lastModified() throws IOException {
 		if (exists && status != null) {
 			return status.getModificationTime();
@@ -167,6 +193,7 @@ class HdfsResource implements ContextResource, WritableResource {
 		throw new IOException("Cannot get timestamp for " + getDescription());
 	}
 
+	@Override
 	public InputStream getInputStream() throws IOException {
 		if (exists) {
 			InputStream stream = fs.open(path);
@@ -174,12 +201,11 @@ class HdfsResource implements ContextResource, WritableResource {
 			if (codecsFactory != null) {
 				CompressionCodec codec = codecsFactory.getCodec(path);
 				if (codec != null) {
-					// the pool is not used since the returned inputstream needs to be decorated to return the decompressor on close
-					// which can mask the actual stream
+					// the pool is not used since the returned inputstream needs to be decorated
+					// to return the decompressor on close which can mask the actual stream
 					// it's also unclear whether the pool is actually useful or not
 					// Decompressor decompressor = CodecPool.getDecompressor(codec);
 					// stream = (decompressor != null ? codec.createInputStream(stream, decompressor) : codec.createInputStream(stream));
-
 					stream = codec.createInputStream(stream);
 				}
 			}
@@ -215,6 +241,7 @@ class HdfsResource implements ContextResource, WritableResource {
 		return path.hashCode();
 	}
 
+	@Override
 	public String getPathWithinContext() {
 		return path.toUri().getPath();
 	}
