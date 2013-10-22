@@ -14,7 +14,7 @@
 
 	<hdp:file-system />
 
-	<hdp:resource-loader file-system-ref="hadoopFs" use-codecs="true" />
+	<hdp:resource-loader file-system-ref="hadoopFs" use-codecs="true" handle-noprefix="true" />
 
 	<hdp:resource-loader-registrar />
 

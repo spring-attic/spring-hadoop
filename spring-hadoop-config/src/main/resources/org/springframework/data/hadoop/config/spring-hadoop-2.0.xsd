@@ -345,6 +345,18 @@ suitable decompressor is found).
 				]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
+			<xsd:attribute name="handle-noprefix">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+Flag if loader should handle resource path without prefix.]]>
+					</xsd:documentation>
+					<xsd:appinfo>
+						<tool:annotation>
+							<tool:expected-type type="java.lang.Boolean" />
+						</tool:annotation>
+					</xsd:appinfo>
+		 		</xsd:annotation>
+ 		</xsd:attribute>
 		<xsd:attribute name="depends-on" use="optional"><xsd:annotation><xsd:documentation>
 	The names of the beans that this bean depends on being initialized. Typically used to guarantee
 	the initialization of certain beans before the Hadoop cluster gets configured and started (directly

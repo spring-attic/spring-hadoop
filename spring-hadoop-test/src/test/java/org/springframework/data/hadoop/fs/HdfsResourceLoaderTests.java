@@ -15,9 +15,12 @@
  */
 package org.springframework.data.hadoop.fs;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
@@ -44,6 +47,9 @@ public class HdfsResourceLoaderTests {
 
 	@javax.annotation.Resource(name = "loaderWithUser")
 	private HdfsResourceLoader loaderWithUser;
+
+	@javax.annotation.Resource(name = "loaderHandleNoprefix")
+	private HdfsResourceLoader loaderHandleNoprefix;
 
 	@Test
 	public void testFilesWithDifferentUsers() throws Exception {
@@ -111,7 +117,21 @@ public class HdfsResourceLoaderTests {
 		assertFileCountViaLoaderWithPatter(loader, "/test/HdfsResourceLoaderTests/dir1/**/*", 3);
 
 		assertFileCountViaLoaderWithPatter(loader, "/test/HdfsResourceLoaderTests/????/*", 4);
-}
+	}
+
+	@Test
+	public void testFilesNoprefix() throws Exception {
+		String fileName1 = "HdfsResourceLoaderTests-testFilesNoprefix1.txt";
+		Resource resource = loaderHandleNoprefix.getResource(fileName1);
+		assertThat(resource, not(instanceOf(HdfsResource.class)));
+		Resource[] resources = loaderHandleNoprefix.getResources(fileName1 + "*");
+		assertThat(resources.length, is(0));
+		resources = loaderHandleNoprefix.getResources("*");
+		assertTrue(resources.length > 0);
+		for (Resource r : resources) {
+			assertThat(r, not(instanceOf(HdfsResource.class)));
+		}
+	}
 
 	private static void assertFileCountViaLoaderWithPatter(HdfsResourceLoader loader, String path, int count) throws IOException {
 		Resource[] resources = loader.getResources(path);

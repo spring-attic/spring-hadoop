@@ -84,6 +84,10 @@ class HadoopResourceLoaderParser extends AbstractImprovedSimpleBeanDefinitionPar
 		if (StringUtils.hasText(useCodecs)) {
 			builder.addPropertyValue("useCodecs", useCodecs);
 		}
+		String handleNoprefix = element.getAttribute("handle-noprefix");
+		if (StringUtils.hasText(handleNoprefix)) {
+			builder.addPropertyValue("handleNoprefix", handleNoprefix);
+		}
 
 		postProcess(builder, element);
 	}

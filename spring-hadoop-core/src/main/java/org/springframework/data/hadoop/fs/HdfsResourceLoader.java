@@ -68,6 +68,9 @@ public class HdfsResourceLoader extends DefaultResourceLoader implements Resourc
 	private volatile boolean useCodecs = true;
 	private volatile CompressionCodecFactory codecsFactory;
 
+	/** Flag telling if path without prefix is routed to hdfs */
+	private volatile boolean handleNoprefix = true;
+
 	/** If we're impersonating a user */
 	private String impersonatedUser = null;
 
@@ -136,7 +139,11 @@ public class HdfsResourceLoader extends DefaultResourceLoader implements Resourc
 
 	@Override
 	protected Resource getResourceByPath(String path) {
-		return new HdfsResource(stripLeadingTilde(path), fs, codecs());
+		if (handleNoprefix) {
+			return new HdfsResource(stripLeadingTilde(path), fs, codecs());
+		} else {
+			return super.getResourceByPath(path);
+		}
 	}
 
 	@Override
@@ -144,7 +151,7 @@ public class HdfsResourceLoader extends DefaultResourceLoader implements Resourc
 		// it looks like spring DefaultResourceLoader will rely java.net.URL to throw
 		// exception before if fall back to getResourceByPath. This is not reliable
 		// so do explicit check if location starts with 'hdfs'.
-		if (location.startsWith(HDFS_URL_PREFIX)) {
+		if (location.startsWith(HDFS_URL_PREFIX) || (location.indexOf(':') < 0 && handleNoprefix)) {
 			return getResourceByPath(location);
 		} else {
 			return super.getResource(location);
@@ -155,7 +162,7 @@ public class HdfsResourceLoader extends DefaultResourceLoader implements Resourc
 	public Resource[] getResources(String locationPattern) throws IOException {
 		Assert.notNull(locationPattern, "Location pattern must not be null");
 
-		if (locationPattern.startsWith(HDFS_URL_PREFIX) || locationPattern.indexOf(':') < 0) {
+		if (locationPattern.startsWith(HDFS_URL_PREFIX) || (locationPattern.indexOf(':') < 0 && handleNoprefix)) {
 			// Only look for a pattern after a prefix here
 			// (to not get fooled by a pattern symbol in a strange prefix).
 			if (pathMatcher.isPattern(stripPrefix(locationPattern))) {
@@ -201,6 +208,15 @@ public class HdfsResourceLoader extends DefaultResourceLoader implements Resourc
 	@Override
 	public ClassLoader getClassLoader() {
 		return fs.getConf().getClassLoader();
+	}
+
+	/**
+	 * Sets the handle noprefix.
+	 *
+	 * @param handleNoprefix the new handle noprefix
+	 */
+	public void setHandleNoprefix(boolean handleNoprefix) {
+		this.handleNoprefix = handleNoprefix;
 	}
 
 	/**
