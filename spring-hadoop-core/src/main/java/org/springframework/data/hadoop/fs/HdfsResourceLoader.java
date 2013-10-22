@@ -61,8 +61,11 @@ public class HdfsResourceLoader extends DefaultResourceLoader implements Resourc
 
 	private volatile boolean useCodecs = true;
 	private volatile CompressionCodecFactory codecsFactory;
+
+	/** If we're impersonating a user */
 	private String impersonatedUser = null;
 
+	/** Needed to fall back to default spring functionality */
 	private ResourcePatternResolver resourcePatternResolver;
 
 	/**
@@ -127,7 +130,7 @@ public class HdfsResourceLoader extends DefaultResourceLoader implements Resourc
 
 	@Override
 	protected Resource getResourceByPath(String path) {
-		return new HdfsResource(path, fs, codecs());
+		return new HdfsResource(stripLeadingTilde(path), fs, codecs());
 	}
 
 	@Override
@@ -154,7 +157,7 @@ public class HdfsResourceLoader extends DefaultResourceLoader implements Resourc
 				return findPathMatchingResources(locationPattern);
 			} else {
 				// a single resource with the given name
-				return new Resource[] { getResource(stripPrefix(locationPattern)) };
+				return new Resource[] { getResource(stripPrefix(stripLeadingTilde(locationPattern))) };
 			}
 		} else {
 			return resourcePatternResolver.getResources(locationPattern);
@@ -189,6 +192,11 @@ public class HdfsResourceLoader extends DefaultResourceLoader implements Resourc
 		}
 	}
 
+	@Override
+	public ClassLoader getClassLoader() {
+		return fs.getConf().getClassLoader();
+	}
+
 	/**
 	 * Returns the Hadoop file system used by this resource loader.
 	 *
@@ -196,10 +204,6 @@ public class HdfsResourceLoader extends DefaultResourceLoader implements Resourc
 	 */
 	public FileSystem getFileSystem() {
 		return fs;
-	}
-
-	public ClassLoader getClassLoader() {
-		return fs.getConf().getClassLoader();
 	}
 
 	/**
@@ -225,11 +229,8 @@ public class HdfsResourceLoader extends DefaultResourceLoader implements Resourc
 	}
 
 	protected Resource[] findPathMatchingResources(String locationPattern) throws IOException {
+		locationPattern = stripLeadingTilde(locationPattern);
 		locationPattern = stripPrefix(locationPattern);
-		// replace ~/ shortcut
-		if (locationPattern.startsWith("~/")) {
-			locationPattern = locationPattern.substring(2);
-		}
 
 		String rootDirPath = determineRootDir(locationPattern);
 		String subPattern = locationPattern.substring(rootDirPath.length());
@@ -250,6 +251,16 @@ public class HdfsResourceLoader extends DefaultResourceLoader implements Resourc
 			rootDirEnd = location.lastIndexOf('/', rootDirEnd - 2) + 1;
 		}
 		return location.substring(0, rootDirEnd);
+	}
+
+	/**
+	 * Removes a leading tilde shortcut if exists.
+	 */
+	private String stripLeadingTilde(String locationPattern) {
+		if (locationPattern.startsWith("~/")) {
+			return locationPattern.substring(2);
+		}
+		return locationPattern;
 	}
 
 	private CompressionCodecFactory codecs() {
@@ -311,12 +322,16 @@ public class HdfsResourceLoader extends DefaultResourceLoader implements Resourc
 		}
 	}
 
+	/**
+	 * Removes a prefix from a given path and what's
+	 * left is a real 'file' path
+	 */
 	private static String stripPrefix(String path) {
 		String ret = null;
 		try {
 			ret = new Path(path).toUri().getPath();
 		} catch (Exception e) {}
-		if (ret == null && path.startsWith("hdfs:") && !path.startsWith("hdfs://")) {
+		if (ret == null && path.startsWith(HDFS_URL_PREFIX) && !path.startsWith("hdfs://")) {
 			// check if path is 'hdfs:myfile.txt', strip prefix and colon
 			ret = path.substring(5);
 		}

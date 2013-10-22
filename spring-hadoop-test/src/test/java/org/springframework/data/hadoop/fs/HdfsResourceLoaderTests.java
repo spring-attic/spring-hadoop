@@ -17,10 +17,9 @@ package org.springframework.data.hadoop.fs;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+
+import java.io.IOException;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -48,46 +47,52 @@ public class HdfsResourceLoaderTests {
 
 	@Test
 	public void testFilesWithDifferentUsers() throws Exception {
-		String name1 = "HdfsResourceLoaderTests1.txt";
-		String name2 = "HdfsResourceLoaderTests2.txt";
+		String userFileName1 = "HdfsResourceLoaderTests-testFilesWithDifferentUsers1.txt";
+		String userFileName2 = "HdfsResourceLoaderTests-testFilesWithDifferentUsers2.txt";
 
-		TestUtils.writeToFS(loader, name1);
-		TestUtils.writeToFS(loaderWithUser, name2);
+		// files should end up on different user directories
+		TestUtils.writeToFS(loader, userFileName1);
+		TestUtils.writeToFS(loaderWithUser, userFileName2);
 
-		// getResources("~/" + name1)
-		Resource[] resources1 = loader.getResources(name1);
-		assertThat(resources1, notNullValue());
-		assertThat(resources1.length, is(1));
-		assertThat(resources1[0].exists(), is(true));
+		assertFileViaLoader(loader, userFileName1, true);
+		assertFileViaLoader(loader, userFileName2, false);
+		assertFileViaLoader(loaderWithUser, userFileName1, false);
+		assertFileViaLoader(loaderWithUser, userFileName2, true);
+	}
 
-		Resource[] resources2 = loader.getResources(name2);
-		assertThat(resources2, notNullValue());
-		assertThat(resources2.length, is(1));
-		assertThat(resources2[0].exists(), is(false));
+	@Test
+	public void testFilesWithPaths() throws Exception {
+		String fileName1 = "HdfsResourceLoaderTests-testFilesWithPaths1.txt";
 
-		Resource[] resources3 = loaderWithUser.getResources(name1);
-		assertThat(resources3, notNullValue());
-		assertThat(resources3.length, is(1));
-		assertThat(resources3[0].exists(), is(false));
+		TestUtils.writeToFS(loader, "/test/" + fileName1);
 
-		Resource[] resources4 = loaderWithUser.getResources(name2);
-		assertThat(resources4, notNullValue());
-		assertThat(resources4.length, is(1));
-		assertThat(resources4[0].exists(), is(true));
+		assertFileViaLoader(loader, "/test/" + fileName1, true);
 	}
 
 	@Test
 	public void testFilesWithTilde() throws Exception {
-		String name1 = "HdfsResourceLoaderTests3.txt";
+		String userFileName1 = "HdfsResourceLoaderTests-testFilesWithTilde1.txt";
 
-		TestUtils.writeToFS(loader, name1);
+		TestUtils.writeToFS(loader, userFileName1);
 
-//		Resource[] resources1 = loader.getResources("~/" + name1);
-		Resource[] resources1 = loader.getResources("~/HdfsResourceLoaderTests3.txt*");
-		assertThat(resources1, notNullValue());
-		assertThat(resources1.length, is(1));
-		assertThat(resources1[0].exists(), is(true));
+		assertFileViaLoaderWithPatter(loader, "~/" + userFileName1 + "*", true);
+		assertFileViaLoader(loader, "~/" + userFileName1, true);
+	}
 
+	private static void assertFileViaLoader(HdfsResourceLoader loader, String path, boolean shouldExist) throws IOException {
+		Resource[] resources = loader.getResources(path);
+		assertThat(resources, notNullValue());
+		assertThat(resources.length, is(1));
+		assertThat(resources[0].exists(), is(shouldExist));
+		Resource resource = loader.getResource(path);
+		assertThat(resource, notNullValue());
+		assertThat(resource.exists(), is(shouldExist));
+	}
+
+	private static void assertFileViaLoaderWithPatter(HdfsResourceLoader loader, String path, boolean shouldExist) throws IOException {
+		Resource[] resources = loader.getResources(path);
+		assertThat(resources, notNullValue());
+		assertThat(resources[0].exists(), is(shouldExist));
 	}
 
 }
