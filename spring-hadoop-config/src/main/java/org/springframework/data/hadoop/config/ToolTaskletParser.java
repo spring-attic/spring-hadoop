@@ -13,40 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.hadoop.batch.config;
+package org.springframework.data.hadoop.config;
 
-import java.util.Collection;
-
-import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.data.hadoop.batch.pig.PigTasklet;
-import org.springframework.data.hadoop.config.AbstractImprovedSimpleBeanDefinitionParser;
-import org.springframework.data.hadoop.config.PigServerParser;
-import org.springframework.util.CollectionUtils;
+import org.springframework.data.hadoop.batch.mapreduce.ToolTasklet;
+import org.springframework.data.hadoop.config.AbstractGenericOptionsParser;
+import org.springframework.data.hadoop.config.ToolRunnerParser;
 import org.w3c.dom.Element;
 
 /**
- * Parser for 'pig-tasklet' element.
+ * Parser for 'tool-tasklet' element.
  * 
  * @author Costin Leau
  */
-class PigTaskletParser extends AbstractImprovedSimpleBeanDefinitionParser {
+class ToolTaskletParser extends AbstractGenericOptionsParser {
 
 	@Override
 	protected Class<?> getBeanClass(Element element) {
-		return PigTasklet.class;
+		return ToolTasklet.class;
 	}
 
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
-		// parse attributes using conventions
 		super.doParse(element, parserContext, builder);
-		// parse scripts
-		Collection<BeanDefinition> scripts = PigServerParser.parseScripts(parserContext, element);
-		if (!CollectionUtils.isEmpty(scripts)) {
-			builder.addPropertyValue("scripts", scripts);
-		}
+		ToolRunnerParser.parseToolDefinition(element, parserContext, builder);
 	}
 
 	@Override

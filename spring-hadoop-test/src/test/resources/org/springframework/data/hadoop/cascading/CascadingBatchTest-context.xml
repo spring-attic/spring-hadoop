@@ -2,14 +2,12 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:batch="http://www.springframework.org/schema/batch"
 	xmlns:hdp="http://www.springframework.org/schema/hadoop"
-    xmlns:hdpb="http://www.springframework.org/schema/hadoop-batch"
 	xmlns:casc="http://www.springframework.org/schema/cascading"
 	xmlns:c="http://www.springframework.org/schema/c"
 	xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
       	http://www.springframework.org/schema/batch	http://www.springframework.org/schema/batch/spring-batch.xsd
       	http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd
-      	http://www.springframework.org/schema/hadoop-batch http://www.springframework.org/schema/hadoop/spring-hadoop-batch.xsd
       	http://www.springframework.org/schema/cascading http://www.springframework.org/schema/cascading/spring-cascading.xsd">
 
 	<import resource="../batch-common.xml"/>
@@ -17,7 +15,7 @@
 	
 	<job id="mainJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="provision" next="do-cascade">
-			<hdpb:script-tasklet script-ref="script"/>
+			<hdp:script-tasklet script-ref="script"/>
 		</step>
 		<step id="do-cascade">
 			<casc:cascading-tasklet unit-of-work-ref="cascade"/>

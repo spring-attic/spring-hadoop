@@ -57,6 +57,14 @@ class HadoopNamespaceHandler extends NamespaceHandlerSupport {
 		registerBeanDefinitionParser("hive-runner", new HiveRunnerParser());
 
 		registerBeanDefinitionParser("hbase-configuration", new HbaseConfigurationParser());
+
+		registerBeanDefinitionParser("job-tasklet", new HadoopJobTaskletParser());
+		registerBeanDefinitionParser("tool-tasklet", new ToolTaskletParser());
+		registerBeanDefinitionParser("jar-tasklet", new JarTaskletParser());
+		registerBeanDefinitionParser("script-tasklet", new ScriptTaskletParser());
+		registerBeanDefinitionParser("hive-tasklet", new HiveTaskletParser());
+		registerBeanDefinitionParser("pig-tasklet", new PigTaskletParser());
+
 	}
 
 	@Override

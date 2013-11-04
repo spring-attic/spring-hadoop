@@ -113,9 +113,23 @@ Post actions/beans to be called before running the action. Multiple bean names c
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	
-	<!-- common attributes shared by properties based configurations 
-		 NOT meant for extensibility - do NOT rely on this type as it might be removed in the future -->
+
+    <xsd:element name="job-tasklet" type="jobRunnerType">
+        <xsd:annotation>
+            <xsd:documentation><![CDATA[
+Defines a Spring Batch tasklet for Hadoop Jobs.
+				]]>
+            </xsd:documentation>
+            <xsd:appinfo>
+                <tool:annotation>
+                    <tool:exports type="org.springframework.data.hadoop.batch.mapreduce.JobTasklet"/>
+                </tool:annotation>
+            </xsd:appinfo>
+        </xsd:annotation>
+    </xsd:element>
+
+    <!-- common attributes shared by properties based configurations
+         NOT meant for extensibility - do NOT rely on this type as it might be removed in the future -->
 	<xsd:complexType name="propertiesConfigurableType" mixed="true">
 		<xsd:attribute name="properties-ref" type="xsd:string">
 			<xsd:annotation>
@@ -784,7 +798,14 @@ Post actions/beans to be called before running the action. Multiple bean names c
 		</xsd:complexType>
 	</xsd:element>
 
-	<!-- common attributes shared by properties based configurations 
+    <xsd:element name="jar-tasklet" type="jarRunnerType">
+        <xsd:annotation>
+            <xsd:documentation><![CDATA[
+Defines a Hadoop Jar Tasklet.]]></xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+	<!-- common attributes shared by properties based configurations
 		 NOT meant for extensibility - do NOT rely on this type as it might be removed in the future -->
 	<xsd:complexType name="toolRunnerType">
 		<xsd:complexContent mixed="true">
@@ -879,6 +900,13 @@ Post actions/beans to be called before running the action. Multiple bean names c
 		</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
+
+    <xsd:element name="tool-tasklet" type="toolRunnerType">
+        <xsd:annotation>
+            <xsd:documentation><![CDATA[
+Defines a Hadoop Tool Tasklet.]]></xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
 
 	<xsd:complexType name="entryType">
 		<xsd:attribute name="value" type="xsd:string" use="required"/>
@@ -1153,8 +1181,21 @@ Reference to a PigServer factory. Defaults to 'pigFactory'.
 				</xsd:annotation>
 			</xsd:attribute>
 		</xsd:complexType>
-	</xsd:element>	
-	
+	</xsd:element>
+
+    <xsd:element name="pig-tasklet" type="pigRunnerType">
+        <xsd:annotation>
+            <xsd:documentation><![CDATA[
+Defines a PigTasklet.
+				]]></xsd:documentation>
+            <xsd:appinfo>
+                <tool:annotation>
+                    <tool:exports type="org.springframework.data.hadoop.batch.pig.PigTasklet"/>
+                </tool:annotation>
+            </xsd:appinfo>
+        </xsd:annotation>
+    </xsd:element>
+
 	<!-- HBase -->
 	<xsd:element name="hbase-configuration">
 		<xsd:complexType>
@@ -1403,7 +1444,20 @@ Reference to HiveClient factory. Defaults to 'hiveClientFactory'.]]></xsd:docume
 		 	</xsd:annotation>
 		 	</xsd:attribute>			
 		</xsd:complexType>
-	</xsd:element>	
+	</xsd:element>
+
+    <xsd:element name="hive-tasklet" type="hiveRunnerType">
+        <xsd:annotation>
+            <xsd:documentation><![CDATA[
+Defines a HiveTasklet.
+				]]></xsd:documentation>
+            <xsd:appinfo>
+                <tool:annotation>
+                    <tool:exports type="org.springframework.data.hadoop.batch.tasklet.HiveTasket"/>
+                </tool:annotation>
+            </xsd:appinfo>
+        </xsd:annotation>
+    </xsd:element>
 
 	<!-- Script type - NOT mean to be reused outside this schema -->
 	<xsd:complexType name="scriptingType" abstract="true" mixed="true">
@@ -1507,4 +1561,52 @@ Post actions/beans to be called before running the action. Multiple bean names c
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
+
+    <xsd:element name="script-tasklet">
+        <xsd:complexType>
+            <xsd:annotation>
+                <xsd:documentation><![CDATA[
+Defines a scripting Tasklet for interacting with Hadoop. Allows Groovy, JavaScript (Rhino), Ruby (JRuby), Python (Jython)
+or any JSR-223 scripting language to be used for executing commands against Hadoop, in particular its file system.
+					]]>
+                </xsd:documentation>
+                <xsd:appinfo>
+                    <tool:annotation>
+                        <tool:exports type="java.lang.Object"/>
+                    </tool:annotation>
+                </xsd:appinfo>
+            </xsd:annotation>
+            <xsd:sequence>
+                <xsd:element name="script" minOccurs="0" maxOccurs="1">
+                    <xsd:annotation>
+                        <xsd:documentation><![CDATA[
+Nested script declaration.]]></xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:complexType mixed="true">
+                        <xsd:complexContent>
+                            <xsd:extension base="scriptingType"/>
+                        </xsd:complexContent>
+                    </xsd:complexType>
+                </xsd:element>
+            </xsd:sequence>
+            <xsd:attribute name="id" type="xsd:ID" use="optional">
+                <xsd:annotation>
+                    <xsd:documentation><![CDATA[
+Bean id.]]></xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="script-ref" type="xsd:string">
+                <xsd:annotation>
+                    <xsd:documentation><![CDATA[
+Reference to a script declaration.]]></xsd:documentation>
+                    <xsd:appinfo>
+                        <tool:annotation kind="ref">
+                            <tool:expected-type type="java.lang.Object" />
+                        </tool:annotation>
+                    </xsd:appinfo>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="scope" type="xsd:string" use="optional" />
+        </xsd:complexType>
+    </xsd:element>
 </xsd:schema>

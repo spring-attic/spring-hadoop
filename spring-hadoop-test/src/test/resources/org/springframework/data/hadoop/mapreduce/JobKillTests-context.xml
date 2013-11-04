@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:hdp="http://www.springframework.org/schema/hadoop"
-	xmlns:hdpb="http://www.springframework.org/schema/hadoop-batch"
 	xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd
-		http://www.springframework.org/schema/hadoop-batch http://www.springframework.org/schema/hadoop/spring-hadoop-batch.xsd
 		http://www.springframework.org/schema/batch	http://www.springframework.org/schema/batch/spring-batch.xsd">
 
 	<import resource="../batch-common.xml"/>
@@ -42,7 +40,7 @@
 		scope="singleton"
 		libs="classpath:mini-hadoop-examples.jar"/>
 
-	<hdpb:job-tasklet id="hdp-tasklet" job-ref="tasklet-victim-job" wait-for-completion="true" executor-ref="taskExecutor"/>
+	<hdp:job-tasklet id="hdp-tasklet" job-ref="tasklet-victim-job" wait-for-completion="true" executor-ref="taskExecutor"/>
 	
 	<hdp:job id="tasklet-victim-job" 
 	   	input-path="/ide-test/input/word/" output-path="/ide-test/runner/killed-tasklet/"

@@ -2,15 +2,13 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:batch="http://www.springframework.org/schema/batch"
 	xmlns:hdp="http://www.springframework.org/schema/hadoop"
-	xmlns:hdpb="http://www.springframework.org/schema/hadoop-batch"
 	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:c="http://www.springframework.org/schema/c"
 	xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
       	http://www.springframework.org/schema/batch	http://www.springframework.org/schema/batch/spring-batch.xsd
       	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
-      	http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd
-      	http://www.springframework.org/schema/hadoop-batch http://www.springframework.org/schema/hadoop/spring-hadoop-batch.xsd">
+      	http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
 
 	<import resource="../../batch-common.xml"/>
 	<import resource="../../hadoop-ctx.xml"/>
@@ -62,7 +60,7 @@
 	
 	<bean class="org.springframework.data.hadoop.hive.HiveTemplate" p:hive-client-factory-ref="hiveClientFactory"/>
 	
-	<hdpb:hive-tasklet id="hive-script" scope="prototype">
+	<hdp:hive-tasklet id="hive-script" scope="prototype">
 		<hdp:script>
 			DROP TABLE IF EXISTS ${hive.table}; 
 			CREATE TABLE testHiveBatchTable (key int, value string);
@@ -75,7 +73,7 @@
 				white=${hive.white}
 			</hdp:arguments>
 		</hdp:script>
-	</hdpb:hive-tasklet>
+	</hdp:hive-tasklet>
 	
 	
 	<hdp:script id="nop-script" language="javascript">
