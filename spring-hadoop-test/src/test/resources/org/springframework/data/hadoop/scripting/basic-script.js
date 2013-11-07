@@ -1,9 +1,10 @@
+try {load("nashorn:mozilla_compat.js");} catch (e) {} // for Java 8
 importPackage(java.util);
 importPackage(org.apache.hadoop.fs);
 
-println("Home dir is " + fs.homeDirectory)
-println("Work dir is " + fs.workingDirectory)
-println("/user exists " + fs.exists("/user"))
+print("Home dir is " + fs.homeDirectory)
+print("Work dir is " + fs.workingDirectory)
+print("/user exists " + fs.exists("/user"))
 
 name = UUID.randomUUID().toString()
 scriptName = "src/test/resources/test.properties"
@@ -12,10 +13,10 @@ fs.copyFromLocalFile(scriptName, name)
 dir = "script-dir/"
 if (!fsh.test(dir)) {
    fsh.mkdir(dir); fsh.cp(name, dir); fsh.chmodr(700, dir)
-   println("File content is " + fsh.cat(dir + name))
+   print("File content is " + fsh.cat(dir + name))
 }
 
-println(fsh.ls(dir))
+print(fsh.ls(dir))
 fsh.rmr(dir)
 
 // return the file length 

@@ -84,7 +84,7 @@ public abstract class AbstractYarnClient implements YarnClient, InitializingBean
 	/** Base path for app staging directory */
 	private String stagingDirPath;
 
-	/** Name of the app specific dir name under staging dir */
+	/** App specific dir name under staging dir */
 	private String applicationDirName;
 
 	/**
@@ -109,12 +109,7 @@ public abstract class AbstractYarnClient implements YarnClient, InitializingBean
 		// localizer distribute will kick off too early
 		ApplicationId applicationId = clientRmOperations.getNewApplication().getApplicationId();
 
-		// if not already set, get it from application id
-		if (applicationDirName == null) {
-			applicationDirName = Integer.toString(applicationId.getId());
-		}
-
-		resourceLocalizer.setStagingId(applicationDirName);
+		resourceLocalizer.setStagingId(applicationId.toString());
 		resourceLocalizer.distribute();
 
 		ApplicationSubmissionContext submissionContext = getSubmissionContext(applicationId);

@@ -20,8 +20,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -103,6 +105,50 @@ public abstract class AbstractRemoteStepExecutionDaoTests {
 	}
 
 	@Test
+	public void testSaveAndGetExecutions() {
+
+		List<StepExecution> stepExecutions = new ArrayList<StepExecution>();
+		for (int i = 0; i < 3; i++) {
+			StepExecution se = new StepExecution("step" + i, jobExecution);
+			se.setStatus(BatchStatus.STARTED);
+			se.setReadSkipCount(i);
+			se.setProcessSkipCount(i);
+			se.setWriteSkipCount(i);
+			se.setProcessSkipCount(i);
+			se.setRollbackCount(i);
+			se.setLastUpdated(new Date(System.currentTimeMillis()));
+			se.setReadCount(i);
+			se.setFilterCount(i);
+			se.setWriteCount(i);
+			stepExecutions.add(se);
+		}
+
+		dao.saveStepExecutions(stepExecutions);
+
+		for (int i = 0; i < 3; i++) {
+
+			StepExecution retrieved = dao.getStepExecution(jobExecution, stepExecutions.get(i).getId());
+
+			assertStepExecutionsAreEqual(stepExecutions.get(i), retrieved);
+			assertNotNull(retrieved.getVersion());
+			assertNotNull(retrieved.getJobExecution());
+			assertNotNull(retrieved.getJobExecution().getId());
+			assertNotNull(retrieved.getJobExecution().getJobId());
+			assertNotNull(retrieved.getJobExecution().getJobInstance());
+		}
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testSaveNullCollectionThrowsException() {
+		dao.saveStepExecutions(null);
+	}
+
+	@Test
+	public void testSaveEmptyCollection() {
+		dao.saveStepExecutions(new ArrayList<StepExecution>());
+	}
+
+	@Test
 	public void testSaveAndGetNonExistentExecution() {
 		assertNull(dao.getStepExecution(jobExecution, 45677L));
 	}
@@ -124,7 +170,7 @@ public abstract class AbstractRemoteStepExecutionDaoTests {
 
 	@Test
 	public void testGetForNotExistingJobExecution() {
-		assertNull(dao.getStepExecution(new JobExecution(jobInstance, (long) 777), 11L));
+		assertNull(dao.getStepExecution(new JobExecution(jobInstance, (long) 777, new JobParameters()), 11L));
 	}
 
 	/**

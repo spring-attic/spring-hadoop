@@ -73,8 +73,18 @@ public class YarnClusterTests {
 	}
 
 	@Test
-	@Timed(millis=120000)
-	public void testAppSubmission() throws Exception {
+	@Timed(millis = 120000)
+	public void testAppSubmission1() throws Exception {
+		doSubmitAndAssert();
+	}
+
+	@Test
+	@Timed(millis = 120000)
+	public void testAppSubmission2() throws Exception {
+		doSubmitAndAssert();
+	}
+
+	private void doSubmitAndAssert() throws Exception {
 		YarnClient client = (YarnClient) ctx.getBean("yarnClient");
 		assertThat(client, notNullValue());
 
@@ -98,7 +108,7 @@ public class YarnClusterTests {
 		File testWorkDir = cluster.getYarnWorkDir();
 
 		PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-		String locationPattern = "file:" + testWorkDir.getAbsolutePath() + "/**/*.std*";
+		String locationPattern = "file:" + testWorkDir.getAbsolutePath() + "/**/" + applicationId.toString() + "/**/*.std*";
 		Resource[] resources = resolver.getResources(locationPattern);
 
 		// get possible appmaster error from stderr file

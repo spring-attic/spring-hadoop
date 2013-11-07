@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 the original author or authors.
+ * Copyright 2011 the original author or authors.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,38 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.hadoop.batch.config;
+package org.springframework.data.hadoop.config;
 
-import java.util.Collection;
-import java.util.Collections;
-
-import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.support.GenericBeanDefinition;
-import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
+import org.springframework.data.hadoop.batch.mapreduce.JobTasklet;
 import org.springframework.data.hadoop.config.AbstractImprovedSimpleBeanDefinitionParser;
-import org.springframework.data.hadoop.config.HiveRunnerParser;
-import org.springframework.data.hadoop.config.LinkedProperties;
-import org.springframework.data.hadoop.hive.HiveScript;
-import org.springframework.data.hadoop.batch.hive.HiveTasklet;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
-import org.springframework.util.xml.DomUtils;
+import org.springframework.data.hadoop.config.NamespaceUtils;
 import org.w3c.dom.Element;
 
 /**
- * Parser for 'hive-tasklet' element.
- *
+ * Hadoop Tasklet Parser.
+ * 
  * @author Costin Leau
  */
-class HiveTaskletParser extends AbstractImprovedSimpleBeanDefinitionParser {
+class HadoopJobTaskletParser extends AbstractImprovedSimpleBeanDefinitionParser {
 
 	@Override
 	protected Class<?> getBeanClass(Element element) {
-		return HiveTasklet.class;
+		return JobTasklet.class;
+	}
+
+	@Override
+	protected boolean isEligibleAttribute(String attributeName) {
+		return (!"job-ref".equals(attributeName)) && super.isEligibleAttribute(attributeName);
 	}
 
 	@Override
@@ -52,11 +44,7 @@ class HiveTaskletParser extends AbstractImprovedSimpleBeanDefinitionParser {
 		// parse attributes using conventions
 		super.doParse(element, parserContext, builder);
 
-		// parse scripts
-		Collection<Object> scripts = HiveRunnerParser.parseScripts(parserContext, element);
-		if (!CollectionUtils.isEmpty(scripts)) {
-			builder.addPropertyValue("scripts", scripts);
-		}
+		NamespaceUtils.setCSVProperty(element, builder, "job-ref", "jobNames");
 	}
 
 	@Override

@@ -82,7 +82,7 @@
    <co id="hdp-def-ns-beans-prefix" />xmlns:beans="http://www.springframework.org/schema/beans"
    xsi:schemaLocation="
     http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-    http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/gemfire/spring-hadoop.xsd"&gt;
+    http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd"&gt;
 	    
     <co id="hdp-def-ns-beans-example" />&lt;beans:bean id ... &gt;
 	

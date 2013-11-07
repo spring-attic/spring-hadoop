@@ -133,6 +133,7 @@
   <hdp:configuration .../>
 		
   <hdp:script id="inlined-js" language="javascript" run-at-startup="true">
+    try {load("nashorn:mozilla_compat.js");} catch (e) {} // for Java 8
     importPackage(java.util);
 
     name = UUID.randomUUID().toString()

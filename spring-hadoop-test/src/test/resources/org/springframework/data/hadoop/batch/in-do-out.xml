@@ -2,12 +2,10 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:batch="http://www.springframework.org/schema/batch"
 	xmlns:hdp="http://www.springframework.org/schema/hadoop"
-	xmlns:hdpb="http://www.springframework.org/schema/hadoop-batch"
 	xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-      	http://www.springframework.org/schema/batch	http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
-      	http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd
-      	http://www.springframework.org/schema/hadoop-batch http://www.springframework.org/schema/hadoop/spring-hadoop-batch.xsd">
+      	http://www.springframework.org/schema/batch	http://www.springframework.org/schema/batch/spring-batch.xsd
+      	http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
 
 	<import resource="../batch-common.xml"/>
 	<import resource="../hadoop-ctx.xml"/>
@@ -34,11 +32,11 @@
 		p:jar="mini-hadoop-examples.jar"
 	/>
 
-	<hdpb:script-tasklet id="script-tasklet" scope="prototype">
-		<hdpb:script language="javascript">
+	<hdp:script-tasklet id="script-tasklet" scope="prototype">
+		<hdp:script language="javascript">
 if (fsh.test("/ide-test/input")) fsh.rmr("/ide-test/input")
 fsh.put("src/test/resources/input/word", "/ide-test/input/word/")			
-		</hdpb:script>
-	</hdpb:script-tasklet>
+		</hdp:script>
+	</hdp:script-tasklet>
 	  
 </beans>

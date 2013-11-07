@@ -2,13 +2,11 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:batch="http://www.springframework.org/schema/batch"
 	xmlns:hdp="http://www.springframework.org/schema/hadoop"
-	xmlns:hdpb="http://www.springframework.org/schema/hadoop-batch"
 	xmlns:c="http://www.springframework.org/schema/c"
 	xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-      	http://www.springframework.org/schema/batch	http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
-      	http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd
-      	http://www.springframework.org/schema/hadoop-batch http://www.springframework.org/schema/hadoop/spring-hadoop-batch.xsd">
+      	http://www.springframework.org/schema/batch	http://www.springframework.org/schema/batch/spring-batch.xsd
+      	http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
 
 	<import resource="../batch-common.xml"/>
 	<import resource="../hadoop-ctx.xml"/>
@@ -40,7 +38,7 @@
 	 
 	<bean id="file-reader" class="org.springframework.batch.item.file.ResourcesItemReader" p:resources="classpath:input/word/*.txt"/>
 
-	<hdpb:job-tasklet id="hadoop-tasklet" job-ref="mr-job" wait-for-completion="true" kill-job-at-shutdown="true" />
+	<hdp:job-tasklet id="hadoop-tasklet" job-ref="mr-job" wait-for-completion="true" kill-job-at-shutdown="true" />
 	
  	<hdp:job id="mr-job" 
 	    input-path="#{jobParameters['mr.input']}" output-path="#{jobParameters['mr.output']}"
@@ -51,30 +49,30 @@
 		scope="step"
 	/>
 
-	<hdpb:script-tasklet id="ref-script-tasklet" scope="step" script-ref="script"/>
+	<hdp:script-tasklet id="ref-script-tasklet" scope="step" script-ref="script"/>
 	
 	<hdp:script language="javascript" id="script" scope="step" pre-action="">
 streamoutput = output + "stream"
 if (fsh.test(streamoutput)) fsh.rmr(streamoutput)
-println("Staged resources 2")
+print("Staged resources 2")
 		<hdp:property name="input" value="#{jobParameters['mr.input']}"/>			
 		<hdp:property name="output" value="#{jobParameters['mr.output']}"/>
 	</hdp:script>
 	
-	<hdpb:script-tasklet id="nested-script-tasklet" scope="step">
-		<hdpb:script language="javascript">
+	<hdp:script-tasklet id="nested-script-tasklet" scope="step">
+		<hdp:script language="javascript">
 if (fsh.test(input)) fsh.rmr(input)
 if (fsh.test(output)) fsh.rmr(output)
 fsh.mkdir(input);
 fsh.put("src/test/resources/input/word/input.txt", input)
-println("Staged resources 1")
+print("Staged resources 1")
 
 			<hdp:property name="input" value="#{jobParameters['mr.input']}"/>
 			<hdp:property name="output" value="#{jobParameters['mr.output']}"/>
-		</hdpb:script>
-	</hdpb:script-tasklet>
+		</hdp:script>
+	</hdp:script-tasklet>
 	
-	<hdpb:job-tasklet id="hadoop-stream" job-ref="ns-stream-job"/>
+	<hdp:job-tasklet id="hadoop-stream" job-ref="ns-stream-job"/>
 	
 	<hdp:streaming id="ns-stream-job"
 		input-path="#{jobParameters['mr.input']}" output-path="#{jobParameters['mr.output']+'stream'}" properties-location="#{jobParameters['properties-file']}"

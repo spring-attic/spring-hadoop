@@ -1,33 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:yarn="http://www.springframework.org/schema/yarn"
 	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:util="http://www.springframework.org/schema/util"
-	xmlns:yarn="http://www.springframework.org/schema/yarn"
 	xsi:schemaLocation="http://www.springframework.org/schema/yarn http://www.springframework.org/schema/yarn/spring-yarn.xsd
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
-	<context:property-placeholder location="hadoop-fake.properties"/>
+	<yarn:localresources>
+		<yarn:copy src="file:build/dependency-all-libs/*" staging="true"/>
+		<yarn:copy src="file:build/libs/*" staging="true"/>
+		<yarn:hdfs path="/*" staging="true"/>
+	</yarn:localresources>
 
-	<yarn:configuration>
-		fs.default.name=${fake.fs}
-		yarn.resourcemanager.address=${fake.rm}
-		test.foo=jee
-	</yarn:configuration>
+	<!-- do not rely on default classpath, instead use all dependencies -->
+	<yarn:environment include-system-env="false">
+		<yarn:classpath default-yarn-app-classpath="false"/>
+	</yarn:environment>
 
-	<yarn:configuration id="complexConfig" resources="classpath:/test-site-1.xml, classpath:/test-site-2.xml" configuration-ref="yarnConfiguration">
-		test.foo.2=jee2
-	</yarn:configuration>
+	<util:properties id="arguments">
+		<prop key="container-count">4</prop>
+	</util:properties>
 
-	<yarn:configuration id="propsConfig" properties-ref="props" properties-location="cfg-1.properties, cfg-2.properties">
-		foo26=jee26
-		foo27=jee27
-		foo28=jee28
-	</yarn:configuration>
-
-	<util:properties id="props" location="props.properties"/>
-
+	<yarn:client app-name="simple-command" memory="3000">
+		<yarn:master-runner context-file="YarnClusterTests-appmaster-context.xml" arguments="arguments"/>
+	</yarn:client>
 
 </beans>

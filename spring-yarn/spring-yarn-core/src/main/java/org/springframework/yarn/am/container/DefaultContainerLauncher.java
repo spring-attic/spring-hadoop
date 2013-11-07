@@ -96,7 +96,7 @@ public class DefaultContainerLauncher extends AbstractLauncher implements Contai
 		}
 
 		ContainerLaunchContext ctx = Records.newRecord(ContainerLaunchContext.class);
-		String stagingId = Integer.toString(container.getId().getApplicationAttemptId().getApplicationId().getId());
+		String stagingId = container.getId().getApplicationAttemptId().getApplicationId().toString();
 		getResourceLocalizer().setStagingId(stagingId);
 		ctx.setLocalResources(getResourceLocalizer().getResources());
 		ctx.setCommands(commands);

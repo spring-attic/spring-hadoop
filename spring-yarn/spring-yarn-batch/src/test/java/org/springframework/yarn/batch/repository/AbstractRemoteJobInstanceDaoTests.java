@@ -15,8 +15,6 @@
  */
 package org.springframework.yarn.batch.repository;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -55,19 +53,9 @@ public abstract class AbstractRemoteJobInstanceDaoTests {
 		assertNotNull(fooInstance.getId());
 		assertEquals(fooJob, fooInstance.getJobName());
 
-		assertThat(fooInstance.getJobParameters().getString("stringKey"), is("stringValue"));
-		assertThat(fooInstance.getJobParameters().getLong("longKey"), is(Long.MAX_VALUE));
-		assertThat(fooInstance.getJobParameters().getDouble("doubleKey"), is(Double.MAX_VALUE));
-		assertThat(fooInstance.getJobParameters().getDate("dateKey"), is(new Date(DATE)));
-
 		JobInstance retrievedInstance = dao.getJobInstance(fooJob, fooParams);
 		assertEquals(fooInstance, retrievedInstance);
 		assertEquals(fooJob, retrievedInstance.getJobName());
-
-		assertThat(retrievedInstance.getJobParameters().getString("stringKey"), is("stringValue"));
-		assertThat(retrievedInstance.getJobParameters().getLong("longKey"), is(Long.MAX_VALUE));
-		assertThat(retrievedInstance.getJobParameters().getDouble("doubleKey"), is(Double.MAX_VALUE));
-		assertThat(retrievedInstance.getJobParameters().getDate("dateKey"), is(new Date(DATE)));
 	}
 
 	@Test
@@ -192,7 +180,7 @@ public abstract class AbstractRemoteJobInstanceDaoTests {
 
 	@Test
 	public void testCreationAddsVersion() {
-		JobInstance jobInstance = new JobInstance((long) 1, new JobParameters(), "testVersionAndId");
+		JobInstance jobInstance = new JobInstance((long) 1, "testVersionAndId");
 		assertNull(jobInstance.getVersion());
 
 		jobInstance = dao.createJobInstance("testVersion", new JobParameters());

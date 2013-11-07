@@ -123,7 +123,9 @@ public class ScriptingTest {
 		ScriptSource script = new StaticScriptSource("null");
 		
 		HdfsScriptRunner hsfb = new HdfsScriptRunner();
-		hsfb.setApplicationContext(new GenericApplicationContext());
+		GenericApplicationContext gac = new GenericApplicationContext();
+		gac.refresh();
+		hsfb.setApplicationContext(gac);
 		hsfb.setScriptSource(script);
 		hsfb.setLanguage("javascript");
 		hsfb.afterPropertiesSet();

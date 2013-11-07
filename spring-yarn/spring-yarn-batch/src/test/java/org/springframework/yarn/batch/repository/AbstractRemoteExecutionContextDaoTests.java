@@ -17,10 +17,14 @@ package org.springframework.yarn.batch.repository;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
@@ -48,7 +52,8 @@ public abstract class AbstractRemoteExecutionContextDaoTests {
 		contextDao = getRemoteExecutionContextDao();
 
 		JobInstance ji = jobInstanceDao.createJobInstance("testJob", new JobParameters());
-		jobExecution = new JobExecution(ji);
+		jobExecution = new JobExecution(ji, new JobParameters());
+
 		jobExecutionDao.saveJobExecution(jobExecution);
 		stepExecution = new StepExecution("stepName", jobExecution);
 		stepExecutionDao.saveStepExecution(stepExecution);
@@ -67,6 +72,46 @@ public abstract class AbstractRemoteExecutionContextDaoTests {
 
 		ExecutionContext retrieved = contextDao.getExecutionContext(jobExecution);
 		assertEquals(ctx, retrieved);
+	}
+
+	@Test
+	public void testSaveAndFindExecutionContexts() {
+
+		List<StepExecution> stepExecutions = new ArrayList<StepExecution>();
+		for (int i = 0; i < 3; i++) {
+			JobInstance ji = jobInstanceDao.createJobInstance("testJob" + i, new JobParameters());
+			JobExecution je = new JobExecution(ji, new JobParameters());
+			jobExecutionDao.saveJobExecution(je);
+			StepExecution se = new StepExecution("step" + i, je);
+			se.setStatus(BatchStatus.STARTED);
+			se.setReadSkipCount(i);
+			se.setProcessSkipCount(i);
+			se.setWriteSkipCount(i);
+			se.setProcessSkipCount(i);
+			se.setRollbackCount(i);
+			se.setLastUpdated(new Date(System.currentTimeMillis()));
+			se.setReadCount(i);
+			se.setFilterCount(i);
+			se.setWriteCount(i);
+			stepExecutions.add(se);
+		}
+		stepExecutionDao.saveStepExecutions(stepExecutions);
+		contextDao.saveExecutionContexts(stepExecutions);
+
+		for (int i = 0; i < 3; i++) {
+			ExecutionContext retrieved = contextDao.getExecutionContext(stepExecutions.get(i).getJobExecution());
+			assertEquals(stepExecutions.get(i).getExecutionContext(), retrieved);
+		}
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testSaveNullExecutionContexts() {
+		contextDao.saveExecutionContexts(null);
+	}
+
+	@Test
+	public void testSaveEmptyExecutionContexts() {
+		contextDao.saveExecutionContexts(new ArrayList<StepExecution>());
 	}
 
 	@Test
