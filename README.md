@@ -69,27 +69,28 @@ from the project root folder. This will compile the sources, run the tests and c
 
 ## Supported distros
 
-By default Spring for Apache Hadoop compiles against Apache Hadoop 1.0.x. Apache Hadoop 1.1.x (hadoop11) Apache Hadoop 1.2.x (hadoop12), Apache Hadoop 2.0.x Alpha (hadoop20), Cloudera CDH3 (cdh3), Cloudera CDH4 (cdh4), Hortonworks HDP 1.3 (hdp13) and Pivotal HD 1.0 (phd1) are also supported; to compile against them pass the `-Pdistro=<label>` project property, like so:
+By default Spring for Apache Hadoop compiles against Apache Hadoop 1.0.x. Apache Hadoop 1.1.x (hadoop11) Apache Hadoop 1.2.x (hadoop12), Apache Hadoop 2.0.x Alpha (hadoop20), Pivotal HD 1.1 (phd1), Cloudera CDH3 (cdh3), Cloudera CDH4 (cdh4), Hortonworks HDP 1.3 (hdp13) are also supported; to compile against them pass the `-Pdistro=<label>` project property, like so:
 
-    gradlew -Pdistro=hadoop11 build
+    gradlew -Pdistro=hadoop20 build
     
 Note that the chosen distro is displayed on the screen:
 
-    Using Apache Hadoop 1.1.x [1.1.2]
+    Using Apache Hadoop 2.0.x [2.0.6-alpha]
 
-In this case, the specified Hadoop distribution (above Apache Hadoop 1.1.x) is used to create the project binaries. This option is useful when testing against Hadoop clusters incompatible with the Hadoop stable line.
+In this case, the specified Hadoop distribution (above Apache Hadoop 2.0.x) is used to create the project binaries. This option is useful when testing against Hadoop clusters incompatible with the Hadoop stable line.
 
 # CI Builds
 
 The status of the CI builds are available at [Status Summary Screen](https://build.springsource.org/telemetry.action?filter=project&projectKey=SPRINGDATAHADOOP)
 
 We are currently running tests against the following distributions:
-* Apache Hadoop 1.0.4
 * Apache Hadoop 1.1.2
+* Apache Hadoop 1.2.1
+* Apache Hadoop 2.0.6-alpha
 * Cloudera CDH3
 * Cloudera CDH4
-* Greenplum HD 1.2
 * Hortonworks HDP 1.3
+* Pivotal HD 1.1
 
 # Testing
 
@@ -97,7 +98,7 @@ For its testing, Spring for Apache Hadoop expects a pseudo-distributed/local Had
 
 * Build properties
 
-From the command-line, use `hd.fs` for the file-system (to avoid confusion, specify the protocol such as 'hdfs://', 's3://', etc - if none is specified, `hdfs://` will be used), `hd.jt` for the jobtracker and `hd.hive` for the Hive host/port information, to override the defaults. For example to run against HDFS at `dumbo:8020` one would use:
+From the command-line, use `hd.fs` for the file-system (to avoid confusion, specify the protocol such as 'hdfs://', 's3://', etc - if none is specified, `hdfs://` will be used), `hd.jt` for the jobtracker, `hd.rm` for the YARN resourcemanager and `hd.hive` for the Hive host/port information, to override the defaults. For example to run against HDFS at `dumbo:8020` one would use:
 
     gradlew -Phd.fs=hdfs://dumbo:8020 build
 
