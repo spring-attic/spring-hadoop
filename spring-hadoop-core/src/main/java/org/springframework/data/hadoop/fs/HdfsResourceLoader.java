@@ -340,7 +340,7 @@ public class HdfsResourceLoader extends DefaultResourceLoader implements Resourc
 			}
 			return Collections.emptySet();
 		}
-		if (!fileStatus.isDirectory()) {
+		if (!fileStatus.isDir()) {
 			// Complain louder if it exists but is no directory.
 			if (log.isWarnEnabled()) {
 				log.warn("Skipping [" + rootDir.toUri().getPath() + "] because it does not denote a directory");
@@ -387,7 +387,7 @@ public class HdfsResourceLoader extends DefaultResourceLoader implements Resourc
 		}
 		for (FileStatus content : dirContents) {
 			String currPath = StringUtils.replace(content.getPath().toUri().getPath(), File.separator, "/");
-			if (content.isDirectory() && pathMatcher.matchStart(fullPattern, currPath + "/")) {
+			if (content.isDir() && pathMatcher.matchStart(fullPattern, currPath + "/")) {
 				doRetrieveMatchingFiles(fullPattern, content.getPath(), result);
 			}
 			if (pathMatcher.match(fullPattern, currPath)) {
