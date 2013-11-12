@@ -22,7 +22,7 @@
 
 	<hdp:resource-loader file-system-ref="hadoopFs" use-codecs="true" handle-noprefix="true" />
 
-	<hdp:resource-loader id="loaderWithUser" user="usernotexist" uri="hdfs://localhost:8020" use-codecs="true" handle-noprefix="true" />
+	<hdp:resource-loader id="loaderWithUser" user="usernotexist" uri="${hadoop.fs}" use-codecs="true" handle-noprefix="true" />
 
 	<hdp:resource-loader id="loaderHandleNoprefix" file-system-ref="hadoopFs" use-codecs="true" handle-noprefix="false" />
 
