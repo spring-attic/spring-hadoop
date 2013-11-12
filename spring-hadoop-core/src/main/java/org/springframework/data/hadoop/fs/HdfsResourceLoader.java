@@ -331,7 +331,6 @@ public class HdfsResourceLoader extends DefaultResourceLoader implements Resourc
 	 * @throws IOException if directory contents could not be retrieved
 	 */
 	protected Set<Path> retrieveMatchingFiles(Path rootDir, String pattern) throws IOException {
-		FileStatus fileStatus = fs.getFileStatus(rootDir);
 		boolean exists = fs.exists(rootDir);
 		if (!exists) {
 			// Silently skip non-existing directories.
@@ -340,6 +339,9 @@ public class HdfsResourceLoader extends DefaultResourceLoader implements Resourc
 			}
 			return Collections.emptySet();
 		}
+		// previous exists() should make sure we don't
+		// get FileNotFoundException
+		FileStatus fileStatus = fs.getFileStatus(rootDir);
 		if (!fileStatus.isDir()) {
 			// Complain louder if it exists but is no directory.
 			if (log.isWarnEnabled()) {

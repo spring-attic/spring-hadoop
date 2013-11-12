@@ -34,6 +34,10 @@
 		p:resource="file:/tmp/test.txt" />
 
 	<bean id="testBeanHdfsResources1" class="org.springframework.data.hadoop.fs.CustomResourceLoaderRegistrarTests$TestBean"
-		p:resources="hdfs:/tmp/*" />
+		p:resources="hdfs:/*" />
+
+	<bean id="testBeanHdfsResources2" class="org.springframework.data.hadoop.fs.CustomResourceLoaderRegistrarTests$TestBean"
+		lazy-init="true"
+		p:resources="hdfs:/path/not/exist/*" />
 
 </beans>

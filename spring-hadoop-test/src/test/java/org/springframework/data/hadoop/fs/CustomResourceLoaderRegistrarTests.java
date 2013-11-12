@@ -75,16 +75,16 @@ public class CustomResourceLoaderRegistrarTests {
 		assertThat(resources1.length, is(1));
 		assertThat(resources1[0], instanceOf(HdfsResource.class));
 
-		Resource[] resources2 = context.getResources("hdfs:/tmp/*");
+		Resource[] resources2 = context.getResources("hdfs:/*");
 		assertThat(resources2, notNullValue());
 
-		Resource[] resources3 = context.getResources("hdfs://localhost:8020/tmp/*");
+		Resource[] resources3 = context.getResources("hdfs://localhost:8020/*");
 		assertThat(resources3, notNullValue());
 
-		Resource[] resources4 = context.getResources("hdfs://localhost/tmp/*");
+		Resource[] resources4 = context.getResources("hdfs://localhost/*");
 		assertThat(resources4, notNullValue());
 
-		Resource[] resources5 = context.getResources("/tmp/*");
+		Resource[] resources5 = context.getResources("/*");
 		assertThat(resources5, notNullValue());
 
 		Resource[] resources6 = context.getResources("classpath:cfg*properties");
@@ -92,6 +92,21 @@ public class CustomResourceLoaderRegistrarTests {
 
 	}
 
+	@Test
+	public void testNonExistPathsForContextGetResources() throws IOException {
+		Resource[] resources1 = context.getResources("hdfs:/path/not/exist/*");
+		assertThat(resources1, notNullValue());
+
+		Resource[] resources2 = context.getResources("hdfs://localhost:8020/path/not/exist/*");
+		assertThat(resources2, notNullValue());
+
+		Resource[] resources3 = context.getResources("hdfs://localhost/path/not/exist/*");
+		assertThat(resources3, notNullValue());
+
+		Resource[] resources4 = context.getResources("/path/not/exist/*");
+		assertThat(resources4, notNullValue());
+	}
+	
 	@Test
 	public void testPathsForBeanResourceEditor() {
 		TestBean testBean1 = context.getBean("testBeanDefault", TestBean.class);
@@ -118,6 +133,12 @@ public class CustomResourceLoaderRegistrarTests {
 		assertThat(testBean6, notNullValue());
 	}
 
+	@Test
+	public void testNonExistPathsForBeanResourceEditor() {
+		TestBean testBean1 = context.getBean("testBeanHdfsResources2", TestBean.class);
+		assertThat(testBean1, notNullValue());
+	}
+	
 	public static class TestBean {
 		public Resource resource;
 		public Resource[] resources;
