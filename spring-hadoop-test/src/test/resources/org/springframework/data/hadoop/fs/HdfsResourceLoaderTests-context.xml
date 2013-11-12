@@ -6,6 +6,12 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
 
+    <!--make sure we have a /user directory with the correct permissions -->
+    <hdp:script language="javascript" run-at-startup="true">
+        if (!fsh.test("/user")) fsh.mkdir("/user")
+        fsh.chmod(777, "/user")
+    </hdp:script>
+
 	<!--use the bean definition to go beyond the configuration options provided by the namespace -->
 	<bean name="ppc" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
 		p:valueSeparator="|" p:location="test.properties" p:systemPropertiesModeName="SYSTEM_PROPERTIES_MODE_OVERRIDE" p:order="100"/>
