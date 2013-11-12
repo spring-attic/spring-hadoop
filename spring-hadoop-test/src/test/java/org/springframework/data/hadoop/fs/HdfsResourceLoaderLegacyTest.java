@@ -55,7 +55,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("/org/springframework/data/hadoop/hadoop-ctx.xml")
-public class HdfsResourceLoaderTest {
+public class HdfsResourceLoaderLegacyTest {
 
 	@Autowired
 	private Configuration cfg;
