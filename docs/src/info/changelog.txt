@@ -5,6 +5,25 @@ http://www.springsource.org/spring-data/hadoop
 Commit changelog: http://github.com/SpringSource/spring-hadoop/tree/v[version]
 Issues changelog: http://jira.springsource.org/secure/ReleaseNote.jspa?projectId=10801
 
+Changes in version 2.0.0 M2 (2013-11-13)
+-----------------------------------------
+General
+* Updating dependencies for Spring Framework, Batch and Integration to current [SHDP-186]
+* Adding Pivotal HD 1.1 as a supported distribution version
+* Adding Spring 4.0 as an option for compile & test
+* Adding support for using CDH4 YARN installations in addition to MR1
+* Various bug fixes
+
+Core
+* Re-writing the HdfsResourceLoader [SHDP-201]
+
+Batch
+*  Fixed remote DAO implementation due to API changes [SHDP-186]
+
+YARN
+* Ease Yarn MiniCluster log discovery [SHDP-190]
+
+
 Changes in version 2.0.0 M1 (2013-09-05)
 -----------------------------------------
 
@@ -28,9 +47,11 @@ Core
 
 Batch
 * Storing Hadoop counters and job status for MR JobTasklet [SHDP-165]
+* Moving the batch namespace element back to core namespace [SHDP-209]
 
 YARN
 * Adding support for YARN applications with Hadoop version 2
+
 
 Changes in version 1.0 GA (2013-02-26)
 --------------------------------------
