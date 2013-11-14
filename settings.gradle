@@ -6,23 +6,23 @@ switch (ext.hadoopDistro) {
 		ext.mr2 = false
 		break    
 	case "cdh4yarn":
-		ext.mr2 = true
+		ext.mr2 = false
 		break    
 	case "cdh4":
 	case "cdh4mr1":
 		ext.mr2 = false
 		break    
 	case "phd1":
-		ext.mr2 = true
+		ext.mr2 = false
 		break
 	case "hadoop22":
 		ext.mr2 = true
 		break
 	case "hadoop11":
-        ext.mr2 = false
+		ext.mr2 = false
 		break
 	default:
-        ext.mr2 = false
+		ext.mr2 = false
 }
 
 gradle.ext.mr2 = mr2
