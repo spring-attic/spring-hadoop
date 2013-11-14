@@ -22,6 +22,7 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.CommonConfigurationKeysPublic;
 import org.apache.hadoop.fs.FsUrlStreamHandlerFactory;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
@@ -32,10 +33,11 @@ import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 
 /**
- * FactoryBean for creating {@link Configuration} instances.
+ * FactoryBean for creating {@link YarnConfiguration} instances.
  *
  * @author Costin Leau
  * @author Janne Valkealahti
+ *
  */
 public class ConfigurationFactoryBean implements BeanClassLoaderAware, InitializingBean, FactoryBean<YarnConfiguration> {
 
@@ -52,7 +54,29 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 
 	private String fsUri;
 	private String rmAddress;
+	private String schedulerAddress;
 
+	@Override
+	public YarnConfiguration getObject() {
+		return internalConfig;
+	}
+
+	@Override
+	public Class<YarnConfiguration> getObjectType() {
+		return YarnConfiguration.class;
+	}
+
+	@Override
+	public boolean isSingleton() {
+		return true;
+	}
+
+	@Override
+	public void setBeanClassLoader(ClassLoader classLoader) {
+		this.beanClassLoader = classLoader;
+	}
+
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		internalConfig = createConfiguration(configuration);
 
@@ -67,18 +91,20 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 
 		// set hdfs / fs URI last to override all other properties
 		if (StringUtils.hasText(fsUri)) {
-			internalConfig.set("fs.default.name", fsUri.trim());
+			internalConfig.set(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY, fsUri.trim());
 		}
 
 		if (StringUtils.hasText(rmAddress)) {
-			internalConfig.set("yarn.resourcemanager.address", rmAddress.trim());
+			internalConfig.set(YarnConfiguration.RM_ADDRESS, rmAddress.trim());
+		}
+
+		if (StringUtils.hasText(schedulerAddress)) {
+			internalConfig.set(YarnConfiguration.RM_SCHEDULER_ADDRESS, schedulerAddress.trim());
 		}
 
 		if (initialize) {
 			internalConfig.size();
 		}
-
-		postProcessConfiguration(internalConfig);
 
 		if (registerJvmUrl) {
 			try {
@@ -93,37 +119,31 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 	}
 
 	/**
-	 * Creates a configuration instance potentially using the existing one (passed as an argument - which can be null).
+	 * Sets the File System ('fs.defaultFS') URI.
 	 *
-	 * @param existing
-	 * @return configuration instance
+	 * @param fsUri the file system uri
 	 */
-	protected YarnConfiguration createConfiguration(Configuration existing) {
-		return (existing != null ? new YarnConfiguration(existing) : new YarnConfiguration());
+	public void setFsUri(String fsUri) {
+		this.fsUri = fsUri;
 	}
 
-
-	protected void postProcessConfiguration(Configuration configuration) {
-		// no-op
+	/**
+	 * Sets the Yarn ('yarn.resourcemanager.address') address.
+	 *
+	 * @param rmAddress the resource manager address
+	 */
+	public void setRmAddress(String rmAddress) {
+		this.rmAddress = rmAddress;
 	}
 
-
-	public YarnConfiguration getObject() {
-		return internalConfig;
+	/**
+	 * Sets the Yarn ('yarn.resourcemanager.scheduler.address') address.
+	 *
+	 * @param schedulerAddress the resource manager scheduler address
+	 */
+	public void setSchedulerAddress(String schedulerAddress) {
+		this.schedulerAddress = schedulerAddress;
 	}
-
-	public Class<?> getObjectType() {
-		return (internalConfig != null ? internalConfig.getClass() : Configuration.class);
-	}
-
-	public boolean isSingleton() {
-		return true;
-	}
-
-	public void setBeanClassLoader(ClassLoader classLoader) {
-		this.beanClassLoader = classLoader;
-	}
-
 
 	/**
 	 * Sets the parent configuration.
@@ -175,20 +195,13 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 	}
 
 	/**
-	 * Sets the File System ('fs.default.name') URI.
+	 * Creates a configuration instance potentially using the existing one (passed as an argument - which can be null).
 	 *
-	 * @param fsUri
+	 * @param existing the configuration
+	 * @return configuration new or wrapped configuration
 	 */
-	public void setFileSystemUri(String fsUri) {
-		this.fsUri = fsUri;
+	protected YarnConfiguration createConfiguration(Configuration existing) {
+		return (existing != null ? new YarnConfiguration(existing) : new YarnConfiguration());
 	}
 
-	/**
-	 * Sets the Job Tracker ('mapred.jobtracker') URI.
-	 *
-	 * @param rmAddress
-	 */
-	public void setResourceManagerAddress(String rmAddress) {
-		this.rmAddress = rmAddress;
-	}
 }

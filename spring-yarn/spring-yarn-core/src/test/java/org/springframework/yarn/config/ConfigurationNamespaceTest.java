@@ -44,6 +44,9 @@ public class ConfigurationNamespaceTest {
 	@Resource
 	private Configuration propsConfig;
 
+	@Resource
+	private Configuration shortcutConfig;
+
 	@Test
 	public void testDefaultConfiguration() throws Exception {
 		assertNotNull(defaultConfig);
@@ -75,6 +78,14 @@ public class ConfigurationNamespaceTest {
 		assertEquals("jee26", propsConfig.get("foo26"));
 		assertEquals("jee27", propsConfig.get("foo27"));
 		assertEquals("jee28", propsConfig.get("foo28"));
+	}
+
+	@Test
+	public void testShortcutConfiguration() throws Exception {
+		assertNotNull(shortcutConfig);
+		assertEquals("10.10.10.10:8032", shortcutConfig.get("yarn.resourcemanager.address"));
+		assertEquals("10.10.10.10:8030", shortcutConfig.get("yarn.resourcemanager.scheduler.address"));
+		assertEquals("hdfs://10.10.10.10:9000", shortcutConfig.get("fs.defaultFS"));
 	}
 
 }
