@@ -1,0 +1,43 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:c="http://www.springframework.org/schema/c"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:hdp="http://www.springframework.org/schema/hadoop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
+
+	<!--use the bean definition to go beyond the configuration options provided by the namespace -->
+	<bean name="ppc" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
+		p:valueSeparator="|" p:location="test.properties" p:systemPropertiesModeName="SYSTEM_PROPERTIES_MODE_OVERRIDE" p:order="100"/>
+
+	<hdp:configuration register-url-handler="false" file-system-uri="${hadoop.fs}" />
+
+	<hdp:file-system />
+
+	<hdp:resource-loader file-system-ref="hadoopFs" use-codecs="true" handle-noprefix="true" />
+
+	<hdp:resource-loader-registrar />
+
+ 	<bean id="testBeanDefault" class="org.springframework.data.hadoop.fs.CustomResourceLoaderRegistrarTests$TestBean"
+		p:resource="default.txt" />
+
+	<bean id="testBeanHdfs" class="org.springframework.data.hadoop.fs.CustomResourceLoaderRegistrarTests$TestBean"
+		p:resource="hdfs:/hdfs.txt" />
+
+	<bean id="testBeanClasspath" class="org.springframework.data.hadoop.fs.CustomResourceLoaderRegistrarTests$TestBean"
+		p:resource="classpath:test.properties" />
+
+	<bean id="testBeanHttp" class="org.springframework.data.hadoop.fs.CustomResourceLoaderRegistrarTests$TestBean"
+		p:resource="http://example.com/tmp/test.txt" />
+
+	<bean id="testBeanFile" class="org.springframework.data.hadoop.fs.CustomResourceLoaderRegistrarTests$TestBean"
+		p:resource="file:/tmp/test.txt" />
+
+	<bean id="testBeanHdfsResources1" class="org.springframework.data.hadoop.fs.CustomResourceLoaderRegistrarTests$TestBean"
+		p:resources="hdfs:/*" />
+
+	<bean id="testBeanHdfsResources2" class="org.springframework.data.hadoop.fs.CustomResourceLoaderRegistrarTests$TestBean"
+		lazy-init="true"
+		p:resources="hdfs:/path/not/exist/*" />
+
+</beans>
