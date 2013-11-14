@@ -188,10 +188,24 @@
 					</xsd:appinfo>
 				</xsd:annotation>
 			</xsd:attribute>
-			<xsd:attribute name="yarn-resourcemanager-address" type="xsd:string">
+			<xsd:attribute name="rm-address" type="xsd:string">
 				<xsd:annotation>
 					<xsd:documentation><![CDATA[
 					The Yarn Resource manager address (host:port). Equivalent to 'yarn.resourcemanager.address' property.
+					]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="fs-uri" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+					The HDFS filesystem address. Equivalent to 'fs.defaultFS' property.
+					]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="scheduler-address" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+					The Yarn Resource manager scheduler address (host:port). Equivalent to 'yarn.resourcemanager.scheduler.address' property.
 					]]></xsd:documentation>
 				</xsd:annotation>
 			</xsd:attribute>

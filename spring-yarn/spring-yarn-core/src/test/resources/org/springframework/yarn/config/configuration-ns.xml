@@ -27,6 +27,8 @@
 		foo28=jee28
 	</yarn:configuration>
 
+	<yarn:configuration id="shortcutConfig" fs-uri="${fake.fs}" rm-address="${fake.rm}" scheduler-address="${fake.scheduler}"/>
+
 	<util:properties id="props" location="props.properties"/>
 
 

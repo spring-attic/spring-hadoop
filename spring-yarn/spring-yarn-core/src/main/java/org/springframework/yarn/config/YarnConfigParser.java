@@ -17,6 +17,7 @@ package org.springframework.yarn.config;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.yarn.YarnSystemConstants;
 import org.springframework.yarn.configuration.ConfigurationFactoryBean;
 import org.w3c.dom.Element;
 
@@ -46,7 +47,7 @@ class YarnConfigParser extends AbstractPropertiesConfiguredBeanDefinitionParser 
 
 	@Override
 	protected String defaultId(ParserContext context, Element element) {
-		return "yarnConfiguration";
+		return YarnSystemConstants.DEFAULT_ID_CONFIGURATION;
 	}
 
 }
