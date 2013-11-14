@@ -15,6 +15,7 @@
  */
 package org.springframework.yarn.am;
 
+import org.apache.hadoop.yarn.api.records.Container;
 import org.apache.hadoop.yarn.api.records.ContainerLaunchContext;
 
 /**
@@ -31,8 +32,9 @@ public interface ContainerLauncherInterceptor {
 	 * to launch the container.
 	 *
 	 * @param context the {@link ContainerLaunchContext}
+	 * @param container the {@link Container}
 	 * @return Unchanged or modified {@link ContainerLaunchContext}
 	 */
-	ContainerLaunchContext preLaunch(ContainerLaunchContext context);
+	ContainerLaunchContext preLaunch(Container container, ContainerLaunchContext context);
 
 }

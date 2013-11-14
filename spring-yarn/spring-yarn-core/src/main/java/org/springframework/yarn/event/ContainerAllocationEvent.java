@@ -53,8 +53,6 @@ public class ContainerAllocationEvent extends AbstractYarnEvent {
 	public String toString() {
 		return "ContainerAllocationEvent [containerId=" + container.getId()
 				+ ", nodeId=" + container.getNodeId()
-				+ ", containerState=" + container.getState()
-				+ ", containerStatus=" + container.getContainerStatus()
 				+ ", containerToken=" + container.getContainerToken()
 				+ "]";
 	}

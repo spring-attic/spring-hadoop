@@ -53,8 +53,6 @@ public class ContainerLaunchedEvent extends AbstractYarnEvent {
 	public String toString() {
 		return "ContainerLaunchedEvent [containerId=" + container.getId()
 				+ ", nodeId=" + container.getNodeId()
-				+ ", containerState=" + container.getState()
-				+ ", containerStatus=" + container.getContainerStatus()
 				+ "]";
 	}
 

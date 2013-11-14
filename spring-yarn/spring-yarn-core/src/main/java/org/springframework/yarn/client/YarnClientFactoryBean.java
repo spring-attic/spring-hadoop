@@ -65,9 +65,6 @@ public class YarnClientFactoryBean implements InitializingBean, FactoryBean<Yarn
 	/** Name of the application */
 	private String appName = "";
 
-	/** User of the application */
-	private String user;
-
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		// set template if not defined
@@ -82,7 +79,6 @@ public class YarnClientFactoryBean implements InitializingBean, FactoryBean<Yarn
 		client.setMemory(memory);
 		client.setQueue(queue);
 		client.setAppName(appName);
-		client.setUser(user);
 		client.setCommands(commands);
 		client.setEnvironment(environment);
 		client.setResourceLocalizer(resourceLocalizer);
@@ -194,19 +190,8 @@ public class YarnClientFactoryBean implements InitializingBean, FactoryBean<Yarn
 		this.queue = queue;
 	}
 
-	/**
-	 * Sets the user.
-	 *
-	 * @param user the new user
-	 */
-	public void setUser(String user) {
-		this.user = user;
-	}
-
 	public void setTemplate(ClientRmOperations template) {
 		this.template = template;
 	}
-
-
 
 }

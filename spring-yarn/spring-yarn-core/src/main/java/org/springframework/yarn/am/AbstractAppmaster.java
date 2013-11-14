@@ -349,7 +349,7 @@ public abstract class AbstractAppmaster extends LifecycleObjectSupport {
 				" trackUrl=" + trackUrl + " rpcHost=" + rpcHost + " rpcPort=" + rpcPort);
 
 		RegisterApplicationMasterResponse response =
-				rmTemplate.registerApplicationMaster(applicationAttemptId, rpcHost, rpcPort, trackUrl);
+				rmTemplate.registerApplicationMaster(rpcHost, rpcPort, trackUrl);
 		applicationRegistered = true;
 		return response;
 	}
@@ -366,22 +366,26 @@ public abstract class AbstractAppmaster extends LifecycleObjectSupport {
 		boolean clean = getResourceLocalizer().clean();
 		log.info("Status of resource localizer clean operation is " + clean);
 
+		// starting from 2.1.x applicationAttemptId is part of the token and
+		// doesn't exist in finish request. We still keep it around as per
+		// old concept.
 		Assert.notNull(applicationAttemptId, "applicationAttemptId must be set");
 		if(!applicationRegistered) {
 			log.warn("Not sending finish request because we're not registered");
 			return null;
 		}
-		if(log.isDebugEnabled()) {
-			log.debug("Sending finish request to resource manager: appAttemptId=" +
-					applicationAttemptId + " status=" + FinalApplicationStatus.SUCCEEDED);
-		}
-		FinishApplicationMasterRequest finishReq = Records.newRecord(FinishApplicationMasterRequest.class);
-		finishReq.setAppAttemptId(applicationAttemptId);
 
+		FinishApplicationMasterRequest finishReq = Records.newRecord(FinishApplicationMasterRequest.class);
 		// assume succeed if not set
 		FinalApplicationStatus status = finalApplicationStatus != null ?
 				finalApplicationStatus : FinalApplicationStatus.SUCCEEDED;
-		finishReq.setFinishApplicationStatus(status);
+
+		if(log.isDebugEnabled()) {
+			log.debug("Sending finish request to resource manager. Current applicationAttemptId=" +
+					applicationAttemptId + " with status=" + status);
+		}
+
+		finishReq.setFinalApplicationStatus(status);
 		return rmTemplate.finish(finishReq);
 	}
 

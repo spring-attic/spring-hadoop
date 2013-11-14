@@ -14,10 +14,10 @@
 	<yarn:localresources/>
 
 	<yarn:environment>
-		AM_CONTAINER_ID=container_1360089121174_0011_01_000001
+		CONTAINER_ID=container_1360089121174_0011_01_000001
 	</yarn:environment>
 
-	<bean id="yarnAmserver" class="org.springframework.yarn.am.AppmasterTests$StubAppmasterService"/>
+	<bean id="yarnAmservice" class="org.springframework.yarn.am.AppmasterTests$StubAppmasterService"/>
 
 	<yarn:master>
 		<yarn:container-command>

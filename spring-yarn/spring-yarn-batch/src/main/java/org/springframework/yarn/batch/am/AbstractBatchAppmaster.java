@@ -203,14 +203,14 @@ public abstract class AbstractBatchAppmaster extends AbstractEventingAppmaster i
 	}
 
 	@Override
-	public ContainerLaunchContext preLaunch(ContainerLaunchContext context) {
+	public ContainerLaunchContext preLaunch(Container container, ContainerLaunchContext context) {
 		AppmasterService service = getAppmasterService();
 
 		if(log.isDebugEnabled()) {
 			log.debug("Intercept launch context: " + context);
 		}
 
-		StepExecution stepExecution = containerToStepMap.get(context.getContainerId());
+		StepExecution stepExecution = containerToStepMap.get(container.getId());
 		String jobName = remoteStepNames.get(stepExecution);
 
 		if(service != null) {

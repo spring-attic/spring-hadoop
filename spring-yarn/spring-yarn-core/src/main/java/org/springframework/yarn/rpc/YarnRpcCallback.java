@@ -15,8 +15,9 @@
  */
 package org.springframework.yarn.rpc;
 
-import org.apache.hadoop.ipc.RemoteException;
-import org.apache.hadoop.yarn.exceptions.YarnRemoteException;
+import java.io.IOException;
+
+import org.apache.hadoop.yarn.exceptions.YarnException;
 
 /**
  * Simple helper interface to execute methods via callbacks.
@@ -33,9 +34,9 @@ public interface YarnRpcCallback<T, P> {
 	 *
 	 * @param proxy rpc proxy instance
 	 * @return Value returned by callback
-	 * @throws YarnRemoteException
-	 * @throws RemoteException
+	 * @throws YarnException
+	 * @throws IOException
 	 */
-	T doInYarn(P proxy) throws YarnRemoteException, RemoteException;
+	T doInYarn(P proxy) throws YarnException, IOException;
 
 }

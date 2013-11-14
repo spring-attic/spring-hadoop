@@ -15,14 +15,15 @@
  */
 package org.springframework.yarn.client;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.List;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.yarn.api.ClientRMProtocol;
-import org.apache.hadoop.yarn.api.protocolrecords.GetAllApplicationsRequest;
-import org.apache.hadoop.yarn.api.protocolrecords.GetAllApplicationsResponse;
+import org.apache.hadoop.yarn.api.ApplicationClientProtocol;
 import org.apache.hadoop.yarn.api.protocolrecords.GetApplicationReportRequest;
+import org.apache.hadoop.yarn.api.protocolrecords.GetApplicationsRequest;
+import org.apache.hadoop.yarn.api.protocolrecords.GetApplicationsResponse;
 import org.apache.hadoop.yarn.api.protocolrecords.GetDelegationTokenRequest;
 import org.apache.hadoop.yarn.api.protocolrecords.GetNewApplicationRequest;
 import org.apache.hadoop.yarn.api.protocolrecords.GetNewApplicationResponse;
@@ -33,22 +34,22 @@ import org.apache.hadoop.yarn.api.protocolrecords.SubmitApplicationResponse;
 import org.apache.hadoop.yarn.api.records.ApplicationId;
 import org.apache.hadoop.yarn.api.records.ApplicationReport;
 import org.apache.hadoop.yarn.api.records.ApplicationSubmissionContext;
-import org.apache.hadoop.yarn.api.records.DelegationToken;
+import org.apache.hadoop.yarn.api.records.Token;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
-import org.apache.hadoop.yarn.exceptions.YarnRemoteException;
+import org.apache.hadoop.yarn.exceptions.YarnException;
 import org.apache.hadoop.yarn.util.Records;
 import org.springframework.yarn.rpc.YarnRpcAccessor;
 import org.springframework.yarn.rpc.YarnRpcCallback;
 
 /**
  * Template implementation for {@link ClientRmOperations} wrapping
- * communication using {@link ClientRMProtocol}. Methods for this
+ * communication using {@link ApplicationClientProtocol}. Methods for this
  * template wraps possible exceptions into Spring Dao exception hierarchy.
  *
  * @author Janne Valkealahti
  *
  */
-public class ClientRmTemplate extends YarnRpcAccessor<ClientRMProtocol> implements ClientRmOperations {
+public class ClientRmTemplate extends YarnRpcAccessor<ApplicationClientProtocol> implements ClientRmOperations {
 
 	/**
 	 * Constructs a {@link ClientRmTemplate} with a given yarn configuration.
@@ -56,16 +57,16 @@ public class ClientRmTemplate extends YarnRpcAccessor<ClientRMProtocol> implemen
 	 * @param config the yarn configuration
 	 */
 	public ClientRmTemplate(Configuration config) {
-		super(ClientRMProtocol.class, config);
+		super(ApplicationClientProtocol.class, config);
 	}
 
 	@Override
 	public List<ApplicationReport> listApplications() {
-		return execute(new YarnRpcCallback<List<ApplicationReport>, ClientRMProtocol>() {
+		return execute(new YarnRpcCallback<List<ApplicationReport>, ApplicationClientProtocol>() {
 			@Override
-			public List<ApplicationReport> doInYarn(ClientRMProtocol proxy) throws YarnRemoteException {
-				GetAllApplicationsRequest request = Records.newRecord(GetAllApplicationsRequest.class);
-				GetAllApplicationsResponse response = proxy.getAllApplications(request);
+			public List<ApplicationReport> doInYarn(ApplicationClientProtocol proxy) throws YarnException, IOException {
+				GetApplicationsRequest request = Records.newRecord(GetApplicationsRequest.class);
+				GetApplicationsResponse response = proxy.getApplications(request);
 				return response.getApplicationList();
 			}
 		});
@@ -73,9 +74,9 @@ public class ClientRmTemplate extends YarnRpcAccessor<ClientRMProtocol> implemen
 
 	@Override
 	public GetNewApplicationResponse getNewApplication() {
-		return execute(new YarnRpcCallback<GetNewApplicationResponse, ClientRMProtocol>() {
+		return execute(new YarnRpcCallback<GetNewApplicationResponse, ApplicationClientProtocol>() {
 			@Override
-			public GetNewApplicationResponse doInYarn(ClientRMProtocol proxy) throws YarnRemoteException {
+			public GetNewApplicationResponse doInYarn(ApplicationClientProtocol proxy) throws YarnException, IOException {
 				GetNewApplicationRequest request = Records.newRecord(GetNewApplicationRequest.class);
 				return proxy.getNewApplication(request);
 			}
@@ -84,9 +85,9 @@ public class ClientRmTemplate extends YarnRpcAccessor<ClientRMProtocol> implemen
 
 	@Override
 	public SubmitApplicationResponse submitApplication(final ApplicationSubmissionContext appSubContext) {
-		return execute(new YarnRpcCallback<SubmitApplicationResponse, ClientRMProtocol>() {
+		return execute(new YarnRpcCallback<SubmitApplicationResponse, ApplicationClientProtocol>() {
 			@Override
-			public SubmitApplicationResponse doInYarn(ClientRMProtocol proxy) throws YarnRemoteException {
+			public SubmitApplicationResponse doInYarn(ApplicationClientProtocol proxy) throws YarnException, IOException {
 				SubmitApplicationRequest request = Records.newRecord(SubmitApplicationRequest.class);
 				request.setApplicationSubmissionContext(appSubContext);
 				return proxy.submitApplication(request);
@@ -96,9 +97,9 @@ public class ClientRmTemplate extends YarnRpcAccessor<ClientRMProtocol> implemen
 
 	@Override
 	public KillApplicationResponse killApplication(final ApplicationId applicationId) {
-		return execute(new YarnRpcCallback<KillApplicationResponse, ClientRMProtocol>() {
+		return execute(new YarnRpcCallback<KillApplicationResponse, ApplicationClientProtocol>() {
 			@Override
-			public KillApplicationResponse doInYarn(ClientRMProtocol proxy) throws YarnRemoteException {
+			public KillApplicationResponse doInYarn(ApplicationClientProtocol proxy) throws YarnException, IOException {
 				KillApplicationRequest request = Records.newRecord(KillApplicationRequest.class);
 				request.setApplicationId(applicationId);
 				return proxy.forceKillApplication(request);
@@ -107,27 +108,27 @@ public class ClientRmTemplate extends YarnRpcAccessor<ClientRMProtocol> implemen
 	}
 
 	@Override
-	public DelegationToken getDelegationToken(final String renewer) {
-		return execute(new YarnRpcCallback<DelegationToken, ClientRMProtocol>() {
+	public Token getDelegationToken(final String renewer) {
+		return execute(new YarnRpcCallback<Token, ApplicationClientProtocol>() {
 			@Override
-			public DelegationToken doInYarn(ClientRMProtocol proxy) throws YarnRemoteException {
+			public Token doInYarn(ApplicationClientProtocol proxy) throws YarnException, IOException {
 				GetDelegationTokenRequest request = Records.newRecord(GetDelegationTokenRequest.class);
 				request.setRenewer(renewer);
 				return proxy.getDelegationToken(request).getRMDelegationToken();
 			}
 		});
 	}
-	
+
 	@Override
 	public ApplicationReport getApplicationReport(final ApplicationId applicationId) {
-		return execute(new YarnRpcCallback<ApplicationReport, ClientRMProtocol>() {
+		return execute(new YarnRpcCallback<ApplicationReport, ApplicationClientProtocol>() {
 			@Override
-			public ApplicationReport doInYarn(ClientRMProtocol proxy) throws YarnRemoteException {
+			public ApplicationReport doInYarn(ApplicationClientProtocol proxy) throws YarnException, IOException {
 				GetApplicationReportRequest request = Records.newRecord(GetApplicationReportRequest.class);
 				request.setApplicationId(applicationId);
 				return proxy.getApplicationReport(request).getApplicationReport();
 			}
-		});		
+		});
 	}
 
 	@Override

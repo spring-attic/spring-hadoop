@@ -21,9 +21,11 @@ import java.util.concurrent.ScheduledFuture;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.hadoop.yarn.api.records.AMResponse;
+import org.apache.hadoop.yarn.api.protocolrecords.AllocateResponse;
 import org.apache.hadoop.yarn.api.records.Container;
 import org.apache.hadoop.yarn.api.records.ContainerStatus;
+import org.apache.hadoop.yarn.api.records.NMToken;
+import org.apache.hadoop.yarn.client.api.NMTokenCache;
 import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.support.PeriodicTrigger;
 import org.springframework.util.Assert;
@@ -93,12 +95,12 @@ public abstract class AbstractPollingAllocator extends AbstractAllocator {
 	 * {@link #handleAllocatedContainers(List)} and
 	 * {@link #handleCompletedContainers(List)}.
 	 *
-	 * @return {@link AMResponse} from a resource manager
+	 * @return {@link AllocateResponse} from a resource manager
 	 */
-	protected abstract AMResponse doContainerRequest();
+	protected abstract AllocateResponse doContainerRequest();
 
 	/**
-	 * Pre process allocated containers. Allows implementors to
+	 * Pre-process allocated containers. Allows implementors to
 	 * intercept containers before further processing is done.
 	 * Default implementation returns list as it is.
 	 *
@@ -160,7 +162,12 @@ public abstract class AbstractPollingAllocator extends AbstractAllocator {
 			return result;
 		}
 
-		AMResponse response = doContainerRequest();
+		AllocateResponse response = doContainerRequest();
+
+		// for now just stash tokens into hadoops NMTokenCache
+		if (!response.getNMTokens().isEmpty()) {
+			populateNmTokenCache(response);
+		}
 
 		List<Container> allocatedContainers = preProcessAllocatedContainers(response.getAllocatedContainers());
 		if(allocatedContainers != null && allocatedContainers.size() > 0) {
@@ -181,7 +188,7 @@ public abstract class AbstractPollingAllocator extends AbstractAllocator {
 
 		List<ContainerStatus> containerStatuses = response.getCompletedContainersStatuses();
 		if(containerStatuses != null && containerStatuses.size() > 0) {
-			if (log.isDebugEnabled()){
+			if (log.isDebugEnabled()) {
 				log.debug("response has " + containerStatuses.size() + " completed containers");
 				for (ContainerStatus cs : containerStatuses) {
 					log.debug("completed container: " + cs.getContainerId() + " with status=" + cs);
@@ -197,6 +204,27 @@ public abstract class AbstractPollingAllocator extends AbstractAllocator {
 		}
 
 		return result;
+	}
+
+	/**
+	 * Populate node manager token cache in {@link NMTokenCache}.
+	 *
+	 * @param allocateResponse the allocate response
+	 */
+	protected void populateNmTokenCache(AllocateResponse allocateResponse) {
+		// TODO: consider replacing hadoop NMTokenCache to non-static cache
+		for (NMToken token : allocateResponse.getNMTokens()) {
+			String nodeId = token.getNodeId().toString();
+			if (log.isDebugEnabled()) {
+				log.info("Token from allocateResponse token=" + token);
+				if (NMTokenCache.containsNMToken(nodeId)) {
+					log.debug("Replacing token for : " + nodeId);
+				} else {
+					log.debug("Received new token for : " + nodeId);
+				}
+			}
+			NMTokenCache.setNMToken(nodeId, token.getToken());
+		}
 	}
 
 	/**
