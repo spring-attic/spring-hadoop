@@ -56,18 +56,6 @@ def hiveGroup = "org.apache.hive"
 // default is Hadoop 1.2.x
 switch (hadoopDistro) {
 
-	// Cloudera CDH3
-	case "cdh3":
-		hadoopVersion = cdh3Version
-		println "Using Cloudera CDH3 [$hadoopVersion]"
-		hbaseVersion = cdh3HbaseVersion
-		// Hive in CDH3 is too old and does not allow Hive Server to be compiled
-		// Note that the POMs and repo are incomplete (hive-builtin is missing)
-		// hiveVersion = cdh3HiveVersion
-		// hiveGroup = "org.apache.hadoop.hive"
-		pigVersion = cdh3PigVersion
-		break;	
-
 	// Cloudera CDH4 YARN
 	case "cdh4yarn":
 		hadoopVersion = cdh4YARNVersion
@@ -140,14 +128,6 @@ switch (hadoopDistro) {
 			  "org.apache.hadoop:hadoop-tools:$hadoopVersion"]
 		break;
 
-	// Hadoop 1.0.x
-	case "hadoop10":
-		hadoopVersion = hd10Version
-		println "Using Apache Hadoop 1.0.x [$hadoopVersion]"
-		hadoop = ["org.apache.hadoop:hadoop-streaming:$hadoopVersion",
-			  "org.apache.hadoop:hadoop-tools:$hadoopVersion"]
-		break;
-
 	default:
 		if (!project.hasProperty("distro")) {
 			println "Using default distro: Apache Hadoop [$hadoopVersion]"
@@ -156,7 +136,7 @@ switch (hadoopDistro) {
 				println "Using Apache Hadoop 1.2.x [$hadoopVersion]"
 			} else {
 				println "Failing build: $hadoopDistro is not a supported distro"
-				println "Supported distros: hadoop10, hadoop11, hadoop12[*], hadoop22, hdp13, chd3, chd4 and phd1"
+				println "Supported distros: hadoop11, hadoop12[*], hadoop22, hdp13, cdh4 and phd1"
 				println "* default"
 				throw new InvalidUserDataException("$hadoopDistro is not a supported distro")
 			}
@@ -309,15 +289,6 @@ configure(hadoopProjects()) {
 	// default is Hadoop 1.2.x
 	switch (hadoopDistro) {
 
-		// Cloudera CDH3
-		case "cdh3":
-			dependencies {
-				optional("org.apache.hadoop:hadoop-streaming:$hadoopVersion") 
-				optional("org.apache.hadoop:hadoop-tools:$hadoopVersion")
-				testCompile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
-			}
-			break;	
-
 		// Cloudera CDH4 YARN
 		case "cdh4yarn":
 			dependencies {
@@ -373,13 +344,6 @@ configure(hadoopProjects()) {
 
 		// Hadoop 1.1.x
 		case "hadoop11":
-			dependencies {
-				testCompile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
-			}
-			break;
-
-		// Hadoop 1.0.x
-		case "hadoop10":
 			dependencies {
 				testCompile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
 			}
