@@ -15,6 +15,7 @@
  */
 package org.springframework.yarn.am.container;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -26,10 +27,14 @@ import java.util.concurrent.ScheduledFuture;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.yarn.api.protocolrecords.StartContainerRequest;
+import org.apache.hadoop.yarn.api.protocolrecords.StartContainersRequest;
+import org.apache.hadoop.yarn.api.protocolrecords.StartContainersResponse;
 import org.apache.hadoop.yarn.api.records.Container;
+import org.apache.hadoop.yarn.api.records.ContainerId;
 import org.apache.hadoop.yarn.api.records.ContainerLaunchContext;
 import org.apache.hadoop.yarn.api.records.ContainerState;
 import org.apache.hadoop.yarn.api.records.ContainerStatus;
+import org.apache.hadoop.yarn.api.records.SerializedException;
 import org.apache.hadoop.yarn.util.ConverterUtils;
 import org.apache.hadoop.yarn.util.Records;
 import org.springframework.scheduling.Trigger;
@@ -91,9 +96,6 @@ public class DefaultContainerLauncher extends AbstractLauncher implements Contai
 		}
 
 		ContainerLaunchContext ctx = Records.newRecord(ContainerLaunchContext.class);
-		ctx.setContainerId(container.getId());
-		ctx.setResource(container.getResource());
-		ctx.setUser(getUsername());
 		String stagingId = container.getId().getApplicationAttemptId().getApplicationId().toString();
 		getResourceLocalizer().setStagingId(stagingId);
 		ctx.setLocalResources(getResourceLocalizer().getResources());
@@ -104,11 +106,21 @@ public class DefaultContainerLauncher extends AbstractLauncher implements Contai
 		Map<String, String> env = getEnvironment();
 		env.put(YarnSystemConstants.SYARN_CONTAINER_ID, ConverterUtils.toString(container.getId()));
 		ctx.setEnvironment(env);
-		ctx = getInterceptors().preLaunch(ctx);
+		ctx = getInterceptors().preLaunch(container, ctx);
 
-		StartContainerRequest request = Records.newRecord(StartContainerRequest.class);
-		request.setContainerLaunchContext(ctx);
-		getCmTemplate(container).startContainer(request);
+		StartContainerRequest startContainerRequest = Records.newRecord(StartContainerRequest.class);
+		startContainerRequest.setContainerLaunchContext(ctx);
+		startContainerRequest.setContainerToken(container.getContainerToken());
+
+		StartContainersRequest startContainersRequest = Records.newRecord(StartContainersRequest.class);
+		ArrayList<StartContainerRequest> startContainerRequestList = new ArrayList<StartContainerRequest>();
+		startContainerRequestList.add(startContainerRequest);
+		startContainersRequest.setStartContainerRequests(startContainerRequestList);
+
+		StartContainersResponse startContainersResponse = getCmTemplate(container).startContainers(startContainersRequest);
+		Map<ContainerId, SerializedException> failedRequests = startContainersResponse.getFailedRequests();
+		List<ContainerId> successfullyStartedContainers = startContainersResponse.getSuccessfullyStartedContainers();
+		// TODO: handle failed/success
 
 		// notify interested parties of new launched container
 		if(getYarnEventPublisher() != null) {

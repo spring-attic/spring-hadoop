@@ -222,9 +222,9 @@ public abstract class AbstractLauncher extends LifecycleObjectSupport {
 		 * @param context the container launch context
 		 * @return the final modified context or <code>null</code> if interceptor broke the chain
 		 */
-		public ContainerLaunchContext preLaunch(ContainerLaunchContext context) {
+		public ContainerLaunchContext preLaunch(Container container, ContainerLaunchContext context) {
 			for (ContainerLauncherInterceptor interceptor : interceptors) {
-				context = interceptor.preLaunch(context);
+				context = interceptor.preLaunch(container, context);
 				if(context == null) {
 					return null;
 				}

@@ -20,14 +20,13 @@ import org.apache.hadoop.yarn.api.protocolrecords.AllocateResponse;
 import org.apache.hadoop.yarn.api.protocolrecords.FinishApplicationMasterRequest;
 import org.apache.hadoop.yarn.api.protocolrecords.FinishApplicationMasterResponse;
 import org.apache.hadoop.yarn.api.protocolrecords.RegisterApplicationMasterResponse;
-import org.apache.hadoop.yarn.api.records.ApplicationAttemptId;
 
 /**
  * Interface for appmaster to resource manager communication.
  *
  * @author Janne Valkealahti
  * @see org.springframework.yarn.am.AppmasterRmTemplate
- * @see org.apache.hadoop.yarn.api.AMRMProtocol
+ * @see org.apache.hadoop.yarn.api.ApplicationMasterProtocol
  *
  */
 public interface AppmasterRmOperations {
@@ -35,14 +34,12 @@ public interface AppmasterRmOperations {
 	/**
 	 * Register application master.
 	 *
-	 * @param appAttemptId the app attempt id
 	 * @param host the host
 	 * @param rpcPort the rpc port
 	 * @param trackUrl the track url
-	 * @return the register application master response
+	 * @return the {@link RegisterApplicationMasterResponse}
 	 */
-	RegisterApplicationMasterResponse registerApplicationMaster(ApplicationAttemptId appAttemptId,
-			String host, Integer rpcPort, String trackUrl);
+	RegisterApplicationMasterResponse registerApplicationMaster(String host, Integer rpcPort, String trackUrl);
 
 	/**
 	 * Allocate container.
@@ -55,8 +52,8 @@ public interface AppmasterRmOperations {
 	/**
 	 * Finish the application master.
 	 *
-	 * @param request the request
-	 * @return the finish application master response
+	 * @param request the {@link FinishApplicationMasterRequest}
+	 * @return the {@link FinishApplicationMasterResponse}
 	 */
 	FinishApplicationMasterResponse finish(FinishApplicationMasterRequest request);
 

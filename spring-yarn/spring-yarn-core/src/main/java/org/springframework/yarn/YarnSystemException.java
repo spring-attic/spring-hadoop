@@ -15,9 +15,11 @@
  */
 package org.springframework.yarn;
 
+import java.io.IOException;
+
 import org.apache.hadoop.ipc.RemoteException;
-import org.apache.hadoop.yarn.YarnException;
-import org.apache.hadoop.yarn.exceptions.YarnRemoteException;
+import org.apache.hadoop.yarn.exceptions.YarnException;
+import org.apache.hadoop.yarn.exceptions.YarnRuntimeException;
 import org.springframework.dao.UncategorizedDataAccessException;
 
 /**
@@ -42,11 +44,11 @@ public class YarnSystemException extends UncategorizedDataAccessException {
 	}
 
 	/**
-	 * Constructs YarnSystemException from {@link YarnRemoteException}.
+	 * Constructs YarnSystemException from {@link YarnRuntimeException}.
 	 *
-	 * @param e the {@link YarnRemoteException}
+	 * @param e the {@link YarnRuntimeException}
 	 */
-	public YarnSystemException(YarnRemoteException e) {
+	public YarnSystemException(YarnRuntimeException e) {
 		super(e.getMessage(), e);
 	}
 
@@ -55,9 +57,12 @@ public class YarnSystemException extends UncategorizedDataAccessException {
 	 *
 	 * @param e the {@link RemoteException}
 	 */
-	public YarnSystemException(RemoteException e) {
+	public YarnSystemException(IOException e) {
 		super(e.getMessage(), e);
 	}
+//	public YarnSystemException(RemoteException e) {
+//		super(e.getMessage(), e);
+//	}
 
 	/**
 	 * Constructs a general YarnSystemException.

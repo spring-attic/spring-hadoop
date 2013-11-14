@@ -15,15 +15,15 @@
  */
 package org.springframework.yarn.rpc;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.security.PrivilegedAction;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.ipc.RPC;
-import org.apache.hadoop.ipc.RemoteException;
 import org.apache.hadoop.security.UserGroupInformation;
-import org.apache.hadoop.yarn.YarnException;
-import org.apache.hadoop.yarn.exceptions.YarnRemoteException;
+import org.apache.hadoop.yarn.exceptions.YarnException;
+import org.apache.hadoop.yarn.exceptions.YarnRuntimeException;
 import org.apache.hadoop.yarn.ipc.YarnRPC;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -107,9 +107,9 @@ public abstract class YarnRpcAccessor<P> implements InitializingBean, Disposable
 			return result;
 		} catch (YarnException e) {
 			throw YarnUtils.convertYarnAccessException(e);
-		} catch (YarnRemoteException e) {
+		} catch (YarnRuntimeException e) {
 			throw YarnUtils.convertYarnAccessException(e);
-		} catch (RemoteException e) {
+		} catch (IOException e) {
 			throw YarnUtils.convertYarnAccessException(e);
 		} catch (RuntimeException e) {
 			throw e;
@@ -132,33 +132,29 @@ public abstract class YarnRpcAccessor<P> implements InitializingBean, Disposable
 	 * a {@link PrivilegedAction}.
 	 *
 	 * @return the proxy
+	 * @throws IOException
 	 */
 	@SuppressWarnings("unchecked")
-	protected P createProxy() {
-		final YarnRPC rpc = YarnRPC.create(configuration);
-		UserGroupInformation user = getUser();
-		if (user != null) {
-			return user.doAs(new PrivilegedAction<P>() {
-				@Override
-				public P run() {
-					return (P) rpc.getProxy(protocolClazz, address, configuration);
-				}
-			});
-		} else {
-			return (P) rpc.getProxy(protocolClazz, address, configuration);
-		}
+	protected P createProxy() throws IOException {
+		return getUser().doAs(new PrivilegedAction<P>() {
+			@Override
+			public P run() {
+				return (P) YarnRPC.create(configuration).getProxy(protocolClazz, address, configuration);
+			}
+		});
 	}
 
 	/**
 	 * Gets the {@link UserGroupInformation user} used to
-	 * create the proxy. Default implementation returns {@code null}
-	 * which means no security is used.
+	 * create the proxy. Default implementation delegates into
+	 * {@link UserGroupInformation#getCurrentUser()}.
 	 *
 	 * @return the user
+	 * @throws IOException if login fails
 	 * @see #createProxy()
 	 */
-	protected UserGroupInformation getUser() {
-		return null;
+	protected UserGroupInformation getUser() throws IOException {
+		return UserGroupInformation.getCurrentUser();
 	}
 
 	/**
