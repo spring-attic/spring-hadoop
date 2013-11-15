@@ -56,6 +56,27 @@ def hiveGroup = "org.apache.hive"
 // default is Hadoop 1.2.x
 switch (hadoopDistro) {
 
+	// Cloudera CDH5 YARN 2.2.x base
+	case "cdh5yarn":
+		hadoopVersion = cdh5YARNVersion
+		println "Using Cloudera CDH5 YARN [$hadoopVersion]"
+		hbaseVersion = cdh5HbaseVersion
+		hiveVersion = cdh5HiveVersion
+		pigVersion = cdh5PigVersion
+		thriftVersion = cdh5ThriftVersion
+		break;	
+
+	// Cloudera CDH5 MR1
+	case "cdh5mr1":
+	case "cdh5":
+		hadoopVersion = cdh5MR1Version
+		println "Using Cloudera CDH5 MR1 [$hadoopVersion]"
+		hbaseVersion = cdh5HbaseVersion
+		hiveVersion = cdh5HiveVersion
+		pigVersion = cdh5PigVersion
+		thriftVersion = cdh5ThriftVersion
+		break;	
+
 	// Cloudera CDH4 YARN
 	case "cdh4yarn":
 		hadoopVersion = cdh4YARNVersion
@@ -136,7 +157,7 @@ switch (hadoopDistro) {
 				println "Using Apache Hadoop 1.2.x [$hadoopVersion]"
 			} else {
 				println "Failing build: $hadoopDistro is not a supported distro"
-				println "Supported distros: hadoop11, hadoop12[*], hadoop22, hdp13, cdh4 and phd1"
+				println "Supported distros: hadoop11, hadoop12[*], hadoop22, hdp13, cdh4, cdh5, cdh5yarn and phd1"
 				println "* default"
 				throw new InvalidUserDataException("$hadoopDistro is not a supported distro")
 			}
@@ -288,6 +309,31 @@ configure(hadoopProjects()) {
 
 	// default is Hadoop 1.2.x
 	switch (hadoopDistro) {
+
+		// Cloudera CDH5 YARN
+		case "cdh5yarn":
+			dependencies {
+				compile("org.apache.hadoop:hadoop-common:$cdh5Version")
+				compile("org.apache.hadoop:hadoop-mapreduce-client-core:$cdh5Version")
+				compile("org.apache.hadoop:hadoop-distcp:$cdh5Version")
+				optional("org.apache.hadoop:hadoop-streaming:$cdh5YARNVersion") 
+				optional("org.apache.hadoop:hadoop-hdfs:$cdh5Version")
+				testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
+				testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
+			}
+			break;	
+
+		// Cloudera CDH5 MR1
+		case "cdh5":
+		case "cdh5mr1":
+			dependencies {
+				compile("org.apache.hadoop:hadoop-common:$cdh5Version")
+				optional("org.apache.hadoop:hadoop-streaming:$cdh5MR1Version") 
+				optional("org.apache.hadoop:hadoop-tools:$cdh5MR1Version")
+				optional("org.apache.hadoop:hadoop-hdfs:$cdh5Version")
+				testCompile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
+			}
+			break;	
 
 		// Cloudera CDH4 YARN
 		case "cdh4yarn":
