@@ -25,14 +25,17 @@ public class YarnTestSystemConstants {
 
 	/** Base hdfs path for tests. */
 	public static final String HDFS_TESTS_BASE_PATH = "/syarn/";
-	
+
 	/** Default bean id for mini yarn cluster. */
 	public static final String DEFAULT_ID_MINIYARNCLUSTER = "yarnCluster";
-	
+
 	/** Default bean id for mini yarn cluster configured configuration. */
 	public static final String DEFAULT_ID_MINIYARNCLUSTER_CONFIG = "yarnConfiguration";
 
 	/** Default id for mini yarn cluster. */
 	public static final String DEFAULT_ID_CLUSTER = "default";
-	
+
+	/** Default id for no minicluster profile. */
+	public static final String PROFILE_ID_NOMINICLUSTER = "nominicluster";
+
 }

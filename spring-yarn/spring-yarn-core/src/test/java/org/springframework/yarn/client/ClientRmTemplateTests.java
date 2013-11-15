@@ -34,6 +34,8 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.yarn.rpc.YarnRpcCallback;
+import org.springframework.yarn.test.context.MiniYarnCluster;
+import org.springframework.yarn.test.context.YarnDelegatingSmartContextLoader;
 
 /**
  * Tests for {@link ClientRmTemplate}.
@@ -42,7 +44,8 @@ import org.springframework.yarn.rpc.YarnRpcCallback;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration
+@ContextConfiguration(loader=YarnDelegatingSmartContextLoader.class)
+@MiniYarnCluster
 public class ClientRmTemplateTests {
 
 	@Resource(name = "yarnClientRmTemplate")

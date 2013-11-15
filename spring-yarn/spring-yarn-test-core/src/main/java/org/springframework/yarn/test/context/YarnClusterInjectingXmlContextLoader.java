@@ -15,27 +15,39 @@
  */
 package org.springframework.yarn.test.context;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.test.context.MergedContextConfiguration;
 import org.springframework.test.context.support.GenericXmlContextLoader;
+import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
+import org.springframework.yarn.test.YarnTestSystemConstants;
 
 /**
- * Extending generic xml based context loader able to 
+ * Extending generic xml based context loader able to
  * manage and inject Yarn mini clusters. This loader is
  * used from {@link YarnDelegatingSmartContextLoader}.
- * 
+ *
  * @author Janne Valkealahti
  *
  */
 public class YarnClusterInjectingXmlContextLoader extends GenericXmlContextLoader {
-	
+
+	private final static Log log = LogFactory.getLog(YarnClusterInjectingXmlContextLoader.class);
+
 	@Override
 	protected void loadBeanDefinitions(GenericApplicationContext context,
 			MergedContextConfiguration mergedConfig) {
 
+		String[] activeProfiles = context.getEnvironment().getActiveProfiles();
+		log.info("Active profiles: " + StringUtils.arrayToCommaDelimitedString(activeProfiles));
+
 		// let parent do its magic
 		super.loadBeanDefinitions(context, mergedConfig);
-		YarnClusterInjectUtils.handleClusterInject(context, mergedConfig);
+		if (!ObjectUtils.containsElement(activeProfiles, YarnTestSystemConstants.PROFILE_ID_NOMINICLUSTER)) {
+			YarnClusterInjectUtils.handleClusterInject(context, mergedConfig);
+		}
 	}
 
 }
