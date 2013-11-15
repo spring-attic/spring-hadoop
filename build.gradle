@@ -183,6 +183,7 @@ switch (hadoopDistro) {
 		println "Using Apache Hadoop 1.1.x [$hadoopVersion]"
 		hadoopArtifacts = ["org.apache.hadoop:hadoop-streaming:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-tools:$hadoopVersion"]
+		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion"]
 		break;
 
 	default:
