@@ -8,15 +8,13 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
-	<context:property-placeholder location="hadoop.properties"/>
-
-	<yarn:configuration>
-	  fs.default.name=${hd.fs}
-	  yarn.resourcemanager.address=${hd.rm}
-	</yarn:configuration>
-
 	<bean id="yarnClientRmTemplate" class="org.springframework.yarn.client.ClientRmTemplate">
 		<constructor-arg index="0"><ref bean="yarnConfiguration"/></constructor-arg>
 	</bean>
+
+	<beans profile="nominicluster">
+		<context:property-placeholder location="hadoop.properties"/>
+		<yarn:configuration fs-uri="${hd.fs}" rm-address="${hd.rm}"/>
+	</beans>
 
 </beans>

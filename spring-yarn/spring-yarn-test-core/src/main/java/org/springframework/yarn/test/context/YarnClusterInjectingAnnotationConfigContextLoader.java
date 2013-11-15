@@ -15,27 +15,39 @@
  */
 package org.springframework.yarn.test.context;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.test.context.MergedContextConfiguration;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
+import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
+import org.springframework.yarn.test.YarnTestSystemConstants;
 
 /**
- * Extending generic annotation based context loader able to 
+ * Extending generic annotation based context loader able to
  * manage and inject Yarn mini clusters. This loader is
  * used from {@link YarnDelegatingSmartContextLoader}.
- * 
+ *
  * @author Janne Valkealahti
  *
  */
 public class YarnClusterInjectingAnnotationConfigContextLoader extends AnnotationConfigContextLoader {
 
+	private final static Log log = LogFactory.getLog(YarnClusterInjectingAnnotationConfigContextLoader.class);
+
 	@Override
 	protected void loadBeanDefinitions(GenericApplicationContext context,
 			MergedContextConfiguration mergedConfig) {
 
+		String[] activeProfiles = context.getEnvironment().getActiveProfiles();
+		log.info("Active profiles: " + StringUtils.arrayToCommaDelimitedString(activeProfiles));
+
 		// let parent do its magic
-		super.loadBeanDefinitions(context, mergedConfig);		
-		YarnClusterInjectUtils.handleClusterInject(context, mergedConfig);
+		super.loadBeanDefinitions(context, mergedConfig);
+		if (!ObjectUtils.containsElement(activeProfiles, YarnTestSystemConstants.PROFILE_ID_NOMINICLUSTER)) {
+			YarnClusterInjectUtils.handleClusterInject(context, mergedConfig);
+		}
 	}
-	
+
 }

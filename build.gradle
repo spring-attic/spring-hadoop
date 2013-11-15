@@ -833,6 +833,7 @@ if (gradle.ext.mr2) {
 			compile("org.apache.hadoop:hadoop-common:$hadoopVersion") { dep ->
 				exclude module: "junit"
 			}
+			testCompile project(":spring-yarn:spring-yarn-test-core")
 			testCompile("org.mockito:mockito-core:$mockitoVersion") { dep ->
 				exclude group: "org.hamcrest"
 			}
@@ -856,6 +857,9 @@ if (gradle.ext.mr2) {
 				projProps.each { k,v ->
 						if (k.toString().startsWith("hd.")) {
 							systemProperties[k] = projProps[k]
+						}
+						if (k.toString().equals("profiles")) {
+							systemProperties['spring.profiles.active'] = projProps[k]
 						}
 				}
 			}
