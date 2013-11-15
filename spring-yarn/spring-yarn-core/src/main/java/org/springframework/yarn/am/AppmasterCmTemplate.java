@@ -32,13 +32,13 @@ import org.apache.hadoop.yarn.api.records.Container;
 import org.apache.hadoop.yarn.api.records.ContainerId;
 import org.apache.hadoop.yarn.api.records.ContainerStatus;
 import org.apache.hadoop.yarn.api.records.Token;
-import org.apache.hadoop.yarn.client.api.NMTokenCache;
 import org.apache.hadoop.yarn.exceptions.YarnException;
 import org.apache.hadoop.yarn.security.NMTokenIdentifier;
 import org.apache.hadoop.yarn.util.ConverterUtils;
 import org.apache.hadoop.yarn.util.Records;
 import org.springframework.yarn.rpc.YarnRpcAccessor;
 import org.springframework.yarn.rpc.YarnRpcCallback;
+import org.springframework.yarn.support.compat.NMTokenCacheCompat;
 
 /**
  * Template implementation for {@link AppmasterCmOperations} wrapping
@@ -111,9 +111,7 @@ public class AppmasterCmTemplate extends YarnRpcAccessor<ContainerManagementProt
 	@Override
 	protected UserGroupInformation getUser() {
 		InetSocketAddress rpcAddress = getRpcAddress(getConfiguration());
-
-		// TODO: at some point remove static cache
-		Token token = NMTokenCache.getNMToken(container.getNodeId().toString());
+		Token token = NMTokenCacheCompat.getNMTokenCache().getNMToken(container.getNodeId().toString());
 
 		// this is what node manager requires for auth
 		UserGroupInformation user =

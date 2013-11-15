@@ -30,6 +30,7 @@ import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.support.PeriodicTrigger;
 import org.springframework.util.Assert;
 import org.springframework.yarn.YarnSystemException;
+import org.springframework.yarn.support.compat.NMTokenCacheCompat;
 
 /**
  * Base implementation of allocator which is meant to handle
@@ -212,18 +213,18 @@ public abstract class AbstractPollingAllocator extends AbstractAllocator {
 	 * @param allocateResponse the allocate response
 	 */
 	protected void populateNmTokenCache(AllocateResponse allocateResponse) {
-		// TODO: consider replacing hadoop NMTokenCache to non-static cache
+		NMTokenCache tokenCache = NMTokenCacheCompat.getNMTokenCache();
 		for (NMToken token : allocateResponse.getNMTokens()) {
 			String nodeId = token.getNodeId().toString();
 			if (log.isDebugEnabled()) {
 				log.info("Token from allocateResponse token=" + token);
-				if (NMTokenCache.containsNMToken(nodeId)) {
+				if (tokenCache.containsNMToken(nodeId)) {
 					log.debug("Replacing token for : " + nodeId);
 				} else {
 					log.debug("Received new token for : " + nodeId);
 				}
 			}
-			NMTokenCache.setNMToken(nodeId, token.getToken());
+			tokenCache.setNMToken(nodeId, token.getToken());
 		}
 	}
 
