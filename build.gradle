@@ -68,7 +68,9 @@ switch (hadoopDistro) {
 		hadoopVersion = cdh5YARNVersion
 		println "Using Cloudera CDH5 YARN [$hadoopVersion]"
 		hbaseVersion = cdh5HbaseVersion
-		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion"]
+		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion",
+				  "org.apache.hbase:hbase-common:$hbaseVersion",
+				  "org.apache.hbase:hbase-client:$hbaseVersion"]
 		hiveVersion = cdh5HiveVersion
 		pigVersion = cdh5PigVersion
 		thriftVersion = cdh5ThriftVersion
@@ -79,7 +81,9 @@ switch (hadoopDistro) {
 		hadoopVersion = cdh5MR1Version
 		println "Using Cloudera CDH5 MR1 [$hadoopVersion]"
 		hbaseVersion = cdh5HbaseVersion
-		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion"]
+		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion",
+				  "org.apache.hbase:hbase-common:$hbaseVersion",
+				  "org.apache.hbase:hbase-client:$hbaseVersion"]
 		hiveVersion = cdh5HiveVersion
 		pigVersion = cdh5PigVersion
 		thriftVersion = cdh5ThriftVersion
@@ -354,6 +358,7 @@ configure(hadoopProjects()) {
 				optional("org.apache.hadoop:hadoop-hdfs:$cdh5Version")
 				testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
 				testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
+				testRuntime "dk.brics.automaton:automaton:1.11-8"
 			}
 			break;	
 
@@ -365,6 +370,7 @@ configure(hadoopProjects()) {
 				optional("org.apache.hadoop:hadoop-tools:$cdh5MR1Version")
 				optional("org.apache.hadoop:hadoop-hdfs:$cdh5Version")
 				testCompile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
+				testRuntime "dk.brics.automaton:automaton:1.11-8"
 			}
 			break;	
 
@@ -378,6 +384,7 @@ configure(hadoopProjects()) {
 				optional("org.apache.hadoop:hadoop-hdfs:$cdh4Version")
 				testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
 				testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
+				testRuntime "dk.brics.automaton:automaton:1.11-8"
 			}
 			break;	
 
@@ -390,6 +397,7 @@ configure(hadoopProjects()) {
 				optional("org.apache.hadoop:hadoop-tools:$cdh4MR1Version")
 				optional("org.apache.hadoop:hadoop-hdfs:$cdh4Version")
 				testCompile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
+				testRuntime "dk.brics.automaton:automaton:1.11-8"
 			}
 			break;	
 
@@ -401,6 +409,7 @@ configure(hadoopProjects()) {
 				compile "org.apache.hive:hive-exec:$hiveVersion"
 				testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
 				testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
+				testRuntime "dk.brics.automaton:automaton:1.11-8"
 			}
 			break;
 
@@ -440,6 +449,7 @@ configure(hadoopProjects()) {
 		default:
 			dependencies {
 				testCompile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
+				testRuntime "dk.brics.automaton:automaton:1.11-8"
 			}
 	}
 
