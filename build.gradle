@@ -42,10 +42,16 @@ println "Using Spring Framework version: [$springVersion]"
 //
 //  Select the Hadoop distribution used for building the binaries
 //
-def List hadoop = []
+def List hadoopArtifacts = []
 def hadoopDefault = "hadoop12"
 def hadoopDistro = project.hasProperty("distro") ? project.getProperty("distro") : hadoopDefault
 def hadoopVersion = hd12Version
+
+// Common Hadoop libraries
+def hiveVersion = defaultHiveVersion
+def pigVersion = defaultPigVersion
+def hbaseVersion = defaultHbaseVersion
+def List hbaseArtifacts = []
 
 // make it possible to use Pig jars compiled for Hadoop 2.0
 def pigQualifier = ''
@@ -61,6 +67,7 @@ switch (hadoopDistro) {
 		hadoopVersion = cdh5YARNVersion
 		println "Using Cloudera CDH5 YARN [$hadoopVersion]"
 		hbaseVersion = cdh5HbaseVersion
+		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion"]
 		hiveVersion = cdh5HiveVersion
 		pigVersion = cdh5PigVersion
 		thriftVersion = cdh5ThriftVersion
@@ -72,6 +79,7 @@ switch (hadoopDistro) {
 		hadoopVersion = cdh5MR1Version
 		println "Using Cloudera CDH5 MR1 [$hadoopVersion]"
 		hbaseVersion = cdh5HbaseVersion
+		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion"]
 		hiveVersion = cdh5HiveVersion
 		pigVersion = cdh5PigVersion
 		thriftVersion = cdh5ThriftVersion
@@ -82,6 +90,7 @@ switch (hadoopDistro) {
 		hadoopVersion = cdh4YARNVersion
 		println "Using Cloudera CDH4 YARN [$hadoopVersion]"
 		hbaseVersion = cdh4HbaseVersion
+		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion"]
 		hiveVersion = cdh4HiveVersion
 		pigVersion = cdh4PigVersion
 		thriftVersion = cdh4ThriftVersion
@@ -93,6 +102,7 @@ switch (hadoopDistro) {
 		hadoopVersion = cdh4MR1Version
 		println "Using Cloudera CDH4 MR1 [$hadoopVersion]"
 		hbaseVersion = cdh4HbaseVersion
+		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion"]
 		hiveVersion = cdh4HiveVersion
 		pigVersion = cdh4PigVersion
 		thriftVersion = cdh4ThriftVersion
@@ -103,38 +113,60 @@ switch (hadoopDistro) {
 		hadoopVersion = phd1Version
 		println "Using Pivotal HD 1.0 - [$hadoopVersion]"
 		hbaseVersion = phd1HbaseVersion
+		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion"]
 		hiveVersion = phd1HiveVersion
 		pigVersion = phd1PigVersion
 		thriftVersion = phd1ThriftVersion
-		hadoop = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
-			  "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
-			  "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
-			  "org.apache.hadoop:hadoop-streaming:$hadoopVersion",
-			  "org.apache.hadoop:hadoop-distcp:$hadoopVersion"]
+		hadoopArtifacts = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-streaming:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-distcp:$hadoopVersion"]
 		break;
 
 	// Hortonworks Data Platform 1.3
 	case "hdp13":
 		hadoopVersion = hdp13Version
 		println "Using Hortonworks Data Platform 1.3 [$hadoopVersion]"
-		hadoop = ["org.apache.hadoop:hadoop-streaming:$hadoopVersion",
-			"org.apache.hadoop:hadoop-tools:$hadoopVersion"]
+		hadoopArtifacts = ["org.apache.hadoop:hadoop-streaming:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-tools:$hadoopVersion"]
 		hbaseVersion = hdp13HbaseVersion
+		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion"]
 		hiveVersion = hdp13HiveVersion
 		pigVersion = hdp13PigVersion
 		thriftVersion = hdp13ThriftVersion
+		break;
+
+	// Hortonworks Data Platform 2.0
+	case "hdp20":
+		hadoopVersion = hdp20Version
+		println "Using Hortonworks Data Platform 2.0 [$hadoopVersion]"
+		hadoopArtifacts = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-streaming:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-distcp:$hadoopVersion"]
+		hbaseVersion = hdp20HbaseVersion
+		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion",
+				  "org.apache.hbase:hbase-common:$hbaseVersion",
+				  "org.apache.hbase:hbase-client:$hbaseVersion"]
+		hiveVersion = hdp20HiveVersion
+		pigVersion = hdp20PigVersion
+		pigQualifier = ':h2'
+		thriftVersion = hdp20ThriftVersion
 		break;
 
 	// Hadoop 2.2 GA
 	case "hadoop22":
 		hadoopVersion = hd22Version
 		println "Using Apache Hadoop 2.2 - [$hadoopVersion]"
-		hadoop = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
-			  "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
-			  "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
-			  "org.apache.hadoop:hadoop-streaming:$hadoopVersion",
-			  "org.apache.hadoop:hadoop-distcp:$hadoopVersion"]
+		hadoopArtifacts = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-streaming:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-distcp:$hadoopVersion"]
 		hbaseVersion = hd22HbaseVersion
+		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion"]
 		hiveVersion = hd22HiveVersion
 		pigVersion = hd22PigVersion
 		pigQualifier = ':h2'
@@ -145,8 +177,8 @@ switch (hadoopDistro) {
 	case "hadoop11":
 		hadoopVersion = hd11Version
 		println "Using Apache Hadoop 1.1.x [$hadoopVersion]"
-		hadoop = ["org.apache.hadoop:hadoop-streaming:$hadoopVersion",
-			  "org.apache.hadoop:hadoop-tools:$hadoopVersion"]
+		hadoopArtifacts = ["org.apache.hadoop:hadoop-streaming:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-tools:$hadoopVersion"]
 		break;
 
 	default:
@@ -157,15 +189,16 @@ switch (hadoopDistro) {
 				println "Using Apache Hadoop 1.2.x [$hadoopVersion]"
 			} else {
 				println "Failing build: $hadoopDistro is not a supported distro"
-				println "Supported distros: hadoop11, hadoop12[*], hadoop22, hdp13, cdh4, cdh5, cdh5yarn and phd1"
+				println "Supported distros: hadoop11, hadoop12[*], hadoop22, hdp13, hdp20, cdh4, cdh5, cdh5yarn and phd1"
 				println "* default"
 				throw new InvalidUserDataException("$hadoopDistro is not a supported distro")
 			}
 		}
 		hadoopVersion = hd12Version
-		hadoop = ["org.apache.hadoop:hadoop-streaming:$hadoopVersion",
-			"org.apache.hadoop:hadoop-tools:$hadoopVersion"]
+		hadoopArtifacts = ["org.apache.hadoop:hadoop-streaming:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-tools:$hadoopVersion"]
 		hbaseVersion = hd12HbaseVersion
+		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion"]
 		hiveVersion = hd12HiveVersion
 		pigVersion = hd12PigVersion
 		thriftVersion = hd12ThriftVersion
@@ -379,6 +412,15 @@ configure(hadoopProjects()) {
 			}
 			break;
 
+		// Hortonworks Data Platform 2.0
+		case "hdp20":
+			dependencies {
+				testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
+				testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
+				testRuntime "dk.brics.automaton:automaton:1.11-8"
+			}
+			break;
+
 		// Hadoop 2.2 GA
 		case "hadoop22":
 			dependencies {
@@ -402,7 +444,7 @@ configure(hadoopProjects()) {
 	}
 
 	dependencies {
-		compile hadoop
+		compile hadoopArtifacts
 
 		// Logging - using commons-logging from spring-core
 		testRuntime("log4j:log4j:$log4jVersion")
@@ -442,8 +484,10 @@ configure(hadoopProjects()) {
 		}
 	
 		// HBase
-		optional("org.apache.hbase:hbase:$hbaseVersion") { dep ->
-			exclude module: "thrift"
+		hbaseArtifacts.each {
+			optional(it) { dep ->
+				exclude module: "thrift"
+			}
 		}
 
 		// Libs dependencies (specified to cope with incompatibilities between them)
@@ -951,4 +995,4 @@ task wrapper(type: Wrapper) {
 	description = "Generates gradlew[.bat] scripts"
 	gradleVersion = "1.6"
 }
-	
+

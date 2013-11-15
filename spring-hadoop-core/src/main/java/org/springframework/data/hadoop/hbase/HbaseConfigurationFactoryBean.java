@@ -17,6 +17,8 @@ package org.springframework.data.hadoop.hbase;
 
 import java.util.Properties;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HConstants;
@@ -35,6 +37,8 @@ import org.springframework.util.StringUtils;
  * @author Costin Leau
  */
 public class HbaseConfigurationFactoryBean implements InitializingBean, DisposableBean, FactoryBean<Configuration> {
+
+    private static final Log log = LogFactory.getLog(HbaseConfigurationFactoryBean.class);
 
 	private boolean deleteConnection = true;
 	private boolean stopProxy = true;
@@ -59,6 +63,7 @@ public class HbaseConfigurationFactoryBean implements InitializingBean, Disposab
 	 * @param stopProxy The stopProxy to set.
 	 */
 	public void setStopProxy(boolean stopProxy) {
+        log.warn("Use of 'stopProxy' has been deprecated");
 		this.stopProxy = stopProxy;
 	}
 
@@ -73,7 +78,7 @@ public class HbaseConfigurationFactoryBean implements InitializingBean, Disposab
 
 	public void destroy() {
 		if (deleteConnection) {
-			HConnectionManager.deleteConnection(getObject(), stopProxy);
+			HConnectionManager.deleteConnection(getObject());
 		}
 	}
 
