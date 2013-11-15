@@ -1,4 +1,4 @@
-The [Spring for Apache Hadoop](http://www.springsource.org/spring-data/hadoop) provides extensions to [Spring](http://www.springsource.org/spring-core), [Spring Batch](http://www.springsource.org/spring-batch), and [Spring Integration](http://www.springsource.org/spring-integration) to build manageable and robust pipeline solutions around Hadoop.  
+The [Spring for Apache Hadoop](http://www.springsource.org/spring-data/hadoop) provides extensions to [Spring](http://www.springsource.org/spring-core), [Spring Batch](http://www.springsource.org/spring-batch), and [Spring Integration](http://www.springsource.org/spring-integration) to build manageable and robust pipeline solutions around Hadoop.
 
 Spring for Apache Hadoop extends Spring Batch by providing support for reading from and writing to HDFS, running various types of Hadoop jobs (Java MapReduce, Streaming, [Hive](http://hive.apache.org),  [Pig](http://pig.apache.org)), [HBase](http://hbase.apache.org) and [Cascading](http://cascading.org) interactions. An important goal is to provide excellent support for non-Java based developers to be productive using Spring Hadoop and not have to write any Java code to use the core feature set.
 
@@ -69,15 +69,32 @@ from the project root folder. This will compile the sources, run the tests and c
 
 ## Supported distros
 
-By default Spring for Apache Hadoop compiles against Apache Hadoop 1.0.x. Apache Hadoop 1.1.x (hadoop11) Apache Hadoop 1.2.x (hadoop12), Apache Hadoop 2.0.x Alpha (hadoop22), Pivotal HD 1.1 (phd1), Cloudera CDH3 (cdh3), Cloudera CDH4 (cdh4), Hortonworks HDP 1.3 (hdp13) are also supported; to compile against them pass the `-Pdistro=<label>` project property, like so:
+By default Spring for Apache Hadoop compiles against the Apache Hadoop 1.2.x stable relase (hadoop12).
+
+The following distros and versions are also supported:
+
+- Apache Hadoop 2.2.x (hadoop22) *
+- Pivotal HD 1.1 (phd1)
+- Cloudera CDH4 MR1 (cdh4, cdh4mr1)
+- Cloudera CDH4 YARN (cdh4yarn)
+- Cloudera CDH5 YARN (cdh5, cdh5yarn) *
+- Cloudera CDH5 MR1 (cdh5mr1)
+- Hortonworks HDP 1.3 (hdp13)
+- Hortonworks HDP 2.0 (hdp20) *
+
+\* The distributions noted with and asterisk will include spring-yarn support in the build.
+
+* For anyone using older distros and versions we recommend using Spring for Apache Hadoop 1.0.x whish is mainatined here: https://github.com/spring-projects/spring-hadoop/tree/1.0.x
+
+To compile against a specific distro version pass the `-Pdistro=<label>` project property, like so:
 
     gradlew -Pdistro=hadoop22 build
-    
+
 Note that the chosen distro is displayed on the screen:
 
     Using Apache Hadoop 2.2.x [2.2.0]
 
-In this case, the specified Hadoop distribution (above Apache Hadoop 2.2.x) is used to create the project binaries. This option is useful when testing against Hadoop clusters incompatible with the Hadoop stable line.
+In this case, the specified Hadoop distribution (above Apache Hadoop 2.2.x) is used to create the project binaries.
 
 # CI Builds
 
@@ -86,10 +103,11 @@ The status of the CI builds are available at [Status Summary Screen](https://bui
 We are currently running tests against the following distributions:
 * Apache Hadoop 1.1.2
 * Apache Hadoop 1.2.1
-* Apache Hadoop 2.0.6-alpha
-* Cloudera CDH3
+* Apache Hadoop 2.2.0
 * Cloudera CDH4
+* Cloudera CDH5
 * Hortonworks HDP 1.3
+* Hortonworks HDP 2.0
 * Pivotal HD 1.1
 
 # Testing
