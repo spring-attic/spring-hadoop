@@ -19,6 +19,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.lessThan;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -143,7 +144,18 @@ public class YarnClusterTests {
 			if (file.getName().endsWith("stdout")) {
 				assertThat(file.length(), greaterThan(0l));
 			} else if (file.getName().endsWith("stderr")) {
-				assertThat(file.length(), is(0l));
+				String content = "";
+				if (file.length() > 0) {
+					Scanner scanner = new Scanner(file);
+					content = scanner.useDelimiter("\\A").next();
+					scanner.close();
+				}
+				if (content.contains("Unable to load realm info from SCDynamicStore")) {
+					// due to OS X giving 'Unable to load realm info from SCDynamicStore' errors we allow 100 bytes here
+					assertThat(file.length(), lessThan(100l));
+				} else {
+					assertThat(file.length(), is(0l));
+				}
 			}
 		}
 	}

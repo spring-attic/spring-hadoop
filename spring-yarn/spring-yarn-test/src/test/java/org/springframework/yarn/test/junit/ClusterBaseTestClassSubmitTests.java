@@ -94,8 +94,13 @@ public class ClusterBaseTestClassSubmitTests extends AbstractYarnClusterTests {
 					content = scanner.useDelimiter("\\A").next();
 					scanner.close();
 				}
-				// can't have anything in stderr files
-				assertThat("stderr file is not empty: " + content, file.length(), is(0l));
+				if (content.contains("Unable to load realm info from SCDynamicStore")) {
+					// due to OS X giving 'Unable to load realm info from SCDynamicStore' errors we allow 100 bytes here
+					assertThat("stderr file is not empty: " + content, file.length(), lessThan(100l));
+				} else {
+					// can't have anything in stderr files
+					assertThat("stderr file is not empty: " + content, file.length(), is(0l));
+				}
 			}
 		}
 
