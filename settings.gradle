@@ -46,6 +46,7 @@ include 'spring-hadoop-batch'
 rootProject.children.find{ it.name == 'spring-hadoop-batch' }.name = 'spring-data-hadoop-batch'
 include 'spring-hadoop-config'
 rootProject.children.find{ it.name == 'spring-hadoop-config' }.name = 'spring-data-hadoop'
+include 'spring-hadoop-test-core'
 include 'spring-hadoop-test'
 include 'spring-cascading'
 if (mr2) {

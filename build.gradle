@@ -43,6 +43,7 @@ println "Using Spring Framework version: [$springVersion]"
 //  Select the Hadoop distribution used for building the binaries
 //
 def List hadoopArtifacts = []
+def List hadoopTestArtifacts = []
 def hadoopDefault = "hadoop12"
 def hadoopDistro = project.hasProperty("distro") ? project.getProperty("distro") : hadoopDefault
 def hadoopVersion = hd12Version
@@ -74,6 +75,19 @@ switch (hadoopDistro) {
 		hiveVersion = cdh5HiveVersion
 		pigVersion = cdh5PigVersion
 		thriftVersion = cdh5ThriftVersion
+		hadoopArtifacts = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-streaming:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-distcp:$hadoopVersion"]
+		hadoopTestArtifacts = ["org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion:tests",
+					"org.apache.hadoop:hadoop-hdfs:$hadoopVersion:tests",
+					"org.apache.hadoop:hadoop-common:$hadoopVersion:tests",
+					"org.apache.hadoop:hadoop-mapreduce-client-app:$hadoopVersion",
+					"org.apache.hadoop:hadoop-mapreduce-client-hs:$hadoopVersion",
+					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion",
+					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion:tests"]
 		break;	
 
 	// Cloudera CDH5 MR1
@@ -87,6 +101,9 @@ switch (hadoopDistro) {
 		hiveVersion = cdh5HiveVersion
 		pigVersion = cdh5PigVersion
 		thriftVersion = cdh5ThriftVersion
+		hadoopArtifacts = ["org.apache.hadoop:hadoop-streaming:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-tools:$hadoopVersion"]
+		hadoopTestArtifacts = ["org.apache.hadoop:hadoop-minicluster:$hadoopVersion"]
 		break;	
 
 	// Cloudera CDH4 YARN
@@ -98,6 +115,19 @@ switch (hadoopDistro) {
 		hiveVersion = cdh4HiveVersion
 		pigVersion = cdh4PigVersion
 		thriftVersion = cdh4ThriftVersion
+		hadoopArtifacts = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-streaming:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-distcp:$hadoopVersion"]
+		hadoopTestArtifacts = ["org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion:tests",
+					"org.apache.hadoop:hadoop-hdfs:$hadoopVersion:tests",
+					"org.apache.hadoop:hadoop-common:$hadoopVersion:tests",
+					"org.apache.hadoop:hadoop-mapreduce-client-app:$hadoopVersion",
+					"org.apache.hadoop:hadoop-mapreduce-client-hs:$hadoopVersion",
+					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion",
+					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion:tests"]
 		break;	
 
 	// Cloudera CDH4 MR1
@@ -110,6 +140,9 @@ switch (hadoopDistro) {
 		hiveVersion = cdh4HiveVersion
 		pigVersion = cdh4PigVersion
 		thriftVersion = cdh4ThriftVersion
+		hadoopArtifacts = ["org.apache.hadoop:hadoop-streaming:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-tools:$hadoopVersion"]
+		hadoopTestArtifacts = ["org.apache.hadoop:hadoop-minicluster:$hadoopVersion"]
 		break;	
 
 	// Pivotal HD 1.0
@@ -124,8 +157,16 @@ switch (hadoopDistro) {
 		hadoopArtifacts = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-streaming:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-distcp:$hadoopVersion"]
+		hadoopTestArtifacts = ["org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion:tests",
+					"org.apache.hadoop:hadoop-hdfs:$hadoopVersion:tests",
+					"org.apache.hadoop:hadoop-common:$hadoopVersion:tests",
+					"org.apache.hadoop:hadoop-mapreduce-client-app:$hadoopVersion",
+					"org.apache.hadoop:hadoop-mapreduce-client-hs:$hadoopVersion",
+					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion",
+					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion:tests"]
 		break;
 
 	// Hortonworks Data Platform 1.3
@@ -134,6 +175,7 @@ switch (hadoopDistro) {
 		println "Using Hortonworks Data Platform 1.3 [$hadoopVersion]"
 		hadoopArtifacts = ["org.apache.hadoop:hadoop-streaming:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-tools:$hadoopVersion"]
+		hadoopTestArtifacts = ["org.apache.hadoop:hadoop-test:$hadoopVersion"]
 		hbaseVersion = hdp13HbaseVersion
 		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion"]
 		hiveVersion = hdp13HiveVersion
@@ -148,8 +190,16 @@ switch (hadoopDistro) {
 		hadoopArtifacts = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-streaming:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-distcp:$hadoopVersion"]
+		hadoopTestArtifacts = ["org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion:tests",
+					"org.apache.hadoop:hadoop-hdfs:$hadoopVersion:tests",
+					"org.apache.hadoop:hadoop-common:$hadoopVersion:tests",
+					"org.apache.hadoop:hadoop-mapreduce-client-app:$hadoopVersion",
+					"org.apache.hadoop:hadoop-mapreduce-client-hs:$hadoopVersion",
+					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion",
+					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion:tests"]
 		hbaseVersion = hdp20HbaseVersion
 		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion",
 				  "org.apache.hbase:hbase-common:$hbaseVersion",
@@ -167,8 +217,16 @@ switch (hadoopDistro) {
 		hadoopArtifacts = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-streaming:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-distcp:$hadoopVersion"]
+		hadoopTestArtifacts = ["org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion:tests",
+					"org.apache.hadoop:hadoop-hdfs:$hadoopVersion:tests",
+					"org.apache.hadoop:hadoop-common:$hadoopVersion:tests",
+					"org.apache.hadoop:hadoop-mapreduce-client-app:$hadoopVersion",
+					"org.apache.hadoop:hadoop-mapreduce-client-hs:$hadoopVersion",
+					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion",
+					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion:tests"]
 		hbaseVersion = hd22HbaseVersion
 		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion"]
 		hiveVersion = hd22HiveVersion
@@ -183,6 +241,7 @@ switch (hadoopDistro) {
 		println "Using Apache Hadoop 1.1.x [$hadoopVersion]"
 		hadoopArtifacts = ["org.apache.hadoop:hadoop-streaming:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-tools:$hadoopVersion"]
+		hadoopTestArtifacts = ["org.apache.hadoop:hadoop-test:$hadoopVersion"]
 		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion"]
 		break;
 
@@ -202,6 +261,7 @@ switch (hadoopDistro) {
 		hadoopVersion = hd12Version
 		hadoopArtifacts = ["org.apache.hadoop:hadoop-streaming:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-tools:$hadoopVersion"]
+		hadoopTestArtifacts = ["org.apache.hadoop:hadoop-test:$hadoopVersion"]
 		hbaseVersion = hd12HbaseVersion
 		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion"]
 		hiveVersion = hd12HiveVersion
@@ -355,8 +415,8 @@ configure(hadoopProjects()) {
 				compile("org.apache.hadoop:hadoop-common:$cdh5Version")
 				compile("org.apache.hadoop:hadoop-mapreduce-client-core:$cdh5Version")
 				compile("org.apache.hadoop:hadoop-distcp:$cdh5Version")
+				compile("org.apache.hadoop:hadoop-hdfs:$cdh5Version")
 				optional("org.apache.hadoop:hadoop-streaming:$cdh5YARNVersion") 
-				optional("org.apache.hadoop:hadoop-hdfs:$cdh5Version")
 				testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
 				testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
 				testRuntime "dk.brics.automaton:automaton:1.11-8"
@@ -366,11 +426,12 @@ configure(hadoopProjects()) {
 		// Cloudera CDH5 MR1
 		case "cdh5mr1":
 			dependencies {
+				compile("org.apache.hadoop:hadoop-hdfs:$cdh5Version")
+				compile("org.apache.hadoop:hadoop-core:$cdh5MR1Version")
 				compile("org.apache.hadoop:hadoop-common:$cdh5Version")
 				optional("org.apache.hadoop:hadoop-streaming:$cdh5MR1Version") 
 				optional("org.apache.hadoop:hadoop-tools:$cdh5MR1Version")
-				optional("org.apache.hadoop:hadoop-hdfs:$cdh5Version")
-				testCompile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
+				testCompile "org.apache.hadoop:hadoop-examples:$cdh5MR1Version"
 				testRuntime "dk.brics.automaton:automaton:1.11-8"
 			}
 			break;	
@@ -381,8 +442,8 @@ configure(hadoopProjects()) {
 				compile("org.apache.hadoop:hadoop-common:$cdh4Version")
 				compile("org.apache.hadoop:hadoop-mapreduce-client-core:$cdh4Version")
 				compile("org.apache.hadoop:hadoop-distcp:$cdh4Version")
+				compile("org.apache.hadoop:hadoop-hdfs:$cdh4Version")
 				optional("org.apache.hadoop:hadoop-streaming:$cdh4YARNVersion") 
-				optional("org.apache.hadoop:hadoop-hdfs:$cdh4Version")
 				testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
 				testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
 				testRuntime "dk.brics.automaton:automaton:1.11-8"
@@ -393,11 +454,12 @@ configure(hadoopProjects()) {
 		case "cdh4":
 		case "cdh4mr1":
 			dependencies {
+				compile("org.apache.hadoop:hadoop-hdfs:$cdh4Version")
+				compile("org.apache.hadoop:hadoop-core:$cdh4MR1Version")
 				compile("org.apache.hadoop:hadoop-common:$cdh4Version")
 				optional("org.apache.hadoop:hadoop-streaming:$cdh4MR1Version") 
 				optional("org.apache.hadoop:hadoop-tools:$cdh4MR1Version")
-				optional("org.apache.hadoop:hadoop-hdfs:$cdh4Version")
-				testCompile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
+				testCompile "org.apache.hadoop:hadoop-examples:$cdh4MR1Version"
 				testRuntime "dk.brics.automaton:automaton:1.11-8"
 			}
 			break;	
@@ -676,6 +738,17 @@ project('spring-data-hadoop') {
 
 }
 
+project('spring-hadoop-test-core') {
+	description = 'Spring for Apache Hadoop Tests Core'
+
+	dependencies {
+		compile "org.springframework:spring-test:$springVersion"
+		compile "junit:junit:$junitVersion"
+		compile hadoopTestArtifacts
+	}
+}
+
+
 project('spring-hadoop-test') {
 	description = 'Spring for Apache Hadoop Integration Tests'
 
@@ -683,6 +756,7 @@ project('spring-hadoop-test') {
 		compile project(":spring-data-hadoop-core")
 		compile project(":spring-data-hadoop-batch")
 		compile project(":spring-data-hadoop")
+		compile project(":spring-hadoop-test-core")
 		compile project(":spring-cascading")
 
 		// Testing
