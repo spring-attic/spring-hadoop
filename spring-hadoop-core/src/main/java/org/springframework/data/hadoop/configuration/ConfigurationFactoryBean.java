@@ -1,12 +1,12 @@
 /*
  * Copyright 2011 the original author or authors.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,8 +32,10 @@ import org.springframework.util.StringUtils;
 
 /**
  * FactoryBean for creating {@link Configuration} instances.
- * 
+ *
  * @author Costin Leau
+ * @author Janne Valkealahti
+ *
  */
 public class ConfigurationFactoryBean implements BeanClassLoaderAware, InitializingBean, FactoryBean<Configuration> {
 
@@ -51,7 +53,9 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 
 	private String fsUri;
 	private String jtUri;
+	private String rmUri;
 
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		internalConfig = createConfiguration(configuration);
 
@@ -64,13 +68,21 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 
 		ConfigurationUtils.addProperties(internalConfig, properties);
 
+		// for below property values we can't use constants
+		// from hadoop packages because we need to able to
+		// compile for different versions.
 		// set hdfs / fs URI last to override all other properties
 		if (StringUtils.hasText(fsUri)) {
 			internalConfig.set("fs.default.name", fsUri.trim());
+			internalConfig.set("fs.defaultFS", fsUri.trim());
 		}
 
 		if (StringUtils.hasText(jtUri)) {
 			internalConfig.set("mapred.job.tracker", jtUri.trim());
+		}
+
+		if (StringUtils.hasText(rmUri)) {
+			internalConfig.set("yarn.resource.manager", rmUri.trim());
 		}
 
 		if (initialize) {
@@ -91,9 +103,29 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 		}
 	}
 
+	@Override
+	public Configuration getObject() {
+		return internalConfig;
+	}
+
+	@Override
+	public Class<?> getObjectType() {
+		return (internalConfig != null ? internalConfig.getClass() : Configuration.class);
+	}
+
+	@Override
+	public boolean isSingleton() {
+		return true;
+	}
+
+	@Override
+	public void setBeanClassLoader(ClassLoader classLoader) {
+		this.beanClassLoader = classLoader;
+	}
+
 	/**
-	 * Creates a configuration instance potentially using the existing one (passed as an argument - which can be null). 
-	 * 
+	 * Creates a configuration instance potentially using the existing one (passed as an argument - which can be null).
+	 *
 	 * @param existing
 	 * @return configuration instance
 	 */
@@ -106,27 +138,9 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 		// no-op
 	}
 
-
-	public Configuration getObject() {
-		return internalConfig;
-	}
-
-	public Class<?> getObjectType() {
-		return (internalConfig != null ? internalConfig.getClass() : Configuration.class);
-	}
-
-	public boolean isSingleton() {
-		return true;
-	}
-
-	public void setBeanClassLoader(ClassLoader classLoader) {
-		this.beanClassLoader = classLoader;
-	}
-
-
 	/**
 	 * Sets the parent configuration.
-	 * 
+	 *
 	 * @param configuration The configuration to set.
 	 */
 	public void setConfiguration(Configuration configuration) {
@@ -135,7 +149,7 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 
 	/**
 	 * Indicates whether to load the defaults (the default) or not for this configuration.
-	 * 
+	 *
 	 * @param loadDefaults The loadDefaults to set.
 	 */
 	public void setLoadDefaults(boolean loadDefaults) {
@@ -144,7 +158,7 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 
 	/**
 	 * Sets the configuration resources.
-	 * 
+	 *
 	 * @param resources The resources to set.
 	 */
 	public void setResources(Set<Resource> resources) {
@@ -153,7 +167,7 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 
 	/**
 	 * Sets the configuration properties.
-	 * 
+	 *
 	 * @param properties The properties to set.
 	 */
 	public void setProperties(Properties properties) {
@@ -164,7 +178,7 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 	 * Indicates whether the configuration object should be initialized (true) or not.
 	 * This option should normally be set to true (the default) as it causes the jars, streams and resources
 	 * set to be loaded - postponing the initializing might cause these to become unreadable.
-	 * 
+	 *
 	 * @param initialize whether to initialize or not.
 	 */
 	public void setInitialize(boolean initialize) {
@@ -175,7 +189,7 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 	 * Indicates whether the configuration should register an URL handler (for allowing urls
 	 * to understand HDFS prefixes, such as hdfs) or not. As this operation impacts an entire VM
 	 * and can be invoked at most once per JVM, by default it is false.
-	 * 
+	 *
 	 * @param register whether to register an URL handler or not
 	 */
 	public void setRegisterUrlHandler(boolean register) {
@@ -183,20 +197,31 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 	}
 
 	/**
-	 * Sets the File System ('fs.default.name') URI.
-	 * 
-	 * @param fsUri
+	 * Sets the File System ('fs.default.name') and ('fs.defaultFS') URI
+	 * for HadoopV1 and HadoopV2 respectively.
+	 *
+	 * @param fsUri the default file system uri
 	 */
 	public void setFileSystemUri(String fsUri) {
 		this.fsUri = fsUri;
 	}
 
 	/**
-	 * Sets the Job Tracker ('mapred.jobtracker') URI.
-	 * 
-	 * @param jtUri
+	 * Sets the Job Tracker ('mapred.jobtracker') URI for HadoopV1.
+	 *
+	 * @param jtUri the job tracker uri
 	 */
 	public void setJobTrackerUri(String jtUri) {
 		this.jtUri = jtUri;
 	}
+
+	/**
+	 * Sets the Yarn resource manager ('yarn.resource.manager') URI for HadoopV2.
+	 *
+	 * @param rmUri the resource manager uri
+	 */
+	public void setRmManagerUri(String rmUri) {
+		this.rmUri = rmUri;
+	}
+
 }
