@@ -10,7 +10,6 @@
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
 		default-lazy-init="true">
 
-
 	<!-- default -->
 	<hdp:configuration>
 		test.name=default
@@ -19,16 +18,15 @@
 	<hdp:configuration id="complex" resources="classpath:/test-site.xml, classpath:/test-site-2.xml" configuration-ref="hadoopConfiguration">
 		test.name.2=complex
 	</hdp:configuration>
-	
+
 	<hdp:configuration id="propsBased" properties-ref="props" properties-location="cfg-1.properties, cfg-2.properties">
 		star=chasing
 		return=captain eo
 		train=last
 	</hdp:configuration>
-	
+
+	<hdp:configuration id="shortcutBased" file-system-uri="hdfs://fakefs:1234" job-tracker-uri="fakejt:1234" rm-manager-uri="fakerm:1234"/>
+
 	<util:properties id="props" location="props.properties"/>
-	
-	<!-- default hdfs resource loader 
-	<hdp:resource-loader />
-	-->
+
 </beans>

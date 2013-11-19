@@ -211,13 +211,19 @@ in a given JVM hence the default is false.
 				<xsd:attribute name="file-system-uri" type="xsd:string">
 				<xsd:annotation>
 					<xsd:documentation><![CDATA[
-The default file-system address (host:port). Equivalent to 'fs.default.name' property.]]></xsd:documentation>
+The default file-system address (host:port). Equivalent to 'fs.default.name' and 'fs.defaultFS' propertys for HadoopV1 and HadoopV2 respectively.]]></xsd:documentation>
 			 	</xsd:annotation>
 				</xsd:attribute>
 				<xsd:attribute name="job-tracker-uri" type="xsd:string">
 				<xsd:annotation>
 					<xsd:documentation><![CDATA[
-The Map/Reduce job tracker address (host:port). Equivalent to 'mapred.job.tracker' property.]]></xsd:documentation>
+The MapReduce job tracker address (host:port) for HadoopV1. Equivalent to 'mapred.job.tracker' property.]]></xsd:documentation>
+			 	</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="rm-manager-uri" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+The Hadoop Yarn resource manager address (host:port) for HadoopV2. Equivalent to 'yarn.resource.manager' property.]]></xsd:documentation>
 			 	</xsd:annotation>
 				</xsd:attribute>
 		</xsd:extension>
