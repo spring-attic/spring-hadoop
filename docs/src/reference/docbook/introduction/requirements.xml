@@ -11,11 +11,20 @@
   <para>Spring for Apache Hadoop 2.0 requires JDK level 6.0 (just like Hadoop)
   and above, Spring <ulink
   url="http://www.springsource.org/about">Framework</ulink> 3.2 and above and
-  is built against <ulink url="http://hadoop.apache.org/">Apache
-  Hadoop</ulink> 1.2.1. Spring for Apache Hadoop 2.0 supports and is <ulink
-  url="https://build.springsource.org/browse/SPRINGDATAHADOOP">tested</ulink>
-  daily against Apache Hadoop 1.2.1 and also against 2.0.6-alpha as well as
-  against various Hadoop distributions: <itemizedlist>
+  is by default built against <ulink url="http://hadoop.apache.org/">Apache
+  Hadoop</ulink> 1.2.1.</para>
+
+  <para>Spring for Apache Hadoop 2.0 supports the following versions and distributions: <itemizedlist>
+      <listitem>
+        <para><ulink url="http://hadoop.apache.org/">Apache Hadoop</ulink> 
+        1.2.1</para>
+      </listitem>
+
+      <listitem>
+        <para><ulink url="http://hadoop.apache.org/">Apache Hadoop</ulink> 
+        2.2.0 *</para>
+      </listitem>
+
       <listitem>
         <para><ulink url="http://www.gopivotal.com/">Pivotal</ulink> HD
         1.1</para>
@@ -23,20 +32,36 @@
 
       <listitem>
         <para><ulink url="http://www.cloudera.com/">Cloudera</ulink> CDH4
-        (CDH4.3.1 MRv1) distributions</para>
+        (CDH4.3.1)</para>
+      </listitem>
+
+      <listitem>
+        <para><ulink url="http://www.cloudera.com/">Cloudera</ulink> CDH5 beta
+        (2.2.0-cdh5.0.0-beta-1) *</para>
       </listitem>
 
       <listitem>
         <para><ulink url="http://www.hortonworks.com/">Hortonworks</ulink>
         Data Platform 1.3</para>
       </listitem>
-    </itemizedlist><para>Any distro compatible with Apache Hadoop 1.x should
-  be supported.</para></para>
 
-  <para><note>
+      <listitem>
+        <para><ulink url="http://www.hortonworks.com/">Hortonworks</ulink>
+        Data Platform 2.0 *</para>
+      </listitem>
+    </itemizedlist>
+    <para>* The distributions noted with and asterisk will include spring-yarn support in the build.</para>
+    <para>Any distribution compatible with Apache Hadoop 1.x or 2.2.x should be supported.</para>
+    <note>
       <para>Spring for Apache Hadoop is is certified to work on Pivotal HD 1.0
       and 1.1, Hortonworks HDP 1.3 and Cloudera CDH 4.4 distributions.</para>
-    </note>Instructions for setting up project builds using various supported
+    </note>
+  </para>
+
+  <para>Spring for Apache Hadoop 2.0 is tested daily against a number of Hadoop distributions. See the <ulink
+  url="https://build.springsource.org/browse/SPRINGDATAHADOOP">test plan page</ulink> for current status.</para>
+
+  <para>Instructions for setting up project builds using various supported
   distributions are provided on the Spring for Apache Hadoop wiki - <ulink
   url="https://github.com/SpringSource/spring-hadoop/wiki">https://github.com/SpringSource/spring-hadoop/wiki</ulink></para>
 
@@ -49,8 +74,8 @@
   required Hadoop version as a basis for discovering the supported
   versions.</para>
 
-  <para>Spring for Apache Hadoop also requires a Hadoop installation up and
-  running. If you don't already have a Hadoop cluster up and running in your
+  <para>To take full advantage of Spring for Apache Hadoop you need a
+  running Hadoop cluster. If you don't already have one in your
   environment, a good first step is to create a single-node cluster. To
   install Hadoop 1.2.1, the "<link
   ns6:href="http://hadoop.apache.org/common/docs/stable/#Getting+Started">Getting
