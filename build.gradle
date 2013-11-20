@@ -635,7 +635,7 @@ configure(rootProject) {
 		}
 
 		from (reference) {
-			into "spring-data-hadoop-reference"
+			into "reference"
 		}
 	}
 
