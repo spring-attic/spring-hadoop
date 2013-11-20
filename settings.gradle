@@ -1,4 +1,4 @@
-//rootProject.name = 'spring-data-hadoop'
+rootProject.name = 'spring-data-hadoop'
 
 ext.hadoopDistro = hasProperty("distro") ? getProperty("distro") : "default"
 switch (ext.hadoopDistro) {
