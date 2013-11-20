@@ -631,7 +631,7 @@ configure(rootProject) {
 		}
 
 		from (api) {
-			into "javadoc-api"
+			into "api"
 		}
 
 		from (reference) {
