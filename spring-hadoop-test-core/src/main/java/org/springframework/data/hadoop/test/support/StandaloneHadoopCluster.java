@@ -23,6 +23,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.LocalFileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.hdfs.MiniDFSCluster;
 import org.apache.hadoop.mapred.JobConf;
 import org.springframework.data.hadoop.test.context.HadoopCluster;
@@ -103,7 +106,8 @@ public class StandaloneHadoopCluster implements HadoopCluster {
 			// who knows what kind of problems this will cause!!!
 			// keeping this here as reminder for the next guy who
 			// clean up the mess
-			System.setProperty("hadoop.log.dir", getTmpDir());
+			String tmpDir = getTmpDir();
+			System.setProperty("hadoop.log.dir", tmpDir);
 
 			// need to get unique dir per cluster
 			System.setProperty("test.build.data", "build/test/data/" + clusterName);
@@ -111,6 +115,13 @@ public class StandaloneHadoopCluster implements HadoopCluster {
 			log.info("Starting cluster=" + clusterName);
 
 			Configuration config = new JobConf();
+
+			// umask trick
+			String umask = getCurrentUmask(tmpDir, config);
+			if (umask != null) {
+				log.info("Setting expected umask to " + umask);
+				config.set("dfs.datanode.data.dir.perm", umask);
+			}
 
 			// dfs cluster is updating config
 			// newer dfs cluster are using builder pattern
@@ -194,6 +205,18 @@ public class StandaloneHadoopCluster implements HadoopCluster {
 	    }
 	    tmpDir.deleteOnExit();
 	    return tmpDir.getAbsolutePath();
+	}
+
+	/**
+	 * Gets the current umask.
+	 */
+	private String getCurrentUmask(String tmpDir, Configuration config) throws IOException {
+		try {
+			LocalFileSystem localFS = FileSystem.getLocal(config);
+			return Integer.toOctalString(localFS.getFileStatus(new Path(getTmpDir())).getPermission().toShort());
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 }
