@@ -5,6 +5,23 @@ http://www.springsource.org/spring-data/hadoop
 Commit changelog: http://github.com/SpringSource/spring-hadoop/tree/v[version]
 Issues changelog: http://jira.springsource.org/secure/ReleaseNote.jspa?projectId=10801
 
+Changes in version 2.0.0 M3 (2013-11-21)
+-----------------------------------------
+General
+* Update all 2.0.x based distros to their 2.2.x version [SHDP-217]
+  - Add CDH 5-beta and HDP 2.0 as build options
+  - Enable spring-yarn support for Hadoop 2.2, HDP 2.0 and CDH5-beta
+* Removing old Hadoop version 1.0.4 and Cloudera CDH3 build options [SHDP-216]
+
+* Add namespace config option for hd.rm and use fs.defaultFS for hadoop2 [SHDP-224]
+
+Test
+* Add support using MiniDFSCluster with MapReduce tests [SHDP-208]
+
+YARN
+* Update to use Hadoop 2.2 APIs instead of 2.0 alpha [SHDP-171]
+
+
 Changes in version 2.0.0 M2 (2013-11-13)
 -----------------------------------------
 General
