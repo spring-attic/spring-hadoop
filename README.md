@@ -84,7 +84,7 @@ The following distros and versions are also supported:
 
 \* The distributions noted with and asterisk will include spring-yarn support in the build.
 
-* For anyone using older distros and versions we recommend using Spring for Apache Hadoop 1.0.x which is mainatined here: https://github.com/spring-projects/spring-hadoop/tree/1.0.x
+* For anyone using older distros and versions we recommend using Spring for Apache Hadoop 1.0.x which is maintained here: https://github.com/spring-projects/spring-hadoop/tree/1.0.x
 
 To compile against a specific distro version pass the `-Pdistro=<label>` project property, like so:
 
