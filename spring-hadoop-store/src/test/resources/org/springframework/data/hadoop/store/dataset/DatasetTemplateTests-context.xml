@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:hdp="http://www.springframework.org/schema/hadoop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<hdp:configuration>
+		fs.default.name=file:///
+	</hdp:configuration>
+
+    <bean id="path" class="java.lang.String">
+        <constructor-arg value="#{systemProperties['java.io.tmpdir']}/dataset/test"/>
+    </bean>
+
+	<hdp:script id="initScript" language="javascript" run-at-startup="true">
+		<hdp:property name="dir" value="#{path}"/>
+		if (fsh.test(dir)) { fsh.rmr(dir); }
+	</hdp:script>
+
+	<bean id="datasetFactory" class="org.springframework.data.hadoop.store.dataset.DatasetRepositoryFactory">
+		<property name="conf" ref="hadoopConfiguration"/>
+		<property name="basePath" value="#{path}"/>
+	</bean>
+	<bean id="datasetOperations" class="org.springframework.data.hadoop.store.dataset.DatasetTemplate">
+		<property name="datasetRepositoryFactory" ref="datasetFactory"/>
+	</bean>
+
+</beans>

@@ -732,7 +732,10 @@ project('spring-data-hadoop-store') {
 	description = 'Spring for Apache Hadoop Store Features'
 
 	dependencies {
-		compile project(":spring-data-hadoop-core")
+		compile "com.cloudera.cdk:cdk-data-core:0.8.1"
+		testCompile project(":spring-data-hadoop")
+		testCompile "org.springframework:spring-test:$springVersion"
+		testRuntime "org.xerial.snappy:snappy-java:1.1.0"
 	}
 
 }
