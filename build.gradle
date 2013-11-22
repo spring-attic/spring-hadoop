@@ -728,6 +728,15 @@ project('spring-data-hadoop-batch') {
 
 }
 
+project('spring-data-hadoop-store') {
+	description = 'Spring for Apache Hadoop Store Features'
+
+	dependencies {
+		compile project(":spring-data-hadoop-core")
+	}
+
+}
+
 project('spring-data-hadoop') {
 	description = 'Spring for Apache Hadoop Configuration'
 
