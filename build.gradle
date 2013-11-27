@@ -734,6 +734,7 @@ project('spring-data-hadoop-store') {
 	dependencies {
 		compile "com.cloudera.cdk:cdk-data-core:0.8.1"
 		testCompile project(":spring-data-hadoop")
+		testCompile project(path:":spring-hadoop-test-core", configuration:"testArtifacts")
 		testCompile "org.springframework:spring-test:$springVersion"
 		testRuntime "org.xerial.snappy:snappy-java:1.1.0"
 	}
@@ -752,6 +753,15 @@ project('spring-data-hadoop') {
 
 project('spring-hadoop-test-core') {
 	description = 'Spring for Apache Hadoop Tests Core'
+
+	// expose test classes so that dependant project
+	// may define it as dependency
+	configurations {
+		testArtifacts.extendsFrom testRuntime
+	}
+	artifacts {
+		testArtifacts testJar
+	}
 
 	dependencies {
 		compile "org.springframework:spring-test:$springVersion"
