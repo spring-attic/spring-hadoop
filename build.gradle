@@ -735,6 +735,8 @@ project('spring-data-hadoop-store') {
 		compile "com.cloudera.cdk:cdk-data-core:0.8.1"
 		testCompile project(":spring-data-hadoop")
 		testCompile "org.springframework:spring-test:$springVersion"
+		testCompile "org.hamcrest:hamcrest-core:$hamcrestVersion"
+		testCompile "org.hamcrest:hamcrest-library:$hamcrestVersion"
 		testRuntime "org.xerial.snappy:snappy-java:1.1.0"
 	}
 
