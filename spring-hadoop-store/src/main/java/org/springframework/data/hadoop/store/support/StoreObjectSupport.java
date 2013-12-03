@@ -37,10 +37,10 @@ public abstract class StoreObjectSupport extends LifecycleObjectSupport {
 	/** Hadoop configuration */
 	private final Configuration configuration;
 
-	/** Codec info for storage */
+	/** Codec info for store */
 	private final CodecInfo codecInfo;
 
-	/** Hdfs path into a storage */
+	/** Hdfs path into a store */
 	private final Path basePath;
 
 	/** Poller checking idle timeouts */

@@ -225,9 +225,9 @@ public abstract class LifecycleObjectSupport implements InitializingBean, SmartL
 	}
 
 	/**
-	 * Gets the storage event publisher.
+	 * Gets the store event publisher.
 	 *
-	 * @return the storage event publisher
+	 * @return the store event publisher
 	 */
 	public StoreEventPublisher getStoreEventPublisher() {
 		if (storeEventPublisher == null && getBeanFactory() != null) {
@@ -240,12 +240,12 @@ public abstract class LifecycleObjectSupport implements InitializingBean, SmartL
 	}
 
 	/**
-	 * Sets the storage event publisher.
+	 * Sets the store event publisher.
 	 *
-	 * @param storeEventPublisher the new storage event publisher
+	 * @param storeEventPublisher the new store event publisher
 	 */
 	public void setStoreEventPublisher(StoreEventPublisher storeEventPublisher) {
-		Assert.notNull(storeEventPublisher, "StorageEventPublisher cannot be null");
+		Assert.notNull(storeEventPublisher, "StoreEventPublisher cannot be null");
 		this.storeEventPublisher = storeEventPublisher;
 	}
 

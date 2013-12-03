@@ -29,7 +29,7 @@ public class StoreException extends NonTransientDataAccessException {
 	private static final long serialVersionUID = 7066482966443178810L;
 
 	/**
-	 * Constructor for StorageException.
+	 * Constructor for StoreException.
 	 * @param msg message
 	 * @param cause the root cause
 	 */
@@ -38,7 +38,7 @@ public class StoreException extends NonTransientDataAccessException {
 	}
 
 	/**
-	 * Constructor for StorageException.
+	 * Constructor for StoreException.
 	 * @param msg message
 	 */
 	public StoreException(String msg) {
