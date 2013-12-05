@@ -25,6 +25,7 @@ import org.junit.Test;
 import org.springframework.data.hadoop.store.codec.Codecs;
 import org.springframework.data.hadoop.store.input.TextFileReader;
 import org.springframework.data.hadoop.store.output.TextFileWriter;
+import org.springframework.data.hadoop.store.strategy.naming.CodecFileNamingStrategy;
 import org.springframework.data.hadoop.store.strategy.naming.RollingFileNamingStrategy;
 import org.springframework.data.hadoop.store.strategy.rollover.SizeRolloverStrategy;
 
@@ -75,6 +76,18 @@ public class TextFileStoreTests extends AbstractStoreTests {
 
 		TextFileReader reader = new TextFileReader(testConfig, testDefaultPath,
 				Codecs.BZIP2.getCodecInfo());
+		TestUtils.readDataAndAssert(reader, DATA09ARRAY);
+	}
+
+	@Test
+	public void testWriteReadManyLinesWithGzipWithCodecNaming() throws IOException {
+		TextFileWriter writer = new TextFileWriter(testConfig, testDefaultPath,
+				Codecs.GZIP.getCodecInfo());
+		writer.setFileNamingStrategy(new CodecFileNamingStrategy());
+		TestUtils.writeData(writer, DATA09ARRAY);
+
+		TextFileReader reader = new TextFileReader(testConfig, testDefaultPath.suffix(".gzip"),
+				Codecs.GZIP.getCodecInfo());
 		TestUtils.readDataAndAssert(reader, DATA09ARRAY);
 	}
 

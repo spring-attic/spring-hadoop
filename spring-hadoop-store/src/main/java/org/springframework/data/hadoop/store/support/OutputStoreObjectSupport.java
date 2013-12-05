@@ -58,9 +58,7 @@ public abstract class OutputStoreObjectSupport extends StoreObjectSupport {
     public OutputStoreObjectSupport(Configuration configuration, Path basePath, CodecInfo codec) {
         super(configuration, basePath, codec);
         this.outputContext = new OutputContext();
-        if (codec != null && outputContext != null) {
-            outputContext.setCodecInfo(codec);
-        }
+        this.outputContext.setCodecInfo(codec);
     }
 
     /**
@@ -80,6 +78,7 @@ public abstract class OutputStoreObjectSupport extends StoreObjectSupport {
      */
     public void setFileNamingStrategy(FileNamingStrategy fileNamingStrategy) {
         outputContext.setFileNamingStrategy(fileNamingStrategy);
+        outputContext.setCodecInfo(getCodec());
     }
 
     /**
