@@ -32,6 +32,20 @@ import java.util.List;
  */
 public abstract class TestUtils {
 
+	public static void writeData(DataStoreWriter<List<String>> writer, List<List<String>> data) throws IOException {
+		writeData(writer, data, true);
+	}
+
+	public static void writeData(DataStoreWriter<List<String>> writer, List<List<String>> data, boolean close) throws IOException {
+		for (List<String> d : data) {
+			writer.write(d);
+		}
+		writer.flush();
+		if (close) {
+			writer.close();
+		}
+	}
+
 	public static void writeData(DataStoreWriter<String> writer, String[] data) throws IOException {
 		writeData(writer, data, true);
 	}
@@ -67,5 +81,13 @@ public abstract class TestUtils {
 		return ret;
 	}
 
+	public static List<List<String>> readDataList(DataStoreReader<List<String>> reader) throws IOException {
+		List<List<String>> ret = new ArrayList<List<String>>();
+		List<String> line = null;
+		while ((line = reader.read()) != null) {
+			ret.add(line);
+		}
+		return ret;
+	}
 
 }
