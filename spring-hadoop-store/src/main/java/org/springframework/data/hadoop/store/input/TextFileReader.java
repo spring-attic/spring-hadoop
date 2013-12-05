@@ -40,6 +40,8 @@ public class TextFileReader extends AbstractDataStreamReader implements DataStor
 
 	private LineReader lineReader;
 
+	private final byte[] delimiter;
+
 	/**
 	 * Instantiates a new text file reader.
 	 *
@@ -48,7 +50,20 @@ public class TextFileReader extends AbstractDataStreamReader implements DataStor
 	 * @param codec the compression codec info
 	 */
 	public TextFileReader(Configuration configuration, Path basePath, CodecInfo codec) {
+		this(configuration, basePath, codec, null);
+	}
+
+	/**
+	 * Instantiates a new text file reader.
+	 *
+	 * @param configuration the configuration
+	 * @param basePath the base path
+	 * @param codec the codec
+	 * @param delimiter the delimiter
+	 */
+	public TextFileReader(Configuration configuration, Path basePath, CodecInfo codec, byte[] delimiter) {
 		super(configuration, basePath, codec);
+		this.delimiter = delimiter;
 	}
 
 	@Override
@@ -66,7 +81,7 @@ public class TextFileReader extends AbstractDataStreamReader implements DataStor
 	public String read() throws IOException {
 		if (streamsHolder == null) {
 			streamsHolder = getInput(getPath());
-			lineReader = new LineReader(streamsHolder.getStream());
+			lineReader = new LineReader(streamsHolder.getStream(), delimiter);
 		}
 		Text text = new Text();
 		lineReader.readLine(text);
