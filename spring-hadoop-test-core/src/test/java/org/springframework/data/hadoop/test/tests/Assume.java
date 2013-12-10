@@ -20,7 +20,14 @@ import static org.junit.Assume.assumeFalse;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.io.compress.CompressionCodec;
+import org.apache.hadoop.io.compress.zlib.ZlibFactory;
+import org.apache.hadoop.util.NativeCodeLoader;
 import org.junit.internal.AssumptionViolatedException;
+import org.springframework.util.ClassUtils;
+import org.springframework.util.ObjectUtils;
+
 
 /**
  *
@@ -59,7 +66,7 @@ public abstract class Assume {
      *
      * @param distros the distros to expect
      */
-    public static void distro(Distro... distros) {
+    public static void hadoopDistro(Distro... distros) {
     	Set<Distro> current = Distro.resolveDistros();
     	for (Distro d : distros) {
 			if (current.contains(d)) {
@@ -70,6 +77,21 @@ public abstract class Assume {
 				+ "] matched with current distros [" + current + "]");
     }
 
+    /**
+     * Assume that a particular {@link Version} is currently used.
+     *
+     * @param version the version to expect
+     */
+	public static void hadoopVersion(Version version) {
+		Version current = Version.resolveVersion();
+		if (ObjectUtils.nullSafeEquals(version, current)) {
+			return;
+		} else {
+			throw new AssumptionViolatedException("spesified version [" + version
+					+ "] not matched with current version [" + current + "]");
+		}
+	}
+
 	/**
 	 * Assume that the specified log is not set to Trace or Debug.
 	 *
@@ -78,6 +100,37 @@ public abstract class Assume {
 	public static void notLogging(Log log) {
 		assumeFalse(log.isTraceEnabled());
 		assumeFalse(log.isDebugEnabled());
+	}
+
+	/**
+	 * Assume that the specified codec class is present.
+	 *
+	 * @param codecClazz the codec class
+	 */
+	public static void codecExists(String codecClazz) {
+		if(ClassUtils.isPresent(codecClazz, Assume.class.getClassLoader())) {
+			Class<?> codecClass = ClassUtils.resolveClassName(codecClazz, Assume.class.getClassLoader());
+			if (ClassUtils.isAssignable(CompressionCodec.class, codecClass)) {
+				return;
+			} else {
+				throw new AssumptionViolatedException("Resolved class [" + codecClass
+						+"] is not instance of CompressionCodec");
+			}
+		} else {
+			throw new AssumptionViolatedException("Class [" + codecClazz
+					+"] cannot be loaded");
+		}
+	}
+
+	/**
+	 * Assume that the hadoop native code is loaded.
+	 */
+	public static void nativeCode(Configuration configuration) {
+		if (NativeCodeLoader.isNativeCodeLoaded() && ZlibFactory.isNativeZlibLoaded(configuration)) {
+			return;
+		} else {
+			throw new AssumptionViolatedException("Native hadoop code not loaded");
+		}
 	}
 
 }

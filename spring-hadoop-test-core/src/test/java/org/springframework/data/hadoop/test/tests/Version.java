@@ -15,61 +15,41 @@
  */
 package org.springframework.data.hadoop.test.tests;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.hadoop.util.VersionInfo;
 import org.springframework.util.StringUtils;
 
 /**
- * A hadoop distro used to limit when certain tests are run.
+ * A hadoop version used to limit when certain tests are run.
  *
  * @author Janne Valkealahti
  *
  */
-public enum Distro {
+public enum Version {
 
 	/**
-	 * Vanilla Apache Hadoop 1.2
+	 * All hadoop 1.x based distros.
 	 */
-	HADOOP12,
+	HADOOP1X,
 
 	/**
-	 * Vanilla Apache Hadoop 2.2
+	 * All hadoop 2.x based distros.
 	 */
-	HADOOP22,
+	HADOOP2X;
 
-	/**
-	 * Cloudera CDH5
-	 */
-	CDH5,
-
-	/**
-	 * Pivotal HD 1.0
-	 */
-	PHD1;
-
-	public static Set<Distro> resolveDistros() {
-		Set<Distro> distros = new HashSet<Distro>();
+	public static Version resolveVersion() {
 		String version = VersionInfo.getVersion();
 
 		if (StringUtils.hasText(version)) {
-
-			// add specific distro, if it wasn't
-			// pivotal or cloudera, it must be
-			// vanilla/hortonworks.
-			if (version.contains("phd")) {
-				distros.add(PHD1);
-			} else if (version.contains("cdh")) {
-				distros.add(CDH5);
-			} else if (version.startsWith("2.2")) {
-				distros.add(HADOOP22);
-			} else if (version.startsWith("1.2")) {
-				distros.add(HADOOP12);
+			// 1.x or 2.x
+			if (version.startsWith("1")) {
+				return HADOOP1X;
+			} else if (version.startsWith("2")) {
+				return HADOOP2X;
 			}
-		}
 
-		return distros;
+		}
+		// should not get here
+		return null;
 	}
 
 }

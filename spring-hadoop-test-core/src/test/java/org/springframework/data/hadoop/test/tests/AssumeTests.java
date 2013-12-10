@@ -15,35 +15,46 @@
  */
 package org.springframework.data.hadoop.test.tests;
 
-import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
-import org.springframework.util.ClassUtils;
+import org.junit.internal.AssumptionViolatedException;
 
 /**
- * Tests for {@link Distro}.
+ * Tests for {@link Assume}.
  *
  * @author Janne Valkealahti
  */
-public class DistroTests {
+public class AssumeTests {
 
 	@Test
-	public void testOneShouldExist() {
-		assertThat(Distro.resolveDistros().size(), not(0));
+	public void testCodecNotExist() {
+		AssumptionViolatedException ave = null;
+		try {
+			Assume.codecExists("foo.Jee");
+		} catch (AssumptionViolatedException e) {
+			ave = e;
+		}
+		assertThat(ave, notNullValue());
+
+		ave = null;
+		try {
+			Assume.codecExists("org.apache.hadoop.conf.Configuration");
+		} catch (AssumptionViolatedException e) {
+			ave = e;
+		}
+		assertThat(ave, notNullValue());
+
+		ave = null;
+		try {
+			Assume.codecExists("org.apache.hadoop.io.compress.GzipCodec");
+		} catch (AssumptionViolatedException e) {
+			ave = e;
+		}
+		assertThat(ave, nullValue());
 	}
 
-	@Test
-	public void testShouldSkipYarn() throws ClassNotFoundException, LinkageError {
-		Assume.hadoopVersion(Version.HADOOP2X);
-		Class<?> clazz = ClassUtils.forName("org.apache.hadoop.yarn.conf.YarnConfiguration", getClass().getClassLoader());
-		assertThat(clazz, notNullValue());
-	}
-
-	@Test
-	public void testHaveVersion() {
-		assertThat(Version.resolveVersion(), notNullValue());
-	}
 
 }
