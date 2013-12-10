@@ -26,13 +26,12 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.hadoop.util.VersionUtils;
+import org.springframework.data.hadoop.test.tests.Assume;
+import org.springframework.data.hadoop.test.tests.Version;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -85,7 +84,7 @@ public class DatasetTemplateTests {
 	@Test
 	public void testReadSavedPojoWithCallback() {
 		//CDK currently uses 2.0 only org.apache.hadoop.fs.FileStatus.isDirectory()
-		Assume.assumeTrue(VersionUtils.isHadoop2X());
+		Assume.hadoopVersion(Version.HADOOP2X);
 		datasetOperations.write(records);
 		final List<TestPojo> results = new ArrayList<TestPojo>();
 		datasetOperations.read(TestPojo.class, new RecordCallback<TestPojo>() {
@@ -110,7 +109,7 @@ public class DatasetTemplateTests {
 	@Test
 	public void testReadSavedPojoCollection() {
 		//CDK currently uses 2.0 only org.apache.hadoop.fs.FileStatus.isDirectory()
-		Assume.assumeTrue(VersionUtils.isHadoop2X());
+		Assume.hadoopVersion(Version.HADOOP2X);
 		datasetOperations.write(records);
 		TestPojo pojo3 = new TestPojo();
 		pojo3.setId(31L);
