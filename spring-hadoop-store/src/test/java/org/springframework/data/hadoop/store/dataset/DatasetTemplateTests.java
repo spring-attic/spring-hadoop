@@ -35,7 +35,7 @@ import org.springframework.data.hadoop.test.tests.Version;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.cloudera.cdk.data.DatasetRepository;
+import org.kitesdk.data.DatasetRepository;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration

@@ -16,7 +16,7 @@
 
 package org.springframework.data.hadoop.store.dataset;
 
-import com.cloudera.cdk.data.DatasetRepository;
+import org.kitesdk.data.DatasetRepository;
 
 /**
  * Callback interface for code that operates on a {@link DatasetRepository}.

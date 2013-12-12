@@ -732,7 +732,7 @@ project('spring-data-hadoop-store') {
 	description = 'Spring for Apache Hadoop Store Features'
 
 	dependencies {
-		compile "com.cloudera.cdk:cdk-data-core:0.8.1"
+		compile "org.kitesdk:kite-data-core:0.10.0"
 		testCompile project(":spring-data-hadoop")
 		testCompile project(path:":spring-hadoop-test-core", configuration:"testArtifacts")
 		testCompile "org.springframework:spring-test:$springVersion"

@@ -23,8 +23,8 @@ import org.apache.hadoop.conf.Configuration;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
-import com.cloudera.cdk.data.DatasetRepository;
-import com.cloudera.cdk.data.filesystem.FileSystemDatasetRepository;
+import org.kitesdk.data.DatasetRepository;
+import org.kitesdk.data.filesystem.FileSystemDatasetRepository;
 
 /**
  * Factory class responsible for creating {@link DatasetRepository} instances. Primarily used in configuration code or

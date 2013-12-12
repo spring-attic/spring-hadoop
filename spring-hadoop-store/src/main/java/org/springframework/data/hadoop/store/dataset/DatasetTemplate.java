@@ -23,12 +23,12 @@ import java.util.List;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
-import com.cloudera.cdk.data.Dataset;
-import com.cloudera.cdk.data.DatasetDescriptor;
-import com.cloudera.cdk.data.DatasetReader;
-import com.cloudera.cdk.data.DatasetWriter;
-import com.cloudera.cdk.data.NoSuchDatasetException;
-import com.cloudera.cdk.data.PartitionStrategy;
+import org.kitesdk.data.Dataset;
+import org.kitesdk.data.DatasetDescriptor;
+import org.kitesdk.data.DatasetReader;
+import org.kitesdk.data.DatasetWriter;
+import org.kitesdk.data.NoSuchDatasetException;
+import org.kitesdk.data.PartitionStrategy;
 
 /**
  * This is the central class in the store.dataset package. It simplifies the use of {@link Dataset}s,
