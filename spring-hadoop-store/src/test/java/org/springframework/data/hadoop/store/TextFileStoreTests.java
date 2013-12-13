@@ -113,4 +113,28 @@ public class TextFileStoreTests extends AbstractStoreTests {
 		assertThat(splitData1.size() + splitData2.size() + splitData3.size(), is(DATA09ARRAY.length));
 	}
 
+	@Test
+	public void testWriteReadManyLinesWithNamingAndRolloverWithGzip() throws IOException {
+
+		TextFileWriter writer = new TextFileWriter(testConfig, testDefaultPath, Codecs.GZIP.getCodecInfo());
+		writer.setFileNamingStrategy(new RollingFileNamingStrategy());
+		writer.setRolloverStrategy(new SizeRolloverStrategy(40));
+
+		// codec is buffering so we need to write some amount of
+		// data before anything is actually written into a file/stream
+		// writing same data over and over again is compressing a lot
+		for (int i = 0; i<45000; i++) {
+			TestUtils.writeData(writer, DATA09ARRAY, false);
+		}
+		TestUtils.writeData(writer, DATA09ARRAY, true);
+
+		TextFileReader reader1 = new TextFileReader(testConfig, testDefaultPath.suffix("0"), Codecs.GZIP.getCodecInfo());
+		List<String> splitData1 = TestUtils.readData(reader1);
+
+		TextFileReader reader2 = new TextFileReader(testConfig, testDefaultPath.suffix("1"), Codecs.GZIP.getCodecInfo());
+		List<String> splitData2 = TestUtils.readData(reader2);
+
+		assertThat(splitData1.size() + splitData2.size(), is(450010));
+	}
+
 }
