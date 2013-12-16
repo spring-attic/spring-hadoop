@@ -61,7 +61,7 @@ public class OutputStreamWriter extends AbstractDataStreamWriter implements Data
 	}
 
 	@Override
-	public void close() throws IOException {
+	public synchronized void close() throws IOException {
 		if (streamsHolder != null) {
 			streamsHolder.close();
 
@@ -77,7 +77,7 @@ public class OutputStreamWriter extends AbstractDataStreamWriter implements Data
 	}
 
 	@Override
-	public void write(byte[] entity) throws IOException {
+	public synchronized void write(byte[] entity) throws IOException {
 		if (streamsHolder == null) {
 			streamsHolder = getOutput();
 		}
