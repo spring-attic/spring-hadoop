@@ -15,7 +15,7 @@
  */
 package org.springframework.yarn.integration.support;
 
-import org.springframework.integration.ip.tcp.connection.support.TcpSocketSupport;
+import org.springframework.integration.ip.tcp.connection.TcpSocketSupport;
 
 /**
  * Extension of {@link TcpSocketSupport} interface adding methods
