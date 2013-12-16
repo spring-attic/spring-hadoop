@@ -15,7 +15,12 @@
  */
 package org.springframework.data.hadoop.store.support;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+
+import org.springframework.data.hadoop.store.DataStoreWriter;
+import org.springframework.util.Assert;
 
 /**
  * Utility methods for store package.
@@ -32,6 +37,8 @@ public abstract class StoreUtils {
 	private static final byte[] csv;
 
 	private static final byte[] tab;
+
+	public static final int BUFFER_SIZE = 4096;
 
 	static {
 		try {
@@ -69,6 +76,63 @@ public abstract class StoreUtils {
 	 */
 	public static byte[] getUTF8TabDelimiter() {
 		return tab;
+	}
+
+	/**
+	 * Copy the contents of the given InputStream to the given DataStoreWriter.
+	 * Closes stream and writer when done.
+	 *
+	 * @param in the input stream
+	 * @param out the data store writer
+	 * @return the number of bytes copied
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
+	public static int copy(InputStream in, DataStoreWriter<byte[]> out) throws IOException {
+		Assert.notNull(in, "No InputStream specified");
+		Assert.notNull(out, "No DataStoreWriter specified");
+		try {
+			return copyStream(in, out);
+		} finally {
+			try {
+				in.close();
+			} catch (IOException ex) {
+			}
+			try {
+				out.close();
+			} catch (IOException ex) {
+			}
+		}
+	}
+
+	/**
+	 * Copy the contents of the given InputStream to the given DataStoreWriter.
+	 * Does not close stream or writer when done.
+	 *
+	 * @param in the input stream
+	 * @param out the data store writer
+	 * @return the number of bytes copied
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
+	public static int copyStream(InputStream in, DataStoreWriter<byte[]> out) throws IOException {
+		Assert.notNull(in, "No InputStream specified");
+		Assert.notNull(out, "No DataStoreWriter specified");
+		int byteCount = 0;
+		byte[] buffer = new byte[BUFFER_SIZE];
+		int bytesRead = -1;
+		while ((bytesRead = in.read(buffer)) != -1) {
+			if (bytesRead < BUFFER_SIZE) {
+				// handling case when we wanted to write
+				// less than a buffer size
+				byte[] buf = new byte[bytesRead];
+				System.arraycopy(buffer, 0, buf, 0, bytesRead);
+				out.write(buf);
+			} else {
+				out.write(buffer);
+			}
+			byteCount += bytesRead;
+		}
+		out.flush();
+		return byteCount;
 	}
 
 }

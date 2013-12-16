@@ -60,6 +60,16 @@ public abstract class TestUtils {
 		}
 	}
 
+	public static void writeData(DataStoreWriter<byte[]> writer, byte[][] data, boolean close) throws IOException {
+		for (byte[] d : data) {
+			writer.write(d);
+		}
+		writer.flush();
+		if (close) {
+			writer.close();
+		}
+	}
+
 	public static void readDataAndAssert(DataStoreReader<String> reader, String[] expected) throws IOException {
 		String line = null;
 		int count = 0;
