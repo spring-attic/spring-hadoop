@@ -17,7 +17,7 @@
 package org.springframework.data.hadoop.store.dataset;
 
 /**
- * Callback interface for code that operates on a {@link com.cloudera.cdk.data.Dataset} record.
+ * Callback interface for code that operates on a {@link org.kitesdk.data.Dataset} record.
  *
  * @author Thomas Risberg
  * @since 2.0

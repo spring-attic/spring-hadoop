@@ -18,11 +18,11 @@ package org.springframework.data.hadoop.store.dataset;
 
 import java.util.Collection;
 
-import com.cloudera.cdk.data.PartitionStrategy;
+import org.kitesdk.data.PartitionStrategy;
 
 /**
- * Interface specifying a basic set of {@link com.cloudera.cdk.data.Dataset} operations against a specific
- * {@link com.cloudera.cdk.data.DatasetRepository}. Implemented by DatasetTemplate.
+ * Interface specifying a basic set of {@link org.kitesdk.data.Dataset} operations against a specific
+ * {@link org.kitesdk.data.DatasetRepository}. Implemented by DatasetTemplate.
  * 
  * @author Thomas Risberg
  * @since 2.0
@@ -61,7 +61,7 @@ public interface DatasetOperations {
 	void write(Collection<?> records);
 
 	/**
-	 * Execute a callback for the {@link com.cloudera.cdk.data.DatasetRepository}
+	 * Execute a callback for the {@link org.kitesdk.data.DatasetRepository}
 	 * 
 	 * @param callback
 	 */

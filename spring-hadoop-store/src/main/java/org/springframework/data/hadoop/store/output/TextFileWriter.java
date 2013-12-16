@@ -70,14 +70,14 @@ public class TextFileWriter extends AbstractDataStreamWriter implements DataStor
 	}
 
 	@Override
-	public void flush() throws IOException {
+	public synchronized  void flush() throws IOException {
 		if (streamsHolder == null) {
 			streamsHolder.getStream().flush();
 		}
 	}
 
 	@Override
-	public void close() throws IOException {
+	public synchronized void close() throws IOException {
 		if (streamsHolder != null) {
 			streamsHolder.close();
 
@@ -93,7 +93,7 @@ public class TextFileWriter extends AbstractDataStreamWriter implements DataStor
 	}
 
 	@Override
-	public void write(String entity) throws IOException {
+	public synchronized void write(String entity) throws IOException {
 		if (streamsHolder == null) {
 			streamsHolder = getOutput();
 		}

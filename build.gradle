@@ -732,8 +732,9 @@ project('spring-data-hadoop-store') {
 	description = 'Spring for Apache Hadoop Store Features'
 
 	dependencies {
-		compile "com.cloudera.cdk:cdk-data-core:0.8.1"
+		compile "org.kitesdk:kite-data-core:0.10.0"
 		testCompile project(":spring-data-hadoop")
+		testCompile project(path:":spring-hadoop-test-core", configuration:"testArtifacts")
 		testCompile "org.springframework:spring-test:$springVersion"
 		testCompile "org.hamcrest:hamcrest-core:$hamcrestVersion"
 		testCompile "org.hamcrest:hamcrest-library:$hamcrestVersion"
@@ -754,6 +755,15 @@ project('spring-data-hadoop') {
 
 project('spring-hadoop-test-core') {
 	description = 'Spring for Apache Hadoop Tests Core'
+
+	// expose test classes so that dependant project
+	// may define it as dependency
+	configurations {
+		testArtifacts.extendsFrom testRuntime
+	}
+	artifacts {
+		testArtifacts testJar
+	}
 
 	dependencies {
 		compile "org.springframework:spring-test:$springVersion"
@@ -1096,6 +1106,6 @@ if (gradle.ext.mr2) {
 
 task wrapper(type: Wrapper) {
 	description = "Generates gradlew[.bat] scripts"
-	gradleVersion = "1.6"
+	gradleVersion = "1.9"
 }
 

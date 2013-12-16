@@ -13,31 +13,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.yarn.integration.support;
+package org.springframework.data.hadoop.test.tests;
 
-import org.springframework.integration.ip.tcp.connection.TcpSocketSupport;
+import org.apache.hadoop.util.VersionInfo;
+import org.springframework.util.StringUtils;
 
 /**
- * Extension of {@link TcpSocketSupport} interface adding methods
- * to get more information about the socket ports.
+ * A hadoop version used to limit when certain tests are run.
  *
  * @author Janne Valkealahti
  *
  */
-public interface PortExposingTcpSocketSupport extends TcpSocketSupport {
+public enum Version {
 
 	/**
-	 * Gets the binded server socket port.
-	 *
-	 * @return the server socket port
+	 * All hadoop 1.x based distros.
 	 */
-	int getServerSocketPort();
+	HADOOP1X,
 
 	/**
-	 * Gets the binded server socket address.
-	 *
-	 * @return the server socket address
+	 * All hadoop 2.x based distros.
 	 */
-	String getServerSocketAddress();
+	HADOOP2X;
+
+	public static Version resolveVersion() {
+		String version = VersionInfo.getVersion();
+
+		if (StringUtils.hasText(version)) {
+			// 1.x or 2.x
+			if (version.startsWith("1")) {
+				return HADOOP1X;
+			} else if (version.startsWith("2")) {
+				return HADOOP2X;
+			}
+
+		}
+		// should not get here
+		return null;
+	}
 
 }
