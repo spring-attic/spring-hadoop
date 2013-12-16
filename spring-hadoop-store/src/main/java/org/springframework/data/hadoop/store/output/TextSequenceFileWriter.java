@@ -61,7 +61,7 @@ public class TextSequenceFileWriter extends AbstractSequenceFileWriter implement
 	}
 
 	@Override
-	public void close() throws IOException {
+	public synchronized void close() throws IOException {
 		if (holder != null) {
 			holder.close();
 
@@ -77,7 +77,7 @@ public class TextSequenceFileWriter extends AbstractSequenceFileWriter implement
 	}
 
 	@Override
-	public void write(String entity) throws IOException {
+	public synchronized void write(String entity) throws IOException {
 		if (holder == null) {
 			holder = getOutput();
 		}
