@@ -15,9 +15,11 @@
  */
 package org.springframework.data.hadoop.store.strategy.naming;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.fs.Path;
-
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 /**
  * A {@code FileNamingStrategy} which simply uses a static file name.
@@ -26,6 +28,8 @@ import org.springframework.util.Assert;
  *
  */
 public class StaticFileNamingStrategy extends AbstractFileNamingStrategy {
+
+	private final static Log log = LogFactory.getLog(StaticFileNamingStrategy.class);
 
 	private final static String DEFAULT_FILENAME = "data";
 
@@ -61,6 +65,26 @@ public class StaticFileNamingStrategy extends AbstractFileNamingStrategy {
 	@Override
 	public void reset() {
 		// we're static, nothing to do
+	}
+
+	@Override
+	public Path init(Path path) {
+		path = super.init(path);
+		log.debug("Initialising from path=" + path);
+		if (path != null) {
+			if (path.getName().startsWith(fileName)) {
+
+				String name = path.getName().substring(fileName.length());
+				if (StringUtils.hasText(name)) {
+					path = new Path(path.getParent(), name);
+					log.debug("Removed handled prefix, path is now " + path);
+				} else {
+					path = null;
+					log.debug("Removed last handled name part, returning null");
+				}
+			}
+		}
+		return path;
 	}
 
 	/**

@@ -56,13 +56,13 @@ public class TextFileStoreCtxTests extends AbstractStoreTests {
 		Thread.sleep(2000);
 		TestUtils.writeData(writer, new String[] { DATA12 }, true);
 
-		TextFileReader reader1 = new TextFileReader(testConfig, testDefaultPath.suffix("0"), null);
+		TextFileReader reader1 = new TextFileReader(testConfig, testDefaultPath.suffix("-0"), null);
 		List<String> splitData1 = TestUtils.readData(reader1);
 
-		TextFileReader reader2 = new TextFileReader(testConfig, testDefaultPath.suffix("1"), null);
+		TextFileReader reader2 = new TextFileReader(testConfig, testDefaultPath.suffix("-1"), null);
 		List<String> splitData2 = TestUtils.readData(reader2);
 
-		TextFileReader reader3 = new TextFileReader(testConfig, testDefaultPath.suffix("2"), null);
+		TextFileReader reader3 = new TextFileReader(testConfig, testDefaultPath.suffix("-2"), null);
 		List<String> splitData3 = TestUtils.readData(reader3);
 
 		assertThat(splitData1.size() + splitData2.size() + splitData3.size(), is(3));

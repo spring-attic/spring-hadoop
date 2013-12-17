@@ -16,10 +16,13 @@
 package org.springframework.data.hadoop.store.support;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Comparator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.springframework.data.hadoop.store.StoreException;
@@ -48,6 +51,9 @@ public abstract class OutputStoreObjectSupport extends StoreObjectSupport {
 	/** Used in-writing prefix if any */
 	private String prefix;
 
+	/** Flag guarding if files can be overwritten */
+	private boolean overwrite = false;
+
 	/**
 	 * Instantiates a new abstract output store support.
 	 *
@@ -59,6 +65,30 @@ public abstract class OutputStoreObjectSupport extends StoreObjectSupport {
         super(configuration, basePath, codec);
         this.outputContext = new OutputContext();
         this.outputContext.setCodecInfo(codec);
+    }
+
+    @Override
+    protected void onInit() throws Exception {
+    	super.onInit();
+
+    	FileSystem fileSystem = getPath().getFileSystem(getConfiguration());
+    	Path initPath = null;
+    	if (fileSystem.exists(getPath())) {
+        	FileStatus[] fileStatuses = fileSystem.listStatus(getPath());
+
+    		Arrays.sort(fileStatuses, new Comparator<FileStatus>() {
+    			public int compare(FileStatus f1, FileStatus f2) {
+    				// newest first
+    				return -Long.valueOf(f1.getModificationTime()).compareTo(f2.getModificationTime());
+    			}
+    		});
+
+    		if (fileStatuses.length > 0) {
+    			initPath = fileStatuses[0].getPath();
+    		}
+    	}
+
+    	outputContext.init(initPath);
     }
 
     /**
@@ -110,6 +140,17 @@ public abstract class OutputStoreObjectSupport extends StoreObjectSupport {
 	}
 
     /**
+     * Sets the flag indicating if written files may be overwritten.
+     * Default value is <code>FALSE</code> meaning {@code StoreException}
+     * is thrown if file is about to get overwritten.
+     *
+     * @param overwrite the new overwrite
+     */
+    public void setOverwrite(boolean overwrite) {
+		this.overwrite = overwrite;
+	}
+
+    /**
      * Gets the resolved path.
      *
      * @return the resolved path
@@ -121,9 +162,21 @@ public abstract class OutputStoreObjectSupport extends StoreObjectSupport {
         } else {
             p = getPath();
         }
+
+        // check for file without inuse prefix/suffix
+        if (!overwrite && pathExists(p)) {
+        	throw new StoreException("Path [" + p + "] exists and overwritten not allowed");
+        }
+
         String name = (StringUtils.hasText(prefix) ? prefix : "") + p.getName()
         		+ (StringUtils.hasText(suffix) ? suffix : "");
-        return new Path(p.getParent(), name);
+
+        p = new Path(p.getParent(), name);
+        // check for file with inuse prefix/suffix
+        if (!overwrite && pathExists(p)) {
+        	throw new StoreException("Path [" + p + "] exists and overwritten not allowed");
+        }
+        return p;
     }
 
     /**
@@ -156,15 +209,30 @@ public abstract class OutputStoreObjectSupport extends StoreObjectSupport {
 		Path toPath = new Path(path.getParent(), name);
 		try {
 			FileSystem fs = path.getFileSystem(getConfiguration());
-			if (!fs.rename(path, toPath)) {
-				throw new StoreException("Failed renaming from " + path + " to " + toPath
-						+ " with configuration " + getConfiguration());
+
+			boolean succeed;
+			try {
+				fs.delete(toPath, false);
+				succeed = fs.rename(path, toPath);
+			} catch (Exception e) {
+				throw new StoreException("Failed renaming from " + path + " to " + toPath, e);
+			}
+			if (!succeed) {
+				throw new StoreException("Failed renaming from " + path + " to " + toPath + " because hdfs returned false");
 			}
 		}
 		catch (IOException e) {
 			log.error("Error renaming file", e);
 			throw new StoreException("Error renaming file", e);
 		}
+	}
+
+	private boolean pathExists(Path path) {
+		try {
+			return path.getFileSystem(getConfiguration()).exists(path);
+		} catch (IOException e) {
+		}
+		return false;
 	}
 
 }

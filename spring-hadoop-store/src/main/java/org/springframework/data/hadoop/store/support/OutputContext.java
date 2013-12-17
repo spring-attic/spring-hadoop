@@ -87,6 +87,13 @@ public class OutputContext {
 		return fileNamingStrategy != null ? fileNamingStrategy.resolve(path) : path;
 	}
 
+	public void init(Path path) {
+		log.info("init path=" + path);
+		if (fileNamingStrategy != null) {
+			fileNamingStrategy.init(path);
+		}
+	}
+
 	/**
 	 * Sets the codec info.
 	 *

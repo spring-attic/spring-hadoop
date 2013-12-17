@@ -40,6 +40,22 @@ public interface FileNamingStrategy {
 	void reset();
 
 	/**
+	 * Initialises a starting state of a strategy. Implementor of this
+	 * method needs to check the final part of the {@code Path} and
+	 * remove it's own handled part if possible. Returned {@code Path}
+	 * is then passed into next strategy for it to able to
+	 * do its own initialisation logic.
+	 * <p>
+	 * {@code Path} passed to this method may be null indicating
+	 * that no further processing should be done or simply we don't
+	 * have information about the initialised path.
+	 *
+	 * @param path the path
+	 * @return the path
+	 */
+	Path init(Path path);
+
+	/**
 	 * Sets the codec info.
 	 *
 	 * @param codecInfo the new codec info

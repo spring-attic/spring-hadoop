@@ -15,6 +15,7 @@
  */
 package org.springframework.data.hadoop.store.strategy.naming;
 
+import org.apache.hadoop.fs.Path;
 import org.springframework.core.Ordered;
 import org.springframework.data.hadoop.store.codec.CodecInfo;
 
@@ -46,6 +47,11 @@ public abstract class AbstractFileNamingStrategy implements FileNamingStrategy, 
 	@Override
 	public void setCodecInfo(CodecInfo codecInfo) {
 		this.codecInfo = codecInfo;
+	}
+
+	@Override
+	public Path init(Path path) {
+		return path;
 	}
 
 	/**

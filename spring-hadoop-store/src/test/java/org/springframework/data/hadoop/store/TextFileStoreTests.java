@@ -21,12 +21,15 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.hadoop.fs.Path;
 import org.junit.Test;
 import org.springframework.data.hadoop.store.codec.Codecs;
 import org.springframework.data.hadoop.store.input.TextFileReader;
 import org.springframework.data.hadoop.store.output.TextFileWriter;
+import org.springframework.data.hadoop.store.strategy.naming.ChainedFileNamingStrategy;
 import org.springframework.data.hadoop.store.strategy.naming.CodecFileNamingStrategy;
 import org.springframework.data.hadoop.store.strategy.naming.RollingFileNamingStrategy;
+import org.springframework.data.hadoop.store.strategy.naming.StaticFileNamingStrategy;
 import org.springframework.data.hadoop.store.strategy.rollover.SizeRolloverStrategy;
 
 /**
@@ -101,13 +104,13 @@ public class TextFileStoreTests extends AbstractStoreTests {
 
 		TestUtils.writeData(writer, DATA09ARRAY);
 
-		TextFileReader reader1 = new TextFileReader(testConfig, testDefaultPath.suffix("0"), null);
+		TextFileReader reader1 = new TextFileReader(testConfig, testDefaultPath.suffix("-0"), null);
 		List<String> splitData1 = TestUtils.readData(reader1);
 
-		TextFileReader reader2 = new TextFileReader(testConfig, testDefaultPath.suffix("1"), null);
+		TextFileReader reader2 = new TextFileReader(testConfig, testDefaultPath.suffix("-1"), null);
 		List<String> splitData2 = TestUtils.readData(reader2);
 
-		TextFileReader reader3 = new TextFileReader(testConfig, testDefaultPath.suffix("2"), null);
+		TextFileReader reader3 = new TextFileReader(testConfig, testDefaultPath.suffix("-2"), null);
 		List<String> splitData3 = TestUtils.readData(reader3);
 
 		assertThat(splitData1.size() + splitData2.size() + splitData3.size(), is(DATA09ARRAY.length));
@@ -128,13 +131,112 @@ public class TextFileStoreTests extends AbstractStoreTests {
 		}
 		TestUtils.writeData(writer, DATA09ARRAY, true);
 
-		TextFileReader reader1 = new TextFileReader(testConfig, testDefaultPath.suffix("0"), Codecs.GZIP.getCodecInfo());
+		TextFileReader reader1 = new TextFileReader(testConfig, testDefaultPath.suffix("-0"), Codecs.GZIP.getCodecInfo());
 		List<String> splitData1 = TestUtils.readData(reader1);
 
-		TextFileReader reader2 = new TextFileReader(testConfig, testDefaultPath.suffix("1"), Codecs.GZIP.getCodecInfo());
+		TextFileReader reader2 = new TextFileReader(testConfig, testDefaultPath.suffix("-1"), Codecs.GZIP.getCodecInfo());
 		List<String> splitData2 = TestUtils.readData(reader2);
 
 		assertThat(splitData1.size() + splitData2.size(), is(450010));
+	}
+
+	@Test
+	public void testContinueStrategies() throws IOException, InterruptedException {
+		String[] dataArray = new String[] { DATA10 };
+
+		TextFileWriter writer = new TextFileWriter(testConfig, testDefaultPath, null);
+
+		ChainedFileNamingStrategy fileNamingStrategy = new ChainedFileNamingStrategy();
+		fileNamingStrategy.register(new StaticFileNamingStrategy());
+		fileNamingStrategy.register(new RollingFileNamingStrategy());
+		writer.setFileNamingStrategy(fileNamingStrategy);
+		writer.setInWritingSuffix(".tmp");
+		writer.afterPropertiesSet();
+		TestUtils.writeData(writer, dataArray);
+
+		Thread.sleep(1000);
+
+		writer = new TextFileWriter(testConfig, testDefaultPath, null);
+		fileNamingStrategy = new ChainedFileNamingStrategy();
+		fileNamingStrategy.register(new StaticFileNamingStrategy());
+		fileNamingStrategy.register(new RollingFileNamingStrategy());
+		writer.setFileNamingStrategy(fileNamingStrategy);
+		writer.setInWritingSuffix(".tmp");
+		writer.afterPropertiesSet();
+		TestUtils.writeData(writer, dataArray);
+
+		Thread.sleep(1000);
+
+		writer = new TextFileWriter(testConfig, testDefaultPath, null);
+		fileNamingStrategy = new ChainedFileNamingStrategy();
+		fileNamingStrategy.register(new StaticFileNamingStrategy());
+		fileNamingStrategy.register(new RollingFileNamingStrategy());
+		writer.setFileNamingStrategy(fileNamingStrategy);
+		writer.setInWritingSuffix(".tmp");
+		writer.afterPropertiesSet();
+		TestUtils.writeData(writer, dataArray);
+
+		TextFileReader reader1 = new TextFileReader(testConfig, new Path(testDefaultPath, "data-0"), null);
+		List<String> splitData1 = TestUtils.readData(reader1);
+
+		TextFileReader reader2 = new TextFileReader(testConfig, new Path(testDefaultPath, "data-1"), null);
+		List<String> splitData2 = TestUtils.readData(reader2);
+
+		TextFileReader reader3 = new TextFileReader(testConfig, new Path(testDefaultPath, "data-2"), null);
+		List<String> splitData3 = TestUtils.readData(reader3);
+
+		assertThat(splitData1.size() + splitData2.size() + splitData3.size(), is(3));
+	}
+
+	@Test
+	public void testContinueStrategiesWithCodec() throws IOException, InterruptedException {
+		String[] dataArray = new String[] { DATA10 };
+
+		TextFileWriter writer = new TextFileWriter(testConfig, testDefaultPath, Codecs.GZIP.getCodecInfo());
+
+		ChainedFileNamingStrategy fileNamingStrategy = new ChainedFileNamingStrategy();
+		fileNamingStrategy.register(new StaticFileNamingStrategy());
+		fileNamingStrategy.register(new RollingFileNamingStrategy());
+		fileNamingStrategy.register(new CodecFileNamingStrategy());
+		writer.setFileNamingStrategy(fileNamingStrategy);
+		writer.setInWritingSuffix(".tmp");
+		writer.afterPropertiesSet();
+		TestUtils.writeData(writer, dataArray);
+
+		Thread.sleep(1000);
+
+		writer = new TextFileWriter(testConfig, testDefaultPath, Codecs.GZIP.getCodecInfo());
+		fileNamingStrategy = new ChainedFileNamingStrategy();
+		fileNamingStrategy.register(new StaticFileNamingStrategy());
+		fileNamingStrategy.register(new RollingFileNamingStrategy());
+		fileNamingStrategy.register(new CodecFileNamingStrategy());
+		writer.setFileNamingStrategy(fileNamingStrategy);
+		writer.setInWritingSuffix(".tmp");
+		writer.afterPropertiesSet();
+		TestUtils.writeData(writer, dataArray);
+
+		Thread.sleep(1000);
+
+		writer = new TextFileWriter(testConfig, testDefaultPath, Codecs.GZIP.getCodecInfo());
+		fileNamingStrategy = new ChainedFileNamingStrategy();
+		fileNamingStrategy.register(new StaticFileNamingStrategy());
+		fileNamingStrategy.register(new RollingFileNamingStrategy());
+		fileNamingStrategy.register(new CodecFileNamingStrategy());
+		writer.setFileNamingStrategy(fileNamingStrategy);
+		writer.setInWritingSuffix(".tmp");
+		writer.afterPropertiesSet();
+		TestUtils.writeData(writer, dataArray);
+
+		TextFileReader reader1 = new TextFileReader(testConfig, new Path(testDefaultPath, "data-0.gzip"), Codecs.GZIP.getCodecInfo());
+		List<String> splitData1 = TestUtils.readData(reader1);
+
+		TextFileReader reader2 = new TextFileReader(testConfig, new Path(testDefaultPath, "data-1.gzip"), Codecs.GZIP.getCodecInfo());
+		List<String> splitData2 = TestUtils.readData(reader2);
+
+		TextFileReader reader3 = new TextFileReader(testConfig, new Path(testDefaultPath, "data-2.gzip"), Codecs.GZIP.getCodecInfo());
+		List<String> splitData3 = TestUtils.readData(reader3);
+
+		assertThat(splitData1.size() + splitData2.size() + splitData3.size(), is(3));
 	}
 
 }

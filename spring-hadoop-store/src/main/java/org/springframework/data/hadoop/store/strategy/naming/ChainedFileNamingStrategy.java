@@ -67,6 +67,14 @@ public class ChainedFileNamingStrategy implements FileNamingStrategy {
 	}
 
 	@Override
+	public Path init(Path path) {
+		for (Iterator<? extends FileNamingStrategy> iterator = strategies.iterator(); iterator.hasNext();) {
+			path = 	iterator.next().init(path);
+		}
+		return path;
+	}
+
+	@Override
 	public void setCodecInfo(CodecInfo codecInfo) {
 		for (Iterator<? extends FileNamingStrategy> iterator = strategies.iterator(); iterator.hasNext();) {
 			iterator.next().setCodecInfo(codecInfo);

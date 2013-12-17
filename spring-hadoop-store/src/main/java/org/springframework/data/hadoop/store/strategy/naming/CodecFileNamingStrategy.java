@@ -15,9 +15,11 @@
  */
 package org.springframework.data.hadoop.store.strategy.naming;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.fs.Path;
-
 import org.springframework.data.hadoop.store.codec.CodecInfo;
+import org.springframework.util.StringUtils;
 
 /**
  * A {@code FileNamingStrategy} which adds suffix based on known codec.
@@ -26,6 +28,8 @@ import org.springframework.data.hadoop.store.codec.CodecInfo;
  *
  */
 public class CodecFileNamingStrategy extends AbstractFileNamingStrategy {
+
+	private final static Log log = LogFactory.getLog(CodecFileNamingStrategy.class);
 
 	/**
 	 * Instantiates a new codec file naming strategy.
@@ -52,6 +56,29 @@ public class CodecFileNamingStrategy extends AbstractFileNamingStrategy {
 
 	@Override
 	public void reset() {
+	}
+
+	@Override
+	public Path init(Path path) {
+		path = super.init(path);
+		log.debug("Initialising from path=" + path);
+
+		CodecInfo c = getCodecInfo();
+		String suffix = c != null ? "." + c.getDefaultSuffix() : "";
+
+		if (path != null && StringUtils.hasText(suffix)) {
+			if (path.getName().startsWith(suffix)) {
+				String name = path.getName().substring(suffix.length());
+				if (StringUtils.hasText(name)) {
+					path = new Path(path.getParent(), name);
+					log.debug("Removed handled prefix, path is now " + path);
+				} else {
+					path = null;
+					log.debug("Removed last handled name part, returning null");
+				}
+			}
+		}
+		return path;
 	}
 
 }
