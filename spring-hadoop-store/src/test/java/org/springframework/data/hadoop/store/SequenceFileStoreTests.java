@@ -21,6 +21,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.hadoop.fs.Path;
 import org.junit.Test;
 import org.springframework.data.hadoop.store.codec.Codecs;
 import org.springframework.data.hadoop.store.input.TextSequenceFileReader;
@@ -88,13 +89,13 @@ public class SequenceFileStoreTests extends AbstractStoreTests {
 
 		TestUtils.writeData(writer, DATA09ARRAY);
 
-		TextSequenceFileReader reader1 = new TextSequenceFileReader(testConfig, testDefaultPath.suffix("0"), null);
+		TextSequenceFileReader reader1 = new TextSequenceFileReader(testConfig, new Path(testDefaultPath, "0"), null);
 		List<String> splitData1 = TestUtils.readData(reader1);
 
-		TextSequenceFileReader reader2 = new TextSequenceFileReader(testConfig, testDefaultPath.suffix("1"), null);
+		TextSequenceFileReader reader2 = new TextSequenceFileReader(testConfig, new Path(testDefaultPath, "1"), null);
 		List<String> splitData2 = TestUtils.readData(reader2);
 
-		TextSequenceFileReader reader3 = new TextSequenceFileReader(testConfig, testDefaultPath.suffix("2"), null);
+		TextSequenceFileReader reader3 = new TextSequenceFileReader(testConfig, new Path(testDefaultPath, "2"), null);
 		List<String> splitData3 = TestUtils.readData(reader3);
 
 		assertThat(splitData1.size() + splitData2.size() + splitData3.size(), is(DATA09ARRAY.length));

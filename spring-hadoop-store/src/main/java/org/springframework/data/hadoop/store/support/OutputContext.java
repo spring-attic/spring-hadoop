@@ -84,7 +84,18 @@ public class OutputContext {
 	 * @return the path
 	 */
 	public Path resolvePath(Path path) {
-		return fileNamingStrategy != null ? fileNamingStrategy.resolve(path) : path;
+		// start by passing null indicating we're starting with
+		// empty path. paths are then appended and we combine
+		// returned path with base path given to this method.
+		Path p =  fileNamingStrategy != null ? fileNamingStrategy.resolve(null) : null;
+		return p != null ? new Path(path, p) : path;
+	}
+
+	public void init(Path path) {
+		log.info("init path=" + path);
+		if (fileNamingStrategy != null) {
+			fileNamingStrategy.init(path);
+		}
 	}
 
 	/**
