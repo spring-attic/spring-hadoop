@@ -228,7 +228,9 @@ switch (hadoopDistro) {
 					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion",
 					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion:tests"]
 		hbaseVersion = hd22HbaseVersion
-		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion"]
+		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion",
+				  "org.apache.hbase:hbase-common:$hbaseVersion",
+				  "org.apache.hbase:hbase-client:$hbaseVersion"]
 		hiveVersion = hd22HiveVersion
 		pigVersion = hd22PigVersion
 		pigQualifier = ':h2'
