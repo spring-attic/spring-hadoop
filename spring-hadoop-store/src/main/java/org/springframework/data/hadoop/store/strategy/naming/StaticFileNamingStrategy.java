@@ -18,7 +18,6 @@ package org.springframework.data.hadoop.store.strategy.naming;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.fs.Path;
-import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
@@ -48,14 +47,16 @@ public class StaticFileNamingStrategy extends AbstractFileNamingStrategy {
 	 * @param fileName the file name
 	 */
 	public StaticFileNamingStrategy(String fileName) {
-		Assert.hasText(fileName, "Filename cannot be empty");
 		this.fileName = fileName;
 	}
 
 	@Override
 	public Path resolve(Path path) {
+		if (!StringUtils.hasText(fileName)) {
+			return path;
+		}
 		if (path != null) {
-			return new Path(path, fileName);
+			return new Path(path.getParent(), path.getName() + fileName);
 		}
 		else {
 			return new Path(fileName);

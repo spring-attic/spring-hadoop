@@ -115,7 +115,7 @@ public class RawStreamStoreTests extends AbstractStoreTests {
 		OutputStreamWriter writer = new OutputStreamWriter(testConfig, testDefaultPath, Codecs.GZIP.getCodecInfo());
 
 		ChainedFileNamingStrategy fileNamingStrategy = new ChainedFileNamingStrategy();
-		fileNamingStrategy.register(new StaticFileNamingStrategy("data"));
+		fileNamingStrategy.register(new StaticFileNamingStrategy("/data"));
 		fileNamingStrategy.register(new CodecFileNamingStrategy());
 		writer.setFileNamingStrategy(fileNamingStrategy);
 
