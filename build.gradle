@@ -237,16 +237,6 @@ switch (hadoopDistro) {
 		thriftVersion = hd22ThriftVersion
 		break;
 
-	// Hadoop 1.1.x
-	case "hadoop11":
-		hadoopVersion = hd11Version
-		println "Using Apache Hadoop 1.1.x [$hadoopVersion]"
-		hadoopArtifacts = ["org.apache.hadoop:hadoop-streaming:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-tools:$hadoopVersion"]
-		hadoopTestArtifacts = ["org.apache.hadoop:hadoop-test:$hadoopVersion"]
-		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion"]
-		break;
-
 	default:
 		if (!project.hasProperty("distro")) {
 			println "Using default distro: Apache Hadoop [$hadoopVersion]"
