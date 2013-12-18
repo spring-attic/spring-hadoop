@@ -148,6 +148,7 @@ public abstract class OutputStoreObjectSupport extends StoreObjectSupport {
      */
     public void setOverwrite(boolean overwrite) {
 		this.overwrite = overwrite;
+		log.info("Setting overwrite to " + overwrite);
 	}
 
     /**

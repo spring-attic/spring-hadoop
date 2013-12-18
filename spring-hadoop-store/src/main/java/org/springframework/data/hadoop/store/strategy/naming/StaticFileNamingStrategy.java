@@ -30,36 +30,39 @@ public class StaticFileNamingStrategy extends AbstractFileNamingStrategy {
 
 	private final static Log log = LogFactory.getLog(StaticFileNamingStrategy.class);
 
-	private final static String DEFAULT_FILENAME = "data";
+	private final static String DEFAULT_NAME = "data";
 
-	private String fileName;
+	private String name;
+
+	private String prefix;
 
 	/**
 	 * Instantiates a new static file naming strategy.
 	 */
 	public StaticFileNamingStrategy() {
-		this(DEFAULT_FILENAME);
+		this(DEFAULT_NAME);
 	}
 
 	/**
 	 * Instantiates a new static file naming strategy.
 	 *
-	 * @param fileName the file name
+	 * @param name the name
 	 */
-	public StaticFileNamingStrategy(String fileName) {
-		this.fileName = fileName;
+	public StaticFileNamingStrategy(String name) {
+		this.name = name;
 	}
 
 	@Override
 	public Path resolve(Path path) {
-		if (!StringUtils.hasText(fileName)) {
+		String part = getNamingPart();
+		if (!StringUtils.hasText(part)) {
 			return path;
 		}
 		if (path != null) {
-			return new Path(path.getParent(), path.getName() + fileName);
+			return new Path(path.getParent(), path.getName() + part);
 		}
 		else {
-			return new Path(fileName);
+			return new Path(part);
 		}
 	}
 
@@ -73,9 +76,10 @@ public class StaticFileNamingStrategy extends AbstractFileNamingStrategy {
 		path = super.init(path);
 		log.debug("Initialising from path=" + path);
 		if (path != null) {
-			if (path.getName().startsWith(fileName)) {
+			String part = getNamingPart();
+			if (path.getName().startsWith(part)) {
 
-				String name = path.getName().substring(fileName.length());
+				String name = path.getName().substring(part.length());
 				if (StringUtils.hasText(name)) {
 					path = new Path(path.getParent(), name);
 					log.debug("Removed handled prefix, path is now " + path);
@@ -89,12 +93,25 @@ public class StaticFileNamingStrategy extends AbstractFileNamingStrategy {
 	}
 
 	/**
-	 * Sets the file name.
+	 * Sets the file name part.
 	 *
-	 * @param fileName the new file name
+	 * @param name the new name part
 	 */
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	/**
+	 * Sets the prefix preceding name part.
+	 *
+	 * @param prefix the new prefix
+	 */
+	public void setPrefix(String prefix) {
+		this.prefix = prefix;
+	}
+
+	private String getNamingPart() {
+		return (StringUtils.hasText(prefix) ? prefix : "") + (StringUtils.hasText(name) ? name : "");
 	}
 
 }
