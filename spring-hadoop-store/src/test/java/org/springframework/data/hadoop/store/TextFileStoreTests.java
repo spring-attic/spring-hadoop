@@ -86,10 +86,13 @@ public class TextFileStoreTests extends AbstractStoreTests {
 	public void testWriteReadManyLinesWithGzipWithCodecNaming() throws IOException {
 		TextFileWriter writer = new TextFileWriter(testConfig, testDefaultPath,
 				Codecs.GZIP.getCodecInfo());
-		writer.setFileNamingStrategy(new CodecFileNamingStrategy());
+		ChainedFileNamingStrategy fileNamingStrategy = new ChainedFileNamingStrategy();
+		fileNamingStrategy.register(new CodecFileNamingStrategy());
+		fileNamingStrategy.register(new StaticFileNamingStrategy());
+		writer.setFileNamingStrategy(fileNamingStrategy);
 		TestUtils.writeData(writer, DATA09ARRAY);
 
-		TextFileReader reader = new TextFileReader(testConfig, testDefaultPath.suffix(".gzip"),
+		TextFileReader reader = new TextFileReader(testConfig, new Path(testDefaultPath, "data.gzip"),
 				Codecs.GZIP.getCodecInfo());
 		TestUtils.readDataAndAssert(reader, DATA09ARRAY);
 	}
@@ -104,13 +107,13 @@ public class TextFileStoreTests extends AbstractStoreTests {
 
 		TestUtils.writeData(writer, DATA09ARRAY);
 
-		TextFileReader reader1 = new TextFileReader(testConfig, testDefaultPath.suffix("-0"), null);
+		TextFileReader reader1 = new TextFileReader(testConfig, new Path(testDefaultPath, "0"), null);
 		List<String> splitData1 = TestUtils.readData(reader1);
 
-		TextFileReader reader2 = new TextFileReader(testConfig, testDefaultPath.suffix("-1"), null);
+		TextFileReader reader2 = new TextFileReader(testConfig, new Path(testDefaultPath, "1"), null);
 		List<String> splitData2 = TestUtils.readData(reader2);
 
-		TextFileReader reader3 = new TextFileReader(testConfig, testDefaultPath.suffix("-2"), null);
+		TextFileReader reader3 = new TextFileReader(testConfig, new Path(testDefaultPath, "2"), null);
 		List<String> splitData3 = TestUtils.readData(reader3);
 
 		assertThat(splitData1.size() + splitData2.size() + splitData3.size(), is(DATA09ARRAY.length));
@@ -131,10 +134,10 @@ public class TextFileStoreTests extends AbstractStoreTests {
 		}
 		TestUtils.writeData(writer, DATA09ARRAY, true);
 
-		TextFileReader reader1 = new TextFileReader(testConfig, testDefaultPath.suffix("-0"), Codecs.GZIP.getCodecInfo());
+		TextFileReader reader1 = new TextFileReader(testConfig, new Path(testDefaultPath, "0"), Codecs.GZIP.getCodecInfo());
 		List<String> splitData1 = TestUtils.readData(reader1);
 
-		TextFileReader reader2 = new TextFileReader(testConfig, testDefaultPath.suffix("-1"), Codecs.GZIP.getCodecInfo());
+		TextFileReader reader2 = new TextFileReader(testConfig, new Path(testDefaultPath, "1"), Codecs.GZIP.getCodecInfo());
 		List<String> splitData2 = TestUtils.readData(reader2);
 
 		assertThat(splitData1.size() + splitData2.size(), is(450010));
@@ -147,7 +150,7 @@ public class TextFileStoreTests extends AbstractStoreTests {
 		TextFileWriter writer = new TextFileWriter(testConfig, testDefaultPath, null);
 
 		ChainedFileNamingStrategy fileNamingStrategy = new ChainedFileNamingStrategy();
-		fileNamingStrategy.register(new StaticFileNamingStrategy("/data"));
+		fileNamingStrategy.register(new StaticFileNamingStrategy("data"));
 		fileNamingStrategy.register(new RollingFileNamingStrategy());
 		writer.setFileNamingStrategy(fileNamingStrategy);
 		writer.setInWritingSuffix(".tmp");
@@ -158,7 +161,7 @@ public class TextFileStoreTests extends AbstractStoreTests {
 
 		writer = new TextFileWriter(testConfig, testDefaultPath, null);
 		fileNamingStrategy = new ChainedFileNamingStrategy();
-		fileNamingStrategy.register(new StaticFileNamingStrategy("/data"));
+		fileNamingStrategy.register(new StaticFileNamingStrategy("data"));
 		fileNamingStrategy.register(new RollingFileNamingStrategy());
 		writer.setFileNamingStrategy(fileNamingStrategy);
 		writer.setInWritingSuffix(".tmp");
@@ -169,7 +172,7 @@ public class TextFileStoreTests extends AbstractStoreTests {
 
 		writer = new TextFileWriter(testConfig, testDefaultPath, null);
 		fileNamingStrategy = new ChainedFileNamingStrategy();
-		fileNamingStrategy.register(new StaticFileNamingStrategy("/data"));
+		fileNamingStrategy.register(new StaticFileNamingStrategy("data"));
 		fileNamingStrategy.register(new RollingFileNamingStrategy());
 		writer.setFileNamingStrategy(fileNamingStrategy);
 		writer.setInWritingSuffix(".tmp");
@@ -195,7 +198,7 @@ public class TextFileStoreTests extends AbstractStoreTests {
 		TextFileWriter writer = new TextFileWriter(testConfig, testDefaultPath, Codecs.GZIP.getCodecInfo());
 
 		ChainedFileNamingStrategy fileNamingStrategy = new ChainedFileNamingStrategy();
-		fileNamingStrategy.register(new StaticFileNamingStrategy("/data"));
+		fileNamingStrategy.register(new StaticFileNamingStrategy("data"));
 		fileNamingStrategy.register(new RollingFileNamingStrategy());
 		fileNamingStrategy.register(new CodecFileNamingStrategy());
 		writer.setFileNamingStrategy(fileNamingStrategy);
@@ -207,7 +210,7 @@ public class TextFileStoreTests extends AbstractStoreTests {
 
 		writer = new TextFileWriter(testConfig, testDefaultPath, Codecs.GZIP.getCodecInfo());
 		fileNamingStrategy = new ChainedFileNamingStrategy();
-		fileNamingStrategy.register(new StaticFileNamingStrategy("/data"));
+		fileNamingStrategy.register(new StaticFileNamingStrategy("data"));
 		fileNamingStrategy.register(new RollingFileNamingStrategy());
 		fileNamingStrategy.register(new CodecFileNamingStrategy());
 		writer.setFileNamingStrategy(fileNamingStrategy);
@@ -219,7 +222,7 @@ public class TextFileStoreTests extends AbstractStoreTests {
 
 		writer = new TextFileWriter(testConfig, testDefaultPath, Codecs.GZIP.getCodecInfo());
 		fileNamingStrategy = new ChainedFileNamingStrategy();
-		fileNamingStrategy.register(new StaticFileNamingStrategy("/data"));
+		fileNamingStrategy.register(new StaticFileNamingStrategy("data"));
 		fileNamingStrategy.register(new RollingFileNamingStrategy());
 		fileNamingStrategy.register(new CodecFileNamingStrategy());
 		writer.setFileNamingStrategy(fileNamingStrategy);

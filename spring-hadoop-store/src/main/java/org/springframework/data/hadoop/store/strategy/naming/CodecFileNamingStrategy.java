@@ -48,8 +48,9 @@ public class CodecFileNamingStrategy extends AbstractFileNamingStrategy {
 		String suffix = c != null ? "." + c.getDefaultSuffix() : "";
 		if (path != null) {
 			return path.suffix(suffix);
-		}
-		else {
+		} else if (StringUtils.hasText(suffix)){
+			return new Path(suffix);
+		} else {
 			return path;
 		}
 	}
