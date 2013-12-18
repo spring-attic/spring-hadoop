@@ -5,6 +5,20 @@ http://www.springsource.org/spring-data/hadoop
 Commit changelog: http://github.com/SpringSource/spring-hadoop/tree/v[version]
 Issues changelog: http://jira.springsource.org/secure/ReleaseNote.jspa?projectId=10801
 
+Changes in version 2.0.0 M4 (2013-12-18)
+-----------------------------------------
+General
+* Removing old Hadoop version 1.1.2 [SHDP-244]
+* Update to latest Spring projects versions [SHDP-233]
+* Update HBase versions to more recent ones [SHDP-222]
+
+Store
+* Create new spring-data-hadoop-store module [SHDP-231]
+* Add Datastore support based on Kite SDK project [SHDP-232]
+* Add support for writing via an OutputStream to HDFS [SHDP-240]
+* Add support for writing delimited entries into store [SHDP-239]
+
+
 Changes in version 2.0.0 M3 (2013-11-21)
 -----------------------------------------
 General
@@ -12,7 +26,6 @@ General
   - Add CDH 5-beta and HDP 2.0 as build options
   - Enable spring-yarn support for Hadoop 2.2, HDP 2.0 and CDH5-beta
 * Removing old Hadoop version 1.0.4 and Cloudera CDH3 build options [SHDP-216]
-
 * Add namespace config option for hd.rm and use fs.defaultFS for hadoop2 [SHDP-224]
 
 Test
