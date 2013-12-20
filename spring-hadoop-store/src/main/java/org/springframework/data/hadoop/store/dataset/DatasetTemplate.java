@@ -20,15 +20,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.util.Assert;
-
+import org.apache.avro.Schema;
+import org.apache.avro.reflect.ReflectData;
 import org.kitesdk.data.Dataset;
 import org.kitesdk.data.DatasetDescriptor;
+import org.kitesdk.data.DatasetNotFoundException;
 import org.kitesdk.data.DatasetReader;
 import org.kitesdk.data.DatasetWriter;
-import org.kitesdk.data.NoSuchDatasetException;
 import org.kitesdk.data.PartitionStrategy;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.util.Assert;
 
 /**
  * This is the central class in the store.dataset package. It simplifies the use of {@link Dataset}s,
@@ -44,7 +45,7 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 	/**
 	 * The {@link DatasetRepositoryFactory} to use for this template.
 	 * 
-	 * @param datasetRepositoryFactory
+	 * @param datasetRepositoryFactory the DatasetRepositoryFactory to use
 	 */
 	public void setDatasetRepositoryFactory(DatasetRepositoryFactory datasetRepositoryFactory) {
 		this.dsFactory = datasetRepositoryFactory;
@@ -57,7 +58,7 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 
 	@Override
 	public <T> void read(Class<T> targetClass, RecordCallback<T> callback) {
-		DatasetReader<T> reader = getDataset(targetClass).getReader();
+		DatasetReader<T> reader = getDataset(targetClass).newReader();
 		try {
 			reader.open();
 			for (T t : reader) {
@@ -71,7 +72,7 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 
 	@Override
 	public <T> Collection<T> read(Class<T> targetClass) {
-		DatasetReader<T> reader = getDataset(targetClass).getReader();
+		DatasetReader<T> reader = getDataset(targetClass).newReader();
 		List<T> results = new ArrayList<T>();
 		try {
 			reader.open();
@@ -86,28 +87,28 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 	}
 
 	@Override
-	public void write(Collection<?> records) {
+	public <T> void write(Collection<T> records) {
 		write(records, null);
 	}
 
 	@Override
-	public void write(Collection<?> records, PartitionStrategy partitionStrategy) {
+	public <T> void write(Collection<T> records, PartitionStrategy partitionStrategy) {
 		if (records == null || records.size() < 1) {
 			return;
 		}
-		Class<?> recordClass = records.toArray()[0].getClass();
-		Dataset dataset = getOrCreateDataset(recordClass, partitionStrategy);
-		DatasetWriter<Object> writer = dataset.getWriter();
+		@SuppressWarnings("unchecked")
+		Class<T> recordClass = (Class<T>) records.iterator().next().getClass();
+		Dataset<T> dataset = getOrCreateDataset(recordClass, partitionStrategy);
+		DatasetWriter<T> writer = dataset.newWriter();
 		try {
 			writer.open();
-			for (Object record : records) {
+			for (T record : records) {
 				writer.write(record);
 			}
 		}
 		finally {
 			writer.close();
 		}
-
 	}
 
 	@Override
@@ -120,30 +121,30 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 		return clazz.getSimpleName().toLowerCase();
 	}
 
-	private <T> Dataset getOrCreateDataset(Class<T> clazz, PartitionStrategy partitionStrategy) {
+	private <T> Dataset<T> getOrCreateDataset(Class<T> clazz, PartitionStrategy partitionStrategy) {
 		String repoName = getDatasetName(clazz);
-		Dataset dataset;
+		Dataset<T> dataset;
 		try {
 			dataset = dsFactory.getDatasetRepository().load(repoName);
 		}
-		catch (NoSuchDatasetException ex) {
+		catch (DatasetNotFoundException ex) {
+			Schema schema = ReflectData.AllowNull.get().getSchema(clazz);
 			DatasetDescriptor descriptor;
 			if (partitionStrategy == null) {
-				descriptor = new DatasetDescriptor.Builder().schema(clazz).get();
+				descriptor = new DatasetDescriptor.Builder().schema(schema).build();
 			}
 			else {
 				descriptor =
-						new DatasetDescriptor.Builder().schema(clazz).partitionStrategy(partitionStrategy).get();
+						new DatasetDescriptor.Builder().schema(schema).partitionStrategy(partitionStrategy).build();
 			}
 			dataset = dsFactory.getDatasetRepository().create(repoName, descriptor);
 		}
 		return dataset;
 	}
 
-	private <T> Dataset getDataset(Class<T> clazz) {
+	private <T> Dataset<T> getDataset(Class<T> clazz) {
 		String repoName = getDatasetName(clazz);
-		Dataset dataset = dsFactory.getDatasetRepository().load(repoName);
-		return dataset;
+		return dsFactory.getDatasetRepository().load(repoName);
 	}
 
 }

@@ -16,17 +16,13 @@
 
 package org.springframework.data.hadoop.store.dataset;
 
-import java.util.Date;
-
 /**
  */
-public class TestPojo implements Comparable<TestPojo> {
+public class AnotherPojo implements Comparable<AnotherPojo> {
 
 	private Long id;
 
-	private String name;
-
-	private Date birthDate;
+	private String description;
 
 	public Long getId() {
 		return id;
@@ -36,29 +32,21 @@ public class TestPojo implements Comparable<TestPojo> {
 		this.id = id;
 	}
 
-	public String getName() {
-		return name;
+	public String getDescription() {
+		return description;
 	}
 
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public Date getBirthDate() {
-		return birthDate;
-	}
-
-	public void setBirthDate(Date birthDate) {
-		this.birthDate = birthDate;
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + ": " + id + " " + name + " " + birthDate;
+		return getClass().getSimpleName() + ": " + id + " " + description;
 	}
 
 	@Override
-	public int compareTo(TestPojo other) {
+	public int compareTo(AnotherPojo other) {
 		if (id.longValue() < other.getId().longValue()) {
 			return -1;
 		}

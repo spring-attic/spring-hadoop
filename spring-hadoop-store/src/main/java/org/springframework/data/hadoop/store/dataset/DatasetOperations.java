@@ -47,18 +47,18 @@ public interface DatasetOperations {
 
 	/**
 	 * Write all records provided in the record collection using the provided partition strategy
-	 * 
+	 *
 	 * @param records the records to write
 	 * @param partitionStrategy the partition strategy
 	 */
-	void write(Collection<?> records, PartitionStrategy partitionStrategy);
+	<T> void write(Collection<T> records, PartitionStrategy partitionStrategy);
 
 	/**
 	 * Write all records provided in the record collection without partitioning
 	 * 
 	 * @param records the records to write
 	 */
-	void write(Collection<?> records);
+	<T> void write(Collection<T> records);
 
 	/**
 	 * Execute a callback for the {@link org.kitesdk.data.DatasetRepository}
