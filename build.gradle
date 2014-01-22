@@ -5,10 +5,12 @@ defaultTasks 'build'
 buildscript {
 	repositories {
 		maven { url "http://repo.springsource.org/plugins-release" }
+		maven { url "http://repo.springsource.org/plugins-milestone" }
 	}
 	dependencies {
 		classpath("org.springframework.build.gradle:propdeps-plugin:0.0.5")
 		classpath("org.springframework.build.gradle:docbook-reference-plugin:0.2.8")
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:$springBootVersion")
 	}
 }
 
@@ -16,6 +18,7 @@ allprojects {
 	group = 'org.springframework.data'
 
 	repositories {
+		mavenLocal()
 		mavenCentral()
 		maven { url 'http://repo.springsource.org/libs-milestone' }
 	}
@@ -974,6 +977,7 @@ if (gradle.ext.mr2) {
 	project('spring-yarn:spring-yarn-core') {
 		description = 'Spring Yarn Core'
 		dependencies {
+			compile project(":spring-data-hadoop")
 			compile "org.apache.hadoop:hadoop-yarn-client:$hadoopVersion"
 			compile("org.apache.hadoop:hadoop-common:$hadoopVersion") { dep ->
 				exclude module: "junit"
@@ -1031,6 +1035,37 @@ if (gradle.ext.mr2) {
 			compile "org.springframework.batch:spring-batch-infrastructure:$springBatchVersion"
 			testCompile project(":spring-data-hadoop-core")
 		}
+	}
+
+	project('spring-yarn:spring-yarn-boot') {
+		description = 'Spring Yarn Boot'
+		dependencies {
+			compile project(":spring-yarn:spring-yarn-core")
+			provided project(":spring-yarn:spring-yarn-batch")
+			compile "org.springframework.boot:spring-boot-autoconfigure:$springBootVersion"
+		}
+	}
+
+	project('spring-yarn:spring-yarn-boot-apps:spring-yarn-boot-client') {
+		//apply plugin: 'spring-boot'
+		description = 'Spring Yarn Boot Client'
+		//springBoot {
+		//	backupSource = true
+		//	customConfiguration = 'hadoopruntime'
+		//}
+		//configurations {
+		//	hadoopruntime.exclude group: 'log4j'
+		//	hadoopruntime.exclude group: 'org.slf4j'
+		//	hadoopruntime.exclude group: 'org.apache.hadoop'
+		//	hadoopruntime.exclude group: 'commons-logging'
+		//	hadoopruntime.exclude group: 'org.codehaus.jettison'
+		//	hadoopruntime.exclude group: 'com.thoughtworks.xstream'
+		//}
+		dependencies {
+			compile project(":spring-yarn:spring-yarn-boot")
+			//hadoopruntime configurations.runtime
+		}
+		//install.dependsOn(bootRepackage)
 	}
 
 	project('spring-yarn:spring-yarn-test-core') {

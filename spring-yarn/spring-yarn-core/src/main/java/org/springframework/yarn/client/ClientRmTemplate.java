@@ -17,7 +17,9 @@ package org.springframework.yarn.client;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.yarn.api.ApplicationClientProtocol;
@@ -35,6 +37,7 @@ import org.apache.hadoop.yarn.api.records.ApplicationId;
 import org.apache.hadoop.yarn.api.records.ApplicationReport;
 import org.apache.hadoop.yarn.api.records.ApplicationSubmissionContext;
 import org.apache.hadoop.yarn.api.records.Token;
+import org.apache.hadoop.yarn.api.records.YarnApplicationState;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.apache.hadoop.yarn.exceptions.YarnException;
 import org.apache.hadoop.yarn.util.Records;
@@ -58,6 +61,20 @@ public class ClientRmTemplate extends YarnRpcAccessor<ApplicationClientProtocol>
 	 */
 	public ClientRmTemplate(Configuration config) {
 		super(ApplicationClientProtocol.class, config);
+	}
+
+	@Override
+	public List<ApplicationReport> listApplications(final EnumSet<YarnApplicationState> states, final Set<String> types) {
+		return execute(new YarnRpcCallback<List<ApplicationReport>, ApplicationClientProtocol>() {
+			@Override
+			public List<ApplicationReport> doInYarn(ApplicationClientProtocol proxy) throws YarnException, IOException {
+				GetApplicationsRequest request = Records.newRecord(GetApplicationsRequest.class);
+				request.setApplicationStates(states);
+				request.setApplicationTypes(types);
+				GetApplicationsResponse response = proxy.getApplications(request);
+				return response.getApplicationList();
+			}
+		});
 	}
 
 	@Override

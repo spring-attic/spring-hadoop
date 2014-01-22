@@ -40,6 +40,13 @@ public class StaticBatchPartitionHandler extends AbstractBatchPartitionHandler {
 
 	/**
 	 * Instantiates a new static batch partition handler.
+	 */
+	public StaticBatchPartitionHandler() {
+		super();
+	}
+
+	/**
+	 * Instantiates a new static batch partition handler.
 	 *
 	 * @param batchAppmaster the batch appmaster
 	 */

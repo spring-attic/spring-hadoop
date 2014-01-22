@@ -25,6 +25,7 @@ import org.springframework.batch.core.step.NoSuchStepException;
 import org.springframework.yarn.YarnSystemConstants;
 import org.springframework.yarn.batch.repository.JobRepositoryRpcFactory;
 import org.springframework.yarn.batch.repository.bindings.PartitionedStepExecutionStatusReq;
+//import org.springframework.yarn.batch.repository.bindings.PartitionedStepExecutionStatusReq;
 import org.springframework.yarn.integration.ip.mind.MindAppmasterServiceClient;
 import org.springframework.yarn.integration.ip.mind.binding.BaseResponseObject;
 
