@@ -19,9 +19,14 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.springframework.util.StringUtils;
 
@@ -32,6 +37,68 @@ import org.springframework.util.StringUtils;
  *
  */
 public class ParsingUtils {
+
+	private static final long KB = 1024;
+
+	private static final long MB = KB * KB;
+
+	private static final long GB = KB * MB;
+
+	private static final long TB = KB * GB;
+
+	private static final Pattern VALUE_PATTERN =
+			Pattern.compile("([0-9]+([\\.,][0-9]+)?)\\s*(|K|M|G|T)B?", Pattern.CASE_INSENSITIVE);
+
+	/**
+	 * Parses the given string as a number representing megs.
+	 *
+	 * @param string the value string
+	 * @return the value as megs
+	 * @throws ParseException the parse exception
+	 */
+	public static int parseBytesAsMegs(final String string) throws ParseException {
+		try {
+			// expect input as megs if it's a number
+			return Integer.parseInt(string);
+		} catch (NumberFormatException e) {
+		}
+		long bytes = parseBytes(string);
+		return (int) (bytes / MB);
+	}
+
+	/**
+	 * Parses the count of bytes from a string.
+	 *
+	 * @param string the value string
+	 * @return the value as bytes
+	 * @throws ParseException the parse exception
+	 */
+	public static long parseBytes(final String string) throws ParseException {
+		long value = 0;
+		final Matcher matcher = VALUE_PATTERN.matcher(string);
+		if (matcher.matches()) {
+				final long numeric = NumberFormat.getNumberInstance(Locale.getDefault())
+						.parse(matcher.group(1))
+						.longValue();
+				final String units = matcher.group(3);
+				if (units.equalsIgnoreCase("")) {
+					value = numeric;
+				} else if (units.equalsIgnoreCase("K")) {
+					value = numeric * KB;
+				} else if (units.equalsIgnoreCase("M")) {
+					value = numeric * MB;
+				} else if (units.equalsIgnoreCase("G")) {
+					value = numeric * GB;
+				} else if (units.equalsIgnoreCase("T")) {
+					value = numeric * TB;
+				} else {
+					throw new ParseException(string, 0);
+				}
+		} else {
+			throw new ParseException(string, 0);
+		}
+		return value;
+	}
 
 	/**
 	 * Extracts a string from another string which can be used as a command in

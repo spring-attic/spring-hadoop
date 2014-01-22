@@ -127,4 +127,21 @@ public class YarnUtils {
 				YarnConfiguration.DEFAULT_RM_PORT);
 	}
 
+	/**
+	 * Merge configurations together.
+	 *
+	 * @param base the configuration to merge to
+	 * @param merge the configuration to merge
+	 * @return the merged configuration
+	 */
+	public static Configuration merge(Configuration base, Configuration merge) {
+		Assert.notNull(base, "Base configuration to merge to must not be null");
+		if (merge != null) {
+			for (Map.Entry<String, String> entry : merge) {
+				base.set(entry.getKey(), entry.getValue());
+			}
+		}
+		return base;
+	}
+
 }

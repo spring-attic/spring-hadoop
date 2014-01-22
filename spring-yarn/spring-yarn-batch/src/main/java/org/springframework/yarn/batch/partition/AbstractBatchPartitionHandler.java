@@ -57,10 +57,26 @@ public abstract class AbstractBatchPartitionHandler implements PartitionHandler 
 
 	/**
 	 * Instantiates a new batch partition handler.
+	 */
+	public AbstractBatchPartitionHandler() {
+		// for able to set appmaster via setter
+	}
+
+	/**
+	 * Instantiates a new batch partition handler.
 	 *
 	 * @param batchAppmaster the batch appmaster
 	 */
 	public AbstractBatchPartitionHandler(AbstractBatchAppmaster batchAppmaster) {
+		this.batchAppmaster = batchAppmaster;
+	}
+
+	/**
+	 * Sets the batch appmaster.
+	 *
+	 * @param batchAppmaster the new batch appmaster
+	 */
+	public void setBatchAppmaster(AbstractBatchAppmaster batchAppmaster) {
 		this.batchAppmaster = batchAppmaster;
 	}
 

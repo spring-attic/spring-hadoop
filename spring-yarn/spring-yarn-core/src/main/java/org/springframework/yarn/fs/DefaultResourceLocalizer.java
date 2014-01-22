@@ -70,6 +70,8 @@ public class DefaultResourceLocalizer implements ResourceLocalizer {
 	/** Flag if distribution work is done */
 	private boolean distributed = false;
 
+	private boolean copied = false;
+
 	/** Locking the work*/
 	private final ReentrantLock distributeLock = new ReentrantLock();
 
@@ -139,6 +141,27 @@ public class DefaultResourceLocalizer implements ResourceLocalizer {
 	}
 
 	@Override
+	public void copy() {
+		// guard by lock to copy only once
+		distributeLock.lock();
+		try {
+			if (!copied) {
+				log.info("About to copy localized files");
+				FileSystem fs = FileSystem.get(configuration);
+				doFileCopy(fs);
+				copied = true;
+			} else {
+				log.info("Files already copied");
+			}
+		} catch (IOException e) {
+			log.error("Error copying files", e);
+			throw new YarnSystemException("Unable to copy files", e);
+		} finally {
+			distributeLock.unlock();
+		}
+	}
+
+	@Override
 	public void distribute() {
 		// guard by lock to distribute only once
 		distributeLock.lock();
@@ -146,7 +169,10 @@ public class DefaultResourceLocalizer implements ResourceLocalizer {
 			if (!distributed) {
 				log.info("About to distribute localized files");
 				FileSystem fs = FileSystem.get(configuration);
-				doFileCopy(fs);
+				if (!copied) {
+					doFileCopy(fs);
+					copied = true;
+				}
 				resources = doFileTransfer(fs);
 				distributed = true;
 			} else {
@@ -158,6 +184,30 @@ public class DefaultResourceLocalizer implements ResourceLocalizer {
 		} catch (URISyntaxException e1) {
 			log.error("Error distributing files", e1);
 			throw new YarnSystemException("Unable to distribute files", e1);
+		} finally {
+			distributeLock.unlock();
+		}
+	}
+
+	@Override
+	public void resolve() {
+		// guard by lock to distribute only once
+		distributeLock.lock();
+		try {
+			if (!distributed) {
+				log.info("About to resolve localized files");
+				FileSystem fs = FileSystem.get(configuration);
+				resources = doFileTransfer(fs);
+				distributed = true;
+			} else {
+				log.info("Files already resolve");
+			}
+		} catch (IOException e) {
+			log.error("Error resolve files", e);
+			throw new YarnSystemException("Unable to resolve files", e);
+		} catch (URISyntaxException e1) {
+			log.error("Error resolving files", e1);
+			throw new YarnSystemException("Unable to resolve files", e1);
 		} finally {
 			distributeLock.unlock();
 		}

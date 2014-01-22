@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
  */
 public abstract class AbstractYarnNamespaceHandler extends NamespaceHandlerSupport {
 
-	private static final String CONFIGURING_POSTPROCESSOR_BEAN_NAME =
+	public static final String CONFIGURING_POSTPROCESSOR_BEAN_NAME =
 			"org.springframework.yarn.config.internal.ConfiguringBeanFactoryPostProcessor";
 
 	@Override

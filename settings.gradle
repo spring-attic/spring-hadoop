@@ -53,7 +53,8 @@ include 'spring-hadoop-test'
 include 'spring-cascading'
 if (mr2) {
   print "Based on selected distro (${hadoopDistro}) we are including spring-yarn\n"
-  include 'spring-yarn:spring-yarn-core','spring-yarn:spring-yarn-integration','spring-yarn:spring-yarn-batch','spring-yarn:spring-yarn-test-core','spring-yarn:spring-yarn-test'
+  include 'spring-yarn:spring-yarn-core','spring-yarn:spring-yarn-integration','spring-yarn:spring-yarn-batch','spring-yarn:spring-yarn-test-core','spring-yarn:spring-yarn-test','spring-yarn:spring-yarn-boot'
+  include 'spring-yarn:spring-yarn-boot-apps:spring-yarn-boot-client'
 }
 
 

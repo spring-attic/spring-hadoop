@@ -36,7 +36,7 @@ import org.springframework.yarn.integration.support.IntegrationContextUtils;
  * @author Janne Valkealahti
  *
  */
-class ConverterRegistrar implements InitializingBean, BeanFactoryAware {
+public class ConverterRegistrar implements InitializingBean, BeanFactoryAware {
 
 	private final Set<Converter<?, ?>> converters;
 
