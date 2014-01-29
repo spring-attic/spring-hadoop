@@ -1,0 +1,5 @@
+# Auto Configure
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+org.springframework.yarn.boot.YarnClientAutoConfiguration,\
+org.springframework.yarn.boot.YarnContainerAutoConfiguration,\
+org.springframework.yarn.boot.YarnAppmasterAutoConfiguration

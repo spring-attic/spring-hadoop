@@ -15,7 +15,9 @@
  */
 package org.springframework.yarn.client;
 
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.hadoop.yarn.api.protocolrecords.GetNewApplicationResponse;
 import org.apache.hadoop.yarn.api.protocolrecords.KillApplicationResponse;
@@ -24,6 +26,7 @@ import org.apache.hadoop.yarn.api.records.ApplicationId;
 import org.apache.hadoop.yarn.api.records.ApplicationReport;
 import org.apache.hadoop.yarn.api.records.ApplicationSubmissionContext;
 import org.apache.hadoop.yarn.api.records.Token;
+import org.apache.hadoop.yarn.api.records.YarnApplicationState;
 
 /**
  * Interface for client to resource manager communication.
@@ -62,6 +65,17 @@ public interface ClientRmOperations {
 	List<ApplicationReport> listApplications();
 
 	/**
+	 * Gets a list of {@link ApplicationReport}s from a resource manager. Allows
+	 * to filter results by using a set of {@code YarnApplicationState}s and
+	 * registered application types.
+	 *
+	 * @param states the yarn application states
+	 * @param types the yarn application types
+	 * @return a list of {@link ApplicationReport}s
+	 */
+	List<ApplicationReport> listApplications(EnumSet<YarnApplicationState> states, Set<String> types);
+
+	/**
 	 * Requests <code>ResourceManager</code> to abort submitted application.
 	 *
 	 * @param applicationId the application id
@@ -79,9 +93,9 @@ public interface ClientRmOperations {
 
 	/**
 	 * Gets a report of the application.
-	 * 
+	 *
 	 * @param applicationId the application id
-	 * 
+	 *
 	 * @return the {@link ApplicationReport}
 	 */
 	ApplicationReport getApplicationReport(ApplicationId applicationId);

@@ -41,7 +41,7 @@ public class BatchAppmasterService extends MindAppmasterService {
 	private static final Log log = LogFactory.getLog(BatchAppmasterService.class);
 
 	/** Job remote service to use */
-	private JobRepositoryRemoteService jobRepositoryRemoteService;
+	private JobRepositoryService jobRepositoryRemoteService;
 
 	/** Interceptors when communicating with service */
 	private final JobRepositoryServiceInterceptorList interceptors =
@@ -77,7 +77,7 @@ public class BatchAppmasterService extends MindAppmasterService {
 	 *
 	 * @param jobRepositoryRemoteService the new job repository remote service
 	 */
-	public void setJobRepositoryRemoteService(JobRepositoryRemoteService jobRepositoryRemoteService) {
+	public void setJobRepositoryRemoteService(JobRepositoryService jobRepositoryRemoteService) {
 		this.jobRepositoryRemoteService = jobRepositoryRemoteService;
 	}
 

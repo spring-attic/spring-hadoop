@@ -50,8 +50,15 @@ public class YarnContainerFactoryBean implements InitializingBean, FactoryBean<Y
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
+		// 1) if we have a reference use that
+		// 2) instantiate a class if given
+		// 3) fall back to default container
 		if(containerRef == null) {
-			containerRef = BeanUtils.instantiate(containerClass);
+			if (containerClass != null) {
+				containerRef = BeanUtils.instantiate(containerClass);
+			} else {
+				containerRef = BeanUtils.instantiate(DefaultYarnContainer.class);
+			}
 		}
 	}
 

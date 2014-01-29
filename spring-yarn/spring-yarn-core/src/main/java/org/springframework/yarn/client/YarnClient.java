@@ -36,11 +36,40 @@ public interface YarnClient {
 	ApplicationId submitApplication();
 
 	/**
+	 * Submits the application known to {@link YarnClient} instance.
+	 *
+	 * @param distribute if set to true files will also be copied
+	 * @return the {@link ApplicationId} for submitted application
+	 */
+	ApplicationId submitApplication(boolean distribute);
+
+	/**
+	 * Installs the application known to {@link YarnClient} instance into hdfs.
+	 */
+	void installApplication();
+
+	/**
 	 * Gets a list of known applications.
 	 *
 	 * @return List of {@link ApplicationReport}s
 	 */
 	List<ApplicationReport> listApplications();
+
+	/**
+	 * Gets a list of known applications filtered by an application type.
+	 *
+	 * @param type the yarn application type
+	 * @return List of {@link ApplicationReport}s
+	 */
+	List<ApplicationReport> listApplications(String type);
+
+	/**
+	 * Gets a list of running applications filtered by an application type.
+	 *
+	 * @param type the yarn application type
+	 * @return List of {@link ApplicationReport}s
+	 */
+	List<ApplicationReport> listRunningApplications(String type);
 
 	/**
 	 * Requests a resource manager to kill the application.
@@ -51,9 +80,9 @@ public interface YarnClient {
 
 	/**
 	 * Gets a report of the application.
-	 * 
+	 *
 	 * @param applicationId the application id
-	 * 
+	 *
 	 * @return the {@link ApplicationReport}
 	 */
 	ApplicationReport getApplicationReport(ApplicationId applicationId);

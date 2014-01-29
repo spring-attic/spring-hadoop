@@ -21,6 +21,7 @@ import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.logging.Log;
@@ -70,6 +71,9 @@ public class DefaultResourceLocalizer implements ResourceLocalizer {
 	/** Flag if distribution work is done */
 	private boolean distributed = false;
 
+	/** Flag if copy work is done */
+	private boolean copied = false;
+
 	/** Locking the work*/
 	private final ReentrantLock distributeLock = new ReentrantLock();
 
@@ -78,6 +82,13 @@ public class DefaultResourceLocalizer implements ResourceLocalizer {
 
 	/** The staging id. */
 	private String stagingId;
+
+	/**
+	 * Contents of a raw byte arrays with mapping to file names. These
+	 * are useful for passing in small configuration files which should
+	 * be copied from memory instead from a real files.
+	 */
+	private Map<String, byte[]> rawFileContents = new HashMap<String, byte[]>();
 
 	/** Resolve copy resources */
 	private PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
@@ -124,6 +135,7 @@ public class DefaultResourceLocalizer implements ResourceLocalizer {
 		if (!ObjectUtils.nullSafeEquals(this.stagingDirectory, stagingDirectory)) {
 			log.info("Marking distributed state false");
 			distributed = false;
+			copied = false;
 		}
 		this.stagingDirectory = stagingDirectory;
 	}
@@ -134,8 +146,30 @@ public class DefaultResourceLocalizer implements ResourceLocalizer {
 		if (!ObjectUtils.nullSafeEquals(this.stagingId, stagingId)) {
 			log.info("Marking distributed state false");
 			distributed = false;
+			copied = false;
 		}
 		this.stagingId = stagingId;
+	}
+
+	@Override
+	public void copy() {
+		// guard by lock to copy only once
+		distributeLock.lock();
+		try {
+			if (!copied) {
+				log.info("About to copy localized files");
+				FileSystem fs = FileSystem.get(configuration);
+				doFileCopy(fs);
+				copied = true;
+			} else {
+				log.info("Files already copied");
+			}
+		} catch (IOException e) {
+			log.error("Error copying files", e);
+			throw new YarnSystemException("Unable to copy files", e);
+		} finally {
+			distributeLock.unlock();
+		}
 	}
 
 	@Override
@@ -146,7 +180,12 @@ public class DefaultResourceLocalizer implements ResourceLocalizer {
 			if (!distributed) {
 				log.info("About to distribute localized files");
 				FileSystem fs = FileSystem.get(configuration);
-				doFileCopy(fs);
+				if (!copied) {
+					doFileCopy(fs);
+					copied = true;
+				} else {
+					log.info("Files already copied");
+				}
 				resources = doFileTransfer(fs);
 				distributed = true;
 			} else {
@@ -164,8 +203,52 @@ public class DefaultResourceLocalizer implements ResourceLocalizer {
 	}
 
 	@Override
+	public void resolve() {
+		// guard by lock to distribute only once
+		distributeLock.lock();
+		try {
+			if (!distributed) {
+				log.info("About to resolve localized files");
+				FileSystem fs = FileSystem.get(configuration);
+				resources = doFileTransfer(fs);
+				distributed = true;
+			} else {
+				log.info("Files already resolve");
+			}
+		} catch (IOException e) {
+			log.error("Error resolve files", e);
+			throw new YarnSystemException("Unable to resolve files", e);
+		} catch (URISyntaxException e1) {
+			log.error("Error resolving files", e1);
+			throw new YarnSystemException("Unable to resolve files", e1);
+		} finally {
+			distributeLock.unlock();
+		}
+	}
+
+	@Override
 	public boolean clean() {
 		return deleteStagingEntries();
+	}
+
+	/**
+	 * Adds a content into a to be written entries.
+	 *
+	 * @param key the key considered as a file name
+	 * @param value the content of a file to be written
+	 * @return true, existing content for key already exist and was replaced
+	 */
+	public boolean AddRawContent(String key, byte[] value) {
+		return rawFileContents.put(key, value) != null;
+	}
+
+	/**
+	 * Sets the raw file contents. Overwrites all existing contents.
+	 *
+	 * @param rawFileContents the raw file contents
+	 */
+	public void setRawFileContents(Map<String, byte[]> rawFileContents) {
+		this.rawFileContents = rawFileContents;
 	}
 
 	/**
@@ -188,6 +271,18 @@ public class DefaultResourceLocalizer implements ResourceLocalizer {
 						log.debug("bytes copied:" + bytes);
 					}
 				}
+			}
+		}
+
+		if (rawFileContents != null) {
+			Path resolvedStagingDirectory = resolveStagingDirectory();
+			for (Entry<String, byte[]> entry : rawFileContents.entrySet()) {
+				Path path = new Path(resolvedStagingDirectory, entry.getKey());
+				FSDataOutputStream os = fs.create(path);
+				if (log.isDebugEnabled()) {
+					log.debug("Creating a file " + path);
+				}
+				FileCopyUtils.copy(entry.getValue(), os);
 			}
 		}
 	}
@@ -294,6 +389,7 @@ public class DefaultResourceLocalizer implements ResourceLocalizer {
 			return false;
 		} finally {
 			distributed = false;
+			copied = false;
 		}
 	}
 

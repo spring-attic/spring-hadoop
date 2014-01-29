@@ -18,6 +18,7 @@ package org.springframework.yarn.container;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.hadoop.conf.Configuration;
 import org.springframework.yarn.listener.CompositeContainerStateListener;
 import org.springframework.yarn.listener.ContainerStateListener;
 import org.springframework.yarn.listener.ContainerStateListener.ContainerState;
@@ -41,6 +42,9 @@ public abstract class AbstractYarnContainer implements LongRunningYarnContainer 
 	/** Listener handling state events */
 	private CompositeContainerStateListener stateListener = new CompositeContainerStateListener();
 
+	/** Yarn configuration */
+	private Configuration configuration;
+
 	@Override
 	public final void run() {
 		runInternal();
@@ -54,6 +58,24 @@ public abstract class AbstractYarnContainer implements LongRunningYarnContainer 
 	@Override
 	public void setParameters(Properties parameters) {
 		this.parameters = parameters;
+	}
+
+	/**
+	 * Gets the Yarn configuration.
+	 *
+	 * @return the Yarn configuration
+	 */
+	public Configuration getConfiguration() {
+		return configuration;
+	}
+
+	/**
+	 * Sets the Yarn configuration.
+	 *
+	 * @param configuration the new Yarn configuration
+	 */
+	public void setConfiguration(Configuration configuration) {
+		this.configuration = configuration;
 	}
 
 	/**

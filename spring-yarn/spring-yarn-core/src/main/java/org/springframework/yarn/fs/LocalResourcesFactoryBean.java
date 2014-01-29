@@ -16,6 +16,8 @@
 package org.springframework.yarn.fs;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.CommonConfigurationKeysPublic;
@@ -41,6 +43,8 @@ public class LocalResourcesFactoryBean implements InitializingBean, FactoryBean<
 
 	/** Localizer copy entries*/
 	private Collection<CopyEntry> copyEntries;
+
+	private Collection<RawCopyEntry> rawEntries;
 
 	/** Yarn configuration*/
 	private Configuration configuration;
@@ -87,7 +91,16 @@ public class LocalResourcesFactoryBean implements InitializingBean, FactoryBean<
 			}
 			Assert.isTrue(entry.local != null && entry.remote != null, "Entry local/remote hdfs address can't be null");
 		}
-		resources = new DefaultResourceLocalizer(configuration, hdfsEntries, copyEntries);
+		DefaultResourceLocalizer defaultResourceLocalizer = new DefaultResourceLocalizer(configuration, hdfsEntries, copyEntries);
+		if (rawEntries != null) {
+			Map<String, byte[]> rawFileContents = new HashMap<String, byte[]>();
+			for (RawCopyEntry e : rawEntries) {
+				rawFileContents.put(e.dest, e.src);
+			}
+			defaultResourceLocalizer.setRawFileContents(rawFileContents);
+		}
+
+		resources = defaultResourceLocalizer;
 	}
 
 	/**
@@ -128,6 +141,7 @@ public class LocalResourcesFactoryBean implements InitializingBean, FactoryBean<
 
 	/**
 	 * Sets hdfs entries reference for this factory.
+	 *
 	 * @param hdfsEntries Collection of hdfs entries
 	 */
 	public void setHdfsEntries(Collection<TransferEntry> hdfsEntries) {
@@ -136,6 +150,7 @@ public class LocalResourcesFactoryBean implements InitializingBean, FactoryBean<
 
 	/**
 	 * Sets copy entries reference for this factory.
+	 *
 	 * @param copyEntries Collection of copy entries
 	 */
 	public void setCopyEntries(Collection<CopyEntry> copyEntries) {
@@ -144,10 +159,15 @@ public class LocalResourcesFactoryBean implements InitializingBean, FactoryBean<
 
 	/**
 	 * Sets Yarn configuration for this factory.
+	 *
 	 * @param configuration Yarn configuration
 	 */
 	public void setConfiguration(Configuration configuration) {
 		this.configuration = configuration;
+	}
+
+	public void setRawCopyEntries(Collection<RawCopyEntry> rawEntries) {
+		this.rawEntries = rawEntries;
 	}
 
 	/**
@@ -185,6 +205,23 @@ public class LocalResourcesFactoryBean implements InitializingBean, FactoryBean<
 		boolean staging;
 
 		public CopyEntry(String src, String dest, boolean staging) {
+			this.src = src;
+			this.dest = dest;
+			this.staging = staging;
+		}
+
+	}
+
+	/**
+	 * Helper class storing raw copy entries.
+	 */
+	public static class RawCopyEntry {
+
+		byte[] src;
+		String dest;
+		boolean staging;
+
+		public RawCopyEntry(byte[] src, String dest, boolean staging) {
 			this.src = src;
 			this.dest = dest;
 			this.staging = staging;

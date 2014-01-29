@@ -3,6 +3,7 @@ bin
 build
 .settings
 .classpath
+.springBeans
 .project
 *.iml
 *.ipr

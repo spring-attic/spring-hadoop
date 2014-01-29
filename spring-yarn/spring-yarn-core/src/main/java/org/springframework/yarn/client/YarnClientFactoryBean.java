@@ -65,6 +65,9 @@ public class YarnClientFactoryBean implements InitializingBean, FactoryBean<Yarn
 	/** Name of the application */
 	private String appName = "";
 
+	/** Type of the application */
+	private String appType;
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		// set template if not defined
@@ -79,6 +82,7 @@ public class YarnClientFactoryBean implements InitializingBean, FactoryBean<Yarn
 		client.setMemory(memory);
 		client.setQueue(queue);
 		client.setAppName(appName);
+		client.setAppType(appType);
 		client.setCommands(commands);
 		client.setEnvironment(environment);
 		client.setResourceLocalizer(resourceLocalizer);
@@ -152,6 +156,15 @@ public class YarnClientFactoryBean implements InitializingBean, FactoryBean<Yarn
 	 */
 	public void setAppName(String appName) {
 		this.appName = appName;
+	}
+
+	/**
+	 * Sets the type for submitted application.
+	 *
+	 * @param appType the new application type
+	 */
+	public void setAppType(String appType) {
+		this.appType = appType;
 	}
 
 	/**
