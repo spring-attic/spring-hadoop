@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,20 @@
  */
 package org.springframework.yarn.batch.repository.bindings.repo;
 
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.yarn.batch.repository.bindings.JobExecutionType;
 import org.springframework.yarn.batch.repository.bindings.StepExecutionType;
 import org.springframework.yarn.integration.ip.mind.binding.BaseObject;
 
+/**
+ * Request binding for {@link JobRepository#updateExecutionContext(JobExecution)}
+ * and {@link JobRepository#updateExecutionContext(StepExecution)}.
+ *
+ * @author Janne Valkealahti
+ *
+ */
 public class UpdateExecutionContextReq extends BaseObject {
 
 	public JobExecutionType jobExecution;

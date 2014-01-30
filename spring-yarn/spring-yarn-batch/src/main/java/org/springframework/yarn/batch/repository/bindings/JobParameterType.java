@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,16 @@
  */
 package org.springframework.yarn.batch.repository.bindings;
 
+import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameter.ParameterType;
 import org.springframework.yarn.integration.ip.mind.binding.BaseObject;
 
+/**
+ * Binding for {@link JobParameter}.
+ *
+ * @author Janne Valkealahti
+ *
+ */
 public class JobParameterType extends BaseObject {
 
 	public Object parameter;

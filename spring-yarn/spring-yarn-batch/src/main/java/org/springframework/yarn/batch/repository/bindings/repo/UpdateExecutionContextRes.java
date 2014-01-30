@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,16 @@
  */
 package org.springframework.yarn.batch.repository.bindings.repo;
 
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.yarn.integration.ip.mind.binding.BaseResponseObject;
 
 /**
- * Response for saving execution context.
+ * Response binding for {@link JobRepository#updateExecutionContext(JobExecution)}
+ * and {@link JobRepository#updateExecutionContext(StepExecution)}.
  *
  * @author Janne Valkealahti
- *
- * @see org.springframework.yarn.batch.repository.RemoteExecutionContextDao#updateExecutionContext(JobExecution)
- * @see org.springframework.yarn.batch.repository.RemoteExecutionContextDao#updateExecutionContext(StepExecution)
- * @see org.springframework.batch.core.JobExecution
- * @see org.springframework.batch.core.StepExecution
  *
  */
 public class UpdateExecutionContextRes extends BaseResponseObject {
