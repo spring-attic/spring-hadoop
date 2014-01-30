@@ -72,7 +72,8 @@ public class StaticEventingAppmaster extends AbstractEventingAppmaster implement
 
 		int exitStatus = status.getExitStatus();
 
-		if (exitStatus == 0) {
+		// 0 - ok, -100 - container released by app
+		if (exitStatus == 0 || exitStatus == -100) {
 			if (isComplete()) {
 				notifyCompleted();
 			}
