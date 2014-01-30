@@ -17,7 +17,7 @@ package org.springframework.yarn.config.annotation.builders;
 
 import org.springframework.yarn.config.annotation.SpringYarnConfigurerAdapter;
 import org.springframework.yarn.config.annotation.configurers.ClientMasterRunnerConfigurer;
-import org.springframework.yarn.config.annotation.configurers.ClientMasterRunnerConfigure;
+import org.springframework.yarn.config.annotation.configurers.DefaultClientMasterRunnerConfigurer;
 
 /**
  * {@code YarnClientConfigure} is an interface for {@code YarnClientBuilder} which is
@@ -53,7 +53,7 @@ import org.springframework.yarn.config.annotation.configurers.ClientMasterRunner
 public interface YarnClientConfigurer {
 
 	/**
-	 * Specify a runner for Appmaster. Applies a new {@link ClientMasterRunnerConfigure}
+	 * Specify a runner for Appmaster. Applies a new {@link DefaultClientMasterRunnerConfigurer}
 	 * into current builder.
 	 *
 	 * <p>

@@ -30,7 +30,7 @@ import org.springframework.yarn.am.YarnAppmaster;
 import org.springframework.yarn.am.allocate.DefaultContainerAllocator;
 import org.springframework.yarn.am.container.DefaultContainerLauncher;
 import org.springframework.yarn.am.monitor.DefaultContainerMonitor;
-import org.springframework.yarn.config.annotation.configurers.MasterContainerRunnerConfigure;
+import org.springframework.yarn.config.annotation.configurers.DefaultMasterContainerRunnerConfigurer;
 import org.springframework.yarn.fs.ResourceLocalizer;
 
 /**
@@ -93,8 +93,8 @@ public final class YarnAppmasterBuilder extends AbstractConfiguredAnnotationBuil
 		return appmaster;
 	}
 
-	public MasterContainerRunnerConfigure withContainerRunner() throws Exception {
-		return apply(new MasterContainerRunnerConfigure());
+	public DefaultMasterContainerRunnerConfigurer withContainerRunner() throws Exception {
+		return apply(new DefaultMasterContainerRunnerConfigurer());
 	}
 
 	public void configuration(Configuration configuration) {

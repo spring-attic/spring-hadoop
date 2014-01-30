@@ -32,7 +32,7 @@ import org.springframework.yarn.launch.LaunchCommandsFactoryBean;
  * @author Janne Valkealahti
  *
  */
-public class MasterContainerRunnerConfigure
+public class DefaultMasterContainerRunnerConfigurer
 		extends AnnotationConfigurerAdapter<YarnAppmaster, YarnAppmasterConfigurer, YarnAppmasterBuilder>
 		implements MasterContainerRunnerConfigurer {
 

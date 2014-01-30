@@ -29,7 +29,7 @@ import org.springframework.data.hadoop.config.common.annotation.configurers.Prop
 import org.springframework.data.hadoop.config.common.annotation.configurers.PropertiesConfigurer;
 import org.springframework.util.StringUtils;
 import org.springframework.yarn.config.annotation.configurers.EnvironmentClasspathConfigurer;
-import org.springframework.yarn.config.annotation.configurers.EnvironmentClasspathConfigure;
+import org.springframework.yarn.config.annotation.configurers.DefaultEnvironmentClasspathConfigurer;
 import org.springframework.yarn.configuration.EnvironmentFactoryBean;
 
 /**
@@ -74,7 +74,7 @@ public final class YarnEnvironmentBuilder
 
 	@Override
 	public EnvironmentClasspathConfigurer withClasspath() throws Exception {
-		return apply(new EnvironmentClasspathConfigure());
+		return apply(new DefaultEnvironmentClasspathConfigurer());
 	}
 
 	@Override

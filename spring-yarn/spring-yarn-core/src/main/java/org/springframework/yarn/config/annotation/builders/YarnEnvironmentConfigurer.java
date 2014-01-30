@@ -20,7 +20,7 @@ import java.io.IOException;
 import org.springframework.data.hadoop.config.common.annotation.configurers.PropertiesConfigure;
 import org.springframework.yarn.config.annotation.SpringYarnConfigurerAdapter;
 import org.springframework.yarn.config.annotation.configurers.EnvironmentClasspathConfigurer;
-import org.springframework.yarn.config.annotation.configurers.EnvironmentClasspathConfigure;
+import org.springframework.yarn.config.annotation.configurers.DefaultEnvironmentClasspathConfigurer;
 
 /**
  * Interface for {@link YarnEnvironmentBuilder} used from
@@ -53,7 +53,7 @@ public interface YarnEnvironmentConfigurer {
 	/**
 	 * Specify a classpath environment variable.
 	 * <p>
-	 * Applies a new {@link EnvironmentClasspathConfigure} into current
+	 * Applies a new {@link DefaultEnvironmentClasspathConfigurer} into current
 	 * builder. Equivalents between JavaConfig and XML are shown below.
 	 *
 	 * <p>JavaConfig:
@@ -76,7 +76,7 @@ public interface YarnEnvironmentConfigurer {
 	 * &lt;/yarn:environment>
 	 * </pre>
 	 *
-	 * @return {@link EnvironmentClasspathConfigure} for classpath
+	 * @return {@link DefaultEnvironmentClasspathConfigurer} for classpath
 	 * @throws Exception if error occurred
 	 */
 	EnvironmentClasspathConfigurer withClasspath() throws Exception;

@@ -19,7 +19,7 @@ import org.springframework.yarn.am.YarnAppmaster;
 import org.springframework.yarn.config.annotation.SpringYarnConfigurerAdapter;
 import org.springframework.yarn.config.annotation.configurers.ClientMasterRunnerConfigurer;
 import org.springframework.yarn.config.annotation.configurers.MasterContainerRunnerConfigurer;
-import org.springframework.yarn.config.annotation.configurers.MasterContainerRunnerConfigure;
+import org.springframework.yarn.config.annotation.configurers.DefaultMasterContainerRunnerConfigurer;
 
 /**
  * {@code YarnAppmasterConfigure} is an interface for {@code YarnAppmasterBuilder} which is
@@ -49,7 +49,7 @@ public interface YarnAppmasterConfigurer {
 
 	/**
 	 * Specify a container runner for Appmaster. Applies a new
-	 * {@link MasterContainerRunnerConfigure} into a current builder.
+	 * {@link DefaultMasterContainerRunnerConfigurer} into a current builder.
 	 *
 	 * <p>
 	 * <p>JavaConfig:

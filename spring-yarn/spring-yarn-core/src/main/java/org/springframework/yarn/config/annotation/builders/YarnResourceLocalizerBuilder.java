@@ -23,8 +23,8 @@ import org.apache.hadoop.yarn.api.records.LocalResourceType;
 import org.apache.hadoop.yarn.api.records.LocalResourceVisibility;
 import org.springframework.data.hadoop.config.common.annotation.AbstractConfiguredAnnotationBuilder;
 import org.springframework.data.hadoop.config.common.annotation.AnnotationBuilder;
-import org.springframework.yarn.config.annotation.configurers.LocalResourcesCopyConfigure;
-import org.springframework.yarn.config.annotation.configurers.LocalResourcesHdfsConfigure;
+import org.springframework.yarn.config.annotation.configurers.DefaultLocalResourcesCopyConfigurer;
+import org.springframework.yarn.config.annotation.configurers.DefaultLocalResourcesHdfsConfigurer;
 import org.springframework.yarn.fs.LocalResourcesFactoryBean;
 import org.springframework.yarn.fs.LocalResourcesFactoryBean.CopyEntry;
 import org.springframework.yarn.fs.LocalResourcesFactoryBean.RawCopyEntry;
@@ -93,12 +93,12 @@ public final class YarnResourceLocalizerBuilder
 		this.rawEntries = rawEntries;
 	}
 
-	public LocalResourcesCopyConfigure withCopy() throws Exception {
-		return apply(new LocalResourcesCopyConfigure());
+	public DefaultLocalResourcesCopyConfigurer withCopy() throws Exception {
+		return apply(new DefaultLocalResourcesCopyConfigurer());
 	}
 
-	public LocalResourcesHdfsConfigure withHdfs() throws Exception {
-		return apply(new LocalResourcesHdfsConfigure());
+	public DefaultLocalResourcesHdfsConfigurer withHdfs() throws Exception {
+		return apply(new DefaultLocalResourcesHdfsConfigurer());
 	}
 
 }

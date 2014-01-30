@@ -17,7 +17,7 @@ package org.springframework.yarn.config.annotation.builders;
 
 import org.springframework.yarn.config.annotation.SpringYarnConfigurerAdapter;
 import org.springframework.yarn.config.annotation.configurers.LocalResourcesCopyConfigurer;
-import org.springframework.yarn.config.annotation.configurers.LocalResourcesCopyConfigure;
+import org.springframework.yarn.config.annotation.configurers.DefaultLocalResourcesCopyConfigurer;
 import org.springframework.yarn.config.annotation.configurers.LocalResourcesHdfsConfigurer;
 
 /**
@@ -50,7 +50,7 @@ import org.springframework.yarn.config.annotation.configurers.LocalResourcesHdfs
 public interface YarnResourceLocalizerConfigurer {
 
 	/**
-	 * Specify configuration options as properties with a {@link LocalResourcesCopyConfigure}.
+	 * Specify configuration options as properties with a {@link DefaultLocalResourcesCopyConfigurer}.
 	 *
 	 * <p>JavaConfig:
 	 * <pre>
@@ -74,7 +74,7 @@ public interface YarnResourceLocalizerConfigurer {
 	LocalResourcesCopyConfigurer withCopy() throws Exception;
 
 	/**
-	 * Specify configuration options as properties with a {@link LocalResourcesCopyConfigure}.
+	 * Specify configuration options as properties with a {@link DefaultLocalResourcesCopyConfigurer}.
 	 *
 	 * <p>JavaConfig:
 	 * <pre>

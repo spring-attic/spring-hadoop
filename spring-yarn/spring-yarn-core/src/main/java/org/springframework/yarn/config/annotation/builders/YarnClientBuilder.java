@@ -23,7 +23,7 @@ import org.springframework.data.hadoop.config.common.annotation.AnnotationBuilde
 import org.springframework.yarn.am.YarnAppmaster;
 import org.springframework.yarn.client.YarnClient;
 import org.springframework.yarn.client.YarnClientFactoryBean;
-import org.springframework.yarn.config.annotation.configurers.ClientMasterRunnerConfigure;
+import org.springframework.yarn.config.annotation.configurers.DefaultClientMasterRunnerConfigurer;
 import org.springframework.yarn.fs.ResourceLocalizer;
 import org.springframework.yarn.support.ParsingUtils;
 
@@ -87,8 +87,8 @@ public class YarnClientBuilder
 	 * @throws Exception the exception
 	 */
 	@Override
-	public ClientMasterRunnerConfigure withMasterRunner() throws Exception {
-		return apply(new ClientMasterRunnerConfigure());
+	public DefaultClientMasterRunnerConfigurer withMasterRunner() throws Exception {
+		return apply(new DefaultClientMasterRunnerConfigurer());
 	}
 
 	@Override

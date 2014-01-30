@@ -36,7 +36,7 @@ import org.springframework.yarn.fs.ResourceLocalizer;
  * @author Janne Valkealahti
  *
  */
-public class LocalResourcesCopyConfigure
+public class DefaultLocalResourcesCopyConfigurer
 		extends AnnotationConfigurerAdapter<ResourceLocalizer, YarnResourceLocalizerConfigurer, YarnResourceLocalizerBuilder>
 		implements LocalResourcesCopyConfigurer {
 
@@ -101,7 +101,7 @@ public class LocalResourcesCopyConfigure
 		}
 		public LocalResourcesCopyConfigurer staging(boolean staging) {
 			copyEntries.add(new CopyEntry(source, destination, staging));
-			return LocalResourcesCopyConfigure.this;
+			return DefaultLocalResourcesCopyConfigurer.this;
 		}
 	}
 

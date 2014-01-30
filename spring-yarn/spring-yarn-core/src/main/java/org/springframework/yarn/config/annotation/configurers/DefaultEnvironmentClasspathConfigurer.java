@@ -31,7 +31,7 @@ import org.springframework.yarn.config.annotation.builders.YarnEnvironmentConfig
  * @author Janne Valkealahti
  *
  */
-public class EnvironmentClasspathConfigure
+public class DefaultEnvironmentClasspathConfigurer
 		extends AnnotationConfigurerAdapter<Map<String, String>, YarnEnvironmentConfigurer, YarnEnvironmentBuilder>
 		implements EnvironmentClasspathConfigurer {
 

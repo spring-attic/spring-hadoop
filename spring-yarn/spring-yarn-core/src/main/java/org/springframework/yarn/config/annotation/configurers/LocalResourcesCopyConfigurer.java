@@ -19,7 +19,7 @@ import java.util.Map;
 
 import org.springframework.data.hadoop.config.common.annotation.AnnotationConfigurerBuilder;
 import org.springframework.yarn.config.annotation.builders.YarnResourceLocalizerConfigurer;
-import org.springframework.yarn.config.annotation.configurers.LocalResourcesCopyConfigure.ConfiguredCopyEntry;
+import org.springframework.yarn.config.annotation.configurers.DefaultLocalResourcesCopyConfigurer.ConfiguredCopyEntry;
 
 public interface LocalResourcesCopyConfigurer extends AnnotationConfigurerBuilder<YarnResourceLocalizerConfigurer> {
 
