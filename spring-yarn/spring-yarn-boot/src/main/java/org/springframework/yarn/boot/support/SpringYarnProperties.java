@@ -45,6 +45,7 @@ public class SpringYarnProperties {
 	public String getApplicationDir() {
 		return applicationDir;
 	}
+
 	public void setApplicationDir(String applicationDir) {
 		this.applicationDir = applicationDir;
 	}
@@ -52,24 +53,31 @@ public class SpringYarnProperties {
 	public String getApplicationsBaseDir() {
 		return applicationsBaseDir;
 	}
+
 	public void setApplicationsBaseDir(String applicationsBaseDir) {
 		this.applicationsBaseDir = applicationsBaseDir;
 	}
 
 	public String getFsUri() {
-		log.info("syp fsUri=[" + fsUri + "]");
-		log.info("syep fsUri=[" + syep.getFs() + "]");
+		if (log.isDebugEnabled()) {
+			log.debug("syp fsUri=[" + fsUri + "]");
+			log.debug("syep fsUri=[" + syep.getFs() + "]");
+		}
 		return syep.getFs() != null ? syep.getFs() : fsUri;
 	}
+
 	public void setFsUri(String fsUri) {
 		this.fsUri = fsUri;
 	}
 
 	public String getRmAddress() {
-		log.info("syp rmAddress=[" + rmAddress + "]");
-		log.info("syep rmAddress=[" + syep.getRm() + "]");
+		if (log.isDebugEnabled()) {
+			log.debug("syp rmAddress=[" + rmAddress + "]");
+			log.debug("syep rmAddress=[" + syep.getRm() + "]");
+		}
 		return syep.getRm() != null ? syep.getRm() : rmAddress;
 	}
+
 	public void setRmAddress(String rmAddress) {
 		this.rmAddress = rmAddress;
 	}
@@ -77,6 +85,7 @@ public class SpringYarnProperties {
 	public String getSchedulerAddress() {
 		return syep.getScheduler() != null ? syep.getScheduler() : schedulerAddress;
 	}
+
 	public void setSchedulerAddress(String schedulerAddress) {
 		this.schedulerAddress = schedulerAddress;
 	}
@@ -84,6 +93,7 @@ public class SpringYarnProperties {
 	public String getAppName() {
 		return appName;
 	}
+
 	public void setAppName(String appName) {
 		this.appName = appName;
 	}
@@ -91,6 +101,7 @@ public class SpringYarnProperties {
 	public String getAppType() {
 		return appType;
 	}
+
 	public void setAppType(String appType) {
 		this.appType = appType;
 	}

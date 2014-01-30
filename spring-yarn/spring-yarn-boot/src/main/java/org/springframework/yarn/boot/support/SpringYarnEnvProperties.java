@@ -18,9 +18,9 @@ package org.springframework.yarn.boot.support;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * Spring Boot {@link ConfigurationProperties} used in {@code SpringYarnClientProperties},
- * {@code SpringYarnAppmasterProperties} and {@code SpringYarnProperties} to resolve
- * supported environment variables.
+ * Spring Boot {@link ConfigurationProperties} used in
+ * {@code SpringYarnClientProperties}, {@code SpringYarnAppmasterProperties} and
+ * {@code SpringYarnProperties} to resolve supported environment variables.
  *
  * @author Janne Valkealahti
  *
@@ -74,7 +74,8 @@ public class SpringYarnEnvProperties {
 	}
 
 	/**
-	 * Sets the value from an environment variable <code>SHDP_HD_SCHEDULER</code>.
+	 * Sets the value from an environment variable
+	 * <code>SHDP_HD_SCHEDULER</code>.
 	 */
 	public void setSHDP_HD_SCHEDULER(String scheduler) {
 		this.scheduler = scheduler;

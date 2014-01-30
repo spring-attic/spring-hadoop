@@ -18,7 +18,8 @@ package org.springframework.yarn.boot.support;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * Spring Boot {@link ConfigurationProperties} for <code>spring.yarn.container</code>.
+ * Spring Boot {@link ConfigurationProperties} for
+ * <code>spring.yarn.container</code>.
  *
  * @author Janne Valkealahti
  *
@@ -40,9 +41,9 @@ public class SpringYarnContainerProperties {
 	public boolean isWaitLatch() {
 		return waitLatch;
 	}
+
 	public void setWaitLatch(boolean waitLatch) {
 		this.waitLatch = waitLatch;
 	}
-
 
 }

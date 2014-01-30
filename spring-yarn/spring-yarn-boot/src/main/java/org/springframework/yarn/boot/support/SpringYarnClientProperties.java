@@ -21,7 +21,8 @@ import java.util.Map;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * Spring Boot {@link ConfigurationProperties} for <code>spring.yarn.client</code>.
+ * Spring Boot {@link ConfigurationProperties} for
+ * <code>spring.yarn.client</code>.
  *
  * @author Janne Valkealahti
  *
@@ -121,10 +122,12 @@ public class SpringYarnClientProperties {
 	 * used internally to transfer small amount of raw file contents from a one
 	 * executing Spring Application into a new application instance.
 	 *
-	 * @param rawFileContents the raw file contents
+	 * @param rawFileContents
+	 *            the raw file contents
 	 */
 	public void setRawFileContents(Map<String, byte[]> rawFileContents) {
-		// TODO: consider pulling this out into a new 'internal' config prop class
+		// TODO: consider pulling this out into a new 'internal' config prop
+		// class
 		this.rawFileContents = rawFileContents;
 	}
 
