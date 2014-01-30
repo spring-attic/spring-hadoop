@@ -41,14 +41,14 @@ public class MasterContainerRunnerConfigure
 	private String stdout = "<LOG_DIR>/Container.stdout";
 	private String stderr = "<LOG_DIR>/Container.stderr";
 	private String beanName = YarnSystemConstants.DEFAULT_ID_CONTAINER;
-	private Class<? extends AbstractCommandLineRunner<?>> runnerClazz = CommandLineContainerRunner.class;
+	private Class<? extends AbstractCommandLineRunner<?>> runnerClass = CommandLineContainerRunner.class;
 
 	private Properties arguments = new Properties();
 
 	@Override
 	public void configure(YarnAppmasterBuilder builder) throws Exception {
 		LaunchCommandsFactoryBean fb = new LaunchCommandsFactoryBean();
-		fb.setRunner(runnerClazz);
+		fb.setRunner(runnerClass);
 		fb.setContextFile(contextClass != null ?  contextClass.getCanonicalName() : contextFile);
 		fb.setBeanName(beanName);
 
@@ -97,7 +97,7 @@ public class MasterContainerRunnerConfigure
 
 	@Override
 	public MasterContainerRunnerConfigurer runnerClass(Class<? extends AbstractCommandLineRunner<?>> runnerClazz) {
-		this.runnerClazz = runnerClazz;
+		this.runnerClass = runnerClazz;
 		return this;
 	}
 

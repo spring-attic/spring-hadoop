@@ -43,7 +43,7 @@ public final class YarnAppmasterBuilder extends AbstractConfiguredAnnotationBuil
 		implements YarnAppmasterConfigurer {
 
 	/** Appmaster class, defaults to StaticAppmaster */
-	private Class<? extends YarnAppmaster> appmasterClazz = StaticAppmaster.class;
+	private Class<? extends YarnAppmaster> appmasterClass = StaticAppmaster.class;
 
 	private Configuration configuration;
 	private ResourceLocalizer resourceLocalizer;
@@ -61,7 +61,7 @@ public final class YarnAppmasterBuilder extends AbstractConfiguredAnnotationBuil
 	@Override
 	protected YarnAppmaster performBuild() throws Exception {
 
-		YarnAppmaster appmaster = BeanUtils.instantiate(appmasterClazz);
+		YarnAppmaster appmaster = BeanUtils.instantiate(appmasterClass);
 
 		if (appmaster instanceof AbstractAppmaster) {
 			AbstractAppmaster abstractAppmaster = (AbstractAppmaster) appmaster;
@@ -111,7 +111,7 @@ public final class YarnAppmasterBuilder extends AbstractConfiguredAnnotationBuil
 
 	@Override
 	public YarnAppmasterBuilder appmasterClass(Class<? extends YarnAppmaster> clazz) {
-		appmasterClazz = clazz;
+		appmasterClass = clazz;
 		return this;
 	}
 
@@ -125,7 +125,7 @@ public final class YarnAppmasterBuilder extends AbstractConfiguredAnnotationBuil
 
 		Class<?> resolvedClass = ClassUtils.resolveClassName(clazz, getClass().getClassLoader());
 		if (ClassUtils.isAssignable(YarnAppmaster.class, resolvedClass)) {
-			appmasterClazz = (Class<? extends YarnAppmaster>) resolvedClass;
+			appmasterClass = (Class<? extends YarnAppmaster>) resolvedClass;
 		} else {
 			throw new IllegalArgumentException("Class " + resolvedClass + " is not an instance of YarnAppmaster");
 		}

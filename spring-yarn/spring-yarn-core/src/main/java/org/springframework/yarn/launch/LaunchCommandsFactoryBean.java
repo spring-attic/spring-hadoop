@@ -44,7 +44,7 @@ public class LaunchCommandsFactoryBean implements InitializingBean, FactoryBean<
 	private Class<?> runner;
 //	private Class<? extends AbstractCommandLineRunner<?>> runner;
 
-	private String runnerClazz;
+	private String runnerClass;
 
 	/** Spring context file argument */
 	private String contextFile;
@@ -109,8 +109,8 @@ public class LaunchCommandsFactoryBean implements InitializingBean, FactoryBean<
 			commandsList.add("-jar");
 			commandsList.add(jarFile);
 		} else {
-			if (runnerClazz != null) {
-				commandsList.add(runnerClazz);
+			if (runnerClass != null) {
+				commandsList.add(runnerClass);
 			} else if (runner != null) {
 				commandsList.add(runner.getCanonicalName());
 			}
@@ -157,8 +157,8 @@ public class LaunchCommandsFactoryBean implements InitializingBean, FactoryBean<
 		this.runner = runner;
 	}
 
-	public void setRunnerClazz(String runnerClazz) {
-		this.runnerClazz = runnerClazz;
+	public void setRunnerClass(String runnerClass) {
+		this.runnerClass = runnerClass;
 	}
 
 	/**

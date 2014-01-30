@@ -26,15 +26,15 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(name = "spring.yarn.container")
 public class SpringYarnContainerProperties {
 
-	private String containerClazz;
+	private String containerClass;
 	private boolean waitLatch = true;
 
-	public String getContainerClazz() {
-		return containerClazz;
+	public String getContainerClass() {
+		return containerClass;
 	}
 
-	public void setContainerClazz(String containerClazz) {
-		this.containerClazz = containerClazz;
+	public void setContainerClass(String containerClass) {
+		this.containerClass = containerClass;
 	}
 
 	public boolean isWaitLatch() {

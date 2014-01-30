@@ -33,7 +33,7 @@ public interface MasterContainerRunnerConfigurer extends AnnotationConfigurerBui
 
 	MasterContainerRunnerConfigurer beanName(String beanName);
 
-	MasterContainerRunnerConfigurer runnerClass(Class<? extends AbstractCommandLineRunner<?>> runnerClazz);
+	MasterContainerRunnerConfigurer runnerClass(Class<? extends AbstractCommandLineRunner<?>> runnerClass);
 
 	MasterContainerRunnerConfigurer arguments(Properties arguments);
 

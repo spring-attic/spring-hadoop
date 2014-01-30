@@ -38,7 +38,7 @@ public class ClientMasterRunnerConfigure
 		implements ClientMasterRunnerConfigurer {
 
 	/** Spring context configuration class */
-	private Class<?> contextClazz;
+	private Class<?> contextClass;
 
 	/** Spring context configuration file */
 	private String contextFile;
@@ -70,7 +70,7 @@ public class ClientMasterRunnerConfigure
 
 	@Override
 	public ClientMasterRunnerConfigurer contextClass(Class<?> clazz) {
-		contextClazz = clazz;
+		contextClass = clazz;
 		return this;
 	}
 
@@ -107,8 +107,8 @@ public class ClientMasterRunnerConfigure
 	private String determineContextConfig() {
 		if (contextFile != null) {
 			return contextFile;
-		} else if (contextClazz != null) {
-			return contextClazz.getCanonicalName();
+		} else if (contextClass != null) {
+			return contextClass.getCanonicalName();
 		} else {
 			return YarnSystemConstants.DEFAULT_CONTEXT_FILE_APPMASTER;
 		}

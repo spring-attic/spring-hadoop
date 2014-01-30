@@ -90,9 +90,9 @@ public class YarnContainerAutoConfiguration {
 
 		@Override
 		public void configure(YarnContainerConfigurer container) throws Exception {
-			if (StringUtils.hasText(sycp.getContainerClazz())) {
+			if (StringUtils.hasText(sycp.getContainerClass())) {
 				container
-					.containerClass(sycp.getContainerClazz());
+					.containerClass(sycp.getContainerClass());
 			} else if (yarnContainerClass != null){
 				container
 					.containerClass(yarnContainerClass);

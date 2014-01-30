@@ -17,7 +17,7 @@ public class SpringYarnAppmasterProperties {
 
 	private String rmSchedulerAddress;
 	private String containerFile;
-	private String appmasterClazz;
+	private String appmasterClass;
 	private String containerRunner;
 	private boolean waitLatch = true;
 	private int containerCount = 1;
@@ -41,11 +41,11 @@ public class SpringYarnAppmasterProperties {
 		this.containerFile = containerFile;
 	}
 
-	public String getAppmasterClazz() {
-		return appmasterClazz;
+	public String getAppmasterClass() {
+		return appmasterClass;
 	}
-	public void setAppmasterClazz(String appmasterClazz) {
-		this.appmasterClazz = appmasterClazz;
+	public void setAppmasterClass(String appmasterClass) {
+		this.appmasterClass = appmasterClass;
 	}
 
 	public String getContainerRunner() {

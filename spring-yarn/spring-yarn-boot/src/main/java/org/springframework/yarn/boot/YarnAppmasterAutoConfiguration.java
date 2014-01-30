@@ -86,7 +86,7 @@ public class YarnAppmasterAutoConfiguration {
 	public static class RuntimeConfig {
 
 		@Bean
-		public String customAppmasterClazz() {
+		public String customAppmasterClass() {
 			return "org.springframework.yarn.batch.am.BatchAppmaster";
 		}
 	}
@@ -104,8 +104,8 @@ public class YarnAppmasterAutoConfiguration {
 		private SpringYarnAppmasterProperties syap;
 
 		@Autowired(required=false)
-		@Qualifier("customAppmasterClazz")
-		private String appmasterClazz;
+		@Qualifier("customAppmasterClass")
+		private String appmasterClass;
 
 		@Override
 		public void configure(YarnConfigConfigurer config) throws Exception {
@@ -138,7 +138,7 @@ public class YarnAppmasterAutoConfiguration {
 		@Override
 		public void configure(YarnAppmasterConfigurer master) throws Exception {
 			master
-				.appmasterClass(syap.getAppmasterClazz() != null ? syap.getAppmasterClazz() : appmasterClazz)
+				.appmasterClass(syap.getAppmasterClass() != null ? syap.getAppmasterClass() : appmasterClass)
 				.containerCommands(createContainerCommands(syap));
 		}
 
@@ -155,9 +155,9 @@ public class YarnAppmasterAutoConfiguration {
 		if (StringUtils.hasText(containerJar) && containerJar.endsWith("jar")) {
 			factory.setJarFile(containerJar);
 		} else if (StringUtils.hasText(syap.getContainerRunner())) {
-			factory.setRunnerClazz(syap.getContainerRunner());
+			factory.setRunnerClass(syap.getContainerRunner());
 		} else if (StringUtils.hasText(containerJar) && containerJar.endsWith("zip")) {
-			factory.setRunnerClazz("org.springframework.boot.loader.PropertiesLauncher");
+			factory.setRunnerClass("org.springframework.boot.loader.PropertiesLauncher");
 		}
 
 		if (syap.getArguments() != null) {

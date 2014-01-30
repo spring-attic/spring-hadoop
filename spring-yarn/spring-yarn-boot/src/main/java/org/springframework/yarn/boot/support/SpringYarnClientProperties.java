@@ -31,7 +31,7 @@ public class SpringYarnClientProperties {
 
 	private String appmasterFile;
 	private List<String> files;
-	private String runnerClazz;
+	private String runnerClass;
 	private List<String> classpath;
 	private Map<String, String> arguments;
 	private Integer priority;
@@ -56,12 +56,12 @@ public class SpringYarnClientProperties {
 		this.files = files;
 	}
 
-	public String getRunnerClazz() {
-		return runnerClazz;
+	public String getRunnerClass() {
+		return runnerClass;
 	}
 
-	public void setRunnerClazz(String runnerClazz) {
-		this.runnerClazz = runnerClazz;
+	public void setRunnerClass(String runnerClass) {
+		this.runnerClass = runnerClass;
 	}
 
 	public List<String> getClasspath() {
