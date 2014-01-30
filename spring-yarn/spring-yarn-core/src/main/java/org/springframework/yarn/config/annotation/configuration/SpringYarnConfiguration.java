@@ -37,6 +37,8 @@ import org.springframework.yarn.config.annotation.SpringYarnConfigs;
 import org.springframework.yarn.config.annotation.SpringYarnConfigurer;
 import org.springframework.yarn.config.annotation.SpringYarnConfigurerAdapter;
 import org.springframework.yarn.config.annotation.builders.SpringYarnConfigBuilder;
+import org.springframework.yarn.event.DefaultYarnEventPublisher;
+import org.springframework.yarn.event.YarnEventPublisher;
 import org.springframework.yarn.fs.ResourceLocalizer;
 
 /**
@@ -62,6 +64,11 @@ public class SpringYarnConfiguration extends AbstractAnnotationConfiguration<Spr
 
 	@Autowired
 	private ApplicationContext applicationContext;
+
+	@Bean(name=YarnSystemConstants.DEFAULT_ID_EVENT_PUBLISHER)
+	public YarnEventPublisher yarnEventPublisher() {
+		return new DefaultYarnEventPublisher();
+	}
 
 	@Bean(name={YarnSystemConstants.DEFAULT_ID_CONFIGURATION, "hadoopConfiguration"})
 	public YarnConfiguration yarnConfiguration() throws Exception {
