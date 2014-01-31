@@ -55,7 +55,7 @@ public class OutputStreamWriter extends AbstractDataStreamWriter implements Data
 
 	@Override
 	public void flush() throws IOException {
-		if (streamsHolder == null) {
+		if (streamsHolder != null) {
 			streamsHolder.getStream().flush();
 		}
 	}
