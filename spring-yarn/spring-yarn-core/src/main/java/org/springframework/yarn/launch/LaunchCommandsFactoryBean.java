@@ -37,8 +37,14 @@ public class LaunchCommandsFactoryBean implements InitializingBean, FactoryBean<
 	/** Main command, default to <JAVA_HOME>/bin/java */
 	private String command = ApplicationConstants.Environment.JAVA_HOME.$() + "/bin/java";
 
+	/** File name indicating executable jar mode */
+	private String jarFile;
+
 	/** Class to run */
-	private Class<? extends AbstractCommandLineRunner<?>> runner;
+	private Class<?> runner;
+//	private Class<? extends AbstractCommandLineRunner<?>> runner;
+
+	private String runnerClass;
 
 	/** Spring context file argument */
 	private String contextFile;
@@ -79,9 +85,9 @@ public class LaunchCommandsFactoryBean implements InitializingBean, FactoryBean<
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(command, "Main command must be set");
-		Assert.notNull(runner, "Main class must be set");
-		Assert.notNull(contextFile, "Context file path must be set");
-		Assert.notNull(beanName, "Bean name must be set");
+//		Assert.notNull(runner, "Main class must be set");
+//		Assert.notNull(contextFile, "Context file path must be set");
+//		Assert.notNull(beanName, "Bean name must be set");
 		Assert.notNull(stdout, "Stdout must be set");
 		Assert.notNull(stderr, "Stderr name must be set");
 
@@ -99,9 +105,22 @@ public class LaunchCommandsFactoryBean implements InitializingBean, FactoryBean<
 			}
 		}
 
-		commandsList.add(runner.getCanonicalName());
-		commandsList.add(contextFile);
-		commandsList.add(beanName);
+		if (jarFile != null) {
+			commandsList.add("-jar");
+			commandsList.add(jarFile);
+		} else {
+			if (runnerClass != null) {
+				commandsList.add(runnerClass);
+			} else if (runner != null) {
+				commandsList.add(runner.getCanonicalName());
+			}
+			if (contextFile != null) {
+				commandsList.add(contextFile);
+			}
+			if (beanName != null) {
+				commandsList.add(beanName);
+			}
+		}
 
 		// arguments without -D
 		if(arguments != null) {
@@ -133,8 +152,24 @@ public class LaunchCommandsFactoryBean implements InitializingBean, FactoryBean<
 	 *
 	 * @param runner the new runner
 	 */
-	public void setRunner(Class<? extends AbstractCommandLineRunner<?>> runner) {
+//	public void setRunner(Class<? extends AbstractCommandLineRunner<?>> runner) {
+	public void setRunner(Class<?> runner) {
 		this.runner = runner;
+	}
+
+	public void setRunnerClass(String runnerClass) {
+		this.runnerClass = runnerClass;
+	}
+
+	/**
+	 * Sets the jar file name. If this is set, the command mode
+	 * is automatically to use executable jar with
+	 * 'java -jar'.
+	 *
+	 * @param jarFile the new jar file
+	 */
+	public void setJarFile(String jarFile) {
+		this.jarFile = jarFile;
 	}
 
 	/**

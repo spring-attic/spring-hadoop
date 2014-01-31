@@ -28,6 +28,8 @@ import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.yarn.YarnSystemConstants;
+import org.springframework.yarn.event.DefaultYarnEventPublisher;
 import org.springframework.yarn.support.YarnContextUtils;
 
 /**
@@ -50,6 +52,9 @@ public class ConfiguringBeanFactoryPostProcessor implements BeanFactoryPostProce
 			}
 			if (!beanFactory.containsBean(YarnContextUtils.TASK_EXECUTOR_BEAN_NAME)) {
 				registerTaskExecutor(registry);
+			}
+			if (!beanFactory.containsBean(YarnSystemConstants.DEFAULT_ID_EVENT_PUBLISHER)) {
+				registerYarnEventPublisher(registry);
 			}
 		}
 	}
@@ -87,6 +92,22 @@ public class ConfiguringBeanFactoryPostProcessor implements BeanFactoryPostProce
 		BeanComponentDefinition schedulerComponent = new BeanComponentDefinition(builder.getBeanDefinition(),
 				YarnContextUtils.TASK_EXECUTOR_BEAN_NAME);
 		BeanDefinitionReaderUtils.registerBeanDefinition(schedulerComponent, registry);
+	}
+
+	/**
+	 * Register yarn event publisher
+	 *
+	 * @param registry the registry
+	 */
+	private void registerYarnEventPublisher(BeanDefinitionRegistry registry) {
+		if (log.isInfoEnabled()) {
+			log.info("No bean named '" + YarnSystemConstants.DEFAULT_ID_EVENT_PUBLISHER
+					+ "' has been explicitly defined. Therefore, a default YarnEventPublisher will be created.");
+		}
+		BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(DefaultYarnEventPublisher.class);
+		BeanComponentDefinition eventComponent = new BeanComponentDefinition(builder.getBeanDefinition(),
+				YarnSystemConstants.DEFAULT_ID_EVENT_PUBLISHER);
+		BeanDefinitionReaderUtils.registerBeanDefinition(eventComponent, registry);
 	}
 
 }

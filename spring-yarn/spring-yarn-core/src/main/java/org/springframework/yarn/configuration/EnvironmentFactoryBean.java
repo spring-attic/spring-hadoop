@@ -104,24 +104,28 @@ public class EnvironmentFactoryBean implements InitializingBean, FactoryBean<Map
 			paths.add("./*");
 		}
 
+		// TODO: we should figure out how to support default classpath
+		//       for different distros because this feels a bit dangerous
 		if (defaultYarnAppClasspath) {
 			paths.add("$" + ApplicationConstants.Environment.HADOOP_CONF_DIR);
 			paths.add("$" + ApplicationConstants.Environment.HADOOP_COMMON_HOME + "/*");
 			paths.add("$" + ApplicationConstants.Environment.HADOOP_COMMON_HOME + "/lib/*");
 			paths.add("$" + ApplicationConstants.Environment.HADOOP_COMMON_HOME + "/share/hadoop/common/*");
 			paths.add("$" + ApplicationConstants.Environment.HADOOP_COMMON_HOME + "/share/hadoop/common/lib/*");
+			paths.add("$" + ApplicationConstants.Environment.HADOOP_COMMON_HOME + "/share/hadoop/mapreduce/*");
+			paths.add("$" + ApplicationConstants.Environment.HADOOP_COMMON_HOME + "/share/hadoop/mapreduce/lib/*");
 			paths.add("$" + ApplicationConstants.Environment.HADOOP_HDFS_HOME + "/*");
-			paths.add("$" + ApplicationConstants.Environment.HADOOP_HDFS_HOME + "/lib*");
+			paths.add("$" + ApplicationConstants.Environment.HADOOP_HDFS_HOME + "/lib/*");
 			paths.add("$" + ApplicationConstants.Environment.HADOOP_HDFS_HOME + "/share/hadoop/hdfs/*");
 			paths.add("$" + ApplicationConstants.Environment.HADOOP_HDFS_HOME + "/share/hadoop/hdfs/lib/*");
 			paths.add("$YARN_HOME/*");
-			paths.add("$YARN_HOME/lib*");
+			paths.add("$YARN_HOME/lib/*");
 			//phd
 			paths.add("$HADOOP_YARN_HOME/*");
 			paths.add("$HADOOP_YARN_HOME/lib/*");
 			//vanilla
 			paths.add("$HADOOP_YARN_HOME/share/hadoop/yarn/*");
-			paths.add("$HADOOP_YARN_HOME/share/hadoop/yarn/lib*");
+			paths.add("$HADOOP_YARN_HOME/share/hadoop/yarn/lib/*");
 		}
 
 		Iterator<String> iterator = paths.iterator();

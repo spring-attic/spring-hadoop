@@ -40,6 +40,7 @@ import org.apache.hadoop.yarn.util.Records;
 import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.support.PeriodicTrigger;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 import org.springframework.yarn.YarnSystemConstants;
 import org.springframework.yarn.YarnSystemException;
 
@@ -92,7 +93,7 @@ public class DefaultContainerLauncher extends AbstractLauncher implements Contai
 	@Override
 	public void launchContainer(Container container, List<String> commands) {
 		if (log.isDebugEnabled()) {
-			log.debug("Launching container: " + container);
+			log.debug("Launching container: " + container + " with commands " + StringUtils.collectionToCommaDelimitedString(commands));
 		}
 
 		ContainerLaunchContext ctx = Records.newRecord(ContainerLaunchContext.class);
@@ -109,6 +110,11 @@ public class DefaultContainerLauncher extends AbstractLauncher implements Contai
 		ctx = getInterceptors().preLaunch(container, ctx);
 
 		StartContainerRequest startContainerRequest = Records.newRecord(StartContainerRequest.class);
+
+		if (log.isDebugEnabled()) {
+			log.debug("Using ContainerLaunchContext: " + ctx);
+		}
+
 		startContainerRequest.setContainerLaunchContext(ctx);
 		startContainerRequest.setContainerToken(container.getContainerToken());
 

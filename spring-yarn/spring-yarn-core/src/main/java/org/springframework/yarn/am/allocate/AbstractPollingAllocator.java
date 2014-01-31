@@ -212,7 +212,11 @@ public abstract class AbstractPollingAllocator extends AbstractAllocator {
 	 *
 	 * @param allocateResponse the allocate response
 	 */
+	@SuppressWarnings("static-access")
 	protected void populateNmTokenCache(AllocateResponse allocateResponse) {
+		// In some distros NMTokenCache don't have static methods
+		// so it's ok to suppress warnings for it, and anyway
+		// we need to stay compatible
 		NMTokenCache tokenCache = NMTokenCacheCompat.getNMTokenCache();
 		for (NMToken token : allocateResponse.getNMTokens()) {
 			String nodeId = token.getNodeId().toString();

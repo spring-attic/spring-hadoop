@@ -18,6 +18,8 @@ package org.springframework.yarn.integration.convert;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
@@ -34,6 +36,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  *
  */
 public class MindHolderToObjectConverter implements Converter<MindRpcMessageHolder, BaseObject> {
+
+	private final static Log log = LogFactory.getLog(MindHolderToObjectConverter.class);
 
 	/** Jackson object mapper */
 	private ObjectMapper objectMapper;
@@ -131,7 +135,13 @@ public class MindHolderToObjectConverter implements Converter<MindRpcMessageHold
 		if (!ObjectUtils.isEmpty(basePackage)) {
 			for (String base : basePackage) {
 				clazzName = base + "." + type;
+				if (log.isDebugEnabled()) {
+					log.debug("Trying to resolve type " + type + " as " + clazzName);
+				}
 				clazz = classCache.get(clazzName);
+				if (log.isDebugEnabled() && clazz != null) {
+					log.debug("Found " + clazz + " from a cache");
+				}
 				if (clazz == null) {
 					try {
 						clazz = ClassUtils.resolveClassName(clazzName, getClass().getClassLoader());

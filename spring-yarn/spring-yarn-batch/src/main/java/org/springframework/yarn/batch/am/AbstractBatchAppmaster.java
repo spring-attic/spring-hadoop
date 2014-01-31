@@ -71,7 +71,7 @@ public abstract class AbstractBatchAppmaster extends AbstractEventingAppmaster i
 	private JobLauncher jobLauncher;
 
 	/** Name of the job to run */
-	private String jobName;
+	private String jobName = "job";
 
 	/** Step executions as reported back from containers */
 	private List<StepExecution> stepExecutions = new ArrayList<StepExecution>();

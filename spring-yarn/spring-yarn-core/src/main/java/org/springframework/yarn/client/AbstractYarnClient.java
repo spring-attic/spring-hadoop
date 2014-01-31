@@ -17,8 +17,11 @@ package org.springframework.yarn.client;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,9 +37,11 @@ import org.apache.hadoop.yarn.api.records.ApplicationSubmissionContext;
 import org.apache.hadoop.yarn.api.records.ContainerLaunchContext;
 import org.apache.hadoop.yarn.api.records.Priority;
 import org.apache.hadoop.yarn.api.records.Resource;
+import org.apache.hadoop.yarn.api.records.YarnApplicationState;
 import org.apache.hadoop.yarn.util.Records;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 import org.springframework.yarn.fs.ResourceLocalizer;
 import org.springframework.yarn.support.YarnUtils;
 import org.springframework.yarn.support.compat.ResourceCompat;
@@ -81,6 +86,9 @@ public abstract class AbstractYarnClient implements YarnClient, InitializingBean
 	/** Name of the application */
 	private String appName = "";
 
+	/** Type of the application */
+	private String appType;
+
 	/** Base path for app staging directory */
 	private String stagingDirPath;
 
@@ -104,13 +112,22 @@ public abstract class AbstractYarnClient implements YarnClient, InitializingBean
 
 	@Override
 	public ApplicationId submitApplication() {
+		return submitApplication(true);
+	}
+
+	@Override
+	public ApplicationId submitApplication(boolean distribute) {
 
 		// we get app id here instead in getSubmissionContext(). Otherwise
 		// localizer distribute will kick off too early
 		ApplicationId applicationId = clientRmOperations.getNewApplication().getApplicationId();
 
 		resourceLocalizer.setStagingId(applicationId.toString());
-		resourceLocalizer.distribute();
+		if (!distribute) {
+			resourceLocalizer.resolve();
+		} else {
+			resourceLocalizer.distribute();
+		}
 
 		ApplicationSubmissionContext submissionContext = getSubmissionContext(applicationId);
 
@@ -123,6 +140,11 @@ public abstract class AbstractYarnClient implements YarnClient, InitializingBean
 	}
 
 	@Override
+	public void installApplication() {
+		resourceLocalizer.copy();
+	}
+
+	@Override
 	public void killApplication(ApplicationId applicationId) {
 		clientRmOperations.killApplication(applicationId);
 	}
@@ -130,6 +152,26 @@ public abstract class AbstractYarnClient implements YarnClient, InitializingBean
 	@Override
 	public List<ApplicationReport> listApplications() {
 		return clientRmOperations.listApplications();
+	}
+
+	@Override
+	public List<ApplicationReport> listApplications(String type) {
+		Set<String> appTypes = new HashSet<String>();
+		if (StringUtils.hasText(type)) {
+			appTypes.add(type);
+		}
+		return clientRmOperations.listApplications(null, appTypes);
+	}
+
+	@Override
+	public List<ApplicationReport> listRunningApplications(String type) {
+		EnumSet<YarnApplicationState> appStates = EnumSet.of(YarnApplicationState.NEW, YarnApplicationState.NEW_SAVING,
+				YarnApplicationState.SUBMITTED, YarnApplicationState.ACCEPTED, YarnApplicationState.RUNNING);
+		Set<String> appTypes = new HashSet<String>();
+		if (StringUtils.hasText(type)) {
+			appTypes.add(type);
+		}
+		return clientRmOperations.listApplications(appStates, appTypes);
 	}
 
 	@Override
@@ -222,6 +264,15 @@ public abstract class AbstractYarnClient implements YarnClient, InitializingBean
 	}
 
 	/**
+	 * Sets the type for submitted application.
+	 *
+	 * @param type the new application type
+	 */
+	public void setAppType(String appType) {
+		this.appType = appType;
+	}
+
+	/**
 	 * Sets the priority.
 	 *
 	 * @param priority the new priority
@@ -297,6 +348,9 @@ public abstract class AbstractYarnClient implements YarnClient, InitializingBean
 		ApplicationSubmissionContext context = Records.newRecord(ApplicationSubmissionContext.class);
 		context.setApplicationId(applicationId);
 		context.setApplicationName(appName);
+		if (StringUtils.hasText(appType)) {
+			context.setApplicationType(appType);
+		}
 		context.setAMContainerSpec(getMasterContainerLaunchContext());
 
 		Resource capability = Records.newRecord(Resource.class);

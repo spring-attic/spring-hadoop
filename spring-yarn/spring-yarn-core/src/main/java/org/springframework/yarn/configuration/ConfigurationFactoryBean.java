@@ -91,10 +91,12 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 
 		// set hdfs / fs URI last to override all other properties
 		if (StringUtils.hasText(fsUri)) {
+			log.info("Overwriting fsUri=[" + internalConfig.get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY) + "] with fsUri=[" +fsUri.trim() + "]");
 			internalConfig.set(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY, fsUri.trim());
 		}
 
 		if (StringUtils.hasText(rmAddress)) {
+			log.info("Overwriting rmAddress=[" + internalConfig.get(YarnConfiguration.RM_ADDRESS) + "] with rmAddress=[" +rmAddress.trim() + "]");
 			internalConfig.set(YarnConfiguration.RM_ADDRESS, rmAddress.trim());
 		}
 

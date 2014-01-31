@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,11 @@ package org.springframework.yarn.batch.repository.bindings;
 import java.util.List;
 
 import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.JobExecution;
 import org.springframework.yarn.integration.ip.mind.binding.BaseObject;
 
 /**
- * Bindings for {@link org.springframework.batch.core.JobExecution}.
+ * Binding for {@link JobExecution}.
  *
  * @author Janne Valkealahti
  *

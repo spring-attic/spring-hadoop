@@ -29,7 +29,7 @@ import org.apache.hadoop.yarn.api.records.LocalResource;
  *
  */
 public interface ResourceLocalizer {
-
+	// TODO: this api is ambiguous and not clean to use for distribute vs copy vs resolve
 	/**
 	 * Gets a map of {@link LocalResource} instances. Underlying
 	 * instances of {@link LocalResource}s needs to be fully
@@ -45,8 +45,22 @@ public interface ResourceLocalizer {
 	 * calling of this method should make implementation
 	 * ready to return resources from {@link #getResources()}
 	 * command.
+	 * <p>
+	 * Effectively result of calling this method should be same
+	 * as calling both {@linkplain #copy()} and {@linkplain #resolve()}
+	 * methods manually.
 	 */
 	void distribute();
+
+	/**
+	 * Only copy files into hdfs.
+	 */
+	void copy();
+
+	/**
+	 * Only resolve localized resources.
+	 */
+	void resolve();
 
 	/**
 	 * Sets the staging directory. If not set, path is

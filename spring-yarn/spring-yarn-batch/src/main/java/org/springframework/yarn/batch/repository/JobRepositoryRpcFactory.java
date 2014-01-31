@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,32 +31,29 @@ import org.springframework.batch.core.JobParameter.ParameterType;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.yarn.batch.repository.bindings.AddStepExecutionsReq;
-import org.springframework.yarn.batch.repository.bindings.CreateJobInstanceReq;
 import org.springframework.yarn.batch.repository.bindings.ExecutionContextType;
 import org.springframework.yarn.batch.repository.bindings.ExecutionContextType.ObjectEntry;
-import org.springframework.yarn.batch.repository.bindings.FindJobExecutionsReq;
-import org.springframework.yarn.batch.repository.bindings.FindRunningJobExecutionsReq;
-import org.springframework.yarn.batch.repository.bindings.GetExecutionContextReq;
-import org.springframework.yarn.batch.repository.bindings.GetJobExecutionReq;
-import org.springframework.yarn.batch.repository.bindings.GetJobInstanceByIdReq;
-import org.springframework.yarn.batch.repository.bindings.GetJobInstanceReq;
-import org.springframework.yarn.batch.repository.bindings.GetJobInstancesReq;
-import org.springframework.yarn.batch.repository.bindings.GetJobNamesReq;
-import org.springframework.yarn.batch.repository.bindings.GetLastJobExecutionReq;
-import org.springframework.yarn.batch.repository.bindings.GetStepExecutionReq;
+import org.springframework.yarn.batch.repository.bindings.exp.FindRunningJobExecutionsReq;
+import org.springframework.yarn.batch.repository.bindings.exp.GetJobExecutionReq;
+import org.springframework.yarn.batch.repository.bindings.exp.GetJobExecutionsReq;
+import org.springframework.yarn.batch.repository.bindings.exp.GetJobInstanceReq;
+import org.springframework.yarn.batch.repository.bindings.exp.GetJobInstancesReq;
+import org.springframework.yarn.batch.repository.bindings.exp.GetJobNamesReq;
+import org.springframework.yarn.batch.repository.bindings.exp.GetStepExecutionReq;
+import org.springframework.yarn.batch.repository.bindings.repo.AddWithStepExecutionReq;
+import org.springframework.yarn.batch.repository.bindings.repo.CreateJobExecutionReq;
+import org.springframework.yarn.batch.repository.bindings.repo.GetLastJobExecutionReq;
+import org.springframework.yarn.batch.repository.bindings.repo.GetLastStepExecutionReq;
+import org.springframework.yarn.batch.repository.bindings.repo.GetStepExecutionCountReq;
+import org.springframework.yarn.batch.repository.bindings.repo.IsJobInstanceExistsReq;
+import org.springframework.yarn.batch.repository.bindings.repo.UpdateExecutionContextReq;
+import org.springframework.yarn.batch.repository.bindings.repo.UpdateWithJobExecutionReq;
+import org.springframework.yarn.batch.repository.bindings.repo.UpdateWithStepExecutionReq;
 import org.springframework.yarn.batch.repository.bindings.JobExecutionType;
 import org.springframework.yarn.batch.repository.bindings.JobInstanceType;
 import org.springframework.yarn.batch.repository.bindings.JobParameterType;
 import org.springframework.yarn.batch.repository.bindings.JobParametersType;
-import org.springframework.yarn.batch.repository.bindings.SaveExecutionContextReq;
-import org.springframework.yarn.batch.repository.bindings.SaveJobExecutionReq;
-import org.springframework.yarn.batch.repository.bindings.SaveStepExecutionReq;
 import org.springframework.yarn.batch.repository.bindings.StepExecutionType;
-import org.springframework.yarn.batch.repository.bindings.SynchronizeStatusReq;
-import org.springframework.yarn.batch.repository.bindings.UpdateExecutionContextReq;
-import org.springframework.yarn.batch.repository.bindings.UpdateJobExecutionReq;
-import org.springframework.yarn.batch.repository.bindings.UpdateStepExecutionReq;
 
 /**
  * Helper class providing factory methods for building requests used
@@ -66,165 +63,6 @@ import org.springframework.yarn.batch.repository.bindings.UpdateStepExecutionReq
  *
  */
 public class JobRepositoryRpcFactory {
-
-	/**
-	 * Builds request for saving a step execution.
-	 *
-	 * @param stepExecution the step execution
-	 * @return the {@link SaveStepExecutionReq} request
-	 */
-	public static SaveStepExecutionReq buildSaveStepExecutionReq(StepExecution stepExecution) {
-		SaveStepExecutionReq req = new SaveStepExecutionReq();
-		req.stepExecution = convertStepExecutionType(stepExecution);
-		return req;
-	}
-
-	/**
-	 * Builds request for adding step executionf from a job execution.
-	 *
-	 * @param jobExecution the job execution
-	 * @return the {@link AddStepExecutionsReq} request
-	 */
-	public static AddStepExecutionsReq buildAddStepExecutionsReq(JobExecution jobExecution) {
-		AddStepExecutionsReq req = new AddStepExecutionsReq();
-		req.jobExecution = convertJobExecutionType(jobExecution);
-		return req;
-	}
-
-	/**
-	 * Builds request for updating a step execution.
-	 *
-	 * @param stepExecution the step execution
-	 * @return the {@link UpdateStepExecutionReq} request
-	 */
-	public static UpdateStepExecutionReq buildUpdateStepExecutionReq(StepExecution stepExecution) {
-		UpdateStepExecutionReq req = new UpdateStepExecutionReq();
-		req.stepExecution = convertStepExecutionType(stepExecution);
-		return req;
-	}
-
-	/**
-	 * Builds request for getting a step execution job execution
-	 * and step execution id.
-	 *
-	 * @param jobExecution the job execution
-	 * @param stepExecutionId the step execution id
-	 * @return the {@link GetStepExecutionReq} request
-	 */
-	public static GetStepExecutionReq buildGetStepExecutionReq(JobExecution jobExecution, Long stepExecutionId) {
-		GetStepExecutionReq req = new GetStepExecutionReq();
-		req.jobExecution = convertJobExecutionType(jobExecution);
-		req.stepExecutionId = stepExecutionId;
-		return req;
-	}
-
-	/**
-	 * Builds request for updating a job execution.
-	 *
-	 * @param jobExecution the job execution
-	 * @return the {@link UpdateJobExecutionReq} request
-	 */
-	public static UpdateJobExecutionReq buildUpdateJobExecutionReq(JobExecution jobExecution) {
-		UpdateJobExecutionReq req = new UpdateJobExecutionReq();
-		req.jobExecution = convertJobExecutionType(jobExecution);
-		return req;
-	}
-
-	/**
-	 * Builds request for synchronizing a job execution status.
-	 *
-	 * @param jobExecution the job execution
-	 * @return the {@link SynchronizeStatusReq} request
-	 */
-	public static SynchronizeStatusReq buildSynchronizeStatusReq(JobExecution jobExecution) {
-		SynchronizeStatusReq req = new SynchronizeStatusReq();
-		req.jobExecution = convertJobExecutionType(jobExecution);
-		return req;
-	}
-
-	/**
-	 * Builds request for saving a job execution.
-	 *
-	 * @param jobExecution the job execution
-	 * @return the {@link SaveJobExecutionReq} request
-	 */
-	public static SaveJobExecutionReq buildSaveJobExecutionReq(JobExecution jobExecution) {
-		SaveJobExecutionReq req = new SaveJobExecutionReq();
-		req.jobExecution = convertJobExecutionType(jobExecution);
-		return req;
-	}
-
-	/**
-	 * Builds request for saving execution context from a step execution.
-	 *
-	 * @param stepExecution the step execution
-	 * @return the {@link SaveExecutionContextReq} request
-	 */
-	public static SaveExecutionContextReq buildSaveExecutionContextReq(StepExecution stepExecution) {
-		SaveExecutionContextReq req = new SaveExecutionContextReq();
-		req.stepExecution = convertStepExecutionType(stepExecution);
-		return req;
-	}
-
-	/**
-	 * Builds request for saving execution context from a job execution.
-	 *
-	 * @param jobExecution the job execution
-	 * @return the {@link SaveExecutionContextReq} request
-	 */
-	public static SaveExecutionContextReq buildSaveExecutionContextReq(JobExecution jobExecution) {
-		SaveExecutionContextReq req = new SaveExecutionContextReq();
-		req.jobExecution = convertJobExecutionType(jobExecution);
-		return req;
-	}
-
-	/**
-	 * Builds request for updating execution context from a step execution.
-	 *
-	 * @param stepExecution the step execution
-	 * @return the {@link UpdateExecutionContextReq} request
-	 */
-	public static UpdateExecutionContextReq buildUpdateExecutionContextReq(StepExecution stepExecution) {
-		UpdateExecutionContextReq req = new UpdateExecutionContextReq();
-		req.stepExecution = convertStepExecutionType(stepExecution);
-		return req;
-	}
-
-	/**
-	 * Builds request for updating execution context from a job execution.
-	 *
-	 * @param jobExecution the job execution
-	 * @return the {@link UpdateExecutionContextReq} request
-	 */
-	public static UpdateExecutionContextReq buildUpdateExecutionContextReq(JobExecution jobExecution) {
-		UpdateExecutionContextReq req = new UpdateExecutionContextReq();
-		req.jobExecution = convertJobExecutionType(jobExecution);
-		return req;
-	}
-
-	/**
-	 * Builds request for getting execution context from a step execution.
-	 *
-	 * @param stepExecution the step execution
-	 * @return the {@link GetExecutionContextReq} request
-	 */
-	public static GetExecutionContextReq buildGetExecutionContextReq(StepExecution stepExecution) {
-		GetExecutionContextReq req = new GetExecutionContextReq();
-		req.stepExecution = convertStepExecutionType(stepExecution);
-		return req;
-	}
-
-	/**
-	 * Builds request for getting execution context from a job execution.
-	 *
-	 * @param jobExecution the step execution
-	 * @return the {@link GetExecutionContextReq} request
-	 */
-	public static GetExecutionContextReq buildGetExecutionContextReq(JobExecution jobExecution) {
-		GetExecutionContextReq req = new GetExecutionContextReq();
-		req.jobExecution = convertJobExecutionType(jobExecution);
-		return req;
-	}
 
 	/**
 	 * Creates {@link StepExecutionType} from {@link StepExecution}.
@@ -385,7 +223,10 @@ public class JobRepositoryRpcFactory {
 		type.id = jobExecution.getId();
 		type.version = jobExecution.getVersion();
 
-		type.jobInstance = convertJobInstanceType(jobExecution.getJobInstance());
+		// TODO: ??? can it be null???
+		if (jobExecution.getJobInstance() != null) {
+			type.jobInstance = convertJobInstanceType(jobExecution.getJobInstance());
+		}
 
 		type.status = jobExecution.getStatus();
 		type.startTime = nullsafeToMillis(jobExecution.getStartTime());
@@ -461,6 +302,10 @@ public class JobRepositoryRpcFactory {
 	 * @return converted job instance
 	 */
 	public static JobInstance convertJobInstanceType(JobInstanceType type) {
+		// TODO: null, really???
+		if (type == null) {
+			return null;
+		}
 		JobInstance jobInstance = new JobInstance(type.id, type.jobName);
 		jobInstance.setVersion(type.version);
 		return jobInstance;
@@ -520,15 +365,8 @@ public class JobRepositoryRpcFactory {
 		return new JobParameters(map);
 	}
 
-	/**
-	 * Builds request for creating a job instance.
-	 *
-	 * @param jobName the job name
-	 * @param jobParameters the job parameters
-	 * @return the {@link CreateJobInstanceReq} request
-	 */
-	public static CreateJobInstanceReq buildCreateJobInstanceReq(String jobName, JobParameters jobParameters) {
-		CreateJobInstanceReq req = new CreateJobInstanceReq();
+	public static IsJobInstanceExistsReq buildIsJobInstanceExistsReq(String jobName, JobParameters jobParameters) {
+		IsJobInstanceExistsReq req = new IsJobInstanceExistsReq();
 
 		Map<String, JobParameterType> map = new HashMap<String, JobParameterType>();
 		for(Entry<String, JobParameter> parameter : jobParameters.getParameters().entrySet()) {
@@ -543,15 +381,8 @@ public class JobRepositoryRpcFactory {
 		return req;
 	}
 
-	/**
-	 * Builds request for getting a job instance.
-	 *
-	 * @param jobName the job name
-	 * @param jobParameters the job parameters
-	 * @return the {@link GetJobInstanceReq} request
-	 */
-	public static GetJobInstanceReq buildGetJobInstanceReq(String jobName, JobParameters jobParameters) {
-		GetJobInstanceReq req = new GetJobInstanceReq();
+	public static CreateJobExecutionReq buildCreateJobExecutionReq(String jobName, JobParameters jobParameters) {
+		CreateJobExecutionReq req = new CreateJobExecutionReq();
 
 		Map<String, JobParameterType> map = new HashMap<String, JobParameterType>();
 		for(Entry<String, JobParameter> parameter : jobParameters.getParameters().entrySet()) {
@@ -566,15 +397,50 @@ public class JobRepositoryRpcFactory {
 		return req;
 	}
 
-	/**
-	 * Builds request for getting a job instance by id.
-	 *
-	 * @param id the job instance id
-	 * @return the {@link GetJobInstanceByIdReq} request
-	 */
-	public static GetJobInstanceByIdReq buildGetJobInstanceByIdReq(Long id) {
-		GetJobInstanceByIdReq req = new GetJobInstanceByIdReq();
-		req.id = id;
+	public static UpdateWithJobExecutionReq buildSaveJobExecutionReq(JobExecution jobExecution) {
+		UpdateWithJobExecutionReq req = new UpdateWithJobExecutionReq();
+		req.jobExecution = JobRepositoryRpcFactory.convertJobExecutionType(jobExecution);
+		return req;
+	}
+
+	public static AddWithStepExecutionReq buildAddWithStepExecutionReq(StepExecution stepExecution) {
+		AddWithStepExecutionReq req = new AddWithStepExecutionReq();
+		req.stepExecution = JobRepositoryRpcFactory.convertStepExecutionType(stepExecution);
+		return req;
+	}
+
+	public static GetStepExecutionCountReq buildGetStepExecutionCountReq(JobInstance jobInstance, String stepName) {
+		GetStepExecutionCountReq req = new GetStepExecutionCountReq();
+		req.jobInstance = JobRepositoryRpcFactory.convertJobInstanceType(jobInstance);
+		req.stepName = stepName;
+		return req;
+	}
+
+	public static GetLastStepExecutionReq buildGetLastStepExecutionReq(JobInstance jobInstance, String stepName) {
+		GetLastStepExecutionReq req = new GetLastStepExecutionReq();
+		req.jobInstance = JobRepositoryRpcFactory.convertJobInstanceType(jobInstance);
+		req.stepName = stepName;
+		return req;
+	}
+
+	public static UpdateWithStepExecutionReq buildUpdateWithStepExecutionReq(StepExecution stepExecution) {
+		UpdateWithStepExecutionReq req = new UpdateWithStepExecutionReq();
+		req.stepExecution = JobRepositoryRpcFactory.convertStepExecutionType(stepExecution);
+		return req;
+	}
+
+	public static GetLastJobExecutionReq buildGetLastJobExecutionReq(String jobName, JobParameters jobParameters) {
+		GetLastJobExecutionReq req = new GetLastJobExecutionReq();
+		Map<String, JobParameterType> map = new HashMap<String, JobParameterType>();
+		for(Entry<String, JobParameter> parameter : jobParameters.getParameters().entrySet()) {
+			JobParameterType type = new JobParameterType();
+			type.parameter = parameter.getValue().getValue();
+			type.parameterType = parameter.getValue().getType();
+			map.put(parameter.getKey(), type);
+		}
+
+		req.jobName = jobName;
+		req.jobParameters = map;
 		return req;
 	}
 
@@ -595,63 +461,65 @@ public class JobRepositoryRpcFactory {
 		return req;
 	}
 
-	/**
-	 * Builds request for getting a last execution by a job instance.
-	 *
-	 * @param jobInstance the job instance
-	 * @return the {@link GetLastJobExecutionReq} request
-	 */
-	public static GetLastJobExecutionReq buildGetLastJobExecutionReq(JobInstance jobInstance) {
-		GetLastJobExecutionReq req = new GetLastJobExecutionReq();
-		req.jobInstance = convertJobInstanceType(jobInstance);
+	public static GetJobInstanceReq buildGetJobInstanceReq(Long instanceId) {
+		GetJobInstanceReq req = new GetJobInstanceReq();
+		req.instanceId = instanceId;
 		return req;
 	}
 
-	/**
-	 * Builds request for finding a job execution by a job instance.
-	 *
-	 * @param jobInstance the job instance
-	 * @return the {@link FindJobExecutionsReq} request
-	 */
-	public static FindJobExecutionsReq buildFindJobExecutionsReq(JobInstance jobInstance) {
-		FindJobExecutionsReq req = new FindJobExecutionsReq();
-		req.jobInstance = convertJobInstanceType(jobInstance);
-		return req;
-	}
-
-	/**
-	 * Builds request for finding a job executions by a job name.
-	 *
-	 * @param jobName the job name
-	 * @return the {@link FindRunningJobExecutionsReq} request
-	 */
-	public static FindRunningJobExecutionsReq buildFindRunningJobExecutionsReq(String jobName) {
-		FindRunningJobExecutionsReq req = new FindRunningJobExecutionsReq();
-		req.jobName = jobName;
-		return req;
-	}
-
-	/**
-	 * Builds request for getting a job execution by its execution id.
-	 *
-	 * @param executionId the execution id
-	 * @return the {@link GetJobExecutionReq} request
-	 */
 	public static GetJobExecutionReq buildGetJobExecutionReq(Long executionId) {
 		GetJobExecutionReq req = new GetJobExecutionReq();
 		req.executionId = executionId;
 		return req;
 	}
 
-	/**
-	 * Builds request for getting a job names.
-	 *
-	 * @return the {@link GetJobNamesReq} request
-	 */
-	public static GetJobNamesReq buildGetJobNamesReq() {
-		GetJobNamesReq req = new GetJobNamesReq();
+	public static GetStepExecutionReq buildGetStepExecutionReq(Long jobExecutionId, Long stepExecutionId) {
+		GetStepExecutionReq req = new GetStepExecutionReq();
+		req.jobExecutionId = jobExecutionId;
+		req.stepExecutionId = stepExecutionId;
 		return req;
 	}
+
+	public static GetJobExecutionsReq buildGetJobExecutionsReq(JobInstance jobInstance) {
+		GetJobExecutionsReq req = new GetJobExecutionsReq();
+		req.jobInstance = JobRepositoryRpcFactory.convertJobInstanceType(jobInstance);
+		return req;
+	}
+
+	public static FindRunningJobExecutionsReq buildFindRunningJobExecutionsReq(String jobName) {
+		FindRunningJobExecutionsReq req = new FindRunningJobExecutionsReq();
+		req.jobName = jobName;
+		return req;
+	}
+
+	public static GetJobNamesReq buildGetJobNamesReq() {
+		return new GetJobNamesReq();
+	}
+
+	/**
+	 * Builds request for updating execution context from a step execution.
+	 *
+	 * @param stepExecution the step execution
+	 * @return the {@link UpdateExecutionContextReq} request
+	 */
+	public static UpdateExecutionContextReq buildUpdateExecutionContextReq(StepExecution stepExecution) {
+		UpdateExecutionContextReq req = new UpdateExecutionContextReq();
+		req.stepExecution = JobRepositoryRpcFactory.convertStepExecutionType(stepExecution);
+		return req;
+	}
+
+	/**
+	 * Builds request for updating execution context from a job execution.
+	 *
+	 * @param jobExecution the job execution
+	 * @return the {@link UpdateExecutionContextReq} request
+	 */
+	public static UpdateExecutionContextReq buildUpdateExecutionContextReq(JobExecution jobExecution) {
+		UpdateExecutionContextReq req = new UpdateExecutionContextReq();
+		req.jobExecution = JobRepositoryRpcFactory.convertJobExecutionType(jobExecution);
+		return req;
+	}
+
 
 	private static Long nullsafeToMillis(Date date) {
 		if(date != null) {

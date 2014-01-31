@@ -52,7 +52,7 @@ public class MasterParser extends AbstractBeanDefinitionParser {
 		// for now, defaulting to StaticAppmaster
 		// and checking if implementation class was defined
 		String type = element.getAttribute("type");
-		String clazz = element.getAttribute("class");
+		String clazz = element.getAttribute("appmaster-class");
 
 		BeanDefinitionBuilder builder;
 		if (StringUtils.hasText(clazz)) {

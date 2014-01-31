@@ -38,7 +38,7 @@ import org.springframework.yarn.integration.support.IntegrationContextUtils;
  * @author Janne Valkealahti
  *
  */
-class ConversionServiceCreator implements BeanFactoryPostProcessor {
+public class ConversionServiceCreator implements BeanFactoryPostProcessor {
 
 	private final Log logger = LogFactory.getLog(this.getClass());
 

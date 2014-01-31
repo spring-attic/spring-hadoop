@@ -23,7 +23,7 @@ import org.springframework.yarn.test.support.ConfigurationDelegatingFactoryBean;
 
 /**
  * Utils used in custom context loaders.
- * 
+ *
  * @author Janne Valkealahti
  *
  */
@@ -31,7 +31,7 @@ abstract class YarnClusterInjectUtils {
 
 	/**
 	 * Create cluster and configuration beans.
-	 * 
+	 *
 	 * @param context the context in which the configuration classes should be registered
 	 * @param mergedConfig the merged configuration from which the classes should be retrieved
 	 */
@@ -41,25 +41,25 @@ abstract class YarnClusterInjectUtils {
 		Class<?> testClass = mergedConfig.getTestClass();
 		boolean hasMiniYarnCluster = testClass.isAnnotationPresent(annotationType);
 		MiniYarnCluster annotation = testClass.getAnnotation(annotationType);
-		
+
 		if (hasMiniYarnCluster) {
 			String clusterName = annotation.clusterName();
 			String configName = annotation.configName();
 			String id = annotation.id();
 			int nodeCount = annotation.nodes();
-			
+
 			BeanDefinitionBuilder builder = BeanDefinitionBuilder
 					.genericBeanDefinition(ClusterDelegatingFactoryBean.class);
 			builder.addPropertyValue("id", id);
 			builder.addPropertyValue("nodes", nodeCount);
 			context.registerBeanDefinition(clusterName, builder.getBeanDefinition());
-		
+
 			builder = BeanDefinitionBuilder
 					.genericBeanDefinition(ConfigurationDelegatingFactoryBean.class);
 			builder.addPropertyReference("cluster", clusterName);
 			context.registerBeanDefinition(configName, builder.getBeanDefinition());
 		}
-		
+
 	}
-	
+
 }

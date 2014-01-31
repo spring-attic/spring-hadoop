@@ -19,6 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -27,10 +28,13 @@ import org.springframework.yarn.am.AppmasterService;
 import org.springframework.yarn.am.YarnAppmaster;
 import org.springframework.yarn.am.allocate.AbstractAllocator;
 import org.springframework.yarn.batch.repository.BatchAppmasterService;
+//import org.springframework.yarn.batch.repository.BatchAppmasterService;
 import org.springframework.yarn.batch.repository.JobRepositoryRemoteServiceInterceptor;
 import org.springframework.yarn.batch.repository.JobRepositoryRpcFactory;
 import org.springframework.yarn.batch.repository.bindings.PartitionedStepExecutionStatusReq;
 import org.springframework.yarn.batch.repository.bindings.PartitionedStepExecutionStatusRes;
+//import org.springframework.yarn.batch.repository.bindings.PartitionedStepExecutionStatusReq;
+//import org.springframework.yarn.batch.repository.bindings.PartitionedStepExecutionStatusRes;
 import org.springframework.yarn.batch.repository.bindings.StepExecutionType;
 import org.springframework.yarn.integration.ip.mind.binding.BaseObject;
 import org.springframework.yarn.integration.ip.mind.binding.BaseResponseObject;
@@ -133,6 +137,15 @@ public class BatchAppmaster extends AbstractBatchAppmaster
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.applicationContext = applicationContext;
+	}
+
+	@Override
+	public JobLauncher getJobLauncher() {
+		JobLauncher jl = super.getJobLauncher();
+		if (jl == null) {
+			jl = applicationContext.getBean(JobLauncher.class);
+		}
+		return jl;
 	}
 
 }
