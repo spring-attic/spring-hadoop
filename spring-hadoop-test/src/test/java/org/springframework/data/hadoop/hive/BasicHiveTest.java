@@ -53,7 +53,6 @@ public class BasicHiveTest {
 	private HiveOperations hiveTemplate;
 
 	{
-		System.setProperty("java.io.tmpdir", "");
 		TestUtils.hackHadoopStagingOnWin();
 	}
 
