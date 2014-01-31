@@ -13,18 +13,4 @@
 			http://www.springframework.org/schema/integration/ip
 			http://www.springframework.org/schema/integration/ip/spring-integration-ip.xsd">
 
-	<bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager"/>
-
-	<bean id="mapJobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">
-		<property name="transactionManager" ref="transactionManager"/>
-	</bean>
-
-	<bean id="jobRepository" class="org.springframework.yarn.batch.repository2.RemoteJobRepository">
-		<property name="jobRepository" ref="mapJobRepository"/>
-	</bean>
-
-<!-- 	<bean id="jobExplorer" class="org.springframework.batch.core.explore.support.MapJobExplorerFactoryBean">
-		<property name="repositoryFactory" ref="&amp;jobRepository" />
-	</bean>
- -->
 </beans>
