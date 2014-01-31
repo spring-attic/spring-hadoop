@@ -86,7 +86,7 @@ public class ConfigurationNamespaceTests {
 		assertThat(shortcutBased.get("fs.default.name"), is("hdfs://fakefs:1234"));
 		assertThat(shortcutBased.get("fs.defaultFS"), is("hdfs://fakefs:1234"));
 		assertThat(shortcutBased.get("mapred.job.tracker"), is("fakejt:1234"));
-		assertThat(shortcutBased.get("yarn.resource.manager"), is("fakerm:1234"));
+		assertThat(shortcutBased.get("yarn.resourcemanager.address"), is("fakerm:1234"));
 	}
 
 }
