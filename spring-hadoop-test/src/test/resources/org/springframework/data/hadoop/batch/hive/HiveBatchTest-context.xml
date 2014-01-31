@@ -1,12 +1,14 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:util="http://www.springframework.org/schema/util"
 	xmlns:hdp="http://www.springframework.org/schema/hadoop"
 	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:c="http://www.springframework.org/schema/c"
 	xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
       	http://www.springframework.org/schema/batch	http://www.springframework.org/schema/batch/spring-batch.xsd
+      	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
       	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
       	http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
 
@@ -18,6 +20,8 @@
 		return=captain eo
 		train=last
 	</hdp:hive-server>
+
+	<util:properties id="props" location="props.properties"/>
 
 	<!--use the bean definition to go beyond the configuration options provided by the namespace -->
 	<bean name="ppc" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" 

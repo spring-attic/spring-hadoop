@@ -29,9 +29,7 @@
 		return=captain eo
 		train=last
 	</hdp:hive-server>
-	
- 	
-	
+
 	<util:properties id="props" location="props.properties"/>
 	
 	<hdp:hive-client-factory host="${hive.host}" port="${hive.port}"/>
