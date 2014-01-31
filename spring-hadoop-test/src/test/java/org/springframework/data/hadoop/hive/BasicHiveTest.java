@@ -28,6 +28,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.data.hadoop.TestUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -43,6 +44,7 @@ import static org.junit.Assume.*;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("/org/springframework/data/hadoop/hive/basic.xml")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class BasicHiveTest {
 
 	@Autowired
