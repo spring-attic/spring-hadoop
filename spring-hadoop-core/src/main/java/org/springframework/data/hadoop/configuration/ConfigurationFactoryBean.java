@@ -82,7 +82,7 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 		}
 
 		if (StringUtils.hasText(rmUri)) {
-			internalConfig.set("yarn.resource.manager", rmUri.trim());
+			internalConfig.set("yarn.resourcemanager.address", rmUri.trim());
 		}
 
 		if (initialize) {
@@ -216,7 +216,7 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 	}
 
 	/**
-	 * Sets the Yarn resource manager ('yarn.resource.manager') URI for HadoopV2.
+	 * Sets the Yarn resource manager ('yarn.resourcemanager.address') URI for HadoopV2.
 	 *
 	 * @param rmUri the resource manager uri
 	 */
