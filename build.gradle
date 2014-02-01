@@ -1043,6 +1043,7 @@ if (gradle.ext.mr2) {
 			compile project(":spring-yarn:spring-yarn-core")
 			provided project(":spring-yarn:spring-yarn-batch")
 			compile "org.springframework.boot:spring-boot-autoconfigure:$springBootVersion"
+			runtime "org.yaml:snakeyaml:$snakeYamlVersion"
 		}
 	}
 
