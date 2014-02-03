@@ -1,9 +1,27 @@
 SPRING for APACHE HADOOP CHANGELOG
 ==================================
-http://www.springsource.org/spring-data/hadoop
+http://projects.spring.io/spring-hadoop/
 
-Commit changelog: http://github.com/SpringSource/spring-hadoop/tree/v[version]
+Commit changelog: http://github.com/spring-projects/spring-hadoop/tree/v[version]
 Issues changelog: http://jira.springsource.org/secure/ReleaseNote.jspa?projectId=10801
+
+Changes in version 2.0.0 M5 (2014-02-03)
+-----------------------------------------
+General
+* Upgrade Kite SDK to 0.10.1 [SHDP-253]
+
+Store
+* Change Dataset to support POJOs containing fields with null values [SHDP-245]
+* Generalize the hdfs io for codecs and writers [SHDP-192]
+
+Test
+* Improve MiniCluster to work well with JavaConfig [SHDP-252]
+* Fix configuration for Hive tests [SHDP-184]
+
+YARN
+* Add JavaConfig for YARN
+* Support YARN using Spring Boot [SHDP-235]
+
 
 Changes in version 2.0.0 M4 (2013-12-18)
 -----------------------------------------
