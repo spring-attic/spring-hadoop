@@ -40,6 +40,7 @@ import org.springframework.yarn.config.annotation.builders.SpringYarnConfigBuild
 import org.springframework.yarn.event.DefaultYarnEventPublisher;
 import org.springframework.yarn.event.YarnEventPublisher;
 import org.springframework.yarn.fs.ResourceLocalizer;
+import org.springframework.yarn.support.YarnUtils;
 
 /**
  * Uses a {@link SpringYarnConfigBuilder} to create {@link SpringYarnConfigs}
@@ -92,7 +93,13 @@ public class SpringYarnConfiguration extends AbstractAnnotationConfiguration<Spr
 
 		if (log.isDebugEnabled()) {
 			log.debug("vanillaConfigBeans: " + vanillaConfigBeans);
+			for (org.apache.hadoop.conf.Configuration conf : vanillaConfigBeans.values()) {
+				log.debug(YarnUtils.toString(conf));
+			}
 			log.debug("yarnConfigBeans: " + yarnConfigBeans);
+			for (org.apache.hadoop.conf.Configuration conf : yarnConfigBeans.values()) {
+				log.debug(YarnUtils.toString(conf));
+			}
 		}
 
 		Map<String, org.apache.hadoop.conf.Configuration> uniqueBeans = new HashMap<String, org.apache.hadoop.conf.Configuration>();
@@ -101,7 +108,7 @@ public class SpringYarnConfiguration extends AbstractAnnotationConfiguration<Spr
 
 		if (uniqueBeans.size() == 1) {
 			log.info("About to set SpringYarnConfigBuilder hadoop configuration");
-				builder.setYarnConfiguration(uniqueBeans.entrySet().iterator().next().getValue());
+			builder.setYarnConfiguration(uniqueBeans.entrySet().iterator().next().getValue());
 		} else {
 			log.info("We couldn't figure out if we could use existing configuration");
 		}

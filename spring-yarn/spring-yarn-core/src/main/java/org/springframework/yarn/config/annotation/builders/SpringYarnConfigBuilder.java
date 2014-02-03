@@ -52,14 +52,21 @@ public class SpringYarnConfigBuilder
 		// shared objects are created in SpringYarnConfigurerAdapter
 		YarnConfigBuilder sharedObject = getSharedObject(YarnConfigBuilder.class);
 
-		log.info("YarnConfigBuilder shared: " + sharedObject);
-		log.info("Existing yarnConfiguration: " + yarnConfiguration);
+		log.info("Existing yarnConfiguration: " + YarnUtils.toString(yarnConfiguration));
 
 		Configuration buildConfiguration = getSharedObject(YarnConfigBuilder.class).build();
 
+		// TODO: we should find better way to merge configs
 		Configuration configuration = (yarnConfiguration == null)
 				? buildConfiguration
-				: YarnUtils.merge(yarnConfiguration, buildConfiguration);
+				: YarnUtils.merge(buildConfiguration, yarnConfiguration);
+
+		if (log.isDebugEnabled()) {
+			log.debug("YarnConfigBuilder shared: " + sharedObject);
+			log.debug("Existing buildConfiguration: " + YarnUtils.toString(buildConfiguration));
+		}
+		log.info("Setting configuration for SpringYarnConfigs: " + YarnUtils.toString(configuration));
+
 
 		config.setConfiguration(configuration);
 
