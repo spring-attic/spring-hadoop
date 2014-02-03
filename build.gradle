@@ -727,13 +727,13 @@ project('spring-data-hadoop-store') {
 	description = 'Spring for Apache Hadoop Store Features'
 
 	dependencies {
-		compile "org.kitesdk:kite-data-core:0.10.0"
+		compile "org.kitesdk:kite-data-core:0.10.1"
 		testCompile project(":spring-data-hadoop")
 		testCompile project(path:":spring-hadoop-test-core", configuration:"testArtifacts")
 		testCompile "org.springframework:spring-test:$springVersion"
 		testCompile "org.hamcrest:hamcrest-core:$hamcrestVersion"
 		testCompile "org.hamcrest:hamcrest-library:$hamcrestVersion"
-		testRuntime "org.xerial.snappy:snappy-java:1.1.0"
+		testRuntime "org.xerial.snappy:snappy-java:1.0.5"
 	}
 
 }
