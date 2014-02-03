@@ -18,7 +18,6 @@ allprojects {
 	group = 'org.springframework.data'
 
 	repositories {
-		mavenLocal()
 		mavenCentral()
 		maven { url 'http://repo.springsource.org/libs-milestone' }
 	}
