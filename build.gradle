@@ -753,6 +753,7 @@ project('spring-hadoop-test-core') {
 	// expose test classes so that dependant project
 	// may define it as dependency
 	configurations {
+		testCompile.exclude group: 'org.mockito'
 		testArtifacts.extendsFrom testRuntime
 	}
 	artifacts {
