@@ -1107,6 +1107,14 @@ if (gradle.ext.mr2) {
 		test.dependsOn([copyHadoopRuntimeDeps,copyHadoopRuntimeDepsAll])
 	}
 
+	project('spring-yarn:spring-yarn-boot-test') {
+		description = 'Spring Yarn Boot Test'
+		dependencies {
+			compile project(":spring-yarn:spring-yarn-boot")
+			compile project(":spring-yarn:spring-yarn-test")
+		}
+	}
+
 }
 
 task wrapper(type: Wrapper) {
