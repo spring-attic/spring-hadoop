@@ -162,7 +162,7 @@ public abstract class AbstractYarnClusterTests implements ApplicationContextAwar
 	 */
 	protected ApplicationInfo submitApplicationAndWaitState(long timeout, TimeUnit unit, YarnApplicationState... applicationStates) throws Exception {
 		Assert.notEmpty(applicationStates, "Need to have atleast one state");
-		Assert.notNull(yarnClient, "Yarn client must be set");
+		Assert.notNull(getYarnClient(), "Yarn client must be set");
 
 		YarnApplicationState state = null;
 		ApplicationId applicationId = submitApplication();
@@ -173,7 +173,7 @@ public abstract class AbstractYarnClusterTests implements ApplicationContextAwar
 		// break label for inner loop
 		done:
 		do {
-			state = findState(yarnClient, applicationId);
+			state = findState(getYarnClient(), applicationId);
 			if (state == null) {
 				break;
 			}
@@ -193,8 +193,8 @@ public abstract class AbstractYarnClusterTests implements ApplicationContextAwar
 	 * @return the submitted application {@link ApplicationId}
 	 */
 	protected ApplicationId submitApplication() {
-		Assert.notNull(yarnClient, "Yarn client must be set");
-		ApplicationId applicationId = yarnClient.submitApplication();
+		Assert.notNull(getYarnClient(), "Yarn client must be set");
+		ApplicationId applicationId = getYarnClient().submitApplication();
 		Assert.notNull(applicationId, "Failed to get application id from submit");
 		return applicationId;
 	}
@@ -213,7 +213,7 @@ public abstract class AbstractYarnClusterTests implements ApplicationContextAwar
 	 * @throws Exception if exception occurred
 	 */
 	protected YarnApplicationState waitState(ApplicationId applicationId, long timeout, TimeUnit unit, YarnApplicationState... applicationStates) throws Exception {
-		Assert.notNull(yarnClient, "Yarn client must be set");
+		Assert.notNull(getYarnClient(), "Yarn client must be set");
 		Assert.notNull(applicationId, "ApplicationId must not be null");
 
 		YarnApplicationState state = null;
@@ -222,7 +222,7 @@ public abstract class AbstractYarnClusterTests implements ApplicationContextAwar
 		// break label for inner loop
 		done:
 		do {
-			state = findState(yarnClient, applicationId);
+			state = findState(getYarnClient(), applicationId);
 			if (state == null) {
 				break;
 			}
@@ -242,9 +242,9 @@ public abstract class AbstractYarnClusterTests implements ApplicationContextAwar
 	 * @param applicationId the application id
 	 */
 	protected void killApplication(ApplicationId applicationId) {
-		Assert.notNull(yarnClient, "Yarn client must be set");
+		Assert.notNull(getYarnClient(), "Yarn client must be set");
 		Assert.notNull(applicationId, "ApplicationId must not be null");
-		yarnClient.killApplication(applicationId);
+		getYarnClient().killApplication(applicationId);
 	}
 
 	/**
@@ -254,9 +254,9 @@ public abstract class AbstractYarnClusterTests implements ApplicationContextAwar
 	 * @return Current application state or <code>NULL</code> if not found
 	 */
 	protected YarnApplicationState getState(ApplicationId applicationId) {
-		Assert.notNull(yarnClient, "Yarn client must be set");
+		Assert.notNull(getYarnClient(), "Yarn client must be set");
 		Assert.notNull(applicationId, "ApplicationId must not be null");
-		return findState(yarnClient, applicationId);
+		return findState(getYarnClient(), applicationId);
 	}
 
 	/**
