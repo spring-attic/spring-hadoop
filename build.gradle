@@ -4,8 +4,8 @@ defaultTasks 'build'
 
 buildscript {
 	repositories {
-		maven { url "http://repo.springsource.org/plugins-release" }
-		maven { url "http://repo.springsource.org/plugins-milestone" }
+		maven { url "http://repo.spring.io/plugins-release" }
+		maven { url "http://repo.spring.io/plugins-milestone" }
 	}
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:$springBootVersion")
@@ -19,7 +19,7 @@ allprojects {
 
 	repositories {
 		mavenCentral()
-		maven { url 'http://repo.springsource.org/libs-milestone' }
+		maven { url 'http://repo.spring.io/libs-milestone' }
 	}
 }
 
@@ -46,9 +46,9 @@ println "Using Spring Framework version: [$springVersion]"
 //
 def List hadoopArtifacts = []
 def List hadoopTestArtifacts = []
-def hadoopDefault = "hadoop12"
+def hadoopDefault = "hadoop22"
 def hadoopDistro = project.hasProperty("distro") ? project.getProperty("distro") : hadoopDefault
-def hadoopVersion = hd12Version
+def hadoopVersion = hd22Version
 
 // Common Hadoop libraries
 def hiveVersion = defaultHiveVersion
@@ -62,7 +62,7 @@ def pigQualifier = ''
 // handle older Hive version
 def hiveGroup = "org.apache.hive"
 
-// default is Hadoop 1.2.x
+// default is Hadoop 2.2.x
 switch (hadoopDistro) {
 
 	// Cloudera CDH5 YARN 2.2.x base
@@ -90,7 +90,7 @@ switch (hadoopDistro) {
 					"org.apache.hadoop:hadoop-mapreduce-client-hs:$hadoopVersion",
 					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion",
 					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion:tests"]
-		break;	
+		break;
 
 	// Cloudera CDH5 MR1
 	case "cdh5mr1":
@@ -212,10 +212,35 @@ switch (hadoopDistro) {
 		thriftVersion = hdp20ThriftVersion
 		break;
 
-	// Hadoop 2.2 GA
-	case "hadoop22":
+	// Hadoop 1.2.x Stable
+	case "hadoop12":
+		hadoopVersion = hd12Version
+		println "Using Apache Hadoop 1.2.x [$hadoopVersion]"
+		hadoopArtifacts = ["org.apache.hadoop:hadoop-streaming:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-tools:$hadoopVersion"]
+		hadoopTestArtifacts = ["org.apache.hadoop:hadoop-test:$hadoopVersion"]
+		hbaseVersion = hd12HbaseVersion
+		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion"]
+		hiveVersion = hd12HiveVersion
+		pigVersion = hd12PigVersion
+		thriftVersion = hd12ThriftVersion
+		break;
+
+	// Hadoop 2.2.x Stable
+	default:
+		if (!project.hasProperty("distro")) {
+			println "Using default distro: Apache Hadoop [$hadoopVersion]"
+		} else {
+			if (hadoopDistro == hadoopDefault) {
+				println "Using Apache Hadoop 2.2 - [$hadoopVersion]"
+			} else {
+				println "Failing build: $hadoopDistro is not a supported distro"
+				println "Supported distros: hadoop12, hadoop22[*], hdp13, hdp20, cdh4, cdh4yarn, cdh5, cdh5mr1 and phd1"
+				println "* default"
+				throw new InvalidUserDataException("$hadoopDistro is not a supported distro")
+			}
+		}
 		hadoopVersion = hd22Version
-		println "Using Apache Hadoop 2.2 - [$hadoopVersion]"
 		hadoopArtifacts = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
@@ -237,30 +262,6 @@ switch (hadoopDistro) {
 		pigVersion = hd22PigVersion
 		pigQualifier = ':h2'
 		thriftVersion = hd22ThriftVersion
-		break;
-
-	default:
-		if (!project.hasProperty("distro")) {
-			println "Using default distro: Apache Hadoop [$hadoopVersion]"
-		} else {
-			if (hadoopDistro == hadoopDefault) {
-				println "Using Apache Hadoop 1.2.x [$hadoopVersion]"
-			} else {
-				println "Failing build: $hadoopDistro is not a supported distro"
-				println "Supported distros: hadoop11, hadoop12[*], hadoop22, hdp13, hdp20, cdh4, cdh4yarn, cdh5, cdh5mr1 and phd1"
-				println "* default"
-				throw new InvalidUserDataException("$hadoopDistro is not a supported distro")
-			}
-		}
-		hadoopVersion = hd12Version
-		hadoopArtifacts = ["org.apache.hadoop:hadoop-streaming:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-tools:$hadoopVersion"]
-		hadoopTestArtifacts = ["org.apache.hadoop:hadoop-test:$hadoopVersion"]
-		hbaseVersion = hd12HbaseVersion
-		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion"]
-		hiveVersion = hd12HiveVersion
-		pigVersion = hd12PigVersion
-		thriftVersion = hd12ThriftVersion
 }
 
 configure(javaProjects()) {
@@ -303,6 +304,7 @@ configure(javaProjects()) {
 		compile "org.springframework:spring-context-support:$springVersion"
 		compile "org.springframework:spring-jdbc:$springVersion"
 		compile "org.springframework:spring-tx:$springVersion"
+		testRuntime "com.google.guava:guava:$guavaVersion"
 	}
 
 	task sourcesJar(type: Jar) {
@@ -399,7 +401,7 @@ configure(javaProjects()) {
 
 configure(hadoopProjects()) {
 
-	// default is Hadoop 1.2.x
+	// default is Hadoop 2.2.x
 	switch (hadoopDistro) {
 
 		// Cloudera CDH5 YARN
@@ -458,7 +460,7 @@ configure(hadoopProjects()) {
 			}
 			break;	
 
-		// Pivotal HD 2.0
+		// Pivotal HD 1.0
 		case "phd1":
 			dependencies {
 				compile "org.apache.hive:hive-common:$hiveVersion"
@@ -487,25 +489,19 @@ configure(hadoopProjects()) {
 			}
 			break;
 
-		// Hadoop 2.2 GA
-		case "hadoop22":
+		// Hadoop 1.2.x Stable
+		case "hadoop12":
 			dependencies {
-				testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
-				testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
+				testCompile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
 				testRuntime "dk.brics.automaton:automaton:1.11-8"
 			}
 			break;
 
-		// Hadoop 1.1.x
-		case "hadoop11":
-			dependencies {
-				testCompile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
-			}
-			break;
-
+		// Hadoop 2.2.x Stable
 		default:
 			dependencies {
-				testCompile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
+				testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
+				testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
 				testRuntime "dk.brics.automaton:automaton:1.11-8"
 			}
 	}
@@ -726,7 +722,7 @@ project('spring-data-hadoop-store') {
 	description = 'Spring for Apache Hadoop Store Features'
 
 	dependencies {
-		compile "org.kitesdk:kite-data-core:0.10.1"
+		compile "org.kitesdk:kite-data-core:$kiteVersion"
 		testCompile project(":spring-data-hadoop")
 		testCompile project(path:":spring-hadoop-test-core", configuration:"testArtifacts")
 		testCompile "org.springframework:spring-test:$springVersion"

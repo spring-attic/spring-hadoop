@@ -26,7 +26,7 @@ import org.springframework.util.ReflectionUtils;
  * Compat class for {@link NMTokenCache}.
  *
  * @author Janne Valkealahti
- *
+ * @Thomas Risberg
  */
 public class NMTokenCacheCompat {
 
@@ -69,4 +69,20 @@ public class NMTokenCacheCompat {
 		return nmTokenCache;
 	}
 
+	public static boolean containsToken(NMTokenCache nmTokenCache, String nodeId) {
+		if (nmTokenCache != null) {
+			Method method = ReflectionUtils.findMethod(NMTokenCache.class, "containsNMToken", String.class);
+			if (method == null) {
+				method = ReflectionUtils.findMethod(NMTokenCache.class, "containsToken", String.class);
+			}
+			if (method != null) {
+				boolean results = (Boolean)ReflectionUtils.invokeMethod(method, nmTokenCache, nodeId);
+				log.debug("NMTokenCache method " + method.getName() + " returned " + results);
+				return results;
+			} else {
+				log.debug("Unable to determine the name for 'containsToken' method on NMTokenCache class");
+			}
+		}
+		return false;
+	}
 }

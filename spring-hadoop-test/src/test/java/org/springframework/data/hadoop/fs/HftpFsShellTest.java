@@ -16,8 +16,8 @@
 package org.springframework.data.hadoop.fs;
 
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.hdfs.HftpFileSystem;
 import org.junit.runner.RunWith;
+import org.springframework.data.hadoop.HadoopException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -25,13 +25,36 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * Integration test for FsShell using the default file system.
  * 
  * @author Costin Leau
+ * @Thomas Risberg
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration
 public class HftpFsShellTest extends AbstractROFsShellTest {
 
+	public static final String HFTP_FILESYSTEM_CLASS_NAME_FOR_V1_THRU_V2_2 =
+			"org.apache.hadoop.hdfs.HftpFileSystem";
+	public static final String HFTP_FILESYSTEM_CLASS_NAME_SINCE_V2_3 =
+			"org.apache.hadoop.hdfs.web.HftpFileSystem";
+
 	@Override
 	Class<? extends FileSystem> fsClass() {
-		return HftpFileSystem.class;
+		return getHftpFileSystemClass();
+	}
+
+	Class<? extends FileSystem> getHftpFileSystemClass() {
+		Class<? extends FileSystem> clazz = null;
+		try {
+			clazz = (Class<? extends FileSystem>) Class.forName(
+					HFTP_FILESYSTEM_CLASS_NAME_FOR_V1_THRU_V2_2);
+		} catch (ClassNotFoundException e) {
+			try {
+				clazz = (Class<? extends FileSystem>) Class.forName(
+						HFTP_FILESYSTEM_CLASS_NAME_SINCE_V2_3);
+			} catch (ClassNotFoundException e1) {
+				throw new HadoopException("HftpFileSystem class not available " +
+						e1.getMessage(), e1);
+			}
+		}
+		return clazz;
 	}
 }
