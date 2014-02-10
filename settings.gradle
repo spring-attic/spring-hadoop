@@ -28,14 +28,11 @@ switch (ext.hadoopDistro) {
 	case "hdp20":
 		ext.mr2 = true
 		break
-	case "hadoop22":
-		ext.mr2 = true
-		break
-	case "hadoop11":
+	case "hadoop12":
 		ext.mr2 = false
 		break
 	default:
-		ext.mr2 = false
+		ext.mr2 = true
 }
 
 gradle.ext.mr2 = mr2
@@ -55,6 +52,3 @@ if (mr2) {
   print "Based on selected distro (${hadoopDistro}) we are including spring-yarn\n"
   include 'spring-yarn:spring-yarn-core','spring-yarn:spring-yarn-integration','spring-yarn:spring-yarn-batch','spring-yarn:spring-yarn-test-core','spring-yarn:spring-yarn-test','spring-yarn:spring-yarn-boot','spring-yarn:spring-yarn-boot-test'
 }
-
-
-
