@@ -222,7 +222,7 @@ public abstract class AbstractPollingAllocator extends AbstractAllocator {
 			String nodeId = token.getNodeId().toString();
 			if (log.isDebugEnabled()) {
 				log.info("Token from allocateResponse token=" + token);
-				if (tokenCache.containsNMToken(nodeId)) {
+				if (NMTokenCacheCompat.containsToken(tokenCache, nodeId)) {
 					log.debug("Replacing token for : " + nodeId);
 				} else {
 					log.debug("Received new token for : " + nodeId);

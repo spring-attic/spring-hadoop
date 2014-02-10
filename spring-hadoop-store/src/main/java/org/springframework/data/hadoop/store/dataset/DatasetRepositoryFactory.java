@@ -64,7 +64,7 @@ public class DatasetRepositoryFactory implements InitializingBean {
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(conf, "The configuration property is required");
 		this.repo = new FileSystemDatasetRepository.Builder()
-				.rootDirectory(new URI(basePath)).configuration(conf).get();
+				.rootDirectory(new URI(basePath)).configuration(conf).build();
 	}
 
 	/**
