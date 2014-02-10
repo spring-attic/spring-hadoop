@@ -28,7 +28,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.data.hadoop.config.common.annotation.simple.EnableSimpleTest;
 import org.springframework.data.hadoop.config.common.annotation.simple.SimpleTestConfigBeanABuilder;
-import org.springframework.data.hadoop.config.common.annotation.simple.SimpleTestConfigBeanBConfigure;
+import org.springframework.data.hadoop.config.common.annotation.simple.SimpleTestConfigBeanBConfigurer;
 import org.springframework.data.hadoop.config.common.annotation.simple.SimpleTestConfigBuilder;
 import org.springframework.data.hadoop.config.common.annotation.simple.SimpleTestConfigurerAdapter;
 import org.springframework.test.context.ContextConfiguration;
@@ -84,7 +84,7 @@ public class XmlImportDependenciesTests {
 		}
 
 		@Override
-		public void configure(SimpleTestConfigBeanBConfigure beanB) throws Exception {
+		public void configure(SimpleTestConfigBeanBConfigurer beanB) throws Exception {
 			beanB
 				.setData("simpleDataB")
 				.setDataBB("simpleDataBB")

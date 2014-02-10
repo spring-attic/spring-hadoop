@@ -17,8 +17,8 @@ package org.springframework.data.hadoop.config.common.annotation.complex;
 
 import org.springframework.data.hadoop.config.common.annotation.AbstractConfiguredAnnotationBuilder;
 import org.springframework.data.hadoop.config.common.annotation.AnnotationBuilder;
-import org.springframework.data.hadoop.config.common.annotation.configurers.ResourceConfigure;
 import org.springframework.data.hadoop.config.common.annotation.configurers.ResourceConfigurer;
+import org.springframework.data.hadoop.config.common.annotation.configurers.DefaultResourceConfigurer;
 
 /**
  * {@link AnnotationBuilder} for {@link ComplexTestConfigBeanB}.
@@ -27,8 +27,8 @@ import org.springframework.data.hadoop.config.common.annotation.configurers.Reso
  *
  */
 public class ComplexTestConfigBeanBBuilder
-		extends AbstractConfiguredAnnotationBuilder<ComplexTestConfigBeanB, ComplexTestConfigBeanBConfigure,ComplexTestConfigBeanBBuilder>
-		implements ComplexTestConfigBeanBConfigure {
+		extends AbstractConfiguredAnnotationBuilder<ComplexTestConfigBeanB, ComplexTestConfigBeanBConfigurer,ComplexTestConfigBeanBBuilder>
+		implements ComplexTestConfigBeanBConfigurer {
 
 	private String dataB;
 	private String dataBB;
@@ -42,20 +42,20 @@ public class ComplexTestConfigBeanBBuilder
 	}
 
 	@Override
-	public ComplexTestConfigBeanBConfigure setData(String data) {
+	public ComplexTestConfigBeanBConfigurer setData(String data) {
 		this.dataB = data;
 		return this;
 	}
 
 	@Override
-	public ComplexTestConfigBeanBConfigure setDataBB(String data) {
+	public ComplexTestConfigBeanBConfigurer setDataBB(String data) {
 		this.dataBB = data;
 		return this;
 	}
 
 	@Override
-	public ResourceConfigure<ComplexTestConfigBeanBConfigure> withResources() throws Exception {
-		return getOrApply(new ResourceConfigurer<ComplexTestConfigBeanB,ComplexTestConfigBeanBConfigure,ComplexTestConfigBeanBBuilder>());
+	public ResourceConfigurer<ComplexTestConfigBeanBConfigurer> withResources() throws Exception {
+		return getOrApply(new DefaultResourceConfigurer<ComplexTestConfigBeanB,ComplexTestConfigBeanBConfigurer,ComplexTestConfigBeanBBuilder>());
 	}
 
 }

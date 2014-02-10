@@ -18,23 +18,22 @@ package org.springframework.data.hadoop.config.common.annotation.configurers;
 import java.util.Set;
 
 import org.springframework.core.io.Resource;
-import org.springframework.data.hadoop.config.common.annotation.AnnotationConfigurerBuilder;
+import org.springframework.data.hadoop.config.common.annotation.AnnotationBuilder;
 
 /**
- * Interface for {@link ResourceConfigurer} which act
- * as intermediate gatekeeper between a user and
- * an {@link AnnotationConfigurer}.
+ * Interface for {@link AnnotationBuilder} which wants to be
+ * aware of {@link Resource}s configured by {@link DefaultResourceConfigurer}.
  *
  * @author Janne Valkealahti
  *
- * @param <I> The type of an interface of B
  */
-public interface ResourceConfigure<I> extends AnnotationConfigurerBuilder<I> {
+public interface ResourceConfigurerAware {
 
-	ResourceConfigure<I> resource(Set<Resource> resources);
-
-	ResourceConfigure<I> resource(Resource resource);
-
-	ResourceConfigure<I> resource(String resource);
+	/**
+	 * Configure {@link Resource}s.
+	 *
+	 * @param resources the resources
+	 */
+	void configureResources(Set<Resource> resources);
 
 }
