@@ -24,14 +24,14 @@ You can find out more details from the [user documentation](http://static.spring
   <id>spring-maven-snapshot</id>
   <snapshots><enabled>true</enabled></snapshots>
   <name>Springframework Maven SNAPSHOT Repository</name>
-  <url>http://repo.springsource.org/snapshot</url>
+  <url>http://repo.spring.io/snapshot</url>
 </repository> 
 
 <!-- used for milestone/rc releases -->
 <repository>
   <id>spring-maven-milestone</id>
   <name>Springframework Maven Milestone Repository</name>
-  <url>http://repo.springsource.org/milestone</url>
+  <url>http://repo.spring.io/milestone</url>
 </repository> 
 ~~~~~
 
@@ -41,9 +41,9 @@ Based on the artifact type, pick one of the repos below:
 
 ~~~~~ groovy
 repositories {
-  maven { url "http://repo.springsource.org/release" }
-  maven { url "http://repo.springsource.org/milestone" }
-  maven { url "http://repo.springsource.org/snapshot" }
+  maven { url "http://repo.spring.io/release" }
+  maven { url "http://repo.spring.io/milestone" }
+  maven { url "http://repo.spring.io/snapshot" }
 }
 
 dependencies {
@@ -69,11 +69,11 @@ from the project root folder. This will compile the sources, run the tests and c
 
 ## Supported distros
 
-By default Spring for Apache Hadoop compiles against the Apache Hadoop 1.2.x stable relase (hadoop12).
+By default Spring for Apache Hadoop compiles against the Apache Hadoop 2.2.x stable relase (hadoop22) *.
 
 The following distros and versions are also supported:
 
-- Apache Hadoop 2.2.x (hadoop22) *
+- Apache Hadoop 1.2.x (hadoop12)
 - Pivotal HD 1.1 (phd1)
 - Cloudera CDH4 MR1 (cdh4, cdh4mr1)
 - Cloudera CDH4 YARN (cdh4yarn)
@@ -88,20 +88,19 @@ The following distros and versions are also supported:
 
 To compile against a specific distro version pass the `-Pdistro=<label>` project property, like so:
 
-    gradlew -Pdistro=hadoop22 build
+    gradlew -Pdistro=hadoop12 build
 
 Note that the chosen distro is displayed on the screen:
 
-    Using Apache Hadoop 2.2.x [2.2.0]
+    Using Apache Hadoop 1.2.x [1.2.1]
 
-In this case, the specified Hadoop distribution (above Apache Hadoop 2.2.x) is used to create the project binaries.
+In this case, the specified Hadoop distribution (above Apache Hadoop 1.2.x) is used to create the project binaries.
 
 # CI Builds
 
 The status of the CI builds are available at [Status Summary Screen](https://build.springsource.org/telemetry.action?filter=project&projectKey=SPRINGDATAHADOOP)
 
 We are currently running tests against the following distributions:
-* Apache Hadoop 1.1.2
 * Apache Hadoop 1.2.1
 * Apache Hadoop 2.2.0
 * Cloudera CDH4
