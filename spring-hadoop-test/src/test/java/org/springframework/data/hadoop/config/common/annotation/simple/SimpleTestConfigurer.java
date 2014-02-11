@@ -27,6 +27,6 @@ public interface SimpleTestConfigurer extends AnnotationConfigurer<SimpleTestCon
 
 	void configure(SimpleTestConfigBeanABuilder a) throws Exception;
 
-	void configure(SimpleTestConfigBeanBConfigure b) throws Exception;
+	void configure(SimpleTestConfigBeanBConfigurer b) throws Exception;
 
 }

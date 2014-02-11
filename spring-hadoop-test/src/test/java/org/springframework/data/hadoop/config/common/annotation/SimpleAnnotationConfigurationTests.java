@@ -33,7 +33,7 @@ import org.springframework.data.hadoop.config.common.annotation.simple.EnableSim
 import org.springframework.data.hadoop.config.common.annotation.simple.SimpleTestConfig;
 import org.springframework.data.hadoop.config.common.annotation.simple.SimpleTestConfigBeanABuilder;
 import org.springframework.data.hadoop.config.common.annotation.simple.SimpleTestConfigBeanB;
-import org.springframework.data.hadoop.config.common.annotation.simple.SimpleTestConfigBeanBConfigure;
+import org.springframework.data.hadoop.config.common.annotation.simple.SimpleTestConfigBeanBConfigurer;
 import org.springframework.data.hadoop.config.common.annotation.simple.SimpleTestConfigBuilder;
 import org.springframework.data.hadoop.config.common.annotation.simple.SimpleTestConfigurerAdapter;
 import org.springframework.test.context.ContextConfiguration;
@@ -109,7 +109,7 @@ public class SimpleAnnotationConfigurationTests {
 		}
 
 		@Override
-		public void configure(SimpleTestConfigBeanBConfigure beanB) throws Exception {
+		public void configure(SimpleTestConfigBeanBConfigurer beanB) throws Exception {
 			beanB
 				.setData("simpleDataB")
 				.setDataBB("simpleDataBB")

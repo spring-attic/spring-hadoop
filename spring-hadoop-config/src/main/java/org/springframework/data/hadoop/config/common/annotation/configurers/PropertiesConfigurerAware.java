@@ -13,14 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.hadoop.config.common.annotation.simple;
+package org.springframework.data.hadoop.config.common.annotation.configurers;
 
-import org.springframework.data.hadoop.config.common.annotation.configurers.ResourceConfigure;
+import java.util.Properties;
 
-public interface SimpleTestConfigBeanBConfigure {
+/**
+ * Interface for {@link org.springframework.data.hadoop.config.common.annotation.AnnotationBuilder AnnotationBuilder}
+ * which wants to be aware of {@link Properties} configured by {@link DefaultPropertiesConfigurer}.
+ *
+ * @author Janne Valkealahti
+ *
+ */
+public interface PropertiesConfigurerAware {
 
-	SimpleTestConfigBeanBConfigure setData(String data);
-	SimpleTestConfigBeanBConfigure setDataBB(String data);
-	ResourceConfigure<SimpleTestConfigBeanBConfigure> withResources() throws Exception;
+	/**
+	 * Configure {@link Properties}.
+	 *
+	 * @param properties the properties
+	 */
+	void configureProperties(Properties properties);
 
 }

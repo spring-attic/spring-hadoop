@@ -45,7 +45,7 @@ public class ComplexTestConfigurerAdapter implements ComplexTestConfigurer {
 	}
 
 	@Override
-	public void configure(ComplexTestConfigBeanBConfigure b) throws Exception {
+	public void configure(ComplexTestConfigBeanBConfigurer b) throws Exception {
 	}
 
 	protected final ComplexTestConfigBeanBBuilder getSimpleTestConfigBeanBBuilder() throws Exception {

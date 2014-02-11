@@ -15,12 +15,12 @@
  */
 package org.springframework.data.hadoop.config.common.annotation.complex;
 
-import org.springframework.data.hadoop.config.common.annotation.configurers.ResourceConfigure;
+import org.springframework.data.hadoop.config.common.annotation.configurers.ResourceConfigurer;
 
-public interface ComplexTestConfigBeanBConfigure {
+public interface ComplexTestConfigBeanBConfigurer {
 
-	ComplexTestConfigBeanBConfigure setData(String data);
-	ComplexTestConfigBeanBConfigure setDataBB(String data);
-	ResourceConfigure<ComplexTestConfigBeanBConfigure> withResources() throws Exception;
+	ComplexTestConfigBeanBConfigurer setData(String data);
+	ComplexTestConfigBeanBConfigurer setDataBB(String data);
+	ResourceConfigurer<ComplexTestConfigBeanBConfigurer> withResources() throws Exception;
 
 }

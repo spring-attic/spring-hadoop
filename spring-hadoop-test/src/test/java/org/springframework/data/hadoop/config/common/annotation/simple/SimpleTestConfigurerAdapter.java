@@ -45,7 +45,7 @@ public class SimpleTestConfigurerAdapter implements SimpleTestConfigurer {
 	}
 
 	@Override
-	public void configure(SimpleTestConfigBeanBConfigure b) throws Exception {
+	public void configure(SimpleTestConfigBeanBConfigurer b) throws Exception {
 	}
 
 	protected final SimpleTestConfigBeanBBuilder getSimpleTestConfigBeanBBuilder() throws Exception {

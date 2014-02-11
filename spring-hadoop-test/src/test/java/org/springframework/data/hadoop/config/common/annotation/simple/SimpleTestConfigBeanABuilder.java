@@ -21,9 +21,9 @@ import java.util.Set;
 import org.springframework.core.io.Resource;
 import org.springframework.data.hadoop.config.common.annotation.AbstractConfiguredAnnotationBuilder;
 import org.springframework.data.hadoop.config.common.annotation.AnnotationBuilder;
-import org.springframework.data.hadoop.config.common.annotation.configurers.ResourceConfigure;
-import org.springframework.data.hadoop.config.common.annotation.configurers.ResourceConfigureAware;
+import org.springframework.data.hadoop.config.common.annotation.configurers.DefaultResourceConfigurer;
 import org.springframework.data.hadoop.config.common.annotation.configurers.ResourceConfigurer;
+import org.springframework.data.hadoop.config.common.annotation.configurers.ResourceConfigurerAware;
 
 /**
  * {@link AnnotationBuilder} for {@link SimpleTestConfigBeanA}.
@@ -33,7 +33,7 @@ import org.springframework.data.hadoop.config.common.annotation.configurers.Reso
  */
 public class SimpleTestConfigBeanABuilder
 		extends AbstractConfiguredAnnotationBuilder<SimpleTestConfigBeanA, SimpleTestConfigBeanABuilder, SimpleTestConfigBeanABuilder>
-		implements ResourceConfigureAware {
+		implements ResourceConfigurerAware {
 
 	private String data;
 	private Set<Resource> resources = new HashSet<Resource>();
@@ -60,8 +60,8 @@ public class SimpleTestConfigBeanABuilder
 		return this;
 	}
 
-	public ResourceConfigure<SimpleTestConfigBeanABuilder> withResources() throws Exception {
-		return getOrApply(new ResourceConfigurer<SimpleTestConfigBeanA, SimpleTestConfigBeanABuilder,SimpleTestConfigBeanABuilder>());
+	public ResourceConfigurer<SimpleTestConfigBeanABuilder> withResources() throws Exception {
+		return getOrApply(new DefaultResourceConfigurer<SimpleTestConfigBeanA, SimpleTestConfigBeanABuilder,SimpleTestConfigBeanABuilder>());
 	}
 
 }

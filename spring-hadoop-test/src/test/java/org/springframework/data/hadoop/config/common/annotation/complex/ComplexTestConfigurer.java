@@ -27,6 +27,6 @@ public interface ComplexTestConfigurer extends AnnotationConfigurer<ComplexTestC
 
 	void configure(ComplexTestConfigBeanABuilder a) throws Exception;
 
-	void configure(ComplexTestConfigBeanBConfigure b) throws Exception;
+	void configure(ComplexTestConfigBeanBConfigurer b) throws Exception;
 
 }
