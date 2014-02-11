@@ -63,7 +63,7 @@ import org.springframework.yarn.batch.listener.PartitionedStepExecutionStateList
  * @author Janne Valkealahti
  *
  */
-public abstract class AbstractBatchAppmaster extends AbstractEventingAppmaster implements ContainerLauncherInterceptor {
+public abstract class AbstractBatchAppmaster extends AbstractEventingAppmaster implements BatchYarnAppmaster, ContainerLauncherInterceptor {
 
 	private static final Log log = LogFactory.getLog(AbstractBatchAppmaster.class);
 
@@ -71,7 +71,7 @@ public abstract class AbstractBatchAppmaster extends AbstractEventingAppmaster i
 	private JobLauncher jobLauncher;
 
 	/** Name of the job to run */
-	private String jobName = "job";
+	private String jobName;
 
 	/** Step executions as reported back from containers */
 	private List<StepExecution> stepExecutions = new ArrayList<StepExecution>();
@@ -221,6 +221,8 @@ public abstract class AbstractBatchAppmaster extends AbstractEventingAppmaster i
 			env.put(YarnSystemConstants.AMSERVICE_PORT, Integer.toString(port));
 			env.put(YarnSystemConstants.AMSERVICE_HOST, address);
 			env.put(YarnSystemConstants.AMSERVICE_BATCH_STEPNAME, jobName);
+			env.put(YarnSystemConstants.AMSERVICE_BATCH_STEPNAME, jobName);
+			env.put(YarnSystemConstants.AMSERVICE_BATCH_STEPEXECUTIONNAME, stepExecution.getStepName());
 			env.put(YarnSystemConstants.AMSERVICE_BATCH_JOBEXECUTIONID, Long.toString(stepExecution.getJobExecutionId()));
 			env.put(YarnSystemConstants.AMSERVICE_BATCH_STEPEXECUTIONID, Long.toString(stepExecution.getId()));
 			context.setEnvironment(env);

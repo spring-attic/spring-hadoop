@@ -21,11 +21,19 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.context.annotation.Import;
 
+/**
+ * Enabled Spring Batch processing used with Yarn Appmaster.
+ *
+ * @author Janne Valkealahti
+ *
+ */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
+@EnableBatchProcessing
 @Import(SimpleYarnBatchConfiguration.class)
 public @interface EnableYarnBatchProcessing {
 

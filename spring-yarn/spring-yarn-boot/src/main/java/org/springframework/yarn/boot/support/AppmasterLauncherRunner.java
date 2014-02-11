@@ -16,7 +16,6 @@
 package org.springframework.yarn.boot.support;
 
 import java.util.Properties;
-import java.util.concurrent.CountDownLatch;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,6 +24,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.util.StringUtils;
 import org.springframework.yarn.am.AppmasterConstants;
 import org.springframework.yarn.am.YarnAppmaster;
+import org.springframework.yarn.launch.ExitStatus;
 import org.springframework.yarn.listener.AppmasterStateListener;
 
 /**
@@ -33,14 +33,9 @@ import org.springframework.yarn.listener.AppmasterStateListener;
  * @author Janne Valkealahti
  *
  */
-public class AppmasterLauncherRunner implements CommandLineRunner {
+public class AppmasterLauncherRunner extends CommandLineRunnerSupport implements CommandLineRunner {
 
 	private static final Log log = LogFactory.getLog(AppmasterLauncherRunner.class);
-
-	/** Latch used for appmaster wait */
-	private CountDownLatch latch = new CountDownLatch(1);
-
-	private boolean waitLatch = true;
 
 	private int containerCount = 1;
 
@@ -52,10 +47,6 @@ public class AppmasterLauncherRunner implements CommandLineRunner {
 		if (yarnAppmaster != null) {
 			launchAppmaster(yarnAppmaster, args);
 		}
-	}
-
-	public void setWaitLatch(boolean waitLatch) {
-		this.waitLatch = waitLatch;
 	}
 
 	public void setContainerCount(int containerCount) {
@@ -74,33 +65,28 @@ public class AppmasterLauncherRunner implements CommandLineRunner {
 		}
 		appmaster.setParameters(properties);
 
-//		appmaster.setParameters(properties != null ? properties : new Properties());
-
 
 		log.info("Running YarnAppmaster with parameters [" + StringUtils.arrayToCommaDelimitedString(parameters) + "]");
 
 		appmaster.addAppmasterStateListener(new AppmasterStateListener() {
 			@Override
 			public void state(AppmasterState state) {
-				if(state == AppmasterState.COMPLETED) {
-					latch.countDown();
+				if (state == AppmasterState.COMPLETED) {
+					countDownLatch();
+					exit(ExitStatus.COMPLETED.getExitCode());
+				} else if (state == AppmasterState.FAILED) {
+					countDownLatch();
+					exit(ExitStatus.FAILED.getExitCode());
 				}
 			}
 		});
 
 		appmaster.submitApplication();
 
-		if (waitLatch) {
+		if (isWaitLatch()) {
 			log.info("Waiting latch to receive appmaster complete state");
-			try {
-				latch.await();
-			} catch (InterruptedException e) {
-				log.info("YarnAppmaster latch wait interrupted");
-			}
-
+			waitLatch();
 			log.info("YarnAppmaster complete");
-			// TODO: think how to handle exit from a boot app
-			System.exit(0);
 		}
 	}
 

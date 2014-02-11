@@ -121,7 +121,7 @@ public class BatchMasterParser extends AbstractBeanDefinitionParser {
 		YarnNamespaceUtils.setReferenceIfAttributeDefined(builder, element, "configuration", YarnSystemConstants.DEFAULT_ID_CONFIGURATION);
 		YarnNamespaceUtils.setReferenceIfAttributeDefined(builder, element, "environment", YarnSystemConstants.DEFAULT_ID_ENVIRONMENT);
 		YarnNamespaceUtils.setReferenceIfAttributeDefined(builder, element, "job-launcher");
-		YarnNamespaceUtils.setValueIfAttributeDefined(builder, element, "job-name");
+		YarnNamespaceUtils.setValueIfAttributeDefined(builder, element, "job-name", false, "job");
 
 		return builder.getBeanDefinition();
 	}

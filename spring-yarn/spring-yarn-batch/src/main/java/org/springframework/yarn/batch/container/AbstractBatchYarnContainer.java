@@ -17,6 +17,7 @@ package org.springframework.yarn.batch.container;
 
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.step.StepLocator;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.yarn.container.YarnContainer;
 import org.springframework.yarn.integration.container.AbstractIntegrationYarnContainer;
 
@@ -50,6 +51,7 @@ public abstract class AbstractBatchYarnContainer extends AbstractIntegrationYarn
 	 *
 	 * @param stepLocator the new step locator
 	 */
+	@Autowired(required=false)
 	public void setStepLocator(StepLocator stepLocator) {
 		this.stepLocator = stepLocator;
 	}
@@ -68,6 +70,7 @@ public abstract class AbstractBatchYarnContainer extends AbstractIntegrationYarn
 	 *
 	 * @param jobExplorer the new job explorer
 	 */
+	@Autowired(required=false)
 	public void setJobExplorer(JobExplorer jobExplorer) {
 		this.jobExplorer = jobExplorer;
 	}

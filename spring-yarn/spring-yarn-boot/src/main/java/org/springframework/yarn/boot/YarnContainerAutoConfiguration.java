@@ -15,11 +15,13 @@
  */
 package org.springframework.yarn.boot;
 
+import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -68,6 +70,19 @@ public class YarnContainerAutoConfiguration {
 	}
 
 	@Configuration
+	@ConditionalOnClass(JobLauncher.class)
+	@ConditionalOnExpression("${spring.yarn.batch.job.enabled:false}")
+	public static class RuntimeConfig {
+
+		@Bean
+		public String customContainerClass() {
+			// class reference would fail if not in classpath
+			return "org.springframework.yarn.batch.container.DefaultBatchYarnContainer";
+		}
+
+	}
+
+	@Configuration
 	@EnableConfigurationProperties({SpringYarnProperties.class, SpringYarnContainerProperties.class, SpringYarnEnvProperties.class})
 	@EnableYarn(enable=Enable.CONTAINER)
 	public static class SpringYarnConfig extends SpringYarnConfigurerAdapter {
@@ -81,6 +96,14 @@ public class YarnContainerAutoConfiguration {
 		@Autowired(required=false)
 		@Qualifier(YarnSystemConstants.DEFAULT_ID_CONTAINER_CLASS)
 		private Class<? extends YarnContainer> yarnContainerClass;
+
+		@Autowired(required=false)
+		@Qualifier(YarnSystemConstants.DEFAULT_ID_CONTAINER_REF)
+		private Object yarnContainerRef;
+
+		@Autowired(required=false)
+		@Qualifier("customContainerClass")
+		private String containerClass;
 
 		@Override
 		public void configure(YarnConfigConfigurer config) throws Exception {
@@ -96,6 +119,13 @@ public class YarnContainerAutoConfiguration {
 			} else if (yarnContainerClass != null){
 				container
 					.containerClass(yarnContainerClass);
+			} else if (yarnContainerRef != null) {
+				if (yarnContainerRef instanceof YarnContainer) {
+					container
+						.containerRef((YarnContainer) yarnContainerRef);
+				}
+			} else if (StringUtils.hasText(containerClass)) {
+				container.containerClass(containerClass);
 			}
 		}
 	}

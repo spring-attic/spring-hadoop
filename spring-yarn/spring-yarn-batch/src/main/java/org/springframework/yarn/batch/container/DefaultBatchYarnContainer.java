@@ -22,10 +22,12 @@ import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.step.NoSuchStepException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.yarn.YarnSystemConstants;
+import org.springframework.yarn.am.AppmasterServiceClient;
 import org.springframework.yarn.batch.repository.JobRepositoryRpcFactory;
 import org.springframework.yarn.batch.repository.bindings.PartitionedStepExecutionStatusReq;
-//import org.springframework.yarn.batch.repository.bindings.PartitionedStepExecutionStatusReq;
+import org.springframework.yarn.integration.IntegrationAppmasterServiceClient;
 import org.springframework.yarn.integration.ip.mind.MindAppmasterServiceClient;
 import org.springframework.yarn.integration.ip.mind.binding.BaseResponseObject;
 
@@ -39,6 +41,11 @@ import org.springframework.yarn.integration.ip.mind.binding.BaseResponseObject;
 public class DefaultBatchYarnContainer extends AbstractBatchYarnContainer {
 
 	private static final Log log = LogFactory.getLog(DefaultBatchYarnContainer.class);
+
+	@Autowired(required=false)
+	public void setAppmasterServiceClient(AppmasterServiceClient appmasterServiceClient) {
+		super.setIntegrationServiceClient((IntegrationAppmasterServiceClient<?>) appmasterServiceClient);
+	}
 
 	@Override
 	protected void runInternal() {
@@ -58,6 +65,7 @@ public class DefaultBatchYarnContainer extends AbstractBatchYarnContainer {
 
 		if(log.isDebugEnabled()) {
 			log.debug("Got StepExecution: " + stepExecution);
+			log.debug("Locating Step: " + stepName);
 		}
 
 		Step step = getStepLocator().getStep(stepName);
