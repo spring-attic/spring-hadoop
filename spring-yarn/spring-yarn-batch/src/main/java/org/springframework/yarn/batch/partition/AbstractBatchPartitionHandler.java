@@ -29,9 +29,11 @@ import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.partition.StepExecutionSplitter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.yarn.am.YarnAppmaster;
 import org.springframework.yarn.am.container.ContainerRequestHint;
 import org.springframework.yarn.am.container.ContainerResolver;
-import org.springframework.yarn.batch.am.AbstractBatchAppmaster;
+import org.springframework.yarn.batch.am.BatchYarnAppmaster;
 import org.springframework.yarn.batch.listener.PartitionedStepExecutionStateListener;
 import org.springframework.yarn.listener.AppmasterStateListener;
 
@@ -47,7 +49,7 @@ public abstract class AbstractBatchPartitionHandler implements PartitionHandler 
 	private static final Log log = LogFactory.getLog(AbstractBatchPartitionHandler.class);
 
 	/** Application master used for batch operations */
-	private AbstractBatchAppmaster batchAppmaster;
+	private BatchYarnAppmaster batchAppmaster;
 
 	/** Default remote step name to execute */
 	private String stepName = "remoteStep";
@@ -67,7 +69,7 @@ public abstract class AbstractBatchPartitionHandler implements PartitionHandler 
 	 *
 	 * @param batchAppmaster the batch appmaster
 	 */
-	public AbstractBatchPartitionHandler(AbstractBatchAppmaster batchAppmaster) {
+	public AbstractBatchPartitionHandler(BatchYarnAppmaster batchAppmaster) {
 		this.batchAppmaster = batchAppmaster;
 	}
 
@@ -76,8 +78,15 @@ public abstract class AbstractBatchPartitionHandler implements PartitionHandler 
 	 *
 	 * @param batchAppmaster the new batch appmaster
 	 */
-	public void setBatchAppmaster(AbstractBatchAppmaster batchAppmaster) {
+	public void setBatchAppmaster(BatchYarnAppmaster batchAppmaster) {
 		this.batchAppmaster = batchAppmaster;
+	}
+
+	@Autowired(required=false)
+	public void setYarnAppmaster(YarnAppmaster yarnAppmaster) {
+		if (yarnAppmaster instanceof BatchYarnAppmaster) {
+			setBatchAppmaster((BatchYarnAppmaster) yarnAppmaster);
+		}
 	}
 
 	protected abstract Set<StepExecution> createStepExecutionSplits(StepExecutionSplitter stepSplitter, StepExecution stepExecution)

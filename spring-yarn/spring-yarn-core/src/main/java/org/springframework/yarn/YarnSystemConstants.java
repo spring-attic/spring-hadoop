@@ -32,6 +32,9 @@ public class YarnSystemConstants {
 	/** Default bean id for container class. */
 	public static final String DEFAULT_ID_CONTAINER_CLASS = "yarnContainerClass";
 
+	/** Default bean id for container ref. */
+	public static final String DEFAULT_ID_CONTAINER_REF = "yarnContainerRef";
+
 	/** Default bean id for client. */
 	public static final String DEFAULT_ID_CLIENT = "yarnClient";
 
@@ -76,6 +79,9 @@ public class YarnSystemConstants {
 
 	/** Default env variable for amservice batch step name. */
 	public static final String AMSERVICE_BATCH_STEPNAME = "SHDP_AMSERVICE_BATCH_STEPNAME";
+
+	/** Default env variable for amservice batch step execution name. */
+	public static final String AMSERVICE_BATCH_STEPEXECUTIONNAME = "SHDP_AMSERVICE_BATCH_STEPEXECUTIONNAME";
 
 	/** Default env variable for amservice batch job execution id. */
 	public static final String AMSERVICE_BATCH_JOBEXECUTIONID = "SHDP_AMSERVICE_BATCH_JOBEXECUTIONID";

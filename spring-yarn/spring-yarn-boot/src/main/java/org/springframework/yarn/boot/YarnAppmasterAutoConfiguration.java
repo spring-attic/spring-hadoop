@@ -23,6 +23,7 @@ import org.apache.hadoop.yarn.api.records.LocalResourceType;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -31,11 +32,16 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.StringUtils;
 import org.springframework.yarn.am.YarnAppmaster;
 import org.springframework.yarn.boot.condition.ConditionalOnYarnAppmaster;
 import org.springframework.yarn.boot.support.AppmasterLauncherRunner;
+import org.springframework.yarn.boot.support.BootApplicationEventTransformer;
+import org.springframework.yarn.boot.support.YarnJobLauncherCommandLineRunner;
 import org.springframework.yarn.boot.support.SpringYarnAppmasterProperties;
+import org.springframework.yarn.boot.support.SpringYarnBatchProperties;
 import org.springframework.yarn.boot.support.SpringYarnEnvProperties;
 import org.springframework.yarn.boot.support.SpringYarnProperties;
 import org.springframework.yarn.config.annotation.EnableYarn;
@@ -46,6 +52,7 @@ import org.springframework.yarn.config.annotation.builders.YarnConfigConfigurer;
 import org.springframework.yarn.config.annotation.builders.YarnEnvironmentConfigurer;
 import org.springframework.yarn.config.annotation.builders.YarnResourceLocalizerConfigurer;
 import org.springframework.yarn.launch.LaunchCommandsFactoryBean;
+import org.springframework.yarn.support.YarnContextUtils;
 
 /**
  * {@link EnableAutoConfiguration Auto-configuration} for Spring Hadoop Yarn
@@ -83,12 +90,41 @@ public class YarnAppmasterAutoConfiguration {
 	@Configuration
 	@ConditionalOnClass(JobLauncher.class)
 	@ConditionalOnExpression("${spring.yarn.batch.job.enabled:false}")
+	@EnableConfigurationProperties({SpringYarnBatchProperties.class})
 	public static class RuntimeConfig {
+
+		@Value("${spring.yarn.batch.job.name:}")
+		private String jobName;
+
+		@Bean(name=YarnContextUtils.TASK_EXECUTOR_BEAN_NAME)
+		public TaskExecutor threadPoolTaskExecutor() {
+			ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+			executor.setCorePoolSize(2);
+			return executor;
+		}
 
 		@Bean
 		public String customAppmasterClass() {
+			// class reference would fail if not in classpath
 			return "org.springframework.yarn.batch.am.BatchAppmaster";
 		}
+
+		@Bean
+		public BootApplicationEventTransformer bootApplicationEventTransformer() {
+			return new BootApplicationEventTransformer();
+		}
+
+		@Bean
+		@ConditionalOnMissingBean(YarnJobLauncherCommandLineRunner.class)
+		@ConditionalOnBean(JobLauncher.class)
+		public YarnJobLauncherCommandLineRunner jobLauncherCommandLineRunner() {
+			YarnJobLauncherCommandLineRunner runner = new YarnJobLauncherCommandLineRunner();
+			if (StringUtils.hasText(jobName)) {
+				runner.setJobName(jobName);
+			}
+			return runner;
+		}
+
 	}
 
 

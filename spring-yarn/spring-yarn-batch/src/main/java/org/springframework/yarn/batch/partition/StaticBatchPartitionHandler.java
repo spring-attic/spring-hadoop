@@ -22,7 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.partition.StepExecutionSplitter;
-import org.springframework.yarn.batch.am.AbstractBatchAppmaster;
+import org.springframework.yarn.batch.am.BatchYarnAppmaster;
 
 /**
  * Implementation of Spring Batch {@link PartitionHandler} which does
@@ -50,7 +50,7 @@ public class StaticBatchPartitionHandler extends AbstractBatchPartitionHandler {
 	 *
 	 * @param batchAppmaster the batch appmaster
 	 */
-	public StaticBatchPartitionHandler(AbstractBatchAppmaster batchAppmaster) {
+	public StaticBatchPartitionHandler(BatchYarnAppmaster batchAppmaster) {
 		super(batchAppmaster);
 	}
 
@@ -60,7 +60,7 @@ public class StaticBatchPartitionHandler extends AbstractBatchPartitionHandler {
 	 * @param batchAppmaster the batch appmaster
 	 * @param gridSize the grid size
 	 */
-	public StaticBatchPartitionHandler(AbstractBatchAppmaster batchAppmaster, int gridSize) {
+	public StaticBatchPartitionHandler(BatchYarnAppmaster batchAppmaster, int gridSize) {
 		super(batchAppmaster);
 		this.gridSize = gridSize;
 	}

@@ -35,8 +35,11 @@ public interface AppmasterStateListener {
 	 */
 	public enum AppmasterState {
 
-		/** Appmaster completed state*/
-		COMPLETED
+		/** Appmaster completed state */
+		COMPLETED,
+
+		/** Appmaster failed state */
+		FAILED
 	}
 
 }
