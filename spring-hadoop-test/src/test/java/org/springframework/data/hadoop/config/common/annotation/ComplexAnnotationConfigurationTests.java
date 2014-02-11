@@ -32,7 +32,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.data.hadoop.config.common.annotation.complex.ComplexTestConfig;
 import org.springframework.data.hadoop.config.common.annotation.complex.ComplexTestConfigBeanABuilder;
 import org.springframework.data.hadoop.config.common.annotation.complex.ComplexTestConfigBeanB;
-import org.springframework.data.hadoop.config.common.annotation.complex.ComplexTestConfigBeanBConfigure;
+import org.springframework.data.hadoop.config.common.annotation.complex.ComplexTestConfigBeanBConfigurer;
 import org.springframework.data.hadoop.config.common.annotation.complex.ComplexTestConfigBuilder;
 import org.springframework.data.hadoop.config.common.annotation.complex.ComplexTestConfigurerAdapter;
 import org.springframework.data.hadoop.config.common.annotation.complex.EnableComplexTest;
@@ -109,7 +109,7 @@ public class ComplexAnnotationConfigurationTests {
 		}
 
 		@Override
-		public void configure(ComplexTestConfigBeanBConfigure beanB) throws Exception {
+		public void configure(ComplexTestConfigBeanBConfigurer beanB) throws Exception {
 			beanB
 				.setData("complexDataB")
 				.setDataBB("complexDataBB")

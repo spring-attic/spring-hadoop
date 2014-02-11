@@ -19,8 +19,8 @@ import java.util.Properties;
 
 import org.springframework.data.hadoop.config.common.annotation.AbstractConfiguredAnnotationBuilder;
 import org.springframework.data.hadoop.config.common.annotation.AnnotationBuilder;
-import org.springframework.data.hadoop.config.common.annotation.configurers.PropertiesConfigureAware;
-import org.springframework.data.hadoop.config.common.annotation.configurers.PropertiesConfigurer;
+import org.springframework.data.hadoop.config.common.annotation.configurers.PropertiesConfigurerAware;
+import org.springframework.data.hadoop.config.common.annotation.configurers.DefaultPropertiesConfigurer;
 
 
 /**
@@ -30,7 +30,7 @@ import org.springframework.data.hadoop.config.common.annotation.configurers.Prop
  *
  */
 public class SimpleTestConfigBuilder extends AbstractConfiguredAnnotationBuilder<SimpleTestConfig, SimpleTestConfigBuilder,SimpleTestConfigBuilder>
-		implements PropertiesConfigureAware {
+		implements PropertiesConfigurerAware {
 
 	private final Properties properties = new Properties();
 
@@ -51,8 +51,8 @@ public class SimpleTestConfigBuilder extends AbstractConfiguredAnnotationBuilder
 		return properties;
 	}
 
-	public PropertiesConfigurer<SimpleTestConfig, SimpleTestConfigBuilder,SimpleTestConfigBuilder> withProperties() throws Exception {
-		return getOrApply(new PropertiesConfigurer<SimpleTestConfig, SimpleTestConfigBuilder,SimpleTestConfigBuilder>());
+	public DefaultPropertiesConfigurer<SimpleTestConfig, SimpleTestConfigBuilder,SimpleTestConfigBuilder> withProperties() throws Exception {
+		return getOrApply(new DefaultPropertiesConfigurer<SimpleTestConfig, SimpleTestConfigBuilder,SimpleTestConfigBuilder>());
 	}
 
 }

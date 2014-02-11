@@ -17,7 +17,7 @@ package org.springframework.yarn.config.annotation.builders;
 
 import java.io.IOException;
 
-import org.springframework.data.hadoop.config.common.annotation.configurers.PropertiesConfigure;
+import org.springframework.data.hadoop.config.common.annotation.configurers.PropertiesConfigurer;
 import org.springframework.yarn.config.annotation.SpringYarnConfigurerAdapter;
 import org.springframework.yarn.config.annotation.configurers.EnvironmentClasspathConfigurer;
 import org.springframework.yarn.config.annotation.configurers.DefaultEnvironmentClasspathConfigurer;
@@ -157,7 +157,7 @@ public interface YarnEnvironmentConfigurer {
 	YarnEnvironmentConfigurer includeSystemEnv(boolean includeSystemEnv);
 
 	/**
-	 * Specify properties with a {@link PropertiesConfigure}.
+	 * Specify properties with a {@link org.springframework.data.hadoop.config.common.annotation.configurers.PropertiesConfigurer}.
 	 *
 	 * <p>JavaConfig:
 	 * <pre>
@@ -179,9 +179,9 @@ public interface YarnEnvironmentConfigurer {
 	 * &lt;yarn:environment properties-ref="props"/>
 	 * </pre>
 	 *
-	 * @return {@link PropertiesConfigure} for chaining
+	 * @return {@link org.springframework.data.hadoop.config.common.annotation.configurers.PropertiesConfigurer} for chaining
 	 * @throws Exception if error occurred
 	 */
-	PropertiesConfigure<YarnEnvironmentConfigurer> withProperties() throws Exception;
+	PropertiesConfigurer<YarnEnvironmentConfigurer> withProperties() throws Exception;
 
 }

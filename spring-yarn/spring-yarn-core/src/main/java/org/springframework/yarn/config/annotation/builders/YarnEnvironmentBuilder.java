@@ -24,9 +24,9 @@ import org.springframework.beans.factory.config.PropertiesFactoryBean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.hadoop.config.common.annotation.AbstractConfiguredAnnotationBuilder;
 import org.springframework.data.hadoop.config.common.annotation.AnnotationBuilder;
-import org.springframework.data.hadoop.config.common.annotation.configurers.PropertiesConfigure;
-import org.springframework.data.hadoop.config.common.annotation.configurers.PropertiesConfigureAware;
 import org.springframework.data.hadoop.config.common.annotation.configurers.PropertiesConfigurer;
+import org.springframework.data.hadoop.config.common.annotation.configurers.PropertiesConfigurerAware;
+import org.springframework.data.hadoop.config.common.annotation.configurers.DefaultPropertiesConfigurer;
 import org.springframework.util.StringUtils;
 import org.springframework.yarn.config.annotation.configurers.EnvironmentClasspathConfigurer;
 import org.springframework.yarn.config.annotation.configurers.DefaultEnvironmentClasspathConfigurer;
@@ -40,7 +40,7 @@ import org.springframework.yarn.configuration.EnvironmentFactoryBean;
  */
 public final class YarnEnvironmentBuilder
 		extends AbstractConfiguredAnnotationBuilder<Map<String, String>, YarnEnvironmentConfigurer, YarnEnvironmentBuilder>
-		implements PropertiesConfigureAware, YarnEnvironmentConfigurer {
+		implements PropertiesConfigurerAware, YarnEnvironmentConfigurer {
 
 	private boolean defaultClasspath = true;
 	private boolean includeBaseDirectory = true;
@@ -101,8 +101,8 @@ public final class YarnEnvironmentBuilder
 	}
 
 	@Override
-	public PropertiesConfigure<YarnEnvironmentConfigurer> withProperties() throws Exception {
-		return apply(new PropertiesConfigurer<Map<String, String>, YarnEnvironmentConfigurer, YarnEnvironmentBuilder>());
+	public PropertiesConfigurer<YarnEnvironmentConfigurer> withProperties() throws Exception {
+		return apply(new DefaultPropertiesConfigurer<Map<String, String>, YarnEnvironmentConfigurer, YarnEnvironmentBuilder>());
 	}
 
 	/**

@@ -24,12 +24,12 @@ import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.springframework.core.io.Resource;
 import org.springframework.data.hadoop.config.common.annotation.AbstractConfiguredAnnotationBuilder;
 import org.springframework.data.hadoop.config.common.annotation.ObjectPostProcessor;
-import org.springframework.data.hadoop.config.common.annotation.configurers.PropertiesConfigure;
-import org.springframework.data.hadoop.config.common.annotation.configurers.PropertiesConfigureAware;
 import org.springframework.data.hadoop.config.common.annotation.configurers.PropertiesConfigurer;
-import org.springframework.data.hadoop.config.common.annotation.configurers.ResourceConfigure;
-import org.springframework.data.hadoop.config.common.annotation.configurers.ResourceConfigureAware;
+import org.springframework.data.hadoop.config.common.annotation.configurers.PropertiesConfigurerAware;
+import org.springframework.data.hadoop.config.common.annotation.configurers.DefaultPropertiesConfigurer;
 import org.springframework.data.hadoop.config.common.annotation.configurers.ResourceConfigurer;
+import org.springframework.data.hadoop.config.common.annotation.configurers.ResourceConfigurerAware;
+import org.springframework.data.hadoop.config.common.annotation.configurers.DefaultResourceConfigurer;
 import org.springframework.yarn.configuration.ConfigurationFactoryBean;
 
 /**
@@ -41,7 +41,7 @@ import org.springframework.yarn.configuration.ConfigurationFactoryBean;
  */
 public final class YarnConfigBuilder
 		extends AbstractConfiguredAnnotationBuilder<YarnConfiguration,YarnConfigConfigurer,YarnConfigBuilder>
-		implements PropertiesConfigureAware, ResourceConfigureAware, YarnConfigConfigurer {
+		implements PropertiesConfigurerAware, ResourceConfigurerAware, YarnConfigConfigurer {
 
 	private final Set<Resource> resources = new HashSet<Resource>();
 	private final Properties properties = new Properties();
@@ -97,13 +97,13 @@ public final class YarnConfigBuilder
 	}
 
 	@Override
-	public ResourceConfigure<YarnConfigConfigurer> withResources() throws Exception {
-		return apply(new ResourceConfigurer<YarnConfiguration, YarnConfigConfigurer, YarnConfigBuilder>());
+	public ResourceConfigurer<YarnConfigConfigurer> withResources() throws Exception {
+		return apply(new DefaultResourceConfigurer<YarnConfiguration, YarnConfigConfigurer, YarnConfigBuilder>());
 	}
 
 	@Override
-	public PropertiesConfigure<YarnConfigConfigurer> withProperties() throws Exception {
-		return apply(new PropertiesConfigurer<YarnConfiguration, YarnConfigConfigurer, YarnConfigBuilder>());
+	public PropertiesConfigurer<YarnConfigConfigurer> withProperties() throws Exception {
+		return apply(new DefaultPropertiesConfigurer<YarnConfiguration, YarnConfigConfigurer, YarnConfigBuilder>());
 	}
 
 	@Override

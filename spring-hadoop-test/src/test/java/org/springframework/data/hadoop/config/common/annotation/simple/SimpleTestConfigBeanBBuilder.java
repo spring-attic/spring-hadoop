@@ -17,7 +17,7 @@ package org.springframework.data.hadoop.config.common.annotation.simple;
 
 import org.springframework.data.hadoop.config.common.annotation.AbstractConfiguredAnnotationBuilder;
 import org.springframework.data.hadoop.config.common.annotation.AnnotationBuilder;
-import org.springframework.data.hadoop.config.common.annotation.configurers.ResourceConfigure;
+import org.springframework.data.hadoop.config.common.annotation.configurers.DefaultResourceConfigurer;
 import org.springframework.data.hadoop.config.common.annotation.configurers.ResourceConfigurer;
 
 /**
@@ -27,8 +27,8 @@ import org.springframework.data.hadoop.config.common.annotation.configurers.Reso
  *
  */
 public class SimpleTestConfigBeanBBuilder
-		extends AbstractConfiguredAnnotationBuilder<SimpleTestConfigBeanB, SimpleTestConfigBeanBConfigure,SimpleTestConfigBeanBBuilder>
-		implements SimpleTestConfigBeanBConfigure {
+		extends AbstractConfiguredAnnotationBuilder<SimpleTestConfigBeanB, SimpleTestConfigBeanBConfigurer,SimpleTestConfigBeanBBuilder>
+		implements SimpleTestConfigBeanBConfigurer {
 
 	private String dataB;
 	private String dataBB;
@@ -42,20 +42,20 @@ public class SimpleTestConfigBeanBBuilder
 	}
 
 	@Override
-	public SimpleTestConfigBeanBConfigure setData(String data) {
+	public SimpleTestConfigBeanBConfigurer setData(String data) {
 		this.dataB = data;
 		return this;
 	}
 
 	@Override
-	public SimpleTestConfigBeanBConfigure setDataBB(String data) {
+	public SimpleTestConfigBeanBConfigurer setDataBB(String data) {
 		this.dataBB = data;
 		return this;
 	}
 
 	@Override
-	public ResourceConfigure<SimpleTestConfigBeanBConfigure> withResources() throws Exception {
-		return getOrApply(new ResourceConfigurer<SimpleTestConfigBeanB,SimpleTestConfigBeanBConfigure,SimpleTestConfigBeanBBuilder>());
+	public ResourceConfigurer<SimpleTestConfigBeanBConfigurer> withResources() throws Exception {
+		return getOrApply(new DefaultResourceConfigurer<SimpleTestConfigBeanB,SimpleTestConfigBeanBConfigurer,SimpleTestConfigBeanBBuilder>());
 	}
 
 }

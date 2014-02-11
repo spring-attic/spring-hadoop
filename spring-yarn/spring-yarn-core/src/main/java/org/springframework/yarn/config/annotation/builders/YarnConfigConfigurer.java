@@ -16,8 +16,8 @@
 package org.springframework.yarn.config.annotation.builders;
 
 import org.apache.hadoop.conf.Configuration;
-import org.springframework.data.hadoop.config.common.annotation.configurers.PropertiesConfigure;
-import org.springframework.data.hadoop.config.common.annotation.configurers.ResourceConfigure;
+import org.springframework.data.hadoop.config.common.annotation.configurers.PropertiesConfigurer;
+import org.springframework.data.hadoop.config.common.annotation.configurers.ResourceConfigurer;
 import org.springframework.yarn.config.annotation.SpringYarnConfigurerAdapter;
 
 /**
@@ -52,7 +52,7 @@ import org.springframework.yarn.config.annotation.SpringYarnConfigurerAdapter;
 public interface YarnConfigConfigurer {
 
 	/**
-	 * Specify configuration options as resource properties with a {@link ResourceConfigure}.
+	 * Specify configuration options as resource properties with a {@link org.springframework.data.hadoop.config.common.annotation.configurers.ResourceConfigurer}.
 	 *
 	 * <p>
 	 * <p>JavaConfig:
@@ -74,13 +74,13 @@ public interface YarnConfigConfigurer {
 	 * &lt;yarn:configuration properties-location="cfg-1.properties, cfg-2.properties"/>
 	 * </pre>
 	 *
-	 * @return {@link ResourceConfigure} for chaining
+	 * @return {@link org.springframework.data.hadoop.config.common.annotation.configurers.ResourceConfigurer} for chaining
 	 * @throws Exception if error occurred
 	 */
-	ResourceConfigure<YarnConfigConfigurer> withResources() throws Exception;
+	ResourceConfigurer<YarnConfigConfigurer> withResources() throws Exception;
 
 	/**
-	 * Specify configuration options as properties with a {@link PropertiesConfigure}.
+	 * Specify configuration options as properties with a {@link org.springframework.data.hadoop.config.common.annotation.configurers.PropertiesConfigurer}.
 	 *
 	 * <p>
 	 * <p>JavaConfig:
@@ -105,10 +105,10 @@ public interface YarnConfigConfigurer {
 	 * &lt;yarn:configuration properties-ref="props"/>
 	 * </pre>
 	 *
-	 * @return {@link PropertiesConfigure} for chaining
+	 * @return {@link org.springframework.data.hadoop.config.common.annotation.configurers.PropertiesConfigurer} for chaining
 	 * @throws Exception if error occurred
 	 */
-	PropertiesConfigure<YarnConfigConfigurer> withProperties() throws Exception;
+	PropertiesConfigurer<YarnConfigConfigurer> withProperties() throws Exception;
 
 	/**
 	 * Specify a Hdfs file system uri.
