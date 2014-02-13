@@ -17,7 +17,7 @@ package org.springframework.yarn.boot.support;
 
 import java.util.Map;
 
-import org.springframework.boot.SpringApplicationEnvironmentAvailableEvent;
+import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.core.env.CommandLinePropertySource;
 import org.springframework.core.env.MapPropertySource;
@@ -31,7 +31,7 @@ import org.springframework.util.Assert;
  * @author Janne Valkealahti
  *
  */
-public class YarnBootClientApplicationListener implements ApplicationListener<SpringApplicationEnvironmentAvailableEvent> {
+public class YarnBootClientApplicationListener implements ApplicationListener<ApplicationEnvironmentPreparedEvent> {
 
 	private final Map<String, Object> propertySourceMap;
 
@@ -46,7 +46,7 @@ public class YarnBootClientApplicationListener implements ApplicationListener<Sp
 	}
 
 	@Override
-	public void onApplicationEvent(SpringApplicationEnvironmentAvailableEvent event) {
+	public void onApplicationEvent(ApplicationEnvironmentPreparedEvent event) {
 		MutablePropertySources propertySources = event.getEnvironment().getPropertySources();
 		if (propertySources.contains(CommandLinePropertySource.COMMAND_LINE_PROPERTY_SOURCE_NAME)) {
 			propertySources.addAfter(CommandLinePropertySource.COMMAND_LINE_PROPERTY_SOURCE_NAME,
