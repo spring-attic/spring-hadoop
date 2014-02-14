@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,11 @@
  */
 package org.springframework.yarn.test.support;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -80,6 +82,41 @@ public abstract class ContainerLogUtils {
 	public static List<Resource> queryContainerLogs(YarnCluster yarnCluster, ApplicationId applicationId)
 			throws IOException {
 		return queryContainerLogs(yarnCluster, applicationId, null);
+	}
+
+	/**
+	 * Reads a file content and return it as String. Returns <code>NULL</code>
+	 * if file doesn't exist and empty String if file exists but is empty.
+	 * @param file the file
+	 * @return the file content
+	 * @throws Exception the exception if error occurred
+	 */
+	public static String getFileContent(File file) throws Exception {
+		Scanner scanner = null;
+		String content = null;
+		Exception reThrow = null;
+		if (file != null && file.length() > 0) {
+			try {
+				scanner = new Scanner(file);
+				content = scanner.useDelimiter("\\A").next();
+			} catch (Exception e) {
+				reThrow = e;
+			} finally {
+				if (scanner != null) {
+					try {
+						scanner.close();
+					} catch (Exception e) {
+					}
+				}
+			}
+		} else if (file != null && file.length() == 0) {
+			content = "";
+		}
+		if (reThrow != null) {
+			throw reThrow;
+		} else {
+			return content;
+		}
 	}
 
 }
