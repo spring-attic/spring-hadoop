@@ -132,6 +132,8 @@ public class YarnClientAutoConfiguration {
 			factory.setArguments(arguments);
 		}
 
+		factory.setOptions(sycp.getOptions());
+
 		factory.setStdout("<LOG_DIR>/Appmaster.stdout");
 		factory.setStderr("<LOG_DIR>/Appmaster.stderr");
 		factory.afterPropertiesSet();

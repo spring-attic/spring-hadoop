@@ -202,6 +202,8 @@ public class YarnAppmasterAutoConfiguration {
 			factory.setArguments(arguments);
 		}
 
+		factory.setOptions(syap.getOptions());
+
 		factory.setStdout("<LOG_DIR>/Container.stdout");
 		factory.setStderr("<LOG_DIR>/Container.stderr");
 		factory.afterPropertiesSet();

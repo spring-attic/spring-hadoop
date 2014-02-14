@@ -26,13 +26,13 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 /**
- * Factory bean helping to construct a command meant to
- * start application master or a container.
+ * Factory bean helping to construct a command meant to start application master
+ * or a container.
  *
  * @author Janne Valkealahti
  *
  */
-public class LaunchCommandsFactoryBean implements InitializingBean, FactoryBean<String[]>{
+public class LaunchCommandsFactoryBean implements InitializingBean, FactoryBean<String[]> {
 
 	/** Main command, default to <JAVA_HOME>/bin/java */
 	private String command = ApplicationConstants.Environment.JAVA_HOME.$() + "/bin/java";
@@ -42,8 +42,8 @@ public class LaunchCommandsFactoryBean implements InitializingBean, FactoryBean<
 
 	/** Class to run */
 	private Class<?> runner;
-//	private Class<? extends AbstractCommandLineRunner<?>> runner;
 
+	/** Class to run */
 	private String runnerClass;
 
 	/** Spring context file argument */
@@ -54,6 +54,9 @@ public class LaunchCommandsFactoryBean implements InitializingBean, FactoryBean<
 
 	/** Possible arguments */
 	private Properties arguments;
+
+	/** Possible jvm options */
+	private List<String> options;
 
 	/** Stdout */
 	private String stdout = "<LOG_DIR>/stdout";
@@ -66,7 +69,7 @@ public class LaunchCommandsFactoryBean implements InitializingBean, FactoryBean<
 
 	@Override
 	public String[] getObject() throws Exception {
-		if(commands == null) {
+		if (commands == null) {
 			afterPropertiesSet();
 		}
 		return commands;
@@ -85,25 +88,14 @@ public class LaunchCommandsFactoryBean implements InitializingBean, FactoryBean<
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(command, "Main command must be set");
-//		Assert.notNull(runner, "Main class must be set");
-//		Assert.notNull(contextFile, "Context file path must be set");
-//		Assert.notNull(beanName, "Bean name must be set");
 		Assert.notNull(stdout, "Stdout must be set");
 		Assert.notNull(stderr, "Stderr name must be set");
 
 		List<String> commandsList = new ArrayList<String>();
 		commandsList.add(command);
 
-		// -D arguments needs to be right after main command
-		if(arguments != null) {
-			Enumeration<?> names = arguments.propertyNames();
-			while (names.hasMoreElements()) {
-				String key = (String) names.nextElement();
-				if (key.startsWith("-D")) {
-					commandsList.add(key + "=" + arguments.getProperty(key));
-				}
-			}
-		}
+		// jvm options right after main command
+		commandsList.addAll(resolveJvmOptions());
 
 		if (jarFile != null) {
 			commandsList.add("-jar");
@@ -122,16 +114,8 @@ public class LaunchCommandsFactoryBean implements InitializingBean, FactoryBean<
 			}
 		}
 
-		// arguments without -D
-		if(arguments != null) {
-			Enumeration<?> names = arguments.propertyNames();
-			while (names.hasMoreElements()) {
-				String key = (String) names.nextElement();
-				if (!key.startsWith("-D")) {
-					commandsList.add(key + "=" + arguments.getProperty(key));
-				}
-			}
-		}
+		// program arguments at the end before stdout/stderr
+		commandsList.addAll(resolveProgramArguments());
 
 		commandsList.add("1>" + stdout);
 		commandsList.add("2>" + stderr);
@@ -141,7 +125,8 @@ public class LaunchCommandsFactoryBean implements InitializingBean, FactoryBean<
 	/**
 	 * Sets the main command.
 	 *
-	 * @param command the new command
+	 * @param command
+	 *            the new command
 	 */
 	public void setCommand(String command) {
 		this.command = command;
@@ -150,23 +135,29 @@ public class LaunchCommandsFactoryBean implements InitializingBean, FactoryBean<
 	/**
 	 * Sets the runner class.
 	 *
-	 * @param runner the new runner
+	 * @param runner
+	 *            the new runner class
 	 */
-//	public void setRunner(Class<? extends AbstractCommandLineRunner<?>> runner) {
 	public void setRunner(Class<?> runner) {
 		this.runner = runner;
 	}
 
+	/**
+	 * Sets the runner class.
+	 *
+	 * @param runnerClass
+	 *            the new runner class
+	 */
 	public void setRunnerClass(String runnerClass) {
 		this.runnerClass = runnerClass;
 	}
 
 	/**
-	 * Sets the jar file name. If this is set, the command mode
-	 * is automatically to use executable jar with
-	 * 'java -jar'.
+	 * Sets the jar file name. If this is set, the command mode is automatically
+	 * to use executable jar with 'java -jar'.
 	 *
-	 * @param jarFile the new jar file
+	 * @param jarFile
+	 *            the new jar file
 	 */
 	public void setJarFile(String jarFile) {
 		this.jarFile = jarFile;
@@ -175,7 +166,8 @@ public class LaunchCommandsFactoryBean implements InitializingBean, FactoryBean<
 	/**
 	 * Sets the context file.
 	 *
-	 * @param contextFile the new context file
+	 * @param contextFile
+	 *            the new context file
 	 */
 	public void setContextFile(String contextFile) {
 		this.contextFile = contextFile;
@@ -184,7 +176,8 @@ public class LaunchCommandsFactoryBean implements InitializingBean, FactoryBean<
 	/**
 	 * Sets the bean name.
 	 *
-	 * @param beanName the new bean name
+	 * @param beanName
+	 *            the new bean name
 	 */
 	public void setBeanName(String beanName) {
 		this.beanName = beanName;
@@ -193,16 +186,28 @@ public class LaunchCommandsFactoryBean implements InitializingBean, FactoryBean<
 	/**
 	 * Sets the arguments.
 	 *
-	 * @param arguments the new arguments
+	 * @param arguments
+	 *            the new arguments
 	 */
 	public void setArguments(Properties arguments) {
 		this.arguments = arguments;
 	}
 
 	/**
+	 * Sets the options.
+	 *
+	 * @param options
+	 *            the new options
+	 */
+	public void setOptions(List<String> options) {
+		this.options = options;
+	}
+
+	/**
 	 * Sets the stdout.
 	 *
-	 * @param stdout the new stdout
+	 * @param stdout
+	 *            the new stdout
 	 */
 	public void setStdout(String stdout) {
 		this.stdout = stdout;
@@ -211,10 +216,65 @@ public class LaunchCommandsFactoryBean implements InitializingBean, FactoryBean<
 	/**
 	 * Sets the stderr.
 	 *
-	 * @param stderr the new stderr
+	 * @param stderr
+	 *            the new stderr
 	 */
 	public void setStderr(String stderr) {
 		this.stderr = stderr;
+	}
+
+	private List<String> resolveJvmOptions() {
+		ArrayList<String> list = new ArrayList<String>();
+
+		if (options != null) {
+			list.addAll(options);
+		}
+
+		if (arguments != null) {
+			// we still have legacy support for getting
+			// -D's from arguments
+			Enumeration<?> names = arguments.propertyNames();
+			while (names.hasMoreElements()) {
+				String key = (String) names.nextElement();
+				if (key.startsWith("-D")) {
+					String opt = key + "=" + arguments.getProperty(key);
+					if (options != null) {
+						if (!containsStartsWith(options, key + "=")) {
+							list.add(opt);
+						}
+					} else {
+						list.add(opt);
+					}
+				}
+			}
+		}
+
+		return list;
+	}
+
+	private List<String> resolveProgramArguments() {
+		ArrayList<String> list = new ArrayList<String>();
+
+		if (arguments != null) {
+			Enumeration<?> names = arguments.propertyNames();
+			while (names.hasMoreElements()) {
+				String key = (String) names.nextElement();
+				if (!key.startsWith("-D")) {
+					list.add(key + "=" + arguments.getProperty(key));
+				}
+			}
+		}
+
+		return list;
+	}
+
+	private static boolean containsStartsWith(List<String> options, String key) {
+		for (String option : options) {
+			if (option.startsWith(key)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }
