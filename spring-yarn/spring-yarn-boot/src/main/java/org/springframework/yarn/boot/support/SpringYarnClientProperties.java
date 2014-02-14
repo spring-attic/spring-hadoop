@@ -34,6 +34,7 @@ public class SpringYarnClientProperties {
 	private List<String> files;
 	private String runnerClass;
 	private List<String> classpath;
+	private List<String> options;
 	private Map<String, String> arguments;
 	private Integer priority;
 	private String queue;
@@ -71,6 +72,14 @@ public class SpringYarnClientProperties {
 
 	public void setClasspath(List<String> classpath) {
 		this.classpath = classpath;
+	}
+
+	public List<String> getOptions() {
+		return options;
+	}
+
+	public void setOptions(List<String> options) {
+		this.options = options;
 	}
 
 	public Map<String, String> getArguments() {

@@ -7,7 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * Spring Boot {@link ConfigurationProperties} for <code>spring.yarn.appmaster</code>.
+ * Spring Boot {@link ConfigurationProperties} for
+ * <code>spring.yarn.appmaster</code>.
  *
  * @author Janne Valkealahti
  *
@@ -22,6 +23,7 @@ public class SpringYarnAppmasterProperties {
 	private boolean waitLatch = true;
 	private int containerCount = 1;
 	private List<String> classpath;
+	private List<String> options;
 	private Map<String, String> arguments;
 
 	@Autowired
@@ -30,6 +32,7 @@ public class SpringYarnAppmasterProperties {
 	public String getRmSchedulerAddress() {
 		return syep.getScheduler() != null ? syep.getScheduler() : rmSchedulerAddress;
 	}
+
 	public void setRmSchedulerAddress(String rmSchedulerAddress) {
 		this.rmSchedulerAddress = rmSchedulerAddress;
 	}
@@ -37,6 +40,7 @@ public class SpringYarnAppmasterProperties {
 	public String getContainerFile() {
 		return containerFile;
 	}
+
 	public void setContainerFile(String containerFile) {
 		this.containerFile = containerFile;
 	}
@@ -44,6 +48,7 @@ public class SpringYarnAppmasterProperties {
 	public String getAppmasterClass() {
 		return appmasterClass;
 	}
+
 	public void setAppmasterClass(String appmasterClass) {
 		this.appmasterClass = appmasterClass;
 	}
@@ -51,6 +56,7 @@ public class SpringYarnAppmasterProperties {
 	public String getContainerRunner() {
 		return containerRunner;
 	}
+
 	public void setContainerRunner(String containerRunner) {
 		this.containerRunner = containerRunner;
 	}
@@ -58,6 +64,7 @@ public class SpringYarnAppmasterProperties {
 	public boolean isWaitLatch() {
 		return waitLatch;
 	}
+
 	public void setWaitLatch(boolean waitLatch) {
 		this.waitLatch = waitLatch;
 	}
@@ -65,6 +72,7 @@ public class SpringYarnAppmasterProperties {
 	public int getContainerCount() {
 		return containerCount;
 	}
+
 	public void setContainerCount(int containerCount) {
 		this.containerCount = containerCount;
 	}
@@ -72,8 +80,17 @@ public class SpringYarnAppmasterProperties {
 	public List<String> getClasspath() {
 		return classpath;
 	}
+
 	public void setClasspath(List<String> classpath) {
 		this.classpath = classpath;
+	}
+
+	public void setOptions(List<String> options) {
+		this.options = options;
+	}
+
+	public List<String> getOptions() {
+		return options;
 	}
 
 	public Map<String, String> getArguments() {
