@@ -1,0 +1,17 @@
+spring:
+    yarn:
+        batch:
+            enabled: true
+            name: nameFoo1
+            jobs:
+              - name: jobsName1
+                enabled: true
+                next: true
+                failNext: true
+                restart: true
+                failRestart: true
+                parameters:
+                  ? job1key1
+                  : job1val1
+                  ? job1key2
+                  : job1val2

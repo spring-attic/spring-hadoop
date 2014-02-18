@@ -89,11 +89,11 @@ public class YarnAppmasterAutoConfiguration {
 
 	@Configuration
 	@ConditionalOnClass(JobLauncher.class)
-	@ConditionalOnExpression("${spring.yarn.batch.job.enabled:false}")
+	@ConditionalOnExpression("${spring.yarn.batch.enabled:false}")
 	@EnableConfigurationProperties({SpringYarnBatchProperties.class})
 	public static class RuntimeConfig {
 
-		@Value("${spring.yarn.batch.job.name:}")
+		@Value("${spring.yarn.batch.name:}")
 		private String jobName;
 
 		@Bean(name=YarnContextUtils.TASK_EXECUTOR_BEAN_NAME)

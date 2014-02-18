@@ -71,7 +71,7 @@ public class YarnContainerAutoConfiguration {
 
 	@Configuration
 	@ConditionalOnClass(JobLauncher.class)
-	@ConditionalOnExpression("${spring.yarn.batch.job.enabled:false}")
+	@ConditionalOnExpression("${spring.yarn.batch.enabled:false}")
 	public static class RuntimeConfig {
 
 		@Bean
