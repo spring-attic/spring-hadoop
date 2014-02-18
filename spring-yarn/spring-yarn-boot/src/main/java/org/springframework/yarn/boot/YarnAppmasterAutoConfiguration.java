@@ -150,7 +150,7 @@ public class YarnAppmasterAutoConfiguration {
 			config
 				.fileSystemUri(syp.getFsUri())
 				.resourceManagerAddress(syp.getRmAddress())
-				.schedulerAddress(syap.getRmSchedulerAddress());
+				.schedulerAddress(syp.getSchedulerAddress());
 		}
 
 		@Override

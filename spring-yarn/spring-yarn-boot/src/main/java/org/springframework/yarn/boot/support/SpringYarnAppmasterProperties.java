@@ -3,7 +3,6 @@ package org.springframework.yarn.boot.support;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
@@ -16,7 +15,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(name = "spring.yarn.appmaster")
 public class SpringYarnAppmasterProperties {
 
-	private String rmSchedulerAddress;
 	private String containerFile;
 	private String appmasterClass;
 	private String containerRunner;
@@ -25,17 +23,6 @@ public class SpringYarnAppmasterProperties {
 	private List<String> classpath;
 	private List<String> options;
 	private Map<String, String> arguments;
-
-	@Autowired
-	private SpringYarnEnvProperties syep;
-
-	public String getRmSchedulerAddress() {
-		return syep.getScheduler() != null ? syep.getScheduler() : rmSchedulerAddress;
-	}
-
-	public void setRmSchedulerAddress(String rmSchedulerAddress) {
-		this.rmSchedulerAddress = rmSchedulerAddress;
-	}
 
 	public String getContainerFile() {
 		return containerFile;
