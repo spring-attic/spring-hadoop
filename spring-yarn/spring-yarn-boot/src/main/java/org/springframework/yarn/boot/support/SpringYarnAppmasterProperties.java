@@ -23,6 +23,9 @@ public class SpringYarnAppmasterProperties {
 	private List<String> classpath;
 	private List<String> options;
 	private Map<String, String> arguments;
+	private Integer priority;
+	private String memory;
+	private Integer virtualCores;
 
 	public String getContainerFile() {
 		return containerFile;
@@ -86,6 +89,30 @@ public class SpringYarnAppmasterProperties {
 
 	public void setArguments(Map<String, String> arguments) {
 		this.arguments = arguments;
+	}
+
+	public Integer getPriority() {
+		return priority;
+	}
+
+	public void setPriority(Integer priority) {
+		this.priority = priority;
+	}
+
+	public String getMemory() {
+		return memory;
+	}
+
+	public void setMemory(String memory) {
+		this.memory = memory;
+	}
+
+	public Integer getVirtualCores() {
+		return virtualCores;
+	}
+
+	public void setVirtualCores(Integer virtualCores) {
+		this.virtualCores = virtualCores;
 	}
 
 }

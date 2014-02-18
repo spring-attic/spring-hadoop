@@ -175,7 +175,11 @@ public class YarnAppmasterAutoConfiguration {
 		public void configure(YarnAppmasterConfigurer master) throws Exception {
 			master
 				.appmasterClass(syap.getAppmasterClass() != null ? syap.getAppmasterClass() : appmasterClass)
-				.containerCommands(createContainerCommands(syap));
+				.containerCommands(createContainerCommands(syap))
+				.withContainerAllocator()
+					.memory(syap.getMemory())
+					.priority(syap.getPriority())
+					.virtualCores(syap.getVirtualCores());
 		}
 
 	}

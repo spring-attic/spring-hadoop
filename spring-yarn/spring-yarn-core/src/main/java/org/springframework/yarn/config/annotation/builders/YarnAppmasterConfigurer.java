@@ -17,9 +17,10 @@ package org.springframework.yarn.config.annotation.builders;
 
 import org.springframework.yarn.am.YarnAppmaster;
 import org.springframework.yarn.config.annotation.SpringYarnConfigurerAdapter;
-import org.springframework.yarn.config.annotation.configurers.ClientMasterRunnerConfigurer;
-import org.springframework.yarn.config.annotation.configurers.MasterContainerRunnerConfigurer;
+import org.springframework.yarn.config.annotation.configurers.DefaultMasterContainerAllocatorConfigurer;
 import org.springframework.yarn.config.annotation.configurers.DefaultMasterContainerRunnerConfigurer;
+import org.springframework.yarn.config.annotation.configurers.MasterContainerAllocatorConfigurer;
+import org.springframework.yarn.config.annotation.configurers.MasterContainerRunnerConfigurer;
 
 /**
  * {@code YarnAppmasterConfigure} is an interface for {@code YarnAppmasterBuilder} which is
@@ -79,9 +80,39 @@ public interface YarnAppmasterConfigurer {
 	 * &lt;/yarn:master>
 	 * </pre>
 	 *
-	 * @return {@link ClientMasterRunnerConfigurer} for chaining
+	 * @return {@link MasterContainerRunnerConfigurer} for chaining
 	 */
 	MasterContainerRunnerConfigurer withContainerRunner() throws Exception;
+
+	/**
+	 * Specify a container allocator for Appmaster. Applies a new
+	 * {@link DefaultMasterContainerAllocatorConfigurer} into a current builder.
+	 *
+	 * <p>
+	 * <p>JavaConfig:
+	 * <p>
+	 * <pre>
+	 *
+	 * public void configure(YarnAppmasterConfigure master) throws Exception {
+	 *   master
+	 *     .withContainerAllocator()
+	 *       .priority(0)
+	 *       .virtualCores(1)
+	 *       .memory(1024);
+	 * }
+	 * </pre>
+	 *
+	 * <p>XML:
+	 * <p>
+	 * <pre>
+	 * &lt;yarn:master>
+	 *   &lt;yarn:container-allocator priority="0" virtualcores="1" memory="1024"/>
+	 * &lt;/yarn:master>
+	 * </pre>
+	 *
+	 * @return {@link MasterContainerAllocatorConfigurer} for chaining
+	 */
+	MasterContainerAllocatorConfigurer withContainerAllocator() throws Exception;
 
 	/**
 	 * Specify a raw array of commands used to start a container.
