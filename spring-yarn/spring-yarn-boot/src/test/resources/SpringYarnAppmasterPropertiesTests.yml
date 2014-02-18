@@ -17,3 +17,6 @@ spring:
               - "options1Foo"
               - "options2Foo"
             waitLatch: false
+            memory: memoryFoo
+            priority: 234
+            virtualCores: 123

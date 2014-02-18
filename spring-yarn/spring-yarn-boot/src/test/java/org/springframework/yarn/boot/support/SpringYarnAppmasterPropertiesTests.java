@@ -68,6 +68,10 @@ public class SpringYarnAppmasterPropertiesTests {
 		assertThat(options.get(0), is("options1Foo"));
 		assertThat(options.get(1), is("options2Foo"));
 
+		assertThat(properties.getMemory(), is("memoryFoo"));
+		assertThat(properties.getPriority(), is(234));
+		assertThat(properties.getVirtualCores(), is(123));
+
 		assertThat(properties.isWaitLatch(), is(false));
 		context.close();
 	}

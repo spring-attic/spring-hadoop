@@ -27,10 +27,15 @@ import org.springframework.yarn.am.AbstractAppmaster;
 import org.springframework.yarn.am.AbstractServicesAppmaster;
 import org.springframework.yarn.am.StaticAppmaster;
 import org.springframework.yarn.am.YarnAppmaster;
+import org.springframework.yarn.am.allocate.AbstractAllocator;
+import org.springframework.yarn.am.allocate.ContainerAllocator;
 import org.springframework.yarn.am.allocate.DefaultContainerAllocator;
 import org.springframework.yarn.am.container.DefaultContainerLauncher;
 import org.springframework.yarn.am.monitor.DefaultContainerMonitor;
+import org.springframework.yarn.config.annotation.configurers.DefaultMasterContainerAllocatorConfigurer;
 import org.springframework.yarn.config.annotation.configurers.DefaultMasterContainerRunnerConfigurer;
+import org.springframework.yarn.config.annotation.configurers.MasterContainerAllocatorConfigurer;
+import org.springframework.yarn.config.annotation.configurers.MasterContainerRunnerConfigurer;
 import org.springframework.yarn.fs.ResourceLocalizer;
 
 /**
@@ -47,6 +52,7 @@ public final class YarnAppmasterBuilder extends AbstractConfiguredAnnotationBuil
 
 	private Configuration configuration;
 	private ResourceLocalizer resourceLocalizer;
+	private ContainerAllocator containerAllocator;
 	private Map<String, String> environment;
 	private String[] commands;
 
@@ -81,10 +87,14 @@ public final class YarnAppmasterBuilder extends AbstractConfiguredAnnotationBuil
 				launcher.setResourceLocalizer(resourceLocalizer);
 				abstractServicesAppmaster.setLauncher(launcher);
 
-				DefaultContainerAllocator allocator = new DefaultContainerAllocator();
-				allocator.setConfiguration(configuration);
-				allocator.setEnvironment(environment);
-				abstractServicesAppmaster.setAllocator(postProcess(allocator));
+				if (containerAllocator == null) {
+					containerAllocator = new DefaultContainerAllocator();
+				}
+				if (containerAllocator instanceof AbstractAllocator) {
+					((AbstractAllocator)containerAllocator).setConfiguration(configuration);
+					((AbstractAllocator)containerAllocator).setEnvironment(environment);
+				}
+				abstractServicesAppmaster.setAllocator(postProcess(containerAllocator));
 
 				abstractServicesAppmaster.setMonitor(new DefaultContainerMonitor());
 			}
@@ -93,8 +103,14 @@ public final class YarnAppmasterBuilder extends AbstractConfiguredAnnotationBuil
 		return appmaster;
 	}
 
-	public DefaultMasterContainerRunnerConfigurer withContainerRunner() throws Exception {
+	@Override
+	public MasterContainerRunnerConfigurer withContainerRunner() throws Exception {
 		return apply(new DefaultMasterContainerRunnerConfigurer());
+	}
+
+	@Override
+	public MasterContainerAllocatorConfigurer withContainerAllocator() throws Exception {
+		return apply(new DefaultMasterContainerAllocatorConfigurer());
 	}
 
 	public void configuration(Configuration configuration) {
@@ -103,6 +119,10 @@ public final class YarnAppmasterBuilder extends AbstractConfiguredAnnotationBuil
 
 	public void setResourceLocalizer(ResourceLocalizer resourceLocalizer) {
 		this.resourceLocalizer = resourceLocalizer;
+	}
+
+	public void setContainerAllocator(ContainerAllocator containerAllocator) {
+		this.containerAllocator = containerAllocator;
 	}
 
 	public void setEnvironment(Map<String, String> environment) {
