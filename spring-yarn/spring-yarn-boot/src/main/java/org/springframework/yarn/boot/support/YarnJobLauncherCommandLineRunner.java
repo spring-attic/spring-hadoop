@@ -161,6 +161,19 @@ public class YarnJobLauncherCommandLineRunner implements CommandLineRunner, Appl
 		JobProperties jobProperties = batchProperties.getJobProperties(jobIdentifier);
 		boolean restart = false;
 
+		// re-create by adding props from a boot JobProperties
+		logger.info("Job parameters from boot properties, parameters" + jobProperties.getParameters());
+		if (jobProperties.getParameters() != null) {
+			Properties tmpProperties = new Properties();
+			Map<String, Object> tmpParameters = jobProperties.getParameters();
+			tmpProperties.putAll(tmpParameters);
+			JobParameters tmpJobParameters = this.converter.getJobParameters(tmpProperties);
+			Map<String, JobParameter> map1 = new HashMap<String, JobParameter>(tmpJobParameters.getParameters());
+			map1.putAll(jobParameters.getParameters());
+			jobParameters = new JobParameters(map1);
+			logger.info("Modified jobParameters=" + jobParameters);
+		}
+
 		if (jobProperties.isRestart()) {
 			if (jobExplorer == null) {
 				throw new JobExecutionException("A JobExplorer must be provided for a restart or start next operation.");
