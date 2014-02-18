@@ -1,0 +1,9 @@
+spring:
+    yarn:
+        appName: appNameFoo
+        appType: appTypeFoo
+        applicationDir: applicationDirFoo
+        applicationsBaseDir: applicationsBaseDirFoo
+        fsUri: fsUriFoo
+        rmAddress: rmAddressFoo
+        schedulerAddress: schedulerAddressFoo

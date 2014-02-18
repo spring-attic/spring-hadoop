@@ -1,0 +1,5 @@
+spring:
+    yarn:
+        container:
+            waitLatch: false
+            containerClass: containerClassFoo

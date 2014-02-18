@@ -33,6 +33,11 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.yarn.batch.repository.bindings.ExecutionContextType;
 import org.springframework.yarn.batch.repository.bindings.ExecutionContextType.ObjectEntry;
+import org.springframework.yarn.batch.repository.bindings.JobExecutionType;
+import org.springframework.yarn.batch.repository.bindings.JobInstanceType;
+import org.springframework.yarn.batch.repository.bindings.JobParameterType;
+import org.springframework.yarn.batch.repository.bindings.JobParametersType;
+import org.springframework.yarn.batch.repository.bindings.StepExecutionType;
 import org.springframework.yarn.batch.repository.bindings.exp.FindRunningJobExecutionsReq;
 import org.springframework.yarn.batch.repository.bindings.exp.GetJobExecutionReq;
 import org.springframework.yarn.batch.repository.bindings.exp.GetJobExecutionsReq;
@@ -49,11 +54,6 @@ import org.springframework.yarn.batch.repository.bindings.repo.IsJobInstanceExis
 import org.springframework.yarn.batch.repository.bindings.repo.UpdateExecutionContextReq;
 import org.springframework.yarn.batch.repository.bindings.repo.UpdateWithJobExecutionReq;
 import org.springframework.yarn.batch.repository.bindings.repo.UpdateWithStepExecutionReq;
-import org.springframework.yarn.batch.repository.bindings.JobExecutionType;
-import org.springframework.yarn.batch.repository.bindings.JobInstanceType;
-import org.springframework.yarn.batch.repository.bindings.JobParameterType;
-import org.springframework.yarn.batch.repository.bindings.JobParametersType;
-import org.springframework.yarn.batch.repository.bindings.StepExecutionType;
 
 /**
  * Helper class providing factory methods for building requests used
@@ -346,6 +346,8 @@ public class JobRepositoryRpcFactory {
 			if(parameterType == ParameterType.DATE) {
 				if(entry.getValue().parameter instanceof Integer) {
 					map.put(entry.getKey(), new JobParameter(new Date((Integer)entry.getValue().parameter)));
+				} else if(entry.getValue().parameter instanceof Long) {
+					map.put(entry.getKey(), new JobParameter(new Date((Long)entry.getValue().parameter)));
 				} else if(entry.getValue().parameter instanceof Date) {
 					map.put(entry.getKey(), new JobParameter(((Date)entry.getValue().parameter)));
 				}

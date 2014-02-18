@@ -1,0 +1,23 @@
+spring:
+    yarn:
+        client:
+            appmasterFile: appmasterFileFoo
+            arguments:
+              ? argumentsKeyFoo1
+              : argumentsValFoo1
+              ? argumentsKeyFoo2
+              : argumentsValFoo2
+            classpath:
+              - "classpath1Foo"
+              - "classpath2Foo"
+            files:
+              - "files1Foo"
+              - "files2Foo"
+            masterRunner: masterRunnerFoo
+            memory: memoryFoo
+            options:
+              - "options1Foo"
+              - "options2Foo"
+            priority: 234
+            queue: queueFoo
+            virtualCores: 123

@@ -120,8 +120,8 @@ public class YarnClientAutoConfiguration {
 
 		if (StringUtils.hasText(appmasterJar) && appmasterJar.endsWith("jar")) {
 			factory.setJarFile(sycp.getAppmasterFile());
-		} else if (StringUtils.hasText(sycp.getRunnerClass())) {
-			factory.setRunnerClass(sycp.getRunnerClass());
+		} else if (StringUtils.hasText(sycp.getMasterRunner())) {
+			factory.setRunnerClass(sycp.getMasterRunner());
 		} else if (StringUtils.hasText(appmasterJar) && appmasterJar.endsWith("zip")) {
 			factory.setRunnerClass("org.springframework.boot.loader.PropertiesLauncher");
 		}

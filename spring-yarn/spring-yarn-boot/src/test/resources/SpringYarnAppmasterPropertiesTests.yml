@@ -1,0 +1,19 @@
+spring:
+    yarn:
+        appmaster:
+            appmasterClass: appmasterClassFoo
+            arguments:
+              ? argumentsKeyFoo1
+              : argumentsValFoo1
+              ? argumentsKeyFoo2
+              : argumentsValFoo2
+            classpath:
+              - "classpath1Foo"
+              - "classpath2Foo"
+            containerCount: 123
+            containerFile: containerFileFoo
+            containerRunner: containerRunnerFoo
+            options:
+              - "options1Foo"
+              - "options2Foo"
+            waitLatch: false

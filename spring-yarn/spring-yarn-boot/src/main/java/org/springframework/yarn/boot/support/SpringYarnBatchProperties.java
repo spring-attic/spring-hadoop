@@ -33,7 +33,25 @@ import org.springframework.util.ObjectUtils;
 @ConfigurationProperties(name = "spring.yarn.batch")
 public class SpringYarnBatchProperties {
 
+	private String name;
+	private boolean enabled = false;
 	private List<JobProperties> jobs;
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
 
 	public List<JobProperties> getJobs() {
 		return jobs;
