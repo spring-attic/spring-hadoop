@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,21 +21,81 @@ import org.springframework.data.hadoop.config.common.annotation.AnnotationConfig
 import org.springframework.yarn.config.annotation.builders.YarnEnvironmentConfigurer;
 
 /**
+ * {@link AnnotationConfigurerBuilder} for configuring classpath environment variable.
  *
+ * <p>
+ * Typically configuration is shown below.
+ * <p>
+ * <pre>
+ * &#064;Configuration
+ * &#064;EnableYarn(enable=Enable.APPMASTER)
+ * static class Config extends SpringYarnConfigurerAdapter {
+ *
+ *   &#064;Override
+ *   public void configure(YarnEnvironmentConfigurer environment) throws Exception {
+ *     environment
+ *       .withClasspath()
+ *         .includeBaseDirectory(true)
+ *         .defaultYarnAppClasspath(true)
+ *         .delimiter(":")
+ *         .entries("entry1", "entry2")
+ *         .entry("entry3");
+ *   }
+ *
+ * }
+ * </pre>
  *
  * @author Janne Valkealahti
  *
  */
 public interface EnvironmentClasspathConfigurer extends AnnotationConfigurerBuilder<YarnEnvironmentConfigurer> {
 
+	/**
+	 * Specify a new classpath entry.
+	 *
+	 * @param entry the classpath entry
+	 * @return {@link EnvironmentClasspathConfigurer} for chaining
+	 */
 	EnvironmentClasspathConfigurer entry(String entry);
 
+	/**
+	 * Specify a new classpath entries.
+	 *
+	 * @param entries the classpath entries
+	 * @return {@link EnvironmentClasspathConfigurer} for chaining
+	 */
 	EnvironmentClasspathConfigurer entries(String... entries);
 
+	/**
+	 * Specify a new classpath entries.
+	 *
+	 * @param entries the classpath entries
+	 * @return {@link EnvironmentClasspathConfigurer} for chaining
+	 */
 	EnvironmentClasspathConfigurer entries(List<String> entries);
 
+	/**
+	 * Specify if default yarn classpath entries should be added.
+	 *
+	 * @param defaultClasspath the default yarn app classpath
+	 * @return {@link EnvironmentClasspathConfigurer} for chaining
+	 */
 	EnvironmentClasspathConfigurer defaultYarnAppClasspath(boolean defaultClasspath);
 
+	/**
+	 * Specify if base directory should be added in classpath.
+	 *
+	 * @param includeBaseDirectory the include base directory
+	 * @return {@link EnvironmentClasspathConfigurer} for chaining
+	 */
 	EnvironmentClasspathConfigurer includeBaseDirectory(boolean includeBaseDirectory);
+
+	/**
+	 * Specify a delimiter used in a classpath.
+	 *
+	 * @param delimiter the delimiter
+	 * @return {@link EnvironmentClasspathConfigurer} for chaining
+	 */
+	EnvironmentClasspathConfigurer delimiter(String delimiter);
 
 }

@@ -41,6 +41,10 @@ public class SpringYarnClientProperties {
 	private String memory;
 	private Integer virtualCores;
 	private Map<String, byte[]> rawFileContents;
+	private boolean includeSystemEnv = true;
+	private boolean defaultYarnAppClasspath = true;
+	private boolean includeBaseDirectory = true;
+	private String delimiter;
 
 	public String getAppmasterFile() {
 		return appmasterFile;
@@ -124,6 +128,38 @@ public class SpringYarnClientProperties {
 
 	public Map<String, byte[]> getRawFileContents() {
 		return rawFileContents;
+	}
+
+	public boolean isIncludeSystemEnv() {
+		return includeSystemEnv;
+	}
+
+	public void setIncludeSystemEnv(boolean includeSystemEnv) {
+		this.includeSystemEnv = includeSystemEnv;
+	}
+
+	public boolean isDefaultYarnAppClasspath() {
+		return defaultYarnAppClasspath;
+	}
+
+	public void setDefaultYarnAppClasspath(boolean defaultYarnAppClasspath) {
+		this.defaultYarnAppClasspath = defaultYarnAppClasspath;
+	}
+
+	public boolean isIncludeBaseDirectory() {
+		return includeBaseDirectory;
+	}
+
+	public void setIncludeBaseDirectory(boolean includeBaseDirectory) {
+		this.includeBaseDirectory = includeBaseDirectory;
+	}
+
+	public String getDelimiter() {
+		return delimiter;
+	}
+
+	public void setDelimiter(String delimiter) {
+		this.delimiter = delimiter;
 	}
 
 	/**

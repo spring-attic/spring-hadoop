@@ -77,6 +77,12 @@ public class SpringYarnClientPropertiesTests {
 		assertThat(properties.getQueue(), is("queueFoo"));
 		assertThat(properties.getRawFileContents(), nullValue());
 		assertThat(properties.getVirtualCores(), is(123));
+
+		assertThat(properties.isDefaultYarnAppClasspath(), is(false));
+		assertThat(properties.isIncludeBaseDirectory(), is(false));
+		assertThat(properties.isIncludeSystemEnv(), is(false));
+		assertThat(properties.getDelimiter(), is(":"));
+
 		context.close();
 	}
 

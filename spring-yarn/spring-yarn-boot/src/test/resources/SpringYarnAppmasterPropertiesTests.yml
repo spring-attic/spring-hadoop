@@ -20,3 +20,7 @@ spring:
             memory: memoryFoo
             priority: 234
             virtualCores: 123
+            includeSystemEnv: false
+            defaultYarnAppClasspath: false
+            includeBaseDirectory: false
+            delimiter: ":"

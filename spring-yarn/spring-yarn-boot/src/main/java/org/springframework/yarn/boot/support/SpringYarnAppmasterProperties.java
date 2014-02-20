@@ -26,6 +26,10 @@ public class SpringYarnAppmasterProperties {
 	private Integer priority;
 	private String memory;
 	private Integer virtualCores;
+	private boolean includeSystemEnv = true;
+	private boolean defaultYarnAppClasspath = true;
+	private boolean includeBaseDirectory = true;
+	private String delimiter;
 
 	public String getContainerFile() {
 		return containerFile;
@@ -113,6 +117,38 @@ public class SpringYarnAppmasterProperties {
 
 	public void setVirtualCores(Integer virtualCores) {
 		this.virtualCores = virtualCores;
+	}
+
+	public boolean isIncludeSystemEnv() {
+		return includeSystemEnv;
+	}
+
+	public void setIncludeSystemEnv(boolean includeSystemEnv) {
+		this.includeSystemEnv = includeSystemEnv;
+	}
+
+	public boolean isDefaultYarnAppClasspath() {
+		return defaultYarnAppClasspath;
+	}
+
+	public void setDefaultYarnAppClasspath(boolean defaultYarnAppClasspath) {
+		this.defaultYarnAppClasspath = defaultYarnAppClasspath;
+	}
+
+	public boolean isIncludeBaseDirectory() {
+		return includeBaseDirectory;
+	}
+
+	public void setIncludeBaseDirectory(boolean includeBaseDirectory) {
+		this.includeBaseDirectory = includeBaseDirectory;
+	}
+
+	public String getDelimiter() {
+		return delimiter;
+	}
+
+	public void setDelimiter(String delimiter) {
+		this.delimiter = delimiter;
 	}
 
 }

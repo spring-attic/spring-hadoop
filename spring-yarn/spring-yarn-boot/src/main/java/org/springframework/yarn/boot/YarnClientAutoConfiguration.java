@@ -87,8 +87,11 @@ public class YarnClientAutoConfiguration {
 		@Override
 		public void configure(YarnEnvironmentConfigurer environment) throws Exception {
 			environment
-				.includeSystemEnv(false)
+				.includeSystemEnv(sycp.isIncludeSystemEnv())
 				.withClasspath()
+					.includeBaseDirectory(sycp.isIncludeBaseDirectory())
+					.defaultYarnAppClasspath(sycp.isDefaultYarnAppClasspath())
+					.delimiter(sycp.getDelimiter())
 					.entries(sycp.getClasspath())
 					.entry(explodedEntryIfZip(sycp));
 		}

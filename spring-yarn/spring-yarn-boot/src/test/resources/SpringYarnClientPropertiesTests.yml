@@ -21,3 +21,7 @@ spring:
             priority: 234
             queue: queueFoo
             virtualCores: 123
+            includeSystemEnv: false
+            defaultYarnAppClasspath: false
+            includeBaseDirectory: false
+            delimiter: ":"

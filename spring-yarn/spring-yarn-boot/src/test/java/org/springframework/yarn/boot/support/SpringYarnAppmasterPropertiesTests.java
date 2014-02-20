@@ -72,6 +72,11 @@ public class SpringYarnAppmasterPropertiesTests {
 		assertThat(properties.getPriority(), is(234));
 		assertThat(properties.getVirtualCores(), is(123));
 
+		assertThat(properties.isDefaultYarnAppClasspath(), is(false));
+		assertThat(properties.isIncludeBaseDirectory(), is(false));
+		assertThat(properties.isIncludeSystemEnv(), is(false));
+		assertThat(properties.getDelimiter(), is(":"));
+
 		assertThat(properties.isWaitLatch(), is(false));
 		context.close();
 	}

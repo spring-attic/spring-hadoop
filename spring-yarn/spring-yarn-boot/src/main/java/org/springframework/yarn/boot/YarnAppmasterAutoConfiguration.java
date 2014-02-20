@@ -165,10 +165,13 @@ public class YarnAppmasterAutoConfiguration {
 		@Override
 		public void configure(YarnEnvironmentConfigurer environment) throws Exception {
 			environment
-			.includeSystemEnv(true)
-			.withClasspath()
-				.entries(syap.getClasspath())
-				.entry(explodedEntryIfZip(syap));
+				.includeSystemEnv(syap.isIncludeSystemEnv())
+				.withClasspath()
+					.includeBaseDirectory(syap.isIncludeBaseDirectory())
+					.defaultYarnAppClasspath(syap.isDefaultYarnAppClasspath())
+					.delimiter(syap.getDelimiter())
+					.entries(syap.getClasspath())
+					.entry(explodedEntryIfZip(syap));
 		}
 
 		@Override
