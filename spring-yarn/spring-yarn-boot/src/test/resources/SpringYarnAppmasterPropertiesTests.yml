@@ -20,3 +20,13 @@ spring:
             memory: memoryFoo
             priority: 234
             virtualCores: 123
+            includeSystemEnv: false
+            defaultYarnAppClasspath: false
+            includeBaseDirectory: false
+            delimiter: ":"
+            localizerZipPattern: patternFoo
+            localizerPropertiesNames: [name1Foo, name2Foo]
+            localizerPropertiesSuffixes: [suffix1Foo, suffix2Foo]
+            localizerPatterns:
+              - "patterns1Foo"
+              - "patterns2Foo"

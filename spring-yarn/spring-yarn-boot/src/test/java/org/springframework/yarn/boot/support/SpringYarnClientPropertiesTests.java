@@ -77,6 +77,32 @@ public class SpringYarnClientPropertiesTests {
 		assertThat(properties.getQueue(), is("queueFoo"));
 		assertThat(properties.getRawFileContents(), nullValue());
 		assertThat(properties.getVirtualCores(), is(123));
+
+		assertThat(properties.isDefaultYarnAppClasspath(), is(false));
+		assertThat(properties.isIncludeBaseDirectory(), is(false));
+		assertThat(properties.isIncludeSystemEnv(), is(false));
+		assertThat(properties.getDelimiter(), is(":"));
+
+		List<String> pattern = properties.getLocalizerPatterns();
+		assertThat(pattern, notNullValue());
+		assertThat(pattern.size(), is(2));
+		assertThat(pattern.get(0), is("patterns1Foo"));
+		assertThat(pattern.get(1), is("patterns2Foo"));
+
+		List<String> names = properties.getLocalizerPropertiesNames();
+		assertThat(names, notNullValue());
+		assertThat(names.size(), is(2));
+		assertThat(names.get(0), is("name1Foo"));
+		assertThat(names.get(1), is("name2Foo"));
+
+		List<String> suffixes = properties.getLocalizerPropertiesSuffixes();
+		assertThat(suffixes, notNullValue());
+		assertThat(suffixes.size(), is(2));
+		assertThat(suffixes.get(0), is("suffix1Foo"));
+		assertThat(suffixes.get(1), is("suffix2Foo"));
+
+		assertThat(properties.getLocalizerZipPattern(), is("patternFoo"));
+
 		context.close();
 	}
 

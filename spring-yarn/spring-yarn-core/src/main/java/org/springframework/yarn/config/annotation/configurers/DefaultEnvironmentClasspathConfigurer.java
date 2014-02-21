@@ -37,7 +37,7 @@ public class DefaultEnvironmentClasspathConfigurer
 
 	private boolean defaultClasspath = true;
 	private boolean includeBaseDirectory = true;
-
+	private String delimiter;
 
 	private ArrayList<String> classpathEntries = new ArrayList<String>();
 
@@ -46,6 +46,9 @@ public class DefaultEnvironmentClasspathConfigurer
 		builder.addClasspathEntries(classpathEntries);
 		builder.setDefaultClasspath(defaultClasspath);
 		builder.setIncludeBaseDirectory(includeBaseDirectory);
+		if (StringUtils.hasText(delimiter)) {
+			builder.setDelimiter(delimiter);
+		}
 	}
 
 	@Override
@@ -82,6 +85,12 @@ public class DefaultEnvironmentClasspathConfigurer
 	@Override
 	public EnvironmentClasspathConfigurer includeBaseDirectory(boolean includeBaseDirectory) {
 		this.includeBaseDirectory = includeBaseDirectory;
+		return this;
+	}
+
+	@Override
+	public EnvironmentClasspathConfigurer delimiter(String delimiter) {
+		this.delimiter = delimiter;
 		return this;
 	}
 

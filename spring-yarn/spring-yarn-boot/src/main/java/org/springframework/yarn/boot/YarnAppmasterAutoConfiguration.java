@@ -19,7 +19,6 @@ import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.hadoop.yarn.api.records.LocalResourceType;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -39,11 +38,13 @@ import org.springframework.yarn.am.YarnAppmaster;
 import org.springframework.yarn.boot.condition.ConditionalOnYarnAppmaster;
 import org.springframework.yarn.boot.support.AppmasterLauncherRunner;
 import org.springframework.yarn.boot.support.BootApplicationEventTransformer;
-import org.springframework.yarn.boot.support.YarnJobLauncherCommandLineRunner;
+import org.springframework.yarn.boot.support.BootLocalResourcesSelector;
+import org.springframework.yarn.boot.support.BootLocalResourcesSelector.Mode;
 import org.springframework.yarn.boot.support.SpringYarnAppmasterProperties;
 import org.springframework.yarn.boot.support.SpringYarnBatchProperties;
 import org.springframework.yarn.boot.support.SpringYarnEnvProperties;
 import org.springframework.yarn.boot.support.SpringYarnProperties;
+import org.springframework.yarn.boot.support.YarnJobLauncherCommandLineRunner;
 import org.springframework.yarn.config.annotation.EnableYarn;
 import org.springframework.yarn.config.annotation.EnableYarn.Enable;
 import org.springframework.yarn.config.annotation.SpringYarnConfigurerAdapter;
@@ -51,6 +52,9 @@ import org.springframework.yarn.config.annotation.builders.YarnAppmasterConfigur
 import org.springframework.yarn.config.annotation.builders.YarnConfigConfigurer;
 import org.springframework.yarn.config.annotation.builders.YarnEnvironmentConfigurer;
 import org.springframework.yarn.config.annotation.builders.YarnResourceLocalizerConfigurer;
+import org.springframework.yarn.config.annotation.configurers.LocalResourcesHdfsConfigurer;
+import org.springframework.yarn.fs.LocalResourcesSelector;
+import org.springframework.yarn.fs.LocalResourcesSelector.Entry;
 import org.springframework.yarn.launch.LaunchCommandsFactoryBean;
 import org.springframework.yarn.support.YarnContextUtils;
 
@@ -68,6 +72,31 @@ import org.springframework.yarn.support.YarnContextUtils;
 public class YarnAppmasterAutoConfiguration {
 
 	private final static Log log = LogFactory.getLog(YarnAppmasterAutoConfiguration.class);
+
+	@Configuration
+	@EnableConfigurationProperties({SpringYarnProperties.class, SpringYarnAppmasterProperties.class})
+	public static class LocalResourcesSelectorConfig {
+
+		@Autowired
+		private SpringYarnAppmasterProperties syap;
+
+		@Bean
+		@ConditionalOnMissingBean(LocalResourcesSelector.class)
+		public LocalResourcesSelector localResourcesSelector() {
+			BootLocalResourcesSelector selector = new BootLocalResourcesSelector(Mode.CONTAINER);
+			if (StringUtils.hasText(syap.getLocalizerZipPattern())) {
+				selector.setZipArchivePattern(syap.getLocalizerZipPattern());
+			}
+			if (syap.getLocalizerPropertiesNames() != null) {
+				selector.setPropertiesNames(syap.getLocalizerPropertiesNames());
+			}
+			if (syap.getLocalizerPropertiesSuffixes() != null) {
+				selector.setPropertiesSuffixes(syap.getLocalizerPropertiesSuffixes());
+			}
+			selector.addPatterns(syap.getLocalizerPatterns());
+			return selector;
+		}
+	}
 
 	@Configuration
 	@EnableConfigurationProperties({SpringYarnProperties.class, SpringYarnAppmasterProperties.class})
@@ -143,6 +172,9 @@ public class YarnAppmasterAutoConfiguration {
 		@Qualifier("customAppmasterClass")
 		private String appmasterClass;
 
+		@Autowired
+		private LocalResourcesSelector localResourcesSelector;
+
 		@Override
 		public void configure(YarnConfigConfigurer config) throws Exception {
 			log.info("Configuring fsUri=[" + syp.getFsUri() + "]");
@@ -155,20 +187,22 @@ public class YarnAppmasterAutoConfiguration {
 
 		@Override
 		public void configure(YarnResourceLocalizerConfigurer localizer) throws Exception {
-			localizer
-				.withHdfs()
-					.hdfs(syp.getApplicationDir() + "application.properties")
-					.hdfs(syp.getApplicationDir() + "*.jar")
-					.hdfs(syp.getApplicationDir() + "*.zip", LocalResourceType.ARCHIVE);
+			LocalResourcesHdfsConfigurer withHdfs = localizer.withHdfs();
+			for (Entry e : localResourcesSelector.select(syp.getApplicationDir())) {
+				withHdfs.hdfs(e.getPath(), e.getType());
+			}
 		}
 
 		@Override
 		public void configure(YarnEnvironmentConfigurer environment) throws Exception {
 			environment
-			.includeSystemEnv(true)
-			.withClasspath()
-				.entries(syap.getClasspath())
-				.entry(explodedEntryIfZip(syap));
+				.includeSystemEnv(syap.isIncludeSystemEnv())
+				.withClasspath()
+					.includeBaseDirectory(syap.isIncludeBaseDirectory())
+					.defaultYarnAppClasspath(syap.isDefaultYarnAppClasspath())
+					.delimiter(syap.getDelimiter())
+					.entries(syap.getClasspath())
+					.entry(explodedEntryIfZip(syap));
 		}
 
 		@Override
