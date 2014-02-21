@@ -30,6 +30,10 @@ public class SpringYarnAppmasterProperties {
 	private boolean defaultYarnAppClasspath = true;
 	private boolean includeBaseDirectory = true;
 	private String delimiter;
+	private List<String> localizerPatterns;
+	private String localizerZipPattern;
+	private List<String> localizerPropertiesNames;
+	private List<String> localizerPropertiesSuffixes;
 
 	public String getContainerFile() {
 		return containerFile;
@@ -149,6 +153,38 @@ public class SpringYarnAppmasterProperties {
 
 	public void setDelimiter(String delimiter) {
 		this.delimiter = delimiter;
+	}
+
+	public List<String> getLocalizerPatterns() {
+		return localizerPatterns;
+	}
+
+	public void setLocalizerPatterns(List<String> localizerPatterns) {
+		this.localizerPatterns = localizerPatterns;
+	}
+
+	public String getLocalizerZipPattern() {
+		return localizerZipPattern;
+	}
+
+	public void setLocalizerZipPattern(String localizerZipPattern) {
+		this.localizerZipPattern = localizerZipPattern;
+	}
+
+	public List<String> getLocalizerPropertiesNames() {
+		return localizerPropertiesNames;
+	}
+
+	public void setLocalizerPropertiesNames(List<String> localizerPropertiesNames) {
+		this.localizerPropertiesNames = localizerPropertiesNames;
+	}
+
+	public List<String> getLocalizerPropertiesSuffixes() {
+		return localizerPropertiesSuffixes;
+	}
+
+	public void setLocalizerPropertiesSuffixes(List<String> localizerPropertiesSuffixes) {
+		this.localizerPropertiesSuffixes = localizerPropertiesSuffixes;
 	}
 
 }

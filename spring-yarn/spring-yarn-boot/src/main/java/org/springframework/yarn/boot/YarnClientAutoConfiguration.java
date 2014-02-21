@@ -17,15 +17,17 @@ package org.springframework.yarn.boot;
 
 import java.util.Properties;
 
-import org.apache.hadoop.yarn.api.records.LocalResourceType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
 import org.springframework.yarn.boot.condition.ConditionalOnMissingYarn;
+import org.springframework.yarn.boot.support.BootLocalResourcesSelector;
+import org.springframework.yarn.boot.support.BootLocalResourcesSelector.Mode;
 import org.springframework.yarn.boot.support.SpringYarnClientProperties;
 import org.springframework.yarn.boot.support.SpringYarnEnvProperties;
 import org.springframework.yarn.boot.support.SpringYarnProperties;
@@ -37,6 +39,9 @@ import org.springframework.yarn.config.annotation.builders.YarnClientConfigurer;
 import org.springframework.yarn.config.annotation.builders.YarnConfigConfigurer;
 import org.springframework.yarn.config.annotation.builders.YarnEnvironmentConfigurer;
 import org.springframework.yarn.config.annotation.builders.YarnResourceLocalizerConfigurer;
+import org.springframework.yarn.config.annotation.configurers.LocalResourcesHdfsConfigurer;
+import org.springframework.yarn.fs.LocalResourcesSelector;
+import org.springframework.yarn.fs.LocalResourcesSelector.Entry;
 import org.springframework.yarn.launch.LaunchCommandsFactoryBean;
 
 /**
@@ -54,6 +59,31 @@ public class YarnClientAutoConfiguration {
 
 	@Configuration
 	@EnableConfigurationProperties({SpringYarnProperties.class, SpringYarnClientProperties.class, SpringYarnEnvProperties.class})
+	public static class LocalResourcesSelectorConfig {
+
+		@Autowired
+		private SpringYarnClientProperties sycp;
+
+		@Bean
+		@ConditionalOnMissingBean(LocalResourcesSelector.class)
+		public LocalResourcesSelector localResourcesSelector() {
+			BootLocalResourcesSelector selector = new BootLocalResourcesSelector(Mode.APPMASTER);
+			if (StringUtils.hasText(sycp.getLocalizerZipPattern())) {
+				selector.setZipArchivePattern(sycp.getLocalizerZipPattern());
+			}
+			if (sycp.getLocalizerPropertiesNames() != null) {
+				selector.setPropertiesNames(sycp.getLocalizerPropertiesNames());
+			}
+			if (sycp.getLocalizerPropertiesSuffixes() != null) {
+				selector.setPropertiesSuffixes(sycp.getLocalizerPropertiesSuffixes());
+			}
+			selector.addPatterns(sycp.getLocalizerPatterns());
+			return selector;
+		}
+	}
+
+	@Configuration
+	@EnableConfigurationProperties({SpringYarnProperties.class, SpringYarnClientProperties.class, SpringYarnEnvProperties.class})
 	@EnableYarn(enable=Enable.CLIENT)
 	public static class SpringYarnConfig extends SpringYarnConfigurerAdapter {
 
@@ -62,6 +92,9 @@ public class YarnClientAutoConfiguration {
 
 		@Autowired
 		private SpringYarnClientProperties sycp;
+
+		@Autowired
+		private LocalResourcesSelector localResourcesSelector;
 
 		@Override
 		public void configure(YarnConfigConfigurer config) throws Exception {
@@ -76,12 +109,12 @@ public class YarnClientAutoConfiguration {
 			localizer
 				.withCopy()
 					.copy(StringUtils.toStringArray(sycp.getFiles()), syp.getApplicationDir(), false)
-					.raw(sycp.getRawFileContents(), syp.getApplicationDir())
-				.and()
-				.withHdfs()
-					.hdfs(syp.getApplicationDir(), "application.properties")
-					.hdfs(syp.getApplicationDir(), "*.jar")
-					.hdfs(syp.getApplicationDir(), "*.zip", LocalResourceType.ARCHIVE).and();
+					.raw(sycp.getRawFileContents(), syp.getApplicationDir());
+
+			LocalResourcesHdfsConfigurer withHdfs = localizer.withHdfs();
+			for (Entry e : localResourcesSelector.select(syp.getApplicationDir())) {
+				withHdfs.hdfs(e.getPath(), e.getType());
+			}
 		}
 
 		@Override

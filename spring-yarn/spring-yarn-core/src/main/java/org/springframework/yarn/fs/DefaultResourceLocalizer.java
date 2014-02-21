@@ -260,6 +260,9 @@ public class DefaultResourceLocalizer implements ResourceLocalizer {
 	protected void doFileCopy(FileSystem fs) throws IOException {
 		for (CopyEntry e : copyEntries) {
 			for (String pattern : StringUtils.commaDelimitedListToStringArray(e.src)) {
+				if (log.isDebugEnabled()) {
+					log.debug("Searching copy entries using pattern=" + pattern);
+				}
 				for (Resource res : resolver.getResources(pattern)) {
 					Path destinationPath = getDestinationPath(e, res);
 					if (log.isDebugEnabled()) {
