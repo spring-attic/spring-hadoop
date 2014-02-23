@@ -107,6 +107,7 @@ public class YarnClientAutoConfiguration {
 		@Override
 		public void configure(YarnResourceLocalizerConfigurer localizer) throws Exception {
 			localizer
+				.stagingDirectory(syp.getStagingDirectory())
 				.withCopy()
 					.copy(StringUtils.toStringArray(sycp.getFiles()), syp.getApplicationDir(), syp.getApplicationDir() == null)
 					.raw(sycp.getRawFileContents(), syp.getApplicationDir());

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.yarn.api.records.LocalResourceType;
 import org.apache.hadoop.yarn.api.records.LocalResourceVisibility;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.util.StringUtils;
 
 /**
  * Factory bean building {@link ResourceLocalizer}s objects.
@@ -46,6 +48,9 @@ public class LocalResourcesFactoryBean implements InitializingBean, FactoryBean<
 
 	/** Yarn configuration*/
 	private Configuration configuration;
+
+	/** Staging directory if set*/
+	private Path stagingDirectory;
 
 	// defaults
 	private LocalResourceType defaultType;
@@ -80,6 +85,9 @@ public class LocalResourcesFactoryBean implements InitializingBean, FactoryBean<
 		}
 
 		DefaultResourceLocalizer defaultResourceLocalizer = new DefaultResourceLocalizer(configuration, hdfsEntries, copyEntries);
+		if (stagingDirectory != null) {
+			defaultResourceLocalizer.setStagingDirectory(stagingDirectory);
+		}
 
 		if (rawEntries != null) {
 			Map<String, byte[]> rawFileContents = new HashMap<String, byte[]>();
@@ -135,6 +143,27 @@ public class LocalResourcesFactoryBean implements InitializingBean, FactoryBean<
 	 */
 	public void setConfiguration(Configuration configuration) {
 		this.configuration = configuration;
+	}
+
+	/**
+	 * Sets the staging directory.
+	 *
+	 * @param stagingDirectory the new staging directory
+	 * @see #setStagingDirectory(Path)
+	 */
+	public void setStagingDirectory(String stagingDirectory) {
+		if (StringUtils.hasText(stagingDirectory)) {
+			setStagingDirectory(new Path(stagingDirectory));
+		}
+	}
+
+	/**
+	 * Sets the staging directory.
+	 *
+	 * @param stagingDirectory the new staging directory
+	 */
+	public void setStagingDirectory(Path stagingDirectory) {
+		this.stagingDirectory = stagingDirectory;
 	}
 
 	public void setRawCopyEntries(Collection<RawCopyEntry> rawEntries) {

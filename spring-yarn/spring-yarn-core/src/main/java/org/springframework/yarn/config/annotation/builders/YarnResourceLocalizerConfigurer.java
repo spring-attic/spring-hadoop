@@ -97,4 +97,6 @@ public interface YarnResourceLocalizerConfigurer {
 	 */
 	LocalResourcesHdfsConfigurer withHdfs() throws Exception;
 
+	YarnResourceLocalizerConfigurer stagingDirectory(String stagingDirectory) throws Exception;
+
 }
