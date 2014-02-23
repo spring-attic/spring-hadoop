@@ -33,6 +33,7 @@ import org.springframework.util.Assert;
 import org.springframework.yarn.am.assign.ContainerAssign;
 import org.springframework.yarn.am.assign.DefaultContainerAssign;
 import org.springframework.yarn.fs.ResourceLocalizer;
+import org.springframework.yarn.fs.SmartResourceLocalizer;
 import org.springframework.yarn.listener.AppmasterStateListener;
 import org.springframework.yarn.listener.AppmasterStateListener.AppmasterState;
 import org.springframework.yarn.listener.CompositeAppmasterStateListener;
@@ -363,8 +364,14 @@ public abstract class AbstractAppmaster extends LifecycleObjectSupport {
 	 */
 	protected FinishApplicationMasterResponse finishAppmaster() {
 
-		boolean clean = getResourceLocalizer().clean();
-		log.info("Status of resource localizer clean operation is " + clean);
+		boolean cleaned = false;
+		if (resourceLocalizer instanceof SmartResourceLocalizer) {
+			cleaned = ((SmartResourceLocalizer)resourceLocalizer).clean();
+		} else {
+			log.warn("Resource localizer is not instance of SmartResourceLocalizer, thus we're not asking cleanup");
+		}
+
+		log.info("Status of resource localizer clean operation is " + cleaned);
 
 		// starting from 2.1.x applicationAttemptId is part of the token and
 		// doesn't exist in finish request. We still keep it around as per

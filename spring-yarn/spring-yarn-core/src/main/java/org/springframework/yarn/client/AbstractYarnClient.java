@@ -43,6 +43,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.yarn.fs.ResourceLocalizer;
+import org.springframework.yarn.fs.SmartResourceLocalizer;
 import org.springframework.yarn.support.YarnUtils;
 import org.springframework.yarn.support.compat.ResourceCompat;
 
@@ -122,11 +123,16 @@ public abstract class AbstractYarnClient implements YarnClient, InitializingBean
 		// localizer distribute will kick off too early
 		ApplicationId applicationId = clientRmOperations.getNewApplication().getApplicationId();
 
-		resourceLocalizer.setStagingId(applicationId.toString());
-		if (!distribute) {
-			resourceLocalizer.resolve();
+		if (resourceLocalizer instanceof SmartResourceLocalizer) {
+			SmartResourceLocalizer smartResourceLocalizer = (SmartResourceLocalizer)resourceLocalizer;
+			smartResourceLocalizer.setStagingId(applicationId.toString());
+			if (!distribute) {
+				smartResourceLocalizer.resolve();
+			} else {
+				smartResourceLocalizer.distribute();
+			}
 		} else {
-			resourceLocalizer.distribute();
+			log.warn("Resource localizer is not instance of SmartResourceLocalizer, thus we're unable to resolve and distrute manually");
 		}
 
 		ApplicationSubmissionContext submissionContext = getSubmissionContext(applicationId);
@@ -141,7 +147,11 @@ public abstract class AbstractYarnClient implements YarnClient, InitializingBean
 
 	@Override
 	public void installApplication() {
-		resourceLocalizer.copy();
+		if (resourceLocalizer instanceof SmartResourceLocalizer) {
+			((SmartResourceLocalizer)resourceLocalizer).copy();
+		} else {
+			log.warn("Resource localizer is not instance of SmartResourceLocalizer, thus we're unable to ask copy operation");
+		}
 	}
 
 	@Override

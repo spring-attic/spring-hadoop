@@ -91,7 +91,9 @@ public class LocalResourcesFactoryBean implements InitializingBean, FactoryBean<
 			}
 			Assert.isTrue(entry.local != null && entry.remote != null, "Entry local/remote hdfs address can't be null");
 		}
+
 		DefaultResourceLocalizer defaultResourceLocalizer = new DefaultResourceLocalizer(configuration, hdfsEntries, copyEntries);
+
 		if (rawEntries != null) {
 			Map<String, byte[]> rawFileContents = new HashMap<String, byte[]>();
 			for (RawCopyEntry e : rawEntries) {

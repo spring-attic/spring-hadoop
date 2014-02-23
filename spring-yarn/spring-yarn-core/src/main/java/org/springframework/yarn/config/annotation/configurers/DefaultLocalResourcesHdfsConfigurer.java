@@ -62,6 +62,14 @@ public class DefaultLocalResourcesHdfsConfigurer
 	}
 
 	@Override
+	public LocalResourcesHdfsConfigurer hdfs(String path, LocalResourceType type, boolean staging) {
+		if (StringUtils.hasText(path)) {
+			hdfsEntries.add(new TransferEntry(type, null, path, null, null, staging));
+		}
+		return this;
+	}
+
+	@Override
 	public LocalResourcesHdfsConfigurer hdfs(String dir, String file, LocalResourceType type) {
 		if (StringUtils.hasText(dir) && StringUtils.hasText(file)) {
 			return hdfs(dir+file, type);

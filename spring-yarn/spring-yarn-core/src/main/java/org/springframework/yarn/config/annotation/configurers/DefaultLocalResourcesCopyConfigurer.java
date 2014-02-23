@@ -60,11 +60,12 @@ public class DefaultLocalResourcesCopyConfigurer
 
 	@Override
 	public LocalResourcesCopyConfigurer copy(String[] srcs, String dest, boolean staging) {
-		if (!ObjectUtils.isEmpty(srcs) && dest != null) {
+		if (!ObjectUtils.isEmpty(srcs)) {
 			for (String src : srcs) {
 				copyEntries.add(new CopyEntry(src, dest, staging));
 			}
 		}
+
 		return this;
 	}
 

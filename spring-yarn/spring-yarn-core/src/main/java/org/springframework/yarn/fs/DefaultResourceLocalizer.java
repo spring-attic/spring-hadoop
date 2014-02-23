@@ -22,7 +22,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,7 +38,6 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
-import org.springframework.yarn.YarnSystemConstants;
 import org.springframework.yarn.YarnSystemException;
 import org.springframework.yarn.fs.LocalResourcesFactoryBean.CopyEntry;
 import org.springframework.yarn.fs.LocalResourcesFactoryBean.TransferEntry;
@@ -52,7 +50,7 @@ import org.springframework.yarn.fs.LocalResourcesFactoryBean.TransferEntry;
  * @author Janne Valkealahti
  *
  */
-public class DefaultResourceLocalizer implements ResourceLocalizer {
+public class DefaultResourceLocalizer extends AbstractResourceLocalizer implements SmartResourceLocalizer {
 
 	private final static Log log = LogFactory.getLog(DefaultResourceLocalizer.class);
 
@@ -62,26 +60,8 @@ public class DefaultResourceLocalizer implements ResourceLocalizer {
 	/** Raw resource copy entries. */
 	private final Collection<CopyEntry> copyEntries;
 
-	/** Yarn configuration, needed to access the hdfs */
-	private final Configuration configuration;
-
 	/** Map returned from this instance */
 	private Map<String, LocalResource> resources;
-
-	/** Flag if distribution work is done */
-	private boolean distributed = false;
-
-	/** Flag if copy work is done */
-	private boolean copied = false;
-
-	/** Locking the work*/
-	private final ReentrantLock distributeLock = new ReentrantLock();
-
-	/** Staging directory */
-	private Path stagingDirectory;
-
-	/** The staging id. */
-	private String stagingId;
 
 	/**
 	 * Contents of a raw byte arrays with mapping to file names. These
@@ -115,52 +95,29 @@ public class DefaultResourceLocalizer implements ResourceLocalizer {
 	 */
 	public DefaultResourceLocalizer(Configuration configuration, Collection<TransferEntry> transferEntries,
 			Collection<CopyEntry> copyEntries, Path stagingDirectory) {
-		this.configuration = configuration;
+		super(configuration, stagingDirectory);
 		this.transferEntries = transferEntries;
 		this.copyEntries = copyEntries;
-		this.stagingDirectory = stagingDirectory;
 	}
 
 	@Override
 	public Map<String, LocalResource> getResources() {
-		if (!distributed) {
+		if (!isDistributed()) {
 			distribute();
 		}
 		return resources;
 	}
 
 	@Override
-	public void setStagingDirectory(Path stagingDirectory) {
-		log.info("Setting stagingDirectory=" + stagingDirectory);
-		if (!ObjectUtils.nullSafeEquals(this.stagingDirectory, stagingDirectory)) {
-			log.info("Marking distributed state false");
-			distributed = false;
-			copied = false;
-		}
-		this.stagingDirectory = stagingDirectory;
-	}
-
-	@Override
-	public void setStagingId(String stagingId) {
-		log.info("Setting stagingId=" + stagingId);
-		if (!ObjectUtils.nullSafeEquals(this.stagingId, stagingId)) {
-			log.info("Marking distributed state false");
-			distributed = false;
-			copied = false;
-		}
-		this.stagingId = stagingId;
-	}
-
-	@Override
 	public void copy() {
 		// guard by lock to copy only once
-		distributeLock.lock();
+		getLock().lock();
 		try {
-			if (!copied) {
+			if (!isCopied()) {
 				log.info("About to copy localized files");
-				FileSystem fs = FileSystem.get(configuration);
+				FileSystem fs = FileSystem.get(getConfiguration());
 				doFileCopy(fs);
-				copied = true;
+				setCopied(true);
 			} else {
 				log.info("Files already copied");
 			}
@@ -168,26 +125,26 @@ public class DefaultResourceLocalizer implements ResourceLocalizer {
 			log.error("Error copying files", e);
 			throw new YarnSystemException("Unable to copy files", e);
 		} finally {
-			distributeLock.unlock();
+			getLock().unlock();
 		}
 	}
 
 	@Override
 	public void distribute() {
 		// guard by lock to distribute only once
-		distributeLock.lock();
+		getLock().lock();
 		try {
-			if (!distributed) {
+			if (!isDistributed()) {
 				log.info("About to distribute localized files");
-				FileSystem fs = FileSystem.get(configuration);
-				if (!copied) {
+				FileSystem fs = FileSystem.get(getConfiguration());
+				if (!isCopied()) {
 					doFileCopy(fs);
-					copied = true;
+					setCopied(true);
 				} else {
 					log.info("Files already copied");
 				}
 				resources = doFileTransfer(fs);
-				distributed = true;
+				setDistributed(true);
 			} else {
 				log.info("Files already distributed");
 			}
@@ -198,20 +155,20 @@ public class DefaultResourceLocalizer implements ResourceLocalizer {
 			log.error("Error distributing files", e1);
 			throw new YarnSystemException("Unable to distribute files", e1);
 		} finally {
-			distributeLock.unlock();
+			getLock().unlock();
 		}
 	}
 
 	@Override
 	public void resolve() {
 		// guard by lock to distribute only once
-		distributeLock.lock();
+		getLock().lock();
 		try {
-			if (!distributed) {
+			if (!isDistributed()) {
 				log.info("About to resolve localized files");
-				FileSystem fs = FileSystem.get(configuration);
+				FileSystem fs = FileSystem.get(getConfiguration());
 				resources = doFileTransfer(fs);
-				distributed = true;
+				setDistributed(true);
 			} else {
 				log.info("Files already resolve");
 			}
@@ -222,7 +179,7 @@ public class DefaultResourceLocalizer implements ResourceLocalizer {
 			log.error("Error resolving files", e1);
 			throw new YarnSystemException("Unable to resolve files", e1);
 		} finally {
-			distributeLock.unlock();
+			getLock().unlock();
 		}
 	}
 
@@ -360,40 +317,6 @@ public class DefaultResourceLocalizer implements ResourceLocalizer {
 			}
 		}
 		return returned;
-	}
-
-	/**
-	 * Resolve runtime staging directory.
-	 *
-	 * @return the resolved path of runtime stagind directory
-	 */
-	private Path resolveStagingDirectory() {
-		Path base = stagingDirectory != null ?
-			stagingDirectory :
-			new Path("/" + YarnSystemConstants.DEFAULT_STAGING_BASE_DIR_NAME, YarnSystemConstants.DEFAULT_STAGING_DIR_NAME);
-		return stagingId != null ?
-			new Path(base, stagingId) :
-			base;
-	}
-
-	/**
-	 * Removes staging entries.
-	 *
-	 * @return true, if successful
-	 */
-	private boolean deleteStagingEntries() {
-		try {
-			FileSystem fs = FileSystem.get(configuration);
-			Path resolvedStagingDirectory = resolveStagingDirectory();
-			log.info("About to delete staging entries for path=" + resolvedStagingDirectory);
-			return fs.delete(resolvedStagingDirectory, true);
-		} catch (IOException e) {
-			log.error("Error deleting staging entries", e);
-			return false;
-		} finally {
-			distributed = false;
-			copied = false;
-		}
 	}
 
 }
