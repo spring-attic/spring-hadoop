@@ -24,8 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
@@ -34,7 +32,6 @@ import org.apache.hadoop.yarn.api.records.LocalResource;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.hadoop.fs.FsShell;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.yarn.fs.LocalResourcesFactoryBean.CopyEntry;
@@ -52,8 +49,6 @@ import org.springframework.yarn.test.context.YarnDelegatingSmartContextLoader;
 @ContextConfiguration(loader=YarnDelegatingSmartContextLoader.class)
 @MiniYarnCluster
 public class DefaultResourceLocalizerTests {
-
-	private final static Log log = LogFactory.getLog(DefaultResourceLocalizerTests.class);
 
 	@Autowired
 	private Configuration configuration;
@@ -98,8 +93,6 @@ public class DefaultResourceLocalizerTests {
 		localizer.setStagingId("foo-id");
 		localizer.copy();
 
-		listFiles();
-
 		FileSystem fs = FileSystem.get(configuration);
 		FileStatus fileStatus = fs.getFileStatus(new Path(dir + "/foo-id/test-site-1.xml"));
 		assertThat(fileStatus.isFile(), is(true));
@@ -118,7 +111,7 @@ public class DefaultResourceLocalizerTests {
 		factory.setCopyEntries(copyEntries);
 
 		List<TransferEntry> transferEntries = new ArrayList<TransferEntry>();
-		TransferEntry tEntry = new TransferEntry(null, null, dir + "/test-site-1.xml", null, null, false);
+		TransferEntry tEntry = new TransferEntry(null, null, dir + "/test-site-1.xml", false);
 		transferEntries.add(tEntry);
 		factory.setHdfsEntries(transferEntries);
 
@@ -143,7 +136,7 @@ public class DefaultResourceLocalizerTests {
 		factory.setCopyEntries(copyEntries);
 
 		List<TransferEntry> transferEntries = new ArrayList<TransferEntry>();
-		TransferEntry tEntry = new TransferEntry(null, null, "/test-site-1.xml", null, null, true);
+		TransferEntry tEntry = new TransferEntry(null, null, "/test-site-1.xml", true);
 		transferEntries.add(tEntry);
 		factory.setHdfsEntries(transferEntries);
 
@@ -157,8 +150,6 @@ public class DefaultResourceLocalizerTests {
 		Map<String, LocalResource> resources = localizer.getResources();
 		assertThat(resources, notNullValue());
 		assertThat(resources.size(), is(1));
-
-		listFiles();
 
 		FileSystem fs = FileSystem.get(configuration);
 		FileStatus fileStatus = fs.getFileStatus(new Path("/tmp/foo/foo-id/test-site-1.xml"));
@@ -178,7 +169,7 @@ public class DefaultResourceLocalizerTests {
 		factory.setCopyEntries(copyEntries);
 
 		List<TransferEntry> transferEntries = new ArrayList<TransferEntry>();
-		TransferEntry tEntry = new TransferEntry(null, null, "/test-site-1.xml", null, null, true);
+		TransferEntry tEntry = new TransferEntry(null, null, "/test-site-1.xml", true);
 		transferEntries.add(tEntry);
 		factory.setHdfsEntries(transferEntries);
 		factory.afterPropertiesSet();
@@ -193,15 +184,13 @@ public class DefaultResourceLocalizerTests {
 		assertThat(resources, notNullValue());
 		assertThat(resources.size(), is(1));
 
-		listFiles();
-
 		FileSystem fs = FileSystem.get(configuration);
 		FileStatus fileStatus = fs.getFileStatus(new Path("/syarn/staging/foo-id/test-site-1.xml"));
 		assertThat(fileStatus.isFile(), is(true));
 		assertThat(fileStatus.getLen(), greaterThan(0l));
 	}
 
-//	@Test
+	@Test
 	public void testDistributeHomeStaging() throws Exception {
 		String dir = "DefaultResourceLocalizerTests-testDistributeHomeStaging";
 		LocalResourcesFactoryBean factory = new LocalResourcesFactoryBean();
@@ -213,7 +202,7 @@ public class DefaultResourceLocalizerTests {
 		factory.setCopyEntries(copyEntries);
 
 		List<TransferEntry> transferEntries = new ArrayList<TransferEntry>();
-		TransferEntry tEntry = new TransferEntry(null, null, "/test-site-1.xml", null, null, true);
+		TransferEntry tEntry = new TransferEntry(null, null, "/test-site-1.xml", true);
 		transferEntries.add(tEntry);
 		factory.setHdfsEntries(transferEntries);
 		factory.afterPropertiesSet();
@@ -223,8 +212,6 @@ public class DefaultResourceLocalizerTests {
 		localizer.setStagingDirectory(new Path(dir));
 		localizer.setStagingId("foo-id");
 		localizer.distribute();
-
-		listFiles();
 
 		Map<String, LocalResource> resources = localizer.getResources();
 		assertThat(resources, notNullValue());
@@ -236,14 +223,6 @@ public class DefaultResourceLocalizerTests {
 		assertThat(fileStatus.isFile(), is(true));
 		assertThat(fileStatus.getLen(), greaterThan(0l));
 
-	}
-
-	private void listFiles() {
-		@SuppressWarnings("resource")
-		FsShell shell = new FsShell(configuration);
-		for (FileStatus s : shell.ls(true, "/")) {
-			log.info("XXX" + s);
-		}
 	}
 
 	@org.springframework.context.annotation.Configuration

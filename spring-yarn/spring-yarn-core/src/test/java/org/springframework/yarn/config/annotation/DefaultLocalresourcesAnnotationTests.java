@@ -76,14 +76,6 @@ public class DefaultLocalresourcesAnnotationTests {
 		assertThat(type, is(LocalResourceType.FILE));
 		LocalResourceVisibility visibility = TestUtils.readField("visibility", entry);
 		assertThat(visibility, is(LocalResourceVisibility.APPLICATION));
-		String local = TestUtils.readField("local", entry);
-		assertThat(local, notNullValue());
-		assertThat(local, startsWith("hdfs"));
-		assertThat(local, endsWith("8020"));
-		String remote = TestUtils.readField("remote", entry);
-		assertThat(remote, notNullValue());
-		assertThat(remote, startsWith("hdfs"));
-		assertThat(remote, endsWith("8020"));
 	}
 
 	@Configuration

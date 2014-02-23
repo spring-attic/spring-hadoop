@@ -18,7 +18,6 @@ package org.springframework.yarn.config;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertNotNull;
 
@@ -104,14 +103,6 @@ public class LocalresourcesNamespaceTest {
 		assertThat(type, is(LocalResourceType.FILE));
 		LocalResourceVisibility visibility = TestUtils.readField("visibility", entry);
 		assertThat(visibility, is(LocalResourceVisibility.APPLICATION));
-		String local = TestUtils.readField("local", entry);
-		assertThat(local, notNullValue());
-		assertThat(local, startsWith("hdfs"));
-		assertThat(local, endsWith("8020"));
-		String remote = TestUtils.readField("remote", entry);
-		assertThat(remote, notNullValue());
-		assertThat(remote, startsWith("hdfs"));
-		assertThat(remote, endsWith("8020"));
 	}
 
 	@Test
@@ -132,10 +123,6 @@ public class LocalresourcesNamespaceTest {
 		assertThat(type, is(LocalResourceType.ARCHIVE));
 		LocalResourceVisibility visibility = TestUtils.readField("visibility", entry);
 		assertThat(visibility, is(LocalResourceVisibility.PRIVATE));
-		String local = TestUtils.readField("local", entry);
-		assertThat(local, is("hdfs://0.0.0.0:9000"));
-		String remote = TestUtils.readField("remote", entry);
-		assertThat(remote, is("hdfs://192.168.223.139:9000"));
 	}
 
 	@Test
@@ -156,10 +143,6 @@ public class LocalresourcesNamespaceTest {
 		assertThat(type, is(LocalResourceType.FILE));
 		LocalResourceVisibility visibility = TestUtils.readField("visibility", entry);
 		assertThat(visibility, is(LocalResourceVisibility.PUBLIC));
-		String local = TestUtils.readField("local", entry);
-		assertThat(local, is("hdfs://0.0.0.0:9001"));
-		String remote = TestUtils.readField("remote", entry);
-		assertThat(remote, is("hdfs://192.168.223.139:9000"));
 
 		entry = (TransferEntry) hdfsEntries.toArray()[1];
 		path = TestUtils.readField("path", entry);
@@ -168,10 +151,6 @@ public class LocalresourcesNamespaceTest {
 		assertThat(type, is(LocalResourceType.FILE));
 		visibility = TestUtils.readField("visibility", entry);
 		assertThat(visibility, is(LocalResourceVisibility.PUBLIC));
-		local = TestUtils.readField("local", entry);
-		assertThat(local, is("hdfs://0.0.0.0:9000"));
-		remote = TestUtils.readField("remote", entry);
-		assertThat(remote, is("hdfs://192.168.223.139:9001"));
 
 		entry = (TransferEntry) hdfsEntries.toArray()[2];
 		path = TestUtils.readField("path", entry);
@@ -180,17 +159,11 @@ public class LocalresourcesNamespaceTest {
 		assertThat(type, is(LocalResourceType.ARCHIVE));
 		visibility = TestUtils.readField("visibility", entry);
 		assertThat(visibility, is(LocalResourceVisibility.PRIVATE));
-		local = TestUtils.readField("local", entry);
-		assertThat(local, is("hdfs://0.0.0.0:9000"));
-		remote = TestUtils.readField("remote", entry);
-		assertThat(remote, is("hdfs://192.168.223.139:9000"));
 	}
 
 	@Test
 	public void testGlobalLocalOverride() throws Exception {
 		assertNotNull(localResourcesFactoryBeanOverride);
-		String remote = TestUtils.readField("defaultRemote", localResourcesFactoryBeanOverride);
-		assertThat(remote, is("hdfs://10.10.10.10:9000"));
 	}
 
 }

@@ -40,7 +40,7 @@ public class DefaultLocalResourcesHdfsConfigurer
 	@Override
 	public LocalResourcesHdfsConfigurer hdfs(String path) {
 		if (StringUtils.hasText(path)) {
-			hdfsEntries.add(new TransferEntry(null, null, path, null, null, false));
+			hdfsEntries.add(new TransferEntry(null, null, path, false));
 		}
 		return this;
 	}
@@ -56,7 +56,7 @@ public class DefaultLocalResourcesHdfsConfigurer
 	@Override
 	public LocalResourcesHdfsConfigurer hdfs(String path, LocalResourceType type) {
 		if (StringUtils.hasText(path)) {
-			hdfsEntries.add(new TransferEntry(type, null, path, null, null, false));
+			hdfsEntries.add(new TransferEntry(type, null, path, false));
 		}
 		return this;
 	}
@@ -64,7 +64,7 @@ public class DefaultLocalResourcesHdfsConfigurer
 	@Override
 	public LocalResourcesHdfsConfigurer hdfs(String path, LocalResourceType type, boolean staging) {
 		if (StringUtils.hasText(path)) {
-			hdfsEntries.add(new TransferEntry(type, null, path, null, null, staging));
+			hdfsEntries.add(new TransferEntry(type, null, path, staging));
 		}
 		return this;
 	}

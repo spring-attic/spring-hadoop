@@ -20,12 +20,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.CommonConfigurationKeysPublic;
 import org.apache.hadoop.yarn.api.records.LocalResourceType;
 import org.apache.hadoop.yarn.api.records.LocalResourceVisibility;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.util.Assert;
 
 /**
  * Factory bean building {@link ResourceLocalizer}s objects.
@@ -52,8 +50,6 @@ public class LocalResourcesFactoryBean implements InitializingBean, FactoryBean<
 	// defaults
 	private LocalResourceType defaultType;
 	private LocalResourceVisibility defaultVisibility;
-	private String defaultLocal;
-	private String defaultRemote;
 
 	@Override
 	public ResourceLocalizer getObject() throws Exception {
@@ -73,8 +69,6 @@ public class LocalResourcesFactoryBean implements InitializingBean, FactoryBean<
 	@Override
 	public void afterPropertiesSet() throws Exception {
 
-		String defaultFs = configuration.get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY);
-
 		// defaults if defined
 		for(TransferEntry entry : hdfsEntries) {
 			if(entry.type == null) {
@@ -83,13 +77,6 @@ public class LocalResourcesFactoryBean implements InitializingBean, FactoryBean<
 			if(entry.visibility == null) {
 				entry.visibility = (defaultVisibility != null ? defaultVisibility : LocalResourceVisibility.APPLICATION);
 			}
-			if(entry.local == null) {
-				entry.local = (defaultLocal != null ? defaultLocal : defaultFs);
-			}
-			if(entry.remote == null) {
-				entry.remote = (defaultRemote != null ? defaultRemote : defaultFs);
-			}
-			Assert.isTrue(entry.local != null && entry.remote != null, "Entry local/remote hdfs address can't be null");
 		}
 
 		DefaultResourceLocalizer defaultResourceLocalizer = new DefaultResourceLocalizer(configuration, hdfsEntries, copyEntries);
@@ -121,24 +108,6 @@ public class LocalResourcesFactoryBean implements InitializingBean, FactoryBean<
 	 */
 	public void setVisibility(LocalResourceVisibility defaultVisibility) {
 		this.defaultVisibility = defaultVisibility;
-	}
-
-	/**
-	 * Sets default local hdfs base address for entry.
-	 *
-	 * @param defaultLocal hdfs base address
-	 */
-	public void setLocal(String defaultLocal) {
-		this.defaultLocal = defaultLocal;
-	}
-
-	/**
-	 * Sets default remote hdfs base address for entry.
-	 *
-	 * @param defaultRemote hdfs base address
-	 */
-	public void setRemote(String defaultRemote) {
-		this.defaultRemote = defaultRemote;
 	}
 
 	/**
@@ -180,18 +149,14 @@ public class LocalResourcesFactoryBean implements InitializingBean, FactoryBean<
 		LocalResourceType type;
 		LocalResourceVisibility visibility;
 		String path;
-		String local;
-		String remote;
 		boolean staging;
 
 		public TransferEntry(LocalResourceType type, LocalResourceVisibility visibility,
-				String path, String local, String remote, boolean staging) {
+				String path, boolean staging) {
 			super();
 			this.type = type;
 			this.visibility = visibility;
 			this.path = path;
-			this.local = local;
-			this.remote = remote;
 			this.staging = staging;
 		}
 

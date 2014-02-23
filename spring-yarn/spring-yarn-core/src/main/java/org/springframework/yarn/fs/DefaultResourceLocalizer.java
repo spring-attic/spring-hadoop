@@ -16,7 +16,6 @@
 package org.springframework.yarn.fs;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.HashMap;
@@ -286,9 +285,8 @@ public class DefaultResourceLocalizer extends AbstractResourceLocalizer implemen
 		Path resolvedStagingDirectory = resolveStagingDirectory();
 		for (TransferEntry e : transferEntries) {
 			Path remotePath = (!e.staging) ?
-					new Path(e.remote + e.path) :
-					new Path(e.remote + resolvedStagingDirectory.toUri().getPath() + e.path);
-			URI localUri = new URI(e.local);
+					new Path(e.path) :
+					new Path(resolvedStagingDirectory.toUri().getPath() + e.path);
 			FileStatus[] fileStatuses = fs.globStatus(remotePath);
 			if(log.isDebugEnabled()) {
 				log.debug("Trying path " + remotePath + " glob fileStatus length=" + (fileStatuses != null ? fileStatuses.length : "null"));
@@ -299,8 +297,7 @@ public class DefaultResourceLocalizer extends AbstractResourceLocalizer implemen
 						log.debug("FileStatus=" + status);
 					}
 					if(status.isFile()) {
-						URI remoteUri = status.getPath().toUri();
-						Path path = new Path(new Path(localUri), remoteUri.getPath());
+						Path path = status.getPath();
 						LocalResource res = Records.newRecord(LocalResource.class);
 						res.setType(e.type);
 						res.setVisibility(e.visibility);
@@ -308,8 +305,7 @@ public class DefaultResourceLocalizer extends AbstractResourceLocalizer implemen
 						res.setTimestamp(status.getModificationTime());
 						res.setSize(status.getLen());
 						if(log.isDebugEnabled()) {
-							log.debug("Using remote uri [" + remoteUri + "] and local uri [" +
-									localUri + "] converted to path [" + path + "]");
+							log.debug("Using path [" + path + "]");
 						}
 						returned.put(status.getPath().getName(), res);
 					}

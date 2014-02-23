@@ -241,8 +241,6 @@
 	</xsd:complexType>
 
 	<xsd:attributeGroup name="hdfs-common-attributes">
-		<xsd:attribute name="local" type="xsd:string" use="optional"/>
-		<xsd:attribute name="remote" type="xsd:string" use="optional"/>
 		<xsd:attribute name="type" use="optional">
 			<xsd:simpleType>
 				<xsd:restriction base="xsd:string">
