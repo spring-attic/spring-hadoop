@@ -130,10 +130,6 @@ public class SpringYarnClientProperties {
 		this.virtualCores = virtualCores;
 	}
 
-	public Map<String, byte[]> getRawFileContents() {
-		return rawFileContents;
-	}
-
 	public boolean isIncludeSystemEnv() {
 		return includeSystemEnv;
 	}
@@ -196,6 +192,10 @@ public class SpringYarnClientProperties {
 
 	public void setLocalizerPropertiesSuffixes(List<String> localizerPropertiesSuffixes) {
 		this.localizerPropertiesSuffixes = localizerPropertiesSuffixes;
+	}
+
+	public Map<String, byte[]> getRawFileContents() {
+		return rawFileContents;
 	}
 
 	/**
