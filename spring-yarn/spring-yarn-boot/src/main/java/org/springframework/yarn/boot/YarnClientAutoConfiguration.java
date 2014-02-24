@@ -107,13 +107,14 @@ public class YarnClientAutoConfiguration {
 		@Override
 		public void configure(YarnResourceLocalizerConfigurer localizer) throws Exception {
 			localizer
+				.stagingDirectory(syp.getStagingDirectory())
 				.withCopy()
-					.copy(StringUtils.toStringArray(sycp.getFiles()), syp.getApplicationDir(), false)
+					.copy(StringUtils.toStringArray(sycp.getFiles()), syp.getApplicationDir(), syp.getApplicationDir() == null)
 					.raw(sycp.getRawFileContents(), syp.getApplicationDir());
 
 			LocalResourcesHdfsConfigurer withHdfs = localizer.withHdfs();
-			for (Entry e : localResourcesSelector.select(syp.getApplicationDir())) {
-				withHdfs.hdfs(e.getPath(), e.getType());
+			for (Entry e : localResourcesSelector.select(syp.getApplicationDir() != null ? syp.getApplicationDir() : "/")) {
+				withHdfs.hdfs(e.getPath(), e.getType(), syp.getApplicationDir() == null);
 			}
 		}
 

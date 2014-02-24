@@ -27,6 +27,8 @@ public interface LocalResourcesHdfsConfigurer extends AnnotationConfigurerBuilde
 
 	LocalResourcesHdfsConfigurer hdfs(String path, LocalResourceType type);
 
+	LocalResourcesHdfsConfigurer hdfs(String path, LocalResourceType type, boolean staging);
+
 	LocalResourcesHdfsConfigurer hdfs(String dir, String file, LocalResourceType type);
 
 }

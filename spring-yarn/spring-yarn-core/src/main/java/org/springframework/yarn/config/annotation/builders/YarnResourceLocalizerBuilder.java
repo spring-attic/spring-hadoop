@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,8 @@ import org.springframework.data.hadoop.config.common.annotation.AbstractConfigur
 import org.springframework.data.hadoop.config.common.annotation.AnnotationBuilder;
 import org.springframework.yarn.config.annotation.configurers.DefaultLocalResourcesCopyConfigurer;
 import org.springframework.yarn.config.annotation.configurers.DefaultLocalResourcesHdfsConfigurer;
+import org.springframework.yarn.config.annotation.configurers.LocalResourcesCopyConfigurer;
+import org.springframework.yarn.config.annotation.configurers.LocalResourcesHdfsConfigurer;
 import org.springframework.yarn.fs.LocalResourcesFactoryBean;
 import org.springframework.yarn.fs.LocalResourcesFactoryBean.CopyEntry;
 import org.springframework.yarn.fs.LocalResourcesFactoryBean.RawCopyEntry;
@@ -42,20 +44,24 @@ public final class YarnResourceLocalizerBuilder
 		implements YarnResourceLocalizerConfigurer {
 
 	private Configuration configuration;
+	private String stagingDirectory;
 	private LocalResourceType defaultType = LocalResourceType.FILE;
 	private LocalResourceVisibility defaultVisibility = LocalResourceVisibility.APPLICATION;
 	private Collection<CopyEntry> copyEntries;
 	private Collection<TransferEntry> transferEntries;
 	private Collection<RawCopyEntry> rawEntries;
 
+	/**
+	 * Instantiates a new yarn resource localizer builder.
+	 */
 	public YarnResourceLocalizerBuilder() {
-
 	}
 
 	@Override
 	protected ResourceLocalizer performBuild() throws Exception {
 		LocalResourcesFactoryBean fb = new LocalResourcesFactoryBean();
 		fb.setType(defaultType);
+		fb.setStagingDirectory(stagingDirectory);
 		fb.setVisibility(defaultVisibility);
 		fb.setConfiguration(configuration);
 		fb.setCopyEntries(copyEntries != null ? copyEntries : new ArrayList<LocalResourcesFactoryBean.CopyEntry>());
@@ -67,16 +73,32 @@ public final class YarnResourceLocalizerBuilder
 		return fb.getObject();
 	}
 
+	@Override
+	public LocalResourcesCopyConfigurer withCopy() throws Exception {
+		return apply(new DefaultLocalResourcesCopyConfigurer());
+	}
+
+	@Override
+	public LocalResourcesHdfsConfigurer withHdfs() throws Exception {
+		return apply(new DefaultLocalResourcesHdfsConfigurer());
+	}
+
+	@Override
+	public YarnResourceLocalizerConfigurer stagingDirectory(String stagingDirectory) {
+		this.stagingDirectory = stagingDirectory;
+		return this;
+	}
+
 	public void configuration(Configuration configuration) {
 		this.configuration = configuration;
 	}
 
-	public YarnResourceLocalizerBuilder defaultLocalResourceType(LocalResourceType type) {
+	public YarnResourceLocalizerConfigurer defaultLocalResourceType(LocalResourceType type) {
 		defaultType = type;
 		return this;
 	}
 
-	public YarnResourceLocalizerBuilder defaultLocalResourceVisibility(LocalResourceVisibility visibility) {
+	public YarnResourceLocalizerConfigurer defaultLocalResourceVisibility(LocalResourceVisibility visibility) {
 		defaultVisibility = visibility;
 		return this;
 	}
@@ -91,14 +113,6 @@ public final class YarnResourceLocalizerBuilder
 
 	public void setRawCopyEntries(Collection<RawCopyEntry> rawEntries) {
 		this.rawEntries = rawEntries;
-	}
-
-	public DefaultLocalResourcesCopyConfigurer withCopy() throws Exception {
-		return apply(new DefaultLocalResourcesCopyConfigurer());
-	}
-
-	public DefaultLocalResourcesHdfsConfigurer withHdfs() throws Exception {
-		return apply(new DefaultLocalResourcesHdfsConfigurer());
 	}
 
 }

@@ -43,6 +43,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.yarn.YarnSystemConstants;
 import org.springframework.yarn.YarnSystemException;
+import org.springframework.yarn.fs.SmartResourceLocalizer;
 
 /**
  * Default container launcher.
@@ -98,7 +99,12 @@ public class DefaultContainerLauncher extends AbstractLauncher implements Contai
 
 		ContainerLaunchContext ctx = Records.newRecord(ContainerLaunchContext.class);
 		String stagingId = container.getId().getApplicationAttemptId().getApplicationId().toString();
-		getResourceLocalizer().setStagingId(stagingId);
+		if (getResourceLocalizer() instanceof SmartResourceLocalizer) {
+			((SmartResourceLocalizer)getResourceLocalizer()).setStagingId(stagingId);
+		} else {
+			log.warn("Resource localizer is not instance of SmartResourceLocalizer, thus we're unable to set staging id");
+		}
+
 		ctx.setLocalResources(getResourceLocalizer().getResources());
 		ctx.setCommands(commands);
 

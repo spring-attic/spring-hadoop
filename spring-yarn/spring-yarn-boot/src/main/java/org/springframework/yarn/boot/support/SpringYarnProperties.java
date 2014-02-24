@@ -33,6 +33,7 @@ public class SpringYarnProperties {
 
 	private String applicationDir;
 	private String applicationsBaseDir;
+	private String stagingDirectory;
 	private String fsUri;
 	private String rmAddress;
 	private String schedulerAddress;
@@ -56,6 +57,14 @@ public class SpringYarnProperties {
 
 	public void setApplicationsBaseDir(String applicationsBaseDir) {
 		this.applicationsBaseDir = applicationsBaseDir;
+	}
+
+	public String getStagingDirectory() {
+		return stagingDirectory;
+	}
+
+	public void setStagingDirectory(String stagingDirectory) {
+		this.stagingDirectory = stagingDirectory;
 	}
 
 	public String getFsUri() {

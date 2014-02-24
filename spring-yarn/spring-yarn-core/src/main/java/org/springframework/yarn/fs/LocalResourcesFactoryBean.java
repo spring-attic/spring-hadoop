@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,12 +20,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.CommonConfigurationKeysPublic;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.yarn.api.records.LocalResourceType;
 import org.apache.hadoop.yarn.api.records.LocalResourceVisibility;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 /**
  * Factory bean building {@link ResourceLocalizer}s objects.
@@ -49,11 +49,12 @@ public class LocalResourcesFactoryBean implements InitializingBean, FactoryBean<
 	/** Yarn configuration*/
 	private Configuration configuration;
 
+	/** Staging directory if set*/
+	private Path stagingDirectory;
+
 	// defaults
 	private LocalResourceType defaultType;
 	private LocalResourceVisibility defaultVisibility;
-	private String defaultLocal;
-	private String defaultRemote;
 
 	@Override
 	public ResourceLocalizer getObject() throws Exception {
@@ -73,8 +74,6 @@ public class LocalResourcesFactoryBean implements InitializingBean, FactoryBean<
 	@Override
 	public void afterPropertiesSet() throws Exception {
 
-		String defaultFs = configuration.get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY);
-
 		// defaults if defined
 		for(TransferEntry entry : hdfsEntries) {
 			if(entry.type == null) {
@@ -83,15 +82,13 @@ public class LocalResourcesFactoryBean implements InitializingBean, FactoryBean<
 			if(entry.visibility == null) {
 				entry.visibility = (defaultVisibility != null ? defaultVisibility : LocalResourceVisibility.APPLICATION);
 			}
-			if(entry.local == null) {
-				entry.local = (defaultLocal != null ? defaultLocal : defaultFs);
-			}
-			if(entry.remote == null) {
-				entry.remote = (defaultRemote != null ? defaultRemote : defaultFs);
-			}
-			Assert.isTrue(entry.local != null && entry.remote != null, "Entry local/remote hdfs address can't be null");
 		}
+
 		DefaultResourceLocalizer defaultResourceLocalizer = new DefaultResourceLocalizer(configuration, hdfsEntries, copyEntries);
+		if (stagingDirectory != null) {
+			defaultResourceLocalizer.setStagingDirectory(stagingDirectory);
+		}
+
 		if (rawEntries != null) {
 			Map<String, byte[]> rawFileContents = new HashMap<String, byte[]>();
 			for (RawCopyEntry e : rawEntries) {
@@ -122,24 +119,6 @@ public class LocalResourcesFactoryBean implements InitializingBean, FactoryBean<
 	}
 
 	/**
-	 * Sets default local hdfs base address for entry.
-	 *
-	 * @param defaultLocal hdfs base address
-	 */
-	public void setLocal(String defaultLocal) {
-		this.defaultLocal = defaultLocal;
-	}
-
-	/**
-	 * Sets default remote hdfs base address for entry.
-	 *
-	 * @param defaultRemote hdfs base address
-	 */
-	public void setRemote(String defaultRemote) {
-		this.defaultRemote = defaultRemote;
-	}
-
-	/**
 	 * Sets hdfs entries reference for this factory.
 	 *
 	 * @param hdfsEntries Collection of hdfs entries
@@ -166,6 +145,27 @@ public class LocalResourcesFactoryBean implements InitializingBean, FactoryBean<
 		this.configuration = configuration;
 	}
 
+	/**
+	 * Sets the staging directory.
+	 *
+	 * @param stagingDirectory the new staging directory
+	 * @see #setStagingDirectory(Path)
+	 */
+	public void setStagingDirectory(String stagingDirectory) {
+		if (StringUtils.hasText(stagingDirectory)) {
+			setStagingDirectory(new Path(stagingDirectory));
+		}
+	}
+
+	/**
+	 * Sets the staging directory.
+	 *
+	 * @param stagingDirectory the new staging directory
+	 */
+	public void setStagingDirectory(Path stagingDirectory) {
+		this.stagingDirectory = stagingDirectory;
+	}
+
 	public void setRawCopyEntries(Collection<RawCopyEntry> rawEntries) {
 		this.rawEntries = rawEntries;
 	}
@@ -178,18 +178,14 @@ public class LocalResourcesFactoryBean implements InitializingBean, FactoryBean<
 		LocalResourceType type;
 		LocalResourceVisibility visibility;
 		String path;
-		String local;
-		String remote;
 		boolean staging;
 
 		public TransferEntry(LocalResourceType type, LocalResourceVisibility visibility,
-				String path, String local, String remote, boolean staging) {
+				String path, boolean staging) {
 			super();
 			this.type = type;
 			this.visibility = visibility;
 			this.path = path;
-			this.local = local;
-			this.remote = remote;
 			this.staging = staging;
 		}
 

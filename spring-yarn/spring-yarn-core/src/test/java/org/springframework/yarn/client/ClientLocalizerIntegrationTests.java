@@ -36,6 +36,7 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.yarn.fs.ResourceLocalizer;
+import org.springframework.yarn.fs.SmartResourceLocalizer;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration
@@ -62,8 +63,8 @@ public class ClientLocalizerIntegrationTests {
 	public void testDistributeWithCopy() throws IOException {
 		assertThat(client, notNullValue());
 
-		localizer.setStagingDirectory(new Path("/syarn-tmp/ClientLocalizerIntegrationTests/1"));
-		localizer.distribute();
+		((SmartResourceLocalizer)localizer).setStagingDirectory(new Path("/syarn-tmp/ClientLocalizerIntegrationTests/1"));
+		((SmartResourceLocalizer)localizer).distribute();
 
 		FileStatus fileStatus = fs.getFileStatus(new Path("/syarn-tmp/ClientLocalizerIntegrationTests/1/hadoop.properties"));
 		assertThat(fileStatus, notNullValue());

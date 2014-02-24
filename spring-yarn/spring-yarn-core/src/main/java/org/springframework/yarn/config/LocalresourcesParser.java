@@ -79,10 +79,6 @@ public class LocalresourcesParser extends AbstractImprovedSimpleBeanDefinitionPa
 					null);
 
 			bd.addConstructorArgValue(entry.getAttribute("path"));
-
-			// if set to null, factory will try to set defaults
-			bd.addConstructorArgValue(entry.hasAttribute("local") ? entry.getAttribute("local") : null);
-			bd.addConstructorArgValue(entry.hasAttribute("remote") ? entry.getAttribute("remote") : null);
 			bd.addConstructorArgValue(entry.hasAttribute("staging") ? entry.getAttribute("staging") : false);
 			entries.add(bd.getBeanDefinition());
 		}

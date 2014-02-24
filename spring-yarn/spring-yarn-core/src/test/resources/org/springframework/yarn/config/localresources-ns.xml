@@ -26,17 +26,17 @@
 		<yarn:hdfs path="/tmp/foo.jar" staging="false"/>
 	</yarn:localresources>
 
-	<yarn:localresources id="yarnLocalresourcesWithDefaults" local="hdfs://0.0.0.0:9000" remote="hdfs://192.168.223.139:9000" type="ARCHIVE" visibility="PRIVATE">
+	<yarn:localresources id="yarnLocalresourcesWithDefaults" type="ARCHIVE" visibility="PRIVATE">
 		<yarn:hdfs path="/tmp/foo.jar"/>
 	</yarn:localresources>
 
-	<yarn:localresources id="yarnLocalresourcesWithMixed" local="hdfs://0.0.0.0:9000" remote="hdfs://192.168.223.139:9000" type="ARCHIVE" visibility="PRIVATE">
-		<yarn:hdfs path="/tmp/foo.jar" local="hdfs://0.0.0.0:9001" remote="hdfs://192.168.223.139:9000" type="FILE" visibility="PUBLIC"/>
-		<yarn:hdfs path="/tmp/jee.jar" local="hdfs://0.0.0.0:9000" remote="hdfs://192.168.223.139:9001" type="FILE" visibility="PUBLIC"/>
+	<yarn:localresources id="yarnLocalresourcesWithMixed" type="ARCHIVE" visibility="PRIVATE">
+		<yarn:hdfs path="/tmp/foo.jar" type="FILE" visibility="PUBLIC"/>
+		<yarn:hdfs path="/tmp/jee.jar" type="FILE" visibility="PUBLIC"/>
 		<yarn:hdfs path="/tmp/bar.jar"/>
 	</yarn:localresources>
 
-	<yarn:localresources id="yarnLocalresourcesOverride" configuration="customConfiguration" local="hdfs://0.0.0.0:9000" remote="${test.remote}">
+	<yarn:localresources id="yarnLocalresourcesOverride" configuration="customConfiguration">
 		<yarn:hdfs path="/tmp/foo.jar"/>
 	</yarn:localresources>
 
