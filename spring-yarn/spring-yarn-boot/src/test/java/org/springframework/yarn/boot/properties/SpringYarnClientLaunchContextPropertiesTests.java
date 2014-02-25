@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.yarn.boot.support;
+package org.springframework.yarn.boot.properties;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -29,22 +28,16 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Configuration;
 
-/**
- * Tests for {@link SpringYarnClientProperties} bindings.
- *
- * @author Janne Valkealahti
- *
- */
-public class SpringYarnClientPropertiesTests {
+public class SpringYarnClientLaunchContextPropertiesTests {
 
 	@Test
 	public void testAllPropertiesSet() {
 		SpringApplication app = new SpringApplication(TestConfiguration.class);
 		ConfigurableApplicationContext context = app
-				.run(new String[] { "--spring.config.name=SpringYarnClientPropertiesTests" });
-		SpringYarnClientProperties properties = context.getBean(SpringYarnClientProperties.class);
+				.run(new String[] { "--spring.config.name=SpringYarnClientLaunchContextPropertiesTests" });
+		SpringYarnClientLaunchContextProperties properties = context.getBean(SpringYarnClientLaunchContextProperties.class);
 		assertThat(properties, notNullValue());
-		assertThat(properties.getAppmasterFile(), is("appmasterFileFoo"));
+		assertThat(properties.getArchiveFile(), is("archiveFileFoo"));
 
 		Map<String, String> arguments = properties.getArguments();
 		assertThat(arguments, notNullValue());
@@ -58,14 +51,7 @@ public class SpringYarnClientPropertiesTests {
 		assertThat(classpath.get(0), is("classpath1Foo"));
 		assertThat(classpath.get(1), is("classpath2Foo"));
 
-		List<String> files = properties.getFiles();
-		assertThat(files, notNullValue());
-		assertThat(files.size(), is(2));
-		assertThat(files.get(0), is("files1Foo"));
-		assertThat(files.get(1), is("files2Foo"));
-
-		assertThat(properties.getMasterRunner(), is("masterRunnerFoo"));
-		assertThat(properties.getMemory(), is("memoryFoo"));
+		assertThat(properties.getRunnerClass(), is("runnerClassFoo"));
 
 		List<String> options = properties.getOptions();
 		assertThat(options, notNullValue());
@@ -73,41 +59,16 @@ public class SpringYarnClientPropertiesTests {
 		assertThat(options.get(0), is("options1Foo"));
 		assertThat(options.get(1), is("options2Foo"));
 
-		assertThat(properties.getPriority(), is(234));
-		assertThat(properties.getQueue(), is("queueFoo"));
-		assertThat(properties.getRawFileContents(), nullValue());
-		assertThat(properties.getVirtualCores(), is(123));
-
 		assertThat(properties.isDefaultYarnAppClasspath(), is(false));
 		assertThat(properties.isIncludeBaseDirectory(), is(false));
 		assertThat(properties.isIncludeSystemEnv(), is(false));
-		assertThat(properties.getDelimiter(), is(":"));
-
-		List<String> pattern = properties.getLocalizerPatterns();
-		assertThat(pattern, notNullValue());
-		assertThat(pattern.size(), is(2));
-		assertThat(pattern.get(0), is("patterns1Foo"));
-		assertThat(pattern.get(1), is("patterns2Foo"));
-
-		List<String> names = properties.getLocalizerPropertiesNames();
-		assertThat(names, notNullValue());
-		assertThat(names.size(), is(2));
-		assertThat(names.get(0), is("name1Foo"));
-		assertThat(names.get(1), is("name2Foo"));
-
-		List<String> suffixes = properties.getLocalizerPropertiesSuffixes();
-		assertThat(suffixes, notNullValue());
-		assertThat(suffixes.size(), is(2));
-		assertThat(suffixes.get(0), is("suffix1Foo"));
-		assertThat(suffixes.get(1), is("suffix2Foo"));
-
-		assertThat(properties.getLocalizerZipPattern(), is("patternFoo"));
+		assertThat(properties.getPathSeparator(), is(":"));
 
 		context.close();
 	}
 
 	@Configuration
-	@EnableConfigurationProperties({ SpringYarnClientProperties.class})
+	@EnableConfigurationProperties({SpringYarnClientLaunchContextProperties.class})
 	protected static class TestConfiguration {
 	}
 

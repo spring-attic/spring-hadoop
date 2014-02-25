@@ -1,0 +1,10 @@
+spring:
+    yarn:
+        client:
+            localizer:
+                patterns:
+                  - "patterns1Foo"
+                  - "patterns2Foo"
+                zipPattern: zipPatternFoo
+                propertiesNames: [name1Foo, name2Foo]
+                propertiesSuffixes: [suffix1Foo, suffix2Foo]

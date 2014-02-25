@@ -2,8 +2,10 @@ spring:
     yarn:
         appName: appNameFoo
         appType: appTypeFoo
+        stagingDir: stagingDirFoo
         applicationDir: applicationDirFoo
-        applicationsBaseDir: applicationsBaseDirFoo
+        applicationBaseDir: applicationBaseDirFoo
         fsUri: fsUriFoo
-        rmAddress: rmAddressFoo
-        schedulerAddress: schedulerAddressFoo
+        resourceManagerHost: resourceManagerHostFoo
+        resourceManagerPort: 321
+        resourceManagerSchedulerPort: 123

@@ -1,0 +1,7 @@
+spring:
+    yarn:
+        appmaster:
+            resource:
+                priority: 234
+                memory: memoryFoo
+                virtualCores: 123

@@ -13,17 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.yarn.boot.support;
+package org.springframework.yarn.boot.properties;
 
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.util.ObjectUtils;
+import org.springframework.yarn.boot.support.YarnJobLauncherCommandLineRunner;
 
 /**
  * Spring Boot {@link ConfigurationProperties} for
- * <code>spring.yarn.batch</code>. These configuration properties
+ * <em>spring.yarn.batch</em>. These configuration properties
  * are used together with {@link YarnJobLauncherCommandLineRunner}
  * to define base functionality to execute jobs.
  *

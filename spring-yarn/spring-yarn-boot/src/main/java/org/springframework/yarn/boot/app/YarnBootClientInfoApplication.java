@@ -30,8 +30,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.util.CollectionUtils;
+import org.springframework.yarn.boot.properties.SpringYarnProperties;
 import org.springframework.yarn.boot.support.SpringYarnBootUtils;
-import org.springframework.yarn.boot.support.SpringYarnProperties;
 import org.springframework.yarn.client.YarnClient;
 import org.springframework.yarn.support.console.ApplicationsReport;
 import org.springframework.yarn.support.console.ApplicationsReport.InstalledField;
@@ -117,8 +117,8 @@ public class YarnBootClientInfoApplication {
 		YarnConfiguration yarnConfiguration = context.getBean(YarnConfiguration.class);
 		SpringYarnProperties springYarnProperties = context.getBean(SpringYarnProperties.class);
 
-		String applicationsBaseDir = springYarnProperties.getApplicationsBaseDir();
-		Path path = new Path(applicationsBaseDir);
+		String applicationBaseDir = springYarnProperties.getApplicationBaseDir();
+		Path path = new Path(applicationBaseDir);
 		FileSystem fs = path.getFileSystem(yarnConfiguration);
 		FileStatus[] listStatus = fs.listStatus(path);
 
