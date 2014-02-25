@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.yarn.boot.support;
+package org.springframework.yarn.boot.properties;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.is;
@@ -25,33 +25,23 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Configuration;
 
-/**
- * Tests for {@link SpringYarnProperties} bindings.
- *
- * @author Janne Valkealahti
- *
- */
-public class SpringYarnPropertiesTests {
+public class SpringYarnAppmasterResourcePropertiesTests {
 
 	@Test
 	public void testAllPropertiesSet() {
 		SpringApplication app = new SpringApplication(TestConfiguration.class);
 		ConfigurableApplicationContext context = app
-				.run(new String[] { "--spring.config.name=SpringYarnPropertiesTests" });
-		SpringYarnProperties properties = context.getBean(SpringYarnProperties.class);
+				.run(new String[] { "--spring.config.name=SpringYarnAppmasterResourcePropertiesTests" });
+		SpringYarnAppmasterResourceProperties properties = context.getBean(SpringYarnAppmasterResourceProperties.class);
 		assertThat(properties, notNullValue());
-		assertThat(properties.getApplicationDir(), is("applicationDirFoo"));
-		assertThat(properties.getApplicationsBaseDir(), is("applicationsBaseDirFoo"));
-		assertThat(properties.getAppName(), is("appNameFoo"));
-		assertThat(properties.getAppType(), is("appTypeFoo"));
-		assertThat(properties.getFsUri(), is("fsUriFoo"));
-		assertThat(properties.getRmAddress(), is("rmAddressFoo"));
-		assertThat(properties.getSchedulerAddress(), is("schedulerAddressFoo"));
+		assertThat(properties.getPriority(), is(234));
+		assertThat(properties.getMemory(), is("memoryFoo"));
+		assertThat(properties.getVirtualCores(), is(123));
 		context.close();
 	}
 
 	@Configuration
-	@EnableConfigurationProperties({ SpringYarnProperties.class, SpringYarnEnvProperties.class })
+	@EnableConfigurationProperties({SpringYarnAppmasterResourceProperties.class})
 	protected static class TestConfiguration {
 	}
 

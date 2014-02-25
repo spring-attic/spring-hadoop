@@ -1,0 +1,21 @@
+spring:
+    yarn:
+        client:
+            launchcontext:
+                archiveFile: archiveFileFoo
+                runnerClass: runnerClassFoo
+                arguments:
+                  ? argumentsKeyFoo1
+                  : argumentsValFoo1
+                  ? argumentsKeyFoo2
+                  : argumentsValFoo2
+                classpath:
+                  - "classpath1Foo"
+                  - "classpath2Foo"
+                options:
+                  - "options1Foo"
+                  - "options2Foo"
+                includeSystemEnv: false
+                defaultYarnAppClasspath: false
+                includeBaseDirectory: false
+                pathSeparator: ":"

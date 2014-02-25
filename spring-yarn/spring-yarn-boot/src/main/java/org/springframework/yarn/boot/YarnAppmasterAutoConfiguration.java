@@ -36,14 +36,17 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.StringUtils;
 import org.springframework.yarn.am.YarnAppmaster;
 import org.springframework.yarn.boot.condition.ConditionalOnYarnAppmaster;
+import org.springframework.yarn.boot.properties.SpringYarnAppmasterLaunchContextProperties;
+import org.springframework.yarn.boot.properties.SpringYarnAppmasterLocalizerProperties;
+import org.springframework.yarn.boot.properties.SpringYarnAppmasterProperties;
+import org.springframework.yarn.boot.properties.SpringYarnAppmasterResourceProperties;
+import org.springframework.yarn.boot.properties.SpringYarnBatchProperties;
+import org.springframework.yarn.boot.properties.SpringYarnEnvProperties;
+import org.springframework.yarn.boot.properties.SpringYarnProperties;
 import org.springframework.yarn.boot.support.AppmasterLauncherRunner;
 import org.springframework.yarn.boot.support.BootApplicationEventTransformer;
 import org.springframework.yarn.boot.support.BootLocalResourcesSelector;
 import org.springframework.yarn.boot.support.BootLocalResourcesSelector.Mode;
-import org.springframework.yarn.boot.support.SpringYarnAppmasterProperties;
-import org.springframework.yarn.boot.support.SpringYarnBatchProperties;
-import org.springframework.yarn.boot.support.SpringYarnEnvProperties;
-import org.springframework.yarn.boot.support.SpringYarnProperties;
 import org.springframework.yarn.boot.support.YarnJobLauncherCommandLineRunner;
 import org.springframework.yarn.config.annotation.EnableYarn;
 import org.springframework.yarn.config.annotation.EnableYarn.Enable;
@@ -74,32 +77,32 @@ public class YarnAppmasterAutoConfiguration {
 	private final static Log log = LogFactory.getLog(YarnAppmasterAutoConfiguration.class);
 
 	@Configuration
-	@EnableConfigurationProperties({SpringYarnProperties.class, SpringYarnAppmasterProperties.class})
+	@EnableConfigurationProperties({ SpringYarnAppmasterLocalizerProperties.class })
 	public static class LocalResourcesSelectorConfig {
 
 		@Autowired
-		private SpringYarnAppmasterProperties syap;
+		private SpringYarnAppmasterLocalizerProperties syalp;
 
 		@Bean
 		@ConditionalOnMissingBean(LocalResourcesSelector.class)
 		public LocalResourcesSelector localResourcesSelector() {
 			BootLocalResourcesSelector selector = new BootLocalResourcesSelector(Mode.CONTAINER);
-			if (StringUtils.hasText(syap.getLocalizerZipPattern())) {
-				selector.setZipArchivePattern(syap.getLocalizerZipPattern());
+			if (StringUtils.hasText(syalp.getZipPattern())) {
+				selector.setZipArchivePattern(syalp.getZipPattern());
 			}
-			if (syap.getLocalizerPropertiesNames() != null) {
-				selector.setPropertiesNames(syap.getLocalizerPropertiesNames());
+			if (syalp.getPropertiesNames() != null) {
+				selector.setPropertiesNames(syalp.getPropertiesNames());
 			}
-			if (syap.getLocalizerPropertiesSuffixes() != null) {
-				selector.setPropertiesSuffixes(syap.getLocalizerPropertiesSuffixes());
+			if (syalp.getPropertiesSuffixes() != null) {
+				selector.setPropertiesSuffixes(syalp.getPropertiesSuffixes());
 			}
-			selector.addPatterns(syap.getLocalizerPatterns());
+			selector.addPatterns(syalp.getPatterns());
 			return selector;
 		}
 	}
 
 	@Configuration
-	@EnableConfigurationProperties({SpringYarnProperties.class, SpringYarnAppmasterProperties.class})
+	@EnableConfigurationProperties({ SpringYarnAppmasterProperties.class })
 	public static class RunnerConfig {
 
 		@Autowired
@@ -110,7 +113,7 @@ public class YarnAppmasterAutoConfiguration {
 		@ConditionalOnBean(YarnAppmaster.class)
 		public AppmasterLauncherRunner appmasterLauncherRunner() {
 			AppmasterLauncherRunner runner = new AppmasterLauncherRunner();
-			runner.setWaitLatch(syap.isWaitLatch());
+			runner.setWaitLatch(syap.isKeepContextAlive());
 			runner.setContainerCount(syap.getContainerCount());
 			return runner;
 		}
@@ -119,7 +122,7 @@ public class YarnAppmasterAutoConfiguration {
 	@Configuration
 	@ConditionalOnClass(JobLauncher.class)
 	@ConditionalOnExpression("${spring.yarn.batch.enabled:false}")
-	@EnableConfigurationProperties({SpringYarnBatchProperties.class})
+	@EnableConfigurationProperties({ SpringYarnBatchProperties.class })
 	public static class RuntimeConfig {
 
 		@Value("${spring.yarn.batch.name:}")
@@ -158,7 +161,9 @@ public class YarnAppmasterAutoConfiguration {
 
 
 	@Configuration
-	@EnableConfigurationProperties({SpringYarnProperties.class, SpringYarnAppmasterProperties.class, SpringYarnEnvProperties.class})
+	@EnableConfigurationProperties({ SpringYarnProperties.class, SpringYarnEnvProperties.class,
+			SpringYarnAppmasterProperties.class, SpringYarnAppmasterLaunchContextProperties.class,
+			SpringYarnAppmasterResourceProperties.class })
 	@EnableYarn(enable=Enable.APPMASTER)
 	static class Config extends SpringYarnConfigurerAdapter {
 
@@ -167,6 +172,12 @@ public class YarnAppmasterAutoConfiguration {
 
 		@Autowired
 		private SpringYarnAppmasterProperties syap;
+
+		@Autowired
+		private SpringYarnAppmasterLaunchContextProperties syalcp;
+
+		@Autowired
+		private SpringYarnAppmasterResourceProperties syarp;
 
 		@Autowired(required=false)
 		@Qualifier("customAppmasterClass")
@@ -178,17 +189,17 @@ public class YarnAppmasterAutoConfiguration {
 		@Override
 		public void configure(YarnConfigConfigurer config) throws Exception {
 			log.info("Configuring fsUri=[" + syp.getFsUri() + "]");
-			log.info("Configuring rmAddress=[" + syp.getRmAddress() + "]");
+			log.info("Configuring rmAddress=[" + syp.getResourceManagerAddress() + "]");
 			config
 				.fileSystemUri(syp.getFsUri())
-				.resourceManagerAddress(syp.getRmAddress())
-				.schedulerAddress(syp.getSchedulerAddress());
+				.resourceManagerAddress(syp.getResourceManagerAddress())
+				.schedulerAddress(syp.getResourceManagerSchedulerAddress());
 		}
 
 		@Override
 		public void configure(YarnResourceLocalizerConfigurer localizer) throws Exception {
 			localizer
-				.stagingDirectory(syp.getStagingDirectory());
+				.stagingDirectory(syp.getStagingDir());
 			LocalResourcesHdfsConfigurer withHdfs = localizer.withHdfs();
 			for (Entry e : localResourcesSelector.select(syp.getApplicationDir() != null ? syp.getApplicationDir() : "/")) {
 				withHdfs.hdfs(e.getPath(), e.getType(), syp.getApplicationDir() == null);
@@ -198,51 +209,51 @@ public class YarnAppmasterAutoConfiguration {
 		@Override
 		public void configure(YarnEnvironmentConfigurer environment) throws Exception {
 			environment
-				.includeSystemEnv(syap.isIncludeSystemEnv())
+				.includeSystemEnv(syalcp.isIncludeSystemEnv())
 				.withClasspath()
-					.includeBaseDirectory(syap.isIncludeBaseDirectory())
-					.defaultYarnAppClasspath(syap.isDefaultYarnAppClasspath())
-					.delimiter(syap.getDelimiter())
-					.entries(syap.getClasspath())
-					.entry(explodedEntryIfZip(syap));
+					.includeBaseDirectory(syalcp.isIncludeBaseDirectory())
+					.defaultYarnAppClasspath(syalcp.isDefaultYarnAppClasspath())
+					.delimiter(syalcp.getPathSeparator())
+					.entries(syalcp.getClasspath())
+					.entry(explodedEntryIfZip(syalcp));
 		}
 
 		@Override
 		public void configure(YarnAppmasterConfigurer master) throws Exception {
 			master
 				.appmasterClass(syap.getAppmasterClass() != null ? syap.getAppmasterClass() : appmasterClass)
-				.containerCommands(createContainerCommands(syap))
+				.containerCommands(createContainerCommands(syalcp))
 				.withContainerAllocator()
-					.memory(syap.getMemory())
-					.priority(syap.getPriority())
-					.virtualCores(syap.getVirtualCores());
+					.memory(syarp.getMemory())
+					.priority(syarp.getPriority())
+					.virtualCores(syarp.getVirtualCores());
 		}
 
 	}
 
-	private static String explodedEntryIfZip(SpringYarnAppmasterProperties syap) {
-		return StringUtils.endsWithIgnoreCase(syap.getContainerFile(), ".zip") ? "./" + syap.getContainerFile() : null;
+	private static String explodedEntryIfZip(SpringYarnAppmasterLaunchContextProperties syalcp) {
+		return StringUtils.endsWithIgnoreCase(syalcp.getArchiveFile(), ".zip") ? "./" + syalcp.getArchiveFile() : null;
 	}
 
-	private static String[] createContainerCommands(SpringYarnAppmasterProperties syap) throws Exception {
+	private static String[] createContainerCommands(SpringYarnAppmasterLaunchContextProperties syalcp) throws Exception {
 		LaunchCommandsFactoryBean factory = new LaunchCommandsFactoryBean();
-		String containerJar = syap.getContainerFile();
+		String containerJar = syalcp.getArchiveFile();
 
 		if (StringUtils.hasText(containerJar) && containerJar.endsWith("jar")) {
 			factory.setJarFile(containerJar);
-		} else if (StringUtils.hasText(syap.getContainerRunner())) {
-			factory.setRunnerClass(syap.getContainerRunner());
+		} else if (StringUtils.hasText(syalcp.getRunnerClass())) {
+			factory.setRunnerClass(syalcp.getRunnerClass());
 		} else if (StringUtils.hasText(containerJar) && containerJar.endsWith("zip")) {
 			factory.setRunnerClass("org.springframework.boot.loader.PropertiesLauncher");
 		}
 
-		if (syap.getArguments() != null) {
+		if (syalcp.getArguments() != null) {
 			Properties arguments = new Properties();
-			arguments.putAll(syap.getArguments());
+			arguments.putAll(syalcp.getArguments());
 			factory.setArguments(arguments);
 		}
 
-		factory.setOptions(syap.getOptions());
+		factory.setOptions(syalcp.getOptions());
 
 		factory.setStdout("<LOG_DIR>/Container.stdout");
 		factory.setStderr("<LOG_DIR>/Container.stderr");

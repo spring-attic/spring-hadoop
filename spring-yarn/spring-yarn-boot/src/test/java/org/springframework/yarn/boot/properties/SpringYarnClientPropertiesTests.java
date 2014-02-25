@@ -13,56 +13,50 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.yarn.boot.support;
+package org.springframework.yarn.boot.properties;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+
+import java.util.List;
 
 import org.junit.Test;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.yarn.boot.support.SpringYarnBatchProperties.JobProperties;
 
 /**
- * Tests for {@link SpringYarnBatchProperties} bindings.
+ * Tests for {@link SpringYarnClientProperties} bindings.
  *
  * @author Janne Valkealahti
  *
  */
-public class SpringYarnBatchPropertiesTests {
+public class SpringYarnClientPropertiesTests {
 
 	@Test
 	public void testAllPropertiesSet() {
 		SpringApplication app = new SpringApplication(TestConfiguration.class);
 		ConfigurableApplicationContext context = app
-				.run(new String[] { "--spring.config.name=SpringYarnBatchPropertiesTests" });
-		SpringYarnBatchProperties properties = context.getBean(SpringYarnBatchProperties.class);
+				.run(new String[] { "--spring.config.name=SpringYarnClientPropertiesTests" });
+		SpringYarnClientProperties properties = context.getBean(SpringYarnClientProperties.class);
 		assertThat(properties, notNullValue());
-		assertThat(properties.isEnabled(), is(true));
-		assertThat(properties.getName(), is("nameFoo1"));
 
-		assertThat(properties.getJobs(), notNullValue());
-		assertThat(properties.getJobs().size(), is(1));
-		assertThat(properties.getJobProperties("jobsName1"), notNullValue());
+		List<String> files = properties.getFiles();
+		assertThat(files, notNullValue());
+		assertThat(files.size(), is(2));
+		assertThat(files.get(0), is("files1Foo"));
+		assertThat(files.get(1), is("files2Foo"));
 
-		JobProperties jobProperties = properties.getJobProperties("jobsName1");
-		assertThat(jobProperties.isEnabled(), is(true));
-		assertThat(jobProperties.isFailNext(), is(true));
-		assertThat(jobProperties.isFailRestart(), is(true));
-		assertThat(jobProperties.isNext(), is(true));
-		assertThat(jobProperties.isRestart(), is(true));
-		assertThat(jobProperties.getParameters(), notNullValue());
-		assertThat(jobProperties.getParameters().size(), is(2));
-		assertThat((String)jobProperties.getParameters().get("job1key1"), is("job1val1"));
-		assertThat((String)jobProperties.getParameters().get("job1key2"), is("job1val2"));
+		assertThat(properties.getPriority(), is(234));
+		assertThat(properties.getQueue(), is("queueFoo"));
+
 		context.close();
 	}
 
 	@Configuration
-	@EnableConfigurationProperties({SpringYarnBatchProperties.class})
+	@EnableConfigurationProperties({ SpringYarnClientProperties.class})
 	protected static class TestConfiguration {
 	}
 

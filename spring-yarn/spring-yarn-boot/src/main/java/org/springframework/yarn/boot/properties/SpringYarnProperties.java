@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.yarn.boot.support;
+package org.springframework.yarn.boot.properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -21,7 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * Spring Boot {@link ConfigurationProperties} for <code>spring.yarn</code>.
+ * Spring Boot {@link ConfigurationProperties} for <em>spring.yarn</em>.
  *
  * @author Janne Valkealahti
  *
@@ -32,11 +32,12 @@ public class SpringYarnProperties {
 	private final static Log log = LogFactory.getLog(SpringYarnProperties.class);
 
 	private String applicationDir;
-	private String applicationsBaseDir;
-	private String stagingDirectory;
+	private String applicationBaseDir;
+	private String stagingDir;
 	private String fsUri;
-	private String rmAddress;
-	private String schedulerAddress;
+	private String resourceManagerHost;
+	private Integer resourceManagerPort = 8032;
+	private Integer resourceManagerSchedulerPort = 8030;
 	private String appName;
 	private String appType;
 
@@ -51,20 +52,20 @@ public class SpringYarnProperties {
 		this.applicationDir = applicationDir;
 	}
 
-	public String getApplicationsBaseDir() {
-		return applicationsBaseDir;
+	public String getApplicationBaseDir() {
+		return applicationBaseDir;
 	}
 
-	public void setApplicationsBaseDir(String applicationsBaseDir) {
-		this.applicationsBaseDir = applicationsBaseDir;
+	public void setApplicationBaseDir(String applicationBaseDir) {
+		this.applicationBaseDir = applicationBaseDir;
 	}
 
-	public String getStagingDirectory() {
-		return stagingDirectory;
+	public String getStagingDir() {
+		return stagingDir;
 	}
 
-	public void setStagingDirectory(String stagingDirectory) {
-		this.stagingDirectory = stagingDirectory;
+	public void setStagingDir(String stagingDir) {
+		this.stagingDir = stagingDir;
 	}
 
 	public String getFsUri() {
@@ -79,24 +80,36 @@ public class SpringYarnProperties {
 		this.fsUri = fsUri;
 	}
 
-	public String getRmAddress() {
-		if (log.isDebugEnabled()) {
-			log.debug("syp rmAddress=[" + rmAddress + "]");
-			log.debug("syep rmAddress=[" + syep.getRm() + "]");
-		}
-		return syep.getRm() != null ? syep.getRm() : rmAddress;
+	public String getResourceManagerAddress() {
+		return syep.getRm() != null ? syep.getRm() : getResourceManagerHost() + ":" + getResourceManagerPort();
 	}
 
-	public void setRmAddress(String rmAddress) {
-		this.rmAddress = rmAddress;
+	public String getResourceManagerSchedulerAddress() {
+		return syep.getScheduler() != null ? syep.getScheduler() : getResourceManagerHost() + ":" + getResourceManagerSchedulerPort();
 	}
 
-	public String getSchedulerAddress() {
-		return syep.getScheduler() != null ? syep.getScheduler() : schedulerAddress;
+	public String getResourceManagerHost() {
+		return resourceManagerHost;
 	}
 
-	public void setSchedulerAddress(String schedulerAddress) {
-		this.schedulerAddress = schedulerAddress;
+	public void setResourceManagerHost(String resourceManagerHost) {
+		this.resourceManagerHost = resourceManagerHost;
+	}
+
+	public Integer getResourceManagerPort() {
+		return resourceManagerPort;
+	}
+
+	public void setResourceManagerPort(Integer resourceManagerPort) {
+		this.resourceManagerPort = resourceManagerPort;
+	}
+
+	public Integer getResourceManagerSchedulerPort() {
+		return resourceManagerSchedulerPort;
+	}
+
+	public void setResourceManagerSchedulerPort(Integer resourceManagerSchedulerPort) {
+		this.resourceManagerSchedulerPort = resourceManagerSchedulerPort;
 	}
 
 	public String getAppName() {

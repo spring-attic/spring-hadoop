@@ -13,37 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.yarn.boot.support;
+package org.springframework.yarn.boot.properties;
+
+import java.util.Map;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-/**
- * Spring Boot {@link ConfigurationProperties} for
- * <code>spring.yarn.container</code>.
- *
- * @author Janne Valkealahti
- *
- */
-@ConfigurationProperties(name = "spring.yarn.container")
-public class SpringYarnContainerProperties {
+@ConfigurationProperties(name = "spring.yarn.client.localizer")
+public class SpringYarnClientLocalizerProperties extends AbstractLocalizerProperties {
 
-	private String containerClass;
-	private boolean waitLatch = true;
+	private Map<String, byte[]> rawFileContents;
 
-	public String getContainerClass() {
-		return containerClass;
+	public Map<String, byte[]> getRawFileContents() {
+		return rawFileContents;
 	}
 
-	public void setContainerClass(String containerClass) {
-		this.containerClass = containerClass;
-	}
-
-	public boolean isWaitLatch() {
-		return waitLatch;
-	}
-
-	public void setWaitLatch(boolean waitLatch) {
-		this.waitLatch = waitLatch;
+	public void setRawFileContents(Map<String, byte[]> rawFileContents) {
+		this.rawFileContents = rawFileContents;
 	}
 
 }

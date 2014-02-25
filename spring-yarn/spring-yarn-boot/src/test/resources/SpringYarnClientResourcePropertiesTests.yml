@@ -1,0 +1,6 @@
+spring:
+    yarn:
+        client:
+            resource:
+                memory: memoryFoo
+                virtualCores: 123

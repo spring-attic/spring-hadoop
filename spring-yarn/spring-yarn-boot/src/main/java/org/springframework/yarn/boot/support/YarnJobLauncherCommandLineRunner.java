@@ -48,7 +48,8 @@ import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.stereotype.Component;
 import org.springframework.util.PatternMatchUtils;
 import org.springframework.util.StringUtils;
-import org.springframework.yarn.boot.support.SpringYarnBatchProperties.JobProperties;
+import org.springframework.yarn.boot.properties.SpringYarnBatchProperties;
+import org.springframework.yarn.boot.properties.SpringYarnBatchProperties.JobProperties;
 
 /**
  * {@link CommandLineRunner} to {@link JobLauncher launch} Spring Batch jobs.

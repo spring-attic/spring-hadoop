@@ -29,10 +29,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
 import org.springframework.yarn.YarnSystemConstants;
 import org.springframework.yarn.boot.condition.ConditionalOnYarnContainer;
+import org.springframework.yarn.boot.properties.SpringYarnContainerProperties;
+import org.springframework.yarn.boot.properties.SpringYarnEnvProperties;
+import org.springframework.yarn.boot.properties.SpringYarnProperties;
 import org.springframework.yarn.boot.support.ContainerLauncherRunner;
-import org.springframework.yarn.boot.support.SpringYarnContainerProperties;
-import org.springframework.yarn.boot.support.SpringYarnEnvProperties;
-import org.springframework.yarn.boot.support.SpringYarnProperties;
 import org.springframework.yarn.config.annotation.EnableYarn;
 import org.springframework.yarn.config.annotation.EnableYarn.Enable;
 import org.springframework.yarn.config.annotation.SpringYarnConfigurerAdapter;
@@ -53,7 +53,7 @@ import org.springframework.yarn.container.YarnContainer;
 public class YarnContainerAutoConfiguration {
 
 	@Configuration
-	@EnableConfigurationProperties({SpringYarnProperties.class, SpringYarnContainerProperties.class})
+	@EnableConfigurationProperties({ SpringYarnProperties.class, SpringYarnContainerProperties.class })
 	public static class RunnerConfig {
 
 		@Autowired
@@ -64,7 +64,7 @@ public class YarnContainerAutoConfiguration {
 		@ConditionalOnBean(YarnContainer.class)
 		public ContainerLauncherRunner containerLauncherRunner() {
 			ContainerLauncherRunner runner = new ContainerLauncherRunner();
-			runner.setWaitLatch(sycp.isWaitLatch());
+			runner.setWaitLatch(sycp.isKeepContextAlive());
 			return runner;
 		}
 	}
@@ -83,7 +83,7 @@ public class YarnContainerAutoConfiguration {
 	}
 
 	@Configuration
-	@EnableConfigurationProperties({SpringYarnProperties.class, SpringYarnContainerProperties.class, SpringYarnEnvProperties.class})
+	@EnableConfigurationProperties({ SpringYarnProperties.class, SpringYarnEnvProperties.class, SpringYarnContainerProperties.class })
 	@EnableYarn(enable=Enable.CONTAINER)
 	public static class SpringYarnConfig extends SpringYarnConfigurerAdapter {
 
