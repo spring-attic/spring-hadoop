@@ -55,7 +55,7 @@ import org.springframework.yarn.client.YarnClient;
 public class YarnBootClientInstallApplication {
 
 	private String appId;
-	private String applicationsBaseDir;
+	private String applicationBaseDir;
 	private List<Object> sources = new ArrayList<Object>();
 	private List<String> profiles = new ArrayList<String>();
 	private Map<String, Properties> configFilesContents = new HashMap<String, Properties>();
@@ -76,12 +76,12 @@ public class YarnBootClientInstallApplication {
 	/**
 	 * Sets an Applications base directory to be used by a builder.
 	 *
-	 * @param applicationsBaseDir the applications base directory
+	 * @param applicationBaseDir the applications base directory
 	 * @return the {@link YarnBootClientInstallApplication} for chaining
 	 */
-	public YarnBootClientInstallApplication applicationsBaseDir(String applicationsBaseDir) {
+	public YarnBootClientInstallApplication applicationBaseDir(String applicationBaseDir) {
 		// can be empty because value may come from an existing properties
-		this.applicationsBaseDir = applicationsBaseDir;
+		this.applicationBaseDir = applicationBaseDir;
 		return this;
 	}
 
@@ -156,11 +156,11 @@ public class YarnBootClientInstallApplication {
 		SpringYarnBootUtils.addSources(builder, sources.toArray(new Object[0]));
 		SpringYarnBootUtils.addProfiles(builder, profiles.toArray(new String[0]));
 		SpringYarnBootUtils.addConfigFilesContents(builder, configFilesContents);
-		if (StringUtils.hasText(applicationsBaseDir)) {
+		if (StringUtils.hasText(applicationBaseDir)) {
 			if (appProperties == null) {
 				appProperties = new Properties();
 			}
-			appProperties.setProperty("spring.yarn.applicationDir", applicationsBaseDir + appId + "/");
+			appProperties.setProperty("spring.yarn.applicationDir", applicationBaseDir + appId + "/");
 		}
 		SpringYarnBootUtils.addApplicationListener(builder, appProperties);
 

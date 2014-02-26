@@ -128,7 +128,7 @@ public final class SpringYarnBootUtils {
 		}
 		if (!content.isEmpty()) {
 			Properties p = new Properties();
-			p.put("spring.yarn.client.rawFileContents", content);
+			p.put("spring.yarn.client.localizer.rawFileContents", content);
 			builder.properties(p);
 		}
 	}
