@@ -36,6 +36,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.StringUtils;
 import org.springframework.yarn.am.YarnAppmaster;
 import org.springframework.yarn.boot.condition.ConditionalOnYarnAppmaster;
+import org.springframework.yarn.boot.properties.SpringHadoopProperties;
 import org.springframework.yarn.boot.properties.SpringYarnAppmasterLaunchContextProperties;
 import org.springframework.yarn.boot.properties.SpringYarnAppmasterLocalizerProperties;
 import org.springframework.yarn.boot.properties.SpringYarnAppmasterProperties;
@@ -161,14 +162,17 @@ public class YarnAppmasterAutoConfiguration {
 
 
 	@Configuration
-	@EnableConfigurationProperties({ SpringYarnProperties.class, SpringYarnEnvProperties.class,
-			SpringYarnAppmasterProperties.class, SpringYarnAppmasterLaunchContextProperties.class,
-			SpringYarnAppmasterResourceProperties.class })
+	@EnableConfigurationProperties({ SpringHadoopProperties.class, SpringYarnProperties.class,
+			SpringYarnEnvProperties.class, SpringYarnAppmasterProperties.class,
+			SpringYarnAppmasterLaunchContextProperties.class, SpringYarnAppmasterResourceProperties.class })
 	@EnableYarn(enable=Enable.APPMASTER)
 	static class Config extends SpringYarnConfigurerAdapter {
 
 		@Autowired
 		private SpringYarnProperties syp;
+
+		@Autowired
+		private SpringHadoopProperties shp;
 
 		@Autowired
 		private SpringYarnAppmasterProperties syap;
@@ -188,12 +192,12 @@ public class YarnAppmasterAutoConfiguration {
 
 		@Override
 		public void configure(YarnConfigConfigurer config) throws Exception {
-			log.info("Configuring fsUri=[" + syp.getFsUri() + "]");
-			log.info("Configuring rmAddress=[" + syp.getResourceManagerAddress() + "]");
+			log.info("Configuring fsUri=[" + shp.getFsUri() + "]");
+			log.info("Configuring rmAddress=[" + shp.getResourceManagerAddress() + "]");
 			config
-				.fileSystemUri(syp.getFsUri())
-				.resourceManagerAddress(syp.getResourceManagerAddress())
-				.schedulerAddress(syp.getResourceManagerSchedulerAddress());
+				.fileSystemUri(shp.getFsUri())
+				.resourceManagerAddress(shp.getResourceManagerAddress())
+				.schedulerAddress(shp.getResourceManagerSchedulerAddress());
 		}
 
 		@Override

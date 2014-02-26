@@ -52,16 +52,16 @@ public class YarnBootClientInfoApplication {
 		Properties props = new Properties();
 
 		// merge settings set by user in a shell
-		SpringYarnBootUtils.mergeHadoopPropertyIntoMap(configuration, "fs.defaultFS", "spring.yarn.fsUri", props);
-		SpringYarnBootUtils.mergeHadoopPropertyIntoMap(configuration, "yarn.resourcemanager.address", "spring.yarn.rmAddress", props);
-		SpringYarnBootUtils.mergeHadoopPropertyIntoMap(configuration, "yarn.resourcemanager.scheduler.address", "spring.yarn.schedulerAddress", props);
+		SpringYarnBootUtils.mergeHadoopPropertyIntoMap(configuration, "fs.defaultFS", "spring.hadoop.fsUri", props);
+		SpringYarnBootUtils.mergeHadoopPropertyIntoMap(configuration, "yarn.resourcemanager.address", "spring.hadoop.resourceManagerAddress", props);
+		SpringYarnBootUtils.mergeHadoopPropertyIntoMap(configuration, "yarn.resourcemanager.scheduler.address", "spring.yarn.resourceManagerSchedulerAddress", props);
 		SpringYarnBootUtils.mergeBootArgumentsIntoMap(args, props);
 		CollectionUtils.mergePropertiesIntoMap(properties, props);
 		SpringYarnBootUtils.appendAsCommaDelimitedIntoProperties("spring.profiles.active", profiles, props);
 
 		// based on a given id, set application dir and shared
 		// applications base dir.
-		String applicationsBaseDir = props.getProperty("spring.yarn.applicationsBaseDir");
+		String applicationsBaseDir = props.getProperty("spring.yarn.applicationBaseDir");
 		if (applicationsBaseDir != null) {
 			props.setProperty("spring.yarn.applicationDir", applicationsBaseDir + id + "/");
 		}

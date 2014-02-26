@@ -29,6 +29,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
 import org.springframework.yarn.YarnSystemConstants;
 import org.springframework.yarn.boot.condition.ConditionalOnYarnContainer;
+import org.springframework.yarn.boot.properties.SpringHadoopProperties;
 import org.springframework.yarn.boot.properties.SpringYarnContainerProperties;
 import org.springframework.yarn.boot.properties.SpringYarnEnvProperties;
 import org.springframework.yarn.boot.properties.SpringYarnProperties;
@@ -83,12 +84,16 @@ public class YarnContainerAutoConfiguration {
 	}
 
 	@Configuration
-	@EnableConfigurationProperties({ SpringYarnProperties.class, SpringYarnEnvProperties.class, SpringYarnContainerProperties.class })
+	@EnableConfigurationProperties({ SpringHadoopProperties.class, SpringYarnProperties.class,
+			SpringYarnEnvProperties.class, SpringYarnContainerProperties.class })
 	@EnableYarn(enable=Enable.CONTAINER)
 	public static class SpringYarnConfig extends SpringYarnConfigurerAdapter {
 
 		@Autowired
 		private SpringYarnProperties syp;
+
+		@Autowired
+		private SpringHadoopProperties shp;
 
 		@Autowired
 		private SpringYarnContainerProperties sycp;
@@ -108,7 +113,7 @@ public class YarnContainerAutoConfiguration {
 		@Override
 		public void configure(YarnConfigConfigurer config) throws Exception {
 			config
-				.fileSystemUri(syp.getFsUri());
+				.fileSystemUri(shp.getFsUri());
 		}
 
 		@Override
