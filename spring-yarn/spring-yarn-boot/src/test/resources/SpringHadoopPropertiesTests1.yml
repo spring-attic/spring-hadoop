@@ -1,0 +1,5 @@
+spring:
+    hadoop:
+        fsUri: fsUriFoo
+        resourceManagerAddress: resourceManagerAddressFoo:321
+        resourceManagerSchedulerAddress: resourceManagerSchedulerAddressFoo:123

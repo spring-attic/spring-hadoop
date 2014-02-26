@@ -26,6 +26,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
 import org.springframework.yarn.boot.condition.ConditionalOnMissingYarn;
+import org.springframework.yarn.boot.properties.SpringHadoopProperties;
 import org.springframework.yarn.boot.properties.SpringYarnClientLaunchContextProperties;
 import org.springframework.yarn.boot.properties.SpringYarnClientLocalizerProperties;
 import org.springframework.yarn.boot.properties.SpringYarnClientProperties;
@@ -86,14 +87,18 @@ public class YarnClientAutoConfiguration {
 	}
 
 	@Configuration
-	@EnableConfigurationProperties({ SpringYarnProperties.class, SpringYarnEnvProperties.class,
-			SpringYarnClientProperties.class, SpringYarnClientLaunchContextProperties.class,
-			SpringYarnClientLocalizerProperties.class, SpringYarnClientResourceProperties.class })
+	@EnableConfigurationProperties({ SpringHadoopProperties.class, SpringYarnProperties.class,
+			SpringYarnEnvProperties.class, SpringYarnClientProperties.class,
+			SpringYarnClientLaunchContextProperties.class, SpringYarnClientLocalizerProperties.class,
+			SpringYarnClientResourceProperties.class })
 	@EnableYarn(enable=Enable.CLIENT)
 	public static class SpringYarnConfig extends SpringYarnConfigurerAdapter {
 
 		@Autowired
 		private SpringYarnProperties syp;
+
+		@Autowired
+		private SpringHadoopProperties shp;
 
 		@Autowired
 		private SpringYarnClientProperties sycp;
@@ -113,9 +118,9 @@ public class YarnClientAutoConfiguration {
 		@Override
 		public void configure(YarnConfigConfigurer config) throws Exception {
 			config
-				.fileSystemUri(syp.getFsUri())
-				.resourceManagerAddress(syp.getResourceManagerAddress())
-				.schedulerAddress(syp.getResourceManagerSchedulerAddress());
+				.fileSystemUri(shp.getFsUri())
+				.resourceManagerAddress(shp.getResourceManagerAddress())
+				.schedulerAddress(shp.getResourceManagerSchedulerAddress());
 		}
 
 		@Override

@@ -5,7 +5,3 @@ spring:
         stagingDir: stagingDirFoo
         applicationDir: applicationDirFoo
         applicationBaseDir: applicationBaseDirFoo
-        fsUri: fsUriFoo
-        resourceManagerHost: resourceManagerHostFoo
-        resourceManagerPort: 321
-        resourceManagerSchedulerPort: 123

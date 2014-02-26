@@ -1,0 +1,6 @@
+spring:
+    hadoop:
+        fsUri: fsUriFoo
+        resourceManagerHost: resourceManagerHostFoo
+        resourceManagerPort: 321
+        resourceManagerSchedulerPort: 123

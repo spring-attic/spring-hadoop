@@ -15,8 +15,6 @@
  */
 package org.springframework.yarn.boot.properties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -29,15 +27,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(name = "spring.yarn")
 public class SpringYarnProperties {
 
-	private final static Log log = LogFactory.getLog(SpringYarnProperties.class);
-
 	private String applicationDir;
 	private String applicationBaseDir;
 	private String stagingDir;
-	private String fsUri;
-	private String resourceManagerHost;
-	private Integer resourceManagerPort = 8032;
-	private Integer resourceManagerSchedulerPort = 8030;
 	private String appName;
 	private String appType;
 
@@ -66,50 +58,6 @@ public class SpringYarnProperties {
 
 	public void setStagingDir(String stagingDir) {
 		this.stagingDir = stagingDir;
-	}
-
-	public String getFsUri() {
-		if (log.isDebugEnabled()) {
-			log.debug("syp fsUri=[" + fsUri + "]");
-			log.debug("syep fsUri=[" + syep.getFs() + "]");
-		}
-		return syep.getFs() != null ? syep.getFs() : fsUri;
-	}
-
-	public void setFsUri(String fsUri) {
-		this.fsUri = fsUri;
-	}
-
-	public String getResourceManagerAddress() {
-		return syep.getRm() != null ? syep.getRm() : getResourceManagerHost() + ":" + getResourceManagerPort();
-	}
-
-	public String getResourceManagerSchedulerAddress() {
-		return syep.getScheduler() != null ? syep.getScheduler() : getResourceManagerHost() + ":" + getResourceManagerSchedulerPort();
-	}
-
-	public String getResourceManagerHost() {
-		return resourceManagerHost;
-	}
-
-	public void setResourceManagerHost(String resourceManagerHost) {
-		this.resourceManagerHost = resourceManagerHost;
-	}
-
-	public Integer getResourceManagerPort() {
-		return resourceManagerPort;
-	}
-
-	public void setResourceManagerPort(Integer resourceManagerPort) {
-		this.resourceManagerPort = resourceManagerPort;
-	}
-
-	public Integer getResourceManagerSchedulerPort() {
-		return resourceManagerSchedulerPort;
-	}
-
-	public void setResourceManagerSchedulerPort(Integer resourceManagerSchedulerPort) {
-		this.resourceManagerSchedulerPort = resourceManagerSchedulerPort;
 	}
 
 	public String getAppName() {

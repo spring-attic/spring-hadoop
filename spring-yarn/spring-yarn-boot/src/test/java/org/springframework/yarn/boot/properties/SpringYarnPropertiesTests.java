@@ -24,7 +24,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.yarn.boot.properties.SpringYarnEnvProperties;
 
 /**
  * Tests for {@link SpringYarnProperties} bindings.
@@ -46,12 +45,6 @@ public class SpringYarnPropertiesTests {
 		assertThat(properties.getAppName(), is("appNameFoo"));
 		assertThat(properties.getAppType(), is("appTypeFoo"));
 		assertThat(properties.getStagingDir(), is("stagingDirFoo"));
-		assertThat(properties.getFsUri(), is("fsUriFoo"));
-		assertThat(properties.getResourceManagerAddress(), is("resourceManagerHostFoo:321"));
-		assertThat(properties.getResourceManagerSchedulerAddress(), is("resourceManagerHostFoo:123"));
-		assertThat(properties.getResourceManagerHost(), is("resourceManagerHostFoo"));
-		assertThat(properties.getResourceManagerPort(), is(321));
-		assertThat(properties.getResourceManagerSchedulerPort(), is(123));
 		context.close();
 	}
 
