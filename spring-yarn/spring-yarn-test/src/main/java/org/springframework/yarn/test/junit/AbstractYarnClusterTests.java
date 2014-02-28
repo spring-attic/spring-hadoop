@@ -165,6 +165,8 @@ public abstract class AbstractYarnClusterTests implements ApplicationContextAwar
 		Assert.notNull(getYarnClient(), "Yarn client must be set");
 
 		YarnApplicationState state = null;
+		ApplicationReport report = null;
+
 		ApplicationId applicationId = submitApplication();
 		Assert.notNull(applicationId, "Failed to get application id from submit");
 
@@ -173,10 +175,11 @@ public abstract class AbstractYarnClusterTests implements ApplicationContextAwar
 		// break label for inner loop
 		done:
 		do {
-			state = findState(getYarnClient(), applicationId);
-			if (state == null) {
+			report = findApplicationReport(getYarnClient(), applicationId);
+			if (report == null) {
 				break;
 			}
+			state = report.getYarnApplicationState();
 			for (YarnApplicationState stateCheck : applicationStates) {
 				if (state.equals(stateCheck)) {
 					break done;
@@ -184,7 +187,7 @@ public abstract class AbstractYarnClusterTests implements ApplicationContextAwar
 			}
 			Thread.sleep(1000);
 		} while (System.currentTimeMillis() < end);
-		return new ApplicationInfo(state, applicationId);
+		return new ApplicationInfo(applicationId, report);
 	}
 
 	/**
@@ -275,6 +278,22 @@ public abstract class AbstractYarnClusterTests implements ApplicationContextAwar
 			}
 		}
 		return state;
+	}
+
+	/**
+	 * Finds the current application report.
+	 *
+	 * @param client the Yarn client
+	 * @param applicationId Yarn app application id
+	 * @return Current application report or <code>NULL</code> if not found
+	 */
+	private ApplicationReport findApplicationReport(YarnClient client, ApplicationId applicationId) {
+		for (ApplicationReport report : client.listApplications()) {
+			if (report.getApplicationId().equals(applicationId)) {
+				return report;
+			}
+		}
+		return null;
 	}
 
 }
