@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 package org.springframework.yarn.test.junit;
 
 import org.apache.hadoop.yarn.api.records.ApplicationId;
+import org.apache.hadoop.yarn.api.records.ApplicationReport;
+import org.apache.hadoop.yarn.api.records.FinalApplicationStatus;
 import org.apache.hadoop.yarn.api.records.YarnApplicationState;
 
 /**
@@ -28,11 +30,11 @@ import org.apache.hadoop.yarn.api.records.YarnApplicationState;
  */
 public class ApplicationInfo {
 
-	/** The yarn application state. */
-	private YarnApplicationState yarnApplicationState;
-
 	/** The application id. */
 	private ApplicationId applicationId;
+
+	/** Raw report from resource manager */
+	private ApplicationReport applicationReport;
 
 	/**
 	 * Instantiates a new application info.
@@ -44,11 +46,11 @@ public class ApplicationInfo {
 	 *
 	 * @param yarnApplicationState the yarn application state
 	 * @param applicationId the application id
+	 * @param applicationReport the application report
 	 */
-	public ApplicationInfo(YarnApplicationState yarnApplicationState,
-			ApplicationId applicationId) {
-		this.yarnApplicationState = yarnApplicationState;
+	public ApplicationInfo(ApplicationId applicationId, ApplicationReport applicationReport) {
 		this.applicationId = applicationId;
+		this.applicationReport = applicationReport;
 	}
 
 	/**
@@ -57,16 +59,16 @@ public class ApplicationInfo {
 	 * @return the yarn application state
 	 */
 	public YarnApplicationState getYarnApplicationState() {
-		return yarnApplicationState;
+		return applicationReport != null ? applicationReport.getYarnApplicationState() : null;
 	}
 
 	/**
-	 * Sets the yarn application state.
+	 * Gets the final application status.
 	 *
-	 * @param yarnApplicationState the new yarn application state
+	 * @return the final application status
 	 */
-	public void setYarnApplicationState(YarnApplicationState yarnApplicationState) {
-		this.yarnApplicationState = yarnApplicationState;
+	public FinalApplicationStatus getFinalApplicationStatus() {
+		return applicationReport != null ? applicationReport.getFinalApplicationStatus() : null;
 	}
 
 	/**
@@ -85,6 +87,24 @@ public class ApplicationInfo {
 	 */
 	public void setApplicationId(ApplicationId applicationId) {
 		this.applicationId = applicationId;
+	}
+
+	/**
+	 * Gets the application report.
+	 *
+	 * @return the application report
+	 */
+	public ApplicationReport getApplicationReport() {
+		return applicationReport;
+	}
+
+	/**
+	 * Sets the application report.
+	 *
+	 * @param applicationReport the new application report
+	 */
+	public void setApplicationReport(ApplicationReport applicationReport) {
+		this.applicationReport = applicationReport;
 	}
 
 }
