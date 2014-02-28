@@ -23,7 +23,7 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.SmartLifecycle;
-import org.springframework.integration.core.SubscribableChannel;
+import org.springframework.messaging.SubscribableChannel;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.yarn.am.AppmasterService;

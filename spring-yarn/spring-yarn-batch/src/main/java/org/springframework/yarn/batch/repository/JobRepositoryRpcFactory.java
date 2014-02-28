@@ -41,12 +41,15 @@ import org.springframework.yarn.batch.repository.bindings.StepExecutionType;
 import org.springframework.yarn.batch.repository.bindings.exp.FindRunningJobExecutionsReq;
 import org.springframework.yarn.batch.repository.bindings.exp.GetJobExecutionReq;
 import org.springframework.yarn.batch.repository.bindings.exp.GetJobExecutionsReq;
+import org.springframework.yarn.batch.repository.bindings.exp.GetJobInstanceCountReq;
 import org.springframework.yarn.batch.repository.bindings.exp.GetJobInstanceReq;
 import org.springframework.yarn.batch.repository.bindings.exp.GetJobInstancesReq;
 import org.springframework.yarn.batch.repository.bindings.exp.GetJobNamesReq;
 import org.springframework.yarn.batch.repository.bindings.exp.GetStepExecutionReq;
 import org.springframework.yarn.batch.repository.bindings.repo.AddWithStepExecutionReq;
 import org.springframework.yarn.batch.repository.bindings.repo.CreateJobExecutionReq;
+import org.springframework.yarn.batch.repository.bindings.repo.CreateJobExecutionWithJobInstanceReq;
+import org.springframework.yarn.batch.repository.bindings.repo.CreateJobInstanceReq;
 import org.springframework.yarn.batch.repository.bindings.repo.GetLastJobExecutionReq;
 import org.springframework.yarn.batch.repository.bindings.repo.GetLastStepExecutionReq;
 import org.springframework.yarn.batch.repository.bindings.repo.GetStepExecutionCountReq;
@@ -228,6 +231,7 @@ public class JobRepositoryRpcFactory {
 			type.jobInstance = convertJobInstanceType(jobExecution.getJobInstance());
 		}
 
+		type.jobConfigurationLocation = jobExecution.getJobConfigurationName();
 		type.status = jobExecution.getStatus();
 		type.startTime = nullsafeToMillis(jobExecution.getStartTime());
 		type.endTime = nullsafeToMillis(jobExecution.getEndTime());
@@ -257,7 +261,8 @@ public class JobRepositoryRpcFactory {
 	public static JobExecution convertJobExecutionType(JobExecutionType type) {
 		JobInstance jobInstance = convertJobInstanceType(type.jobInstance);
 		JobParameters jobParameters = convertJobParametersType(type.jobParameters);
-		JobExecution jobExecution = new JobExecution(jobInstance, type.id, jobParameters);
+
+		JobExecution jobExecution = new JobExecution(jobInstance, type.id, jobParameters, type.jobConfigurationLocation);
 
 		jobExecution.setVersion(type.version);
 		jobExecution.setStatus(type.status);
@@ -399,6 +404,38 @@ public class JobRepositoryRpcFactory {
 		return req;
 	}
 
+	public static CreateJobInstanceReq buildCreateJobInstanceReq(String jobName, JobParameters jobParameters) {
+		CreateJobInstanceReq req = new CreateJobInstanceReq();
+
+		Map<String, JobParameterType> map = new HashMap<String, JobParameterType>();
+		for(Entry<String, JobParameter> parameter : jobParameters.getParameters().entrySet()) {
+			JobParameterType type = new JobParameterType();
+			type.parameter = parameter.getValue().getValue();
+			type.parameterType = parameter.getValue().getType();
+			map.put(parameter.getKey(), type);
+		}
+
+		req.jobName = jobName;
+		req.jobParameters = map;
+		return req;
+	}
+
+	public static CreateJobExecutionWithJobInstanceReq buildCreateJobExecutionWithJobInstanceReq(JobInstance jobInstance, JobParameters jobParameters, String jobConfigurationLocation) {
+		CreateJobExecutionWithJobInstanceReq req = new CreateJobExecutionWithJobInstanceReq();
+
+		Map<String, JobParameterType> map = new HashMap<String, JobParameterType>();
+		for(Entry<String, JobParameter> parameter : jobParameters.getParameters().entrySet()) {
+			JobParameterType type = new JobParameterType();
+			type.parameter = parameter.getValue().getValue();
+			type.parameterType = parameter.getValue().getType();
+			map.put(parameter.getKey(), type);
+		}
+		req.jobInstance = JobRepositoryRpcFactory.convertJobInstanceType(jobInstance);
+		req.jobConfigurationLocation = jobConfigurationLocation;
+
+		return req;
+	}
+
 	public static UpdateWithJobExecutionReq buildSaveJobExecutionReq(JobExecution jobExecution) {
 		UpdateWithJobExecutionReq req = new UpdateWithJobExecutionReq();
 		req.jobExecution = JobRepositoryRpcFactory.convertJobExecutionType(jobExecution);
@@ -415,6 +452,12 @@ public class JobRepositoryRpcFactory {
 		GetStepExecutionCountReq req = new GetStepExecutionCountReq();
 		req.jobInstance = JobRepositoryRpcFactory.convertJobInstanceType(jobInstance);
 		req.stepName = stepName;
+		return req;
+	}
+
+	public static GetJobInstanceCountReq buildGetJobInstanceCountReq(String jobName) {
+		GetJobInstanceCountReq req = new GetJobInstanceCountReq();
+		req.jobName = jobName;
 		return req;
 	}
 

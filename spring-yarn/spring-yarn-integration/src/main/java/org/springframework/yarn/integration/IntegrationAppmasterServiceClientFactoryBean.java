@@ -21,8 +21,8 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.integration.MessageChannel;
-import org.springframework.integration.core.PollableChannel;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.PollableChannel;
 import org.springframework.util.ClassUtils;
 import org.springframework.yarn.am.AppmasterServiceClient;
 

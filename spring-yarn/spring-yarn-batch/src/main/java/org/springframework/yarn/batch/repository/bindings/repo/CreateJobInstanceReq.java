@@ -13,38 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.yarn.batch.repository.bindings;
+package org.springframework.yarn.batch.repository.bindings.repo;
 
-import java.util.List;
+import java.util.Map;
 
-import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.yarn.batch.repository.bindings.JobParameterType;
 import org.springframework.yarn.integration.ip.mind.binding.BaseObject;
 
 /**
- * Binding for {@link JobExecution}.
+ * Request binding for {@link JobRepository#createJobExecution(String, JobParameters)}.
  *
  * @author Janne Valkealahti
  *
  */
-public class JobExecutionType extends BaseObject {
+public class CreateJobInstanceReq extends BaseObject {
 
-	public Long id;
-	public Integer version;
-	public String jobConfigurationLocation;
-	public JobInstanceType jobInstance;
-	public List<StepExecutionType> stepExecutions;
-	public BatchStatus status;
-	public Long startTime;
-	public Long createTime;
-	public Long endTime;
-	public Long lastUpdated;
-	public String exitStatus;
-	public ExecutionContextType executionContext;
-	public JobParametersType jobParameters;
+	public String jobName;
+	public Map<String, JobParameterType> jobParameters;
 
-	public JobExecutionType() {
-		super("JobExecutionType");
+	public CreateJobInstanceReq() {
+		super("CreateJobInstanceReq");
 	}
 
 }
