@@ -15,7 +15,6 @@
  */
 package org.springframework.yarn.am.monitor;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -36,7 +35,7 @@ import org.springframework.yarn.listener.ContainerMonitorListener.ContainerMonit
  * @author Janne Valkealahti
  *
  */
-public class DefaultContainerMonitor extends AbstractMonitor implements ContainerMonitor {
+public class DefaultContainerMonitor extends AbstractMonitor implements ContainerAware, ContainerMonitor {
 
 	private final static Log log = LogFactory.getLog(DefaultContainerMonitor.class);
 
@@ -59,29 +58,15 @@ public class DefaultContainerMonitor extends AbstractMonitor implements Containe
 	private final Object lock = new Object();
 
 	@Override
-	public void reportContainerStatus(List<ContainerStatus> containerStatuses) {
-		handleContainerStatus(containerStatuses, false);
+	public void onContainer(List<Container> containers) {
+		for (Container container : containers) {
+			handleContainer(container);
+		}
 	}
 
 	@Override
-	public void reportContainerStatus(ContainerStatus containerStatus) {
-		List<ContainerStatus> containerStatuses = new ArrayList<ContainerStatus>();
-		containerStatuses.add(containerStatus);
+	public void onContainerStatus(List<ContainerStatus> containerStatuses) {
 		handleContainerStatus(containerStatuses, false);
-	}
-
-	@Override
-	public void reportContainer(Container container) {
-		if (log.isDebugEnabled()) {
-			log.debug("Reporting container=" + container);
-		}
-
-		String cid = ConverterUtils.toString(container.getId());
-		allocated.add(cid);
-
-		if (log.isDebugEnabled()) {
-			log.debug("State after reportContainer: " + toDebugString());
-		}
 	}
 
 	@Override
@@ -104,6 +89,26 @@ public class DefaultContainerMonitor extends AbstractMonitor implements Containe
 		return completed.size();
 	}
 
+	private void handleContainer(Container container) {
+		if (log.isDebugEnabled()) {
+			log.debug("Reporting container=" + container);
+		}
+
+		String cid = ConverterUtils.toString(container.getId());
+		synchronized (lock) {
+			if (allocated.contains(cid)) {
+				running.add(cid);
+				allocated.remove(cid);
+			} else {
+				allocated.add(cid);
+			}
+		}
+
+		if (log.isDebugEnabled()) {
+			log.debug("State after reportContainer: " + toDebugString());
+		}
+	}
+
 	private void handleContainerStatus(List<ContainerStatus> containerStatuses, boolean notifyIntermediates) {
 		for (ContainerStatus status : containerStatuses) {
 
@@ -120,20 +125,24 @@ public class DefaultContainerMonitor extends AbstractMonitor implements Containe
 				if (state.equals(ContainerState.COMPLETE)) {
 					if (exitStatus > 0) {
 						failed.add(cid);
-					} else {
+					} else if (exitStatus != -100){
+						// TODO: should do something centrally about exit statuses
+						//       -100 - container released by app
 						completed.add(cid);
 					}
 				}
 				allocated.remove(cid);
 				running.remove(cid);
-			}
-
-			if (notifyIntermediates) {
-				dispatchCurrentContainerMonitorState();
+				if (notifyIntermediates) {
+					dispatchCurrentContainerMonitorState();
+				}
 			}
 		}
+
 		if (!notifyIntermediates) {
-			dispatchCurrentContainerMonitorState();
+			synchronized (lock) {
+				dispatchCurrentContainerMonitorState();
+			}
 		}
 		if (log.isDebugEnabled()) {
 			log.debug("State after handleContainerStatus: " + toDebugString());
@@ -144,10 +153,7 @@ public class DefaultContainerMonitor extends AbstractMonitor implements Containe
 	 * Dispatches current {@link ContainerMonitorState} into event listener.
 	 */
 	private void dispatchCurrentContainerMonitorState() {
-		int total = allocated.size();
-		int fail = failed.size();
-		int comp = completed.size()+fail;
-		notifyState(new ContainerMonitorState(total, comp, fail, comp/(double)total));
+		notifyState(new ContainerMonitorState(allocated.size(), running.size(), completed.size(), failed.size()));
 	}
 
 	/**

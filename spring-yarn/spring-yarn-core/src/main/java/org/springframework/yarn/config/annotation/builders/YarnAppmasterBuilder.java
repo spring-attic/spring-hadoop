@@ -85,7 +85,7 @@ public final class YarnAppmasterBuilder extends AbstractConfiguredAnnotationBuil
 				launcher.setConfiguration(configuration);
 				launcher.setEnvironment(environment);
 				launcher.setResourceLocalizer(resourceLocalizer);
-				abstractServicesAppmaster.setLauncher(launcher);
+				abstractServicesAppmaster.setLauncher(postProcess(launcher));
 
 				if (containerAllocator == null) {
 					containerAllocator = new DefaultContainerAllocator();
@@ -95,8 +95,7 @@ public final class YarnAppmasterBuilder extends AbstractConfiguredAnnotationBuil
 					((AbstractAllocator)containerAllocator).setEnvironment(environment);
 				}
 				abstractServicesAppmaster.setAllocator(postProcess(containerAllocator));
-
-				abstractServicesAppmaster.setMonitor(new DefaultContainerMonitor());
+				abstractServicesAppmaster.setMonitor(postProcess(new DefaultContainerMonitor()));
 			}
 
 		}

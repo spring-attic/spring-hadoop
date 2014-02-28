@@ -68,6 +68,13 @@ public class DefaultYarnEventPublisher implements YarnEventPublisher, Applicatio
 	}
 
 	@Override
+	public void publishContainerLaunchRequestFailed(Object source, Container container) {
+		if (applicationEventPublisher != null) {
+			applicationEventPublisher.publishEvent(new ContainerLaunchRequestFailedEvent(source, container));
+		}
+	}
+
+	@Override
 	public void publishContainerCompleted(Object source, ContainerStatus status) {
 		if (applicationEventPublisher != null) {
 			applicationEventPublisher.publishEvent(new ContainerCompletedEvent(source, status));

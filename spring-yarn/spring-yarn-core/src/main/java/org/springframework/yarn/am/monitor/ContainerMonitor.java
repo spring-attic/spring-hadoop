@@ -15,10 +15,6 @@
  */
 package org.springframework.yarn.am.monitor;
 
-import java.util.List;
-
-import org.apache.hadoop.yarn.api.records.Container;
-import org.apache.hadoop.yarn.api.records.ContainerStatus;
 import org.springframework.yarn.listener.ContainerMonitorListener;
 
 /**
@@ -29,27 +25,6 @@ import org.springframework.yarn.listener.ContainerMonitorListener;
  *
  */
 public interface ContainerMonitor {
-
-	/**
-	 * Notifies monitor for new {@link ContainerStatus}.
-	 *
-	 * @param containerStatuses the container statuses
-	 */
-	void reportContainerStatus(List<ContainerStatus> containerStatuses);
-
-	/**
-	 * Notifies monitor for new {@link ContainerStatus}.
-	 *
-	 * @param containerStatus the container status
-	 */
-	void reportContainerStatus(ContainerStatus containerStatus);
-
-	/**
-	 * Notifies monitor of {@link Container}.
-	 *
-	 * @param container the container
-	 */
-	void reportContainer(Container container);
 
 	/**
 	 * Gets a count of free containers.

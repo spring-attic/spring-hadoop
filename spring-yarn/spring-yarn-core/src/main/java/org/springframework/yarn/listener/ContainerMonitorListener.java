@@ -35,72 +35,72 @@ public interface ContainerMonitorListener {
 	 */
 	public class ContainerMonitorState {
 
-		/** Number of free allocations */
-		private int allocated;
-		/** Number of completed */
+		private int free;
+
+		private int running;
+
 		private int completed;
-		/** Number of failed */
+
 		private int failed;
-		/** Progress as 0..1 */
-		private double progress;
 
 		/**
 		 * Instantiates a new container monitor state.
 		 *
-		 * @param allocated the allocated
-		 * @param completed the completed
-		 * @param failed the failed
-		 * @param progress the progress
+		 * @param free the free count
+		 * @param running the running count
+		 * @param completed the completed count
+		 * @param failed the failed count
 		 */
-		public ContainerMonitorState(int allocated, int completed, int failed, double progress) {
+		public ContainerMonitorState(int free, int running, int completed, int failed) {
 			super();
-			this.allocated = allocated;
+			this.free = free;
+			this.running = running;
 			this.completed = completed;
 			this.failed = failed;
-			this.progress = progress;
 		}
 
 		/**
-		 * Gets the allocated.
+		 * Gets the free count.
 		 *
-		 * @return the allocated
+		 * @return the allocated free
 		 */
-		public int getAllocated() {
-			return allocated;
+		public int getFree() {
+			return free;
 		}
 
 		/**
-		 * Gets the completed.
+		 * Gets the running count.
 		 *
-		 * @return the completed
+		 * @return the running count
+		 */
+		public int getRunning() {
+			return running;
+		}
+
+		/**
+		 * Gets the completed count.
+		 *
+		 * @return the completed count
 		 */
 		public int getCompleted() {
 			return completed;
 		}
 
 		/**
-		 * Gets the failed.
+		 * Gets the failed count.
 		 *
-		 * @return the failed
+		 * @return the failed count
 		 */
 		public int getFailed() {
 			return failed;
 		}
 
-		/**
-		 * Gets the progress.
-		 *
-		 * @return the progress
-		 */
-		public double getProgress() {
-			return progress;
-		}
-
 		@Override
 		public String toString() {
-			return "ContainerMonitorState [allocated=" + allocated + ", completed=" + completed + ", failed=" + failed
-					+ ", progress=" + progress + "]";
+			return "ContainerMonitorState [free=" + free + ", running=" + running + ", completed=" + completed
+					+ ", failed=" + failed + "]";
 		}
+
 	}
 
 }

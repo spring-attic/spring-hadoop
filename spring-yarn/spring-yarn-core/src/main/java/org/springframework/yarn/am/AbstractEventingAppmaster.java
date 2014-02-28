@@ -23,6 +23,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.yarn.event.AbstractYarnEvent;
 import org.springframework.yarn.event.ContainerAllocationEvent;
 import org.springframework.yarn.event.ContainerCompletedEvent;
+import org.springframework.yarn.event.ContainerLaunchRequestFailedEvent;
 import org.springframework.yarn.event.ContainerLaunchedEvent;
 
 /**
@@ -54,6 +55,8 @@ public abstract class AbstractEventingAppmaster extends AbstractServicesAppmaste
 			onContainerAllocated(((ContainerAllocationEvent) event).getContainer());
 		} else if (event instanceof ContainerLaunchedEvent) {
 			onContainerLaunched(((ContainerLaunchedEvent) event).getContainer());
+		} else if (event instanceof ContainerLaunchRequestFailedEvent) {
+			onContainerLaunchRequestFailed(((ContainerLaunchRequestFailedEvent) event).getContainer());
 		} else if (event instanceof ContainerCompletedEvent) {
 			onContainerCompleted(((ContainerCompletedEvent) event).getContainerStatus());
 		}
@@ -80,6 +83,18 @@ public abstract class AbstractEventingAppmaster extends AbstractServicesAppmaste
 	protected void onContainerLaunched(Container container) {
 		if (log.isDebugEnabled()) {
 			log.debug("onContainerLaunched:" + container);
+		}
+	}
+
+	/**
+	 * Invoked when {@link ContainerLaunchRequestFailedEvent} is received as an
+	 * application event. Wrapped {@link Container} is passed to a method.
+	 *
+	 * @param container the container
+	 */
+	protected void onContainerLaunchRequestFailed(Container container) {
+		if (log.isDebugEnabled()) {
+			log.debug("onContainerLaunchRequestFailed:" + container);
 		}
 	}
 

@@ -15,12 +15,16 @@
  */
 package org.springframework.yarn.am;
 
+import java.util.Arrays;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.yarn.api.records.Container;
 import org.apache.hadoop.yarn.api.records.ContainerStatus;
 import org.apache.hadoop.yarn.api.records.FinalApplicationStatus;
 import org.springframework.yarn.am.allocate.AbstractAllocator;
+import org.springframework.yarn.am.monitor.ContainerAware;
+import org.springframework.yarn.am.monitor.ContainerMonitor;
 
 /**
  * A simple application master implementation which will allocate
@@ -55,20 +59,26 @@ public class StaticEventingAppmaster extends AbstractEventingAppmaster implement
 
 	@Override
 	protected void onContainerAllocated(Container container) {
-		getMonitor().reportContainer(container);
+		if (getMonitor() instanceof ContainerAware) {
+			((ContainerAware)getMonitor()).onContainer(Arrays.asList(container));
+		}
 		getLauncher().launchContainer(container, getCommands());
 	}
 
 	@Override
 	protected void onContainerLaunched(Container container) {
-		getMonitor().reportContainer(container);
+		if (getMonitor() instanceof ContainerAware) {
+			((ContainerAware)getMonitor()).onContainer(Arrays.asList(container));
+		}
 	}
 
 	@Override
 	protected void onContainerCompleted(ContainerStatus status) {
 		super.onContainerCompleted(status);
 
-		getMonitor().reportContainerStatus(status);
+		if (getMonitor() instanceof ContainerAware) {
+			((ContainerAware)getMonitor()).onContainerStatus(Arrays.asList(status));
+		}
 
 		int exitStatus = status.getExitStatus();
 
@@ -78,6 +88,7 @@ public class StaticEventingAppmaster extends AbstractEventingAppmaster implement
 				notifyCompleted();
 			}
 		} else {
+			log.warn("Got ContainerStatus=[" + status + "]");
 			if (!onContainerFailed(status)) {
 				setFinalApplicationStatus(FinalApplicationStatus.FAILED);
 				notifyCompleted();
@@ -103,13 +114,14 @@ public class StaticEventingAppmaster extends AbstractEventingAppmaster implement
 
 	/**
 	 * Returns state telling if application is considered
-	 * as complete. Default implementation is delegating
-	 * call to container monitor.
+	 * as complete. Default implementation is comparing if
+	 * current target container count has been satisfied
+	 * by a count from a method {@link ContainerMonitor#completedCount()}.
 	 *
 	 * @return true if application is complete
 	 */
 	protected boolean isComplete() {
-		return (getMonitor().completedCount() - getMonitor().failedCount()) >= containerCount;
+		return getMonitor().completedCount() >= containerCount;
 	}
 
 }
