@@ -18,6 +18,7 @@ package org.springframework.yarn.test.context;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.test.context.MergedContextConfiguration;
+import org.springframework.yarn.test.context.MetaAnnotationUtils.AnnotationDescriptor;
 import org.springframework.yarn.test.support.ClusterDelegatingFactoryBean;
 import org.springframework.yarn.test.support.ConfigurationDelegatingFactoryBean;
 
@@ -37,12 +38,12 @@ abstract class YarnClusterInjectUtils {
 	 */
 	public static void handleClusterInject(GenericApplicationContext context,
 			MergedContextConfiguration mergedConfig) {
-		final Class<MiniYarnCluster> annotationType = MiniYarnCluster.class;
 		Class<?> testClass = mergedConfig.getTestClass();
-		boolean hasMiniYarnCluster = testClass.isAnnotationPresent(annotationType);
-		MiniYarnCluster annotation = testClass.getAnnotation(annotationType);
+		AnnotationDescriptor<MiniYarnCluster> annotationDescriptor = MetaAnnotationUtils.findAnnotationDescriptor(
+				testClass, MiniYarnCluster.class);
 
-		if (hasMiniYarnCluster) {
+		if (annotationDescriptor != null && annotationDescriptor.getAnnotation() != null) {
+			MiniYarnCluster annotation = annotationDescriptor.getAnnotation();
 			String clusterName = annotation.clusterName();
 			String configName = annotation.configName();
 			String id = annotation.id();
