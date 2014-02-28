@@ -28,17 +28,13 @@ def javaProjects() {
 }
 
 def hadoopProjects() {
-	subprojects.findAll { project -> project.name.contains('-hadoop-') || project.name.contains('-cascading') }
+	subprojects.findAll { project -> project.name.contains('-hadoop-') }
 }
 
 def yarnProjects() {
 	subprojects.findAll { project -> project.name.contains('-yarn-') }
 }
 
-//
-// Select the Spring version used for building and testing
-//
-def springVersion = project.hasProperty("spring4") ? spring4Version : spring3Version
 println "Using Spring Framework version: [$springVersion]"
 
 //
@@ -282,7 +278,6 @@ configure(javaProjects()) {
 	ext.skipHive = true
 	ext.skipHBase = true
 	ext.skipWebHdfs = true
-	ext.skipCascading = true
 
 	// exclude poms from the classpath (pulled in by Cloudera)
 	eclipse.classpath.file {
@@ -357,7 +352,6 @@ configure(javaProjects()) {
 				"http://static.springsource.org/spring-batch/apidocs/",
 				"http://static.springsource.org/spring-integration/api/",
 				"https://builds.apache.org/job/Thrift/javadoc/",
-				"http://docs.cascading.org/cascading/2.1/javadoc/"
 			]
 
 			exclude "org/springframework/data/hadoop/config/**"
@@ -772,7 +766,6 @@ project('spring-hadoop-test') {
 		compile project(":spring-data-hadoop-batch")
 		compile project(":spring-data-hadoop")
 		compile project(":spring-hadoop-test-core")
-		compile project(":spring-cascading")
 
 		// Testing
 		testCompile "junit:junit:$junitVersion"
@@ -787,8 +780,6 @@ project('spring-hadoop-test') {
 
 		testRuntime "cglib:cglib:$cglibVersion"
 		testRuntime "commons-io:commons-io:$commonsioVersion"
-
-		testCompile "cascading:cascading-local:$cascadingVersion"
 
 		// Testing
 		testRuntime "org.codehaus.groovy:groovy:$groovyVersion"
@@ -842,23 +833,14 @@ project('spring-hadoop-test') {
 		}
 	}
 
-	task enableCascadingTests {
-		description = "Enabling Cascading tests"
-		group = "Verification"
-		doLast() {
-			project.ext.skipCascading = false
-		}
-	}
-
 	task enableAllTests() {
-		description = "Enabling all (incl. Pig, Hive, HBase, WebHdfs, Cascading) tests"
+		description = "Enabling all (incl. Pig, Hive, HBase, WebHdfs) tests"
 		group = "Verification"
 		doLast() {
 			project.ext.skipPig = false
 			project.ext.skipHive = false
 			project.ext.skipHBase = false
 			project.ext.skipWebHdfs = false
-			project.ext.skipCascading = false
 		}
 	}
 
@@ -898,11 +880,6 @@ project('spring-hadoop-test') {
 				excludes.add("**/WebHdfs*")
 			}
 
-			if (project.ext.skipCascading) {
-				ext.msg += "Cascading "
-				excludes.add("**/cascading/**")
-			}
-	
 			if (!msg.trim().isEmpty())
 					println "Skipping [$msg] Tests";
 	
@@ -924,23 +901,6 @@ project('spring-hadoop-test') {
 					}
 			}
 		}
-	}
-
-}
-
-project('spring-cascading') {
-	description = 'Spring Cascading Support'
-
-	dependencies {
-		compile project(":spring-data-hadoop-batch")
-        compile project(":spring-data-hadoop")
-
-		compile "org.springframework.integration:spring-integration-core:$springIntVersion"
-		// cascading
-		compile("cascading:cascading-hadoop:$cascadingVersion") { dep ->
-			exclude module: "hadoop-core"
-		}
-
 	}
 
 }

@@ -66,7 +66,6 @@
   url="https://github.com/SpringSource/spring-hadoop/wiki">https://github.com/SpringSource/spring-hadoop/wiki</ulink></para>
 
   <para>Regarding Hadoop-related projects, SDHP supports <ulink
-  url="http://cascading.org/">Cascading</ulink> 2.1, <ulink
   url="http://hbase.apache.org/">HBase</ulink> 0.90.x, <ulink
   url="http://hive.apache.org/">Hive</ulink> 0.8.x and <ulink
   url="http://pig.apache.org/">Pig</ulink> 0.9.x and above. As a rule of

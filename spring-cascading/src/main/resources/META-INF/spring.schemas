@@ -1,2 +1,0 @@
-http\://www.springframework.org/schema/cascading/spring-cascading-2.0.xsd=/org/springframework/data/hadoop/cascading/config/spring-cascading-2.0.xsd
-http\://www.springframework.org/schema/cascading/spring-cascading.xsd=/org/springframework/data/hadoop/cascading/config/spring-cascading-2.0.xsd

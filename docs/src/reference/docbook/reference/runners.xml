@@ -3,7 +3,7 @@
 
    	 <title>Using the <emphasis>runner</emphasis> classes</title>
    	 
-   	 <para>Spring for Apache Hadoop provides for each Hadoop interaction type, whether it is vanilla Map/Reduce, Cascading, Hive or Pig, a <emphasis>runner</emphasis>, a dedicated class used for declarative (or programmatic) interaction. The list below illustrates the existing <emphasis>runner</emphasis> classes for each type, their name and namespace element.</para>
+   	 <para>Spring for Apache Hadoop provides for each Hadoop interaction type, whether it is vanilla Map/Reduce, Hive or Pig, a <emphasis>runner</emphasis>, a dedicated class used for declarative (or programmatic) interaction. The list below illustrates the existing <emphasis>runner</emphasis> classes for each type, their name and namespace element.</para>
    	 
 		<table id="runners:type:table" pgwide="1" align="center">
  			<title>Available <emphasis>Runner</emphasis>s</title>
@@ -54,12 +54,6 @@
           	      <entry>Runner for executing Pig scripts.</entry>
          	    </row>
           	   <row>
-          	      <entry>Cascading <literal>Cascade</literal>s</entry>
-          	      <entry><literal>CascadeRunner</literal></entry>
-          	      <entry><literal>-</literal></entry>
-          	      <entry>Runner for executing Cascading <literal>Cascade</literal>s.</entry>
-         	    </row>
-          	   <row>
           	      <entry>JSR-223/JVM scripts</entry>
           	      <entry><literal>HdfsScriptRunner</literal></entry>
           	      <entry><literal>script</literal></entry>
@@ -76,7 +70,7 @@
    	 	<listitem>
    	 	 <para>declaration does <emphasis role="strong">not</emphasis> imply execution</para>
    	 	 
-   	 	 <para>The runner allows a script, a job, a cascade to run but the execution can be triggered either programmatically or by the container at start-up.</para>
+   	 	 <para>The runner allows a script, a job to run but the execution can be triggered either programmatically or by the container at start-up.</para>
    	 	</listitem>
    	 	
    	 	<listitem>
