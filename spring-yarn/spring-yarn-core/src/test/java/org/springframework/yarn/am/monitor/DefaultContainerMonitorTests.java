@@ -21,6 +21,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
 import java.util.Set;
 
 import org.apache.hadoop.yarn.api.records.ApplicationAttemptId;
@@ -55,10 +56,10 @@ public class DefaultContainerMonitorTests {
 		// container 1
 		// failed free running
 		// allocated running completed failed
-		monitor.reportContainer(container1);
+		monitor.onContainer(Arrays.asList(container1));
 		assertMonitorState(monitor, 1, 0, 0, 0);
 
-		monitor.reportContainerStatus(getMockContainerStatus(containerId1, ContainerState.COMPLETE, 0));
+		monitor.onContainerStatus(Arrays.asList(getMockContainerStatus(containerId1, ContainerState.COMPLETE, 0)));
 		assertMonitorState(monitor, 0, 0, 1, 0);
 	}
 
@@ -76,16 +77,16 @@ public class DefaultContainerMonitorTests {
 		// container 1
 		// failed free running
 		// allocated running completed failed
-		monitor.reportContainer(container1);
+		monitor.onContainer(Arrays.asList(container1));
 		assertMonitorState(monitor, 1, 0, 0, 0);
 
-		monitor.reportContainerStatus(getMockContainerStatus(containerId1, ContainerState.COMPLETE, 0));
+		monitor.onContainerStatus(Arrays.asList(getMockContainerStatus(containerId1, ContainerState.COMPLETE, 0)));
 		assertMonitorState(monitor, 0, 0, 1, 0);
 
-		monitor.reportContainer(container2);
+		monitor.onContainer(Arrays.asList(container2));
 		assertMonitorState(monitor, 1, 0, 1, 0);
 
-		monitor.reportContainerStatus(getMockContainerStatus(containerId2, ContainerState.COMPLETE, 0));
+		monitor.onContainerStatus(Arrays.asList(getMockContainerStatus(containerId2, ContainerState.COMPLETE, 0)));
 		assertMonitorState(monitor, 0, 0, 2, 0);
 	}
 
@@ -105,22 +106,22 @@ public class DefaultContainerMonitorTests {
 		// container 1
 		// failed free running
 		// allocated running completed failed
-		monitor.reportContainer(container1);
+		monitor.onContainer(Arrays.asList(container1));
 		assertMonitorState(monitor, 1, 0, 0, 0);
 
-		monitor.reportContainerStatus(getMockContainerStatus(containerId1, ContainerState.COMPLETE, 1));
-		assertMonitorState(monitor, 0, 0, 0, 1);
+		monitor.onContainerStatus(Arrays.asList(getMockContainerStatus(containerId1, ContainerState.COMPLETE, 0)));
+		assertMonitorState(monitor, 0, 0, 1, 0);
 
 		// container 2
-		monitor.reportContainer(container2);
-		assertMonitorState(monitor, 1, 0, 0, 1);
+		monitor.onContainer(Arrays.asList(container2));
+		assertMonitorState(monitor, 1, 0, 1, 0);
 
-		monitor.reportContainerStatus(getMockContainerStatus(containerId2, ContainerState.COMPLETE, 0));
-		assertMonitorState(monitor, 0, 0, 1, 1);
+		monitor.onContainerStatus(Arrays.asList(getMockContainerStatus(containerId2, ContainerState.COMPLETE, 0)));
+		assertMonitorState(monitor, 0, 0, 2, 0);
 
 		// container 3
-		monitor.reportContainerStatus(getMockContainerStatus(containerId3, ContainerState.COMPLETE, -100));
-		assertMonitorState(monitor, 0, 0, 2, 1);
+		monitor.onContainerStatus(Arrays.asList(getMockContainerStatus(containerId3, ContainerState.COMPLETE, -100)));
+		assertMonitorState(monitor, 0, 0, 2, 0);
 
 	}
 

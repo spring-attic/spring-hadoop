@@ -130,13 +130,27 @@ public class DefaultContainerLauncher extends AbstractLauncher implements Contai
 		startContainersRequest.setStartContainerRequests(startContainerRequestList);
 
 		StartContainersResponse startContainersResponse = getCmTemplate(container).startContainers(startContainersRequest);
-		Map<ContainerId, SerializedException> failedRequests = startContainersResponse.getFailedRequests();
-		List<ContainerId> successfullyStartedContainers = startContainersResponse.getSuccessfullyStartedContainers();
-		// TODO: handle failed/success
+
+		// failed indicates failure for the request, not failure on container
+		Map<ContainerId, SerializedException> failed = startContainersResponse.getFailedRequests();
+		List<ContainerId> succeed = startContainersResponse.getSuccessfullyStartedContainers();
+
+		if (log.isDebugEnabled()) {
+			log.debug("Response for starting container=[" + container + "] is startContainersResponse=[" + startContainersResponse + "]");
+		}
 
 		// notify interested parties of new launched container
 		if(getYarnEventPublisher() != null) {
-			getYarnEventPublisher().publishContainerLaunched(this, container);
+			for (ContainerId cid : succeed) {
+				if (container.getId().equals(cid)) {
+					getYarnEventPublisher().publishContainerLaunched(this, container);
+				}
+			}
+			for (ContainerId cid : failed.keySet()) {
+				if (container.getId().equals(cid)) {
+					getYarnEventPublisher().publishContainerLaunchRequestFailed(this, container);
+				}
+			}
 		}
 	}
 

@@ -46,6 +46,15 @@ public interface YarnEventPublisher {
 
 	/**
 	 * Publish an application event containing information
+	 * about the failed {@link Container} launch request.
+	 *
+	 * @param source the component that published the event (never {@code null})
+	 * @param container the Container
+	 */
+	void publishContainerLaunchRequestFailed(Object source, Container container);
+
+	/**
+	 * Publish an application event containing information
 	 * about the completed {@link ContainerStatus}.
 	 *
 	 * @param source the component that published the event (never {@code null})

@@ -24,6 +24,7 @@ import org.apache.hadoop.yarn.api.records.ContainerLaunchContext;
 import org.apache.hadoop.yarn.api.records.ContainerStatus;
 import org.springframework.util.Assert;
 import org.springframework.yarn.am.container.AbstractLauncher;
+import org.springframework.yarn.am.monitor.ContainerAware;
 import org.springframework.yarn.listener.ContainerAllocatorListener;
 
 /**
@@ -66,14 +67,18 @@ public abstract class AbstractProcessingAppmaster extends AbstractServicesAppmas
 			@Override
 			public void allocated(List<Container> allocatedContainers) {
 				for (Container container : allocatedContainers) {
-					getMonitor().reportContainer(container);
+					if (getMonitor() instanceof ContainerAware) {
+						((ContainerAware)getMonitor()).onContainer(allocatedContainers);
+					}
 					getLauncher().launchContainer(container, getCommands());
 					onContainerAllocated(container);
 				}
 			}
 			@Override
 			public void completed(List<ContainerStatus> completedContainers) {
-				getMonitor().reportContainerStatus(completedContainers);
+				if (getMonitor() instanceof ContainerAware) {
+					((ContainerAware)getMonitor()).onContainerStatus(completedContainers);
+				}
 				for (ContainerStatus status : completedContainers) {
 					onContainerCompleted(status);
 				}
