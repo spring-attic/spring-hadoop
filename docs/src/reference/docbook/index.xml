@@ -54,7 +54,6 @@
       <xi:include href="reference/hbase.xml"/>
       <xi:include href="reference/hive.xml"/>
       <xi:include href="reference/pig.xml"/>
-      <xi:include href="reference/cascading.xml"/>
       <xi:include href="reference/runners.xml"/>
       <xi:include href="reference/security.xml"/>
       <xi:include href="reference/yarn.xml"/>

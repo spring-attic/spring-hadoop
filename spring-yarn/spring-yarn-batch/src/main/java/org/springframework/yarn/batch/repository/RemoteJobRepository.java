@@ -32,6 +32,10 @@ import org.springframework.yarn.batch.repository.bindings.repo.AddWithStepExecut
 import org.springframework.yarn.batch.repository.bindings.repo.AddWithStepExecutionRes;
 import org.springframework.yarn.batch.repository.bindings.repo.CreateJobExecutionReq;
 import org.springframework.yarn.batch.repository.bindings.repo.CreateJobExecutionRes;
+import org.springframework.yarn.batch.repository.bindings.repo.CreateJobExecutionWithJobInstanceReq;
+import org.springframework.yarn.batch.repository.bindings.repo.CreateJobExecutionWithJobInstanceRes;
+import org.springframework.yarn.batch.repository.bindings.repo.CreateJobInstanceReq;
+import org.springframework.yarn.batch.repository.bindings.repo.CreateJobInstanceRes;
 import org.springframework.yarn.batch.repository.bindings.repo.GetLastJobExecutionReq;
 import org.springframework.yarn.batch.repository.bindings.repo.GetLastJobExecutionRes;
 import org.springframework.yarn.batch.repository.bindings.repo.GetLastStepExecutionReq;
@@ -167,6 +171,38 @@ public class RemoteJobRepository extends AbstractRemoteDao implements JobReposit
 		GetLastJobExecutionReq request = JobRepositoryRpcFactory.buildGetLastJobExecutionReq(jobName, jobParameters);
 		GetLastJobExecutionRes response = (GetLastJobExecutionRes) getAppmasterScOperations().doMindRequest(request);
 		return JobRepositoryRpcFactory.convertJobExecutionType(response.jobExecution);
+	}
+
+	@Override
+	public JobInstance createJobInstance(String jobName, JobParameters jobParameters) {
+		Assert.notNull(jobName, "Job name must not be null.");
+		Assert.notNull(jobParameters, "JobParameters must not be null.");
+
+		JobInstance jobInstance = null;
+		try {
+			CreateJobInstanceReq request = JobRepositoryRpcFactory.buildCreateJobInstanceReq(jobName, jobParameters);
+			CreateJobInstanceRes response = (CreateJobInstanceRes) getAppmasterScOperations().doMindRequest(request);
+			jobInstance = JobRepositoryRpcFactory.convertJobInstanceType(response.jobInstance);
+		} catch (Exception e) {
+			throw convertException(e);
+		}
+		return jobInstance;
+	}
+
+	@Override
+	public JobExecution createJobExecution(JobInstance jobInstance, JobParameters jobParameters, String jobConfigurationLocation) {
+		Assert.notNull(jobInstance, "Job instance must not be null.");
+		Assert.notNull(jobParameters, "JobParameters must not be null.");
+
+		JobExecution jobExecution = null;
+		try {
+			CreateJobExecutionWithJobInstanceReq request = JobRepositoryRpcFactory.buildCreateJobExecutionWithJobInstanceReq(jobInstance, jobParameters, jobConfigurationLocation);
+			CreateJobExecutionWithJobInstanceRes response = (CreateJobExecutionWithJobInstanceRes) getAppmasterScOperations().doMindRequest(request);
+			jobExecution = JobRepositoryRpcFactory.convertJobExecutionType(response.jobExecution);
+		} catch (Exception e) {
+			throw convertException(e);
+		}
+		return jobExecution;
 	}
 
 }

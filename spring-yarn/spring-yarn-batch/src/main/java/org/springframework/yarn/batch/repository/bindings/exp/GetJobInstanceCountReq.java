@@ -13,38 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.yarn.batch.repository.bindings;
+package org.springframework.yarn.batch.repository.bindings.exp;
 
-import java.util.List;
-
-import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.yarn.integration.ip.mind.binding.BaseObject;
 
 /**
- * Binding for {@link JobExecution}.
+ * Request binding for {@link JobExplorer#getJobInstanceCount(String)}.
  *
  * @author Janne Valkealahti
  *
  */
-public class JobExecutionType extends BaseObject {
+public class GetJobInstanceCountReq extends BaseObject {
 
-	public Long id;
-	public Integer version;
-	public String jobConfigurationLocation;
-	public JobInstanceType jobInstance;
-	public List<StepExecutionType> stepExecutions;
-	public BatchStatus status;
-	public Long startTime;
-	public Long createTime;
-	public Long endTime;
-	public Long lastUpdated;
-	public String exitStatus;
-	public ExecutionContextType executionContext;
-	public JobParametersType jobParameters;
+	public String jobName;
 
-	public JobExecutionType() {
-		super("JobExecutionType");
+	public GetJobInstanceCountReq() {
+		super("GetJobInstanceCountReq");
 	}
 
 }

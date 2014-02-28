@@ -24,6 +24,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.explore.JobExplorer;
+import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.yarn.batch.repository.bindings.JobExecutionType;
 import org.springframework.yarn.batch.repository.bindings.JobInstanceType;
 import org.springframework.yarn.batch.repository.bindings.exp.FindRunningJobExecutionsReq;
@@ -32,6 +33,8 @@ import org.springframework.yarn.batch.repository.bindings.exp.GetJobExecutionReq
 import org.springframework.yarn.batch.repository.bindings.exp.GetJobExecutionRes;
 import org.springframework.yarn.batch.repository.bindings.exp.GetJobExecutionsReq;
 import org.springframework.yarn.batch.repository.bindings.exp.GetJobExecutionsRes;
+import org.springframework.yarn.batch.repository.bindings.exp.GetJobInstanceCountReq;
+import org.springframework.yarn.batch.repository.bindings.exp.GetJobInstanceCountRes;
 import org.springframework.yarn.batch.repository.bindings.exp.GetJobInstanceReq;
 import org.springframework.yarn.batch.repository.bindings.exp.GetJobInstanceRes;
 import org.springframework.yarn.batch.repository.bindings.exp.GetJobInstancesReq;
@@ -122,6 +125,16 @@ public class RemoteJobExplorer extends AbstractRemoteDao implements JobExplorer 
 		GetJobNamesReq request = JobRepositoryRpcFactory.buildGetJobNamesReq();
 		GetJobNamesRes response = (GetJobNamesRes) getAppmasterScOperations().doMindRequest(request);
 		return response.jobNames;
+	}
+
+	@Override
+	public int getJobInstanceCount(String jobName) throws NoSuchJobException {
+		GetJobInstanceCountReq request = JobRepositoryRpcFactory.buildGetJobInstanceCountReq(jobName);
+		GetJobInstanceCountRes response = (GetJobInstanceCountRes) getAppmasterScOperations().doMindRequest(request);
+		if (response.count != null) {
+			return response.count;
+		}
+		return 0;
 	}
 
 }
