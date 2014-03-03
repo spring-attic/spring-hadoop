@@ -31,7 +31,7 @@ import org.springframework.yarn.listener.ContainerStateListener.ContainerState;
  * @author Janne Valkealahti
  *
  */
-public abstract class AbstractYarnContainer implements LongRunningYarnContainer {
+public abstract class AbstractYarnContainer implements LongRunningYarnContainer, YarnContainerRuntime {
 
 	/** Environment variables for the process. */
 	private Map<String, String> environment;

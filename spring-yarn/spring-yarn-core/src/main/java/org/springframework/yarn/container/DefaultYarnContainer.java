@@ -15,6 +15,8 @@
  */
 package org.springframework.yarn.container;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
@@ -27,13 +29,20 @@ import org.springframework.beans.factory.BeanFactoryAware;
  */
 public class DefaultYarnContainer extends AbstractYarnContainer implements BeanFactoryAware {
 
+	private final static Log log = LogFactory.getLog(DefaultYarnContainer.class);
+
 	private BeanFactory beanFactory;
 
 	@Override
 	protected void runInternal() {
-		// TODO: add error checks and generally similar execution flow from SI
+		// TODO: use return value to determine container exit status
 		ContainerHandler containerHandler = beanFactory.getBean(ContainerHandler.class);
-		containerHandler.handle();
+		try {
+			Object result = containerHandler.handle(this);
+			log.info("Result from container handle: " + result);
+		} catch (Exception e) {
+			log.error("Error handling container", e);
+		}
 	}
 
 	@Override

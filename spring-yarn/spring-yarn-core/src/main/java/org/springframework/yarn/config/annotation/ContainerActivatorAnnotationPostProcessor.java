@@ -23,7 +23,7 @@ import org.springframework.yarn.annotation.OnYarnContainerStart;
 import org.springframework.yarn.container.ContainerHandler;
 
 /**
- * Post-processor for Methods annotated with {@link OnYarnContainerStart @YarnContainerActivator}.
+ * Post-processor for Methods annotated with @{@link OnYarnContainerStart}.
  *
  * @author Janne Valkealahti
  *
