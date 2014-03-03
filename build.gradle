@@ -718,7 +718,7 @@ project('spring-data-hadoop-store') {
 	dependencies {
 		compile "org.kitesdk:kite-data-core:$kiteVersion"
 		testCompile project(":spring-data-hadoop")
-		testCompile project(path:":spring-data-hadoop-test-core", configuration:"testArtifacts")
+		testCompile project(path:":spring-data-hadoop-test", configuration:"testArtifacts")
 		testCompile "org.springframework:spring-test:$springVersion"
 		testCompile "org.hamcrest:hamcrest-core:$hamcrestVersion"
 		testCompile "org.hamcrest:hamcrest-library:$hamcrestVersion"
@@ -737,7 +737,7 @@ project('spring-data-hadoop') {
 
 }
 
-project('spring-data-hadoop-test-core') {
+project('spring-data-hadoop-test') {
 	description = 'Spring for Apache Hadoop Tests Core'
 
 	// expose test classes so that dependant project
@@ -751,6 +751,7 @@ project('spring-data-hadoop-test-core') {
 	}
 
 	dependencies {
+        compile project(":spring-data-hadoop-core")
 		compile "org.springframework:spring-test:$springVersion"
 		compile "junit:junit:$junitVersion"
 		compile hadoopTestArtifacts
@@ -758,14 +759,14 @@ project('spring-data-hadoop-test-core') {
 }
 
 
-project('spring-data-hadoop-test') {
+project('spring-data-hadoop-build-tests') {
 	description = 'Spring for Apache Hadoop Integration Tests'
 
 	dependencies {
 		compile project(":spring-data-hadoop-core")
 		compile project(":spring-data-hadoop-batch")
 		compile project(":spring-data-hadoop")
-		compile project(":spring-data-hadoop-test-core")
+		compile project(":spring-data-hadoop-test")
 
 		// Testing
 		testCompile "junit:junit:$junitVersion"
@@ -938,7 +939,6 @@ if (gradle.ext.mr2) {
 			compile("org.apache.hadoop:hadoop-common:$hadoopVersion") { dep ->
 				exclude module: "junit"
 			}
-			testCompile project(":spring-yarn:spring-yarn-test-core")
 			testCompile("org.mockito:mockito-core:$mockitoVersion") { dep ->
 				exclude group: "org.hamcrest"
 			}
@@ -1003,7 +1003,7 @@ if (gradle.ext.mr2) {
 		}
 	}
 
-	project('spring-yarn:spring-yarn-test-core') {
+	project('spring-yarn:spring-yarn-test') {
 		description = 'Spring Yarn Test Core'
 		configurations {
 			hadoopruntime.exclude group: 'log4j'
@@ -1014,6 +1014,7 @@ if (gradle.ext.mr2) {
 			hadoopruntime.exclude group: 'com.thoughtworks.xstream'
 		}
 		dependencies {
+            compile project(":spring-yarn:spring-yarn-core")
 			compile "org.springframework:spring-test:$springVersion"
 			compile "junit:junit:$junitVersion"
 			compile "org.apache.hadoop:hadoop-yarn-client:$hadoopVersion"
@@ -1038,8 +1039,8 @@ if (gradle.ext.mr2) {
 		test.dependsOn([copyHadoopRuntimeDeps,copyHadoopRuntimeDepsAll])
 	}
 
-	project('spring-yarn:spring-yarn-test') {
-		description = 'Spring Yarn Test'
+	project('spring-yarn:spring-yarn-build-tests') {
+		description = 'Spring Yarn Integration Test'
 		configurations {
 			hadoopruntime.exclude group: 'log4j'
 			hadoopruntime.exclude group: 'org.slf4j'
@@ -1050,7 +1051,7 @@ if (gradle.ext.mr2) {
 		}
 		dependencies {
 			compile project(":spring-yarn:spring-yarn-core")
-			compile project(":spring-yarn:spring-yarn-test-core")
+			compile project(":spring-yarn:spring-yarn-test")
 			hadoopruntime configurations.runtime
 		}
 		task copyHadoopRuntimeDeps(type: Copy) {
