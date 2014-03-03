@@ -939,7 +939,7 @@ if (gradle.ext.mr2) {
 			compile("org.apache.hadoop:hadoop-common:$hadoopVersion") { dep ->
 				exclude module: "junit"
 			}
-			testCompile project(":spring-yarn:spring-yarn-test-core")
+			testCompile project(":spring-yarn:spring-yarn-test")
 			testCompile("org.mockito:mockito-core:$mockitoVersion") { dep ->
 				exclude group: "org.hamcrest"
 			}
@@ -1004,7 +1004,7 @@ if (gradle.ext.mr2) {
 		}
 	}
 
-	project('spring-yarn:spring-yarn-test-core') {
+	project('spring-yarn:spring-yarn-test') {
 		description = 'Spring Yarn Test Core'
 		configurations {
 			hadoopruntime.exclude group: 'log4j'
@@ -1051,7 +1051,7 @@ if (gradle.ext.mr2) {
 		}
 		dependencies {
 			compile project(":spring-yarn:spring-yarn-core")
-			compile project(":spring-yarn:spring-yarn-test-core")
+			compile project(":spring-yarn:spring-yarn-test")
 			hadoopruntime configurations.runtime
 		}
 		task copyHadoopRuntimeDeps(type: Copy) {
