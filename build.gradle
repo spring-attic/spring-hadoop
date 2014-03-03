@@ -718,7 +718,7 @@ project('spring-data-hadoop-store') {
 	dependencies {
 		compile "org.kitesdk:kite-data-core:$kiteVersion"
 		testCompile project(":spring-data-hadoop")
-		testCompile project(path:":spring-hadoop-test-core", configuration:"testArtifacts")
+		testCompile project(path:":spring-data-hadoop-test-core", configuration:"testArtifacts")
 		testCompile "org.springframework:spring-test:$springVersion"
 		testCompile "org.hamcrest:hamcrest-core:$hamcrestVersion"
 		testCompile "org.hamcrest:hamcrest-library:$hamcrestVersion"
@@ -737,7 +737,7 @@ project('spring-data-hadoop') {
 
 }
 
-project('spring-hadoop-test-core') {
+project('spring-data-hadoop-test-core') {
 	description = 'Spring for Apache Hadoop Tests Core'
 
 	// expose test classes so that dependant project
@@ -758,14 +758,14 @@ project('spring-hadoop-test-core') {
 }
 
 
-project('spring-hadoop-test') {
+project('spring-data-hadoop-test') {
 	description = 'Spring for Apache Hadoop Integration Tests'
 
 	dependencies {
 		compile project(":spring-data-hadoop-core")
 		compile project(":spring-data-hadoop-batch")
 		compile project(":spring-data-hadoop")
-		compile project(":spring-hadoop-test-core")
+		compile project(":spring-data-hadoop-test-core")
 
 		// Testing
 		testCompile "junit:junit:$junitVersion"
