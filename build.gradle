@@ -939,7 +939,6 @@ if (gradle.ext.mr2) {
 			compile("org.apache.hadoop:hadoop-common:$hadoopVersion") { dep ->
 				exclude module: "junit"
 			}
-			testCompile project(":spring-yarn:spring-yarn-test")
 			testCompile("org.mockito:mockito-core:$mockitoVersion") { dep ->
 				exclude group: "org.hamcrest"
 			}
@@ -1015,6 +1014,7 @@ if (gradle.ext.mr2) {
 			hadoopruntime.exclude group: 'com.thoughtworks.xstream'
 		}
 		dependencies {
+            compile project(":spring-yarn:spring-yarn-core")
 			compile "org.springframework:spring-test:$springVersion"
 			compile "junit:junit:$junitVersion"
 			compile "org.apache.hadoop:hadoop-yarn-client:$hadoopVersion"
@@ -1069,7 +1069,7 @@ if (gradle.ext.mr2) {
 		description = 'Spring Yarn Boot Test'
 		dependencies {
 			compile project(":spring-yarn:spring-yarn-boot")
-			compile project(":spring-yarn:spring-yarn-build-tests")
+			compile project(":spring-yarn:spring-yarn-test")
 		}
 	}
 
