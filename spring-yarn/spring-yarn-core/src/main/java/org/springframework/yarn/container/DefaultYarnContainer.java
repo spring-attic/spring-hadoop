@@ -20,6 +20,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
+import org.springframework.yarn.listener.ContainerStateListener.ContainerState;
 
 /**
  * Default implementation of a {@link YarnContainer}.
@@ -35,13 +36,37 @@ public class DefaultYarnContainer extends AbstractYarnContainer implements BeanF
 
 	@Override
 	protected void runInternal() {
-		// TODO: use return value to determine container exit status
-		ContainerHandler containerHandler = beanFactory.getBean(ContainerHandler.class);
+		Exception runtimeException = null;
+		Object result = null;
+
 		try {
-			Object result = containerHandler.handle(this);
-			log.info("Result from container handle: " + result);
+			ContainerHandler containerHandler = beanFactory.getBean(ContainerHandler.class);
+			result = containerHandler.handle(this);
 		} catch (Exception e) {
+			runtimeException = e;
 			log.error("Error handling container", e);
+		}
+
+		log.info("Container state based on result=[" + result + "] runtimeException=[" + runtimeException + "]");
+
+		if (runtimeException != null) {
+			notifyContainerState(ContainerState.FAILED, 1);
+		} else if (result != null && result instanceof Integer) {
+			int val = ((Integer)result).intValue();
+			if (val < 0) {
+				notifyContainerState(ContainerState.FAILED, val);
+			} else {
+				notifyContainerState(ContainerState.COMPLETED, val);
+			}
+		} else if (result != null && result instanceof Boolean) {
+			boolean val = ((Boolean)result).booleanValue();
+			if (val) {
+				notifyContainerState(ContainerState.COMPLETED, 0);
+			} else {
+				notifyContainerState(ContainerState.FAILED, -1);
+			}
+		} else {
+			notifyCompleted();
 		}
 	}
 

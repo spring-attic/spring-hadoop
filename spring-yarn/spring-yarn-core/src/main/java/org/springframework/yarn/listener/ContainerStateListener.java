@@ -27,16 +27,20 @@ public interface ContainerStateListener {
 	 * Invoked when container state is changing.
 	 *
 	 * @param state the {@link ContainerState}
+	 * @param exit the requested exit status
 	 */
-	void state(ContainerState state);
+	void state(ContainerState state, int exit);
 
 	/**
 	 * Enum for container states
 	 */
 	public enum ContainerState {
 
-		/** Container completed state*/
-		COMPLETED
+		/** Container completed state */
+		COMPLETED,
+
+		/** Container failed state */
+		FAILED
 	}
 
 }

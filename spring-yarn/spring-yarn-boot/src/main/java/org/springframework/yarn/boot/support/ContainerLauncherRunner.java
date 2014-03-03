@@ -25,7 +25,10 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.util.StringUtils;
 import org.springframework.yarn.container.LongRunningYarnContainer;
 import org.springframework.yarn.container.YarnContainer;
+import org.springframework.yarn.launch.JvmSystemExiter;
+import org.springframework.yarn.launch.SystemExiter;
 import org.springframework.yarn.listener.ContainerStateListener;
+import org.springframework.yarn.listener.ContainerStateListener.ContainerState;
 
 /**
  * {@link CommandLineRunner} to {@link YarnContainer run} Spring Yarn container.
@@ -37,6 +40,9 @@ public class ContainerLauncherRunner implements CommandLineRunner {
 
 	private static final Log log = LogFactory.getLog(ContainerLauncherRunner.class);
 
+	/** Exiter helping for testing */
+	private static SystemExiter systemExiter = new JvmSystemExiter();
+
 	/** Latch used for long running container wait */
 	private CountDownLatch latch;
 
@@ -44,6 +50,8 @@ public class ContainerLauncherRunner implements CommandLineRunner {
 
 	@Autowired(required = false)
 	private YarnContainer yarnContainer;
+
+	private final StateWrapper stateWrapper = new StateWrapper();
 
 	@Override
 	public void run(String... args) throws Exception {
@@ -68,10 +76,10 @@ public class ContainerLauncherRunner implements CommandLineRunner {
 			latch = new CountDownLatch(1);
 			((LongRunningYarnContainer)container).addContainerStateListener(new ContainerStateListener() {
 				@Override
-				public void state(ContainerState state) {
-					if(state == ContainerState.COMPLETED) {
-						latch.countDown();
-					}
+				public void state(ContainerState state, int exit) {
+					stateWrapper.state = state;
+					stateWrapper.exit = exit;
+					latch.countDown();
 				}
 			});
 		}
@@ -89,9 +97,19 @@ public class ContainerLauncherRunner implements CommandLineRunner {
 			}
 
 			log.info("YarnContainer complete");
-			System.exit(0);
+			int exitCode = 0;
+			if (stateWrapper.state != null) {
+				if (stateWrapper.exit != null) {
+					exitCode = stateWrapper.exit;
+				}
+			}
+			systemExiter.exit(exitCode);
 		}
+	}
 
+	private static class StateWrapper {
+		ContainerState state;
+		Integer exit;
 	}
 
 }

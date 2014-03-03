@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -120,7 +120,26 @@ public abstract class AbstractYarnContainer implements LongRunningYarnContainer,
 	 * Notify completed state to container state listeners.
 	 */
 	protected void notifyCompleted() {
-		stateListener.state(ContainerState.COMPLETED);
+		notifyCompleted(0);
+	}
+
+	/**
+	 * Notify completed state to container state listeners.
+	 *
+	 * @param exit the exit
+	 */
+	protected void notifyCompleted(int exit) {
+		notifyContainerState(ContainerState.COMPLETED, exit);
+	}
+
+	/**
+	 * Notify state to container state listeners.
+	 *
+	 * @param state the state
+	 * @param exit the exit
+	 */
+	protected void notifyContainerState(ContainerState state, int exit) {
+		stateListener.state(state, exit);
 	}
 
 	/**
