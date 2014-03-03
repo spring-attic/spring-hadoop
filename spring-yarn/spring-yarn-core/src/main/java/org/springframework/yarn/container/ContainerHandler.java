@@ -17,8 +17,7 @@ package org.springframework.yarn.container;
 
 import java.lang.reflect.Method;
 
-import org.springframework.util.Assert;
-import org.springframework.util.ReflectionUtils;
+import org.springframework.yarn.annotation.OnYarnContainerStart;
 import org.springframework.yarn.annotation.YarnContainer;
 
 /**
@@ -31,27 +30,55 @@ import org.springframework.yarn.annotation.YarnContainer;
  */
 public class ContainerHandler {
 
-	private final Object target;
-	private final Method method;
+	private final YarnContainerRuntimeProcessor<?> processor;
 
 	/**
 	 * Instantiates a new container handler.
 	 *
 	 * @param target the target bean
-	 * @param method the target method
 	 */
-	public ContainerHandler(Object target, Method method) {
-		Assert.notNull(target, "Target bean must be set");
-		Assert.notNull(method, "Target bean method must be set");
-		this.target = target;
-		this.method = method;
+	public ContainerHandler(Object target) {
+		this(new MethodInvokingYarnContainerRuntimeProcessor<Object>(target, OnYarnContainerStart.class));
 	}
 
 	/**
-	 * Handle and run method associated with a bean target.
+	 * Instantiates a new container handler.
+	 *
+	 * @param target the target bean
+	 * @param method the method
 	 */
-	public void handle() {
-		ReflectionUtils.invokeMethod(method, target);
+	public ContainerHandler(Object target, Method method) {
+		this(new MethodInvokingYarnContainerRuntimeProcessor<Object>(target, method));
+	}
+
+	/**
+	 * Instantiates a new container handler.
+	 *
+	 * @param target the target bean
+	 * @param methodName the method name
+	 */
+	public ContainerHandler(Object target, String methodName) {
+		this(new MethodInvokingYarnContainerRuntimeProcessor<Object>(target, methodName));
+	}
+
+	/**
+	 * Instantiates a new container handler.
+	 *
+	 * @param <T> the generic type
+	 * @param processor the processor
+	 */
+	public <T> ContainerHandler(MethodInvokingYarnContainerRuntimeProcessor<T> processor) {
+		this.processor = processor;
+	}
+
+	/**
+	 * Handle container using a {@link YarnContainerRuntimeProcessor}.
+	 *
+	 * @param yarnContainerRuntime the yarn container runtime
+	 * @return the result value
+	 */
+	public Object handle(YarnContainerRuntime yarnContainerRuntime) {
+		return processor.process(yarnContainerRuntime);
 	}
 
 }

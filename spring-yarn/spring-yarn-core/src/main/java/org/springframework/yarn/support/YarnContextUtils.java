@@ -16,7 +16,9 @@
 package org.springframework.yarn.support;
 
 import org.springframework.beans.factory.BeanFactory;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.util.Assert;
 import org.springframework.yarn.YarnSystemConstants;
@@ -38,6 +40,12 @@ public class YarnContextUtils {
 	/** Default task executor bean name */
 	public static final String TASK_EXECUTOR_BEAN_NAME = "taskExecutor";
 
+	/** Default conversion service bean name */
+	public static final String CONVERSION_SERVICE_BEAN_NAME = "yarnConversionService";
+
+	/** Default evaluation context bean name */
+	public static final String EVALUATION_CONTEXT_BEAN_NAME = "yarnEvaluationContext";
+
 	/**
 	 * Return the {@link TaskScheduler} bean whose name is "taskScheduler" if
 	 * available.
@@ -56,6 +64,33 @@ public class YarnContextUtils {
 	 */
 	public static TaskExecutor getTaskExecutor(BeanFactory beanFactory) {
 		return getBeanOfType(beanFactory, TASK_EXECUTOR_BEAN_NAME, TaskExecutor.class);
+	}
+
+	/**
+	 * Return the {@link ConversionService} bean whose name is
+	 * "yarnConversionService" if available.
+	 *
+	 * @param beanFactory
+	 *            BeanFactory for lookup, must not be null.
+	 *
+	 * @return The {@link ConversionService} bean whose name is
+	 *         "yarnConversionService" if available.
+	 */
+	public static ConversionService getConversionService(BeanFactory beanFactory) {
+		return getBeanOfType(beanFactory, CONVERSION_SERVICE_BEAN_NAME, ConversionService.class);
+	}
+
+	/**
+	 * Return the {@link StandardEvaluationContext} bean whose name is
+	 * "yarnEvaluationContext" if available.
+	 *
+	 * @param beanFactory BeanFactory for lookup, must not be null.
+	 *
+	 * @return the instance of {@link StandardEvaluationContext} bean whose name
+	 *         is "yarnEvaluationContext" .
+	 */
+	public static StandardEvaluationContext getEvaluationContext(BeanFactory beanFactory) {
+		return getBeanOfType(beanFactory, EVALUATION_CONTEXT_BEAN_NAME, StandardEvaluationContext.class);
 	}
 
 	/**

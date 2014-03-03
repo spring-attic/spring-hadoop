@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,34 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.yarn.listener;
+package org.springframework.yarn.container;
+
+import java.util.Map;
+import java.util.Properties;
 
 /**
- * Interface used for container to notify its state.
+ * A generic runtime representation of a container.
  *
  * @author Janne Valkealahti
  *
  */
-public interface ContainerStateListener {
+public interface YarnContainerRuntime {
 
 	/**
-	 * Invoked when container state is changing.
+	 * Gets the environment.
 	 *
-	 * @param state the {@link ContainerState}
-	 * @param exit the requested exit status
+	 * @return the environment
 	 */
-	void state(ContainerState state, int exit);
+	public Map<String, String> getEnvironment();
 
 	/**
-	 * Enum for container states
+	 * Gets the parameters.
+	 *
+	 * @return the parameters
 	 */
-	public enum ContainerState {
-
-		/** Container completed state */
-		COMPLETED,
-
-		/** Container failed state */
-		FAILED
-	}
+	public Properties getParameters();
 
 }

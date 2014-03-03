@@ -27,6 +27,7 @@ import org.springframework.yarn.YarnSystemConstants;
 import org.springframework.yarn.launch.AbstractCommandLineRunner;
 import org.springframework.yarn.launch.ExitStatus;
 import org.springframework.yarn.listener.ContainerStateListener;
+import org.springframework.yarn.listener.ContainerStateListener.ContainerState;
 
 /**
  * A simple container runner executing a bean
@@ -41,6 +42,8 @@ public class CommandLineContainerRunner extends AbstractCommandLineRunner<YarnCo
 
 	/** Latch to wait container complete state */
 	private CountDownLatch latch;
+
+	private final StateWrapper stateWrapper = new StateWrapper();
 
 	@Override
 	protected ExitStatus handleBeanRun(YarnContainer bean, String[] parameters, Set<String> opts) {
@@ -57,10 +60,10 @@ public class CommandLineContainerRunner extends AbstractCommandLineRunner<YarnCo
 			latch = new CountDownLatch(1);
 			((LongRunningYarnContainer)bean).addContainerStateListener(new ContainerStateListener() {
 				@Override
-				public void state(ContainerState state) {
-					if(state == ContainerState.COMPLETED) {
-						latch.countDown();
-					}
+				public void state(ContainerState state, int exit) {
+					stateWrapper.state = state;
+					// TODO: should handle exit value
+					latch.countDown();
 				}
 			});
 		}
@@ -80,7 +83,11 @@ public class CommandLineContainerRunner extends AbstractCommandLineRunner<YarnCo
 			log.debug("YarnClient bean complete");
 		}
 
-		return ExitStatus.COMPLETED;
+		if (stateWrapper.state != null && stateWrapper.state == ContainerState.FAILED) {
+			return ExitStatus.FAILED;
+		} else {
+			return ExitStatus.COMPLETED;
+		}
 	}
 
 	@Override
@@ -95,6 +102,10 @@ public class CommandLineContainerRunner extends AbstractCommandLineRunner<YarnCo
 
 	public static void main(String[] args) {
 		new CommandLineContainerRunner().doMain(args);
+	}
+
+	private static class StateWrapper {
+		ContainerState state;
 	}
 
 }

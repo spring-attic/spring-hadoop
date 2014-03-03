@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,34 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.yarn.listener;
+package org.springframework.yarn.container;
+
 
 /**
- * Interface used for container to notify its state.
+ * Defines a strategy of processing a container and returning
+ * some Object (or null).
  *
  * @author Janne Valkealahti
  *
+ * @param <T>
  */
-public interface ContainerStateListener {
+public interface YarnContainerRuntimeProcessor<T> {
 
 	/**
-	 * Invoked when container state is changing.
+	 * Process the container based on information available
+	 * from {@link YarnContainerRuntime}.
 	 *
-	 * @param state the {@link ContainerState}
-	 * @param exit the requested exit status
+	 * @param yarnContainerRuntime the yarn container runtime
+	 * @return the result
 	 */
-	void state(ContainerState state, int exit);
-
-	/**
-	 * Enum for container states
-	 */
-	public enum ContainerState {
-
-		/** Container completed state */
-		COMPLETED,
-
-		/** Container failed state */
-		FAILED
-	}
+	T process(YarnContainerRuntime yarnContainerRuntime);
 
 }

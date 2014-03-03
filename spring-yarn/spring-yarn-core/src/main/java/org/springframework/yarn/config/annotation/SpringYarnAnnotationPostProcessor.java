@@ -50,7 +50,7 @@ import org.springframework.yarn.container.ContainerHandler;
 
 /**
  * A {@link BeanPostProcessor} implementation that processes method-level
- * messaging annotations such as @ContainerActivator.
+ * annotations such as @{@link OnYarnContainerStart}.
  *
  * @author Mark Fisher
  * @author Marius Bogoevici
@@ -62,14 +62,26 @@ public class SpringYarnAnnotationPostProcessor implements BeanPostProcessor, Bea
 
 	private final static Log log = LogFactory.getLog(SpringYarnAnnotationPostProcessor.class);
 
+	/** Factory from BeanFactoryAware */
 	private volatile ConfigurableListableBeanFactory beanFactory;
 
-	private final Map<Class<? extends Annotation>, MethodAnnotationPostProcessor<?>> postProcessors = new HashMap<Class<? extends Annotation>, MethodAnnotationPostProcessor<?>>();
+	/** Post processors map - annotation -> method post processor */
+	private final Map<Class<? extends Annotation>, MethodAnnotationPostProcessor<?>> postProcessors =
+			new HashMap<Class<? extends Annotation>, MethodAnnotationPostProcessor<?>>();
 
+	/**
+	 * Application events for post processed beans (if bean instance of ApplicationListener) will
+	 * be dispatched from here via callback in this class.
+	 */
 	private final Set<ApplicationListener<ApplicationEvent>> listeners = new HashSet<ApplicationListener<ApplicationEvent>>();
 
+	/**
+	 * Lifecycle callbacks for post processed bean (if bean instance of Lifecycle) will
+	 * be dispatched from here via callback in this class.
+	 */
 	private final Set<Lifecycle> lifecycles = new HashSet<Lifecycle>();
 
+	/** Flag for Lifecycle in this class */
 	private volatile boolean running = true;
 
 	@Override
@@ -81,9 +93,8 @@ public class SpringYarnAnnotationPostProcessor implements BeanPostProcessor, Bea
 
 	@Override
 	public void afterPropertiesSet() {
-		Assert.notNull(this.beanFactory, "BeanFactory must not be null");
-		postProcessors.put(OnYarnContainerStart.class,
-				new ContainerActivatorAnnotationPostProcessor(this.beanFactory));
+		Assert.notNull(beanFactory, "BeanFactory must not be null");
+		postProcessors.put(OnYarnContainerStart.class, new ContainerActivatorAnnotationPostProcessor(beanFactory));
 	}
 
 	@Override
@@ -93,22 +104,29 @@ public class SpringYarnAnnotationPostProcessor implements BeanPostProcessor, Bea
 
 	@Override
 	public Object postProcessAfterInitialization(final Object bean, final String beanName) throws BeansException {
-		Assert.notNull(this.beanFactory, "BeanFactory must not be null");
-		final Class<?> beanClass = this.getBeanClass(bean);
-		if (!this.isStereotype(beanClass)) {
+		Assert.notNull(beanFactory, "BeanFactory must not be null");
+		final Class<?> beanClass = getBeanClass(bean);
+
+		if (!isStereotype(beanClass)) {
 			// we only post-process stereotype components
 			return bean;
 		}
+
 		ReflectionUtils.doWithMethods(beanClass, new ReflectionUtils.MethodCallback() {
+
 			@SuppressWarnings({ "unchecked", "rawtypes" })
 			public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
 				Annotation[] annotations = AnnotationUtils.getAnnotations(method);
+
 				for (Annotation annotation : annotations) {
 					MethodAnnotationPostProcessor postProcessor = postProcessors.get(annotation.annotationType());
+
 					if (postProcessor != null && shouldCreateHandler(annotation)) {
 						Object result = postProcessor.postProcess(bean, beanName, method, annotation);
+
 						if (result != null && result instanceof ContainerHandler) {
 							String endpointBeanName = generateBeanName(beanName, method, annotation.annotationType());
+
 							if (result instanceof BeanNameAware) {
 								((BeanNameAware) result).setBeanName(endpointBeanName);
 							}
@@ -183,11 +201,26 @@ public class SpringYarnAnnotationPostProcessor implements BeanPostProcessor, Bea
 		return true;
 	}
 
+	/**
+	 * Gets the bean class. Will check if bean is a proxy and
+	 * find a class from there as target class, otherwise
+	 * we just get bean class.
+	 *
+	 * @param bean the bean
+	 * @return the bean class
+	 */
 	private Class<?> getBeanClass(Object bean) {
 		Class<?> targetClass = AopUtils.getTargetClass(bean);
 		return (targetClass != null) ? targetClass : bean.getClass();
 	}
 
+	/**
+	 * Checks if class is a stereotype meaning if there is
+	 * a Component annotation present.
+	 *
+	 * @param beanClass the bean class
+	 * @return true, if is stereotype
+	 */
 	private boolean isStereotype(Class<?> beanClass) {
 		List<Annotation> annotations = new ArrayList<Annotation>(Arrays.asList(beanClass.getAnnotations()));
 		Class<?>[] interfaces = beanClass.getInterfaces();
@@ -204,11 +237,10 @@ public class SpringYarnAnnotationPostProcessor implements BeanPostProcessor, Bea
 	}
 
 	private String generateBeanName(String originalBeanName, Method method, Class<? extends Annotation> annotationType) {
-		String baseName = originalBeanName + "." + method.getName() + "."
-				+ ClassUtils.getShortNameAsProperty(annotationType);
+		String baseName = originalBeanName + "." + method.getName() + "." + ClassUtils.getShortNameAsProperty(annotationType);
 		String name = baseName;
 		int count = 1;
-		while (this.beanFactory.containsBean(name)) {
+		while (beanFactory.containsBean(name)) {
 			name = baseName + "#" + (++count);
 		}
 		return name;
