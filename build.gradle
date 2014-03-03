@@ -751,6 +751,7 @@ project('spring-data-hadoop-test') {
 	}
 
 	dependencies {
+        compile project(":spring-data-hadoop-core")
 		compile "org.springframework:spring-test:$springVersion"
 		compile "junit:junit:$junitVersion"
 		compile hadoopTestArtifacts
