@@ -1039,8 +1039,8 @@ if (gradle.ext.mr2) {
 		test.dependsOn([copyHadoopRuntimeDeps,copyHadoopRuntimeDepsAll])
 	}
 
-	project('spring-yarn:spring-yarn-test') {
-		description = 'Spring Yarn Test'
+	project('spring-yarn:spring-yarn-build-tests') {
+		description = 'Spring Yarn Integration Test'
 		configurations {
 			hadoopruntime.exclude group: 'log4j'
 			hadoopruntime.exclude group: 'org.slf4j'
@@ -1069,7 +1069,7 @@ if (gradle.ext.mr2) {
 		description = 'Spring Yarn Boot Test'
 		dependencies {
 			compile project(":spring-yarn:spring-yarn-boot")
-			compile project(":spring-yarn:spring-yarn-test")
+			compile project(":spring-yarn:spring-yarn-build-tests")
 		}
 	}
 
