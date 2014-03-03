@@ -758,7 +758,7 @@ project('spring-data-hadoop-test-core') {
 }
 
 
-project('spring-data-hadoop-test') {
+project('spring-data-hadoop-build-tests') {
 	description = 'Spring for Apache Hadoop Integration Tests'
 
 	dependencies {

@@ -47,8 +47,8 @@ include 'spring-hadoop-config'
 rootProject.children.find{ it.name == 'spring-hadoop-config' }.name = 'spring-data-hadoop'
 include 'spring-hadoop-test-core'
 rootProject.children.find{ it.name == 'spring-hadoop-test-core' }.name = 'spring-data-hadoop-test-core'
-include 'spring-hadoop-test'
-rootProject.children.find{ it.name == 'spring-hadoop-test' }.name = 'spring-data-hadoop-test'
+include 'spring-hadoop-build-tests'
+rootProject.children.find{ it.name == 'spring-hadoop-build-tests' }.name = 'spring-data-hadoop-build-tests'
 if (mr2) {
   print "Based on selected distro (${hadoopDistro}) we are including spring-yarn\n"
   include 'spring-yarn:spring-yarn-core','spring-yarn:spring-yarn-integration','spring-yarn:spring-yarn-batch','spring-yarn:spring-yarn-test-core','spring-yarn:spring-yarn-test','spring-yarn:spring-yarn-boot','spring-yarn:spring-yarn-boot-test'
