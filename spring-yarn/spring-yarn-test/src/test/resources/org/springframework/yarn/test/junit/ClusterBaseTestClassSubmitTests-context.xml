@@ -17,7 +17,7 @@
 
 	<!-- do not rely on default classpath, instead use all dependencies -->
 	<yarn:environment include-system-env="false">
-		<yarn:classpath default-yarn-app-classpath="false"/>
+		<yarn:classpath use-default-yarn-classpath="false"/>
 	</yarn:environment>
 
 	<util:properties id="arguments">

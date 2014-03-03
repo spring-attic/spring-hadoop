@@ -42,7 +42,7 @@ public final class YarnEnvironmentBuilder
 		extends AbstractConfiguredAnnotationBuilder<Map<String, String>, YarnEnvironmentConfigurer, YarnEnvironmentBuilder>
 		implements PropertiesConfigurerAware, YarnEnvironmentConfigurer {
 
-	private boolean defaultClasspath = true;
+	private boolean useDefaultYarnClasspath = true;
 	private boolean includeBaseDirectory = true;
 	private boolean includeSystemEnv = true;
 	private String delimiter = ":";
@@ -60,7 +60,7 @@ public final class YarnEnvironmentBuilder
 		fb.setProperties(properties);
 		fb.setClasspath(StringUtils.collectionToDelimitedString(classpathEntries, delimiter));
 		fb.setDelimiter(delimiter);
-		fb.setDefaultYarnAppClasspath(defaultClasspath);
+		fb.setUseDefaultYarnClasspath(useDefaultYarnClasspath);
 		fb.setIncludeSystemEnv(includeSystemEnv);
 		fb.setIncludeBaseDirectory(includeBaseDirectory);
 		fb.afterPropertiesSet();
@@ -117,10 +117,10 @@ public final class YarnEnvironmentBuilder
 	/**
 	 * Sets the default classpath.
 	 *
-	 * @param defaultClasspath the new default classpath
+	 * @param useDefaultClasspath the new default classpath
 	 */
-	public void setDefaultClasspath(boolean defaultClasspath) {
-		this.defaultClasspath = defaultClasspath;
+	public void setUseDefaultYarnClasspath(boolean useDefaultClasspath) {
+		this.useDefaultYarnClasspath = useDefaultClasspath;
 	}
 
 	/**

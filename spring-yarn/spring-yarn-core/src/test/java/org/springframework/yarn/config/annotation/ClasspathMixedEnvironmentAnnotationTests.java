@@ -87,7 +87,7 @@ public class ClasspathMixedEnvironmentAnnotationTests {
 						.and()
 					.withClasspath()
 						.entry("./*")
-						.defaultYarnAppClasspath(true)
+						.useDefaultYarnClasspath(true)
 						.and()
 					.entry("myvar1", "myvalue1")
 					.entry("foo", "jee");

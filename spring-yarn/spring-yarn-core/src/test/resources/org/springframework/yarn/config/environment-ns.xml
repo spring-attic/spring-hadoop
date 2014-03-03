@@ -29,7 +29,7 @@
 	</yarn:environment>
 
 	<yarn:environment id="defClasspathEnvMixed">
-		<yarn:classpath default-yarn-app-classpath="true" delimiter=":" />
+		<yarn:classpath use-default-yarn-classpath="true" delimiter=":" />
 		foo=jee
 		test-myvar1=${myvar1}
 	</yarn:environment>

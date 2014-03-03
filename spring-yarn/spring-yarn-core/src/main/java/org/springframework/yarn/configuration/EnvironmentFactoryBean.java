@@ -53,7 +53,7 @@ public class EnvironmentFactoryBean implements InitializingBean, FactoryBean<Map
 	 * to a classpath. Effectively entries will be resolved from
 	 * {@link YarnConfiguration.DEFAULT_YARN_APPLICATION_CLASSPATH}.
 	 */
-	private boolean defaultYarnAppClasspath;
+	private boolean useDefaultYarnClasspath;
 
 	/**
 	 * Flag indicating if base directory should included
@@ -106,7 +106,7 @@ public class EnvironmentFactoryBean implements InitializingBean, FactoryBean<Map
 
 		// TODO: we should figure out how to support default classpath
 		//       for different distros because this feels a bit dangerous
-		if (defaultYarnAppClasspath) {
+		if (useDefaultYarnClasspath) {
 			paths.add("$" + ApplicationConstants.Environment.HADOOP_CONF_DIR);
 			paths.add("$" + ApplicationConstants.Environment.HADOOP_COMMON_HOME + "/*");
 			paths.add("$" + ApplicationConstants.Environment.HADOOP_COMMON_HOME + "/lib/*");
@@ -191,11 +191,11 @@ public class EnvironmentFactoryBean implements InitializingBean, FactoryBean<Map
 	 * If set to true a default 'yarn' entries will be added to
 	 * a 'CLASSPATH' environment variable.
 	 *
-	 * @param defaultYarnAppClasspath Flag telling if default yarn entries
+	 * @param useDefaultYarnClasspath Flag telling if default yarn entries
 	 *                                should be added to classpath
 	 */
-	public void setDefaultYarnAppClasspath(boolean defaultYarnAppClasspath) {
-		this.defaultYarnAppClasspath = defaultYarnAppClasspath;
+	public void setUseDefaultYarnClasspath(boolean useDefaultYarnClasspath) {
+		this.useDefaultYarnClasspath = useDefaultYarnClasspath;
 	}
 
 	/**

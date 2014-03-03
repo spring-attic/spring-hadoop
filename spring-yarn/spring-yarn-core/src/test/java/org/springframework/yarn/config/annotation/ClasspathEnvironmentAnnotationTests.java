@@ -80,7 +80,7 @@ public class ClasspathEnvironmentAnnotationTests {
 				environment
 					.withClasspath()
 						.entry("./*")
-						.defaultYarnAppClasspath(true);
+						.useDefaultYarnClasspath(true);
 		}
 
 	}

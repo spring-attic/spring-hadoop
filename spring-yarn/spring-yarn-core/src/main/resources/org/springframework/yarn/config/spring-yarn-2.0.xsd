@@ -288,7 +288,7 @@
 	</xsd:complexType>
 
 	<xsd:complexType name="classpathType" mixed="true">
-		<xsd:attribute name="default-yarn-app-classpath" type="xsd:boolean" default="true">
+		<xsd:attribute name="use-default-yarn-classpath" type="xsd:boolean" default="true">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[
 				Configures whether default Hadoop Yarn app classpath entries will be added to a classpath.

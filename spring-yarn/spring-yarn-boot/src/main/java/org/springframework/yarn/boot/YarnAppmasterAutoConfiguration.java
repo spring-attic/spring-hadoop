@@ -216,7 +216,7 @@ public class YarnAppmasterAutoConfiguration {
 				.includeSystemEnv(syalcp.isIncludeSystemEnv())
 				.withClasspath()
 					.includeBaseDirectory(syalcp.isIncludeBaseDirectory())
-					.defaultYarnAppClasspath(syalcp.isDefaultYarnAppClasspath())
+					.useDefaultYarnClasspath(syalcp.isUseDefaultYarnClasspath())
 					.delimiter(syalcp.getPathSeparator())
 					.entries(syalcp.getClasspath())
 					.entry(explodedEntryIfZip(syalcp));
