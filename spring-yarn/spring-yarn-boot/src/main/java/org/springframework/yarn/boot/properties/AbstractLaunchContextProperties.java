@@ -27,7 +27,7 @@ public abstract class AbstractLaunchContextProperties {
 	private List<String> classpath;
 	private String pathSeparator;
 	private boolean includeBaseDirectory = true;
-	private boolean defaultYarnAppClasspath = true;
+	private boolean useDefaultYarnClasspath = true;
 	private boolean includeSystemEnv = true;
 
 	public String getArchiveFile() {
@@ -86,12 +86,12 @@ public abstract class AbstractLaunchContextProperties {
 		this.includeBaseDirectory = includeBaseDirectory;
 	}
 
-	public boolean isDefaultYarnAppClasspath() {
-		return defaultYarnAppClasspath;
+	public boolean isUseDefaultYarnClasspath() {
+		return useDefaultYarnClasspath;
 	}
 
-	public void setDefaultYarnAppClasspath(boolean defaultYarnAppClasspath) {
-		this.defaultYarnAppClasspath = defaultYarnAppClasspath;
+	public void setUseDefaultYarnClasspath(boolean useDefaultYarnClasspath) {
+		this.useDefaultYarnClasspath = useDefaultYarnClasspath;
 	}
 
 	public boolean isIncludeSystemEnv() {

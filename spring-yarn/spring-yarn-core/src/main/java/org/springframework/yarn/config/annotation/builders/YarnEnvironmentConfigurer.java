@@ -39,7 +39,7 @@ import org.springframework.yarn.config.annotation.configurers.DefaultEnvironment
  *       .withClasspath()
  *         .entry("cpEntry1")
  *         .entry("cpEntry2")
- *         .defaultYarnAppClasspath(true);
+ *         .useDefaultYarnClasspath(true);
  *   }
  *
  * }
@@ -63,13 +63,13 @@ public interface YarnEnvironmentConfigurer {
 	 *     .withClasspath()
 	 *       .entry("cpEntry1")
 	 *       .entry("cpEntry2")
-	 *       .defaultYarnAppClasspath(true);
+	 *       .useDefaultYarnClasspath(true);
 	 * }
 	 * </pre>
 	 * <p>XML:
 	 * <pre>
 	 * &lt;yarn:environment>
-	 *   &lt;yarn:classpath default-yarn-app-classpath="true" delimiter=":">
+	 *   &lt;yarn:classpath use-default-yarn-classpath="true" delimiter=":">
 	 *     cpEntry1
 	 *     cpEntry2
 	 *   &lt;/yarn:classpath>

@@ -16,6 +16,7 @@
 package org.springframework.yarn.config;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasItemInArray;
 import static org.hamcrest.Matchers.is;
@@ -55,6 +56,12 @@ public class EnvironmentNamespaceTest {
 
 	@Resource(name = "&defClasspathEnv")
 	private EnvironmentFactoryBean environmentFactoryBeanDefClasspathEnv;
+
+	@Resource(name = "defClasspathEnvCustomDefaultClasspath")
+	private Map<String, String> defClasspathEnvironmentCustomDefaultClasspath;
+
+	@Resource(name = "&defClasspathEnvCustomDefaultClasspath")
+	private EnvironmentFactoryBean environmentFactoryBeanDefClasspathEnvCustomDefaultClasspath;
 
 	@Resource(name = "defClasspathEnvMixed")
 	private Map<String, String> defClasspathEnvironmentMixed;
@@ -96,6 +103,25 @@ public class EnvironmentNamespaceTest {
 
 		String classpath = defClasspathEnvironment.get("CLASSPATH");
 		assertNotNull(classpath);
+
+		String[] entries = classpath.split(":");
+		assertNotNull(entries);
+		assertThat(entries.length, greaterThan(0));
+		assertThat(entries, hasItemInArray("./*"));
+
+		// check that there's no extra or empty elements
+		assertThat(false, is(classpath.contains("::")));
+		assertThat(true, is(classpath.charAt(0) != ':'));
+		assertThat(true, is(classpath.charAt(classpath.length()-1) != ':'));
+	}
+
+	@Test
+	public void testEnvironmentWithClasspathCustomDefault() throws Exception {
+		assertNotNull(defClasspathEnvironmentCustomDefaultClasspath);
+
+		String classpath = defClasspathEnvironmentCustomDefaultClasspath.get("CLASSPATH");
+		assertNotNull(classpath);
+		assertThat(classpath, containsString("/tmp/fake1:/tmp/fake2"));
 
 		String[] entries = classpath.split(":");
 		assertNotNull(entries);
