@@ -27,7 +27,7 @@ public class CompositeContainerStateListener extends AbstractCompositeListener<C
 		implements ContainerStateListener {
 
 	@Override
-	public void state(ContainerState state, int exit) {
+	public void state(ContainerState state, Object exit) {
 		for (Iterator<ContainerStateListener> iterator = getListeners().reverse(); iterator.hasNext();) {
 			ContainerStateListener listener = iterator.next();
 			listener.state(state, exit);

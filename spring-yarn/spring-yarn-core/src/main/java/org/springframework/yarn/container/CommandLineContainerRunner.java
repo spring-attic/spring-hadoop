@@ -60,7 +60,7 @@ public class CommandLineContainerRunner extends AbstractCommandLineRunner<YarnCo
 			latch = new CountDownLatch(1);
 			((LongRunningYarnContainer)bean).addContainerStateListener(new ContainerStateListener() {
 				@Override
-				public void state(ContainerState state, int exit) {
+				public void state(ContainerState state, Object exit) {
 					stateWrapper.state = state;
 					// TODO: should handle exit value
 					latch.countDown();

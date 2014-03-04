@@ -35,6 +35,11 @@ import org.springframework.util.StringUtils;
 public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 
 	/**
+	 * Convenient constant value representing finished processing.
+	 */
+	public static final ExitStatus COMPLETED = new ExitStatus("COMPLETED");
+
+	/**
 	 * Convenient constant value representing unknown state - assumed not
 	 * continuable.
 	 */
@@ -52,7 +57,7 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	/**
 	 * Convenient constant value representing finished processing.
 	 */
-	public static final ExitStatus COMPLETED = new ExitStatus("COMPLETED");
+	public static final ExitStatus OK = new ExitStatus("OK");
 
 	/**
 	 * Convenient constant value representing job that did no processing (e.g.
@@ -111,8 +116,9 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	 *
 	 * Severity is defined by the exit code:
 	 * <ul>
+	 * <li>Codes beginning with COMPLETED have severity 0</li>
 	 * <li>Codes beginning with EXECUTING have severity 1</li>
-	 * <li>Codes beginning with COMPLETED have severity 2</li>
+	 * <li>Codes beginning with OK have severity 2</li>
 	 * <li>Codes beginning with NOOP have severity 3</li>
 	 * <li>Codes beginning with STOPPED have severity 4</li>
 	 * <li>Codes beginning with FAILED have severity 5</li>
@@ -159,10 +165,13 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	 * @return mapped exit code
 	 */
 	private int severity(ExitStatus status) {
+		if (status.exitCode.startsWith(COMPLETED.exitCode)) {
+			return 0;
+		}
 		if (status.exitCode.startsWith(EXECUTING.exitCode)) {
 			return 1;
 		}
-		if (status.exitCode.startsWith(COMPLETED.exitCode)) {
+		if (status.exitCode.startsWith(OK.exitCode)) {
 			return 2;
 		}
 		if (status.exitCode.startsWith(NOOP.exitCode)) {

@@ -25,7 +25,9 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.util.StringUtils;
 import org.springframework.yarn.container.LongRunningYarnContainer;
 import org.springframework.yarn.container.YarnContainer;
+import org.springframework.yarn.launch.ExitCodeMapper;
 import org.springframework.yarn.launch.JvmSystemExiter;
+import org.springframework.yarn.launch.SimpleJvmExitCodeMapper;
 import org.springframework.yarn.launch.SystemExiter;
 import org.springframework.yarn.listener.ContainerStateListener;
 import org.springframework.yarn.listener.ContainerStateListener.ContainerState;
@@ -40,8 +42,9 @@ public class ContainerLauncherRunner implements CommandLineRunner {
 
 	private static final Log log = LogFactory.getLog(ContainerLauncherRunner.class);
 
-	/** Exiter helping for testing */
 	private static SystemExiter systemExiter = new JvmSystemExiter();
+
+	private ExitCodeMapper exitCodeMapper = new SimpleJvmExitCodeMapper();
 
 	/** Latch used for long running container wait */
 	private CountDownLatch latch;
@@ -73,10 +76,14 @@ public class ContainerLauncherRunner implements CommandLineRunner {
 
 		// use latch if container wants to be long running
 		if (container instanceof LongRunningYarnContainer && ((LongRunningYarnContainer)container).isWaitCompleteState()) {
+			log.info("Container requested that we wait state, setting up latch");
 			latch = new CountDownLatch(1);
 			((LongRunningYarnContainer)container).addContainerStateListener(new ContainerStateListener() {
 				@Override
-				public void state(ContainerState state, int exit) {
+				public void state(ContainerState state, Object exit) {
+					if (log.isDebugEnabled()) {
+						log.debug("Got state ContainerState=" + state + " and exit=" + exit);
+					}
 					stateWrapper.state = state;
 					stateWrapper.exit = exit;
 					latch.countDown();
@@ -84,6 +91,7 @@ public class ContainerLauncherRunner implements CommandLineRunner {
 			});
 		}
 
+		// tell container to do its stuff
 		container.run();
 
 		if (waitLatch) {
@@ -100,16 +108,23 @@ public class ContainerLauncherRunner implements CommandLineRunner {
 			int exitCode = 0;
 			if (stateWrapper.state != null) {
 				if (stateWrapper.exit != null) {
-					exitCode = stateWrapper.exit;
+					if (stateWrapper.exit instanceof String) {
+						exitCode = exitCodeMapper.intValue((String)stateWrapper.exit);
+					} else if (stateWrapper.exit instanceof Boolean) {
+						exitCode = exitCodeMapper.intValue((Boolean)stateWrapper.exit);
+					} else if (stateWrapper.exit instanceof Integer) {
+						exitCode = (Integer) stateWrapper.exit;
+					}
 				}
 			}
+			log.info("Exiting with exitCode=" + exitCode);
 			systemExiter.exit(exitCode);
 		}
 	}
 
 	private static class StateWrapper {
 		ContainerState state;
-		Integer exit;
+		Object exit;
 	}
 
 }

@@ -18,6 +18,8 @@ package org.springframework.yarn.container;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.springframework.yarn.listener.CompositeContainerStateListener;
 import org.springframework.yarn.listener.ContainerStateListener;
@@ -32,6 +34,8 @@ import org.springframework.yarn.listener.ContainerStateListener.ContainerState;
  *
  */
 public abstract class AbstractYarnContainer implements LongRunningYarnContainer, YarnContainerRuntime {
+
+	private final static Log log = LogFactory.getLog(AbstractYarnContainer.class);
 
 	/** Environment variables for the process. */
 	private Map<String, String> environment;
@@ -138,7 +142,8 @@ public abstract class AbstractYarnContainer implements LongRunningYarnContainer,
 	 * @param state the state
 	 * @param exit the exit
 	 */
-	protected void notifyContainerState(ContainerState state, int exit) {
+	protected void notifyContainerState(ContainerState state, Object exit) {
+		log.info("Notifying listeners of ContainerState=" + state + " and exit=" + exit);
 		stateListener.state(state, exit);
 	}
 
