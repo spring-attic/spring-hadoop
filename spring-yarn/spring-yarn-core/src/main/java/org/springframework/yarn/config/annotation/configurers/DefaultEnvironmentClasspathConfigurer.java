@@ -35,7 +35,8 @@ public class DefaultEnvironmentClasspathConfigurer
 		extends AnnotationConfigurerAdapter<Map<String, String>, YarnEnvironmentConfigurer, YarnEnvironmentBuilder>
 		implements EnvironmentClasspathConfigurer {
 
-	private boolean defaultClasspath = true;
+	private boolean useDefaultYarnClasspath = true;
+	private String defaultYarnAppClasspath;
 	private boolean includeBaseDirectory = true;
 	private String delimiter;
 
@@ -44,7 +45,8 @@ public class DefaultEnvironmentClasspathConfigurer
 	@Override
 	public void configure(YarnEnvironmentBuilder builder) throws Exception {
 		builder.addClasspathEntries(classpathEntries);
-		builder.setDefaultClasspath(defaultClasspath);
+		builder.setUseDefaultYarnClasspath(useDefaultYarnClasspath);
+		builder.setDefaultYarnAppClasspath(defaultYarnAppClasspath);
 		builder.setIncludeBaseDirectory(includeBaseDirectory);
 		if (StringUtils.hasText(delimiter)) {
 			builder.setDelimiter(delimiter);
@@ -77,8 +79,14 @@ public class DefaultEnvironmentClasspathConfigurer
 	}
 
 	@Override
-	public EnvironmentClasspathConfigurer defaultYarnAppClasspath(boolean defaultClasspath) {
-		this.defaultClasspath = defaultClasspath;
+	public EnvironmentClasspathConfigurer useDefaultYarnClasspath(boolean defaultClasspath) {
+		this.useDefaultYarnClasspath = defaultClasspath;
+		return this;
+	}
+
+	@Override
+	public EnvironmentClasspathConfigurer defaultYarnAppClasspath(String defaultClasspath) {
+		this.defaultYarnAppClasspath = defaultClasspath;
 		return this;
 	}
 

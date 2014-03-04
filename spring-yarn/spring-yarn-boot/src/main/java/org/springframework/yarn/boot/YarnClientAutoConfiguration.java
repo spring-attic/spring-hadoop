@@ -143,7 +143,8 @@ public class YarnClientAutoConfiguration {
 				.includeSystemEnv(syclcp.isIncludeSystemEnv())
 				.withClasspath()
 					.includeBaseDirectory(syclcp.isIncludeBaseDirectory())
-					.defaultYarnAppClasspath(syclcp.isDefaultYarnAppClasspath())
+					.useDefaultYarnClasspath(syclcp.isUseDefaultYarnClasspath())
+					.defaultYarnAppClasspath(syp.getDefaultYarnAppClasspath())
 					.delimiter(syclcp.getPathSeparator())
 					.entries(syclcp.getClasspath())
 					.entry(explodedEntryIfZip(syclcp));

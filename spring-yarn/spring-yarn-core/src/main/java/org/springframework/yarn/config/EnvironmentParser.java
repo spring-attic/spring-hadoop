@@ -49,10 +49,12 @@ class EnvironmentParser extends AbstractPropertiesConfiguredBeanDefinitionParser
 		if(entries.size() == 1) {
 			Element entry = entries.get(0);
 			String textContent = entry.getTextContent();
-			String defYarnClasspath = entry.getAttribute("default-yarn-app-classpath");
+			String useDefaultYarnClasspath = entry.getAttribute("use-default-yarn-classpath");
+			String defaultYarnAppClasspath = entry.getAttribute("default-yarn-app-classpath");
 			String includeBaseDirectory = entry.getAttribute("include-base-directory");
 			String delimiter = entry.getAttribute("delimiter");
-			builder.addPropertyValue("defaultYarnAppClasspath", defYarnClasspath);
+			builder.addPropertyValue("useDefaultYarnClasspath", useDefaultYarnClasspath);
+			builder.addPropertyValue("defaultYarnAppClasspath", defaultYarnAppClasspath);
 			builder.addPropertyValue("includeBaseDirectory", includeBaseDirectory);
 			builder.addPropertyValue("delimiter", delimiter);
 			// nested entries will be added to classpath

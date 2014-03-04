@@ -16,6 +16,6 @@ spring:
                   - "options1Foo"
                   - "options2Foo"
                 includeSystemEnv: false
-                defaultYarnAppClasspath: false
+                useDefaultYarnClasspath: false
                 includeBaseDirectory: false
                 pathSeparator: ":"

@@ -45,6 +45,7 @@ public class SpringYarnPropertiesTests {
 		assertThat(properties.getAppName(), is("appNameFoo"));
 		assertThat(properties.getAppType(), is("appTypeFoo"));
 		assertThat(properties.getStagingDir(), is("stagingDirFoo"));
+		assertThat(properties.getDefaultYarnAppClasspath(), is("defaultYarnAppClasspathFoo"));
 		context.close();
 	}
 

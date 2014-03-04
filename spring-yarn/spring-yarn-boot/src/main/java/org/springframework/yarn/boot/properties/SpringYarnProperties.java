@@ -32,6 +32,7 @@ public class SpringYarnProperties {
 	private String stagingDir;
 	private String appName;
 	private String appType;
+	private String defaultYarnAppClasspath;
 
 	@Autowired
 	private SpringYarnEnvProperties syep;
@@ -74,6 +75,14 @@ public class SpringYarnProperties {
 
 	public void setAppType(String appType) {
 		this.appType = appType;
+	}
+
+	public String getDefaultYarnAppClasspath() {
+		return defaultYarnAppClasspath;
+	}
+
+	public void setDefaultYarnAppClasspath(String defaultYarnAppClasspath) {
+		this.defaultYarnAppClasspath = defaultYarnAppClasspath;
 	}
 
 }
