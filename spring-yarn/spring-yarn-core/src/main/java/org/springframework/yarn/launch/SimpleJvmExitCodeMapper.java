@@ -20,6 +20,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.util.ObjectUtils;
 
 /**
  * An implementation of {@link ExitCodeMapper} that can be configured through a
@@ -80,6 +81,11 @@ public class SimpleJvmExitCodeMapper implements ExitCodeMapper {
 		}
 
 		return (statusCode != null) ? statusCode.intValue() : JVM_EXITCODE_GENERIC_ERROR;
+	}
+
+	@Override
+	public int intValue(Boolean exitCode) {
+		return ObjectUtils.nullSafeEquals(exitCode, true) ? JVM_EXITCODE_COMPLETED : JVM_EXITCODE_GENERIC_ERROR;
 	}
 
 }

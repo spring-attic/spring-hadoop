@@ -15,6 +15,7 @@
  */
 package org.springframework.yarn.container;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -25,6 +26,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.yarn.annotation.OnYarnContainerStart;
 import org.springframework.yarn.annotation.YarnContainer;
 import org.springframework.yarn.config.annotation.SpringYarnAnnotationPostProcessor;
+import org.springframework.yarn.launch.ExitStatus;
 import org.springframework.yarn.listener.ContainerStateListener;
 import org.springframework.yarn.listener.ContainerStateListener.ContainerState;
 
@@ -45,7 +47,7 @@ public class DefaultYarnContainerTests {
 
 		container.addContainerStateListener(new ContainerStateListener() {
 			@Override
-			public void state(ContainerState state, int exit) {
+			public void state(ContainerState state, Object exit) {
 				stateWrapper.state = state;
 				stateWrapper.exit = exit;
 			}
@@ -53,7 +55,8 @@ public class DefaultYarnContainerTests {
 
 		container.run();
 		assertThat(stateWrapper.state, is(ContainerState.COMPLETED));
-		assertThat(stateWrapper.exit, is(0));
+		assertThat(stateWrapper.exit, instanceOf(Integer.class));
+		assertThat((Integer)stateWrapper.exit, is(0));
 
 		context.stop();
 	}
@@ -67,7 +70,7 @@ public class DefaultYarnContainerTests {
 
 		container.addContainerStateListener(new ContainerStateListener() {
 			@Override
-			public void state(ContainerState state, int exit) {
+			public void state(ContainerState state, Object exit) {
 				stateWrapper.state = state;
 				stateWrapper.exit = exit;
 			}
@@ -75,7 +78,8 @@ public class DefaultYarnContainerTests {
 
 		container.run();
 		assertThat(stateWrapper.state, is(ContainerState.COMPLETED));
-		assertThat(stateWrapper.exit, is(0));
+		assertThat(stateWrapper.exit, instanceOf(Boolean.class));
+		assertThat((Boolean)stateWrapper.exit, is(true));
 
 		context.stop();
 	}
@@ -89,7 +93,7 @@ public class DefaultYarnContainerTests {
 
 		container.addContainerStateListener(new ContainerStateListener() {
 			@Override
-			public void state(ContainerState state, int exit) {
+			public void state(ContainerState state, Object exit) {
 				stateWrapper.state = state;
 				stateWrapper.exit = exit;
 			}
@@ -97,7 +101,8 @@ public class DefaultYarnContainerTests {
 
 		container.run();
 		assertThat(stateWrapper.state, is(ContainerState.COMPLETED));
-		assertThat(stateWrapper.exit, is(10));
+		assertThat(stateWrapper.exit, instanceOf(Integer.class));
+		assertThat((Integer)stateWrapper.exit, is(10));
 
 		context.stop();
 	}
@@ -111,7 +116,7 @@ public class DefaultYarnContainerTests {
 
 		container.addContainerStateListener(new ContainerStateListener() {
 			@Override
-			public void state(ContainerState state, int exit) {
+			public void state(ContainerState state, Object exit) {
 				stateWrapper.state = state;
 				stateWrapper.exit = exit;
 			}
@@ -119,7 +124,7 @@ public class DefaultYarnContainerTests {
 
 		container.run();
 		assertThat(stateWrapper.state, is(ContainerState.FAILED));
-		assertThat(stateWrapper.exit, is(1));
+		assertThat(stateWrapper.exit, instanceOf(Exception.class));
 
 		context.stop();
 	}
@@ -133,7 +138,7 @@ public class DefaultYarnContainerTests {
 
 		container.addContainerStateListener(new ContainerStateListener() {
 			@Override
-			public void state(ContainerState state, int exit) {
+			public void state(ContainerState state, Object exit) {
 				stateWrapper.state = state;
 				stateWrapper.exit = exit;
 			}
@@ -141,7 +146,30 @@ public class DefaultYarnContainerTests {
 
 		container.run();
 		assertThat(stateWrapper.state, is(ContainerState.FAILED));
-		assertThat(stateWrapper.exit, is(1));
+		assertThat(stateWrapper.exit, instanceOf(Exception.class));
+
+		context.stop();
+	}
+
+	@Test
+	public void testContainerStringBean() {
+		@SuppressWarnings("resource")
+		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(BaseConfig.class, TestBean6Config.class);
+		DefaultYarnContainer container = context.getBean(DefaultYarnContainer.class);
+		final StateWrapper stateWrapper = new StateWrapper();
+
+		container.addContainerStateListener(new ContainerStateListener() {
+			@Override
+			public void state(ContainerState state, Object exit) {
+				stateWrapper.state = state;
+				stateWrapper.exit = exit;
+			}
+		});
+
+		container.run();
+		assertThat(stateWrapper.state, is(ContainerState.COMPLETED));
+		assertThat(stateWrapper.exit, instanceOf(String.class));
+		assertThat((String)stateWrapper.exit, is("UNKNOWN"));
 
 		context.stop();
 	}
@@ -203,6 +231,14 @@ public class DefaultYarnContainerTests {
 		}
 	}
 
+	@Configuration
+	static class TestBean6Config {
+		@Bean
+		TestBean6 testBean() {
+			return new TestBean6();
+		}
+	}
+
 	@YarnContainer
 	private static class TestBean1 {
 
@@ -250,9 +286,18 @@ public class DefaultYarnContainerTests {
 		}
 	}
 
+	@YarnContainer
+	private static class TestBean6 {
+
+		@OnYarnContainerStart
+		public String test() {
+			return ExitStatus.UNKNOWN.getExitCode();
+		}
+	}
+
 	private static class StateWrapper {
 		ContainerState state;
-		Integer exit;
+		Object exit;
 	}
 
 }

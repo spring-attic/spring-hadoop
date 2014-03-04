@@ -48,6 +48,16 @@ public interface ExitCodeMapper {
 	 * @return The corresponding exit status as known by the calling
 	 *         environment.
 	 */
-	public int intValue(String exitCode);
+	int intValue(String exitCode);
+
+	/**
+	 * Convert the exit code from Boolean into an integer that the calling
+	 * environment as an operating system can interpret as an exit status.
+	 *
+	 * @param exitCode The exit code which is used internally.
+	 * @return The corresponding exit status as known by the calling
+	 *         environment.
+	 */
+	int intValue(Boolean exitCode);
 
 }

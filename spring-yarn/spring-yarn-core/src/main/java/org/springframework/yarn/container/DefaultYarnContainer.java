@@ -50,21 +50,9 @@ public class DefaultYarnContainer extends AbstractYarnContainer implements BeanF
 		log.info("Container state based on result=[" + result + "] runtimeException=[" + runtimeException + "]");
 
 		if (runtimeException != null) {
-			notifyContainerState(ContainerState.FAILED, 1);
-		} else if (result != null && result instanceof Integer) {
-			int val = ((Integer)result).intValue();
-			if (val < 0) {
-				notifyContainerState(ContainerState.FAILED, val);
-			} else {
-				notifyContainerState(ContainerState.COMPLETED, val);
-			}
-		} else if (result != null && result instanceof Boolean) {
-			boolean val = ((Boolean)result).booleanValue();
-			if (val) {
-				notifyContainerState(ContainerState.COMPLETED, 0);
-			} else {
-				notifyContainerState(ContainerState.FAILED, -1);
-			}
+			notifyContainerState(ContainerState.FAILED, runtimeException);
+		} else if (result != null) {
+			notifyContainerState(ContainerState.COMPLETED, result);
 		} else {
 			notifyCompleted();
 		}
@@ -73,6 +61,13 @@ public class DefaultYarnContainer extends AbstractYarnContainer implements BeanF
 	@Override
 	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
 		this.beanFactory = beanFactory;
+	}
+
+	@Override
+	public boolean isWaitCompleteState() {
+		// we need to tell boot ContainerLauncherRunner that we're
+		// about to notify state via events so it should wait
+		return true;
 	}
 
 }

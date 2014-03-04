@@ -29,7 +29,7 @@ public interface ContainerStateListener {
 	 * @param state the {@link ContainerState}
 	 * @param exit the requested exit status
 	 */
-	void state(ContainerState state, int exit);
+	void state(ContainerState state, Object exit);
 
 	/**
 	 * Enum for container states
