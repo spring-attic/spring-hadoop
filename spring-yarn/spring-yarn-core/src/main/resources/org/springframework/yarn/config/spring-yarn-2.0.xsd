@@ -296,6 +296,14 @@
 				</xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
+		<xsd:attribute name="default-yarn-app-classpath" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				Configures default Hadoop Yarn app classpath entries which potentially might be added to a classpath.
+				]]>
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
 		<xsd:attribute name="include-base-directory" type="xsd:boolean" default="true">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[

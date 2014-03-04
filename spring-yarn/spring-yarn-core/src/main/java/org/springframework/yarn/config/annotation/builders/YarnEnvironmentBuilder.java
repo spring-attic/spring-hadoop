@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,7 @@ public final class YarnEnvironmentBuilder
 	private boolean useDefaultYarnClasspath = true;
 	private boolean includeBaseDirectory = true;
 	private boolean includeSystemEnv = true;
+	private String defaultYarnAppClasspath;
 	private String delimiter = ":";
 	private Properties properties = new Properties();
 	private ArrayList<String> classpathEntries = new ArrayList<String>();
@@ -60,6 +61,7 @@ public final class YarnEnvironmentBuilder
 		fb.setProperties(properties);
 		fb.setClasspath(StringUtils.collectionToDelimitedString(classpathEntries, delimiter));
 		fb.setDelimiter(delimiter);
+		fb.setDefaultYarnAppClasspath(defaultYarnAppClasspath);
 		fb.setUseDefaultYarnClasspath(useDefaultYarnClasspath);
 		fb.setIncludeSystemEnv(includeSystemEnv);
 		fb.setIncludeBaseDirectory(includeBaseDirectory);
@@ -139,6 +141,15 @@ public final class YarnEnvironmentBuilder
 	 */
 	public void setDelimiter(String delimiter) {
 		this.delimiter = delimiter;
+	}
+
+	/**
+	 * Sets the default yarn app classpath.
+	 *
+	 * @param defaultYarnAppClasspath the new default yarn app classpath
+	 */
+	public void setDefaultYarnAppClasspath(String defaultYarnAppClasspath) {
+		this.defaultYarnAppClasspath = defaultYarnAppClasspath;
 	}
 
 }

@@ -37,6 +37,7 @@ import org.springframework.yarn.config.annotation.builders.YarnEnvironmentConfig
  *       .withClasspath()
  *         .includeBaseDirectory(true)
  *         .useDefaultYarnClasspath(true)
+ *         .defaultYarnAppClasspath("my:cp:entries")
  *         .delimiter(":")
  *         .entries("entry1", "entry2")
  *         .entry("entry3");
@@ -81,6 +82,14 @@ public interface EnvironmentClasspathConfigurer extends AnnotationConfigurerBuil
 	 * @return {@link EnvironmentClasspathConfigurer} for chaining
 	 */
 	EnvironmentClasspathConfigurer useDefaultYarnClasspath(boolean useDefaultClasspath);
+
+	/**
+	 * Specify a default yarn application classpath
+	 *
+	 * @param defaultClasspath the default classpath
+	 * @return {@link EnvironmentClasspathConfigurer} for chaining
+	 */
+	EnvironmentClasspathConfigurer defaultYarnAppClasspath(String defaultClasspath);
 
 	/**
 	 * Specify if base directory should be added in classpath.

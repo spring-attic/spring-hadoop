@@ -36,6 +36,7 @@ public class DefaultEnvironmentClasspathConfigurer
 		implements EnvironmentClasspathConfigurer {
 
 	private boolean useDefaultYarnClasspath = true;
+	private String defaultYarnAppClasspath;
 	private boolean includeBaseDirectory = true;
 	private String delimiter;
 
@@ -45,6 +46,7 @@ public class DefaultEnvironmentClasspathConfigurer
 	public void configure(YarnEnvironmentBuilder builder) throws Exception {
 		builder.addClasspathEntries(classpathEntries);
 		builder.setUseDefaultYarnClasspath(useDefaultYarnClasspath);
+		builder.setDefaultYarnAppClasspath(defaultYarnAppClasspath);
 		builder.setIncludeBaseDirectory(includeBaseDirectory);
 		if (StringUtils.hasText(delimiter)) {
 			builder.setDelimiter(delimiter);
@@ -79,6 +81,12 @@ public class DefaultEnvironmentClasspathConfigurer
 	@Override
 	public EnvironmentClasspathConfigurer useDefaultYarnClasspath(boolean defaultClasspath) {
 		this.useDefaultYarnClasspath = defaultClasspath;
+		return this;
+	}
+
+	@Override
+	public EnvironmentClasspathConfigurer defaultYarnAppClasspath(String defaultClasspath) {
+		this.defaultYarnAppClasspath = defaultClasspath;
 		return this;
 	}
 

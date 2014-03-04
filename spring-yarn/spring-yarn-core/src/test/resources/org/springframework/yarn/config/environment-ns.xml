@@ -28,6 +28,10 @@
 		<yarn:classpath />
 	</yarn:environment>
 
+	<yarn:environment id="defClasspathEnvCustomDefaultClasspath">
+		<yarn:classpath use-default-yarn-classpath="true" default-yarn-app-classpath="/tmp/fake1:/tmp/fake2"/>
+	</yarn:environment>
+
 	<yarn:environment id="defClasspathEnvMixed">
 		<yarn:classpath use-default-yarn-classpath="true" delimiter=":" />
 		foo=jee
