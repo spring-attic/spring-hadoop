@@ -168,6 +168,100 @@
  			
   </section>
 
+  <section id="yarn:javaconfig">
+
+  	<title>Using the Spring for Apache Yarn JavaConfig</title>  	
+
+   	<para>It is also possible to work without XML configuration and rely on
+    Annotation based configuration model. XML and JavaConfig for
+    <emphasis>Spring YARN</emphasis> are not full replacement for each
+    others but we try to mimic the behaviour as much as we can.</para>
+
+   	<para>We basically rely on two concepts when working with JavaConfig.
+    Firstly an annotation <interfacename>@EnableYarn</interfacename> is
+    used to activate different parts of a Spring Configuration depending
+    on <emphasis>enable</emphasis> attribute. We can enable configuration
+    for <emphasis>CONTAINER</emphasis>, <emphasis>APPMASTER</emphasis> or
+    <emphasis>CLIENT</emphasis>. Secondly when configuration is enabled
+    one can use <classname>SpringYarnConfigurerAdapter</classname> whose
+    callback methods can be used to do further configuration for components
+    familiar from XML.</para>
+
+   	<programlisting language="java"><![CDATA[
+@Configuration
+@EnableYarn(enable=Enable.CONTAINER)
+public class ContainerConfiguration extends SpringYarnConfigurerAdapter {
+
+  @Override
+  public void configure(YarnContainerConfigurer container) throws Exception {
+    container
+      .containerClass(MultiContextContainer.class);
+  }
+
+}
+]]></programlisting>
+
+   	<para>In above example we enabled configuration for <emphasis>CONTAINER</emphasis>
+    and used <classname>SpringYarnConfigurerAdapter</classname> and its
+    <literal>configure</literal> callback method for
+    <interfacename>YarnContainerConfigurer</interfacename>. In this method
+    we instructed container class to be a <classname>MultiContextContainer</classname>.</para>
+
+   	<programlisting language="java"><![CDATA[
+@Configuration
+@EnableYarn(enable=Enable.APPMASTER)
+public class AppmasterConfiguration extends SpringYarnConfigurerAdapter {
+
+  @Override
+  public void configure(YarnAppmasterConfigurer master) throws Exception {
+    master
+      .withContainerRunner();
+  }
+
+}
+]]></programlisting>
+
+   	<para>In above example we enabled configuration for <emphasis>APPMASTER</emphasis>
+    and because of this a callback method for
+    <interfacename>YarnAppmasterConfigurer</interfacename>
+    is called automatically.</para>
+
+   	<programlisting language="java"><![CDATA[
+@Configuration
+@EnableYarn(enable=Enable.CLIENT)
+@PropertySource("classpath:hadoop.properties")
+public class ClientConfiguration extends SpringYarnConfigurerAdapter {
+
+  @Autowired
+  private Environment env;
+
+  @Override
+  public void configure(YarnConfigConfigurer config) throws Exception {
+    config
+      .fileSystemUri(env.getProperty("hd.fs"))
+      .resourceManagerAddress(env.getProperty("hd.rm"));
+  }
+
+  @Override
+  public void configure(YarnClientConfigurer client) throws Exception {
+    Properties arguments = new Properties();
+    arguments.put("container-count", "4");
+    client
+      .appName("multi-context-jc")
+      .withMasterRunner()
+        .contextClass(AppmasterConfiguration.class)
+        .arguments(arguments);
+}
+]]></programlisting>
+
+   	<para>In above example we enabled configuration for <emphasis>CLIENT</emphasis>.
+    Here one will get yet another callback for
+    <interfacename>YarnClientConfigurer</interfacename>. Additionally this shows
+    how a Hadoop configuration can be customized using a callback for
+    <interfacename>YarnConfigConfigurer</interfacename>.</para>
+
+  </section>
+
   <section id="yarn:config">
   
     <title>Configuring Yarn</title>
@@ -645,12 +739,12 @@
 	be defined anyway.</para>
 	
     <programlisting language="xml"><![CDATA[<yarn:environment include-system-env="false">
-  <yarn:classpath default-yarn-app-classpath="true" delimiter=":">
+  <yarn:classpath use-default-yarn-classpath="true" delimiter=":">
     ./*
   </yarn:classpath>
 </yarn:environment>]]></programlisting>     
 	
-    <para>If <emphasis>default-yarn-app-classpath</emphasis> parameter is set to
+    <para>If <emphasis>use-default-yarn-classpath</emphasis> parameter is set to
     <emphasis>true</emphasis>(default value) a default yarn entries will be added to classpath
 	automatically. Resulting entries are shown below:</para>
 
@@ -699,7 +793,7 @@ $HADOOP_YARN_HOME/share/hadoop/yarn/lib/*]]></programlisting>
             </tbody>
         </tgroup>  
     </table>
-	
+
     <table id="yarn:environment:classpathflags" pgwide="1" align="center">
         <title><literal>classpath</literal> attributes</title>
         <tgroup cols="3">
@@ -716,10 +810,10 @@ $HADOOP_YARN_HOME/share/hadoop/yarn/lib/*]]></programlisting>
             </thead>
             <tbody>
                 <row>
-                    <entry><literal>default-yarn-app-classpath</literal></entry>
+                    <entry><literal>use-default-yarn-classpath</literal></entry>
                     <entry><literal>true</literal>(default), <literal>false</literal></entry>
                     <entry>Defines whether default yarn entries are added
-					to classpath.</entry>
+                    to classpath.</entry>
                 </row>
                 <row>
                     <entry><literal>delimiter</literal></entry>
@@ -729,24 +823,24 @@ $HADOOP_YARN_HOME/share/hadoop/yarn/lib/*]]></programlisting>
             </tbody>
         </tgroup>  
     </table>
-	
-	
+
+
   </section>
 
   <section id="yarn:client">
-  
+
     <title>Application Client</title>
-	
-  	<para>Client is always your entry point when interacting with
-	a Yarn system whether one is about to submit a new application
-	instance or just querying <emphasis>Resource Manager</emphasis>
-	for running application(s) status.
-	Currently support for client is very limited and a simple
-	command to start <emphasis>Application Master</emphasis>
-	can be defined. If there is just a need to query
-	<emphasis>Resource Manager</emphasis>, command
-	definition is not needed.</para>
-	
+
+    <para>Client is always your entry point when interacting with
+    a Yarn system whether one is about to submit a new application
+    instance or just querying <emphasis>Resource Manager</emphasis>
+    for running application(s) status.
+    Currently support for client is very limited and a simple
+    command to start <emphasis>Application Master</emphasis>
+    can be defined. If there is just a need to query
+    <emphasis>Resource Manager</emphasis>, command
+    definition is not needed.</para>
+
     <programlisting language="xml"><![CDATA[<yarn:client app-name="customAppName">
   <yarn:master-command>
     <![CDATA[
@@ -759,24 +853,24 @@ $HADOOP_YARN_HOME/share/hadoop/yarn/lib/*]]></programlisting>
       2><LOG_DIR>/AppMaster.stderr
     ]]]]><![CDATA[>
   </yarn:master-command>
-</yarn:client>]]></programlisting>     
+</yarn:client>]]></programlisting>
 
     <para>The declaration above defines a <interfacename>YarnClient</interfacename>
-	bean (to be precise a factory bean of type 
-	<classname>YarnClientFactoryBean</classname>) named, by default,
-	<emphasis>yarnClient</emphasis>. It also defines a command launching
-	an <emphasis>Application Master</emphasis> using
-	<literal>&lt;master-command&gt;</literal> entry which is also a way
-	to define the raw commands. If this <emphasis>yarnClient</emphasis>
-	instance is used to submit an application, its name would come from
-	a <emphasis>app-name</emphasis> attribute.</para>
+    bean (to be precise a factory bean of type 
+    <classname>YarnClientFactoryBean</classname>) named, by default,
+    <emphasis>yarnClient</emphasis>. It also defines a command launching
+    an <emphasis>Application Master</emphasis> using
+    <literal>&lt;master-command&gt;</literal> entry which is also a way
+    to define the raw commands. If this <emphasis>yarnClient</emphasis>
+    instance is used to submit an application, its name would come from
+    a <emphasis>app-name</emphasis> attribute.</para>
 
     <programlisting language="xml"><![CDATA[<yarn:client app-name="customAppName">
   <yarn:master-runner/>
-</yarn:client>]]></programlisting>     
+</yarn:client>]]></programlisting>
 
     <para>For a convinience entry <literal>&lt;master-runner&gt;</literal>
-	can be used to define same command entries.</para>
+    can be used to define same command entries.</para>
 
     <programlisting language="xml"><![CDATA[<yarn:client app-name="customAppName">
   <util:properties id="customArguments">
@@ -792,12 +886,12 @@ $HADOOP_YARN_HOME/share/hadoop/yarn/lib/*]]></programlisting>
 </yarn:client>]]></programlisting>     
 
     <para>All previous three examples are effectively identical from
-	Spring Yarn point of view.</para>
-	
-	<note>
-	  <para>The &lt;LOG_DIR&gt; refers to Hadoop's dedicated log directory
-	  for the running container.</para>
-	</note>
+    Spring Yarn point of view.</para>
+
+    <note>
+      <para>The &lt;LOG_DIR&gt; refers to Hadoop's dedicated log directory
+      for the running container.</para>
+    </note>
 
     <programlisting language="xml"><![CDATA[<yarn:client app-name="customAppName"
   configuration="customConfiguration"
@@ -811,10 +905,10 @@ $HADOOP_YARN_HOME/share/hadoop/yarn/lib/*]]></programlisting>
 </yarn:client>]]></programlisting>     
 
     <para>If there is a need to change some of the parameters for the
-	<emphasis>Application Master</emphasis> submission, <literal>memory</literal>
-	and <literal>virtualcores</literal> defines the container settings.
-	For submission, <literal>queue</literal> and <literal>priority</literal>
-	defines how submission is actually done.</para>
+    <emphasis>Application Master</emphasis> submission, <literal>memory</literal>
+    and <literal>virtualcores</literal> defines the container settings.
+    For submission, <literal>queue</literal> and <literal>priority</literal>
+    defines how submission is actually done.</para>
 
     <table id="yarn:client:clientflags" pgwide="1" align="center">
         <title><literal>yarn:client</literal> attributes</title>
@@ -840,25 +934,25 @@ $HADOOP_YARN_HOME/share/hadoop/yarn/lib/*]]></programlisting>
                     <entry><literal>configuration</literal></entry>
                     <entry>Bean Reference</entry>
                     <entry>A reference to configuration bean name, default is
-					<emphasis>yarnConfiguration</emphasis></entry>
+                    <emphasis>yarnConfiguration</emphasis></entry>
                 </row>
                 <row>
                     <entry><literal>resourcelocalizer</literal></entry>
                     <entry>Bean Reference</entry>
                     <entry>A reference to resource localizer bean name, default is
-					<emphasis>yarnLocalresources</emphasis></entry>
+                    <emphasis>yarnLocalresources</emphasis></entry>
                 </row>
                 <row>
                     <entry><literal>environment</literal></entry>
                     <entry>Bean Reference</entry>
                     <entry>A reference to environment bean name, default is
-					<emphasis>yarnEnvironment</emphasis></entry>
+                    <emphasis>yarnEnvironment</emphasis></entry>
                 </row>
                 <row>
                     <entry><literal>template</literal></entry>
                     <entry>Bean Reference</entry>
                     <entry>A reference to a bean implementing
-					<interfacename>ClientRmOperations</interfacename></entry>
+                    <interfacename>ClientRmOperations</interfacename></entry>
                 </row>
                 <row>
                     <entry><literal>memory</literal></entry>
@@ -956,16 +1050,16 @@ $HADOOP_YARN_HOME/share/hadoop/yarn/lib/*]]></programlisting>
             </tbody>
         </tgroup>  
     </table>
-		
+
   </section>
 
   <section id="yarn:master">
-  
+
     <title>Application Master</title>
-	
-  	<para>Application master is responsible for container allocation,
-	launching and monitoring.</para>
-	
+
+    <para>Application master is responsible for container allocation,
+    launching and monitoring.</para>
+
     <programlisting language="xml"><![CDATA[<yarn:master>
   <yarn:container-allocator hosts="host1,host2" racks="rack1,rack2" virtualcores="1" memory="64" priority="0"/>    
   <yarn:container-launcher username="whoami"/>    
@@ -979,29 +1073,29 @@ $HADOOP_YARN_HOME/share/hadoop/yarn/lib/*]]></programlisting>
     ]]]]><![CDATA[>
   </yarn:container-command>
 </yarn:master>
-]]></programlisting>     
+]]></programlisting>
 
     <para>The declaration above defines a <interfacename>YarnAppmaster</interfacename>
-	bean (to be precise a bean of type 
-	<classname>StaticAppmaster</classname>) named, by default,
-	<emphasis>yarnAppmaster</emphasis>. It also defines a command launching
-	a <emphasis>Container(s)</emphasis> using
-	<literal>&lt;container-command&gt;</literal> entry, parameters
-	for allocation using <literal>&lt;container-allocator&gt;</literal>
-	entry and finally a launcher parameter using
-	<literal>&lt;container-launcher&gt;</literal> entry.</para>
-	
-	<para>Currently there is a simple implementation of
-	<classname>StaticAppmaster</classname> which is able to allocate and
-	launch a number of containers. These containers are monitored
-	by querying resource manager for container execution completion.</para>
+    bean (to be precise a bean of type 
+    <classname>StaticAppmaster</classname>) named, by default,
+    <emphasis>yarnAppmaster</emphasis>. It also defines a command launching
+    a <emphasis>Container(s)</emphasis> using
+    <literal>&lt;container-command&gt;</literal> entry, parameters
+    for allocation using <literal>&lt;container-allocator&gt;</literal>
+    entry and finally a launcher parameter using
+    <literal>&lt;container-launcher&gt;</literal> entry.</para>
+
+    <para>Currently there is a simple implementation of
+    <classname>StaticAppmaster</classname> which is able to allocate and
+    launch a number of containers. These containers are monitored
+    by querying resource manager for container execution completion.</para>
 
     <programlisting language="xml"><![CDATA[<yarn:master>
   <yarn:container-runner/>
 </yarn:master>]]></programlisting>     
 
     <para>For a convinience entry <literal>&lt;container-runner&gt;</literal>
-	can be used to define same command entries.</para>
+    can be used to define same command entries.</para>
 
     <programlisting language="xml"><![CDATA[<yarn:master>
   <util:properties id="customArguments">
@@ -1014,9 +1108,9 @@ $HADOOP_YARN_HOME/share/hadoop/yarn/lib/*]]></programlisting>
     arguments="customArguments"
     stdout="<LOG_DIR>/Container.stdout"
     stderr="<LOG_DIR>/Container.stderr" />
-</yarn:master>]]></programlisting>     
+</yarn:master>]]></programlisting>
 
-	
+
     <table id="yarn:master:masterflags" pgwide="1" align="center">
         <title><literal>yarn:master</literal> attributes</title>
         <tgroup cols="3">
@@ -1036,19 +1130,19 @@ $HADOOP_YARN_HOME/share/hadoop/yarn/lib/*]]></programlisting>
                     <entry><literal>configuration</literal></entry>
                     <entry>Bean Reference</entry>
                     <entry>A reference to configuration bean name, default is
-					<emphasis>yarnConfiguration</emphasis></entry>
+                    <emphasis>yarnConfiguration</emphasis></entry>
                 </row>
                 <row>
                     <entry><literal>resourcelocalizer</literal></entry>
                     <entry>Bean Reference</entry>
                     <entry>A reference to resource localizer bean name, default is
-					<emphasis>yarnLocalresources</emphasis></entry>
+                    <emphasis>yarnLocalresources</emphasis></entry>
                 </row>
                 <row>
                     <entry><literal>environment</literal></entry>
                     <entry>Bean Reference</entry>
                     <entry>A reference to environment bean name, default is
-					<emphasis>yarnEnvironment</emphasis></entry>
+                    <emphasis>yarnEnvironment</emphasis></entry>
                 </row>
             </tbody>
         </tgroup>  
@@ -1117,7 +1211,7 @@ $HADOOP_YARN_HOME/share/hadoop/yarn/lib/*]]></programlisting>
                     <entry><literal>username</literal></entry>
                     <entry>String</entry>
                     <entry>Set the <emphasis>user</emphasis> to whom the
-					container has been allocated.</entry>
+                    container has been allocated.</entry>
                 </row>
             </tbody>
         </tgroup>  
@@ -1171,13 +1265,13 @@ $HADOOP_YARN_HOME/share/hadoop/yarn/lib/*]]></programlisting>
             </tbody>
         </tgroup>  
     </table>
-	
+
   </section>
 
   <section id="yarn:container">
-  
+
     <title>Application Container</title>
-	
+
     <para>There is very little what Spring Yarn needs
 	to know about the Container in terms of its configuration.
 	There is a simple contract
@@ -1224,12 +1318,12 @@ $HADOOP_YARN_HOME/share/hadoop/yarn/lib/*]]></programlisting>
   <bean class="org.springframework.yarn.container.TestContainer"/>
 </yarn:container>
 ]]></programlisting>
-	
-	
+
+
   </section>
 
   <section id="yarn:appmasterservices">
-  
+ 
     <title>Application Master Services</title>
 
     <para>It is fairly easy to create an application which launches a few
@@ -1257,7 +1351,7 @@ $HADOOP_YARN_HOME/share/hadoop/yarn/lib/*]]></programlisting>
     options for built-in services can be found from sections below -  
     <link linkend="yarn:masterservice">Appmaster Service</link> and 
     <link linkend="yarn:masterserviceclient">Appmaster Service Client</link>.</para>
-  
+
     <section id="yarn:appmasterservicesconcepts">
 
       <title>Basic Concepts</title>
@@ -1270,7 +1364,7 @@ $HADOOP_YARN_HOME/share/hadoop/yarn/lib/*]]></programlisting>
       service needs to know where it is and how to connect to it.
       Thirtly, if not creating these services from scratch, it'd be
       nice if some sort of abstraction already exist.</para>
-      
+
       <para>Contract for appmaster service is very simple,
       <emphasis>Application Master Service</emphasis> needs to implement
       <interfacename>AppmasterService</interfacename> interface be registered
@@ -1298,21 +1392,21 @@ $HADOOP_YARN_HOME/share/hadoop/yarn/lib/*]]></programlisting>
       <para>Example above shows a default bean names, <emphasis>yarnAmservice</emphasis>
       and <emphasis>yarnClientAmservice</emphasis> respectively recognised by
       Spring Yarn.</para>
-	
+
       <para>Interface <interfacename>AppmasterServiceClient</interfacename> is
       currently an empty interface just marking class to be
       a appmaster service client.</para>
 
       <programlisting language="java"><![CDATA[public interface AppmasterServiceClient {
 }]]></programlisting>
-	
-	
+
+
     </section>
 
     <section id="yarn:appmasterservicesjson">
-  
+
       <title>Using JSON</title>
-	
+
       <para>Default implementations can be used to exchange messages using
       a simple domain classes and actual messages are converted into json
       and send over the transport.</para>
@@ -1337,13 +1431,13 @@ public void testServiceInterfaces() throws Exception {
     doMindRequest(request);
   assertThat(response.stringField, is("echo:stringFieldValue"));
 }]]></programlisting>
-	
+
     </section>
 
     <section id="yarn:appmasterservicesconversion">
-  
+
       <title>Converters</title>
-	
+
       <para>When default implementations for Application master services are
       exchanging messages, converters are net registered automatically. There
       is a namespace tag <emphasis>converters</emphasis> to ease
@@ -1351,7 +1445,7 @@ public void testServiceInterfaces() throws Exception {
 
       <programlisting language="xml"><![CDATA[<bean id="mapper" 
   class="org.springframework.yarn.integration.support.Jackson2ObjectMapperFactoryBean" />	
-	
+
 <yarn-int:converter>
   <bean class="org.springframework.yarn.integration.convert.MindObjectToHolderConverter">
     <constructor-arg ref="mapper"/>
@@ -1365,26 +1459,26 @@ public void testServiceInterfaces() throws Exception {
   </bean>
 </yarn-int:converter>
 ]]></programlisting>
-  
+
     </section>
-	
+
   </section>
 
 
-  
+
   <section id="yarn:masterservice">
-  
+
     <title>Application Master Service</title>
-	
+
     <para>This section of this document is about configuration, more about
     general concepts for see a <xref linkend="yarn:appmasterservices"/>.</para>
-	
+
     <para>Currently Spring Yarn have support for services using Spring
     Integration tcp channels as a transport.</para>
-		
+
     <programlisting language="xml"><![CDATA[<bean id="mapper" 
   class="org.springframework.yarn.integration.support.Jackson2ObjectMapperFactoryBean" />
-	
+
 <yarn-int:converter>
   <bean class="org.springframework.yarn.integration.convert.MindObjectToHolderConverter">
     <constructor-arg ref="mapper"/>
@@ -1397,14 +1491,14 @@ public void testServiceInterfaces() throws Exception {
     <constructor-arg value="org.springframework.yarn.integration.ip.mind"/>
   </bean>
 </yarn-int:converter>
-	
+
 <yarn-int:amservice
   service-impl="org.springframework.yarn.integration.ip.mind.TestService"/>
 ]]></programlisting>
 
     <para>If there is a need to manually configure the server
-	side dispatch channel, a little bit more configuration
-	is needed.</para>
+    side dispatch channel, a little bit more configuration
+    is needed.</para>
 
     <programlisting language="xml"><![CDATA[
 <bean id="serializer"
@@ -1424,9 +1518,9 @@ public void testServiceInterfaces() throws Exception {
 <ip:tcp-inbound-gateway id="inboundGateway"
   connection-factory="serverConnectionFactory"
   request-channel="serverChannel" />
-  
+
 <int:channel id="serverChannel" />
-  
+
 <yarn-int:amservice
   service-impl="org.springframework.yarn.integration.ip.mind.TestService"
   channel="serverChannel"
@@ -1472,22 +1566,22 @@ public void testServiceInterfaces() throws Exception {
         </tgroup>  
     </table>
 
-	
+
   </section>
 
   <section id="yarn:masterserviceclient">
-  
+
     <title>Application Master Service Client</title>
-	
+
     <para>This section of this document is about configuration, more about
     general concepts for see a <xref linkend="yarn:appmasterservices"/>.</para>
-	
+
     <para>Currently Spring Yarn have support for services using Spring
     Integration tcp channels as a transport.</para>
-		
+
     <programlisting language="xml"><![CDATA[<bean id="mapper" 
   class="org.springframework.yarn.integration.support.Jackson2ObjectMapperFactoryBean" />
-	
+
 <yarn-int:converter>
   <bean class="org.springframework.yarn.integration.convert.MindObjectToHolderConverter">
     <constructor-arg ref="mapper"/>
@@ -1500,7 +1594,7 @@ public void testServiceInterfaces() throws Exception {
     <constructor-arg value="org.springframework.yarn.integration.ip.mind"/>
   </bean>
 </yarn-int:converter>
-	
+
 <yarn-int:amservice-client
   service-impl="org.springframework.yarn.integration.ip.mind.DefaultMindAppmasterServiceClient"
   host="${SHDP_AMSERVICE_HOST}"
@@ -1738,20 +1832,20 @@ public void testServiceInterfaces() throws Exception {
                       <entry><literal>job-launcher</literal></entry>
                       <entry>Bean Reference</entry>
                       <entry>A reference to job launcher bean name, default is
-  					  <emphasis>jobLauncher</emphasis>. Target is a normal
-					  Spring Batch bean implementing
-					  <interfacename>JobLauncher</interfacename>.</entry>
+                      <emphasis>jobLauncher</emphasis>. Target is a normal
+                      Spring Batch bean implementing
+                      <interfacename>JobLauncher</interfacename>.</entry>
                   </row>
               </tbody>
-          </tgroup>  
+          </tgroup>
       </table>
-	  
+
     </section>
-	
+
     <section id="yarn:batchpartitionintro">
-  
+
       <title>Partitioning</title>
-	
+
       <para>Let's take a quick look how Spring Batch partitioning is
       handled. Concept of running a partitioned job involves three things,
       <emphasis>Remote steps</emphasis>, <emphasis>Partition Handler</emphasis>
@@ -1764,18 +1858,18 @@ public void testServiceInterfaces() throws Exception {
       using the <interfacename>TaskExecutor</interfacename> strategy from Spring.
       Spring Hadoop provides implementation to execute Steps remotely
       on a Hadoop cluster.</para>
-   	 
+
       <note>
         <para>For more background information about the Spring
         Batch Partitioning, read the Spring Batch
         reference documentation.</para>
       </note>
-	
+
 
       <section id="yarn:batchmasterconfig">
-  
+
         <title>Configuring Master</title>
-	
+
         <para>As we previously mentioned a step executed on a remote
         host also need to access a job repository. If job repository would be
         based on a database instance, configuration could be similar on a container
@@ -1817,13 +1911,13 @@ public void testServiceInterfaces() throws Exception {
     <constructor-arg value="org.springframework.yarn.batch.repository.bindings"/>
   </bean>
 </yarn-int:converter>]]></programlisting>
-	
+
       </section>
-  
+
       <section id="yarn:batchcontainerconfig">
-    
+
         <title>Configuring Container</title>
-  	  
+
         <para>Previously we made a choice to use in-memore job repository
         running inside the application master. Now we need to talk to this
         repository via client service. We start by adding same converters as
@@ -1843,7 +1937,7 @@ public void testServiceInterfaces() throws Exception {
     <constructor-arg value="org.springframework.yarn.batch.repository.bindings"/>
   </bean>
 </yarn-int:converter>]]></programlisting>
-	
+
 
         <para>We use general client implementation able to communicate
         with a service running on <emphasis>Application Master</emphasis>.</para>
@@ -1852,7 +1946,7 @@ public void testServiceInterfaces() throws Exception {
   service-impl="org.springframework.yarn.integration.ip.mind.DefaultMindAppmasterServiceClient"
   host="${SHDP_AMSERVICE_HOST}"
   port="${SHDP_AMSERVICE_PORT}" />]]></programlisting>
-	  
+
         <para>Remote step is just like any other step.</para>
 
         <programlisting language="xml"><![CDATA[<bean id="hello" class="org.springframework.yarn.examples.PrintTasklet">
@@ -1862,13 +1956,13 @@ public void testServiceInterfaces() throws Exception {
 <batch:step id="remoteStep">
   <batch:tasklet transaction-manager="transactionManager" start-limit="100" ref="hello"/>
 </batch:step>]]></programlisting>
-	
+
         <para>We need to have a way to locate the step from an application
         context. For this we can define a step locator which is later
         configured into running container.</para>
 
         <programlisting language="xml"><![CDATA[<bean id="stepLocator" class="org.springframework.yarn.batch.partition.BeanFactoryStepLocator"/>]]></programlisting>
-	
+
         <para>Spring Hadoop contains a custom job repository implementation
         which is able to talk back to a remote instance via custom json protocol.</para>
 
@@ -1882,7 +1976,7 @@ public void testServiceInterfaces() throws Exception {
 <bean id="jobExplorer" class="org.springframework.yarn.batch.repository.RemoteJobExplorerFactoryBean">
   <property name="repositoryFactory" ref="&amp;jobRepository" />
 </bean>]]></programlisting>
-	
+
         <para>Finally we define a <emphasis>Container</emphasis> understanding
         how to work with a remote steps.</para>
 
@@ -1891,11 +1985,1581 @@ public void testServiceInterfaces() throws Exception {
   <property name="jobExplorer" ref="jobExplorer"/>
   <property name="integrationServiceClient" ref="yarnAmserviceClient"/>
 </bean>]]></programlisting>
-	
+
       </section>
 
     </section>
-  
+
+  </section>
+
+  <section id="yarn:boot">
+
+    <title>Using Spring Boot Application Model</title>
+
+    <para>We have additional support for leveraging <emphasis>Spring Boot</emphasis>
+    when creating applications using <emphasis>Spring YARN</emphasis>.
+    All dependencies for this exists in a sub-module named
+    <literal>spring-yarn-boot</literal> which itself depends on
+    <emphasis>Spring Boot</emphasis>.</para>
+
+    <para><emphasis>Spring Boot</emphasis> extensions in
+    <emphasis>Spring YARN</emphasis> are used to ease following issues:</para>
+
+
+    <itemizedlist>
+      <listitem>
+          <para>Create a clear model how application is built,
+          packaged and run on <emphasis>Hadoop YARN</emphasis>.</para>
+      </listitem>
+      <listitem>
+          <para>Automatically configure components depending whether we are
+          on <emphasis>Client</emphasis>, <emphasis>Appmaster</emphasis>
+          or <emphasis>Container</emphasis>.</para>
+      </listitem>
+      <listitem>
+          <para>Create an easy to use externalized configuration model based
+          on Boot's <classname>ConfigurationProperties</classname>.</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>Before we get into details let's go through how simple it is to
+    create and deploy a custom application to a Hadoop cluster. Notice that
+    there are no need to use XML.</para>
+
+    <programlisting language="java"><![CDATA[
+@Configuration
+@EnableAutoConfiguration
+public class ContainerApplication {
+
+  public static void main(String[] args) {
+    SpringApplication.run(ContainerApplication.class, args);
+  }
+
+  @Bean
+  public HelloPojo helloPojo() {
+    return new HelloPojo();
+  }
+
+}
+]]></programlisting>
+
+    <para>In above <classname>ContainerApplication</classname>, notice how we
+    added <interfacename>@Configuration</interfacename> in a class level itself
+    and <interfacename>@Bean</interfacename> for a <literal>helloPojo()</literal>
+    method.</para>
+
+    <programlisting language="java"><![CDATA[
+@YarnContainer
+public class HelloPojo {
+
+  private static final Log log = LogFactory.getLog(HelloPojo.class);
+
+  @Autowired
+  private Configuration configuration;
+
+  @OnYarnContainerStart
+  public void publicVoidNoArgsMethod() {
+    log.info("Hello from HelloPojo");
+    log.info("About to list from hdfs root content");
+    FsShell shell = new FsShell(configuration);
+    for (FileStatus s : shell.ls(false, "/")) {
+      log.info(s);
+    }
+  }
+
+}
+]]></programlisting>
+
+    <para><classname>HelloPojo</classname> class is a simple POJO in a sense
+    that it doesn't extend any <emphasis>Spring YARN</emphasis> base classes.
+    What we did in this class:</para>
+
+    <itemizedlist>
+      <listitem>
+          <para>We've added a class level<interfacename>@YarnContainer</interfacename>
+          annotation.</para>
+      </listitem>
+      <listitem>
+          <para>We've added a method level <interfacename>@OnYarnContainerStart</interfacename>
+          annotation.</para>
+      </listitem>
+      <listitem>
+          <para>We've <classname>@Autowired</classname> a Hadoop's Configuration class.</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>To demonstrate that we actually have some real functionality in this class,
+    we simply use Spring Hadoop's <classname>FsShell</classname> to list entries from
+    a root of a HDFS file system. For this we need to have access to Hadoop's
+    Configuration which is prepared for you so that you can just autowire it.</para>
+
+    <programlisting language="java"><![CDATA[
+@EnableAutoConfiguration
+public class ClientApplication {
+
+  public static void main(String[] args) {
+    SpringApplication.run(ClientApplication.class, args)
+      .getBean(YarnClient.class)
+      .submitApplication();
+  }
+
+}
+]]></programlisting>
+
+    <itemizedlist>
+      <listitem>
+          <para><interfacename>@EnableAutoConfiguration</interfacename> tells Spring Boot to
+          start adding beans based on classpath setting, other beans,
+          and various property settings.</para>
+      </listitem>
+      <listitem>
+          <para>Specific auto-configuration for Spring YARN components takes
+          place since Spring YARN is on the classpath.</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>The <literal>main()</literal> method uses Spring Boot's
+    <literal>SpringApplication.run()</literal> method to launch an application. From
+    there we simply request a bean of type <interfacename>YarnClient</interfacename> and
+    execute its <literal>submitApplication()</literal> method. What happens next depends
+    on application configuration, which we go through later in this document.</para>
+
+    <programlisting language="java"><![CDATA[
+@EnableAutoConfiguration
+public class AppmasterApplication {
+
+  public static void main(String[] args) {
+    SpringApplication.run(AppmasterApplication.class, args);
+  }
+
+}
+]]></programlisting>
+
+    <para>Application class for <interfacename>YarnAppmaster</interfacename> looks even
+    simpler than what we just did for <classname>ClientApplication</classname>.
+    Again the <literal>main()</literal> method uses Spring Boot's
+    <literal>SpringApplication.run()</literal> method to launch an application.</para>
+
+    <para>In real life, you most likely need to start adding more custom
+    functionality to your application component and you'd do that by start adding more beans.
+    To do that you need to define a Spring <interfacename>@Configuration</interfacename>
+    or <interfacename>@ComponentScan</interfacename>. AppmasterApplication would
+    then act as your main starting point to define more custom functionality.</para>
+
+    <programlisting language="text"><![CDATA[
+spring:
+  hadoop:
+    fsUri: hdfs://localhost:8020
+    resourceManagerHost: localhost
+  yarn:
+    appName: yarn-boot-simple
+    applicationDir: /app/yarn-boot-simple/
+    client:
+      files:
+       - "file:build/libs/yarn-boot-simple-container-0.1.0.jar"
+       - "file:build/libs/yarn-boot-simple-appmaster-0.1.0.jar"
+      launchcontext:
+        archiveFile: yarn-boot-simple-appmaster-0.1.0.jar
+    appmaster:
+      containerCount: 1
+      launchcontext:
+        archiveFile: yarn-boot-simple-container-0.1.0.jar
+]]></programlisting>
+
+    <para>Final part for your application is its runtime configuration which glues
+    all the components together which then can be called as a Spring YARN application.
+    This configuration act as source for Spring Boot's
+    <interfacename>@ConfigurationProperties</interfacename> and contains relevant
+    configuration properties which cannot be auto-discovered or otherwise needs
+    to have an option to be overwritten by an end user.</para>
+
+    <para>You can then write your own defaults for your own environment. Because these
+    <interfacename>@ConfigurationProperties</interfacename> are resolved at runtime by
+    Spring Boot, you even have an easy option to overwrite these properties either
+    by using command-line options or provide additional configuration property files.</para>
+
+    <section id="yarn:bootautoconfig">
+      <title>Auto Configuration</title>
+      <para><emphasis>Spring Boot</emphasis> is heavily influenced by
+      auto-configuration trying to predict what user wants to do. These
+      decisions are based on configuration properties, what's currently
+      available from a classpath and generally everything what auto-configurers
+      are able to see.</para>
+      <para>Auto-configuration is able to see if it's currently
+      running on a YARN cluster and can also differentiate between
+      <emphasis>YarnContainer</emphasis> and
+      <emphasis>YarnAppmaster</emphasis>. Parts of the auto-configuration
+      which cannot be automatically detected are guarded by a flags
+      in configuration properties which then allows end-user to either
+      enable or disable these functionalities.</para>
+    </section>
+
+    <section id="yarn:bootappfiles">
+      <title>Application Files</title>
+      <para>As we already mentioned <emphasis>Spring Boot</emphasis> creates
+      a clear model how you would work with your application files. Most likely
+      what you need in your application is jar or zip file(s) having needed
+      application code and optional configuration properties to customize
+      the application logic. Customization via an external properties files
+      makes it easier to change application functionality and reduce a need
+      to hard-code application logic.</para>
+
+      <para>Running an application on YARN needs an instance of
+      <emphasis>YarnAppmaster</emphasis> and instances of
+      <emphasis>YarnContainer</emphasis>s. Both of these containers
+      will need a set of files and instructions how to execute a
+      container. Based on auto-configuration and configuration
+      properties we will make few assumptions how a container
+      is executed.</para>
+
+      <para>We are fundamentally supporting three different type of
+      combinations:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>If a container main archive file is a jar file we expect
+          it to be packaged with Boot and be self container
+          executable jar archive.</para>
+        </listitem>
+        <listitem>
+          <para>If a container main archive is a zip file we expect
+          it to be packages with Boot. In this case we use a special
+          runner which knows how to run this exploded archive.</para>
+        </listitem>
+        <listitem>
+          <para>User defines a main class to be run and everything
+          this class will need is already setup.</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>More detailed functionality can be found from a below
+      sections; <xref linkend="yarn:bootclasspath"/>,
+      <xref linkend="yarn:bootrunners"/> and
+      <xref linkend="yarn:bootconfigprops"/>.</para>
+
+    </section>
+
+    <section id="yarn:bootclasspath">
+      <title>Application Classpath</title>
+      <para>Let's go through as an examples how a classpath
+      is configured on different use cases.</para>
+
+      <section>
+        <title>Simple Executable Jar</title>
+        <para>Running a container using an executable jar archive
+        is the most simple scenario due to classpath limitation
+        imposed by a JVM. Everything needed for the classpath
+        needs to be inside the archive itself. Boot plugins
+        for maven and gradle will greatly help to package all
+        library dependencies into this archive.</para>
+
+        <programlisting language="text"><![CDATA[
+spring:
+  yarn:
+    client:
+      launchcontext:
+        archiveFile: yarn-boot-appmaster-0.1.0.jar
+    appmaster:
+      launchcontext:
+        archiveFile: yarn-boot-container-0.1.0.jar
+]]></programlisting>
+
+      </section>
+
+      <section>
+        <title>Simple Zip Archive</title>
+        <para>Using a zip archive is basically needed in two use
+        cases. In first case you want to re-use existing libraries
+        in YARN cluster for your classpath. In second case you
+        want to add custom classpath entries from an exploded
+        zip archive.</para>
+
+        <programlisting language="text"><![CDATA[
+spring:
+  yarn:
+    defaultYarnAppClasspath: "/path/to/hadoop/libs/*"
+    appmaster:
+      launchcontext:
+        useDefaultYarnClasspath: true
+        archiveFile: yarn-boot-container-0.1.0.zip
+]]></programlisting>
+
+        <para>In above example you can have a zip archive which
+        doesn't bundle all dependant Hadoop YARN libraries. Default
+        classpath entries are then resolved from
+        <literal>defaultYarnAppClasspath</literal> property.</para>
+
+        <programlisting language="text"><![CDATA[
+spring:
+  yarn:
+    appmaster:
+      launchcontext:
+        archiveFile: yarn-boot-container-0.1.0.zip
+        classpath:
+         - "./yarn-boot-container-0.1.0.zip/config"
+         - "./yarn-boot-container-0.1.0.zip/lib"
+]]></programlisting>
+
+        <para>In above example you needed to use custom classpath
+        entries from an exploded zip archive.</para>
+
+      </section>
+
+    </section>
+
+    <section id="yarn:bootrunners">
+      <title>Container Runners</title>
+      <para>Using a propertys
+      <literal>spring.yarn.client.launchcontext.archiveFile</literal> and
+      <literal>spring.yarn.appmaster.launchcontext.archiveFile</literal>
+      respectively, will indicate that container is run based on an archive
+      file and Boot runners are used. These runner classes are either used
+      manually when constructing an actual raw command for container or
+      internally within an executable jar archive.</para>
+
+      <para>However there are times when you may need to work on much
+      lower level. Maybe you are having trouble using an executable
+      jar archive or Boot runner is not enough what you want to do.
+      For this use case you would use propertys
+      <literal>spring.yarn.client.launchcontext.runnerClass</literal> and
+      <literal>spring.yarn.appmaster.launchcontext.runnerClass</literal>.
+      </para>
+
+      <section>
+        <title>Custom Runner</title>
+
+        <programlisting language="text"><![CDATA[
+spring:
+  yarn:
+    appmaster:
+      launchcontext:
+        runnerClass: com.example.MyMainClazz
+]]></programlisting>
+
+      </section>
+
+    </section>
+
+    <section id="yarn:bootresourcelocalizer">
+      <title>Resource Localizing</title>
+      <para>Order for containers to use application files, a YARN resource
+      localization process needs to do its tasks. We have a few configuration
+      properties which are used to determine which files are actually
+      localized into container's working directory. </para>
+
+        <programlisting language="text"><![CDATA[
+spring:
+  yarn:
+    client:
+      localizer:
+        patterns:
+         - "*appmaster*jar"
+         - "*appmaster*zip"
+        zipPattern: "*zip"
+        propertiesNames: [application]
+        propertiesSuffixes: [properties, yml]
+    appmaster:
+      localizer:
+        patterns:
+         - "*container*jar"
+         - "*container*zip"
+        zipPattern: "*zip"
+        propertiesNames: [application]
+        propertiesSuffixes: [properties, yml]
+]]></programlisting>
+
+      <para>Above is an example which equals a default functionality
+      when localized resources are chosen. For example for a container
+      we automatically choose all files matching a simple patterns
+      <literal>*container*jar</literal> and <literal>*container*zip</literal>.
+      Additionally we choose configuration properties files matching names
+      <literal>application.properties</literal> and <literal>application.yml</literal>.
+      Property <emphasis>zipPattern</emphasis> is used as an pattern to
+      instruct YARN resource localizer to triet file as an archive to be
+      automatically exploded.</para>
+
+      <para>If for some reason the default functionality and how
+      it can be configured via configuration properties is not
+      suiteable, one can define a custom bean to change how
+      things work. Interface <interfacename>LocalResourcesSelector</interfacename>
+      is used to find localized resources.</para>
+
+      <programlisting language="java"><![CDATA[
+public interface LocalResourcesSelector {
+  List<Entry> select(String dir);
+}
+]]></programlisting>
+
+      <para>Below you see a logic how a default
+      <classname>BootLocalResourcesSelector</classname> is created 
+      during the auto-configuration. You would then create a custom
+      implementation and create it as a bean in your Configuration
+      class. You would not need to use any Conditionals but not
+      how in auto-configuration we use <classname>@ConditionalOnMissingBean</classname>
+      to check if user have already created his own implementation.</para>
+
+      <programlisting language="java"><![CDATA[
+@Configuration
+@EnableConfigurationProperties({ SpringYarnAppmasterLocalizerProperties.class })
+public static class LocalResourcesSelectorConfig {
+
+  @Autowired
+  private SpringYarnAppmasterLocalizerProperties syalp;
+
+  @Bean
+  @ConditionalOnMissingBean(LocalResourcesSelector.class)
+  public LocalResourcesSelector localResourcesSelector() {
+    BootLocalResourcesSelector selector = new BootLocalResourcesSelector(Mode.CONTAINER);
+    if (StringUtils.hasText(syalp.getZipPattern())) {
+      selector.setZipArchivePattern(syalp.getZipPattern());
+    }
+    if (syalp.getPropertiesNames() != null) {
+      selector.setPropertiesNames(syalp.getPropertiesNames());
+    }
+    if (syalp.getPropertiesSuffixes() != null) {
+      selector.setPropertiesSuffixes(syalp.getPropertiesSuffixes());
+    }
+    selector.addPatterns(syalp.getPatterns());
+    return selector;
+  }
+}
+]]></programlisting>
+
+    <para>Your configuration could then look like:</para>
+
+    <programlisting language="java"><![CDATA[
+@EnableAutoConfiguration
+public class AppmasterApplication {
+
+  @Bean
+  public LocalResourcesSelector localResourcesSelector() {
+    return MyLocalResourcesSelector();
+  }
+
+  public static void main(String[] args) {
+    SpringApplication.run(AppmasterApplication.class, args);
+  }
+
+}
+]]></programlisting>
+
+    </section>
+
+    <section id="yarn:bootpojo">
+      <title>Container as POJO</title>
+      <para>In Boot application model if <emphasis>YarnContainer</emphasis> is
+      not explicitly defined it defaults to <classname>DefaultYarnContainer</classname>
+      which expects to find a <literal>POJO</literal> created as a bean
+      having a specific annotations instructing the actual functionality.</para>
+
+      <para><interfacename>@YarnContainer</interfacename> is a stereotype annotation itself
+      having a Spring's <interfacename>@Component</interfacename> defined in it. This is
+      automatically marking a class to be a candidate having
+      a <interfacename>@YarnContainer</interfacename> functionality.</para>
+
+      <para>Within a <literal>POJO</literal> class we can use
+      <interfacename>@OnYarnContainerStart</interfacename> annotation to mark a public
+      method to act as an activator for a method endpoint.</para>
+
+     <programlisting language="java"><![CDATA[
+@OnYarnContainerStart
+public void publicVoidNoArgsMethod() {
+}
+]]></programlisting>
+
+      <para>Returning type of <literal>int</literal> participates
+      in a <emphasis>YarnContainer</emphasis> exit value.</para>
+
+      <programlisting language="java"><![CDATA[
+@OnYarnContainerStart
+public int publicIntNoArgsMethod() {
+  return 0;
+}
+]]></programlisting>
+
+      <para>Returning type of <literal>boolean</literal> participates
+      in a <emphasis>YarnContainer</emphasis> exit value where
+      <emphasis>true</emphasis> would mean complete and
+      <emphasis>false</emphasis> failed container.</para>
+
+  <programlisting language="java"><![CDATA[
+@OnYarnContainerStart
+public boolean publicBooleanNoArgsMethod() {
+  return true;
+}
+]]></programlisting>
+
+      <para>Returning type of <literal>String</literal> participates
+      in a <emphasis>YarnContainer</emphasis> exit value by matching
+      <classname>ExitStatus</classname> and getting exit value
+      from <interfacename>ExitCodeMapper</interfacename>.</para>
+
+      <programlisting language="java"><![CDATA[
+@OnYarnContainerStart
+public String publicVoidNoArgsMethod() {
+  return "COMPLETE";
+}
+]]></programlisting>
+
+      <para>If method throws any <classname>Exception</classname>
+      <emphasis>YarnContainer</emphasis> is marked as failed.</para>
+
+      <programlisting language="java"><![CDATA[
+@OnYarnContainerStart
+public void publicThrowsException() {
+  throw new RuntimeExection("My Error");
+}
+]]></programlisting>
+
+      <para>Method parameter can be bound with
+      <interfacename>@YarnEnvironments</interfacename> to get access
+      to current <emphasis>YarnContainer</emphasis> environment
+      variables.</para>
+
+      <programlisting language="java"><![CDATA[
+@OnYarnContainerStart
+public void publicVoidNoArgsMethod(@YarnEnvironments Map<String,String> env) {
+}
+]]></programlisting>
+
+      <para>Method parameter can be bound with
+      <interfacename>@YarnEnvironment</interfacename> to get access
+      to specific <emphasis>YarnContainer</emphasis> environment
+      variable.</para>
+
+      <programlisting language="java"><![CDATA[
+@OnYarnContainerStart
+public void publicVoidNoArgsMethod(@YarnEnvironment("key") String value) {
+}
+]]></programlisting>
+
+      <para>Method parameter can be bound with
+      <interfacename>@YarnParameters</interfacename> to get access
+      to current <emphasis>YarnContainer</emphasis> arguments.</para>
+
+      <programlisting language="java"><![CDATA[
+@OnYarnContainerStart
+public void publicVoidNoArgsMethod(@YarnParameters Properties properties) {
+}
+]]></programlisting>
+
+      <para>Method parameter can be bound with
+      <interfacename>@YarnParameter</interfacename> to get access
+      to a specific <emphasis>YarnContainer</emphasis> arguments.</para>
+
+      <programlisting language="java"><![CDATA[
+@OnYarnContainerStart
+public void publicVoidNoArgsMethod(@YarnParameter("key") String value) {
+}
+]]></programlisting>
+
+
+    </section>
+
+    <section id="yarn:bootconfigprops">
+
+      <title>Configuration Properties</title>
+
+      <para>Configuration properties can be defined using various methods.
+      See a Spring Boot dodumentation for details.</para>
+
+      <table id="yarn:boot:configpropsspringhadoop" pgwide="1" align="center">
+          <title><literal>spring.hadoop</literal> configuration properties</title>
+          <tgroup cols="4">
+              <colspec colname="c1" colwidth="2*" align="left"/>
+              <colspec colname="c2" colwidth="1*"/>
+              <colspec colname="c3" colwidth="1*"/>
+              <colspec colname="c4" colwidth="1*"/>
+              <thead>
+                  <row>
+                      <entry>Property Name</entry>
+                      <entry>Required</entry>
+                      <entry>Type</entry>
+                      <entry>Default Value</entry>
+                  </row>
+              </thead>
+              <tbody>
+                  <row>
+                      <entry><literal>spring.hadoop.fsUri</literal></entry>
+                      <entry>Yes</entry>
+                      <entry>String</entry>
+                      <entry>null</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.hadoop.resourceManagerAddress</literal></entry>
+                      <entry>No</entry>
+                      <entry>String</entry>
+                      <entry>null</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.hadoop.resourceManagerSchedulerAddress</literal></entry>
+                      <entry>No</entry>
+                      <entry>String</entry>
+                      <entry>null</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.hadoop.resourceManagerHost</literal></entry>
+                      <entry>No</entry>
+                      <entry>String</entry>
+                      <entry>null</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.hadoop.resourceManagerPort</literal></entry>
+                      <entry>No</entry>
+                      <entry>Integer</entry>
+                      <entry>8032</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.hadoop.resourceManagerSchedulerPort</literal></entry>
+                      <entry>No</entry>
+                      <entry>Integer</entry>
+                      <entry>8030</entry>
+                  </row>
+              </tbody>
+          </tgroup>
+      </table>
+
+      <variablelist>
+          <varlistentry><term><filename>spring.hadoop.fsUri</filename></term>
+              <listitem><para>
+              A hdfs file system uri for a namenode.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.hadoop.resourceManagerAddress</filename></term>
+              <listitem><para>
+              Address of a YARN resource manager.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.hadoop.resourceManagerSchedulerAddress</filename></term>
+              <listitem><para>
+              Address of a YARN resource manager scheduler.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.hadoop.resourceManagerHost</filename></term>
+              <listitem><para>
+              Hostname of a YARN resource manager.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.hadoop.resourceManagerPort</filename></term>
+              <listitem><para>
+              Port of a YARN resource manager.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.hadoop.resourceManagerSchedulerPort</filename></term>
+              <listitem><para>
+              Port of a YARN resource manager scheduler. This property is only
+              needed for an application master.
+              </para></listitem>
+          </varlistentry>
+      </variablelist>
+
+      <table id="yarn:boot:configpropsspringyarn" pgwide="1" align="center">
+          <title><literal>spring.yarn</literal> configuration properties</title>
+          <tgroup cols="4">
+              <colspec colname="c1" colwidth="2*" align="left"/>
+              <colspec colname="c2" colwidth="1*"/>
+              <colspec colname="c3" colwidth="1*"/>
+              <colspec colname="c4" colwidth="1*"/>
+              <thead>
+                  <row>
+                      <entry>Property Name</entry>
+                      <entry>Required</entry>
+                      <entry>Type</entry>
+                      <entry>Default Value</entry>
+                  </row>
+              </thead>
+              <tbody>
+                  <row>
+                      <entry><literal>spring.yarn.applicationDir</literal></entry>
+                      <entry>No</entry>
+                      <entry>String</entry>
+                      <entry>null</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.applicationBaseDir</literal></entry>
+                      <entry>No</entry>
+                      <entry>String</entry>
+                      <entry>null</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.stagingDir</literal></entry>
+                      <entry>No</entry>
+                      <entry>String</entry>
+                      <entry>/spring/staging</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.appName</literal></entry>
+                      <entry>No</entry>
+                      <entry>String</entry>
+                      <entry>null</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.appType</literal></entry>
+                      <entry>No</entry>
+                      <entry>String</entry>
+                      <entry>YARN</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.defaultYarnAppClasspath</literal></entry>
+                      <entry>No</entry>
+                      <entry>String</entry>
+                      <entry>null</entry>
+                  </row>
+              </tbody>
+          </tgroup>
+      </table>
+
+      <variablelist>
+          <varlistentry><term><filename>spring.yarn.applicationDir</filename></term>
+              <listitem><para>
+              An application home directory in hdfs. If client copies
+              files into a hdfs during an application submission, files will
+              end up in this directory. If this property is omitted, a staging
+              directory will be used instead.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.applicationBaseDir</filename></term>
+              <listitem><para>
+              An applications base directory where build-in application
+              deployment functionality would create a new application instance.
+              For a normal application submit operation, this is not needed.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.stagingDir</filename></term>
+              <listitem><para>
+              A global staging base directory in hdfs.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.appName</filename></term>
+              <listitem><para>
+              Defines a registered application name visible from a YARN
+              resource manager.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.appType</filename></term>
+              <listitem><para>
+              Defines a registered application type used in YARN resource manager.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.defaultYarnAppClasspath</filename></term>
+              <listitem><para>
+              Defines a default base YARN application classpath entries.
+              </para></listitem>
+          </varlistentry>
+      </variablelist>
+
+
+      <table id="yarn:boot:configpropsspringyarnappmaster" pgwide="1" align="center">
+          <title><literal>spring.yarn.appmaster</literal> configuration properties</title>
+          <tgroup cols="4">
+              <colspec colname="c1" colwidth="2*" align="left"/>
+              <colspec colname="c2" colwidth="1*"/>
+              <colspec colname="c3" colwidth="1*"/>
+              <colspec colname="c4" colwidth="1*"/>
+              <thead>
+                  <row>
+                      <entry>Property Name</entry>
+                      <entry>Required</entry>
+                      <entry>Type</entry>
+                      <entry>Default Value</entry>
+                  </row>
+              </thead>
+              <tbody>
+                  <row>
+                      <entry><literal>spring.yarn.appmaster.appmasterClass</literal></entry>
+                      <entry>No</entry>
+                      <entry>Class</entry>
+                      <entry>null</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.appmaster.containerCount</literal></entry>
+                      <entry>No</entry>
+                      <entry>Integer</entry>
+                      <entry>1</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.appmaster.keepContextAlive</literal></entry>
+                      <entry>No</entry>
+                      <entry>Boolean</entry>
+                      <entry>true</entry>
+                  </row>
+              </tbody>
+          </tgroup>
+      </table>
+
+      <variablelist>
+          <varlistentry><term><filename>spring.yarn.appmaster.appmasterClass</filename></term>
+              <listitem><para>
+              Fully qualified classname which auto-configuration can automatically
+              instantiate as a custom application master.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.appmaster.containerCount</filename></term>
+              <listitem><para>
+              Property which is automatically kept in configuration as a hint which
+              an application master can choose to use when determing how many
+              containers should be launched.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.appmaster.keepContextAlive</filename></term>
+              <listitem><para>
+              Setting for an application master runner to stop main thread to wait
+              a latch before continuing. This is needed in cases where main thread
+              needs to wait event from other threads to be able to exit.
+              </para></listitem>
+          </varlistentry>
+      </variablelist>
+
+      <table id="yarn:boot:configpropsspringyarnappmasterlaunchcontext" pgwide="1" align="center">
+          <title><literal>spring.yarn.appmaster.launchcontext</literal> configuration properties</title>
+          <tgroup cols="4">
+              <colspec colname="c1" colwidth="2*" align="left"/>
+              <colspec colname="c2" colwidth="1*"/>
+              <colspec colname="c3" colwidth="1*"/>
+              <colspec colname="c4" colwidth="1*"/>
+              <thead>
+                  <row>
+                      <entry>Property Name</entry>
+                      <entry>Required</entry>
+                      <entry>Type</entry>
+                      <entry>Default Value</entry>
+                  </row>
+              </thead>
+              <tbody>
+                  <row>
+                      <entry><literal>spring.yarn.appmaster.launchcontext.archiveFile</literal></entry>
+                      <entry>No</entry>
+                      <entry>String</entry>
+                      <entry>null</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.appmaster.launchcontext.runnerClass</literal></entry>
+                      <entry>No</entry>
+                      <entry>Class</entry>
+                      <entry>null</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.appmaster.launchcontext.options</literal></entry>
+                      <entry>No</entry>
+                      <entry>List</entry>
+                      <entry>null</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.appmaster.launchcontext.arguments</literal></entry>
+                      <entry>No</entry>
+                      <entry>Map</entry>
+                      <entry>null</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.appmaster.launchcontext.classpath</literal></entry>
+                      <entry>No</entry>
+                      <entry>List</entry>
+                      <entry>null</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.appmaster.launchcontext.pathSeparator</literal></entry>
+                      <entry>No</entry>
+                      <entry>String</entry>
+                      <entry>:</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.appmaster.launchcontext.includeBaseDirectory</literal></entry>
+                      <entry>No</entry>
+                      <entry>Boolean</entry>
+                      <entry>true</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.appmaster.launchcontext.useDefaultYarnClasspath</literal></entry>
+                      <entry>No</entry>
+                      <entry>Boolean</entry>
+                      <entry>true</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.appmaster.launchcontext.includeSystemEnv</literal></entry>
+                      <entry>No</entry>
+                      <entry>Boolean</entry>
+                      <entry>true</entry>
+                  </row>
+              </tbody>
+          </tgroup>
+      </table>
+
+      <variablelist>
+          <varlistentry><term><filename>spring.yarn.appmaster.launchcontext.archiveFile</filename></term>
+              <listitem><para>
+              Indicates that a container main file is treated as executable jar or exploded zip.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.appmaster.launchcontext.runnerClass</filename></term>
+              <listitem><para>
+              Indicates a fully qualified class name for a container runner.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.appmaster.launchcontext.options</filename></term>
+              <listitem><para>
+              JVM system options.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.appmaster.launchcontext.arguments</filename></term>
+              <listitem><para>
+              Application arguments.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.appmaster.launchcontext.classpath</filename></term>
+              <listitem><para>
+              Additional classpath entries.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.appmaster.launchcontext.pathSeparator</filename></term>
+              <listitem><para>
+              Separator in a classpath.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.appmaster.launchcontext.includeBaseDirectory</filename></term>
+              <listitem><para>
+              If base directory should be added in a classpath.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.appmaster.launchcontext.useDefaultYarnClasspath</filename></term>
+              <listitem><para>
+              If default yarn application classpath should be added.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.appmaster.launchcontext.includeSystemEnv</filename></term>
+              <listitem><para>
+              If system environment variables are added to a container environment.
+              </para></listitem>
+          </varlistentry>
+      </variablelist>
+
+      <table id="yarn:boot:configpropsspringyarnappmasterlocalizer" pgwide="1" align="center">
+          <title><literal>spring.yarn.appmaster.localizer</literal> configuration properties</title>
+          <tgroup cols="4">
+              <colspec colname="c1" colwidth="2*" align="left"/>
+              <colspec colname="c2" colwidth="1*"/>
+              <colspec colname="c3" colwidth="1*"/>
+              <colspec colname="c4" colwidth="1*"/>
+              <thead>
+                  <row>
+                      <entry>Property Name</entry>
+                      <entry>Required</entry>
+                      <entry>Type</entry>
+                      <entry>Default Value</entry>
+                  </row>
+              </thead>
+              <tbody>
+                  <row>
+                      <entry><literal>spring.yarn.appmaster.localizer.patterns</literal></entry>
+                      <entry>No</entry>
+                      <entry>List</entry>
+                      <entry>null</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.appmaster.localizer.zipPattern</literal></entry>
+                      <entry>No</entry>
+                      <entry>String</entry>
+                      <entry>null</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.appmaster.localizer.propertiesNames</literal></entry>
+                      <entry>No</entry>
+                      <entry>List</entry>
+                      <entry>null</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.appmaster.localizer.propertiesSuffixes</literal></entry>
+                      <entry>No</entry>
+                      <entry>List</entry>
+                      <entry>null</entry>
+                  </row>
+              </tbody>
+          </tgroup>
+      </table>
+
+      <variablelist>
+          <varlistentry><term><filename>spring.yarn.appmaster.localizer.patterns</filename></term>
+              <listitem><para>
+              A simple patterns to choose localized files.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.appmaster.localizer.zipPattern</filename></term>
+              <listitem><para>
+              A simple pattern to mark a file as archive to be exploded.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.appmaster.localizer.propertiesNames</filename></term>
+              <listitem><para>
+              Base name of a configuration files.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.appmaster.localizer.propertiesSuffixes</filename></term>
+              <listitem><para>
+              Suffixes for a configuration files.
+              </para></listitem>
+          </varlistentry>
+      </variablelist>
+
+      <table id="yarn:boot:configpropsspringyarnappmasterresource" pgwide="1" align="center">
+          <title><literal>spring.yarn.appmaster.resource</literal> configuration properties</title>
+          <tgroup cols="4">
+              <colspec colname="c1" colwidth="2*" align="left"/>
+              <colspec colname="c2" colwidth="1*"/>
+              <colspec colname="c3" colwidth="1*"/>
+              <colspec colname="c4" colwidth="1*"/>
+              <thead>
+                  <row>
+                      <entry>Property Name</entry>
+                      <entry>Required</entry>
+                      <entry>Type</entry>
+                      <entry>Default Value</entry>
+                  </row>
+              </thead>
+              <tbody>
+                  <row>
+                      <entry><literal>spring.yarn.appmaster.resource.priority</literal></entry>
+                      <entry>No</entry>
+                      <entry>String</entry>
+                      <entry>null</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.appmaster.resource.memory</literal></entry>
+                      <entry>No</entry>
+                      <entry>String</entry>
+                      <entry>null</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.appmaster.resource.virtualCores</literal></entry>
+                      <entry>No</entry>
+                      <entry>String</entry>
+                      <entry>null</entry>
+                  </row>
+              </tbody>
+          </tgroup>
+      </table>
+
+      <variablelist>
+          <varlistentry><term><filename>spring.yarn.appmaster.resource.priority</filename></term>
+              <listitem><para>
+              Container priority.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.appmaster.resource.memory</filename></term>
+              <listitem><para>
+              Container memory allocation.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.appmaster.resource.virtualCores</filename></term>
+              <listitem><para>
+              Container cpu allocation.
+              </para></listitem>
+          </varlistentry>
+      </variablelist>
+
+
+
+      <table id="yarn:boot:configpropsspringyarnclient" pgwide="1" align="center">
+          <title><literal>spring.yarn.client</literal> configuration properties</title>
+          <tgroup cols="4">
+              <colspec colname="c1" colwidth="2*" align="left"/>
+              <colspec colname="c2" colwidth="1*"/>
+              <colspec colname="c3" colwidth="1*"/>
+              <colspec colname="c4" colwidth="1*"/>
+              <thead>
+                  <row>
+                      <entry>Property Name</entry>
+                      <entry>Required</entry>
+                      <entry>Type</entry>
+                      <entry>Default Value</entry>
+                  </row>
+              </thead>
+              <tbody>
+                  <row>
+                      <entry><literal>spring.yarn.client.files</literal></entry>
+                      <entry>No</entry>
+                      <entry>List</entry>
+                      <entry>null</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.client.priority</literal></entry>
+                      <entry>No</entry>
+                      <entry>Integer</entry>
+                      <entry>null</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.client.queue</literal></entry>
+                      <entry>No</entry>
+                      <entry>String</entry>
+                      <entry>null</entry>
+                  </row>
+              </tbody>
+          </tgroup>
+      </table>
+
+      <variablelist>
+          <varlistentry><term><filename>spring.yarn.client.files</filename></term>
+              <listitem><para>
+              Files to copy into hdfs during application submission.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.client.priority</filename></term>
+              <listitem><para>
+              Application priority.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.client.queue</filename></term>
+              <listitem><para>
+              Application submission queue.
+              </para></listitem>
+          </varlistentry>
+      </variablelist>
+
+      <table id="yarn:boot:configpropsspringyarnclientlaunchcontext" pgwide="1" align="center">
+          <title><literal>spring.yarn.client.launchcontext</literal> configuration properties</title>
+          <tgroup cols="4">
+              <colspec colname="c1" colwidth="2*" align="left"/>
+              <colspec colname="c2" colwidth="1*"/>
+              <colspec colname="c3" colwidth="1*"/>
+              <colspec colname="c4" colwidth="1*"/>
+              <thead>
+                  <row>
+                      <entry>Property Name</entry>
+                      <entry>Required</entry>
+                      <entry>Type</entry>
+                      <entry>Default Value</entry>
+                  </row>
+              </thead>
+              <tbody>
+                  <row>
+                      <entry><literal>spring.yarn.client.launchcontext.archiveFile</literal></entry>
+                      <entry>No</entry>
+                      <entry>String</entry>
+                      <entry>null</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.client.launchcontext.runnerClass</literal></entry>
+                      <entry>No</entry>
+                      <entry>Class</entry>
+                      <entry>null</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.client.launchcontext.options</literal></entry>
+                      <entry>No</entry>
+                      <entry>List</entry>
+                      <entry>null</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.client.launchcontext.arguments</literal></entry>
+                      <entry>No</entry>
+                      <entry>Map</entry>
+                      <entry>null</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.client.launchcontext.classpath</literal></entry>
+                      <entry>No</entry>
+                      <entry>List</entry>
+                      <entry>null</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.client.launchcontext.pathSeparator</literal></entry>
+                      <entry>No</entry>
+                      <entry>String</entry>
+                      <entry>:</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.client.launchcontext.includeBaseDirectory</literal></entry>
+                      <entry>No</entry>
+                      <entry>Boolean</entry>
+                      <entry>true</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.client.launchcontext.useDefaultYarnClasspath</literal></entry>
+                      <entry>No</entry>
+                      <entry>Boolean</entry>
+                      <entry>true</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.client.launchcontext.includeSystemEnv</literal></entry>
+                      <entry>No</entry>
+                      <entry>Boolean</entry>
+                      <entry>true</entry>
+                  </row>
+              </tbody>
+          </tgroup>
+      </table>
+
+      <variablelist>
+          <varlistentry><term><filename>spring.yarn.client.launchcontext.archiveFile</filename></term>
+              <listitem><para>
+              Indicates that a container main file is treated as executable jar or exploded zip.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.client.launchcontext.runnerClass</filename></term>
+              <listitem><para>
+              Indicates a fully qualified class name for a container runner.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.client.launchcontext.options</filename></term>
+              <listitem><para>
+              JVM system options.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.client.launchcontext.arguments</filename></term>
+              <listitem><para>
+              Application arguments.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.client.launchcontext.classpath</filename></term>
+              <listitem><para>
+              Additional classpath entries.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.client.launchcontext.pathSeparator</filename></term>
+              <listitem><para>
+              Separator in a classpath.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.client.launchcontext.includeBaseDirectory</filename></term>
+              <listitem><para>
+              If base directory should be added in a classpath.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.client.launchcontext.useDefaultYarnClasspath</filename></term>
+              <listitem><para>
+              If default yarn application classpath should be added.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.client.launchcontext.includeSystemEnv</filename></term>
+              <listitem><para>
+              If system environment variables are added to a container environment.
+              </para></listitem>
+          </varlistentry>
+      </variablelist>
+
+      <table id="yarn:boot:configpropsspringyarnclientlocalizer" pgwide="1" align="center">
+          <title><literal>spring.yarn.client.localizer</literal> configuration properties</title>
+          <tgroup cols="4">
+              <colspec colname="c1" colwidth="2*" align="left"/>
+              <colspec colname="c2" colwidth="1*"/>
+              <colspec colname="c3" colwidth="1*"/>
+              <colspec colname="c4" colwidth="1*"/>
+              <thead>
+                  <row>
+                      <entry>Property Name</entry>
+                      <entry>Required</entry>
+                      <entry>Type</entry>
+                      <entry>Default Value</entry>
+                  </row>
+              </thead>
+              <tbody>
+                  <row>
+                      <entry><literal>spring.yarn.client.localizer.patterns</literal></entry>
+                      <entry>No</entry>
+                      <entry>List</entry>
+                      <entry>null</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.client.localizer.zipPattern</literal></entry>
+                      <entry>No</entry>
+                      <entry>String</entry>
+                      <entry>null</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.client.localizer.propertiesNames</literal></entry>
+                      <entry>No</entry>
+                      <entry>List</entry>
+                      <entry>null</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.client.localizer.propertiesSuffixes</literal></entry>
+                      <entry>No</entry>
+                      <entry>List</entry>
+                      <entry>null</entry>
+                  </row>
+              </tbody>
+          </tgroup>
+      </table>
+
+      <variablelist>
+          <varlistentry><term><filename>spring.yarn.client.localizer.patterns</filename></term>
+              <listitem><para>
+              A simple patterns to choose localized files.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.client.localizer.zipPattern</filename></term>
+              <listitem><para>
+              A simple pattern to mark a file as archive to be exploded.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.client.localizer.propertiesNames</filename></term>
+              <listitem><para>
+              Base name of a configuration files.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.client.localizer.propertiesSuffixes</filename></term>
+              <listitem><para>
+              Suffixes for a configuration files.
+              </para></listitem>
+          </varlistentry>
+      </variablelist>
+
+      <table id="yarn:boot:configpropsspringyarnclientresource" pgwide="1" align="center">
+          <title><literal>spring.yarn.client.resource</literal> configuration properties</title>
+          <tgroup cols="4">
+              <colspec colname="c1" colwidth="2*" align="left"/>
+              <colspec colname="c2" colwidth="1*"/>
+              <colspec colname="c3" colwidth="1*"/>
+              <colspec colname="c4" colwidth="1*"/>
+              <thead>
+                  <row>
+                      <entry>Property Name</entry>
+                      <entry>Required</entry>
+                      <entry>Type</entry>
+                      <entry>Default Value</entry>
+                  </row>
+              </thead>
+              <tbody>
+                  <row>
+                      <entry><literal>spring.yarn.client.resource.memory</literal></entry>
+                      <entry>No</entry>
+                      <entry>String</entry>
+                      <entry>null</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.client.resource.virtualCores</literal></entry>
+                      <entry>No</entry>
+                      <entry>String</entry>
+                      <entry>null</entry>
+                  </row>
+              </tbody>
+          </tgroup>
+      </table>
+
+      <variablelist>
+          <varlistentry><term><filename>spring.yarn.client.resource.memory</filename></term>
+              <listitem><para>
+              Application master memory allocation.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.client.resource.virtualCores</filename></term>
+              <listitem><para>
+              Application master cpu allocation.
+              </para></listitem>
+          </varlistentry>
+      </variablelist>
+
+
+      <table id="yarn:boot:configpropsspringyarncontainer" pgwide="1" align="center">
+          <title><literal>spring.yarn.container</literal> configuration properties</title>
+          <tgroup cols="4">
+              <colspec colname="c1" colwidth="2*" align="left"/>
+              <colspec colname="c2" colwidth="1*"/>
+              <colspec colname="c3" colwidth="1*"/>
+              <colspec colname="c4" colwidth="1*"/>
+              <thead>
+                  <row>
+                      <entry>Property Name</entry>
+                      <entry>Required</entry>
+                      <entry>Type</entry>
+                      <entry>Default Value</entry>
+                  </row>
+              </thead>
+              <tbody>
+                  <row>
+                      <entry><literal>spring.yarn.container.keepContextAlive</literal></entry>
+                      <entry>No</entry>
+                      <entry>Boolean</entry>
+                      <entry>true</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.container.containerClass</literal></entry>
+                      <entry>No</entry>
+                      <entry>Class</entry>
+                      <entry>null</entry>
+                  </row>
+              </tbody>
+          </tgroup>
+      </table>
+
+      <variablelist>
+          <varlistentry><term><filename>spring.yarn.container.keepContextAlive</filename></term>
+              <listitem><para>
+              Setting for an application container runner to stop main thread to wait
+              a latch before continuing. This is needed in cases where main thread
+              needs to wait event from other threads to be able to exit.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.container.containerClass</filename></term>
+              <listitem><para>
+              Fully qualified classname which auto-configuration can automatically
+              instantiate as a custom container.
+              </para></listitem>
+          </varlistentry>
+      </variablelist>
+
+
+
+
+
+      <table id="yarn:boot:configpropsspringyarnbatch" pgwide="1" align="center">
+          <title><literal>spring.yarn.batch</literal> configuration properties</title>
+          <tgroup cols="4">
+              <colspec colname="c1" colwidth="2*" align="left"/>
+              <colspec colname="c2" colwidth="1*"/>
+              <colspec colname="c3" colwidth="1*"/>
+              <colspec colname="c4" colwidth="1*"/>
+              <thead>
+                  <row>
+                      <entry>Property Name</entry>
+                      <entry>Required</entry>
+                      <entry>Type</entry>
+                      <entry>Default Value</entry>
+                  </row>
+              </thead>
+              <tbody>
+                  <row>
+                      <entry><literal>spring.yarn.batch.name</literal></entry>
+                      <entry>No</entry>
+                      <entry>String</entry>
+                      <entry>null</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.batch.enabled</literal></entry>
+                      <entry>No</entry>
+                      <entry>Boolean</entry>
+                      <entry>false</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.batch.jobs</literal></entry>
+                      <entry>No</entry>
+                      <entry>List</entry>
+                      <entry>null</entry>
+                  </row>
+              </tbody>
+          </tgroup>
+      </table>
+
+      <variablelist>
+          <varlistentry><term><filename>spring.yarn.batch.name</filename></term>
+              <listitem><para>
+              Comma-delimited list of search patterns to find jobs to run
+              defined either locally in application context or in job registry.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.batch.enabled</filename></term>
+              <listitem><para>
+              Indicates if batch processing on yarn is enabled.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.batch.jobs</filename></term>
+              <listitem><para>
+              Indicates a list of individual configuration properties for jobs.
+              </para></listitem>
+          </varlistentry>
+      </variablelist>
+
+      <table id="yarn:boot:configpropsspringyarnbatchjobs" pgwide="1" align="center">
+          <title><literal>spring.yarn</literal> configuration properties</title>
+          <tgroup cols="4">
+              <colspec colname="c1" colwidth="2*" align="left"/>
+              <colspec colname="c2" colwidth="1*"/>
+              <colspec colname="c3" colwidth="1*"/>
+              <colspec colname="c4" colwidth="1*"/>
+              <thead>
+                  <row>
+                      <entry>Property Name</entry>
+                      <entry>Required</entry>
+                      <entry>Type</entry>
+                      <entry>Default Value</entry>
+                  </row>
+              </thead>
+              <tbody>
+                  <row>
+                      <entry><literal>spring.yarn.batch.jobs.name</literal></entry>
+                      <entry>No</entry>
+                      <entry>String</entry>
+                      <entry>null</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.batch.jobs.enabled</literal></entry>
+                      <entry>No</entry>
+                      <entry>Boolean</entry>
+                      <entry>false</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.batch.jobs.next</literal></entry>
+                      <entry>No</entry>
+                      <entry>Boolean</entry>
+                      <entry>false</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.batch.jobs.failNext</literal></entry>
+                      <entry>No</entry>
+                      <entry>Boolean</entry>
+                      <entry>false</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.batch.jobs.restart</literal></entry>
+                      <entry>No</entry>
+                      <entry>Boolean</entry>
+                      <entry>false</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.batch.jobs.failRestart</literal></entry>
+                      <entry>No</entry>
+                      <entry>Boolean</entry>
+                      <entry>false</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.batch.jobs.parameters</literal></entry>
+                      <entry>No</entry>
+                      <entry>String</entry>
+                      <entry>null</entry>
+                  </row>
+              </tbody>
+          </tgroup>
+      </table>
+
+      <variablelist><title>Descriptions</title>
+          <varlistentry><term><filename>spring.yarn.batch.jobs.name</filename></term>
+              <listitem><para>
+              Name of a job to configure.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.batch.jobs.enabled</filename></term>
+              <listitem><para>
+              Indicates if job is enabled.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.batch.jobs.next</filename></term>
+              <listitem><para>
+              Indicates if job parameters incrementer is used to prepare a job for next run.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.batch.jobs.failNext</filename></term>
+              <listitem><para>
+              Indicates if job execution should fail if job cannot be prepared for next execution.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.batch.jobs.restart</filename></term>
+              <listitem><para>
+              Indicates of job should be restarted.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.batch.jobs.failRestart</filename></term>
+              <listitem><para>
+              Indicates if job execution should fail if job cannot be restarted.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.batch.jobs.parameters</filename></term>
+              <listitem><para>
+              Defines a Map of additional job parameters. Keys and values are in normal
+              format supported by Batch.
+              </para></listitem>
+          </varlistentry>
+      </variablelist>
+
+    </section>
+
   </section>
 
 </chapter>
