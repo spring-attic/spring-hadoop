@@ -489,4 +489,104 @@ public class MultiContextTests extends AbstractYarnClusterTests {
 
   </section>
 
+  <section id="testing:boot">
+
+    <title>Testing Boot Based Applications</title>                      
+
+    <para>In previous sections we showed a generic concepts of unit testing
+    in <emphasis>Spring Hadoop</emphasis> and <emphasis>Spring YARN</emphasis>.
+    We also have a first class support for testing <emphasis>Spring Boot</emphasis>
+    based applications made for YARN.</para>
+
+    <para></para>
+
+    <programlisting language="java"><![CDATA[
+@MiniYarnCluster
+@ContextConfiguration(loader = YarnDelegatingSmartContextLoader.class, classes = EmptyConfig.class)
+public class AppTests extends AbstractBootYarnClusterTests {
+
+  @Test
+  public void testApp() throws Exception {
+    ApplicationInfo info = submitApplicationAndWait(ClientApplication.class, new String[0]);
+    assertThat(info.getYarnApplicationState(), is(YarnApplicationState.FINISHED));
+
+    List<Resource> resources = ContainerLogUtils.queryContainerLogs(
+      getYarnCluster(), info.getApplicationId());
+    assertThat(resources, notNullValue());
+    assertThat(resources.size(), is(4));
+
+    for (Resource res : resources) {
+      File file = res.getFile();
+      String content = ContainerLogUtils.getFileContent(file);
+      if (file.getName().endsWith("stdout")) {
+        assertThat(file.length(), greaterThan(0l));
+        if (file.getName().equals("Container.stdout")) {
+          assertThat(content, containsString("Hello from HelloPojo"));
+        }
+      } else if (file.getName().endsWith("stderr")) {
+        assertThat("stderr with content: " + content, file.length(), is(0l));
+      }
+    }
+  }
+
+}
+
+]]></programlisting>
+
+    <para>Let’s go through step by step what’s happening in this JUnit class. As
+    already mentioned earlier we don’t need any existing or running Hadoop instances,
+    instead testing framework from Spring YARN provides an easy way to fire up
+    a mini cluster where your tests can be run in an isolated environment.</para>
+
+    <itemizedlist>
+      <listitem>
+        <para><interfacename>@ContextConfiguration</interfacename> together with
+        <classname>YarnDelegatingSmartContextLoader</classname> tells Spring to prepare
+        a testing context for a mini cluster. <classname>EmptyConfig</classname> is
+        a simple helper class to use if there are no additional configuration for tests.</para>
+      </listitem>
+      <listitem>
+        <para><interfacename>@MiniYarnCluster</interfacename> tells Spring to start
+        a Hadoop’s mini cluster having components for <emphasis>HDFS</emphasis>
+        and <emphasis>YARN</emphasis>. Hadoop’s configuration from this minicluster is
+        automatically injected into your testing context.</para>
+      </listitem>
+      <listitem>
+        <para><classname>AbstractBootYarnClusterTests</classname> is a class containing
+        a lot of base functionality what you need in your tests.</para>
+      </listitem>
+    </itemizedlist>
+
+
+    <para>Then it’s time to deploy the application into a running minicluster</para>
+
+    <itemizedlist>
+      <listitem>
+        <para><literal>submitApplicationAndWait()</literal> method simply runs your
+        <classname>ClientApplication</classname> and expects it to an application deployment.
+        On default it will wait 60 seconds an application to finish and returns an current state.</para>
+      </listitem>
+      <listitem>
+        <para>We make sure that we have a correct application state</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>We use <classname>ContainerLogUtils</classname> to find our container
+    logs files from a minicluster.</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>We assert count of a log files</para>
+      </listitem>
+      <listitem>
+        <para>We expect some specified content from log file</para>
+      </listitem>
+      <listitem>
+        <para>We expect stderr files to be empty</para>
+      </listitem>
+    </itemizedlist>
+
+  </section>
+
+
 </chapter>
