@@ -5,6 +5,22 @@ http://projects.spring.io/spring-hadoop/
 Commit changelog: http://github.com/spring-projects/spring-hadoop/tree/v[version]
 Issues changelog: http://jira.springsource.org/secure/ReleaseNote.jspa?projectId=10801
 
+Changes in version 2.0.0 M6 (2014-03-05)
+-----------------------------------------
+General
+* Update build make Hadoop 2.2.0 default and update dependencies [SHDP-268]
+* Upgrade to use Spring 4 as the Spring version [SHDP-285]
+* Rename -test and -test-core modules [SHDP-291]
+
+YARN
+* Update to Spring Boot RC3 [SHDP-271]
+* Ease testing of packaged Spring Yarn apps [SHDP-254]
+* Fix inconsistnencies in boot config properties [SHDP-276]
+* Add missing boot props for classpath [SHDP-280]
+* Allow more precise control of container localized files [SHDP-279]
+* Support testing using single annotation [SHDP-281]
+
+
 Changes in version 2.0.0 M5 (2014-02-03)
 -----------------------------------------
 General
