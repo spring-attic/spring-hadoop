@@ -25,7 +25,7 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.util.LineReader;
 import org.springframework.data.hadoop.store.DataStoreReader;
 import org.springframework.data.hadoop.store.codec.CodecInfo;
-import org.springframework.data.hadoop.store.support.StreamsHolder;
+import org.springframework.data.hadoop.store.split.Split;
 
 /**
  * A {@code TextFileReader} is a {@code DataStoreReader} implementation
@@ -36,9 +36,7 @@ import org.springframework.data.hadoop.store.support.StreamsHolder;
  */
 public class TextFileReader extends AbstractDataStreamReader implements DataStoreReader<String> {
 
-	private StreamsHolder<InputStream> streamsHolder;
-
-	private LineReader lineReader;
+	private ReaderHelper<LineReader, byte[]> readerHelper;
 
 	private final byte[] delimiter;
 
@@ -59,33 +57,64 @@ public class TextFileReader extends AbstractDataStreamReader implements DataStor
 	 * @param configuration the configuration
 	 * @param basePath the base path
 	 * @param codec the codec
+	 * @param split the input split
+	 */
+	public TextFileReader(Configuration configuration, Path basePath, CodecInfo codec, Split split) {
+		this(configuration, basePath, codec, split, null);
+	}
+
+	/**
+	 * Instantiates a new text file reader.
+	 *
+	 * @param configuration the configuration
+	 * @param basePath the base path
+	 * @param codec the codec
+	 * @param split the input split
 	 * @param delimiter the delimiter
 	 */
-	public TextFileReader(Configuration configuration, Path basePath, CodecInfo codec, byte[] delimiter) {
-		super(configuration, basePath, codec);
+	public TextFileReader(Configuration configuration, Path basePath, CodecInfo codec, Split split, byte[] delimiter) {
+		super(configuration, basePath, codec, split);
 		this.delimiter = delimiter;
 	}
 
 	@Override
 	public void close() throws IOException {
-		if (lineReader != null) {
-			lineReader.close();
-			lineReader = null;
-		}
-		if (streamsHolder != null) {
-			streamsHolder.close();
+		if (readerHelper != null) {
+			if (readerHelper.getReader() != null) {
+				readerHelper.getReader().close();
+			}
+			if (readerHelper.getHolder() != null) {
+				readerHelper.getHolder().close();
+			}
+			readerHelper = null;
 		}
 	}
 
 	@Override
-	public String read() throws IOException {
-		if (streamsHolder == null) {
-			streamsHolder = getInput(getPath());
-			lineReader = new LineReader(streamsHolder.getStream(), delimiter);
+	public String read() throws IOException  {
+		if (readerHelper == null) {
+			readerHelper = new ReaderHelper<LineReader, byte[]>(getInput(), getInputContext(), getSplit(), getCodec()) {
+				@Override
+				protected LineReader createReader(InputStream inputStream) throws IOException {
+					LineReader lineReader = new LineReader(inputStream, delimiter);
+					if (getContext().getStart() > 0) {
+						processReadCount(lineReader.readLine(new Text()));
+					}
+					return lineReader;
+				}
+
+				@Override
+				protected byte[] doRead(LineReader delegate) throws IOException {
+					Text text = new Text();
+					if (!getInputContext().isEndReached()) {
+						processReadCount(delegate.readLine(text));
+					}
+					return text.getBytes();
+				}
+			};
+			readerHelper.init();
 		}
-		Text text = new Text();
-		lineReader.readLine(text);
-		byte[] value = text.getBytes();
+		byte[] value = readerHelper.read();
 		return value != null && value.length > 0 ? new String(value) : null;
 	}
 
