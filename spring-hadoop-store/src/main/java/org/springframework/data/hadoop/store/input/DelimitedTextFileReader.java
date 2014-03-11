@@ -23,6 +23,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.springframework.data.hadoop.store.DataStoreReader;
 import org.springframework.data.hadoop.store.codec.CodecInfo;
+import org.springframework.data.hadoop.store.split.Split;
 import org.springframework.data.hadoop.store.support.StoreUtils;
 import org.springframework.util.StringUtils;
 
@@ -55,7 +56,7 @@ public class DelimitedTextFileReader implements DataStoreReader<List<String>> {
 	 * @param codec the codec
 	 */
 	public DelimitedTextFileReader(Configuration configuration, Path basePath, CodecInfo codec) {
-		this(configuration, basePath, codec, CSV, null);
+		this(configuration, basePath, codec, null, CSV, null);
 	}
 
 	/**
@@ -67,7 +68,7 @@ public class DelimitedTextFileReader implements DataStoreReader<List<String>> {
 	 * @param fieldDelimiter the field delimiter
 	 */
 	public DelimitedTextFileReader(Configuration configuration, Path basePath, CodecInfo codec, byte[] fieldDelimiter) {
-		this(configuration, basePath, codec, fieldDelimiter, null);
+		this(configuration, basePath, codec, null, fieldDelimiter, null);
 	}
 
 	/**
@@ -79,9 +80,9 @@ public class DelimitedTextFileReader implements DataStoreReader<List<String>> {
 	 * @param fieldDelimiter the field delimiter
 	 * @param textDelimiter the text delimiter
 	 */
-	public DelimitedTextFileReader(Configuration configuration, Path basePath, CodecInfo codec, byte[] fieldDelimiter, byte[] textDelimiter) {
+	public DelimitedTextFileReader(Configuration configuration, Path basePath, CodecInfo codec, Split inputSplit, byte[] fieldDelimiter, byte[] textDelimiter) {
 		this.fieldDelimiter = new String(fieldDelimiter);
-		this.textFileReader = new TextFileReader(configuration, basePath, codec, textDelimiter);
+		this.textFileReader = new TextFileReader(configuration, basePath, codec, inputSplit, textDelimiter);
 	}
 
 	@Override
