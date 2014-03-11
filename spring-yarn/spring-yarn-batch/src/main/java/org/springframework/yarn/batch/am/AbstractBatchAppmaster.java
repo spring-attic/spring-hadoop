@@ -115,12 +115,11 @@ public abstract class AbstractBatchAppmaster extends AbstractEventingAppmaster i
 		String host = container.getNodeId().getHost();
 		String rack = RackResolver.resolve(host).getNetworkLocation();
 		if (log.isDebugEnabled()) {
-			log.debug("Matching agains: host=" + host + " rack=" + rack);
+			log.debug("Matching against host=" + host + " rack=" + rack);
 		}
 
-
 		Iterator<Entry<StepExecution, ContainerRequestHint>> iterator = requestData.entrySet().iterator();
-		while (iterator.hasNext() && stepExecution != null) {
+		while (iterator.hasNext() && stepExecution == null) {
 			Entry<StepExecution, ContainerRequestHint> entry = iterator.next();
 			if (entry.getValue() != null && entry.getValue().getHosts() != null) {
 				for (String h : entry.getValue().getHosts()) {
@@ -131,11 +130,10 @@ public abstract class AbstractBatchAppmaster extends AbstractEventingAppmaster i
 				}
 			}
 		}
-
 		log.debug("stepExecution after hosts match: " + stepExecution);
 
 		iterator = requestData.entrySet().iterator();
-		while (iterator.hasNext() && stepExecution != null) {
+		while (iterator.hasNext() && stepExecution == null) {
 			Entry<StepExecution, ContainerRequestHint> entry = iterator.next();
 			if (entry.getValue() != null && entry.getValue().getRacks() != null) {
 				for (String r : entry.getValue().getRacks()) {
@@ -196,7 +194,6 @@ public abstract class AbstractBatchAppmaster extends AbstractEventingAppmaster i
 		} else {
 			log.warn("No assigned step execution for containerId=" + containerId);
 		}
-
 
 		// finally notify allocator for release
 		getAllocator().releaseContainer(containerId);

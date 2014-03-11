@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,15 @@
 package org.springframework.yarn.batch.item;
 
 import java.io.IOException;
-import java.io.InputStream;
 
-import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.io.Text;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
+import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.ReaderNotOpenException;
 import org.springframework.batch.item.UnexpectedInputException;
-import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
-import org.springframework.core.io.Resource;
+import org.springframework.data.hadoop.store.DataStoreReader;
 import org.springframework.util.Assert;
 
 /**
@@ -38,30 +35,13 @@ import org.springframework.util.Assert;
  *
  * @param <T> the type of object returned as item read
  */
-public class HdfsFileSplitItemReader<T> implements ResourceAwareItemReaderItemStream<T> {
+public class DataStoreItemReader<T> implements ItemStreamReader<T> {
 
-	private static final String READ_POSITION = "read.position";
+	public static final String READ_POSITION = "read.position";
 
-	/** Resource to read */
-	private Resource resource;
+	private long position = 0;
 
-	/** Start position for the file */
-	private long splitStart;
-
-	/** Length of the split for file read */
-	private long splitLength;
-
-	/** Current input stream read position */
-	private long position;
-
-	/** Custom line reader */
-	private LineReader lineReader;
-
-	/** Exposed input stream for seek */
-	private FSDataInputStream fsInputStream;
-
-	/** Read buffer */
-	private Text buffer = new Text();
+	private DataStoreReader<T> dataStoreReader;
 
 	/** Mapper for data */
 	private LineDataMapper<T> lineDataMapper;
@@ -70,30 +50,27 @@ public class HdfsFileSplitItemReader<T> implements ResourceAwareItemReaderItemSt
 	private boolean saveState = true;
 
 	/**
-	 * Instantiates a new hdfs file split item reader.
+	 * Instantiates a new data store item reader.
 	 */
-	public HdfsFileSplitItemReader() {
+	public DataStoreItemReader() {
+	}
+
+	/**
+	 * Instantiates a new data store item reader.
+	 *
+	 * @param dataStoreReader the data store reader
+	 */
+	public DataStoreItemReader(DataStoreReader<T> dataStoreReader) {
+		this.dataStoreReader = dataStoreReader;
 	}
 
 	@Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
-		Assert.notNull(resource, "Input resource must be set");
+		Assert.notNull(dataStoreReader, "DataStoreReader must be set");
 		Assert.notNull(lineDataMapper, "LineDataMapper must be set");
-
-		try {
-			InputStream inputStream = resource.getInputStream();
-			fsInputStream = (FSDataInputStream)inputStream;
-			fsInputStream.seek(splitStart);
-			lineReader = new LineReader(fsInputStream);
-		} catch (Exception e) {
-			throw new ItemStreamException("Failed to initialize the reader", e);
+		if (saveState) {
+			restorePosition(executionContext.getLong(READ_POSITION, -1));
 		}
-
-		position = splitStart;
-		if (splitStart != 0) {
-			readLine();
-		}
-
 	}
 
 	@Override
@@ -106,32 +83,26 @@ public class HdfsFileSplitItemReader<T> implements ResourceAwareItemReaderItemSt
 
 	@Override
 	public void close() throws ItemStreamException {
-		if (fsInputStream != null) {
+		if (dataStoreReader != null) {
 			try {
-				fsInputStream.close();
+				dataStoreReader.close();
 			} catch (IOException e) {
 				throw new ItemStreamException("Error while closing item reader", e);
+			} finally {
+				dataStoreReader = null;
 			}
 		}
 	}
 
 	@Override
 	public T read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
-		if (position > (splitStart+splitLength)) {
-			return null;
-		}
-		String line = readLine();
-
+		T line = readStore();
 		if (line == null) {
 			return null;
+		} else {
+			position++;
 		}
-
-		return lineDataMapper.mapLine(line);
-	}
-
-	@Override
-	public void setResource(Resource resource) {
-		this.resource = resource;
+		return lineDataMapper.mapLine((String)line);
 	}
 
 	/**
@@ -144,21 +115,12 @@ public class HdfsFileSplitItemReader<T> implements ResourceAwareItemReaderItemSt
 	}
 
 	/**
-	 * Sets the split start.
+	 * Sets the data store reader.
 	 *
-	 * @param splitStart the new split start
+	 * @param dataStoreReader the new data store reader
 	 */
-	public void setSplitStart(long splitStart) {
-		this.splitStart = splitStart;
-	}
-
-	/**
-	 * Sets the split length.
-	 *
-	 * @param splitLength the new split length
-	 */
-	public void setSplitLength(long splitLength) {
-		this.splitLength = splitLength;
+	public void setDataStoreReader(DataStoreReader<T> dataStoreReader) {
+		this.dataStoreReader = dataStoreReader;
 	}
 
 	/**
@@ -187,22 +149,35 @@ public class HdfsFileSplitItemReader<T> implements ResourceAwareItemReaderItemSt
 	 *
 	 * @return data or {@code NULL} if end of stream
 	 */
-	private String readLine() {
-		if (lineReader == null) {
+	private T readStore() {
+		if (dataStoreReader == null) {
 			throw new ReaderNotOpenException("Reader must be open before it can be read.");
 		}
-		buffer.clear();
 		try {
-			int consumed = lineReader.readLine(buffer);
-			position += consumed;
-			if (consumed == 0) {
-				return null;
+			return dataStoreReader.read();
+		} catch (IOException e) {
+			throw new NonTransientResourceException("Unable to read from resource: [" + dataStoreReader + "]", e);
+		}
+	}
+
+	/**
+	 * Restores a position if it's possible.
+	 *
+	 * @param toPosition the position to restore
+	 */
+	private void restorePosition(long toPosition) throws ItemStreamException {
+		if (toPosition < 0) {
+			return;
+		}
+		while (readStore() != null) {
+			if (!(++position < toPosition)) {
+				break;
 			}
 		}
-		catch (IOException e) {
-			throw new NonTransientResourceException("Unable to read from resource: [" + resource + "]", e);
+		if (position < toPosition) {
+			throw new ItemStreamException("Expected to restore to position " + toPosition
+					+ " but was only able to read to position " + position);
 		}
-		return buffer.toString();
 	}
 
 }

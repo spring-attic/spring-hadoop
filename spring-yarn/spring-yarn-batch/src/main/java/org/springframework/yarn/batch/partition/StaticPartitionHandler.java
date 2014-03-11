@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,38 +31,44 @@ import org.springframework.yarn.batch.am.BatchYarnAppmaster;
  * @author Janne Valkealahti
  *
  */
-public class StaticBatchPartitionHandler extends AbstractBatchPartitionHandler {
+public class StaticPartitionHandler extends AbstractPartitionHandler {
 
-	private static final Log log = LogFactory.getLog(StaticBatchPartitionHandler.class);
+	private static final Log log = LogFactory.getLog(StaticPartitionHandler.class);
 
-	/** Grid size for partitioning */
 	private int gridSize = 1;
 
 	/**
-	 * Instantiates a new static batch partition handler.
+	 * Instantiates a new static partition handler.
 	 */
-	public StaticBatchPartitionHandler() {
+	public StaticPartitionHandler() {
 		super();
 	}
 
 	/**
-	 * Instantiates a new static batch partition handler.
+	 * Instantiates a new static partition handler.
 	 *
 	 * @param batchAppmaster the batch appmaster
 	 */
-	public StaticBatchPartitionHandler(BatchYarnAppmaster batchAppmaster) {
+	public StaticPartitionHandler(BatchYarnAppmaster batchAppmaster) {
 		super(batchAppmaster);
 	}
 
 	/**
-	 * Instantiates a new static batch partition handler.
+	 * Instantiates a new static partition handler.
 	 *
 	 * @param batchAppmaster the batch appmaster
 	 * @param gridSize the grid size
 	 */
-	public StaticBatchPartitionHandler(BatchYarnAppmaster batchAppmaster, int gridSize) {
+	public StaticPartitionHandler(BatchYarnAppmaster batchAppmaster, int gridSize) {
 		super(batchAppmaster);
 		this.gridSize = gridSize;
+	}
+
+	@Override
+	protected Set<StepExecution> createSplits(StepExecutionSplitter stepSplitter, StepExecution stepExecution)
+			throws Exception {
+		log.info("Creating splits for stepExecution=[" + stepExecution + "] with gridSize=" + gridSize);
+		return stepSplitter.split(stepExecution, gridSize);
 	}
 
 	/**
@@ -76,15 +82,6 @@ public class StaticBatchPartitionHandler extends AbstractBatchPartitionHandler {
 	 */
 	public void setGridSize(int gridSize) {
 		this.gridSize = gridSize;
-	}
-
-	@Override
-	protected Set<StepExecution> createStepExecutionSplits(StepExecutionSplitter stepSplitter, StepExecution stepExecution)
-			throws Exception {
-		if (log.isDebugEnabled()) {
-			log.debug("Creating splits for stepExecution=" + stepExecution + " with gridSize=" + gridSize);
-		}
-		return stepSplitter.split(stepExecution, gridSize);
 	}
 
 }
