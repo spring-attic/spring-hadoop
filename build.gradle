@@ -987,9 +987,11 @@ if (gradle.ext.mr2) {
 		description = 'Spring Yarn Batch'
 		dependencies {
 			compile project(":spring-yarn:spring-yarn-integration")
+			compile project(":spring-data-hadoop-store")
 			compile "org.springframework.batch:spring-batch-core:$springBatchVersion"
 			compile "org.springframework.batch:spring-batch-infrastructure:$springBatchVersion"
 			testCompile project(":spring-data-hadoop-core")
+			testCompile project(":spring-yarn:spring-yarn-test")
 		}
 	}
 
