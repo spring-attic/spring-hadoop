@@ -1,12 +1,12 @@
 /*
  * Copyright 2011-2013 the original author or authors.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -60,7 +60,7 @@ public class ToolTests {
 
 		@Override
 		public void setConf(Configuration conf) {
-			this.conf = conf;
+			TestTool.conf = conf;
 		}
 
 		@Override
@@ -70,7 +70,7 @@ public class ToolTests {
 
 		@Override
 		public int run(String[] args) throws Exception {
-			this.args = args;
+			TestTool.args = args;
 			return 0;
 		}
 	}
@@ -94,7 +94,7 @@ public class ToolTests {
 
 	@Test
 	public void testToolArgs() throws Exception {
-		Callable runner = ctx.getBean("nested", Callable.class);
+		Callable<?> runner = ctx.getBean("nested", Callable.class);
 		runner.call();
 		assertNotNull(TestTool.conf);
 		Configuration conf = TestTool.conf;
@@ -115,6 +115,7 @@ public class ToolTests {
 		assertTrue(ctx.isPrototype("tasklet-ns"));
 	}
 
+	@SuppressWarnings("static-access")
 	@Test
 	public void testTasklet() throws Exception {
 		JobsTrigger tj = new JobsTrigger();
@@ -124,13 +125,14 @@ public class ToolTests {
 	@Test
 	public void testToolJarLoading() throws Exception {
 		ClassLoader loader = getClass().getClassLoader();
-		Callable runner = ctx.getBean("tool-jar", Callable.class);
+		Callable<?> runner = ctx.getBean("tool-jar", Callable.class);
 		Object result = runner.call();
-		
+
 		assertNotNull(System.getProperty("org.springframework.data.tool.init"));
 		assertEquals(Integer.valueOf(13), result);
 		assertFalse(org.springframework.util.ClassUtils.isPresent("test.SomeTool", loader));
 
+		@SuppressWarnings("resource")
 		ParentLastURLClassLoader cl = new ParentLastURLClassLoader(
 				new URL[] { ctx.getResource("some-tool.jar").getURL() }, loader);
 
