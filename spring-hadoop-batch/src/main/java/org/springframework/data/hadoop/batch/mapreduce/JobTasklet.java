@@ -1,12 +1,12 @@
 /*
  * Copyright 2011-2013 the original author or authors.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,7 +37,7 @@ import org.springframework.data.hadoop.mapreduce.JobUtils;
 /**
  * Batch tasklet for executing one Hadoop job.
  * Can be configured to not wait for the job to finish - by default the tasklet waits for the job submitted to finish.
- * 
+ *
  * @author Costin Leau
  * @author Thomas Risberg
  */
@@ -115,6 +115,7 @@ public class JobTasklet extends JobExecutor implements Tasklet {
 		return RepeatStatus.FINISHED;
 	}
 
+	@SuppressWarnings("deprecation")
 	private void saveCounters(Job job, StepContribution contribution) {
 		Counters counters = null;
 		try {
@@ -130,6 +131,7 @@ public class JobTasklet extends JobExecutor implements Tasklet {
 			return;
 		}
 
+		// TODO: remove deprecation suppress when we don't want to rely on org.apache.hadoop.mapred
 		Counter count = counters.findCounter(Task.Counter.MAP_INPUT_RECORDS);
 
 		for (int i = 0; i < safeLongToInt(count.getValue()); i++) {
