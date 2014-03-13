@@ -16,9 +16,6 @@
 package org.springframework.data.hadoop.config;
 
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.CustomEditorConfigurer;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
@@ -29,8 +26,6 @@ import org.w3c.dom.Element;
  * @author Costin Leau
  */
 class HadoopNamespaceHandler extends NamespaceHandlerSupport {
-
-	private static String DEFAULT_CONVERTER = "org.springframework.data.hadoop.mapreduce.MapReducePropertyEditorRegistrar.ns.registration";
 
 	public void init() {
 		registerBeanDefinitionParser("job-runner", new HadoopJobRunnerParser());
@@ -75,16 +70,4 @@ class HadoopNamespaceHandler extends NamespaceHandlerSupport {
 		return super.parse(element, parserContext);
 	}
 
-	private void registerImplicitBeans(ParserContext parserContext) {
-		BeanDefinitionRegistry registry = parserContext.getRegistry();
-		if (!registry.containsBeanDefinition(DEFAULT_CONVERTER)) {
-			BeanDefinition def = BeanDefinitionBuilder.genericBeanDefinition(CustomEditorConfigurer.class).setRole(
-					BeanDefinition.ROLE_INFRASTRUCTURE).addPropertyValue(
-					"propertyEditorRegistrars",
-					BeanDefinitionBuilder.genericBeanDefinition(
-							"org.springframework.data.hadoop.mapreduce.MapReducePropertyEditorRegistrar").
-						setRole(BeanDefinition.ROLE_INFRASTRUCTURE).getBeanDefinition()).getBeanDefinition();
-			registry.registerBeanDefinition(DEFAULT_CONVERTER, def);
-		}
-	}
 }

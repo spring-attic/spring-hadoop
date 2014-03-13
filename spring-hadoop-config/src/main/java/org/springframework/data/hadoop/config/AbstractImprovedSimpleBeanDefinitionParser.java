@@ -1,12 +1,12 @@
 /*
  * Copyright 2011 the original author or authors.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,7 +31,7 @@ import org.w3c.dom.NamedNodeMap;
 
 /**
  * Simple extension to {@link AbstractSimpleBeanDefinitionParser} that handles properties references (-ref).
- * 
+ *
  * @author Costin Leau
  */
 public abstract class AbstractImprovedSimpleBeanDefinitionParser extends AbstractSimpleBeanDefinitionParser {
@@ -47,7 +47,7 @@ public abstract class AbstractImprovedSimpleBeanDefinitionParser extends Abstrac
 		// set depends-on
 		String depends = element.getAttribute(BeanDefinitionParserDelegate.DEPENDS_ON_ATTRIBUTE);
 		if (StringUtils.hasText(depends)) {
-			builder.getRawBeanDefinition().setDependsOn(StringUtils.tokenizeToStringArray(depends, BeanDefinitionParserDelegate.BEAN_NAME_DELIMITERS));
+			builder.getRawBeanDefinition().setDependsOn(StringUtils.tokenizeToStringArray(depends, BeanDefinitionParserDelegate.MULTI_VALUE_ATTRIBUTE_DELIMITERS));
 		}
 
 		NamedNodeMap attributes = element.getAttributes();
@@ -113,24 +113,4 @@ public abstract class AbstractImprovedSimpleBeanDefinitionParser extends Abstrac
 		return name;
 	}
 
-	private static String camelCaseToHyphenated(String camelCase) {
-		Assert.notNull(camelCase, "'attributeName' must not be null");
-		char[] chars = camelCase.toCharArray();
-		StringBuilder sb = new StringBuilder(chars.length + 2);
-		boolean upperCase = false;
-		for (char c : chars) {
-			if (Character.isUpperCase(c)) {
-				if (!upperCase) {
-					sb.append("-");
-					c = Character.toLowerCase(c);
-					upperCase = true;
-				}
-			}
-			else {
-				upperCase = false;
-			}
-			sb.append(c);
-		}
-		return new String(sb);
-	}
 }
