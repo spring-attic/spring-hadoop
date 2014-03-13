@@ -1,12 +1,12 @@
 /*
  * Copyright 2011-2013 the original author or authors.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,12 +26,11 @@ import org.apache.hadoop.hbase.client.HTableInterface;
 import org.springframework.core.NamedThreadLocal;
 import org.springframework.transaction.support.ResourceTransactionManager;
 import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 
 /**
  * Synchronization manager handling the tracking of Hbase resources (specifically tables). Used either manually or through {@link HbaseInterceptor} to bind a table to the thread.
- * Each subsequent call made through {@link HbaseTemplate} is aware of the table bound and will use it instead of retrieving a new instance. 
- * 
+ * Each subsequent call made through {@link HbaseTemplate} is aware of the table bound and will use it instead of retrieving a new instance.
+ *
  * @author Costin Leau
  */
 public abstract class HbaseSynchronizationManager {
@@ -40,13 +39,9 @@ public abstract class HbaseSynchronizationManager {
 
 	private static final ThreadLocal<Map<String, HTableInterface>> resources = new NamedThreadLocal<Map<String, HTableInterface>>("Bound resources");
 
-	private static final boolean aopAvailable = ClassUtils.isPresent("org.springframework.aop.scope.ScopedObject",
-			HbaseSynchronizationManager.class.getClassLoader());
-
-
 	/**
 	 * Checks whether any resource is bound for the given key.
-	 * 
+	 *
 	 * @param key key to check
 	 * @return whether or not a resource is bound for the given key
 	 */
@@ -57,7 +52,7 @@ public abstract class HbaseSynchronizationManager {
 
 	/**
 	 * Returns the resource (table) associated with the given key.
-	 * 
+	 *
 	 * @param key association key
 	 * @return associated resource (table)
 	 */
@@ -120,7 +115,7 @@ public abstract class HbaseSynchronizationManager {
 
 	/**
 	 * Unbinds a resource for the given key from the current thread.
-	 * 
+	 *
 	 * @param key the key to unbind (usually the resource factory)
 	 * @return the previously bound value, or <code>null</code> if none bound
 	 */
@@ -151,7 +146,7 @@ public abstract class HbaseSynchronizationManager {
 
 	/**
 	 * Returns the bound tables (by name).
-	 * 
+	 *
 	 * @return names of bound tables
 	 */
 	public static Set<String> getTableNames() {

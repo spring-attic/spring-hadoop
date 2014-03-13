@@ -1,12 +1,12 @@
 /*
  * Copyright 2011-2013 the original author or authors.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -55,17 +55,18 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * HDFS FileSystem Shell supporting the 'hadoop fs/dfs [x]' commands as methods. 
+ * HDFS FileSystem Shell supporting the 'hadoop fs/dfs [x]' commands as methods.
  * See the <a href="http://hadoop.apache.org/common/docs/stable/file_system_shell.html">official guide</a> for more information.
  * <p/>
- * This class mimics as much as possible the shell behavior yet it is meant to be used in a programmatic way, 
+ * This class mimics as much as possible the shell behavior yet it is meant to be used in a programmatic way,
  * that is rather then printing out information, they return object or collections that one can iterate through. If the message is
  * all that's needed then simply call the returned object {@link #toString()} explicitly or implicitly (by printing out or doing string
- * concatenation). 
- * 
- * @author Hadoop's FsShell authors 
+ * concatenation).
+ *
+ * @author Hadoop's FsShell authors
  * @author Costin Leau
  */
+@SuppressWarnings("deprecation")
 public class FsShell implements Closeable, DisposableBean {
 
 	private boolean internalFs = false;
@@ -303,7 +304,7 @@ public class FsShell implements Closeable, DisposableBean {
 
 		final String COPYTOLOCAL_PREFIX = "_copyToLocal_";
 
-		/* Keep the structure similar to ChecksumFileSystem.copyToLocal(). 
+		/* Keep the structure similar to ChecksumFileSystem.copyToLocal().
 		* Ideal these two should just invoke FileUtil.copy() and not repeat
 		* recursion here. Of course, copy() should support two more options :
 		* copyCrc and useTmpFile (may be useTmpFile need not be an option).
@@ -968,9 +969,9 @@ public class FsShell implements Closeable, DisposableBean {
 						break;
 					default:
 						in = i;
-						break;						
-					}					
-					i.seek(0);					
+						break;
+					}
+					i.seek(0);
 					texts.add(getContent(in));
 				}
 			} catch (IOException ex) {
@@ -1035,9 +1036,9 @@ public class FsShell implements Closeable, DisposableBean {
 	}
 
 	/**
-	 * Utility that checks whether the given path has a URI - if it doesn't, it falls back 
+	 * Utility that checks whether the given path has a URI - if it doesn't, it falls back
 	 * to the specified FS (rather then always HDFS as Hadoop does).
-	 * 
+	 *
 	 * @param path path
 	 * @return associated file system
 	 */

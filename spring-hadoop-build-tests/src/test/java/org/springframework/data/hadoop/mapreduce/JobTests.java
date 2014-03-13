@@ -1,12 +1,12 @@
 /*
  * Copyright 2011-2013 the original author or authors.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,7 +15,10 @@
  */
 package org.springframework.data.hadoop.mapreduce;
 
-import java.io.StringWriter;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import javax.annotation.Resource;
 
@@ -33,11 +36,6 @@ import org.springframework.data.hadoop.TestUtils;
 import org.springframework.data.hadoop.mapreduce.ToolTests.TestTool;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Costin Leau
@@ -116,11 +114,6 @@ public class JobTests {
 		assertNotNull(job);
 		Configuration cfg = job.getConfiguration();
 		assertNotNull(cfg);
-
-		StringWriter sw = new StringWriter();
-		//cfg.dumpConfiguration(cfg, sw);
-
-		//System.out.println(sw.toString());
 
 		assertEquals("chasing", cfg.get("star"));
 		assertEquals("captain eo", cfg.get("return"));

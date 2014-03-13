@@ -1,12 +1,12 @@
 /*
  * Copyright 2011-2013 the original author or authors.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,7 +23,6 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.HTableInterface;
 import org.springframework.util.Assert;
 
@@ -31,7 +30,7 @@ import org.springframework.util.Assert;
  * AOP interceptor that binds a new Hbase table to the thread before a method call, closing and removing it afterwards in case of any method outcome.
  * If there is already a pre-bound table (from a previous call or transaction), the interceptor simply participates in it.
  * Typically used alongside {@link HbaseSynchronizationManager}.
- * 
+ *
  * @author Costin Leau
  */
 public class HbaseInterceptor extends HbaseAccessor implements MethodInterceptor {
@@ -49,7 +48,7 @@ public class HbaseInterceptor extends HbaseAccessor implements MethodInterceptor
 
 	public Object invoke(MethodInvocation methodInvocation) throws Throwable {
 		Set<String> boundTables = new LinkedHashSet<String>();
-		
+
 		for (String tableName : tableNames) {
 			if (!HbaseSynchronizationManager.hasResource(tableName)) {
 				boundTables.add(tableName);
@@ -57,7 +56,7 @@ public class HbaseInterceptor extends HbaseAccessor implements MethodInterceptor
 				HbaseSynchronizationManager.bindResource(tableName, table);
 			}
 		}
-		
+
 		try {
 			Object retVal = methodInvocation.proceed();
 			return retVal;

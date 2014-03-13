@@ -330,6 +330,7 @@ public class HdfsResourceLoader extends DefaultResourceLoader implements Resourc
 	 * @return the Set of matching Path instances
 	 * @throws IOException if directory contents could not be retrieved
 	 */
+	@SuppressWarnings("deprecation")
 	protected Set<Path> retrieveMatchingFiles(Path rootDir, String pattern) throws IOException {
 		boolean exists = fs.exists(rootDir);
 		if (!exists) {
@@ -368,6 +369,7 @@ public class HdfsResourceLoader extends DefaultResourceLoader implements Resourc
 	 * @param result the Set of matching File instances to add to
 	 * @throws IOException if directory contents could not be retrieved
 	 */
+	@SuppressWarnings("deprecation")
 	protected void doRetrieveMatchingFiles(String fullPattern, Path dir, Set<Path> result) throws IOException {
 		if (log.isDebugEnabled()) {
 			log.debug("Searching directory [" + dir.toUri().getPath() +

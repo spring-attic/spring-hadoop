@@ -1,12 +1,12 @@
 /*
  * Copyright 2011-2013 the original author or authors.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -53,7 +53,7 @@ import org.springframework.util.StringUtils;
 
 /**
  * Code execution utilities.
- * 
+ *
  * @author Costin Leau
  * @author Jarred Li
  */
@@ -63,12 +63,13 @@ abstract class ExecutionUtils {
 
 	private static final Log log = LogFactory.getLog(ExecutionUtils.class);
 
+	@SuppressWarnings("serial")
 	static class ExitTrapped extends Error {
 
 		private int exitCode;
 
 		ExitTrapped(String permissionName) {
-			// handle non-Sun JDKs 
+			// handle non-Sun JDKs
 			int hasDot = permissionName.indexOf(".");
 			this.exitCode = Integer.valueOf((hasDot > 0 ? permissionName.substring(hasDot + 1) : permissionName.substring(7)));
 		}
@@ -150,14 +151,14 @@ abstract class ExecutionUtils {
 		return cl;
 	}
 
+	@SuppressWarnings("resource")
 	private static boolean isLegacyJar(Resource jar) throws IOException {
 		JarInputStream jis = new JarInputStream(jar.getInputStream());
 		JarEntry entry = null;
 		try {
 			while ((entry = jis.getNextJarEntry()) != null) {
 				String name = entry.getName();
-				if (name.startsWith("lib/") //|| name.startsWith("classes/")
-				) {
+				if (name.startsWith("lib/")) {//|| name.startsWith("classes/")
 					return true;
 				}
 			}
@@ -209,6 +210,7 @@ abstract class ExecutionUtils {
 	}
 
 
+	@SuppressWarnings("resource")
 	private static void unjar(Resource jar, File baseDir) throws IOException {
 		JarInputStream jis = new JarInputStream(jar.getInputStream());
 		JarEntry entry = null;
@@ -321,8 +323,8 @@ abstract class ExecutionUtils {
 
 	/**
 	 * Leak-preventing method analyzing the threads started by the JVM which hold a reference
-	 * to a classloader that should be reclaimed. 
-	 * 
+	 * to a classloader that should be reclaimed.
+	 *
 	 * @param leakedClassLoader
 	 * @param replacementClassLoader
 	 */
@@ -344,7 +346,7 @@ abstract class ExecutionUtils {
 	private static void cleanHadoopLocalDirAllocator() {
 		Field field = ReflectionUtils.findField(LocalDirAllocator.class, "contexts");
 		ReflectionUtils.makeAccessible(field);
-		Map contexts = (Map) ReflectionUtils.getField(field, null);
+		Map<?, ?> contexts = (Map<?, ?>) ReflectionUtils.getField(field, null);
 		if (contexts != null) {
 			contexts.clear();
 		}
@@ -398,7 +400,7 @@ abstract class ExecutionUtils {
 
 	/**
 	 * Most jars don't close the file system.
-	 * 
+	 *
 	 * @param cfg
 	 */
 	static void shutdownFileSystem(Configuration cfg) {
@@ -421,14 +423,14 @@ abstract class ExecutionUtils {
 
 	/**
 	 * Returns the threads running inside the current JVM.
-	 * 
+	 *
 	 * @return running threads
 	 */
 	static Thread[] threads() {
-		// Could have used the code below but it tends to be somewhat ineffective and slow 
+		// Could have used the code below but it tends to be somewhat ineffective and slow
 		// Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
 
-		// Get the current thread group 
+		// Get the current thread group
 		ThreadGroup tg = Thread.currentThread().getThreadGroup();
 		// Find the root thread group
 		while (tg.getParent() != null) {
@@ -443,7 +445,7 @@ abstract class ExecutionUtils {
 			threadCountGuess *= 2;
 			threads = new Thread[threadCountGuess];
 			// Note tg.enumerate(Thread[]) silently ignores any threads that
-			// can't fit into the array 
+			// can't fit into the array
 			threadCountActual = tg.enumerate(threads);
 		}
 

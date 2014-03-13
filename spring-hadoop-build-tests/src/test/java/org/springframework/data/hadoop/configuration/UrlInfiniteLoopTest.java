@@ -1,12 +1,12 @@
 /*
  * Copyright 2011-2013 the original author or authors.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -78,6 +78,7 @@ public class UrlInfiniteLoopTest {
 
 		assertEquals("8", cfg.get("mapred.reduce.tasks"));
 		assertEquals("4", cfg.get("mapred.map.tasks"));
+		@SuppressWarnings("deprecation")
 		Job j = new Job(cfg);
 		assertEquals("8", j.getConfiguration().get("mapred.reduce.tasks"));
 		assertEquals("4", j.getConfiguration().get("mapred.map.tasks"));

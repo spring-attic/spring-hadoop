@@ -1,12 +1,12 @@
 /*
  * Copyright 2011 the original author or authors.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -42,8 +42,8 @@ import org.springframework.util.StringUtils;
 /**
  * Factory bean focused on creating streaming jobs.
  * As opposed to {@link JobFactoryBean} which is Java-specific, this factory is suitable for streaming scenarios (such as
- * invoking Ruby/Python scripts or command-line scripts). 
- * 
+ * invoking Ruby/Python scripts or command-line scripts).
+ *
  * @author Costin Leau
  */
 public class StreamJobFactoryBean extends JobGenericOptions implements InitializingBean, FactoryBean<Job>,
@@ -75,6 +75,7 @@ public class StreamJobFactoryBean extends JobGenericOptions implements Initializ
 		return true;
 	}
 
+	@SuppressWarnings("deprecation")
 	public void afterPropertiesSet() throws Exception {
 		Assert.isTrue(!ObjectUtils.isEmpty(input), "at least one input required");
 		Assert.hasText(output, "the output is required");
@@ -185,7 +186,7 @@ public class StreamJobFactoryBean extends JobGenericOptions implements Initializ
 
 	/**
 	 * Sets the job input paths.
-	 * 
+	 *
 	 * @param input The input to set.
 	 */
 	public void setInputPath(String... input) {
@@ -194,7 +195,7 @@ public class StreamJobFactoryBean extends JobGenericOptions implements Initializ
 
 	/**
 	 * Sets the job output paths.
-	 * 
+	 *
 	 * @param output The output to set.
 	 */
 	public void setOutputPath(String output) {
@@ -203,7 +204,7 @@ public class StreamJobFactoryBean extends JobGenericOptions implements Initializ
 
 	/**
 	 * Sets the job mapper.
-	 * 
+	 *
 	 * @param mapper The mapper to set.
 	 */
 	public void setMapper(String mapper) {
@@ -220,7 +221,7 @@ public class StreamJobFactoryBean extends JobGenericOptions implements Initializ
 
 	/**
 	 * Sets the job combiner.
-	 * 
+	 *
 	 * @param combiner The combiner to set.
 	 */
 	public void setCombiner(String combiner) {
@@ -229,7 +230,7 @@ public class StreamJobFactoryBean extends JobGenericOptions implements Initializ
 
 	/**
 	 * Sets the job input format.
-	 * 
+	 *
 	 * @param inputFormat The inputFormat to set.
 	 */
 	public void setInputFormat(String inputFormat) {
@@ -238,7 +239,7 @@ public class StreamJobFactoryBean extends JobGenericOptions implements Initializ
 
 	/**
 	 * Sets the job output format.
-	 * 
+	 *
 	 * @param outputFormat The outputFormat to set.
 	 */
 	public void setOutputFormat(String outputFormat) {
@@ -247,7 +248,7 @@ public class StreamJobFactoryBean extends JobGenericOptions implements Initializ
 
 	/**
 	 * Sets the job partitioner.
-	 * 
+	 *
 	 * @param partitioner The partitioner to set.
 	 */
 	public void setPartitioner(String partitioner) {
@@ -256,7 +257,7 @@ public class StreamJobFactoryBean extends JobGenericOptions implements Initializ
 
 	/**
 	 * Sets the Hadoop configuration to use.
-	 * 
+	 *
 	 * @param configuration The configuration to set.
 	 */
 	public void setConfiguration(Configuration configuration) {
@@ -265,7 +266,7 @@ public class StreamJobFactoryBean extends JobGenericOptions implements Initializ
 
 	/**
 	 * Sets the environment for the commands to be executed.
-	 * 
+	 *
 	 * @param cmdEnv The environment command/property to set.
 	 */
 	public void setCmdEnv(Properties cmdEnv) {
@@ -274,7 +275,7 @@ public class StreamJobFactoryBean extends JobGenericOptions implements Initializ
 
 	/**
 	 * Sets the job number of reducer tasks.
-	 * 
+	 *
 	 * @param numReduceTasks The numReduceTasks to set.
 	 */
 	public void setNumberReducers(Integer numReduceTasks) {
@@ -283,7 +284,7 @@ public class StreamJobFactoryBean extends JobGenericOptions implements Initializ
 
 	/**
 	 * Sets the configuration properties to use.
-	 * 
+	 *
 	 * @param properties The properties to set.
 	 */
 	public void setProperties(Properties properties) {

@@ -1,12 +1,12 @@
 /*
  * Copyright 2011-2013 the original author or authors.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,9 +29,9 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.util.Assert;
 
 /**
- * Central class for accessing the HBase API. Simplifies the use of HBase and helps to avoid common errors. 
- * It executes core HBase workflow, leaving application code to invoke actions and extract results. 
- * 
+ * Central class for accessing the HBase API. Simplifies the use of HBase and helps to avoid common errors.
+ * It executes core HBase workflow, leaving application code to invoke actions and extract results.
+ *
  * @author Costin Leau
  */
 public class HbaseTemplate extends HbaseAccessor implements HbaseOperations {
@@ -79,6 +79,7 @@ public class HbaseTemplate extends HbaseAccessor implements HbaseOperations {
 		HbaseUtils.releaseTable(tableName, table, getTableFactory());
 	}
 
+	@SuppressWarnings("deprecation")
 	private boolean applyFlushSetting(HTableInterface table) {
 		boolean autoFlush = table.isAutoFlush();
 		if (table instanceof HTable) {
@@ -87,6 +88,7 @@ public class HbaseTemplate extends HbaseAccessor implements HbaseOperations {
 		return autoFlush;
 	}
 
+	@SuppressWarnings("deprecation")
 	private void restoreFlushSettings(HTableInterface table, boolean oldFlush) {
 		if (table instanceof HTable) {
 			if (table.isAutoFlush() != oldFlush) {

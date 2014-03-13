@@ -1,12 +1,12 @@
 /*
  * Copyright 2011-2013 the original author or authors.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,7 +32,7 @@ import static org.junit.Assert.*;
 
 /**
  * Integration test for FsShell. Note that this test uses FsShell itself inside testing to increase the coverage and reduce the test size.
- * 
+ *
  * @author Costin Leau
  */
 public abstract class AbstractFsShellTest extends AbstractROFsShellTest {
@@ -52,7 +52,7 @@ public abstract class AbstractFsShellTest extends AbstractROFsShellTest {
 		try {
 			shell.copyFromLocal(name1, dst);
 			assertTrue(shell.test(dst));
-			assertEquals(name1, shell.cat(dst).toString());		
+			assertEquals(name1, shell.cat(dst).toString());
 			Collection<String> contents =  shell.text(dst);
 			assertEquals(name1, contents.iterator().next().toString());
 		} finally {
@@ -130,7 +130,7 @@ public abstract class AbstractFsShellTest extends AbstractROFsShellTest {
 	public void testCp() throws Exception {
 		String fName = UUID.randomUUID() + ".txt";
 		String name1 = "local/" + fName;
-		Resource res = TestUtils.writeToFS(cfg, name1);
+		TestUtils.writeToFS(cfg, name1);
 
 		String dst = "local/cp/";
 		shell.mkdir(dst);
@@ -370,6 +370,7 @@ public abstract class AbstractFsShellTest extends AbstractROFsShellTest {
 		assertFalse(shell.test(name2));
 	}
 
+	@SuppressWarnings("deprecation")
 	@Test
 	public void testTouchz() throws Exception {
 		String name1 = "local/" + UUID.randomUUID() + ".txt";
