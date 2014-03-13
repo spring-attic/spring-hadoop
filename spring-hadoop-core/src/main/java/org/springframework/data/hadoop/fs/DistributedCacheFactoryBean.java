@@ -1,12 +1,12 @@
 /*
  * Copyright 2011-2013 the original author or authors.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,21 +38,22 @@ import org.springframework.util.StringUtils;
 
 /**
  * Factory for easy declarative configuration of a {@link DistributedCache}.
- * 
+ *
  * @author Costin Leau
  * @author Thomas Risberg
  */
+@SuppressWarnings("deprecation")
 public class DistributedCacheFactoryBean implements InitializingBean, FactoryBean<DistributedCache> {
 
 	/**
 	 * Class describing an entry of the distributed cache.
-	 * 
+	 *
 	 * @author Costin Leau
 	 */
 	public static class CacheEntry {
 		/**
 		 * A distributed cache entry type.
-		 * 
+		 *
 		 * @author Costin Leau
 		 */
 		public enum EntryType {
@@ -208,7 +209,7 @@ public class DistributedCacheFactoryBean implements InitializingBean, FactoryBea
 
 	/**
 	 * Sets the entries to be added to the distributed cache.
-	 * 
+	 *
 	 * @param entries The entries to set.
 	 */
 	public void setEntries(Collection<CacheEntry> entries) {
@@ -217,7 +218,7 @@ public class DistributedCacheFactoryBean implements InitializingBean, FactoryBea
 
 	/**
 	 * Sets the local entries to be added to the distributed cache.
-	 * 
+	 *
 	 * @param resources The entries to set.
 	 */
 
@@ -227,7 +228,7 @@ public class DistributedCacheFactoryBean implements InitializingBean, FactoryBea
 
 	/**
 	 * Sets the cache entries to be added to the distributed cache.
-	 * 
+	 *
 	 * @param resources The entries to set.
 	 */
 	public void setCacheEntries(Collection<Resource> resources) {
@@ -236,7 +237,7 @@ public class DistributedCacheFactoryBean implements InitializingBean, FactoryBea
 
 	/**
 	 * Sets the class-path entries to be added to the distributed cache.
-	 * 
+	 *
 	 * @param resources The entries to set.
 	 */
 	public void setClassPathEntries(Collection<Resource> resources) {
@@ -263,7 +264,7 @@ public class DistributedCacheFactoryBean implements InitializingBean, FactoryBea
 
 	/**
 	 * Sets the Hadoop configuration for the cache.
-	 * 
+	 *
 	 * @param conf The conf to set.
 	 */
 	public void setConfiguration(Configuration conf) {
@@ -272,7 +273,7 @@ public class DistributedCacheFactoryBean implements InitializingBean, FactoryBea
 
 	/**
 	 * Sets the Hadoop file system for this cache.
-	 * 
+	 *
 	 * @param fs File system to set.
 	 */
 	public void setFileSystem(FileSystem fs) {
@@ -281,7 +282,7 @@ public class DistributedCacheFactoryBean implements InitializingBean, FactoryBea
 
 	/**
 	 * Indicates whether to create symlinks or not.
-	 * 
+	 *
 	 * @param createSymlink whether to create symlinks or not.
 	 */
 	public void setCreateSymlink(boolean createSymlink) {
