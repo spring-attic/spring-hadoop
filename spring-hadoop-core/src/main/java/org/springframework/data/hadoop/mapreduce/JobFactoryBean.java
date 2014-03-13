@@ -1,12 +1,12 @@
 /*
  * Copyright 2011 the original author or authors.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -55,7 +55,7 @@ import org.springframework.util.StringUtils;
  * classes. This is done on purpose in case the job itself and its dependencies are
  * on a jar not available on the classpath ({@link #setJar(Resource)}) in which case
  * a special, on-the-fly classloader is used.
- * 
+ *
  * @author Costin Leau
  */
 // TODO: extract input/output format configs
@@ -116,7 +116,7 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 		return true;
 	}
 
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({ "rawtypes", "deprecation" })
 	public void afterPropertiesSet() throws Exception {
 		final Configuration cfg = ConfigurationUtils.createFrom(configuration, properties);
 
@@ -229,7 +229,7 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 		return (Class<? extends T>) ClassUtils.resolveClassName(className, cl);
 	}
 
-	private void configureMapperTypesIfPossible(Job j, Class<? extends Mapper> mapper) {
+	private void configureMapperTypesIfPossible(Job j, @SuppressWarnings("rawtypes") Class<? extends Mapper> mapper) {
 		// Find mapper
 		Class<?> targetClass = mapper;
 		Type targetType = mapper;
@@ -261,10 +261,11 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 		}
 	}
 
-	private void configureReducerTypesIfPossible(Job j, Class<? extends Reducer> reducer) {
+	private void configureReducerTypesIfPossible(Job j, @SuppressWarnings("rawtypes") Class<? extends Reducer> reducer) {
 		// don't do anything yet
 	}
 
+	@SuppressWarnings("unused")
 	private void validatePaths(String path, ResourcePatternResolver resourceLoader, boolean shouldExist)
 			throws IOException {
 		Resource res = resourceLoader.getResource(path);
@@ -283,7 +284,7 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 
 	/**
 	 * Sets the Hadoop configuration to use.
-	 * 
+	 *
 	 * @param configuration The configuration to set.
 	 */
 	public void setConfiguration(Configuration configuration) {
@@ -292,7 +293,7 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 
 	/**
 	 * Sets the job name.
-	 * 
+	 *
 	 * @param name The name to set.
 	 */
 	public void setName(String name) {
@@ -301,7 +302,7 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 
 	/**
 	 * Sets the job key class.
-	 * 
+	 *
 	 * @param key The keyClass to set.
 	 */
 	public void setKey(String key) {
@@ -310,7 +311,7 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 
 	/**
 	 * Sets the job value class.
-	 * 
+	 *
 	 * @param value The valueClass to set.
 	 */
 	public void setValue(String value) {
@@ -319,7 +320,7 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 
 	/**
 	 * Sets the job map key class.
-	 * 
+	 *
 	 * @param mapKey The mapKeyClass to set.
 	 */
 	public void setMapKey(String mapKey) {
@@ -328,7 +329,7 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 
 	/**
 	 * Sets the job map value class.
-	 * 
+	 *
 	 * @param mapValue The mapValueClass to set.
 	 */
 	public void setMapValue(String mapValue) {
@@ -337,7 +338,7 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 
 	/**
 	 * Sets the job mapper class.
-	 * 
+	 *
 	 * @param mapper The mapper to set.
 	 */
 	public void setMapper(String mapper) {
@@ -346,7 +347,7 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 
 	/**
 	 * Sets the job reducer class.
-	 * 
+	 *
 	 * @param reducer The reducer to set.
 	 */
 	public void setReducer(String reducer) {
@@ -355,7 +356,7 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 
 	/**
 	 * Sets the job combiner class.
-	 * 
+	 *
 	 * @param combiner The combiner to set.
 	 */
 	public void setCombiner(String combiner) {
@@ -364,7 +365,7 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 
 	/**
 	 * Sets the job input format class.
-	 * 
+	 *
 	 * @param inputFormat The inputFormat to set.
 	 */
 	public void setInputFormat(String inputFormat) {
@@ -373,7 +374,7 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 
 	/**
 	 * Sets the job output format class.
-	 * 
+	 *
 	 * @param outputFormat The outputFormat to set.
 	 */
 	public void setOutputFormat(String outputFormat) {
@@ -382,7 +383,7 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 
 	/**
 	 * Sets the job partitioner class.
-	 * 
+	 *
 	 * @param partitioner The partitioner to set.
 	 */
 	public void setPartitioner(String partitioner) {
@@ -391,7 +392,7 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 
 	/**
 	 * Sets the job sort comparator class.
-	 * 
+	 *
 	 * @param sortComparator The sortComparator to set.
 	 */
 	public void setSortComparator(String sortComparator) {
@@ -400,7 +401,7 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 
 	/**
 	 * Sets the job grouping comparator class.
-	 * 
+	 *
 	 * @param groupingComparator The groupingComparator to set.
 	 */
 	public void setGroupingComparator(String groupingComparator) {
@@ -409,7 +410,7 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 
 	/**
 	 * Sets the job working directory.
-	 * 
+	 *
 	 * @param workingDir The workingDir to set.
 	 */
 	public void setWorkingDir(String workingDir) {
@@ -418,7 +419,7 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 
 	/**
 	 * Sets the number of reduce task for this job.
-	 *  
+	 *
 	 * @param numReduceTasks The numReduceTasks to set.
 	 */
 	public void setNumberReducers(Integer numReduceTasks) {
@@ -427,7 +428,7 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 
 	/**
 	 * Determines the job jar (available on the classpath) based on the given class.
-	 * 
+	 *
 	 * @param jarClass The jarClass to set.
 	 */
 	public void setJarByClass(Class<?> jarClass) {
@@ -436,7 +437,7 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 
 	/**
 	 * Sets the job jar (which might not be on the classpath).
-	 * 
+	 *
 	 * @param jar The jar to set.
 	 */
 	public void setJar(Resource jar) {
@@ -445,11 +446,11 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 
 	/**
 	 * Sets the job input path.
-	 * 
+	 *
 	 * @param inputPath job input path.
 	 */
 	public void setInputPath(String... inputPath) {
-		// handle , strings here instead of the namespace to allow SpEL to kick in (if needed)  
+		// handle , strings here instead of the namespace to allow SpEL to kick in (if needed)
 		if (inputPath != null && inputPath.length == 1) {
 			inputPath = StringUtils.commaDelimitedListToStringArray(inputPath[0]);
 		}
@@ -458,7 +459,7 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 
 	/**
 	 * Sets the job output path.
-	 * 
+	 *
 	 * @param outputPath The outputPath to set.
 	 */
 	public void setOutputPath(String outputPath) {
@@ -467,7 +468,7 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 
 	/**
 	 * Indicates whether the job output should be compressed or not.
-	 * 
+	 *
 	 * @param compressOutput The compressOutput to set.
 	 */
 	public void setCompressOutput(Boolean compressOutput) {
@@ -476,7 +477,7 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 
 	/**
 	 * Sets the job codec class.
-	 * 
+	 *
 	 * @param codecClass The codecClass to set.
 	 */
 	public void setCodec(String codecClass) {
@@ -485,7 +486,7 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 
 	/**
 	 * The configuration properties to set for this job.
-	 * 
+	 *
 	 * @param properties The properties to set.
 	 */
 	public void setProperties(Properties properties) {
