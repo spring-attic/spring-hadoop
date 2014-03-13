@@ -38,6 +38,7 @@ import org.springframework.yarn.support.compat.NMTokenCacheCompat;
  */
 public class NMTokenCacheTests {
 
+	@SuppressWarnings("static-access")
 	@Test
 	public void testTokenCacheGenericUsage() {
 		// cdh

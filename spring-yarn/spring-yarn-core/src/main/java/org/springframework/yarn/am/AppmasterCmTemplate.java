@@ -108,6 +108,7 @@ public class AppmasterCmTemplate extends YarnRpcAccessor<ContainerManagementProt
 		return NetUtils.createSocketAddr(cmIpPortStr);
 	}
 
+	@SuppressWarnings("static-access")
 	@Override
 	protected UserGroupInformation getUser() {
 		InetSocketAddress rpcAddress = getRpcAddress(getConfiguration());
