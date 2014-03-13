@@ -142,19 +142,19 @@ public interface YarnEnvironmentConfigurer {
 	 * <pre>
 	 * public void configure(YarnEnvironmentConfigure environment) throws Exception {
 	 *   environment
-	 *     .includeSystemEnv(false);
+	 *     .includeLocalSystemEnv(false);
 	 * }
 	 * </pre>
 	 *
 	 * <p>XML:
 	 * <pre>
-	 * &lt;yarn:environment include-system-env="false"/>
+	 * &lt;yarn:environment include-local-system-env="false"/>
 	 * </pre>
 	 *
-	 * @param includeSystemEnv if system env variables should be included
+	 * @param includeLocalSystemEnv if system env variables should be included
 	 * @return {@link YarnEnvironmentConfigurer} for chaining
 	 */
-	YarnEnvironmentConfigurer includeSystemEnv(boolean includeSystemEnv);
+	YarnEnvironmentConfigurer includeLocalSystemEnv(boolean includeLocalSystemEnv);
 
 	/**
 	 * Specify properties with a {@link org.springframework.data.hadoop.config.common.annotation.configurers.PropertiesConfigurer}.

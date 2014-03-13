@@ -22,7 +22,7 @@
 	</yarn:localresources>
 
 	<!-- do not rely on default classpath, instead use all dependencies -->
-	<yarn:environment>
+	<yarn:environment include-local-system-env="true">
 		<yarn:classpath use-default-yarn-classpath="false"/>
 	</yarn:environment>
 

@@ -103,7 +103,6 @@ public abstract class AbstractAppmaster extends LifecycleObjectSupport {
 	@Override
 	protected void onInit() throws Exception {
 		super.onInit();
-		applicationAttemptId = YarnUtils.getApplicationAttemptId(environment);
 		AppmasterRmTemplate armt = new AppmasterRmTemplate(getConfiguration());
 		armt.afterPropertiesSet();
 		rmTemplate = armt;
@@ -328,6 +327,7 @@ public abstract class AbstractAppmaster extends LifecycleObjectSupport {
 	 * @return the register application master response
 	 */
 	protected RegisterApplicationMasterResponse registerAppmaster() {
+		applicationAttemptId = YarnUtils.getApplicationAttemptId(getEnvironment());
 		Assert.notNull(applicationAttemptId, "applicationAttemptId must be set");
 		if(applicationRegistered) {
 			log.warn("Not sending register request because we are already registered");

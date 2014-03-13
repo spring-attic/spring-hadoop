@@ -45,6 +45,7 @@ public class CommandLineAppmasterRunner extends AbstractCommandLineRunner<YarnAp
 	protected ExitStatus handleBeanRun(YarnAppmaster bean, String[] parameters, Set<String> opts) {
 		Properties properties = StringUtils.splitArrayElementsIntoProperties(parameters, "=");
 		bean.setParameters(properties != null ? properties : new Properties());
+		bean.setEnvironment(System.getenv());
 		if(log.isDebugEnabled()) {
 			log.debug("Starting YarnAppmaster bean: " + StringUtils.arrayToCommaDelimitedString(parameters));
 		}

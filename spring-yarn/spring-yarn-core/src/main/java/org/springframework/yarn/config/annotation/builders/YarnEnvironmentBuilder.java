@@ -44,7 +44,7 @@ public final class YarnEnvironmentBuilder
 
 	private boolean useDefaultYarnClasspath = true;
 	private boolean includeBaseDirectory = true;
-	private boolean includeSystemEnv = true;
+	private boolean includeLocalSystemEnv = false;
 	private String defaultYarnAppClasspath;
 	private String delimiter = ":";
 	private Properties properties = new Properties();
@@ -63,7 +63,7 @@ public final class YarnEnvironmentBuilder
 		fb.setDelimiter(delimiter);
 		fb.setDefaultYarnAppClasspath(defaultYarnAppClasspath);
 		fb.setUseDefaultYarnClasspath(useDefaultYarnClasspath);
-		fb.setIncludeSystemEnv(includeSystemEnv);
+		fb.setIncludeLocalSystemEnv(includeLocalSystemEnv);
 		fb.setIncludeBaseDirectory(includeBaseDirectory);
 		fb.afterPropertiesSet();
 		return fb.getObject();
@@ -97,8 +97,8 @@ public final class YarnEnvironmentBuilder
 	}
 
 	@Override
-	public YarnEnvironmentConfigurer includeSystemEnv(boolean includeSystemEnv) {
-		this.includeSystemEnv = includeSystemEnv;
+	public YarnEnvironmentConfigurer includeLocalSystemEnv(boolean includeLocalSystemEnv) {
+		this.includeLocalSystemEnv = includeLocalSystemEnv;
 		return this;
 	}
 

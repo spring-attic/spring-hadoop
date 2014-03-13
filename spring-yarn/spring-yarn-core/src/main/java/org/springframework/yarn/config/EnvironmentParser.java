@@ -43,7 +43,7 @@ class EnvironmentParser extends AbstractPropertiesConfiguredBeanDefinitionParser
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 		super.doParse(element, parserContext, builder);
 
-		builder.addPropertyValue("includeSystemEnv", element.getAttribute("include-system-env"));
+		builder.addPropertyValue("includeLocalSystemEnv", element.getAttribute("include-local-system-env"));
 
 		List<Element> entries = DomUtils.getChildElementsByTagName(element, "classpath");
 		if(entries.size() == 1) {

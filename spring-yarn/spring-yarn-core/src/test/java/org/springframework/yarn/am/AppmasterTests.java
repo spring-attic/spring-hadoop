@@ -20,6 +20,9 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +49,16 @@ public class AppmasterTests {
         assertThat(service, notNullValue());
 
         ReflectionTestUtils.invokeMethod(master, "getAppmasterService", new Object[0]);
+	}
+
+	public static class TestAppmaster extends StaticAppmaster {
+		@Override
+		protected void onInit() throws Exception {
+			Map<String, String> environment = new HashMap<String, String>();
+			environment.put("CONTAINER_ID", "container_1360089121174_0011_01_000001");
+			setEnvironment(environment);
+			super.onInit();
+		}
 	}
 
 	public static class StubAppmasterService implements AppmasterService {

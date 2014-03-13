@@ -213,7 +213,7 @@ public class YarnAppmasterAutoConfiguration {
 		@Override
 		public void configure(YarnEnvironmentConfigurer environment) throws Exception {
 			environment
-				.includeSystemEnv(syalcp.isIncludeSystemEnv())
+				.includeLocalSystemEnv(syalcp.isIncludeLocalSystemEnv())
 				.withClasspath()
 					.includeBaseDirectory(syalcp.isIncludeBaseDirectory())
 					.useDefaultYarnClasspath(syalcp.isUseDefaultYarnClasspath())

@@ -49,7 +49,7 @@ public class EnvironmentFactoryBean implements InitializingBean, FactoryBean<Map
 	private String defaultYarnAppClasspath;
 
 	/** Flag indicating if system env properties should be included */
-	private boolean includeSystemEnv = true;
+	private boolean includeLocalSystemEnv = false;
 
 	/**
 	 * Flag indicating if a default yarn entries should be added
@@ -157,10 +157,10 @@ public class EnvironmentFactoryBean implements InitializingBean, FactoryBean<Map
 	 * If set to true properties from a {@link System#getenv()} will
 	 * be included to environment settings. Default value is true.
 	 *
-	 * @param includeSystemEnv flag to set
+	 * @param includeLocalSystemEnv flag to set
 	 */
-	public void setIncludeSystemEnv(boolean includeSystemEnv) {
-		this.includeSystemEnv = includeSystemEnv;
+	public void setIncludeLocalSystemEnv(boolean includeLocalSystemEnv) {
+		this.includeLocalSystemEnv = includeLocalSystemEnv;
 	}
 
 	/**
@@ -169,7 +169,7 @@ public class EnvironmentFactoryBean implements InitializingBean, FactoryBean<Map
 	 * @return map of environment variables
 	 */
 	protected Map<String, String> createEnvironment() {
-		if(includeSystemEnv) {
+		if(includeLocalSystemEnv) {
 			return new HashMap<String, String>(System.getenv());
 		} else {
 			return new HashMap<String, String>();

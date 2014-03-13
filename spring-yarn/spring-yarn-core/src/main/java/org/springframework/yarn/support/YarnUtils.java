@@ -88,8 +88,13 @@ public class YarnUtils {
 	 * @return the {@link ApplicationAttemptId}
 	 */
 	public static ApplicationAttemptId getApplicationAttemptId(Map<String, String> environment) {
+		if (environment == null) {
+			return null;
+		}
 		String amContainerId = environment.get(ApplicationConstants.Environment.CONTAINER_ID.name());
-		Assert.notNull(amContainerId, "CONTAINER_ID env variable has to exist to build appAttemptId");
+		if (amContainerId == null) {
+			return null;
+		}
 		ContainerId containerId = ConverterUtils.toContainerId(amContainerId);
 		return containerId.getApplicationAttemptId();
 	}
