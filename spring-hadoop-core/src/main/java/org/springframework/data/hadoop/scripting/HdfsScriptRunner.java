@@ -1,12 +1,12 @@
 /*
  * Copyright 2011-2013 the original author or authors.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,12 +34,12 @@ import org.springframework.util.Assert;
 
 /**
  * Hadoop-customized runner that exposes Hadoop specific variables to scripting languages.
- * 
+ *
  * The instances exposes are reused from the enclosing context (using naming conventions or autowiring strategies)
  * or created on demand (in case of lightweight objects).
  * <p/>
  * These are :
- * 
+ *
  * <table>
  *  <th>
  *  <tr>
@@ -55,11 +55,11 @@ import org.springframework.util.Assert;
  *  <tr><td>fsh</td><td>org.springframework.data.hadoop.fs.FsShell</td><td>File System shell, exposing hadoop 'fs' commands as an API</td></tr>
  *  <tr><td>hdfsRL</td><td>org.springframework.data.hadoop.io.HdfsResourceLoader</td><td>HdfsResourceLoader (relies on 'hadoop-resource-loader' or singleton type match, falls back to creating one automatically based on 'cfg')</td></tr>
  * </table>
- * 
+ *
  * <p/>
  * Note that the above variables are added only if found (have a non-null value) and the keys are not bound already.
  * To make the runner execute at startup, use {@link #setRunAtStartup(boolean)}.
- * 
+ *
  * @see HdfsResourceLoader
  * @see FsShell
  * @see ApplicationContext
@@ -180,6 +180,7 @@ public class HdfsScriptRunner extends Jsr223ScriptRunner implements ApplicationC
 	}
 
 
+	@SuppressWarnings("resource")
 	private Object detectFS(String variableName, Configuration detectedCfg) {
 		String defaultName = "hadoopFs";
 		Class<?> defaultType = FileSystem.class;
@@ -234,7 +235,7 @@ public class HdfsScriptRunner extends Jsr223ScriptRunner implements ApplicationC
 
 	/**
 	 * Sets the Hadoop configuration to use.
-	 * 
+	 *
 	 * @param configuration The configuration to set.
 	 */
 	public void setConfiguration(Configuration configuration) {
