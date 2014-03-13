@@ -140,7 +140,7 @@ public class YarnClientAutoConfiguration {
 		@Override
 		public void configure(YarnEnvironmentConfigurer environment) throws Exception {
 			environment
-				.includeSystemEnv(syclcp.isIncludeSystemEnv())
+				.includeLocalSystemEnv(syclcp.isIncludeLocalSystemEnv())
 				.withClasspath()
 					.includeBaseDirectory(syclcp.isIncludeBaseDirectory())
 					.useDefaultYarnClasspath(syclcp.isUseDefaultYarnClasspath())

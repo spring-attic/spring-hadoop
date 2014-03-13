@@ -61,7 +61,7 @@ public class SpringYarnClientLaunchContextPropertiesTests {
 
 		assertThat(properties.isUseDefaultYarnClasspath(), is(false));
 		assertThat(properties.isIncludeBaseDirectory(), is(false));
-		assertThat(properties.isIncludeSystemEnv(), is(false));
+		assertThat(properties.isIncludeLocalSystemEnv(), is(true));
 		assertThat(properties.getPathSeparator(), is(":"));
 
 		context.close();

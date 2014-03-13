@@ -64,6 +64,7 @@ public class AppmasterLauncherRunner extends CommandLineRunnerSupport implements
 			properties.put(AppmasterConstants.CONTAINER_COUNT, Integer.toString(containerCount));
 		}
 		appmaster.setParameters(properties);
+		appmaster.setEnvironment(System.getenv());
 
 
 		log.info("Running YarnAppmaster with parameters [" + StringUtils.arrayToCommaDelimitedString(parameters) + "]");

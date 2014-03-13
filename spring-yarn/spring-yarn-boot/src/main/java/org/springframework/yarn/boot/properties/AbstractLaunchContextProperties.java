@@ -28,7 +28,7 @@ public abstract class AbstractLaunchContextProperties {
 	private String pathSeparator;
 	private boolean includeBaseDirectory = true;
 	private boolean useDefaultYarnClasspath = true;
-	private boolean includeSystemEnv = true;
+	private boolean includeLocalSystemEnv = false;
 
 	public String getArchiveFile() {
 		return archiveFile;
@@ -94,12 +94,12 @@ public abstract class AbstractLaunchContextProperties {
 		this.useDefaultYarnClasspath = useDefaultYarnClasspath;
 	}
 
-	public boolean isIncludeSystemEnv() {
-		return includeSystemEnv;
+	public boolean isIncludeLocalSystemEnv() {
+		return includeLocalSystemEnv;
 	}
 
-	public void setIncludeSystemEnv(boolean includeSystemEnv) {
-		this.includeSystemEnv = includeSystemEnv;
+	public void setIncludeLocalSystemEnv(boolean includeLocalSystemEnv) {
+		this.includeLocalSystemEnv = includeLocalSystemEnv;
 	}
 
 }

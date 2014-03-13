@@ -76,7 +76,6 @@ public final class YarnAppmasterBuilder extends AbstractConfiguredAnnotationBuil
 			}
 
 			abstractAppmaster.setConfiguration(configuration);
-			abstractAppmaster.setEnvironment(environment);
 			abstractAppmaster.setResourceLocalizer(resourceLocalizer);
 			if (appmaster instanceof AbstractServicesAppmaster) {
 				AbstractServicesAppmaster abstractServicesAppmaster = (AbstractServicesAppmaster)appmaster;

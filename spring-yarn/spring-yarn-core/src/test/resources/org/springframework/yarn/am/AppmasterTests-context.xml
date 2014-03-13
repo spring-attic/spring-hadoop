@@ -13,13 +13,11 @@
 
 	<yarn:localresources/>
 
-	<yarn:environment>
-		CONTAINER_ID=container_1360089121174_0011_01_000001
-	</yarn:environment>
+	<yarn:environment/>
 
 	<bean id="yarnAmservice" class="org.springframework.yarn.am.AppmasterTests$StubAppmasterService"/>
 
-	<yarn:master>
+	<yarn:master appmaster-class="org.springframework.yarn.am.AppmasterTests$TestAppmaster">
 		<yarn:container-command>
 			<![CDATA[
 			fakecommand

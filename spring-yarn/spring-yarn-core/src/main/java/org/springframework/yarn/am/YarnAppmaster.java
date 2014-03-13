@@ -15,6 +15,7 @@
  */
 package org.springframework.yarn.am;
 
+import java.util.Map;
 import java.util.Properties;
 
 import org.springframework.yarn.listener.AppmasterStateListener;
@@ -34,7 +35,16 @@ public interface YarnAppmaster {
 	void submitApplication();
 
 	/**
-	 * Sets parameters for the application.
+	 * Sets the environment variables. This method should be
+	 * used by a launcher or any other party handling
+	 * creation of an appmaster.
+	 *
+	 * @param environment the environment variables
+	 */
+	public void setEnvironment(Map<String, String> environment);
+
+	/**
+	 * Sets parameters for the appmaster.
 	 *
 	 * @param parameters the parameters to set
 	 */

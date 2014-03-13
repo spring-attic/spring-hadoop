@@ -136,7 +136,7 @@
 			</xsd:attribute>
 			<xsd:attribute name="resources">
 			</xsd:attribute>
-			<xsd:attribute name="include-system-env" type="xsd:boolean" default="true">
+			<xsd:attribute name="include-local-system-env" type="xsd:boolean" default="false">
 			</xsd:attribute>
 		</xsd:extension>
 		</xsd:complexContent>
