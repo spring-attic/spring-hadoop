@@ -145,6 +145,7 @@ public class HdfsResourceLoaderLegacyTest {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	@Test
 	public void testResolve() throws Exception {
 		Resource resource = loader.getResource("/test");
