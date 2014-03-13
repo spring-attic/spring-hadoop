@@ -45,7 +45,6 @@ import org.springframework.yarn.batch.repository.bindings.repo.GetStepExecutionC
 import org.springframework.yarn.batch.repository.bindings.repo.IsJobInstanceExistsReq;
 import org.springframework.yarn.batch.repository.bindings.repo.IsJobInstanceExistsRes;
 import org.springframework.yarn.batch.repository.bindings.repo.UpdateExecutionContextReq;
-import org.springframework.yarn.batch.repository.bindings.repo.UpdateExecutionContextRes;
 import org.springframework.yarn.batch.repository.bindings.repo.UpdateWithJobExecutionReq;
 import org.springframework.yarn.batch.repository.bindings.repo.UpdateWithJobExecutionRes;
 import org.springframework.yarn.batch.repository.bindings.repo.UpdateWithStepExecutionReq;
@@ -142,13 +141,17 @@ public class RemoteJobRepository extends AbstractRemoteDao implements JobReposit
 	@Override
 	public void updateExecutionContext(StepExecution stepExecution) {
 		UpdateExecutionContextReq request = JobRepositoryRpcFactory.buildUpdateExecutionContextReq(stepExecution);
-		UpdateExecutionContextRes response = (UpdateExecutionContextRes) getAppmasterScOperations().doMindRequest(request);
+		getAppmasterScOperations().doMindRequest(request);
+		// TODO: handle response
+		//UpdateExecutionContextRes response = (UpdateExecutionContextRes) getAppmasterScOperations().doMindRequest(request);
 	}
 
 	@Override
 	public void updateExecutionContext(JobExecution jobExecution) {
 		UpdateExecutionContextReq request = JobRepositoryRpcFactory.buildUpdateExecutionContextReq(jobExecution);
-		UpdateExecutionContextRes response = (UpdateExecutionContextRes) getAppmasterScOperations().doMindRequest(request);
+		getAppmasterScOperations().doMindRequest(request);
+		// TODO: handle response
+		//UpdateExecutionContextRes response = (UpdateExecutionContextRes) getAppmasterScOperations().doMindRequest(request);
 	}
 
 	@Override
