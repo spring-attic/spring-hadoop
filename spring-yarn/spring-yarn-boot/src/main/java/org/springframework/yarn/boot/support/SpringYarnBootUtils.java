@@ -27,6 +27,7 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.yarn.boot.properties.SpringYarnProperties;
 
 /**
  * Utilities for Spring Yarn Boot.
@@ -130,6 +131,16 @@ public final class SpringYarnBootUtils {
 			Properties p = new Properties();
 			p.put("spring.yarn.client.localizer.rawFileContents", content);
 			builder.properties(p);
+		}
+	}
+
+	public static String resolveApplicationdir(SpringYarnProperties syp) {
+		if (StringUtils.hasText(syp.getApplicationBaseDir()) && StringUtils.hasText(syp.getApplicationId())) {
+			return (syp.getApplicationBaseDir().endsWith("/") ? syp.getApplicationBaseDir() : syp
+					.getApplicationBaseDir() + "/")
+					+ syp.getApplicationId() + "/";
+		} else {
+			return syp.getApplicationDir();
 		}
 	}
 

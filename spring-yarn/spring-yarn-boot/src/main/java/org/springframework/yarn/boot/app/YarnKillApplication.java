@@ -15,22 +15,19 @@
  */
 package org.springframework.yarn.boot.app;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
-
 import org.apache.hadoop.yarn.api.records.ApplicationId;
+import org.apache.hadoop.yarn.api.records.ApplicationReport;
+import org.apache.hadoop.yarn.api.records.YarnApplicationState;
+import org.apache.hadoop.yarn.util.ConverterUtils;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.batch.BatchAutoConfiguration;
 import org.springframework.boot.autoconfigure.jmx.JmxAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.EmbeddedServletContainerAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.WebMvcAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.util.Assert;
-import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.yarn.boot.SpringApplicationCallback;
 import org.springframework.yarn.boot.SpringApplicationTemplate;
@@ -38,7 +35,7 @@ import org.springframework.yarn.boot.support.SpringYarnBootUtils;
 import org.springframework.yarn.client.YarnClient;
 
 /**
- * Generic Spring Boot client application used to submit Spring Yarn Boot based apps into Yarn.
+ * Generic Spring Boot client application used to kill Spring Yarn Boot based apps.
  *
  * @author Janne Valkealahti
  *
@@ -46,59 +43,60 @@ import org.springframework.yarn.client.YarnClient;
 @Configuration
 @EnableAutoConfiguration(exclude = { EmbeddedServletContainerAutoConfiguration.class, WebMvcAutoConfiguration.class,
 		JmxAutoConfiguration.class, BatchAutoConfiguration.class })
-public class YarnBootClientSubmitApplication {
+public class YarnKillApplication extends AbstractClientApplication<YarnKillApplication> {
 
-	private String appId;
-	private List<Object> sources = new ArrayList<Object>();
-	private List<String> profiles = new ArrayList<String>();
-	private Properties appProperties;
-
-
-	public YarnBootClientSubmitApplication appId(String appId) {
-		Assert.state(StringUtils.hasText(appId), "App id must not be empty");
-		this.appId = appId;
-		return this;
+	public String run() {
+		return run(new String[0]);
 	}
 
-	public YarnBootClientSubmitApplication profiles(String ... profiles) {
-		if (!ObjectUtils.isEmpty(profiles)) {
-			this.profiles.addAll(Arrays.asList(profiles));
-		}
-		return this;
-	}
-
-	public YarnBootClientSubmitApplication sources(Object... sources) {
-		if (!ObjectUtils.isEmpty(sources)) {
-			this.sources.addAll(Arrays.asList(sources));
-		}
-		return this;
-	}
-
-	public YarnBootClientSubmitApplication appProperties(Properties appProperties) {
-		this.appProperties = appProperties;
-		return this;
-	}
-
-	public ApplicationId run(String... args) {
-		Assert.state(StringUtils.hasText(appId), "App id must be set");
+	public String run(String... args) {
 		SpringApplicationBuilder builder = new SpringApplicationBuilder();
 		builder.web(false);
-		builder.sources(YarnBootClientSubmitApplication.class);
+		builder.sources(YarnKillApplication.class, OperationProperties.class);
 		SpringYarnBootUtils.addSources(builder, sources.toArray(new Object[0]));
 		SpringYarnBootUtils.addProfiles(builder, profiles.toArray(new String[0]));
-
+		if (StringUtils.hasText(applicationBaseDir)) {
+			appProperties.setProperty("spring.yarn.applicationDir", applicationBaseDir + instanceId + "/");
+		}
 		SpringYarnBootUtils.addApplicationListener(builder, appProperties);
-
 		SpringApplicationTemplate template = new SpringApplicationTemplate(builder);
-		return template.execute(new SpringApplicationCallback<ApplicationId>() {
+
+		return template.execute(new SpringApplicationCallback<String>() {
 
 			@Override
-			public ApplicationId runWithSpringApplication(ApplicationContext context) throws Exception {
+			public String runWithSpringApplication(ApplicationContext context) throws Exception {
 				YarnClient client = context.getBean(YarnClient.class);
-				return client.submitApplication(false);
+				OperationProperties operationProperties = context.getBean(OperationProperties.class);
+				ApplicationId applicationId = ConverterUtils.toApplicationId(operationProperties.getApplicationId());
+				ApplicationReport report = client.getApplicationReport(applicationId);
+				if (report.getYarnApplicationState() == YarnApplicationState.FINISHED
+						|| report.getYarnApplicationState() == YarnApplicationState.KILLED
+						|| report.getYarnApplicationState() == YarnApplicationState.FAILED) {
+					return "Application " + applicationId + " is not running";
+				} else {
+					client.killApplication(applicationId);
+					return "Kill request for " + applicationId + " sent";
+				}
 			}
 
 		}, args);
+
+	}
+
+	@Override
+	protected YarnKillApplication getThis() {
+		return this;
+	}
+
+	@ConfigurationProperties(name = "spring.yarn.internal.YarnKillApplication")
+	public static class OperationProperties {
+		String applicationId;
+		public void setApplicationId(String applicationId) {
+			this.applicationId = applicationId;
+		}
+		public String getApplicationId() {
+			return applicationId;
+		}
 	}
 
 }

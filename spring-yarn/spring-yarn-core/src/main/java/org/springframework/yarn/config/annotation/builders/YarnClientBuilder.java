@@ -20,6 +20,8 @@ import java.util.Map;
 import org.apache.hadoop.conf.Configuration;
 import org.springframework.data.hadoop.config.common.annotation.AbstractConfiguredAnnotationBuilder;
 import org.springframework.data.hadoop.config.common.annotation.AnnotationBuilder;
+import org.springframework.util.ClassUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.yarn.am.YarnAppmaster;
 import org.springframework.yarn.client.YarnClient;
 import org.springframework.yarn.client.YarnClientFactoryBean;
@@ -47,6 +49,7 @@ public class YarnClientBuilder
 	private String queue;
 	private String memory;
 	private Integer virtualCores;
+	private Class<? extends YarnClient> clientClass;
 
 	/**
 	 * Instantiates a new yarn client builder.
@@ -61,6 +64,9 @@ public class YarnClientBuilder
 		fb.setEnvironment(environment);
 		fb.setAppName(appName);
 		fb.setAppType(appType);
+		if (clientClass != null) {
+			fb.setClientClass(clientClass);
+		}
 		if (commands != null) {
 			fb.setCommands(commands);
 		}
@@ -136,6 +142,29 @@ public class YarnClientBuilder
 	@Override
 	public YarnClientConfigurer virtualCores(Integer virtualCores) {
 		this.virtualCores = virtualCores;
+		return this;
+	}
+
+	@Override
+	public YarnClientConfigurer clientClass(Class<? extends YarnClient> clazz) {
+		this.clientClass = clazz;
+		return this;
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public YarnClientConfigurer clientClass(String clazz) {
+		// let null or empty to pass without errors
+		if (!StringUtils.hasText(clazz)) {
+			return this;
+		}
+
+		Class<?> resolvedClass = ClassUtils.resolveClassName(clazz, getClass().getClassLoader());
+		if (ClassUtils.isAssignable(YarnClient.class, resolvedClass)) {
+			clientClass = (Class<? extends YarnClient>) resolvedClass;
+		} else {
+			throw new IllegalArgumentException("Class " + resolvedClass + " is not an instance of YarnClient");
+		}
 		return this;
 	}
 

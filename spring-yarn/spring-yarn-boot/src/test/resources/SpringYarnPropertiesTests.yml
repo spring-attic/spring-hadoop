@@ -5,4 +5,5 @@ spring:
         stagingDir: stagingDirFoo
         applicationDir: applicationDirFoo
         applicationBaseDir: applicationBaseDirFoo
+        applicationId: applicationIdFoo
         defaultYarnAppClasspath: defaultYarnAppClasspathFoo

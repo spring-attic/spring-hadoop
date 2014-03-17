@@ -15,6 +15,7 @@
  */
 package org.springframework.yarn.config.annotation.builders;
 
+import org.springframework.yarn.client.YarnClient;
 import org.springframework.yarn.config.annotation.SpringYarnConfigurerAdapter;
 import org.springframework.yarn.config.annotation.configurers.ClientMasterRunnerConfigurer;
 import org.springframework.yarn.config.annotation.configurers.DefaultClientMasterRunnerConfigurer;
@@ -304,5 +305,49 @@ public interface YarnClientConfigurer {
 	 * @return {@link YarnClientConfigurer} for chaining
 	 */
 	YarnClientConfigurer queue(String queue);
+
+	/**
+	 * Specify a {@code YarnClient} class.
+	 *
+	 * <p>
+	 * <p>JavaConfig:
+	 * <p>
+	 * <pre>
+	 * public void configure(YarnClientConfigure client) throws Exception {
+	 *   client
+	 *     .clientClass(MyYarnClient.class);
+	 * }
+	 * </pre>
+	 *
+	 * <p>XML:
+	 * <p>
+	 * No equivalent
+	 *
+	 * @param clazz The Yarn client class
+	 * @return {@link YarnClientConfigurer} for chaining
+	 */
+	YarnClientConfigurer clientClass(Class<? extends YarnClient> clazz);
+
+	/**
+	 * Specify a {@code YarnClient} as a fully qualified class name.
+	 *
+	 * <p>
+	 * <p>JavaConfig:
+	 * <p>
+	 * <pre>
+	 * public void configure(YarnClientConfigure client) throws Exception {
+	 *   client
+	 *     .clientClass("com.example.MyYarnClient");
+	 * }
+	 * </pre>
+	 *
+	 * <p>XML:
+	 * <p>
+	 * No equivalent
+	 *
+	 * @param clazz The Yarn client class
+	 * @return {@link YarnClientConfigurer} for chaining
+	 */
+	YarnClientConfigurer clientClass(String clazz);
 
 }

@@ -35,6 +35,7 @@ import org.springframework.yarn.boot.properties.SpringYarnEnvProperties;
 import org.springframework.yarn.boot.properties.SpringYarnProperties;
 import org.springframework.yarn.boot.support.BootLocalResourcesSelector;
 import org.springframework.yarn.boot.support.BootLocalResourcesSelector.Mode;
+import org.springframework.yarn.boot.support.SpringYarnBootUtils;
 import org.springframework.yarn.client.YarnClient;
 import org.springframework.yarn.config.annotation.EnableYarn;
 import org.springframework.yarn.config.annotation.EnableYarn.Enable;
@@ -125,15 +126,16 @@ public class YarnClientAutoConfiguration {
 
 		@Override
 		public void configure(YarnResourceLocalizerConfigurer localizer) throws Exception {
+			String applicationDir = SpringYarnBootUtils.resolveApplicationdir(syp);
 			localizer
 				.stagingDirectory(syp.getStagingDir())
 				.withCopy()
-					.copy(StringUtils.toStringArray(sycp.getFiles()), syp.getApplicationDir(), syp.getApplicationDir() == null)
-					.raw(syclp.getRawFileContents(), syp.getApplicationDir());
+					.copy(StringUtils.toStringArray(sycp.getFiles()), applicationDir, applicationDir == null)
+					.raw(syclp.getRawFileContents(), applicationDir);
 
 			LocalResourcesHdfsConfigurer withHdfs = localizer.withHdfs();
-			for (Entry e : localResourcesSelector.select(syp.getApplicationDir() != null ? syp.getApplicationDir() : "/")) {
-				withHdfs.hdfs(e.getPath(), e.getType(), syp.getApplicationDir() == null);
+			for (Entry e : localResourcesSelector.select(applicationDir != null ? applicationDir : "/")) {
+				withHdfs.hdfs(e.getPath(), e.getType(), applicationDir == null);
 			}
 		}
 
@@ -153,6 +155,7 @@ public class YarnClientAutoConfiguration {
 		@Override
 		public void configure(YarnClientConfigurer client) throws Exception {
 			client
+				.clientClass(sycp.getClientClass())
 				.appName(syp.getAppName())
 				.appType(syp.getAppType())
 				.priority(sycp.getPriority())

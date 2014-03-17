@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,16 @@
  */
 package org.springframework.yarn.client;
 
+import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.hadoop.conf.Configuration;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.util.ClassUtils;
 import org.springframework.yarn.fs.ResourceLocalizer;
 
 /**
@@ -39,7 +42,9 @@ public class YarnClientFactoryBean implements InitializingBean, FactoryBean<Yarn
 	private ClientRmOperations template;
 
 	/** Client returned by this factory */
-	private CommandYarnClient client;
+	private YarnClient client;
+
+	private Class<? extends YarnClient> clientClass = CommandYarnClient.class;
 
 	/** Container request priority */
 	private int priority = 0;
@@ -76,17 +81,22 @@ public class YarnClientFactoryBean implements InitializingBean, FactoryBean<Yarn
 			crmt.afterPropertiesSet();
 			template = crmt;
 		}
-		client = new CommandYarnClient(template);
-		client.setPriority(priority);
-		client.setVirtualcores(virtualcores);
-		client.setMemory(memory);
-		client.setQueue(queue);
-		client.setAppName(appName);
-		client.setAppType(appType);
-		client.setCommands(commands);
-		client.setEnvironment(environment);
-		client.setResourceLocalizer(resourceLocalizer);
-		client.setConfiguration(configuration);
+		Constructor<? extends YarnClient> ctor = ClassUtils.getConstructorIfAvailable(clientClass,
+				ClientRmOperations.class);
+		client = BeanUtils.instantiateClass(ctor, template);
+		if (client instanceof AbstractYarnClient) {
+			AbstractYarnClient c = (AbstractYarnClient)client;
+			c.setPriority(priority);
+			c.setVirtualcores(virtualcores);
+			c.setMemory(memory);
+			c.setQueue(queue);
+			c.setAppName(appName);
+			c.setAppType(appType);
+			c.setCommands(commands);
+			c.setEnvironment(environment);
+			c.setResourceLocalizer(resourceLocalizer);
+			c.setConfiguration(configuration);
+		}
 	}
 
 	@Override
@@ -102,6 +112,15 @@ public class YarnClientFactoryBean implements InitializingBean, FactoryBean<Yarn
 	@Override
 	public boolean isSingleton() {
 		return true;
+	}
+
+	/**
+	 * Sets the client class.
+	 *
+	 * @param clientClass the new client class
+	 */
+	public void setClientClass(Class<? extends YarnClient> clientClass) {
+		this.clientClass = clientClass;
 	}
 
 	/**

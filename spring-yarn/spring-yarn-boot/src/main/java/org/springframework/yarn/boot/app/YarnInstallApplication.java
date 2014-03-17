@@ -15,10 +15,7 @@
  */
 package org.springframework.yarn.boot.app;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -31,12 +28,14 @@ import org.springframework.boot.autoconfigure.web.WebMvcAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.util.Assert;
-import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.yarn.boot.SpringApplicationCallback;
+import org.springframework.yarn.boot.SpringApplicationException;
 import org.springframework.yarn.boot.SpringApplicationTemplate;
+import org.springframework.yarn.boot.properties.SpringYarnProperties;
 import org.springframework.yarn.boot.support.SpringYarnBootUtils;
+import org.springframework.yarn.client.ApplicationDescriptor;
+import org.springframework.yarn.client.ApplicationYarnClient;
 import org.springframework.yarn.client.YarnClient;
 
 /**
@@ -52,66 +51,9 @@ import org.springframework.yarn.client.YarnClient;
 @Configuration
 @EnableAutoConfiguration(exclude = { EmbeddedServletContainerAutoConfiguration.class, WebMvcAutoConfiguration.class,
 		JmxAutoConfiguration.class, BatchAutoConfiguration.class })
-public class YarnBootClientInstallApplication {
+public class YarnInstallApplication extends AbstractClientApplication<YarnInstallApplication> {
 
-	private String appId;
-	private String applicationBaseDir;
-	private List<Object> sources = new ArrayList<Object>();
-	private List<String> profiles = new ArrayList<String>();
 	private Map<String, Properties> configFilesContents = new HashMap<String, Properties>();
-	private Properties appProperties;
-
-	/**
-	 * Sets an appid to be used by a builder.
-	 *
-	 * @param appId the appid
-	 * @return the {@link YarnBootClientInstallApplication} for chaining
-	 */
-	public YarnBootClientInstallApplication appId(String appId) {
-		Assert.state(StringUtils.hasText(appId), "App id must not be empty");
-		this.appId = appId;
-		return this;
-	}
-
-	/**
-	 * Sets an Applications base directory to be used by a builder.
-	 *
-	 * @param applicationBaseDir the applications base directory
-	 * @return the {@link YarnBootClientInstallApplication} for chaining
-	 */
-	public YarnBootClientInstallApplication applicationBaseDir(String applicationBaseDir) {
-		// can be empty because value may come from an existing properties
-		this.applicationBaseDir = applicationBaseDir;
-		return this;
-	}
-
-	/**
-	 * Sets an additional sources to by used when running
-	 * an {@link SpringApplication}.
-	 *
-	 * @param sources the additional sources for Spring Application
-	 * @return the {@link YarnBootClientInstallApplication} for chaining
-	 */
-	public YarnBootClientInstallApplication sources(Object... sources) {
-		if (!ObjectUtils.isEmpty(sources)) {
-			this.sources.addAll(Arrays.asList(sources));
-		}
-		return this;
-	}
-
-	/**
-	 * Sets an additional profiles to be used when running
-	 * an {@link SpringApplication}.
-	 *
-	 * @param profiles the additional profiles for Spring Application
-	 * @return the {@link YarnBootClientInstallApplication} for chaining
-	 */
-	public YarnBootClientInstallApplication profiles(String ... profiles) {
-		if (!ObjectUtils.isEmpty(profiles)) {
-			this.profiles.addAll(Arrays.asList(profiles));
-		}
-		return this;
-	}
 
 	/**
 	 * Associates a new {@link Properties} with a name. These properties will
@@ -120,26 +62,21 @@ public class YarnBootClientInstallApplication {
 	 *
 	 * @param configFileName the config file name
 	 * @param configProperties the config properties
-	 * @return the {@link YarnBootClientInstallApplication} for chaining
+	 * @return the {@link YarnInstallApplication} for chaining
 	 */
-	public YarnBootClientInstallApplication configFile(String configFileName, Properties configProperties) {
+	public YarnInstallApplication configFile(String configFileName, Properties configProperties) {
 		configFilesContents.put(configFileName, configProperties);
 		return this;
 	}
 
 	/**
-	 * Sets application properties which will be passed into a Spring Boot
-	 * environment. Properties are placed with a priority which is just below
-	 * command line arguments put above all other properties. Effectively this
-	 * means that these properties allow to override all existing properties
-	 * but still doesn't override properties based on command line arguments.
+	 * Run a {@link SpringApplication} build by a
+	 * {@link SpringApplicationBuilder} using an empty args.
 	 *
-	 * @param appProperties the app properties
-	 * @return the {@link YarnBootClientInstallApplication} for chaining
+	 * @see #run(String...)
 	 */
-	public YarnBootClientInstallApplication appProperties(Properties appProperties) {
-		this.appProperties = appProperties;
-		return this;
+	public void run() {
+		run(new String[0]);
 	}
 
 	/**
@@ -148,20 +85,22 @@ public class YarnBootClientInstallApplication {
 	 * @param args the Spring Application args
 	 */
 	public void run(String... args) {
-		Assert.state(StringUtils.hasText(appId), "App id must be set");
+		if (!StringUtils.hasText(instanceId)) {
+			throw new SpringApplicationException("Error executing a spring application", new IllegalArgumentException(
+					"Instance id must be set"));
+		}
 
 		SpringApplicationBuilder builder = new SpringApplicationBuilder();
 		builder.web(false);
-		builder.sources(YarnBootClientInstallApplication.class);
+		builder.sources(YarnInstallApplication.class);
 		SpringYarnBootUtils.addSources(builder, sources.toArray(new Object[0]));
 		SpringYarnBootUtils.addProfiles(builder, profiles.toArray(new String[0]));
 		SpringYarnBootUtils.addConfigFilesContents(builder, configFilesContents);
 		if (StringUtils.hasText(applicationBaseDir)) {
-			if (appProperties == null) {
-				appProperties = new Properties();
-			}
-			appProperties.setProperty("spring.yarn.applicationDir", applicationBaseDir + appId + "/");
+			appProperties.setProperty("spring.yarn.applicationDir", applicationBaseDir + instanceId + "/");
 		}
+		appProperties.setProperty("spring.yarn.applicationId", instanceId);
+
 		SpringYarnBootUtils.addApplicationListener(builder, appProperties);
 
 		SpringApplicationTemplate template = new SpringApplicationTemplate(builder);
@@ -170,11 +109,22 @@ public class YarnBootClientInstallApplication {
 			@Override
 			public Void runWithSpringApplication(ApplicationContext context) throws Exception {
 				YarnClient client = context.getBean(YarnClient.class);
-				client.installApplication();
+				SpringYarnProperties syp = context.getBean(SpringYarnProperties.class);
+				String applicationdir = SpringYarnBootUtils.resolveApplicationdir(syp);
+				if (client instanceof ApplicationYarnClient) {
+					((ApplicationYarnClient)client).installApplication(new ApplicationDescriptor(applicationdir));
+				} else {
+					client.installApplication();
+				}
 				return null;
 			}
 
 		}, args);
+	}
+
+	@Override
+	protected YarnInstallApplication getThis() {
+		return this;
 	}
 
 }

@@ -17,19 +17,24 @@ package org.springframework.yarn.boot.app;
 
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Properties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.batch.BatchAutoConfiguration;
+import org.springframework.boot.autoconfigure.jmx.JmxAutoConfiguration;
+import org.springframework.boot.autoconfigure.web.EmbeddedServletContainerAutoConfiguration;
+import org.springframework.boot.autoconfigure.web.WebMvcAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.util.CollectionUtils;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.util.StringUtils;
+import org.springframework.yarn.boot.SpringApplicationCallback;
+import org.springframework.yarn.boot.SpringApplicationTemplate;
 import org.springframework.yarn.boot.properties.SpringYarnProperties;
 import org.springframework.yarn.boot.support.SpringYarnBootUtils;
 import org.springframework.yarn.client.YarnClient;
@@ -44,84 +49,75 @@ import org.springframework.yarn.support.console.ApplicationsReport.SubmittedRepo
  * @author Janne Valkealahti
  *
  */
-public class YarnBootClientInfoApplication {
+@Configuration
+@EnableAutoConfiguration(exclude = { EmbeddedServletContainerAutoConfiguration.class, WebMvcAutoConfiguration.class,
+		JmxAutoConfiguration.class, BatchAutoConfiguration.class })
+public class YarnInfoApplication extends AbstractClientApplication<YarnInfoApplication> {
 
-	private static final Log log = LogFactory.getLog(YarnBootClientInfoApplication.class);
-
-	public String info(String id, String[] profiles, Properties properties, org.apache.hadoop.conf.Configuration configuration, String[] args) {
-		Properties props = new Properties();
-
-		// merge settings set by user in a shell
-		SpringYarnBootUtils.mergeHadoopPropertyIntoMap(configuration, "fs.defaultFS", "spring.hadoop.fsUri", props);
-		SpringYarnBootUtils.mergeHadoopPropertyIntoMap(configuration, "yarn.resourcemanager.address", "spring.hadoop.resourceManagerAddress", props);
-		SpringYarnBootUtils.mergeHadoopPropertyIntoMap(configuration, "yarn.resourcemanager.scheduler.address", "spring.yarn.resourceManagerSchedulerAddress", props);
-		SpringYarnBootUtils.mergeBootArgumentsIntoMap(args, props);
-		CollectionUtils.mergePropertiesIntoMap(properties, props);
-		SpringYarnBootUtils.appendAsCommaDelimitedIntoProperties("spring.profiles.active", profiles, props);
-
-		// based on a given id, set application dir and shared
-		// applications base dir.
-		String applicationsBaseDir = props.getProperty("spring.yarn.applicationBaseDir");
-		if (applicationsBaseDir != null) {
-			props.setProperty("spring.yarn.applicationDir", applicationsBaseDir + id + "/");
-		}
-
-		// convert all properties and settings into boot args and run the application
-		return run(SpringYarnBootUtils.propertiesToBootArguments(props));
+	/**
+	 * Run a {@link SpringApplication} build by a
+	 * {@link SpringApplicationBuilder} using an empty args.
+	 *
+	 * @see #run(String...)
+	 */
+	public String run() {
+		return run(new String[0]);
 	}
 
+	/**
+	 * Run a {@link SpringApplication} build by a {@link SpringApplicationBuilder}.
+	 *
+	 * @param args the Spring Application args
+	 */
 	public String run(String... args) {
-		ConfigurableApplicationContext context = null;
-		Exception exception = null;
-		String info = null;
+		SpringApplicationBuilder builder = new SpringApplicationBuilder();
+		builder.web(false);
+		builder.sources(YarnInstallApplication.class, OperationProperties.class);
+		SpringYarnBootUtils.addSources(builder, sources.toArray(new Object[0]));
+		SpringYarnBootUtils.addProfiles(builder, profiles.toArray(new String[0]));
+		if (StringUtils.hasText(applicationBaseDir)) {
+			appProperties.setProperty("spring.yarn.applicationDir", applicationBaseDir + instanceId + "/");
+		}
+		SpringYarnBootUtils.addApplicationListener(builder, appProperties);
 
-		try {
-			context = new SpringApplicationBuilder(YarnBootClientInstallApplication.class, OperationProperties.class)
-					.web(false)
-					.run(args);
-			OperationProperties operationProperties = context.getBean(OperationProperties.class);
+		SpringApplicationTemplate template = new SpringApplicationTemplate(builder);
+		return template.execute(new SpringApplicationCallback<String>() {
 
-			if (Operation.INSTALLED == operationProperties.getOperation()) {
-				info = getInstalledReport(context);
-			} else if (Operation.SUBMITTED == operationProperties.getOperation()) {
-				info = getSubmittedReport(context, operationProperties.isVerbose(), operationProperties.getType(), operationProperties.getHeaders());
-			} else {
-				// it's ok to fail fast, these properties are pretty much used internally
-				throw new IllegalArgumentException("Operation not found");
+			@Override
+			public String runWithSpringApplication(ApplicationContext context) throws Exception {
+				OperationProperties operationProperties = context.getBean(OperationProperties.class);
+				if (Operation.INSTALLED == operationProperties.getOperation()) {
+					return getInstalledReport(context);
+				} else if (Operation.SUBMITTED == operationProperties.getOperation()) {
+					YarnClient client = context.getBean(YarnClient.class);
+					return getSubmittedReport(client, operationProperties.isVerbose(), operationProperties.getType(),
+							operationProperties.getHeaders());
+				}
+				return null;
 			}
 
-		}
-		catch (Exception e) {
-			exception = e;
-			log.debug("Error running reporting", e);
-		}
-		finally {
-			if (context != null) {
-				try {
-					context.close();
-				}
-				catch (Exception e) {
-					log.debug("Error closing context", e);
-				}
-				context = null;
-			}
-		}
+		}, args);
 
-		if (exception != null) {
-			throw new RuntimeException("Failed to run reporting, " + exception.getMessage(), exception);
-		}
-		return info;
 	}
 
-	private String getInstalledReport(ApplicationContext context) throws Exception {
+	/**
+	 * Build the report for installed applications.
+	 *
+	 * @param context the application context
+	 * @return the installed report
+	 * @throws Exception the exception
+	 */
+	protected String getInstalledReport(ApplicationContext context) throws Exception {
 		YarnConfiguration yarnConfiguration = context.getBean(YarnConfiguration.class);
 		SpringYarnProperties springYarnProperties = context.getBean(SpringYarnProperties.class);
 
 		String applicationBaseDir = springYarnProperties.getApplicationBaseDir();
 		Path path = new Path(applicationBaseDir);
 		FileSystem fs = path.getFileSystem(yarnConfiguration);
-		FileStatus[] listStatus = fs.listStatus(path);
-
+		FileStatus[] listStatus = new FileStatus[0];
+		if (fs.exists(path)) {
+			listStatus = fs.listStatus(path);
+		}
 		return ApplicationsReport.installedReportBuilder()
 				.add(InstalledField.NAME)
 				.add(InstalledField.PATH)
@@ -129,8 +125,16 @@ public class YarnBootClientInfoApplication {
 				.build().toString();
 	}
 
-	private String getSubmittedReport(ApplicationContext context, boolean verbose, String type, Map<String,String> headers) {
-		YarnClient client = context.getBean(YarnClient.class);
+	/**
+	 * Build the report for submitted applications.
+	 *
+	 * @param client the client
+	 * @param verbose the verbose
+	 * @param type the type
+	 * @param headers the headers
+	 * @return the submitted report
+	 */
+	protected String getSubmittedReport(YarnClient client, boolean verbose, String type, Map<String,String> headers) {
 		SubmittedReportBuilder builder = ApplicationsReport.submittedReportBuilder();
 		builder.add(SubmittedField.ID, SubmittedField.USER, SubmittedField.NAME, SubmittedField.QUEUE,
 				SubmittedField.TYPE, SubmittedField.STARTTIME, SubmittedField.FINISHTIME, SubmittedField.STATE,
@@ -149,11 +153,12 @@ public class YarnBootClientInfoApplication {
 		return builder.build().toString();
 	}
 
-	public static void main(String[] args) {
-		new YarnBootClientInfoApplication().run(args);
+	@Override
+	protected YarnInfoApplication getThis() {
+		return this;
 	}
 
-	@ConfigurationProperties(name = "spring.yarn.internal.YarnBootClientInfoApplication")
+	@ConfigurationProperties(name = "spring.yarn.internal.YarnInfoApplication")
 	public static class OperationProperties {
 		private Operation operation;
 		private boolean verbose;

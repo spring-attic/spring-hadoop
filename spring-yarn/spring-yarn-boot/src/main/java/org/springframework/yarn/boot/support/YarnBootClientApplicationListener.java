@@ -17,6 +17,8 @@ package org.springframework.yarn.boot.support;
 
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.core.env.CommandLinePropertySource;
@@ -32,6 +34,8 @@ import org.springframework.util.Assert;
  *
  */
 public class YarnBootClientApplicationListener implements ApplicationListener<ApplicationEnvironmentPreparedEvent> {
+
+	private final static Log log = LogFactory.getLog(YarnBootClientApplicationListener.class);
 
 	private final Map<String, Object> propertySourceMap;
 
@@ -49,9 +53,16 @@ public class YarnBootClientApplicationListener implements ApplicationListener<Ap
 	public void onApplicationEvent(ApplicationEnvironmentPreparedEvent event) {
 		MutablePropertySources propertySources = event.getEnvironment().getPropertySources();
 		if (propertySources.contains(CommandLinePropertySource.COMMAND_LINE_PROPERTY_SOURCE_NAME)) {
+			if(log.isDebugEnabled()) {
+				log.debug("Adding afterCommandLineArgs property source after "
+						+ CommandLinePropertySource.COMMAND_LINE_PROPERTY_SOURCE_NAME);
+			}
 			propertySources.addAfter(CommandLinePropertySource.COMMAND_LINE_PROPERTY_SOURCE_NAME,
 					new MapPropertySource("afterCommandLineArgs", propertySourceMap));
 		} else {
+			if(log.isDebugEnabled()) {
+				log.debug("Adding afterCommandLineArgs property source as first");
+			}
 			propertySources.addFirst(new MapPropertySource("afterCommandLineArgs", propertySourceMap));
 		}
 	}
