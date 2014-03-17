@@ -6,3 +6,4 @@ spring:
               - "files2Foo"
             priority: 234
             queue: queueFoo
+            clientClass: clientClassFoo

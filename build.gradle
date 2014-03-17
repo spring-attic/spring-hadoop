@@ -1005,6 +1005,34 @@ if (gradle.ext.mr2) {
 		}
 	}
 
+	project('spring-yarn:spring-yarn-boot-build-tests') {
+
+		apply plugin: 'spring-boot'
+
+		description = 'Spring Yarn Boot'
+		dependencies {
+			compile project(":spring-yarn:spring-yarn-boot")
+			testCompile project(":spring-yarn:spring-yarn-boot")
+			testCompile project(":spring-yarn:spring-yarn-test")
+		}
+
+		// create a boot jar which we can use in tests
+		// disable main bootRepackage task so that it
+		// doesn't mess with main artifact
+		// test needs to depend on these tasks
+		task appmasterJar(type: Jar) {
+			archiveName = 'test-archive-appmaster.jar'
+			from sourceSets.test.output
+		}
+		task appmasterBootJar(type: BootRepackage, dependsOn: appmasterJar) {
+			withJarTask = appmasterJar
+			mainClass = 'org.springframework.yarn.boot.app.SpringYarnBootApplication'
+		}
+		bootRepackage.enabled = false
+		test.dependsOn(appmasterBootJar)
+
+	}
+
 	project('spring-yarn:spring-yarn-test') {
 		description = 'Spring Yarn Test Core'
 		configurations {

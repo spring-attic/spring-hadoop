@@ -32,6 +32,7 @@ public class SpringYarnClientProperties {
 	private List<String> files;
 	private Integer priority;
 	private String queue;
+	private String clientClass;
 
 	public List<String> getFiles() {
 		return files;
@@ -55,6 +56,14 @@ public class SpringYarnClientProperties {
 
 	public void setQueue(String queue) {
 		this.queue = queue;
+	}
+
+	public String getClientClass() {
+		return clientClass;
+	}
+
+	public void setClientClass(String clientClass) {
+		this.clientClass = clientClass;
 	}
 
 }

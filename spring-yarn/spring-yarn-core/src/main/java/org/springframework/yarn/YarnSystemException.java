@@ -60,9 +60,6 @@ public class YarnSystemException extends UncategorizedDataAccessException {
 	public YarnSystemException(IOException e) {
 		super(e.getMessage(), e);
 	}
-//	public YarnSystemException(RemoteException e) {
-//		super(e.getMessage(), e);
-//	}
 
 	/**
 	 * Constructs a general YarnSystemException.

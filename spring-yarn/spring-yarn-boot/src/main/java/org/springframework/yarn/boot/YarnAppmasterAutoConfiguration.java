@@ -48,6 +48,7 @@ import org.springframework.yarn.boot.support.AppmasterLauncherRunner;
 import org.springframework.yarn.boot.support.BootApplicationEventTransformer;
 import org.springframework.yarn.boot.support.BootLocalResourcesSelector;
 import org.springframework.yarn.boot.support.BootLocalResourcesSelector.Mode;
+import org.springframework.yarn.boot.support.SpringYarnBootUtils;
 import org.springframework.yarn.boot.support.YarnJobLauncherCommandLineRunner;
 import org.springframework.yarn.config.annotation.EnableYarn;
 import org.springframework.yarn.config.annotation.EnableYarn.Enable;
@@ -202,11 +203,12 @@ public class YarnAppmasterAutoConfiguration {
 
 		@Override
 		public void configure(YarnResourceLocalizerConfigurer localizer) throws Exception {
+			String applicationDir = SpringYarnBootUtils.resolveApplicationdir(syp);
 			localizer
 				.stagingDirectory(syp.getStagingDir());
 			LocalResourcesHdfsConfigurer withHdfs = localizer.withHdfs();
-			for (Entry e : localResourcesSelector.select(syp.getApplicationDir() != null ? syp.getApplicationDir() : "/")) {
-				withHdfs.hdfs(e.getPath(), e.getType(), syp.getApplicationDir() == null);
+			for (Entry e : localResourcesSelector.select(applicationDir != null ? applicationDir : "/")) {
+				withHdfs.hdfs(e.getPath(), e.getType(), applicationDir == null);
 			}
 		}
 
