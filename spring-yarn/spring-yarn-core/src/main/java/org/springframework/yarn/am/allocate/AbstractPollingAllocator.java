@@ -45,7 +45,7 @@ public abstract class AbstractPollingAllocator extends AbstractAllocator {
 	private static final Log log = LogFactory.getLog(AbstractAllocator.class);
 
 	/** Trigger for polling task */
-	private volatile Trigger trigger = new PeriodicTrigger(5000);
+	private volatile Trigger trigger = new PeriodicTrigger(1000);
 
 	/** Poller runnable  */
 	private volatile Runnable poller;
