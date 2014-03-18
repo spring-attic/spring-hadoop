@@ -134,6 +134,7 @@
 			</xsd:sequence>
 			<xsd:attribute name="id" type="xsd:ID" use="optional">
 			</xsd:attribute>
+			<xsd:attribute name="configuration" default="yarnConfiguration"/>
 			<xsd:attribute name="resources">
 			</xsd:attribute>
 			<xsd:attribute name="include-local-system-env" type="xsd:boolean" default="false">

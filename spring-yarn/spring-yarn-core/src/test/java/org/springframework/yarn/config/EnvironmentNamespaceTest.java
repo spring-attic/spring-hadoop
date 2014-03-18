@@ -29,6 +29,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -62,6 +63,12 @@ public class EnvironmentNamespaceTest {
 
 	@Resource(name = "&defClasspathEnvCustomDefaultClasspath")
 	private EnvironmentFactoryBean environmentFactoryBeanDefClasspathEnvCustomDefaultClasspath;
+
+	@Resource(name = "defClasspathEnvCustomDefaultClasspathFromYarn")
+	private Map<String, String> defClasspathEnvironmentCustomDefaultClasspathFromYarn;
+
+	@Resource(name = "&defClasspathEnvCustomDefaultClasspathFromYarn")
+	private EnvironmentFactoryBean environmentFactoryBeanDefClasspathEnvCustomDefaultClasspathFromYarn;
 
 	@Resource(name = "defClasspathEnvMixed")
 	private Map<String, String> defClasspathEnvironmentMixed;
@@ -121,7 +128,29 @@ public class EnvironmentNamespaceTest {
 
 		String classpath = defClasspathEnvironmentCustomDefaultClasspath.get("CLASSPATH");
 		assertNotNull(classpath);
-		assertThat(classpath, containsString("/tmp/fake1:/tmp/fake2"));
+		assertThat(classpath, containsString("/tmp/fake1"));
+		assertThat(classpath, containsString("/tmp/fake2"));
+
+		String[] entries = classpath.split(":");
+		assertNotNull(entries);
+		assertThat(entries.length, greaterThan(0));
+		assertThat(entries, hasItemInArray("./*"));
+
+		// check that there's no extra or empty elements
+		assertThat(false, is(classpath.contains("::")));
+		assertThat(true, is(classpath.charAt(0) != ':'));
+		assertThat(true, is(classpath.charAt(classpath.length()-1) != ':'));
+	}
+
+	@Test
+	public void testEnvironmentWithClasspathCustomDefaultFromYarn() throws Exception {
+		assertNotNull(defClasspathEnvironmentCustomDefaultClasspathFromYarn);
+
+		String classpath = defClasspathEnvironmentCustomDefaultClasspathFromYarn.get("CLASSPATH");
+		assertNotNull(classpath);
+		for (String entry : YarnConfiguration.DEFAULT_YARN_APPLICATION_CLASSPATH) {
+			assertThat(classpath, containsString(entry));
+		}
 
 		String[] entries = classpath.split(":");
 		assertNotNull(entries);

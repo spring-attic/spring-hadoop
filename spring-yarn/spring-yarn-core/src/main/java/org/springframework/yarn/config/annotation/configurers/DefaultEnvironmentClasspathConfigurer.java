@@ -91,6 +91,12 @@ public class DefaultEnvironmentClasspathConfigurer
 	}
 
 	@Override
+	public EnvironmentClasspathConfigurer defaultYarnAppClasspath(String... defaultClasspath) {
+		this.defaultYarnAppClasspath = StringUtils.arrayToCommaDelimitedString(defaultClasspath);
+		return this;
+	}
+
+	@Override
 	public EnvironmentClasspathConfigurer includeBaseDirectory(boolean includeBaseDirectory) {
 		this.includeBaseDirectory = includeBaseDirectory;
 		return this;

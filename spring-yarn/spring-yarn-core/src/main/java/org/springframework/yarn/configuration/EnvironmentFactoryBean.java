@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.hadoop.yarn.api.ApplicationConstants;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -68,6 +68,9 @@ public class EnvironmentFactoryBean implements InitializingBean, FactoryBean<Map
 	/** Delimiter used in a classpath string */
 	private String delimiter;
 
+	/** Yarn configuration */
+	private Configuration configuration;
+
 	@Override
 	public Map<String, String> getObject() throws Exception {
 		return environment;
@@ -107,32 +110,14 @@ public class EnvironmentFactoryBean implements InitializingBean, FactoryBean<Map
 			paths.add("./*");
 		}
 
-		// TODO: we should figure out how to support default classpath
-		//       for different distros because this feels a bit dangerous
 		if (useDefaultYarnClasspath) {
+			String defaultClasspathString = "";
 			if (StringUtils.hasText(defaultYarnAppClasspath)) {
-				paths.add(defaultYarnAppClasspath);
-			} else {
-				paths.add("$" + ApplicationConstants.Environment.HADOOP_CONF_DIR);
-				paths.add("$" + ApplicationConstants.Environment.HADOOP_COMMON_HOME + "/*");
-				paths.add("$" + ApplicationConstants.Environment.HADOOP_COMMON_HOME + "/lib/*");
-				paths.add("$" + ApplicationConstants.Environment.HADOOP_COMMON_HOME + "/share/hadoop/common/*");
-				paths.add("$" + ApplicationConstants.Environment.HADOOP_COMMON_HOME + "/share/hadoop/common/lib/*");
-				paths.add("$" + ApplicationConstants.Environment.HADOOP_COMMON_HOME + "/share/hadoop/mapreduce/*");
-				paths.add("$" + ApplicationConstants.Environment.HADOOP_COMMON_HOME + "/share/hadoop/mapreduce/lib/*");
-				paths.add("$" + ApplicationConstants.Environment.HADOOP_HDFS_HOME + "/*");
-				paths.add("$" + ApplicationConstants.Environment.HADOOP_HDFS_HOME + "/lib/*");
-				paths.add("$" + ApplicationConstants.Environment.HADOOP_HDFS_HOME + "/share/hadoop/hdfs/*");
-				paths.add("$" + ApplicationConstants.Environment.HADOOP_HDFS_HOME + "/share/hadoop/hdfs/lib/*");
-				paths.add("$YARN_HOME/*");
-				paths.add("$YARN_HOME/lib/*");
-				//phd
-				paths.add("$HADOOP_YARN_HOME/*");
-				paths.add("$HADOOP_YARN_HOME/lib/*");
-				//vanilla
-				paths.add("$HADOOP_YARN_HOME/share/hadoop/yarn/*");
-				paths.add("$HADOOP_YARN_HOME/share/hadoop/yarn/lib/*");
+				defaultClasspathString = defaultYarnAppClasspath;
+			} else if (configuration != null) {
+				defaultClasspathString = configuration.get(YarnConfiguration.YARN_APPLICATION_CLASSPATH);
 			}
+			paths.addAll(StringUtils.commaDelimitedListToSet(defaultClasspathString));
 		}
 
 		Iterator<String> iterator = paths.iterator();
@@ -161,6 +146,15 @@ public class EnvironmentFactoryBean implements InitializingBean, FactoryBean<Map
 	 */
 	public void setIncludeLocalSystemEnv(boolean includeLocalSystemEnv) {
 		this.includeLocalSystemEnv = includeLocalSystemEnv;
+	}
+
+	/**
+	 * Sets the yarn configuration.
+	 *
+	 * @param configuration the new yarn configuration
+	 */
+	public void setConfiguration(Configuration configuration) {
+		this.configuration = configuration;
 	}
 
 	/**
