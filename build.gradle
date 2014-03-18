@@ -72,7 +72,6 @@ switch (hadoopDistro) {
 				  "org.apache.hbase:hbase-client:$hbaseVersion"]
 		hiveVersion = cdh5HiveVersion
 		pigVersion = cdh5PigVersion
-		thriftVersion = cdh5ThriftVersion
 		hadoopArtifacts = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
@@ -98,7 +97,6 @@ switch (hadoopDistro) {
 				  "org.apache.hbase:hbase-client:$hbaseVersion"]
 		hiveVersion = cdh5HiveVersion
 		pigVersion = cdh5PigVersion
-		thriftVersion = cdh5ThriftVersion
 		hadoopArtifacts = ["org.apache.hadoop:hadoop-streaming:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-tools:$hadoopVersion"]
 		hadoopTestArtifacts = ["org.apache.hadoop:hadoop-minicluster:$hadoopVersion"]
@@ -112,7 +110,6 @@ switch (hadoopDistro) {
 		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion"]
 		hiveVersion = cdh4HiveVersion
 		pigVersion = cdh4PigVersion
-		thriftVersion = cdh4ThriftVersion
 		hadoopArtifacts = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
@@ -137,7 +134,6 @@ switch (hadoopDistro) {
 		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion"]
 		hiveVersion = cdh4HiveVersion
 		pigVersion = cdh4PigVersion
-		thriftVersion = cdh4ThriftVersion
 		hadoopArtifacts = ["org.apache.hadoop:hadoop-streaming:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-tools:$hadoopVersion"]
 		hadoopTestArtifacts = ["org.apache.hadoop:hadoop-minicluster:$hadoopVersion"]
@@ -151,7 +147,6 @@ switch (hadoopDistro) {
 		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion"]
 		hiveVersion = phd1HiveVersion
 		pigVersion = phd1PigVersion
-		thriftVersion = phd1ThriftVersion
 		hadoopArtifacts = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
@@ -178,7 +173,6 @@ switch (hadoopDistro) {
 		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion"]
 		hiveVersion = hdp13HiveVersion
 		pigVersion = hdp13PigVersion
-		thriftVersion = hdp13ThriftVersion
 		break;
 
 	// Hortonworks Data Platform 2.0
@@ -205,7 +199,6 @@ switch (hadoopDistro) {
 		hiveVersion = hdp20HiveVersion
 		pigVersion = hdp20PigVersion
 		pigQualifier = ':h2'
-		thriftVersion = hdp20ThriftVersion
 		break;
 
 	// Hadoop 1.2.x Stable
@@ -219,7 +212,6 @@ switch (hadoopDistro) {
 		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion"]
 		hiveVersion = hd12HiveVersion
 		pigVersion = hd12PigVersion
-		thriftVersion = hd12ThriftVersion
 		break;
 
 	// Hadoop 2.2.x Stable
@@ -257,7 +249,6 @@ switch (hadoopDistro) {
 		hiveVersion = hd22HiveVersion
 		pigVersion = hd22PigVersion
 		pigQualifier = ':h2'
-		thriftVersion = hd22ThriftVersion
 }
 
 configure(javaProjects()) {
@@ -525,16 +516,6 @@ configure(hadoopProjects()) {
 		// needed by JDBC test
 		testRuntime "$hiveGroup:hive-jdbc:$hiveVersion"
 	
-		// needed by the Hive Server tests
-		// testRuntime "$hiveGroup:hive-builtins:$hiveVersion" 
-		// testRuntime("$hiveGroup:hive-metastore:$hiveVersion") 
-
-		//testRuntime "$hiveGroup:hive-common:$hiveVersion"
-		//testRuntime "$hiveGroup:hive-shims:$hiveVersion"
-		//testRuntime "$hiveGroup:hive-serde:$hiveVersion"
-		//testRuntime "org.apache.thrift:libthrift:$thriftVersion"
-		//testRuntime "org.apache.thrift:libfb303:$thriftVersion"
-
 		// Pig
 		optional("org.apache.pig:pig:$pigVersion$pigQualifier") { dep ->
 			exclude module: "junit"
@@ -1112,6 +1093,6 @@ if (gradle.ext.mr2) {
 
 task wrapper(type: Wrapper) {
 	description = "Generates gradlew[.bat] scripts"
-	gradleVersion = "1.9"
+	gradleVersion = "1.8"
 }
 
