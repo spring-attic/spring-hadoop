@@ -31,7 +31,7 @@ import org.springframework.yarn.integration.ip.mind.binding.BaseResponseObject;
 /**
  * Application master service implementation which is used for
  * remote Spring Batch steps to talk to Job Repository. Simply
- * passes requests to {@link JobRepositoryRemoteService}.
+ * passes requests to {@link JobRepositoryService}.
  *
  * @author Janne Valkealahti
  *

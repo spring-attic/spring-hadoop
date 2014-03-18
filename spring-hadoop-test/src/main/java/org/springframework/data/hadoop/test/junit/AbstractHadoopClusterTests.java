@@ -29,7 +29,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 /**
  * Abstract base class providing default functionality
  * for running tests using Hadoop mini cluster.
- * 
+ *
  * @author Janne Valkealahti
  *
  */
@@ -37,38 +37,38 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public abstract class AbstractHadoopClusterTests implements ApplicationContextAware {
 
 	protected ApplicationContext applicationContext;
-	
+
 	protected Configuration configuration;
-	
+
 	protected HadoopCluster hadoopCluster;
-	
+
 	/**
 	 * Gets the {@link ApplicationContext} for tests.
-	 * 
+	 *
 	 * @return the Application context
 	 */
 	public ApplicationContext getApplicationContext() {
 		return applicationContext;
 	}
-	
+
 	@Override
 	public final void setApplicationContext(ApplicationContext applicationContext) {
 		this.applicationContext = applicationContext;
 	}
 
 	/**
-	 * Gets the running cluster runtime 
+	 * Gets the running cluster runtime
 	 * {@link Configuration} for tests.
-	 * 
+	 *
 	 * @return the Hadoop cluster config
 	 */
 	public Configuration getConfiguration() {
 		return configuration;
 	}
-	
+
 	/**
 	 * Sets the {@link Configuration}.
-	 * 
+	 *
 	 * @param configuration the Configuration
 	 */
 	@Autowired
@@ -78,34 +78,34 @@ public abstract class AbstractHadoopClusterTests implements ApplicationContextAw
 
 	/**
 	 * Gets the running {@link HadoopCluster} for tests.
-	 * 
+	 *
 	 * @return the Hadoop cluster
 	 */
 	public HadoopCluster getHadoopCluster() {
 		return hadoopCluster;
 	}
-	
+
 	/**
 	 * Sets the {@link HadoopCluster}
-	 * 
-	 * @param HadoopCluster the Hadoop cluster
+	 *
+	 * @param hadoopCluster the Hadoop cluster
 	 */
 	@Autowired
 	public void setHadoopCluster(HadoopCluster hadoopCluster) {
 		this.hadoopCluster = hadoopCluster;
 	}
-	
+
 	/**
-	 * Returns a configured {@link Filesystem} instance for
+	 * Returns a configured {@link FileSystem} instance for
 	 * test cases to read and write files to it.
 	 * <p/>
-	 * Tests should use this {@link Filesystem} instance.
-	 * 
+	 * Tests should use this {@link FileSystem} instance.
+	 *
 	 * @return the filesystem configured by mini cluster.
 	 * @throws IOException
 	 */
 	protected FileSystem getFileSystem() throws IOException {
 		return hadoopCluster.getFileSystem();
 	}
-		
+
 }

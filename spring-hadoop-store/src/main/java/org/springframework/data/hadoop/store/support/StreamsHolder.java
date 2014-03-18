@@ -18,9 +18,9 @@ package org.springframework.data.hadoop.store.support;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 import org.apache.hadoop.fs.Path;
-
 import org.springframework.util.Assert;
 
 /**

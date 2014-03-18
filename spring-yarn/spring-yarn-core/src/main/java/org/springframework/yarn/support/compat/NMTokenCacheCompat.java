@@ -26,7 +26,7 @@ import org.springframework.util.ReflectionUtils;
  * Compat class for {@link NMTokenCache}.
  *
  * @author Janne Valkealahti
- * @Thomas Risberg
+ * @author Thomas Risberg
  */
 public class NMTokenCacheCompat {
 

@@ -36,7 +36,7 @@ public class JobExecutionEvent extends AbstractYarnEvent {
 	 * Constructs event with the given {@link StepExecution}.
 	 *
 	 * @param source the component that published the event (never {@code null})
-	 * @param stepExecution the Step execution
+	 * @param jobExecution the Job execution
 	 */
 	public JobExecutionEvent(Object source, JobExecution jobExecution) {
 		super(source);

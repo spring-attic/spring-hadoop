@@ -165,7 +165,7 @@ public interface YarnAppmasterConfigurer {
 	 * &lt;yarn:master appmaster-class="com.example.MyYarnAppmaster"/>
 	 * </pre>
 	 *
-	 * @param uri The Yarn appmaster class
+	 * @param clazz The Yarn appmaster class
 	 * @return {@link YarnAppmasterConfigurer} for chaining
 	 */
 	YarnAppmasterConfigurer appmasterClass(Class<? extends YarnAppmaster> clazz);
@@ -187,7 +187,7 @@ public interface YarnAppmasterConfigurer {
 	 * <p>
 	 * No equivalent
 	 *
-	 * @param uri The Yarn appmaster class
+	 * @param clazz The Yarn appmaster class
 	 * @return {@link YarnAppmasterConfigurer} for chaining
 	 */
 	YarnAppmasterConfigurer appmasterClass(String clazz);

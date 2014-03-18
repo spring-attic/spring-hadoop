@@ -276,7 +276,7 @@ public abstract class AbstractYarnClient implements YarnClient, InitializingBean
 	/**
 	 * Sets the type for submitted application.
 	 *
-	 * @param type the new application type
+	 * @param appType the new application type
 	 */
 	public void setAppType(String appType) {
 		this.appType = appType;

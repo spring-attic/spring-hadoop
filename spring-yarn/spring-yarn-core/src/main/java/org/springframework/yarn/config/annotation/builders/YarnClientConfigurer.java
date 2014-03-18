@@ -127,7 +127,7 @@ public interface YarnClientConfigurer {
 	 * <p>
 	 * No equivalent
 	 *
-	 * @param appName The Yarn application type
+	 * @param appType The Yarn application type
 	 * @return {@link YarnClientConfigurer} for chaining
 	 */
 	YarnClientConfigurer appType(String appType);
@@ -209,7 +209,7 @@ public interface YarnClientConfigurer {
 	 * &lt;yarn:client virtualcores="1"/>
 	 * </pre>
 	 *
-	 * @param priority The Yarn application virtual core resource count
+	 * @param virtualCores The Yarn application virtual core resource count
 	 * @return {@link YarnClientConfigurer} for chaining
 	 */
 	YarnClientConfigurer virtualCores(Integer virtualCores);
@@ -246,7 +246,7 @@ public interface YarnClientConfigurer {
 	 * &lt;yarn:client memory="1024"/>
 	 * </pre>
 	 *
-	 * @param priority The Yarn application containers memory reservation
+	 * @param memory The Yarn application containers memory reservation
 	 * @return {@link YarnClientConfigurer} for chaining
 	 */
 	YarnClientConfigurer memory(String memory);
@@ -272,7 +272,7 @@ public interface YarnClientConfigurer {
 	 * &lt;yarn:client memory="1024"/>
 	 * </pre>
 	 *
-	 * @param priority The Yarn application containers memory reservation
+	 * @param memory The Yarn application containers memory reservation
 	 * @return {@link YarnClientConfigurer} for chaining
 	 * @see #memory(String)
 	 */
@@ -301,7 +301,7 @@ public interface YarnClientConfigurer {
 	 * &lt;yarn:client queue="default"/>
 	 * </pre>
 	 *
-	 * @param priority The Yarn application submission queue
+	 * @param queue The Yarn application submission queue
 	 * @return {@link YarnClientConfigurer} for chaining
 	 */
 	YarnClientConfigurer queue(String queue);

@@ -21,13 +21,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.springframework.data.hadoop.config.common.annotation.AbstractConfiguredAnnotationBuilder;
+import org.springframework.data.hadoop.config.common.annotation.AnnotationBuilder;
 import org.springframework.yarn.config.annotation.SpringYarnConfigs;
 import org.springframework.yarn.fs.ResourceLocalizer;
 import org.springframework.yarn.support.YarnUtils;
 
 /**
- * {@link org.springframework.data.config.annotation.AnnotationBuilder AnnotationBuilder}
- * for {@link SpringYarnConfigs}.
+ * {@link AnnotationBuilder} for {@link SpringYarnConfigs}.
  *
  * @author Janne Valkealahti
  *

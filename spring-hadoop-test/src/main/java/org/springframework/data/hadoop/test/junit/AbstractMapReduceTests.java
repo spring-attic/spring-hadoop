@@ -73,7 +73,6 @@ public class AbstractMapReduceTests extends AbstractHadoopClusterTests {
 	 * @param unit the unit for timeout
 	 * @return the job status
 	 * @throws Exception if exception occurred
-	 * @see #waitStatus(Job, long, TimeUnit, JobStatus...)
 	 */
 	protected JobStatus waitFinishedStatus(Job job, long timeout, TimeUnit unit) throws Exception {
 		return waitStatus(job, timeout, unit, JobStatus.SUCCEEDED, JobStatus.FAILED, JobStatus.KILLED);
