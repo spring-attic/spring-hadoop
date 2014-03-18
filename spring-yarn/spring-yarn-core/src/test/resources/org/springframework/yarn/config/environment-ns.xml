@@ -13,6 +13,8 @@
 
 	<util:properties id="props" location="props.properties"/>
 
+	<yarn:configuration/>
+
 	<yarn:environment>
 		foo=jee
 		test-myvar1=${myvar1}
@@ -29,7 +31,11 @@
 	</yarn:environment>
 
 	<yarn:environment id="defClasspathEnvCustomDefaultClasspath">
-		<yarn:classpath use-default-yarn-classpath="true" default-yarn-app-classpath="/tmp/fake1:/tmp/fake2"/>
+		<yarn:classpath use-default-yarn-classpath="true" default-yarn-app-classpath="/tmp/fake1,/tmp/fake2"/>
+	</yarn:environment>
+
+	<yarn:environment id="defClasspathEnvCustomDefaultClasspathFromYarn">
+		<yarn:classpath use-default-yarn-classpath="true"/>
 	</yarn:environment>
 
 	<yarn:environment id="defClasspathEnvMixed">

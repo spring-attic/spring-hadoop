@@ -44,6 +44,7 @@ class EnvironmentParser extends AbstractPropertiesConfiguredBeanDefinitionParser
 		super.doParse(element, parserContext, builder);
 
 		builder.addPropertyValue("includeLocalSystemEnv", element.getAttribute("include-local-system-env"));
+		YarnNamespaceUtils.setReferenceIfAttributeDefined(builder, element, "configuration");
 
 		List<Element> entries = DomUtils.getChildElementsByTagName(element, "classpath");
 		if(entries.size() == 1) {

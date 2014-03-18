@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.hadoop.conf.Configuration;
 import org.springframework.beans.factory.config.PropertiesFactoryBean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.hadoop.config.common.annotation.AbstractConfiguredAnnotationBuilder;
@@ -42,6 +43,7 @@ public final class YarnEnvironmentBuilder
 		extends AbstractConfiguredAnnotationBuilder<Map<String, String>, YarnEnvironmentConfigurer, YarnEnvironmentBuilder>
 		implements PropertiesConfigurerAware, YarnEnvironmentConfigurer {
 
+	private Configuration configuration;
 	private boolean useDefaultYarnClasspath = true;
 	private boolean includeBaseDirectory = true;
 	private boolean includeLocalSystemEnv = false;
@@ -58,6 +60,7 @@ public final class YarnEnvironmentBuilder
 	@Override
 	protected Map<String, String> performBuild() throws Exception {
 		EnvironmentFactoryBean fb = new EnvironmentFactoryBean();
+		fb.setConfiguration(configuration);
 		fb.setProperties(properties);
 		fb.setClasspath(StringUtils.collectionToDelimitedString(classpathEntries, delimiter));
 		fb.setDelimiter(delimiter);
@@ -114,6 +117,15 @@ public final class YarnEnvironmentBuilder
 	 */
 	public void addClasspathEntries(ArrayList<String> classpathEntries) {
 		this.classpathEntries.addAll(classpathEntries);
+	}
+
+	/**
+	 * Sets the yarn configuration.
+	 *
+	 * @param configuration the yarn configuration
+	 */
+	public void configuration(Configuration configuration) {
+		this.configuration = configuration;
 	}
 
 	/**

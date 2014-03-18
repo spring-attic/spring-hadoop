@@ -75,7 +75,9 @@ public class SpringYarnConfigBuilder
 		ResourceLocalizer localizer = yarnResourceLocalizerBuilder.build();
 		config.setLocalizer(localizer);
 
-		Map<String, String> env = getSharedObject(YarnEnvironmentBuilder.class).build();
+		YarnEnvironmentBuilder yarnEnvironmentBuilder = getSharedObject(YarnEnvironmentBuilder.class);
+		yarnEnvironmentBuilder.configuration(configuration);
+		Map<String, String> env = yarnEnvironmentBuilder.build();
 		config.setEnvironment(env);
 
 		YarnClientBuilder yarnClientBuilder = getSharedObject(YarnClientBuilder.class);

@@ -84,12 +84,21 @@ public interface EnvironmentClasspathConfigurer extends AnnotationConfigurerBuil
 	EnvironmentClasspathConfigurer useDefaultYarnClasspath(boolean useDefaultClasspath);
 
 	/**
-	 * Specify a default yarn application classpath
+	 * Specify a default yarn application classpath. Given classpath
+	 * entry can be a comma delimited list.
 	 *
 	 * @param defaultClasspath the default classpath
 	 * @return {@link EnvironmentClasspathConfigurer} for chaining
 	 */
 	EnvironmentClasspathConfigurer defaultYarnAppClasspath(String defaultClasspath);
+
+	/**
+	 * Specify a default yarn application classpath entries.
+	 *
+	 * @param defaultClasspath the default classpath entries.
+	 * @return {@link EnvironmentClasspathConfigurer} for chaining
+	 */
+	EnvironmentClasspathConfigurer defaultYarnAppClasspath(String... defaultClasspath);
 
 	/**
 	 * Specify if base directory should be added in classpath.
