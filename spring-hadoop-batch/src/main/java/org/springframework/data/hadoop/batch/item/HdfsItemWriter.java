@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 the original author or authors.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -42,7 +42,7 @@ import org.springframework.util.StringUtils;
  * prevents the ability to restart using this {@link ItemWriter}.
  * <br/>
  * This {@link ItemWriter} is <em>not</em> thread-safe.
- * 
+ *
  * @author Michael Minella
  */
 public class HdfsItemWriter<T> implements ItemStreamWriter<T> {
@@ -56,7 +56,7 @@ public class HdfsItemWriter<T> implements ItemStreamWriter<T> {
 
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @param fileSystem - HDFS {@link FileSystem} reference
 	 * @param itemSerializer - Strategy for serializing items
 	 * @param fileName - Name of the file to be written to
@@ -158,7 +158,7 @@ public class HdfsItemWriter<T> implements ItemStreamWriter<T> {
 	/**
 	 * Extracts the payload as a byte array.
 	 * @param message
-	 * @return
+	 * @return the payload as byte array
 	 */
 	private byte[] getPayloadAsBytes(List<? extends T> items) throws IOException{
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();

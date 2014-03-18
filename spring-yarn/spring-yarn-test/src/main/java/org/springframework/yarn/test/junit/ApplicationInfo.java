@@ -44,7 +44,6 @@ public class ApplicationInfo {
 	/**
 	 * Instantiates a new application info.
 	 *
-	 * @param yarnApplicationState the yarn application state
 	 * @param applicationId the application id
 	 * @param applicationReport the application report
 	 */

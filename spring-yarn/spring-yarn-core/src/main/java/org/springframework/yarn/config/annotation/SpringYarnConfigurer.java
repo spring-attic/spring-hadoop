@@ -60,7 +60,7 @@ public interface SpringYarnConfigurer extends AnnotationConfigurer<SpringYarnCon
 	/**
 	 * Configure {@link ResourceLocalizer} via {@link YarnResourceLocalizerBuilder} builder.
 	 *
-	 * @param config the {@link ResourceLocalizer} builder
+	 * @param localizer the {@link ResourceLocalizer} builder
 	 * @throws Exception if error occurred
 	 */
 	void configure(YarnResourceLocalizerConfigurer localizer) throws Exception;

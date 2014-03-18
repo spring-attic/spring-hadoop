@@ -100,7 +100,7 @@ public abstract class AbstractClientApplication<T extends AbstractClientApplicat
 	 * Effectively this means that these properties allow to override all
 	 * existing properties but still doesn't override properties based on
 	 * command-line arguments. Command-line arguments in this context are the
-	 * ones passed to {@link #run(String...)} method.
+	 * ones passed to <code>run</code> method in a sub-class.
 	 *
 	 * @param appProperties the app properties
 	 * @return the T for chaining

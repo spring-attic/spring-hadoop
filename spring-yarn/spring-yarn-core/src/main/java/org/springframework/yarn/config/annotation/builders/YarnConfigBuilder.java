@@ -23,6 +23,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.springframework.core.io.Resource;
 import org.springframework.data.hadoop.config.common.annotation.AbstractConfiguredAnnotationBuilder;
+import org.springframework.data.hadoop.config.common.annotation.AnnotationBuilder;
 import org.springframework.data.hadoop.config.common.annotation.ObjectPostProcessor;
 import org.springframework.data.hadoop.config.common.annotation.configurers.PropertiesConfigurer;
 import org.springframework.data.hadoop.config.common.annotation.configurers.PropertiesConfigurerAware;
@@ -33,8 +34,7 @@ import org.springframework.data.hadoop.config.common.annotation.configurers.Defa
 import org.springframework.yarn.configuration.ConfigurationFactoryBean;
 
 /**
- * {@link org.springframework.data.config.annotation.AnnotationBuilder AnnotationBuilder}
- * for {@link YarnConfiguration}.
+ * {@link AnnotationBuilder} for {@link YarnConfiguration}.
  *
  * @author Janne Valkealahti
  *

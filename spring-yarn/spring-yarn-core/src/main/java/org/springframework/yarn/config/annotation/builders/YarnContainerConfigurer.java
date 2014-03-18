@@ -62,7 +62,7 @@ public interface YarnContainerConfigurer {
 	 * &lt;yarn:container container-class="com.example.MyYarnContainer"/>
 	 * </pre>
 	 *
-	 * @param uri The Yarn container class
+	 * @param clazz The Yarn container class
 	 * @return {@link YarnContainerConfigurer} for chaining
 	 */
 	YarnContainerConfigurer containerClass(Class<? extends YarnContainer> clazz);
@@ -84,7 +84,7 @@ public interface YarnContainerConfigurer {
 	 * <p>
 	 * No equivalent
 	 *
-	 * @param uri The Yarn container class
+	 * @param clazz The Yarn container class
 	 * @return {@link YarnContainerConfigurer} for chaining
 	 */
 	YarnContainerConfigurer containerClass(String clazz);
@@ -112,7 +112,7 @@ public interface YarnContainerConfigurer {
 	 * &lt;yarn:container container-ref="myYarnContainer"/>
 	 * </pre>
 	 *
-	 * @param uri The Yarn container reference
+	 * @param ref The Yarn container reference
 	 * @return {@link YarnContainerConfigurer} for chaining
 	 */
 	YarnContainerConfigurer containerRef(YarnContainer ref);

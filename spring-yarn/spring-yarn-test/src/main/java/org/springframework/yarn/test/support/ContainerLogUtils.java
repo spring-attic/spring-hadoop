@@ -77,7 +77,7 @@ public abstract class ContainerLogUtils {
 	 * @param applicationId the application id
 	 * @return the list of log file {@code Resource}s
 	 * @throws IOException Signals that an I/O exception has occurred.
-	 * @see {@link #queryContainerLogs(YarnCluster, ApplicationId, String)}
+	 * @see #queryContainerLogs(YarnCluster, ApplicationId, String)
 	 */
 	public static List<Resource> queryContainerLogs(YarnCluster yarnCluster, ApplicationId applicationId)
 			throws IOException {

@@ -19,14 +19,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.data.hadoop.config.common.annotation.AnnotationConfigurer;
 import org.springframework.data.hadoop.config.common.annotation.AnnotationConfigurerAdapter;
 import org.springframework.util.StringUtils;
 import org.springframework.yarn.config.annotation.builders.YarnEnvironmentBuilder;
 import org.springframework.yarn.config.annotation.builders.YarnEnvironmentConfigurer;
 
 /**
- * {@link org.springframework.data.config.annotation.AnnotationConfigurer AnnotationConfigurer}
- * which knows how to handle configuring a classpath.
+ * {@link AnnotationConfigurer} which knows how to handle configuring a
+ * classpath.
  *
  * @author Janne Valkealahti
  *
