@@ -1030,7 +1030,12 @@ if (gradle.ext.mr2) {
 		}
 		bootRepackage.enabled = false
 		test.dependsOn(appmasterBootJar)
-
+		// boot plugin imports gradle application plugin
+		// which creates distZip task which fails
+		// because we don't need mainClassname, so
+		// disabling startScripts and distZip tasks
+		startScripts.enabled = false
+		distZip.enabled = false
 	}
 
 	project('spring-yarn:spring-yarn-test') {
