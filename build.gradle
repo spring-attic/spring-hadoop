@@ -334,7 +334,7 @@ configure(javaProjects()) {
 			links = [
 				"http://static.springframework.org/spring/docs/3.0.x/javadoc-api",
 				"http://download.oracle.com/javase/6/docs/api",
-				"http://commons.apache.org/proper/commons-logging/commons-logging-1.1.1/apidocs/",
+				"http://commons.apache.org/proper/commons-logging/apidocs/",
 				"http://logging.apache.org/log4j/1.2/apidocs/",
 				"http://hadoop.apache.org/common/docs/current/api/",
 				"http://hbase.apache.org/apidocs/",
