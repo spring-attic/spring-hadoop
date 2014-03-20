@@ -27,12 +27,12 @@ import org.springframework.util.StringUtils;
 public enum Version {
 
 	/**
-	 * All hadoop 1.x based distros.
+	 * All hadoop 1.x and MR1 based distros.
 	 */
 	HADOOP1X,
 
 	/**
-	 * All hadoop 2.x based distros.
+	 * All hadoop 2.x YARN based distros.
 	 */
 	HADOOP2X;
 
@@ -41,7 +41,7 @@ public enum Version {
 
 		if (StringUtils.hasText(version)) {
 			// 1.x or 2.x
-			if (version.startsWith("1")) {
+			if (version.startsWith("1") || version.contains("mr1")) {
 				return HADOOP1X;
 			} else if (version.startsWith("2")) {
 				return HADOOP2X;

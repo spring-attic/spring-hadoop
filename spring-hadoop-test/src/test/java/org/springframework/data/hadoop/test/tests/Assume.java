@@ -73,7 +73,7 @@ public abstract class Assume {
 				return;
 			}
 		}
-		throw new AssumptionViolatedException("None of a spesified distros [" + distros
+		throw new AssumptionViolatedException("None of a specified distros [" + distros
 				+ "] matched with current distros [" + current + "]");
     }
 
@@ -87,7 +87,7 @@ public abstract class Assume {
 		if (ObjectUtils.nullSafeEquals(version, current)) {
 			return;
 		} else {
-			throw new AssumptionViolatedException("spesified version [" + version
+			throw new AssumptionViolatedException("specified version [" + version
 					+ "] not matched with current version [" + current + "]");
 		}
 	}
