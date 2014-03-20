@@ -2,7 +2,7 @@
 <chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" xml:id="testing">
 
   <title>Testing Support</title>
-	
+
   <para>Hadoop testing has always been a cumbersome process especially if you
   try to do testing phase during the normal project build process.
   Traditionally developers have had few options like running Hadoop cluster
@@ -246,7 +246,7 @@ public class WordcountTests extends AbstractMapReduceTests {
     </section>
 
   </section>
-	
+
   <section id="testing:yarn">
 
     <title>Testing Yarn</title>
@@ -377,6 +377,73 @@ public class ClusterBaseTestClassTests extends AbstractYarnClusterTests {
       understant that if tests are expecting vanilla environment to be present, test context should be
       dirtied using <classname>@DirtiesContext</classname> annotation.</para>
 
+      <para><emphasis>Spring Test Context</emphasis> configuration works exactly
+      like you'd work with any other <emphasis>Spring Test</emphasis> based tests.
+      It defaults on finding xml based config and fall back to Annotation based
+      config. For example if one is working with <emphasis>JavaConfig</emphasis>
+      a simple static configuration class can be used within the test class.</para>
+
+      <para>For test cases where additional context configuration is not needed
+      a simple helper annotation <classname>@MiniYarnClusterTest</classname>
+      can be used.</para>
+
+      <programlisting language="java"><![CDATA[@MiniYarnClusterTest
+public class ActivatorTests extends AbstractBootYarnClusterTests {
+  @Test
+  public void testSomething(){
+    ...
+  }
+}]]></programlisting>
+
+      <para>In above example a simple test case was created using annontation
+      <emphasis>@MiniYarnClusterTest</emphasis>. Behind a scenes it's using
+      junit and prepares a YARN minicluster for you and injects needed configuration
+      for you.</para>
+
+      <para>Drawback of using a composed annotation like this is that the
+      <emphasis>@Configuration</emphasis> is then applied from an annotation
+      class itself and user can't no longer add a static <emphasis>@Configuration</emphasis>
+      class in a test class itself and expect Spring to pick it up from
+      there which is a normal behaviour in Spring testing support.
+      If user wants to use a simple composed annotation and use a
+      custom <emphasis>@Configuration</emphasis>, one can simply duplicate
+      functionality of this <emphasis>@MiniYarnClusterTest</emphasis> annotation.</para>
+
+      <programlisting language="java"><![CDATA[@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+@ContextConfiguration(loader=YarnDelegatingSmartContextLoader.class)
+@MiniYarnCluster
+public @interface CustomMiniYarnClusterTest {
+
+  @Configuration
+  public static class Config {
+    @Bean
+    public String myCustomBean() {
+      return "myCustomBean";
+    }
+  }
+
+}
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@CustomMiniYarnClusterTest
+public class ComposedAnnotationTests {
+
+  @Autowired
+  private ApplicationContext ctx;
+
+  @Test
+  public void testBean() {
+    assertTrue(ctx.containsBean("myCustomBean"));
+  }
+
+}]]></programlisting>
+
+      <para>In above example a custom composed annotation
+      <emphasis>@CustomMiniYarnClusterTest</emphasis> was created and
+      then used within a test class. This a great way to put your configuration
+      is one place and still keep your test class relatively non-verbose.</para>
+
     </section>
 
     <section id="testing:yarn:multicontextexample">
@@ -453,20 +520,20 @@ public class MultiContextTests extends AbstractYarnClusterTests {
     YarnApplicationState state = submitApplicationAndWait();
     assertNotNull(state);
     assertTrue(state.equals(YarnApplicationState.FINISHED));
-  	
+
     File workDir = getYarnCluster().getYarnWorkDir();
-  		
+
     PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
     String locationPattern = "file:" + workDir.getAbsolutePath() + "/**/*.std*";
     Resource[] resources = resolver.getResources(locationPattern);
-  		
+
     // appmaster and 4 containers should
     // make it 10 log files
     assertThat(resources, notNullValue());
     assertThat(resources.length, is(10));
-  		
+
     for (Resource res : resources) {
-      File file = res.getFile();		
+      File file = res.getFile();
       if (file.getName().endsWith("stdout")) {
         // there has to be some content in stdout file
         assertThat(file.length(), greaterThan(0l));
@@ -481,7 +548,7 @@ public class MultiContextTests extends AbstractYarnClusterTests {
         // can't have anything in stderr files
         assertThat(file.length(), is(0l));
       }
-    }		
+    }
   }
 }]]></programlisting>
 
@@ -491,7 +558,7 @@ public class MultiContextTests extends AbstractYarnClusterTests {
 
   <section id="testing:boot">
 
-    <title>Testing Boot Based Applications</title>                      
+    <title>Testing Boot Based Applications</title>
 
     <para>In previous sections we showed a generic concepts of unit testing
     in <emphasis>Spring Hadoop</emphasis> and <emphasis>Spring YARN</emphasis>.
@@ -500,9 +567,7 @@ public class MultiContextTests extends AbstractYarnClusterTests {
 
     <para></para>
 
-    <programlisting language="java"><![CDATA[
-@MiniYarnCluster
-@ContextConfiguration(loader = YarnDelegatingSmartContextLoader.class, classes = EmptyConfig.class)
+    <programlisting language="java"><![CDATA[@MiniYarnClusterTest
 public class AppTests extends AbstractBootYarnClusterTests {
 
   @Test
@@ -529,9 +594,7 @@ public class AppTests extends AbstractBootYarnClusterTests {
     }
   }
 
-}
-
-]]></programlisting>
+}]]></programlisting>
 
     <para>Let’s go through step by step what’s happening in this JUnit class. As
     already mentioned earlier we don’t need any existing or running Hadoop instances,
@@ -550,6 +613,12 @@ public class AppTests extends AbstractBootYarnClusterTests {
         a Hadoop’s mini cluster having components for <emphasis>HDFS</emphasis>
         and <emphasis>YARN</emphasis>. Hadoop’s configuration from this minicluster is
         automatically injected into your testing context.</para>
+      </listitem>
+      <listitem>
+        <para><interfacename>@MiniYarnClusterTest</interfacename> is basically a replacement
+        of <interfacename>@MiniYarnCluster</interfacename> and
+        <interfacename>@ContextConfiguration</interfacename> having an empty
+        context configuration.</para>
       </listitem>
       <listitem>
         <para><classname>AbstractBootYarnClusterTests</classname> is a class containing

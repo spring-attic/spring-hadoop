@@ -532,56 +532,45 @@ public class ClientConfiguration extends SpringYarnConfigurerAdapter {
   <yarn:hdfs path="/path/in/hdfs/*.jar"/>
 </yarn:localresources>
 ]]></programlisting>
-	
+
     <para>Behind the scenes it's not enough to simple have a reference
-	to file in a hdfs file system. Yarn itself when localizing resources into
-	container needs to do a consistency check for copied files. This is done
-	by checking file size and timestamp. This information needs to passed
-	to yarn together with a file path. Order to do this the one who
-	defines these beans needs to ask this information from hdfs prior to
-	sending out resouce localizer request. This kind of behaviour exists to
-	make sure that once localization is defined, <emphasis>Container</emphasis> will
-	fail fast if dependant files were replaced during the process.</para>
+    to file in a hdfs file system. Yarn itself when localizing resources into
+    container needs to do a consistency check for copied files. This is done
+    by checking file size and timestamp. This information needs to passed
+    to yarn together with a file path. Order to do this the one who
+    defines these beans needs to ask this information from hdfs prior to
+    sending out resouce localizer request. This kind of behaviour exists to
+    make sure that once localization is defined, <emphasis>Container</emphasis> will
+    fail fast if dependant files were replaced during the process.</para>
 
     <para>On default the hdfs base address is coming from a Yarn configuration and
-	<interfacename>ResourceLocalizer</interfacename> bean will use configuration named
-	<emphasis>yarnLocalresources</emphasis>. If there is a need to use something else
-	than the default bean, <emphasis>configuration</emphasis> parameter
-	can be used to make a reference to other defined configurations.</para>
-	
+    <interfacename>ResourceLocalizer</interfacename> bean will use configuration named
+    <emphasis>yarnLocalresources</emphasis>. If there is a need to use something else
+    than the default bean, <emphasis>configuration</emphasis> parameter
+    can be used to make a reference to other defined configurations.</para>
+
     <programlisting language="xml"><![CDATA[<yarn:localresources configuration="yarnConfiguration">
   <yarn:hdfs path="/path/in/hdfs/my.jar"/>
 </yarn:localresources>
-]]></programlisting>     
+]]></programlisting>
 
     <para>For example, client defining a launch context for
-	<emphasis>Application Master</emphasis> needs to access dependent hdfs entries. The one
-	defining and using <interfacename>ResourceLocalizer</interfacename> bean
-	may have a different hdfs address than the Node Manager preparing the
-	Container. Effectively hdfs entry given to resource localizer needs to be
-	accessed from a <emphasis>Node Manager</emphasis>.</para>
-	
-    <para>To overcome this problem, parameters <emphasis>local</emphasis> and
-	<emphasis>remote</emphasis> can be used to define a different hdfs base entries.</para>
-	
-    <programlisting language="xml"><![CDATA[<yarn:localresources local="hdfs://0.0.0.0:9000" remote="hdfs://10.10.10.10:9000">
-  <yarn:hdfs path="/app/multi-context/multi-context-1.0.0.M1.jar"/>
-  <yarn:hdfs path="/app/spring-yarn-core-1.0.0.BUILD-SNAPSHOT.jar"/>
-</yarn:localresources>
-]]></programlisting>     
+    <emphasis>Application Master</emphasis> needs to access dependent hdfs entries.
+    Effectively hdfs entry given to resource localizer needs to be
+    accessed from a <emphasis>Node Manager</emphasis>.</para>
 
     <para>Yarn resource localizer is using additional parameters to define entry type
-	and visibility. Usage is described below:</para>
-	
+    and visibility. Usage is described below:</para>
+
     <programlisting language="xml"><![CDATA[<yarn:localresources>
   <yarn:hdfs path="/path/in/hdfs/my.jar" type="FILE" visibility="APPLICATION"/>
 </yarn:localresources>
 ]]></programlisting>
 
     <para>For convenience it is possible to copy files into hdfs during the
-	localization process using a <emphasis>yarn:copy</emphasis> tag. Currently
-	base staging directory is <emphasis>/syarn/staging/xx</emphasis> where 
-	<emphasis>xx</emphasis> is a unique identifier per application instance.</para>
+    localization process using a <emphasis>yarn:copy</emphasis> tag. Currently
+    base staging directory is <emphasis>/syarn/staging/xx</emphasis> where 
+    <emphasis>xx</emphasis> is a unique identifier per application instance.</para>
 
     <programlisting language="xml"><![CDATA[<yarn:localresources>
   <yarn:copy src="file:/local/path/to/files/*jar" staging="true"/>
@@ -608,17 +597,7 @@ public class ClientConfiguration extends SpringYarnConfigurerAdapter {
                     <entry><literal>configuration</literal></entry>
                     <entry>Bean Reference</entry>
                     <entry>A reference to configuration bean name, default is
-					<emphasis>yarnConfiguration</emphasis></entry>
-                </row>
-                <row>
-                    <entry><literal>local</literal></entry>
-                    <entry>HDFS Base URL</entry>
-                    <entry>Global default if not defined in entry level</entry>
-                </row>
-                <row>
-                    <entry><literal>remote</literal></entry>
-                    <entry>HDFS Base URL</entry>
-                    <entry>Global default if not defined in entry level</entry>
+                    <emphasis>yarnConfiguration</emphasis></entry>
                 </row>
                 <row>
                     <entry><literal>type</literal></entry>
@@ -653,16 +632,6 @@ public class ClientConfiguration extends SpringYarnConfigurerAdapter {
                     <entry><literal>path</literal></entry>
                     <entry>HDFS Path</entry>
                     <entry>Path in hdfs</entry>
-                </row>
-                <row>
-                    <entry><literal>local</literal></entry>
-                    <entry>HDFS Base URL</entry>
-                    <entry>Path accessible by a running container</entry>
-                </row>
-                <row>
-                    <entry><literal>remote</literal></entry>
-                    <entry>HDFS Base URL</entry>
-                    <entry>Path accessible by a client</entry>
                 </row>
                 <row>
                     <entry><literal>type</literal></entry>
@@ -711,64 +680,54 @@ public class ClientConfiguration extends SpringYarnConfigurerAdapter {
             </tbody>
         </tgroup>  
     </table>
-	
+
   </section>
 
   <section id="yarn:containerenvironment">
     <title>Container Environment</title>
 
     <para>One central concept in Yarn is to use environment variables
-	which then can be read from a container. While it's possible to
-	read those variable at any time it is considered bad design if
-	one chooce to do so. Spring Yarn will pass variable into application
-	before any business methods are executed, which makes things more
-	clearly and testing becomes much more easier.</para>
-	
+    which then can be read from a container. While it's possible to
+    read those variable at any time it is considered bad design if
+    one chooce to do so. Spring Yarn will pass variable into application
+    before any business methods are executed, which makes things more
+    clearly and testing becomes much more easier.</para>
+
     <programlisting language="xml"><![CDATA[<yarn:environment/>]]></programlisting>	
-	
+
     <para>The declaration above defines a <interfacename>Map</interfacename>
-	bean (to be precise a factory bean of type 
-	<classname>EnvironmentFactoryBean</classname>) named, by default,
-	<emphasis>yarnEnvironment</emphasis>. The default name is used, by
-	conventions, by the other elements that require a reference to a
-	environment variables.</para>	
+    bean (to be precise a factory bean of type 
+    <classname>EnvironmentFactoryBean</classname>) named, by default,
+    <emphasis>yarnEnvironment</emphasis>. The default name is used, by
+    conventions, by the other elements that require a reference to a
+    environment variables.</para>
 
     <para>For conveniance it is possible to define a classpath
-	entry directly into an environment. Most likely one is about
-	to run some java code with libraries so classpath needs to
-	be defined anyway.</para>
-	
+    entry directly into an environment. Most likely one is about
+    to run some java code with libraries so classpath needs to
+    be defined anyway.</para>
+
     <programlisting language="xml"><![CDATA[<yarn:environment include-system-env="false">
   <yarn:classpath use-default-yarn-classpath="true" delimiter=":">
     ./*
   </yarn:classpath>
-</yarn:environment>]]></programlisting>     
-	
+</yarn:environment>]]></programlisting>
+
     <para>If <emphasis>use-default-yarn-classpath</emphasis> parameter is set to
     <emphasis>true</emphasis>(default value) a default yarn entries will be added to classpath
-	automatically. Resulting entries are shown below:</para>
+    automatically. These entries are on default resolved from a normal
+    <literal>Hadoop Yarn Configuration</literal> using its
+    <emphasis>yarn.application.classpath</emphasis> property or if
+    <emphasis>default-yarn-app-classpath</emphasis> has a any content entries
+    are resolved from there.</para>
 
-    <programlisting language="xml"><![CDATA[$HADOOP_CONF_DIR:
-$HADOOP_COMMON_HOME/*:
-$HADOOP_COMMON_HOME/lib/*:
-$HADOOP_COMMON_HOME/share/hadoop/common/*:
-$HADOOP_COMMON_HOME/share/hadoop/common/lib/*:
-$HADOOP_HDFS_HOME/*:
-$HADOOP_HDFS_HOME/lib/*:
-$HADOOP_HDFS_HOME/share/hadoop/hdfs/*:
-$HADOOP_HDFS_HOME/share/hadoop/hdfs/lib/*:
-$YARN_HOME/*:
-$YARN_HOME/lib/*:
-$HADOOP_YARN_HOME/share/hadoop/yarn/*:
-$HADOOP_YARN_HOME/share/hadoop/yarn/lib/*]]></programlisting>	
-	
     <note>
       <para>Be carefull if passing environment variables between different systems.
-	  For example if running a client on Windows and passing variables to
-	  Application Master running on Linux, execution wrapper in Yarn may
-	  silently fail.</para>
+      For example if running a client on Windows and passing variables to
+      Application Master running on Linux, execution wrapper in Yarn may
+      silently fail.</para>
     </note>
-	
+
     <table id="yarn:environment:environmentflags" pgwide="1" align="center">
         <title><literal>yarn:environment</literal> attributes</title>
         <tgroup cols="3">
@@ -786,9 +745,9 @@ $HADOOP_YARN_HOME/share/hadoop/yarn/lib/*]]></programlisting>
             <tbody>
                 <row>
                     <entry><literal>include-system-env</literal></entry>
-                    <entry><literal>true</literal>(default), <literal>false</literal></entry>
+                    <entry><literal>true</literal>, <literal>false</literal>(default)</entry>
                     <entry>Defines whether system environment variables are
-					actually added to this bean.</entry>
+                    actually added to this bean.</entry>
                 </row>
             </tbody>
         </tgroup>  
@@ -814,6 +773,12 @@ $HADOOP_YARN_HOME/share/hadoop/yarn/lib/*]]></programlisting>
                     <entry><literal>true</literal>(default), <literal>false</literal></entry>
                     <entry>Defines whether default yarn entries are added
                     to classpath.</entry>
+                </row>
+                <row>
+                    <entry><literal>default-yarn-app-classpath</literal></entry>
+                    <entry>Classpath entries</entry>
+                    <entry>Defines a comma delimited list of default yarn
+                    application classpath entries.</entry>
                 </row>
                 <row>
                     <entry><literal>delimiter</literal></entry>
@@ -2682,6 +2647,12 @@ public void publicVoidNoArgsMethod(@YarnParameter("key") String value) {
                       <entry>null</entry>
                   </row>
                   <row>
+                      <entry><literal>spring.yarn.applicationId</literal></entry>
+                      <entry>No</entry>
+                      <entry>String</entry>
+                      <entry>null</entry>
+                  </row>
+                  <row>
                       <entry><literal>spring.yarn.stagingDir</literal></entry>
                       <entry>No</entry>
                       <entry>String</entry>
@@ -2723,6 +2694,13 @@ public void publicVoidNoArgsMethod(@YarnParameter("key") String value) {
               An applications base directory where build-in application
               deployment functionality would create a new application instance.
               For a normal application submit operation, this is not needed.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.applicationId</filename></term>
+              <listitem><para>
+              An application identifier used together with
+              <literal>applicationBaseDir</literal> in deployment scenarios where
+              <literal>applicationDir</literal> cannot be hard coded.
               </para></listitem>
           </varlistentry>
           <varlistentry><term><filename>spring.yarn.stagingDir</filename></term>
@@ -3091,6 +3069,12 @@ public void publicVoidNoArgsMethod(@YarnParameter("key") String value) {
                       <entry>String</entry>
                       <entry>null</entry>
                   </row>
+                  <row>
+                      <entry><literal>spring.yarn.client.clientClass</literal></entry>
+                      <entry>No</entry>
+                      <entry>Class</entry>
+                      <entry>null</entry>
+                  </row>
               </tbody>
           </tgroup>
       </table>
@@ -3109,6 +3093,12 @@ public void publicVoidNoArgsMethod(@YarnParameter("key") String value) {
           <varlistentry><term><filename>spring.yarn.client.queue</filename></term>
               <listitem><para>
               Application submission queue.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.client.clientClass</filename></term>
+              <listitem><para>
+              Fully qualified classname which auto-configuration can automatically
+              instantiate as a custom client.
               </para></listitem>
           </varlistentry>
       </variablelist>
@@ -3557,6 +3547,172 @@ public void publicVoidNoArgsMethod(@YarnParameter("key") String value) {
               </para></listitem>
           </varlistentry>
       </variablelist>
+
+    </section>
+
+    <section id="yarn:installsubmitmodel">
+
+      <title>Controlling Applications</title>
+
+      <para>We've already talked about how resources are localized into a running container.
+      These resources are always localized from a HDFS file system which effectively means that the whole
+      process of getting application files into a newly launched YARN application is a two phase process;
+      firstly files are copied into HDFS and secondly files are localized from a HDFS.</para>
+
+      <para>When application instance is submitted into YARN, there are two ways how these application
+      files can be handled. First which is the most obvious is to just copy all the necessary files into
+      known location in HDFS and then instruct YARN to localize files from there. Second method is to
+      split this into two different stages, first install application files into HDFS and then submit application
+      from there. At first there seem to be no difference with these two ways to handle application
+      deployment. However if files are always copied into HDFS when application is submitted, you
+      need a physical access to those files. This may not always be possible so it's easier if
+      you have a change to prepare these files by first installing application into HDFS
+      and then just send a submit command to a YARN resource manager.</para>
+
+      <para>To ease a process of handling a full application life cycle, few utility classes exist
+      which are meant to be used with Spring Boot. These classes are considered to be a foundational
+      Boot application classes, not a ready packaged Boot executable jars. Instead you would use
+      these from your own application whether that application is a Boot or other Spring based application.</para>
+
+      <section>
+        <title>Generic Usage</title>
+
+        <para>Internally these applications are executed using a <classname>SpringApplicationBuilder</classname>
+        and a dedicated <emphasis>Spring Application Context</emphasis>. This allows to isolate Boot
+        application instance from your current context if you have one. One fundamental idea in these
+        applications is to make it possible to work with Spring profiles and Boot configuration properties.
+        If your existing application is already using profiles and configuration properties,
+        simply launching a new Boot would most likely derive those settings automatically
+        which is something what you may not want.</para>
+
+        <para><classname>AbstractClientApplication</classname> which all these built-in
+        applications are based on contains methods to work with <emphasis>Spring profiles</emphasis>
+        and additional configuration properties.</para>
+
+        <para>Let's go through all this using an example:</para>
+      </section>
+
+      <section>
+        <title>Using Configuration Properties</title>
+
+          <para>Below sample is pretty much a similar from all other example except of a two settings,
+          <literal>applicationBaseDir</literal> and <literal>clientClass</literal>. Property
+          <literal>applicationBaseDir</literal> defines where in HDFS a new app will be installed.
+          <classname>DefaultApplicationYarnClient</classname> defined using <literal>clientClass</literal>
+          adds better functionality to guard against starting app which doesn't exist or
+          not overwriting existing apps in HDFS.</para>
+
+          <programlisting language="java"><![CDATA[spring:
+  hadoop:
+    fsUri: hdfs://localhost:8020
+    resourceManagerHost: localhost
+  yarn:
+    appType: GS
+    appName: gs-yarn-appmodel
+    applicationBaseDir: /app/
+    applicationDir: /app/gs-yarn-appmodel/
+    client:
+      clientClass: org.springframework.yarn.client.DefaultApplicationYarnClient
+      files:
+        - "file:build/libs/gs-yarn-appmodel-container-0.1.0.jar"
+        - "file:build/libs/gs-yarn-appmodel-appmaster-0.1.0.jar"
+      launchcontext:
+        archiveFile: gs-yarn-appmodel-appmaster-0.1.0.jar
+    appmaster:
+      containerCount: 1
+      launchcontext:
+        archiveFile: gs-yarn-appmodel-container-0.1.0.jar]]></programlisting>
+      </section>
+
+      <section>
+        <title>Using YarnInstallApplication</title>
+
+          <para>YarnInstallApplication is used to install your application into HDFS.</para>
+
+          <programlisting language="java"><![CDATA[public void doInstall() {
+  YarnInstallApplication app = new YarnInstallApplication();
+  app.instanceId("version1");
+  Properties instanceProperties = new Properties();
+  instanceProperties.setProperty("spring.yarn.applicationId", "version1");
+  app.configFile("application.properties", instanceProperties);
+  app.run();
+}]]></programlisting>
+
+          <para>In above example we simply created a <classname>YarnInstallApplication</classname>,
+          set its <literal>instanceId</literal> and executed a run method. We also instructed
+          <classname>YarnInstallApplication</classname> to write used <literal>instanceId</literal>
+          into a configuration file named <emphasis>application.properties</emphasis> so that
+          it'd be available to an application itself.</para>
+
+      </section>
+
+      <section>
+        <title>Using YarnSubmitApplication</title>
+
+          <para>YarnSubmitApplication is used to submit your application from HDFS into YARN.</para>
+
+          <programlisting language="java"><![CDATA[public void doSubmit() {
+  YarnSubmitApplication app = new YarnSubmitApplication();
+  app.instanceId("version1");
+  ApplicationId applicationId = app.run();
+}]]></programlisting>
+
+          <para>In above example we simply created a <classname>YarnSubmitApplication</classname>,
+          set its <literal>instanceId</literal> and executed a run method.</para>
+
+      </section>
+
+      <section>
+        <title>Using YarnInfoApplication</title>
+
+          <para>YarnInfoApplication is used to query application info from a YARN Resource Manager and HDFS.</para>
+
+          <programlisting language="java"><![CDATA[public void doListInstalled() {
+  YarnInfoApplication app = new YarnInfoApplication();
+  Properties appProperties = new Properties();
+  appProperties.setProperty("spring.yarn.internal.YarnInfoApplication.operation", "INSTALLED");
+  app.appProperties(appProperties);
+  String info = app.run();
+  System.out.println(info);
+}
+
+public void doListSubmitted() {
+  YarnInfoApplication app = new YarnInfoApplication();
+  Properties appProperties = new Properties();
+  appProperties.setProperty("spring.yarn.internal.YarnInfoApplication.operation", "SUBMITTED");
+  appProperties.setProperty("spring.yarn.internal.YarnInfoApplication.verbose", "true");
+  appProperties.setProperty("spring.yarn.internal.YarnInfoApplication.type", "GS");
+  app.appProperties(appProperties);
+  String info = app.run();
+  System.out.println(info);
+}]]></programlisting>
+
+          <para>In above example we simply created a <classname>YarnInfoApplication</classname>,
+          and used it to list installed and running applications. By adding
+          <literal>appProperties</literal> will make Boot to pick these properties
+          after every other source of configuration properties but still allows to pass
+          command-line options to override everything which is a normal way in Boot.</para>
+
+      </section>
+
+      <section>
+        <title>Using YarnKillApplication</title>
+
+          <para>YarnKillApplication is used to kill running application instances.</para>
+
+          <programlisting language="java"><![CDATA[public void doKill() {
+  YarnKillApplication app = new YarnKillApplication();
+  Properties appProperties = new Properties();
+  appProperties.setProperty("spring.yarn.internal.YarnKillApplication.applicationId", "application_1395058039949_0052");
+  app.appProperties(appProperties);
+  String info = app.run();
+  System.out.println(info);
+}]]></programlisting>
+
+          <para>In above example we simply created a <classname>YarnKillApplication</classname>,
+          and used it to send a application kill request into a YARN resource manager.</para>
+
+      </section>
 
     </section>
 
