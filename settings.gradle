@@ -28,6 +28,9 @@ switch (ext.hadoopDistro) {
 	case "hdp20":
 		ext.mr2 = true
 		break
+	case "hadoop23":
+		ext.mr2 = true
+		break
 	case "hadoop12":
 		ext.mr2 = false
 		break

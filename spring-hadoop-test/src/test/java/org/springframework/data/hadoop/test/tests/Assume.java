@@ -62,22 +62,6 @@ public abstract class Assume {
     }
 
     /**
-     * Assume that a particular {@link Distro} is currently used.
-     *
-     * @param distros the distros to expect
-     */
-    public static void hadoopDistro(Distro... distros) {
-    	Set<Distro> current = Distro.resolveDistros();
-    	for (Distro d : distros) {
-			if (current.contains(d)) {
-				return;
-			}
-		}
-		throw new AssumptionViolatedException("None of a specified distros [" + distros
-				+ "] matched with current distros [" + current + "]");
-    }
-
-    /**
      * Assume that a particular {@link Version} is currently used.
      *
      * @param version the version to expect
