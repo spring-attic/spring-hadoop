@@ -26,18 +26,23 @@
       </listitem>
 
       <listitem>
+        <para><ulink url="http://hadoop.apache.org/">Apache Hadoop</ulink> 
+        2.3.0 *</para>
+      </listitem>
+
+      <listitem>
         <para><ulink url="http://www.gopivotal.com/">Pivotal</ulink> HD
         1.1</para>
       </listitem>
 
       <listitem>
         <para><ulink url="http://www.cloudera.com/">Cloudera</ulink> CDH4
-        (CDH4.3.1)</para>
+        (CDH4.6.0)</para>
       </listitem>
 
       <listitem>
         <para><ulink url="http://www.cloudera.com/">Cloudera</ulink> CDH5 beta
-        (2.2.0-cdh5.0.0-beta-1) *</para>
+        (2.2.0-cdh5.0.0-beta-2) *</para>
       </listitem>
 
       <listitem>
@@ -59,11 +64,11 @@
   </para>
 
   <para>Spring for Apache Hadoop 2.0 is tested daily against a number of Hadoop distributions. See the <ulink
-  url="https://build.springsource.org/browse/SPRINGDATAHADOOP">test plan page</ulink> for current status.</para>
+  url="https://build.spring.io/browse/SPRINGDATAHADOOP">test plan page</ulink> for current status.</para>
 
   <para>Instructions for setting up project builds using various supported
   distributions are provided on the Spring for Apache Hadoop wiki - <ulink
-  url="https://github.com/SpringSource/spring-hadoop/wiki">https://github.com/SpringSource/spring-hadoop/wiki</ulink></para>
+  url="https://github.com/spring-projects/spring-hadoop/wiki">https://github.com/spring-projects/spring-hadoop/wiki</ulink></para>
 
   <para>Regarding Hadoop-related projects, SDHP supports <ulink
   url="http://hbase.apache.org/">HBase</ulink> 0.90.x, <ulink
@@ -76,13 +81,12 @@
   <para>To take full advantage of Spring for Apache Hadoop you need a
   running Hadoop cluster. If you don't already have one in your
   environment, a good first step is to create a single-node cluster. To
-  install Hadoop 1.2.1, the "<link
+  install the most recent stable verision of Hadoop, the "<link
   ns6:href="http://hadoop.apache.org/common/docs/stable/#Getting+Started">Getting
   Started"</link> page from the official Apache documentation is a good
-  general guide. If you are running on Ubuntu, the tutorial from Michael G.
-  Noll, "<link
-  ns6:href="http://www.michael-noll.com/tutorials/running-hadoop-on-ubuntu-linux-single-node-cluster/">Running
-  Hadoop On Ubuntu Linux (Single-Node Cluster)</link>" provides more details.
+  general guide. There should be a link for "Single Node Setup".</para>
+
+  <para>
   It is also convenient to download a Virtual Machine where Hadoop is setup
   and ready to go. Cloudera, Hortonworks and Pivotal all provide virtual
   machines and provide VM downloads on their product pages. Additionally, the
