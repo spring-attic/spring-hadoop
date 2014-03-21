@@ -38,6 +38,7 @@ public class SpringYarnContainerPropertiesTests {
 	@Test
 	public void testAllPropertiesSet() {
 		SpringApplication app = new SpringApplication(TestConfiguration.class);
+		app.setWebEnvironment(false);
 		ConfigurableApplicationContext context = app
 				.run(new String[] { "--spring.config.name=SpringYarnContainerPropertiesTests" });
 		SpringYarnContainerProperties properties = context.getBean(SpringYarnContainerProperties.class);

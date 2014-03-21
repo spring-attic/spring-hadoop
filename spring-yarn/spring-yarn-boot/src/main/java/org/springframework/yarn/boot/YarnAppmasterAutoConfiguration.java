@@ -28,12 +28,15 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.StringUtils;
+import org.springframework.yarn.YarnSystemConstants;
+import org.springframework.yarn.am.AppmasterTrackService;
 import org.springframework.yarn.am.YarnAppmaster;
 import org.springframework.yarn.boot.condition.ConditionalOnYarnAppmaster;
 import org.springframework.yarn.boot.properties.SpringHadoopProperties;
@@ -48,6 +51,7 @@ import org.springframework.yarn.boot.support.AppmasterLauncherRunner;
 import org.springframework.yarn.boot.support.BootApplicationEventTransformer;
 import org.springframework.yarn.boot.support.BootLocalResourcesSelector;
 import org.springframework.yarn.boot.support.BootLocalResourcesSelector.Mode;
+import org.springframework.yarn.boot.support.EmbeddedAppmasterTrackService;
 import org.springframework.yarn.boot.support.SpringYarnBootUtils;
 import org.springframework.yarn.boot.support.YarnJobLauncherCommandLineRunner;
 import org.springframework.yarn.config.annotation.EnableYarn;
@@ -77,6 +81,18 @@ import org.springframework.yarn.support.YarnContextUtils;
 public class YarnAppmasterAutoConfiguration {
 
 	private final static Log log = LogFactory.getLog(YarnAppmasterAutoConfiguration.class);
+
+	@Configuration
+	@ConditionalOnWebApplication
+	public static class TrackServiceConfig {
+		// if embedded servlet container exists we try to register
+		// it as a track service with its address
+		@Bean(name=YarnSystemConstants.DEFAULT_ID_AMTRACKSERVICE)
+		@ConditionalOnMissingBean(AppmasterTrackService.class)
+		public AppmasterTrackService appmasterTrackService() {
+			return new EmbeddedAppmasterTrackService();
+		}
+	}
 
 	@Configuration
 	@EnableConfigurationProperties({ SpringYarnAppmasterLocalizerProperties.class })

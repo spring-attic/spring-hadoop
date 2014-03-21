@@ -38,6 +38,7 @@ public class SpringYarnClientPropertiesTests {
 	@Test
 	public void testAllPropertiesSet() {
 		SpringApplication app = new SpringApplication(TestConfiguration.class);
+		app.setWebEnvironment(false);
 		ConfigurableApplicationContext context = app
 				.run(new String[] { "--spring.config.name=SpringYarnClientPropertiesTests" });
 		SpringYarnClientProperties properties = context.getBean(SpringYarnClientProperties.class);

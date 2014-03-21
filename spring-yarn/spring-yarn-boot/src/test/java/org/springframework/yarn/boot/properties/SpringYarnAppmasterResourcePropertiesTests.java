@@ -30,6 +30,7 @@ public class SpringYarnAppmasterResourcePropertiesTests {
 	@Test
 	public void testAllPropertiesSet() {
 		SpringApplication app = new SpringApplication(TestConfiguration.class);
+		app.setWebEnvironment(false);
 		ConfigurableApplicationContext context = app
 				.run(new String[] { "--spring.config.name=SpringYarnAppmasterResourcePropertiesTests" });
 		SpringYarnAppmasterResourceProperties properties = context.getBean(SpringYarnAppmasterResourceProperties.class);
