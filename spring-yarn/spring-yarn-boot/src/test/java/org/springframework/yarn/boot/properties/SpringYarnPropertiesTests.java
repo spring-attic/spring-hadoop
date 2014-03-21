@@ -43,7 +43,7 @@ public class SpringYarnPropertiesTests {
 		assertThat(properties, notNullValue());
 		assertThat(properties.getApplicationDir(), is("applicationDirFoo"));
 		assertThat(properties.getApplicationBaseDir(), is("applicationBaseDirFoo"));
-		assertThat(properties.getApplicationId(), is("applicationIdFoo"));
+		assertThat(properties.getApplicationVersion(), is("applicationVersionFoo"));
 		assertThat(properties.getAppName(), is("appNameFoo"));
 		assertThat(properties.getAppType(), is("appTypeFoo"));
 		assertThat(properties.getStagingDir(), is("stagingDirFoo"));

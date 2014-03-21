@@ -87,7 +87,7 @@ public abstract class AbstractApplicationTests {
 		@SuppressWarnings("resource")
 		FsShell shell = new FsShell(configuration);
 		for (FileStatus s : shell.ls(true, "/")) {
-			log.info("XXX " + s);
+			log.info("status " + s);
 		}
 	}
 
@@ -96,7 +96,6 @@ public abstract class AbstractApplicationTests {
 		FsShell shell = new FsShell(configuration);
 		Collection<String> text = shell.text(path);
 		if (text.size() == 1) {
-			log.info("XXX content path");
 			log.info(text.iterator().next());
 		}
 	}

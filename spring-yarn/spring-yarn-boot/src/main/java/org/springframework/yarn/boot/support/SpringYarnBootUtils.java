@@ -135,10 +135,10 @@ public final class SpringYarnBootUtils {
 	}
 
 	public static String resolveApplicationdir(SpringYarnProperties syp) {
-		if (StringUtils.hasText(syp.getApplicationBaseDir()) && StringUtils.hasText(syp.getApplicationId())) {
+		if (StringUtils.hasText(syp.getApplicationBaseDir()) && StringUtils.hasText(syp.getApplicationVersion())) {
 			return (syp.getApplicationBaseDir().endsWith("/") ? syp.getApplicationBaseDir() : syp
 					.getApplicationBaseDir() + "/")
-					+ syp.getApplicationId() + "/";
+					+ syp.getApplicationVersion() + "/";
 		} else {
 			return syp.getApplicationDir();
 		}

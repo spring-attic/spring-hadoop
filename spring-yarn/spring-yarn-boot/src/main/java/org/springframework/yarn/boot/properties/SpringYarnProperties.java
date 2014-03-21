@@ -29,7 +29,7 @@ public class SpringYarnProperties {
 
 	private String applicationDir;
 	private String applicationBaseDir;
-	private String applicationId;
+	private String applicationVersion;
 	private String stagingDir;
 	private String appName;
 	private String appType;
@@ -54,12 +54,12 @@ public class SpringYarnProperties {
 		this.applicationBaseDir = applicationBaseDir;
 	}
 
-	public String getApplicationId() {
-		return applicationId;
+	public String getApplicationVersion() {
+		return applicationVersion;
 	}
 
-	public void setApplicationId(String applicationId) {
-		this.applicationId = applicationId;
+	public void setApplicationVersion(String applicationVersion) {
+		this.applicationVersion = applicationVersion;
 	}
 
 	public String getStagingDir() {

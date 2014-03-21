@@ -26,7 +26,7 @@ import org.springframework.yarn.boot.support.SpringYarnBootUtils;
 
 public class YarnInfoApplicationTests extends AbstractApplicationTests {
 
-	private final String BASE = "/tmp/YarnBootClientInfoApplicationTests/";
+	private final String BASE = "/tmp/YarnInfoApplicationTests/";
 
 	private final static Log log = LogFactory.getLog(YarnInfoApplicationTests.class);
 
@@ -49,7 +49,7 @@ public class YarnInfoApplicationTests extends AbstractApplicationTests {
 		YarnInfoApplication app = new YarnInfoApplication();
 		app.appProperties(appProperties);
 		String info = app.run(args);
-		log.info("XXX info:\n" + info);
+		log.info("info:\n" + info);
 	}
 
 	@Test
@@ -71,14 +71,14 @@ public class YarnInfoApplicationTests extends AbstractApplicationTests {
 
 		String[] args = new String[]{
 				"--spring.yarn.applicationBaseDir=" + BASE,
-				"--spring.yarn.internal.YarnInfoApplication.operation=INSTALLED"
+				"--spring.yarn.internal.YarnInfoApplication.operation=PUSHED"
 		};
 
 		YarnInfoApplication app = new YarnInfoApplication();
 		app.appProperties(appProperties);
 		app.applicationBaseDir(BASE);
 		String info = app.run(args);
-		log.info("XXX info:\n" + info);
+		log.info("info:\n" + info);
 	}
 
 }

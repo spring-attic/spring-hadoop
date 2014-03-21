@@ -56,7 +56,7 @@ public class YarnKillApplication extends AbstractClientApplication<YarnKillAppli
 		SpringYarnBootUtils.addSources(builder, sources.toArray(new Object[0]));
 		SpringYarnBootUtils.addProfiles(builder, profiles.toArray(new String[0]));
 		if (StringUtils.hasText(applicationBaseDir)) {
-			appProperties.setProperty("spring.yarn.applicationDir", applicationBaseDir + instanceId + "/");
+			appProperties.setProperty("spring.yarn.applicationDir", applicationBaseDir + applicationVersion + "/");
 		}
 		SpringYarnBootUtils.addApplicationListener(builder, appProperties);
 		SpringApplicationTemplate template = new SpringApplicationTemplate(builder);

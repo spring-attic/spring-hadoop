@@ -65,7 +65,7 @@ public class YarnSubmitApplication extends AbstractClientApplication<YarnSubmitA
 	 * @return the application id
 	 */
 	public ApplicationId run(String... args) {
-		Assert.state(StringUtils.hasText(instanceId), "Instance id must be set");
+		Assert.state(StringUtils.hasText(applicationVersion), "Instance id must be set");
 		SpringApplicationBuilder builder = new SpringApplicationBuilder();
 		builder.web(false);
 		builder.sources(YarnSubmitApplication.class);
@@ -73,10 +73,10 @@ public class YarnSubmitApplication extends AbstractClientApplication<YarnSubmitA
 		SpringYarnBootUtils.addProfiles(builder, profiles.toArray(new String[0]));
 
 		if (StringUtils.hasText(applicationBaseDir)) {
-			appProperties.setProperty("spring.yarn.applicationDir", applicationBaseDir + instanceId + "/");
+			appProperties.setProperty("spring.yarn.applicationDir", applicationBaseDir + applicationVersion + "/");
 		}
 
-		appProperties.setProperty("spring.yarn.applicationId", instanceId);
+		appProperties.setProperty("spring.yarn.applicationVersion", applicationVersion);
 		SpringYarnBootUtils.addApplicationListener(builder, appProperties);
 
 		SpringApplicationTemplate template = new SpringApplicationTemplate(builder);
