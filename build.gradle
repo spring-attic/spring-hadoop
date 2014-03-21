@@ -365,7 +365,7 @@ configure(javaProjects()) {
 				"http://hadoop.apache.org/common/docs/current/api/",
 				"http://hbase.apache.org/apidocs/",
 				"http://pig.apache.org/docs/r0.12.0/api/",
-				"http://hive.apache.org/javadocs/r0.12.0/",
+				"http://hive.apache.org/javadocs/r0.12.0/api",
 				"http://docs.spring.io/spring-batch/apidocs/",
 				"http://docs.spring.io/spring-integration/api/",
 				"https://builds.apache.org/job/Thrift/javadoc/",
