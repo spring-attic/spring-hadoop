@@ -5,6 +5,28 @@ http://projects.spring.io/spring-hadoop/
 Commit changelog: http://github.com/spring-projects/spring-hadoop/tree/v[version]
 Issues changelog: http://jira.springsource.org/secure/ReleaseNote.jspa?projectId=10801
 
+Changes in version 2.0.0 RC1 (2014-03-25)
+-----------------------------------------
+General
+* Update to latest dependency versions [SHDP-302]
+* Add Hadoop 2.3.0 as a supported version [SHDP-306]
+
+Store
+* Refactor HdfsFileSplitItemReader to use store classes [SHDP-295]
+* Add split reader for TextFileReader [SHDP-294]
+
+YARN
+* Consolidate boot launcher exit and latch wait [SHDP-266]
+* Better model for using default yarn classpath [SHDP-272]
+* Make Yarn app push/submit model consistent [SHDP-287] [SHDP-307]
+* Method with OnYarnContainerStart should handle errors [SHDP-292]
+* Bound container parameters with OnYarnContainerStart [SHDP-293]
+* Improve spring-yarn-boot configuration options [SHDP-296]
+* Set allocator poll interval to 1 sec [SHDP-301]
+* Register embedded container as track service [SHDP-305]
+* Fix ClusterBaseTestClassSubmitTests for Hadoop 2.3.0 based distros [SHDP-308]
+
+
 Changes in version 2.0.0 M6 (2014-03-05)
 -----------------------------------------
 General
