@@ -736,6 +736,9 @@ project('spring-data-hadoop-store') {
 		testCompile project(":spring-data-hadoop")
 		testCompile project(path:":spring-data-hadoop-test", configuration:"testArtifacts")
 		testCompile "org.springframework:spring-test:$springVersion"
+		testCompile("org.mockito:mockito-core:$mockitoVersion") { dep ->
+			exclude group: "org.hamcrest"
+		}
 		testCompile "org.hamcrest:hamcrest-core:$hamcrestVersion"
 		testCompile "org.hamcrest:hamcrest-library:$hamcrestVersion"
 		testRuntime "org.xerial.snappy:snappy-java:1.1.0"
