@@ -2647,7 +2647,7 @@ public void publicVoidNoArgsMethod(@YarnParameter("key") String value) {
                       <entry>null</entry>
                   </row>
                   <row>
-                      <entry><literal>spring.yarn.applicationId</literal></entry>
+                      <entry><literal>spring.yarn.applicationVersion</literal></entry>
                       <entry>No</entry>
                       <entry>String</entry>
                       <entry>null</entry>
@@ -2696,9 +2696,9 @@ public void publicVoidNoArgsMethod(@YarnParameter("key") String value) {
               For a normal application submit operation, this is not needed.
               </para></listitem>
           </varlistentry>
-          <varlistentry><term><filename>spring.yarn.applicationId</filename></term>
+          <varlistentry><term><filename>spring.yarn.applicationVersion</filename></term>
               <listitem><para>
-              An application identifier used together with
+              An application version identifier used together with
               <literal>applicationBaseDir</literal> in deployment scenarios where
               <literal>applicationDir</literal> cannot be hard coded.
               </para></listitem>
@@ -3550,7 +3550,7 @@ public void publicVoidNoArgsMethod(@YarnParameter("key") String value) {
 
     </section>
 
-    <section id="yarn:installsubmitmodel">
+    <section id="yarn:pushsubmitmodel">
 
       <title>Controlling Applications</title>
 
@@ -3561,7 +3561,7 @@ public void publicVoidNoArgsMethod(@YarnParameter("key") String value) {
 
       <para>When application instance is submitted into YARN, there are two ways how these application
       files can be handled. First which is the most obvious is to just copy all the necessary files into
-      known location in HDFS and then instruct YARN to localize files from there. Second method is to
+      a known location in HDFS and then instruct YARN to localize files from there. Second method is to
       split this into two different stages, first install application files into HDFS and then submit application
       from there. At first there seem to be no difference with these two ways to handle application
       deployment. However if files are always copied into HDFS when application is submitted, you
@@ -3595,7 +3595,7 @@ public void publicVoidNoArgsMethod(@YarnParameter("key") String value) {
       <section>
         <title>Using Configuration Properties</title>
 
-          <para>Below sample is pretty much a similar from all other example except of a two settings,
+          <para>Below sample is pretty much a similar from all other examples except of two settings,
           <literal>applicationBaseDir</literal> and <literal>clientClass</literal>. Property
           <literal>applicationBaseDir</literal> defines where in HDFS a new app will be installed.
           <classname>DefaultApplicationYarnClient</classname> defined using <literal>clientClass</literal>
@@ -3625,22 +3625,22 @@ public void publicVoidNoArgsMethod(@YarnParameter("key") String value) {
       </section>
 
       <section>
-        <title>Using YarnInstallApplication</title>
+        <title>Using YarnPushApplication</title>
 
-          <para>YarnInstallApplication is used to install your application into HDFS.</para>
+          <para>YarnPushApplication is used to push your application into HDFS.</para>
 
           <programlisting language="java"><![CDATA[public void doInstall() {
-  YarnInstallApplication app = new YarnInstallApplication();
-  app.instanceId("version1");
+  YarnPushApplication app = new YarnPushApplication();
+  app.applicationVersion("version1");
   Properties instanceProperties = new Properties();
-  instanceProperties.setProperty("spring.yarn.applicationId", "version1");
+  instanceProperties.setProperty("spring.yarn.applicationVersion", "version1");
   app.configFile("application.properties", instanceProperties);
   app.run();
 }]]></programlisting>
 
-          <para>In above example we simply created a <classname>YarnInstallApplication</classname>,
-          set its <literal>instanceId</literal> and executed a run method. We also instructed
-          <classname>YarnInstallApplication</classname> to write used <literal>instanceId</literal>
+          <para>In above example we simply created a <classname>YarnPushApplication</classname>,
+          set its <literal>applicationVersion</literal> and executed a run method. We also instructed
+          <classname>YarnPushApplication</classname> to write used <literal>applicationVersion</literal>
           into a configuration file named <emphasis>application.properties</emphasis> so that
           it'd be available to an application itself.</para>
 
@@ -3653,12 +3653,12 @@ public void publicVoidNoArgsMethod(@YarnParameter("key") String value) {
 
           <programlisting language="java"><![CDATA[public void doSubmit() {
   YarnSubmitApplication app = new YarnSubmitApplication();
-  app.instanceId("version1");
+  app.applicationVersion("version1");
   ApplicationId applicationId = app.run();
 }]]></programlisting>
 
           <para>In above example we simply created a <classname>YarnSubmitApplication</classname>,
-          set its <literal>instanceId</literal> and executed a run method.</para>
+          set its <literal>applicationVersion</literal> and executed a run method.</para>
 
       </section>
 
@@ -3667,10 +3667,10 @@ public void publicVoidNoArgsMethod(@YarnParameter("key") String value) {
 
           <para>YarnInfoApplication is used to query application info from a YARN Resource Manager and HDFS.</para>
 
-          <programlisting language="java"><![CDATA[public void doListInstalled() {
+          <programlisting language="java"><![CDATA[public void doListPushed() {
   YarnInfoApplication app = new YarnInfoApplication();
   Properties appProperties = new Properties();
-  appProperties.setProperty("spring.yarn.internal.YarnInfoApplication.operation", "INSTALLED");
+  appProperties.setProperty("spring.yarn.internal.YarnInfoApplication.operation", "PUSHED");
   app.appProperties(appProperties);
   String info = app.run();
   System.out.println(info);

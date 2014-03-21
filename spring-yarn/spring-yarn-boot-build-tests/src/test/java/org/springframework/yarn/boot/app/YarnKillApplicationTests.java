@@ -35,15 +35,16 @@ import org.springframework.yarn.boot.support.SpringYarnBootUtils;
  */
 public class YarnKillApplicationTests extends AbstractApplicationTests {
 
+	private final String BASE = "/tmp/YarnKillApplicationTests/";
+
 	@Test
 	public void testKill() throws Exception {
 		String ID = "testKill";
-		String BASE = "/tmp/YarnKillApplicationTests/";
 
 		// install
-		YarnInstallApplication installApp = new YarnInstallApplication();
-		installApp.instanceId(ID);
-		installApp.applicationBaseDir(BASE);
+		YarnPushApplication pushApp = new YarnPushApplication();
+		pushApp.applicationVersion(ID);
+		pushApp.applicationBaseDir(BASE);
 
 		Properties appProperties = new Properties();
 		SpringYarnBootUtils.mergeHadoopPropertyIntoMap(configuration, "fs.defaultFS", "spring.hadoop.fsUri",
@@ -53,19 +54,19 @@ public class YarnKillApplicationTests extends AbstractApplicationTests {
 		SpringYarnBootUtils.mergeHadoopPropertyIntoMap(configuration, "yarn.resourcemanager.scheduler.address",
 				"spring.hadoop.resourceManagerSchedulerAddress", appProperties);
 
-		installApp.configFile("application.properties", appProperties);
-		installApp.appProperties(appProperties);
+		pushApp.configFile("application.properties", appProperties);
+		pushApp.appProperties(appProperties);
 
 		String[] installArgs = new String[]{
 				"--spring.yarn.appmaster.appmasterClass=org.springframework.yarn.boot.app.StartSleepAppmaster",
 				"--spring.yarn.client.clientClass=org.springframework.yarn.client.DefaultApplicationYarnClient",
 				"--spring.yarn.client.files[0]=" + APPMASTER_ARCHIVE_PATH
 		};
-		installApp.run(installArgs);
+		pushApp.run(installArgs);
 
 		// submit
 		YarnSubmitApplication submitApp = new YarnSubmitApplication();
-		submitApp.instanceId(ID);
+		submitApp.applicationVersion(ID);
 		submitApp.applicationBaseDir(BASE);
 		submitApp.appProperties(appProperties);
 

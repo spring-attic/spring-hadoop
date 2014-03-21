@@ -39,9 +39,9 @@ import org.springframework.yarn.client.ApplicationYarnClient;
 import org.springframework.yarn.client.YarnClient;
 
 /**
- * Generic Spring Boot client application used to install Spring Yarn Boot based apps into hdfs.
+ * Generic Spring Boot client application used to push Spring Yarn Boot based apps into hdfs.
  * <p>
- * Installed application bundle is merely a collection of files inside a directory. All files
+ * Pushed application bundle is merely a collection of files inside a directory. All files
  * in this directory is considered to belong to the bundle and directory should not have any
  * other files or nested directories.
  *
@@ -51,7 +51,7 @@ import org.springframework.yarn.client.YarnClient;
 @Configuration
 @EnableAutoConfiguration(exclude = { EmbeddedServletContainerAutoConfiguration.class, WebMvcAutoConfiguration.class,
 		JmxAutoConfiguration.class, BatchAutoConfiguration.class })
-public class YarnInstallApplication extends AbstractClientApplication<YarnInstallApplication> {
+public class YarnPushApplication extends AbstractClientApplication<YarnPushApplication> {
 
 	private Map<String, Properties> configFilesContents = new HashMap<String, Properties>();
 
@@ -62,9 +62,9 @@ public class YarnInstallApplication extends AbstractClientApplication<YarnInstal
 	 *
 	 * @param configFileName the config file name
 	 * @param configProperties the config properties
-	 * @return the {@link YarnInstallApplication} for chaining
+	 * @return the {@link YarnPushApplication} for chaining
 	 */
-	public YarnInstallApplication configFile(String configFileName, Properties configProperties) {
+	public YarnPushApplication configFile(String configFileName, Properties configProperties) {
 		configFilesContents.put(configFileName, configProperties);
 		return this;
 	}
@@ -85,21 +85,21 @@ public class YarnInstallApplication extends AbstractClientApplication<YarnInstal
 	 * @param args the Spring Application args
 	 */
 	public void run(String... args) {
-		if (!StringUtils.hasText(instanceId)) {
+		if (!StringUtils.hasText(applicationVersion)) {
 			throw new SpringApplicationException("Error executing a spring application", new IllegalArgumentException(
 					"Instance id must be set"));
 		}
 
 		SpringApplicationBuilder builder = new SpringApplicationBuilder();
 		builder.web(false);
-		builder.sources(YarnInstallApplication.class);
+		builder.sources(YarnPushApplication.class);
 		SpringYarnBootUtils.addSources(builder, sources.toArray(new Object[0]));
 		SpringYarnBootUtils.addProfiles(builder, profiles.toArray(new String[0]));
 		SpringYarnBootUtils.addConfigFilesContents(builder, configFilesContents);
 		if (StringUtils.hasText(applicationBaseDir)) {
-			appProperties.setProperty("spring.yarn.applicationDir", applicationBaseDir + instanceId + "/");
+			appProperties.setProperty("spring.yarn.applicationDir", applicationBaseDir + applicationVersion + "/");
 		}
-		appProperties.setProperty("spring.yarn.applicationId", instanceId);
+		appProperties.setProperty("spring.yarn.applicationVersion", applicationVersion);
 
 		SpringYarnBootUtils.addApplicationListener(builder, appProperties);
 
@@ -123,7 +123,7 @@ public class YarnInstallApplication extends AbstractClientApplication<YarnInstal
 	}
 
 	@Override
-	protected YarnInstallApplication getThis() {
+	protected YarnPushApplication getThis() {
 		return this;
 	}
 

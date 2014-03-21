@@ -34,21 +34,21 @@ import org.springframework.util.StringUtils;
  */
 public abstract class AbstractClientApplication<T extends AbstractClientApplication<T>> {
 
-	protected String instanceId;
+	protected String applicationVersion;
 	protected String applicationBaseDir;
 	protected List<Object> sources = new ArrayList<Object>();
 	protected List<String> profiles = new ArrayList<String>();
 	protected Properties appProperties = new Properties();
 
 	/**
-	 * Sets an instance id to be used by a builder.
+	 * Sets an application version to be used by a builder.
 	 *
-	 * @param instanceId the appid
+	 * @param applicationVersion the application version
 	 * @return the T for chaining
 	 */
-	public T instanceId(String instanceId) {
-		Assert.state(StringUtils.hasText(instanceId), "Instance id must not be empty");
-		this.instanceId = instanceId;
+	public T applicationVersion(String applicationVersion) {
+		Assert.state(StringUtils.hasText(applicationVersion), "Application version must not be empty");
+		this.applicationVersion = applicationVersion;
 		return getThis();
 	}
 

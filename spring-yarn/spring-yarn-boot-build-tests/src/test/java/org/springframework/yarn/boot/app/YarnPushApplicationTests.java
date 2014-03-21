@@ -28,21 +28,21 @@ import org.springframework.yarn.boot.SpringApplicationException;
 import org.springframework.yarn.boot.support.SpringYarnBootUtils;
 
 /**
- * Tests for {@link YarnInstallApplication}.
+ * Tests for {@link YarnPushApplication}.
  *
  * @author Janne Valkealahti
  *
  */
-public class YarnInstallApplicationTests extends AbstractApplicationTests {
+public class YarnPushApplicationTests extends AbstractApplicationTests {
 
-	private final String BASE = "/tmp/YarnBootClientInstallApplicationTests/";
+	private final String BASE = "/tmp/YarnPushApplicationTests/";
 
 	@Test
-	public void testEmptyInstall() throws Exception {
-		String ID = "testEmptyInstall";
+	public void testEmptyPush() throws Exception {
+		String ID = "testEmptyPush";
 
-		YarnInstallApplication app = new YarnInstallApplication();
-		app.instanceId(ID);
+		YarnPushApplication app = new YarnPushApplication();
+		app.applicationVersion(ID);
 		app.applicationBaseDir(BASE);
 
 		// minicluster, need to pass host/ports
@@ -66,11 +66,11 @@ public class YarnInstallApplicationTests extends AbstractApplicationTests {
 	}
 
 	@Test
-	public void testInstall() throws Exception {
-		String ID = "testInstall";
+	public void testPush() throws Exception {
+		String ID = "testPush";
 
-		YarnInstallApplication app = new YarnInstallApplication();
-		app.instanceId(ID);
+		YarnPushApplication app = new YarnPushApplication();
+		app.applicationVersion(ID);
 		app.applicationBaseDir(BASE);
 
 		Properties appProperties = new Properties();
@@ -106,8 +106,8 @@ public class YarnInstallApplicationTests extends AbstractApplicationTests {
 	}
 
 	@Test(expected=SpringApplicationException.class)
-	public void testInstallFailureIdMissing() throws Exception {
-		YarnInstallApplication app = new YarnInstallApplication();
+	public void testPushFailureIdMissing() throws Exception {
+		YarnPushApplication app = new YarnPushApplication();
 		String[] args = new String[]{
 				"--spring.yarn.client.files[0]=" + APPMASTER_ARCHIVE_PATH
 		};
@@ -115,15 +115,15 @@ public class YarnInstallApplicationTests extends AbstractApplicationTests {
 	}
 
 	@Test(expected=SpringApplicationException.class)
-	public void testInstallFailureAppAlreadyInstalled() throws Exception {
-		String ID = "testInstallFailureAppAlreadyInstalled";
+	public void testPushFailureAppAlreadyInstalled() throws Exception {
+		String ID = "testPushFailureAppAlreadyInstalled";
 
 		Path path = new Path(BASE + ID);
 		FileSystem fs = path.getFileSystem(configuration);
 		fs.mkdirs(path);
 
-		YarnInstallApplication app = new YarnInstallApplication();
-		app.instanceId(ID);
+		YarnPushApplication app = new YarnPushApplication();
+		app.applicationVersion(ID);
 		app.applicationBaseDir(BASE);
 
 		Properties properties = new Properties();

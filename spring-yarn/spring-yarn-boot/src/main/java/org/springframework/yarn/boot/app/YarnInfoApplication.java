@@ -72,11 +72,11 @@ public class YarnInfoApplication extends AbstractClientApplication<YarnInfoAppli
 	public String run(String... args) {
 		SpringApplicationBuilder builder = new SpringApplicationBuilder();
 		builder.web(false);
-		builder.sources(YarnInstallApplication.class, OperationProperties.class);
+		builder.sources(YarnPushApplication.class, OperationProperties.class);
 		SpringYarnBootUtils.addSources(builder, sources.toArray(new Object[0]));
 		SpringYarnBootUtils.addProfiles(builder, profiles.toArray(new String[0]));
 		if (StringUtils.hasText(applicationBaseDir)) {
-			appProperties.setProperty("spring.yarn.applicationDir", applicationBaseDir + instanceId + "/");
+			appProperties.setProperty("spring.yarn.applicationDir", applicationBaseDir + applicationVersion + "/");
 		}
 		SpringYarnBootUtils.addApplicationListener(builder, appProperties);
 
@@ -86,7 +86,7 @@ public class YarnInfoApplication extends AbstractClientApplication<YarnInfoAppli
 			@Override
 			public String runWithSpringApplication(ApplicationContext context) throws Exception {
 				OperationProperties operationProperties = context.getBean(OperationProperties.class);
-				if (Operation.INSTALLED == operationProperties.getOperation()) {
+				if (Operation.PUSHED == operationProperties.getOperation()) {
 					return getInstalledReport(context);
 				} else if (Operation.SUBMITTED == operationProperties.getOperation()) {
 					YarnClient client = context.getBean(YarnClient.class);
@@ -191,7 +191,7 @@ public class YarnInfoApplication extends AbstractClientApplication<YarnInfoAppli
 	}
 
 	public static enum Operation {
-		INSTALLED,
+		PUSHED,
 		SUBMITTED
 	}
 
