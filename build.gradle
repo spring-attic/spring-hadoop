@@ -358,16 +358,16 @@ configure(javaProjects()) {
 	//		]
   
 			links = [
-				"http://static.springframework.org/spring/docs/3.0.x/javadoc-api",
+				"http://docs.spring.io/spring/docs/4.0.x/javadoc-api/",
 				"http://download.oracle.com/javase/6/docs/api",
 				"http://commons.apache.org/proper/commons-logging/apidocs/",
 				"http://logging.apache.org/log4j/1.2/apidocs/",
 				"http://hadoop.apache.org/common/docs/current/api/",
 				"http://hbase.apache.org/apidocs/",
-				"http://pig.apache.org/docs/r0.10.0/api/",
-				"http://hive.apache.org/docs/r0.7.1/api/",
-				"http://static.springsource.org/spring-batch/apidocs/",
-				"http://static.springsource.org/spring-integration/api/",
+				"http://pig.apache.org/docs/r0.12.0/api/",
+				"http://hive.apache.org/javadocs/r0.12.0/",
+				"http://docs.spring.io/spring-batch/apidocs/",
+				"http://docs.spring.io/spring-integration/api/",
 				"https://builds.apache.org/job/Thrift/javadoc/",
 			]
 
@@ -381,8 +381,8 @@ configure(javaProjects()) {
 		manifest.attributes["Created-By"] = "${System.getProperty("java.version")} (${System.getProperty("java.specification.vendor")})"
 		manifest.attributes['Implementation-Title'] = 'spring-data-hadoop'
 		manifest.attributes['Implementation-Version'] = project.version
-		manifest.attributes['Implementation-URL'] = "http://www.springsource.org/spring-data/hadoop"
-		manifest.attributes['Implementation-Vendor'] = "SpringSource"
+		manifest.attributes['Implementation-URL'] = "http://projects.spring.io/spring-hadoop/"
+		manifest.attributes['Implementation-Vendor'] = "Spring by Pivotal"
 		manifest.attributes['Implementation-Vendor-Id'] = "org.springframework"
 
 		def build = System.env['SHDP.BUILD']
