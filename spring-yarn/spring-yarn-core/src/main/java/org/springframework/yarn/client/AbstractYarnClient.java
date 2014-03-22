@@ -122,6 +122,7 @@ public abstract class AbstractYarnClient implements YarnClient, InitializingBean
 		// we get app id here instead in getSubmissionContext(). Otherwise
 		// localizer distribute will kick off too early
 		ApplicationId applicationId = clientRmOperations.getNewApplication().getApplicationId();
+		log.info("submitApplication, got applicationId=[" + applicationId + "]");
 
 		if (resourceLocalizer instanceof SmartResourceLocalizer) {
 			SmartResourceLocalizer smartResourceLocalizer = (SmartResourceLocalizer)resourceLocalizer;
