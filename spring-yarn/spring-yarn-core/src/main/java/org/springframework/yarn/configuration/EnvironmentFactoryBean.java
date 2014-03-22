@@ -116,6 +116,12 @@ public class EnvironmentFactoryBean implements InitializingBean, FactoryBean<Map
 				defaultClasspathString = defaultYarnAppClasspath;
 			} else if (configuration != null) {
 				defaultClasspathString = configuration.get(YarnConfiguration.YARN_APPLICATION_CLASSPATH);
+				if (!StringUtils.hasText(defaultClasspathString)) {
+					// 2.3.x changed default yarn.application.classpath to be empty, so
+					// if we got empty, fall back to DEFAULT_YARN_APPLICATION_CLASSPATH
+					defaultClasspathString = StringUtils
+							.arrayToCommaDelimitedString(YarnConfiguration.DEFAULT_YARN_APPLICATION_CLASSPATH);
+				}
 			}
 			paths.addAll(StringUtils.commaDelimitedListToSet(defaultClasspathString));
 		}
