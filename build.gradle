@@ -1067,6 +1067,7 @@ if (gradle.ext.mr2) {
 			hadoopruntime.exclude group: 'commons-logging'
 			hadoopruntime.exclude group: 'org.codehaus.jettison'
 			hadoopruntime.exclude group: 'com.thoughtworks.xstream'
+			hadoopruntimenotest.exclude group: 'org.apache.hadoop', module: 'hadoop-yarn-server-tests'
 		}
 		dependencies {
             compile project(":spring-yarn:spring-yarn-core")
@@ -1082,6 +1083,7 @@ if (gradle.ext.mr2) {
 			compile "org.apache.hadoop:hadoop-hdfs:$hadoopVersion:tests"
 			compile "org.apache.hadoop:hadoop-common:$hadoopVersion:tests"
 			hadoopruntime configurations.runtime
+			hadoopruntimenotest configurations.runtime
 		}
 		task copyHadoopRuntimeDeps(type: Copy) {
 			into "$buildDir/dependency-libs"
@@ -1089,7 +1091,7 @@ if (gradle.ext.mr2) {
 		}
 		task copyHadoopRuntimeDepsAll(type: Copy) {
 			into "$buildDir/dependency-all-libs"
-			from configurations.runtime
+			from configurations.hadoopruntimenotest
 		}
 		test.dependsOn([copyHadoopRuntimeDeps,copyHadoopRuntimeDepsAll])
 	}
@@ -1103,11 +1105,13 @@ if (gradle.ext.mr2) {
 			hadoopruntime.exclude group: 'commons-logging'
 			hadoopruntime.exclude group: 'org.codehaus.jettison'
 			hadoopruntime.exclude group: 'com.thoughtworks.xstream'
+			hadoopruntimenotest.exclude group: 'org.apache.hadoop', module: 'hadoop-yarn-server-tests'
 		}
 		dependencies {
 			compile project(":spring-yarn:spring-yarn-core")
 			compile project(":spring-yarn:spring-yarn-test")
 			hadoopruntime configurations.runtime
+			hadoopruntimenotest configurations.runtime
 		}
 		task copyHadoopRuntimeDeps(type: Copy) {
 			into "$buildDir/dependency-libs"
@@ -1115,7 +1119,7 @@ if (gradle.ext.mr2) {
 		}
 		task copyHadoopRuntimeDepsAll(type: Copy) {
 			into "$buildDir/dependency-all-libs"
-			from configurations.runtime
+			from configurations.hadoopruntimenotest
 		}
 		test.dependsOn([copyHadoopRuntimeDeps,copyHadoopRuntimeDepsAll])
 	}

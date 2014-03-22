@@ -31,6 +31,8 @@ import org.apache.hadoop.yarn.exceptions.YarnException;
 import org.apache.hadoop.yarn.util.Records;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.yarn.rpc.YarnRpcCallback;
@@ -46,6 +48,7 @@ import org.springframework.yarn.test.context.YarnDelegatingSmartContextLoader;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(loader=YarnDelegatingSmartContextLoader.class)
 @MiniYarnCluster
+@DirtiesContext(classMode=ClassMode.AFTER_CLASS)
 public class ClientRmTemplateTests {
 
 	@Resource(name = "yarnClientRmTemplate")

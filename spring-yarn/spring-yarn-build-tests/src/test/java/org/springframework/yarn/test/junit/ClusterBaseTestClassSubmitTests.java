@@ -29,7 +29,9 @@ import java.util.concurrent.TimeUnit;
 import org.apache.hadoop.yarn.api.records.YarnApplicationState;
 import org.junit.Test;
 import org.springframework.core.io.Resource;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.Timed;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.yarn.test.context.MiniYarnCluster;
 import org.springframework.yarn.test.context.YarnDelegatingSmartContextLoader;
@@ -45,6 +47,7 @@ import org.springframework.yarn.test.support.ContainerLogUtils;
  */
 @ContextConfiguration(loader = YarnDelegatingSmartContextLoader.class)
 @MiniYarnCluster
+@DirtiesContext(classMode=ClassMode.AFTER_CLASS)
 public class ClusterBaseTestClassSubmitTests extends AbstractYarnClusterTests {
 
 	@Test

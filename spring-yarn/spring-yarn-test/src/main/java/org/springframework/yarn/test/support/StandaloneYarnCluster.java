@@ -29,39 +29,39 @@ import org.springframework.yarn.test.context.YarnCluster;
 /**
  * Standalone simple mini cluster having Yarn
  * and Hdfs nodes.
- * 
+ *
  * @author Janne Valkealahti
  *
  */
 public class StandaloneYarnCluster implements YarnCluster {
-	
+
 	private final static Log log = LogFactory.getLog(StandaloneYarnCluster.class);
 
 	/** Yarn specific mini cluster */
 	private MiniYARNCluster yarnCluster = null;
-	
+
 	/** Hdfs specific mini cluster */
 	private MiniDFSCluster dfsCluster = null;
-	
+
 	/** Unique cluster name */
 	private final String clusterName;
-	
+
 	/** Configuration build at runtime */
 	private Configuration configuration;
-	
+
 	/** Monitor sync for start and stop */
 	private final Object startupShutdownMonitor = new Object();
-	
+
 	/** Flag for cluster state */
 	private boolean started;
-	
+
 	/** Number of nodes for yarn and dfs */
 	private int nodes = 1;
 
 	/**
 	 * Instantiates a mini cluster with default
 	 * cluster node count.
-	 * 
+	 *
 	 * @param clusterName the unique cluster name
 	 */
 	public StandaloneYarnCluster(String clusterName) {
@@ -71,7 +71,7 @@ public class StandaloneYarnCluster implements YarnCluster {
 	/**
 	 * Instantiates a mini cluster with given
 	 * cluster node count.
-	 * 
+	 *
 	 * @param clusterName the unique cluster name
 	 * @param nodes the node count
 	 */
@@ -79,36 +79,45 @@ public class StandaloneYarnCluster implements YarnCluster {
 		this.clusterName = clusterName;
 		this.nodes = nodes;
 	}
-	
+
 	@Override
 	public Configuration getConfiguration() {
 		return configuration;
 	}
-	
+
 	@Override
 	public void start() throws IOException {
 		log.info("Checking if cluster=" + clusterName + " needs to be started");
-		synchronized (this.startupShutdownMonitor) {			
+		synchronized (this.startupShutdownMonitor) {
 			if (started) {
 				return;
 			}
+
+			// SHDP-309 hack to set hadoop.security.token.service.use_ip
+			// for what we want because 2.3.0 added core-site.xml in
+			// jar container MiniYARNCluster which sets this value to false
+			// while default is true.
+			// we try to add new default resource which should override
+			// one from a core-site.xml
+			Configuration.addDefaultResource("shdp-site.xml");
+
 			log.info("Starting cluster=" + clusterName);
 			configuration = new YarnConfiguration();
 			configuration.set(MiniDFSCluster.HDFS_MINIDFS_BASEDIR, "target/" + clusterName + "-dfs");
-		
+
 			dfsCluster = new MiniDFSCluster.Builder(configuration).
 					numDataNodes(nodes).
 					build();
-		
+
 			yarnCluster = new MiniYARNCluster(clusterName, nodes, 1, 1);
 			yarnCluster.init(configuration);
 			yarnCluster.start();
-		
+
 			log.info("Started cluster=" + clusterName);
 			started = true;
 		}
 	}
-	
+
 	@Override
 	public void stop() {
 		log.info("Checking if cluster=" + clusterName + " needs to be stopped");
@@ -128,7 +137,7 @@ public class StandaloneYarnCluster implements YarnCluster {
 			started = false;
 		}
 	}
-	
+
 	@Override
 	public File getYarnWorkDir() {
 		return yarnCluster != null ? yarnCluster.getTestWorkDir() : null;
@@ -137,11 +146,11 @@ public class StandaloneYarnCluster implements YarnCluster {
 	/**
 	 * Sets a number of nodes for cluster. Every node
 	 * will act as yarn and dfs role. Default is one node.
-	 * 
+	 *
 	 * @param nodes the number of nodes
 	 */
 	public void setNodes(int nodes) {
 		this.nodes = nodes;
 	}
-	
+
 }

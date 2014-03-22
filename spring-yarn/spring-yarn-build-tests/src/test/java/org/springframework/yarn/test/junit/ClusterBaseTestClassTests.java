@@ -19,6 +19,8 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.yarn.client.YarnClient;
 import org.springframework.yarn.test.context.MiniYarnCluster;
@@ -26,12 +28,13 @@ import org.springframework.yarn.test.context.YarnDelegatingSmartContextLoader;
 
 /**
  * Tests for {@link AbstractYarnClusterTests}.
- * 
+ *
  * @author Janne Valkealahti
  *
  */
 @ContextConfiguration(loader=YarnDelegatingSmartContextLoader.class)
 @MiniYarnCluster
+@DirtiesContext(classMode=ClassMode.AFTER_CLASS)
 public class ClusterBaseTestClassTests extends AbstractYarnClusterTests {
 
 	@Test
@@ -40,7 +43,7 @@ public class ClusterBaseTestClassTests extends AbstractYarnClusterTests {
 		assertNotNull(getConfiguration());
 		assertNotNull(getYarnCluster());
 	}
-	
+
 	@Override
 	@Autowired(required=false)
 	public void setYarnClient(YarnClient yarnClient) {
@@ -48,5 +51,5 @@ public class ClusterBaseTestClassTests extends AbstractYarnClusterTests {
 		// it here for test not to fail
 		super.setYarnClient(yarnClient);
 	}
-		
+
 }
