@@ -38,7 +38,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.Timed;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.yarn.client.YarnClient;
@@ -54,6 +56,7 @@ import org.springframework.yarn.test.context.YarnCluster;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration
+@DirtiesContext(classMode=ClassMode.AFTER_CLASS)
 public class YarnClusterTests {
 
 	@Autowired
