@@ -42,6 +42,8 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 
 	private DatasetRepositoryFactory dsFactory;
 
+	private DatasetDefinition defaultDatasetDefinition;
+
 	/**
 	 * The {@link DatasetRepositoryFactory} to use for this template.
 	 * 
@@ -51,9 +53,28 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 		this.dsFactory = datasetRepositoryFactory;
 	}
 
+	/**
+	 * The default {@link DatasetDefinition} to use for this template.
+	 */
+	public DatasetDefinition getDefaultDatasetDefinition() {
+		return defaultDatasetDefinition;
+	}
+
+	/**
+	 * The default {@link DatasetDefinition} to use for this template.
+	 *
+	 * @param defaultDatasetDefinition the DatasetDefinition to use
+	 */
+	public void setDefaultDatasetDefinition(DatasetDefinition defaultDatasetDefinition) {
+		this.defaultDatasetDefinition = defaultDatasetDefinition;
+	}
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(dsFactory, "The datasetRepositoryFactory property is required");
+		if (defaultDatasetDefinition == null) {
+			defaultDatasetDefinition = new DatasetDefinition(true);
+		}
 	}
 
 	@Override
@@ -88,17 +109,12 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 
 	@Override
 	public <T> void write(Collection<T> records) {
-		write(records, null);
-	}
-
-	@Override
-	public <T> void write(Collection<T> records, PartitionStrategy partitionStrategy) {
 		if (records == null || records.size() < 1) {
 			return;
 		}
 		@SuppressWarnings("unchecked")
 		Class<T> recordClass = (Class<T>) records.iterator().next().getClass();
-		Dataset<T> dataset = getOrCreateDataset(recordClass, partitionStrategy);
+		Dataset<T> dataset = getOrCreateDataset(recordClass);
 		DatasetWriter<T> writer = dataset.newWriter();
 		try {
 			writer.open();
@@ -121,21 +137,28 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 		return clazz.getSimpleName().toLowerCase();
 	}
 
-	private <T> Dataset<T> getOrCreateDataset(Class<T> clazz, PartitionStrategy partitionStrategy) {
+	private <T> Dataset<T> getOrCreateDataset(Class<T> clazz) {
 		String repoName = getDatasetName(clazz);
+		DatasetDefinition datasetDefinition = getDefaultDatasetDefinition();
 		Dataset<T> dataset;
 		try {
 			dataset = dsFactory.getDatasetRepository().load(repoName);
 		}
 		catch (DatasetNotFoundException ex) {
-			Schema schema = ReflectData.AllowNull.get().getSchema(clazz);
+			Schema schema = datasetDefinition.getSchema(clazz);
 			DatasetDescriptor descriptor;
-			if (partitionStrategy == null) {
-				descriptor = new DatasetDescriptor.Builder().schema(schema).build();
+			if (datasetDefinition.getPartitionStrategy() == null) {
+				descriptor = new DatasetDescriptor.Builder()
+						.schema(schema)
+						.format(datasetDefinition.getFormat())
+						.build();
 			}
 			else {
-				descriptor =
-						new DatasetDescriptor.Builder().schema(schema).partitionStrategy(partitionStrategy).build();
+				descriptor = new DatasetDescriptor.Builder()
+						.schema(schema)
+						.format(datasetDefinition.getFormat())
+						.partitionStrategy(datasetDefinition.getPartitionStrategy())
+						.build();
 			}
 			dataset = dsFactory.getDatasetRepository().create(repoName, descriptor);
 		}

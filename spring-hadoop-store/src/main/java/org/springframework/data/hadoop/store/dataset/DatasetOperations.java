@@ -46,15 +46,7 @@ public interface DatasetOperations {
 	<T> Collection<T> read(Class<T> targetClass);
 
 	/**
-	 * Write all records provided in the record collection using the provided partition strategy
-	 *
-	 * @param records the records to write
-	 * @param partitionStrategy the partition strategy
-	 */
-	<T> void write(Collection<T> records, PartitionStrategy partitionStrategy);
-
-	/**
-	 * Write all records provided in the record collection without partitioning
+	 * Write all records provided in the record collection
 	 * 
 	 * @param records the records to write
 	 */

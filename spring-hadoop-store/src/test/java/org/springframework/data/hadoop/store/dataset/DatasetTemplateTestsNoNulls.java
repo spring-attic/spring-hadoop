@@ -16,18 +16,6 @@
 
 package org.springframework.data.hadoop.store.dataset;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,14 +24,20 @@ import org.springframework.data.hadoop.test.tests.Version;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import org.kitesdk.data.DatasetRepository;
+import java.util.Collections;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration
-public class DatasetTemplateTests extends AbstractDatasetTemplateTests {
+@ContextConfiguration({"DatasetTemplateTests-context.xml"})
+public class DatasetTemplateTestsNoNulls extends AbstractDatasetTemplateTests {
 
-	@Test
-	public void testReadSavedPojoWithNullValues() {
+	@Autowired
+	public void setDatasetOperations(DatasetOperations datasetOperations) {
+		((DatasetTemplate)datasetOperations).setDefaultDatasetDefinition(new DatasetDefinition(false));
+		this.datasetOperations = datasetOperations;
+	}
+
+	@Test(expected = org.apache.avro.file.DataFileWriter.AppendWriteException.class)
+	public void testWritePojoWithNullValuesShouldFail() {
 		//Kite SDK currently uses some Hadoop 2.0 only methods
 		Assume.hadoopVersion(Version.HADOOP2X);
 		datasetOperations.write(records);
@@ -52,16 +46,6 @@ public class DatasetTemplateTests extends AbstractDatasetTemplateTests {
 		pojo4.setName(null);
 		pojo4.setBirthDate(null);
 		datasetOperations.write(Collections.singletonList(pojo4));
-		Collection<TestPojo> results = datasetOperations.read(TestPojo.class);
-		assertEquals(3, results.size());
-		List<TestPojo> sorted = new ArrayList<TestPojo>(results);
-		Collections.sort(sorted);
-		assertTrue(sorted.get(0).getName().equals("Sven"));
-		assertTrue(sorted.get(0).getId().equals(22L));
-		assertNull(sorted.get(1).getName());
-		assertTrue(sorted.get(1).getId().equals(33L));
-		assertTrue(sorted.get(2).getName().equals("Nisse"));
-		assertTrue(sorted.get(2).getId().equals(48L));
 	}
 
 }
