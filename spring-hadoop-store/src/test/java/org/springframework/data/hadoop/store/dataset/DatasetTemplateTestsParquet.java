@@ -21,57 +21,64 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kitesdk.data.DatasetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.hadoop.test.tests.Assume;
-import org.springframework.data.hadoop.test.tests.Version;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.Collections;
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
+import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"DatasetTemplateTests-context.xml"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-public class DatasetTemplateTestsNoNulls extends AbstractDatasetTemplateTests {
+public class DatasetTemplateTestsParquet {
+
+	protected DatasetOperations datasetOperations;
+	protected List<Object> records = new ArrayList<Object>();
+	@Autowired
+	protected String path;
 
 	@Autowired
 	public void setDatasetOperations(DatasetOperations datasetOperations) {
-		((DatasetTemplate)datasetOperations).setDefaultDatasetDefinition(new DatasetDefinition(false));
+		((DatasetTemplate)datasetOperations)
+				.setDefaultDatasetDefinition(new DatasetDefinition(true, "parquet"));
 		this.datasetOperations = datasetOperations;
 	}
 
 	@Before
 	public void setUp() {
-		TestPojo pojo1 = new TestPojo();
+		ParquetPojo pojo1 = new ParquetPojo();
 		pojo1.setId(22L);
 		pojo1.setName("Sven");
-		pojo1.setBirthDate(new Date());
+		pojo1.setBirthDate(new Date().getTime());
 		records.add(pojo1);
-		TestPojo pojo2 = new TestPojo();
+		ParquetPojo pojo2 = new ParquetPojo();
 		pojo2.setId(48L);
 		pojo2.setName("Nisse");
-		pojo2.setBirthDate(new Date());
+		pojo2.setBirthDate(new Date().getTime());
 		records.add(pojo2);
 
 		datasetOperations.execute(new DatasetRepositoryCallback() {
 			@Override
 			public void doInRepository(DatasetRepository datasetRepository) {
-				datasetRepository.delete(datasetOperations.getDatasetName(TestPojo.class));
+				datasetRepository.delete(datasetOperations.getDatasetName(ParquetPojo.class));
 			}
 		});
 	}
 
-	@Test(expected = org.apache.avro.file.DataFileWriter.AppendWriteException.class)
-	public void testWritePojoWithNullValuesShouldFail() {
-		//Kite SDK currently uses some Hadoop 2.0 only methods
-		Assume.hadoopVersion(Version.HADOOP2X);
+	@Test
+	public void testSavePojo() {
 		datasetOperations.write(records);
-		TestPojo pojo4 = new TestPojo();
-		pojo4.setId(33L);
-		pojo4.setName(null);
-		pojo4.setBirthDate(null);
-		datasetOperations.write(Collections.singletonList(pojo4));
+		assertTrue("Dataset path created", new File(path).exists());
+		assertTrue("Dataset storage created",
+				new File(path + "/" + datasetOperations.getDatasetName(ParquetPojo.class)).exists());
+		assertTrue("Dataset metadata created",
+				new File(path + "/" + datasetOperations.getDatasetName(ParquetPojo.class) + "/.metadata").exists());
 	}
+
 
 }

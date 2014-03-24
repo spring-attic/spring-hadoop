@@ -49,10 +49,6 @@ public class DatasetDefinition{
 		Assert.notNull(format, "The format can't be null");
 		try {
 			this.format = Formats.fromString(format);
-			//TODO: add support for additional formats like parquet
-			if (!this.format.equals(Formats.AVRO)) {
-				throw new StoreException("Format '" + format + "' is not currently supported.");
-			}
 		} catch (IllegalArgumentException e) {
 			throw new StoreException("Invalid format '" + format + "' specified", e);
 		}

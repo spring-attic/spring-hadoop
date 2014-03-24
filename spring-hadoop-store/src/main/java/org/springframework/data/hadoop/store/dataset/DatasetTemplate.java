@@ -16,19 +16,24 @@
 
 package org.springframework.data.hadoop.store.dataset;
 
+import java.beans.PropertyDescriptor;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import org.apache.avro.Schema;
-import org.apache.avro.reflect.ReflectData;
+import org.apache.avro.generic.GenericRecord;
+import org.apache.avro.generic.GenericRecordBuilder;
 import org.kitesdk.data.Dataset;
 import org.kitesdk.data.DatasetDescriptor;
 import org.kitesdk.data.DatasetNotFoundException;
 import org.kitesdk.data.DatasetReader;
 import org.kitesdk.data.DatasetWriter;
-import org.kitesdk.data.PartitionStrategy;
+import org.kitesdk.data.Formats;
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.PropertyAccessorFactory;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.data.hadoop.store.StoreException;
 import org.springframework.util.Assert;
 
 /**
@@ -112,18 +117,10 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 		if (records == null || records.size() < 1) {
 			return;
 		}
-		@SuppressWarnings("unchecked")
-		Class<T> recordClass = (Class<T>) records.iterator().next().getClass();
-		Dataset<T> dataset = getOrCreateDataset(recordClass);
-		DatasetWriter<T> writer = dataset.newWriter();
-		try {
-			writer.open();
-			for (T record : records) {
-				writer.write(record);
-			}
-		}
-		finally {
-			writer.close();
+		if (Formats.PARQUET.getName().equals(defaultDatasetDefinition.getFormat().getName())) {
+			writeGenericRecords(records);
+		} else {
+			writePojo(records);
 		}
 	}
 
@@ -137,15 +134,31 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 		return clazz.getSimpleName().toLowerCase();
 	}
 
-	private <T> Dataset<T> getOrCreateDataset(Class<T> clazz) {
-		String repoName = getDatasetName(clazz);
+	private <T> void writePojo(Collection<T> records) {
+		@SuppressWarnings("unchecked")
+		Class<T> pojoClass = (Class<T>) records.iterator().next().getClass();
+		Dataset<T> dataset = getOrCreateDataset(pojoClass, pojoClass);
+		DatasetWriter<T> writer = dataset.newWriter();
+		try {
+			writer.open();
+			for (T record : records) {
+				writer.write(record);
+			}
+		}
+		finally {
+			writer.close();
+		}
+	}
+
+	private <T> Dataset<T> getOrCreateDataset(Class pojoClass, Class<T> recordClass) {
+		String repoName = getDatasetName(pojoClass);
 		DatasetDefinition datasetDefinition = getDefaultDatasetDefinition();
 		Dataset<T> dataset;
 		try {
 			dataset = dsFactory.getDatasetRepository().load(repoName);
 		}
 		catch (DatasetNotFoundException ex) {
-			Schema schema = datasetDefinition.getSchema(clazz);
+			Schema schema = datasetDefinition.getSchema(pojoClass);
 			DatasetDescriptor descriptor;
 			if (datasetDefinition.getPartitionStrategy() == null) {
 				descriptor = new DatasetDescriptor.Builder()
@@ -163,6 +176,47 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 			dataset = dsFactory.getDatasetRepository().create(repoName, descriptor);
 		}
 		return dataset;
+	}
+
+	private <T> void writeGenericRecords(Collection<T> records) {
+		@SuppressWarnings("unchecked")
+		Class<T> pojoClass = (Class<T>) records.iterator().next().getClass();
+		Dataset<GenericRecord> dataset = getOrCreateDataset(pojoClass, GenericRecord.class);
+		DatasetWriter<GenericRecord> writer = dataset.newWriter();
+		try {
+			writer.open();
+			Schema schema = dataset.getDescriptor().getSchema();
+			for (T record : records) {
+				GenericRecordBuilder builder = new GenericRecordBuilder(schema);
+				BeanWrapper beanWrapper = PropertyAccessorFactory.forBeanPropertyAccess(record);
+				PropertyDescriptor[] props = beanWrapper.getPropertyDescriptors();
+				for (Schema.Field f : schema.getFields()) {
+					if (beanWrapper.isReadableProperty(f.name())) {
+						Schema fieldSchema = f.schema();
+						if (f.schema().getType().equals(Schema.Type.UNION)) {
+							for (Schema s : f.schema().getTypes()) {
+								if (!s.getName().equals("null")) {
+									fieldSchema = s;
+								}
+							}
+						}
+						if (fieldSchema.getType().equals(Schema.Type.RECORD)) {
+							//TODO: add support for java.util.Date etc.
+							// something like: builder.set(f.name(), new SpecificData().newRecord(value, fieldSchema));
+							Object value = beanWrapper.getPropertyValue(f.name());
+							throw new StoreException("Unsupported object type: " + value.getClass().getName() +
+									" for field: " + f.name());
+						} else {
+							builder.set(f.name(), beanWrapper.getPropertyValue(f.name()));
+						}
+					}
+				}
+				writer.write(builder.build());
+			}
+		} finally {
+			writer.close();
+		}
+
 	}
 
 	private <T> Dataset<T> getDataset(Class<T> clazz) {
