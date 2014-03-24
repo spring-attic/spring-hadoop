@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.yarn.api.ApplicationConstants;
 import org.apache.hadoop.yarn.api.records.Container;
 import org.apache.hadoop.yarn.api.records.ContainerLaunchContext;
 import org.springframework.core.OrderComparator;
@@ -49,9 +48,6 @@ public abstract class AbstractLauncher extends LifecycleObjectSupport {
 
 	/** Resource localizer for the containers */
 	private ResourceLocalizer resourceLocalizer;
-
-	/** Username for launch context */
-	private String username;
 
 	/** Interceptors when communicating with service */
 	private final ContainerLauncherInterceptorList interceptors =
@@ -115,28 +111,6 @@ public abstract class AbstractLauncher extends LifecycleObjectSupport {
 	 */
 	public ResourceLocalizer getResourceLocalizer() {
 		return resourceLocalizer;
-	}
-
-	/**
-	 * Gets the username for launch context.
-	 *
-	 * @return the username
-	 */
-	public String getUsername() {
-		if(username != null) {
-			return username;
-		} else {
-			return getEnvironment().get(ApplicationConstants.Environment.USER.name());
-		}
-	}
-
-	/**
-	 * Sets the username for the launch context.
-	 *
-	 * @param username the new username
-	 */
-	public void setUsername(String username) {
-		this.username = username;
 	}
 
 	/**

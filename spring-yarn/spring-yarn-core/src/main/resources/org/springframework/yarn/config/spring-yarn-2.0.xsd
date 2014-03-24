@@ -111,8 +111,22 @@
 					<xsd:element name="copy" type="copyEntryType"/>
 				</xsd:choice>
 			</xsd:sequence>
-			<xsd:attribute name="id" type="xsd:ID" use="optional"/>
-			<xsd:attribute name="configuration" default="yarnConfiguration"/>
+			<xsd:attribute name="id" type="xsd:ID" use="optional">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+					Bean id.
+					]]>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="configuration" default="yarnConfiguration">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+					A reference to configuration bean name, default is 'yarnConfiguration'.
+					]]>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
 			<xsd:attributeGroup ref="hdfs-common-attributes"/>
 		</xsd:complexType>
 	</xsd:element>
@@ -133,11 +147,28 @@
 				</xsd:choice>
 			</xsd:sequence>
 			<xsd:attribute name="id" type="xsd:ID" use="optional">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+					Bean id.
+					]]>
+					</xsd:documentation>
+				</xsd:annotation>
 			</xsd:attribute>
-			<xsd:attribute name="configuration" default="yarnConfiguration"/>
-			<xsd:attribute name="resources">
+			<xsd:attribute name="configuration" default="yarnConfiguration">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+					A reference to configuration bean name, default is 'yarnConfiguration'.
+					]]>
+					</xsd:documentation>
+				</xsd:annotation>
 			</xsd:attribute>
 			<xsd:attribute name="include-local-system-env" type="xsd:boolean" default="false">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+					Defines whether system environment variables are actually added to this bean.
+					]]>
+					</xsd:documentation>
+				</xsd:annotation>
 			</xsd:attribute>
 		</xsd:extension>
 		</xsd:complexContent>
@@ -230,19 +261,61 @@
 	<!-- start of common types -->
 
 	<xsd:complexType name="hdfsEntryType">
-		<xsd:attribute name="path" type="xsd:string" use="required"/>
-		<xsd:attribute name="staging" type="xsd:string" use="optional"/>
+		<xsd:attribute name="path" type="xsd:string" use="required">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				Path in hdfs.
+				]]>
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="staging" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				Internal temporary stagind directory.
+				]]>
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
 		<xsd:attributeGroup ref="hdfs-common-attributes"/>
 	</xsd:complexType>
 
 	<xsd:complexType name="copyEntryType">
-		<xsd:attribute name="src" type="xsd:string" use="required"/>
-		<xsd:attribute name="dest" type="xsd:string" use="optional"/>
-		<xsd:attribute name="staging" type="xsd:string" use="optional"/>
+		<xsd:attribute name="src" type="xsd:string" use="required">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				Comma delimited list of resource patterns.
+				]]>
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="dest" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				Destination for copy operations for an entry.
+				]]>
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="staging" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				Internal temporary stagind directory.
+				]]>
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
 	</xsd:complexType>
 
 	<xsd:attributeGroup name="hdfs-common-attributes">
 		<xsd:attribute name="type" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				Localized entry's Yarn type. ARCHIVE - automatically unarchived by the Node Manager,
+				FILE - regular file, PATTERN - hybrid between archive and file.
+				]]>
+				</xsd:documentation>
+			</xsd:annotation>
 			<xsd:simpleType>
 				<xsd:restriction base="xsd:string">
 					<xsd:enumeration value="ARCHIVE"/>
@@ -252,6 +325,14 @@
 			</xsd:simpleType>
 		</xsd:attribute>
 		<xsd:attribute name="visibility" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				Localized entry's Yarn visibility. PUBLIC - Shared by all users on the node,
+				PRIVATE - Shared among all applications of the same user on the node,
+				APPLICATION - Shared only among containers of the same application on the node.
+				]]>
+				</xsd:documentation>
+			</xsd:annotation>
 			<xsd:simpleType>
 				<xsd:restriction base="xsd:string">
 					<xsd:enumeration value="PUBLIC"/>
@@ -267,25 +348,108 @@
 	</xsd:complexType>
 
 	<xsd:complexType name="runnerType" mixed="true">
-		<xsd:attribute name="command" type="xsd:string" use="optional"/>
-		<xsd:attribute name="runner" type="xsd:string" use="optional"/>
-		<xsd:attribute name="context-file" type="xsd:string" use="optional"/>
-		<xsd:attribute name="bean-name" type="xsd:string" use="optional"/>
-		<xsd:attribute name="arguments" type="xsd:string" use="optional"/>
-		<xsd:attribute name="stdout" type="xsd:string" use="optional"/>
-		<xsd:attribute name="stderr" type="xsd:string" use="optional"/>
+		<xsd:attribute name="command" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				Command line first entry.
+				]]>
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="runner" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				Optionally defines a fully qualified classname to replace a command line runner class.
+				]]>
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="context-file" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				Command line second entry.
+				]]>
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="bean-name" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				Command line third entry.
+				]]>
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="arguments" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				Reference to Java's Properties. Added to command line parameters as key/value pairs separated by '='.
+				]]>
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="stdout" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				Appended with 1>, default is "<LOG_DIR>/Container.stdout" or "<LOG_DIR>/Appmaster.stdout".
+				]]>
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="stderr" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				Appended with 2>, default is "<LOG_DIR>/Container.stderr" or "<LOG_DIR>/Appmaster.stderr".
+				]]>
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
 	</xsd:complexType>
 
 	<xsd:complexType name="containerAllocatorType" mixed="true">
-		<xsd:attribute name="hosts" type="xsd:string" use="optional"/>
-		<xsd:attribute name="racks" type="xsd:string" use="optional"/>
-		<xsd:attribute name="virtualcores" type="xsd:string" use="optional"/>
-		<xsd:attribute name="memory" type="xsd:string" use="optional"/>
-		<xsd:attribute name="priority" type="xsd:string" use="optional"/>
+		<xsd:attribute name="hosts" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				Preferred hostname of nodes for allocation.
+				]]>
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="racks" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				Preferred name of racks for allocation.
+				]]>
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="virtualcores" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				A number of virtual cpu cores of the resource.
+				]]>
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="memory" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				A memory of the resource.
+				]]>
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="priority" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				Assigned priority of a request.
+				]]>
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
 	</xsd:complexType>
 
 	<xsd:complexType name="containerLauncherType" mixed="true">
-		<xsd:attribute name="username" type="xsd:string" use="optional"/>
 	</xsd:complexType>
 
 	<xsd:complexType name="classpathType" mixed="true">
@@ -333,15 +497,78 @@
 				</xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
-		<xsd:attribute name="template" use="optional"/>
-		<xsd:attribute name="configuration" default="yarnConfiguration"/>
-		<xsd:attribute name="resource-localizer" default="yarnLocalresources"/>
-		<xsd:attribute name="environment" default="yarnEnvironment"/>
-		<xsd:attribute name="app-name" use="optional"/>
-		<xsd:attribute name="priority" use="optional"/>
-		<xsd:attribute name="virtualcores" use="optional"/>
-		<xsd:attribute name="memory" use="optional"/>
-		<xsd:attribute name="queue" use="optional"/>
+		<xsd:attribute name="template" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				A reference to a bean implementing ClientRmOperations.
+				]]>
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="configuration" default="yarnConfiguration">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				A reference to configuration bean name, default is 'yarnConfiguration'.
+				]]>
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="resource-localizer" default="yarnLocalresources">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				A reference to resource localizer bean name, default is 'yarnLocalresources'.
+				]]>
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="environment" default="yarnEnvironment">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				A reference to environment bean name, default is 'yarnEnvironment'.
+				]]>
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="app-name" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				Yarn submitted application name.
+				]]>
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="priority" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				Submission priority.
+				]]>
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="virtualcores" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				Number of appmaster resource virtual cores.
+				]]>
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="memory" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				Amount of memory for appmaster resource.
+				]]>
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="queue" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				Submission queue.
+				]]>
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
 	</xsd:complexType>
 
 	<xsd:complexType name="masterType">
@@ -353,12 +580,46 @@
 				</xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
-		<xsd:attribute name="template" use="optional"/>
-		<xsd:attribute name="appmaster-class" use="optional"/>
-		<xsd:attribute name="type" use="optional"/>
-		<xsd:attribute name="configuration" default="yarnConfiguration"/>
-		<xsd:attribute name="resource-localizer" default="yarnLocalresources"/>
-		<xsd:attribute name="environment" default="yarnEnvironment"/>
+		<xsd:attribute name="appmaster-class" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				Fully qualified classname which configuration can automatically instantiate as a custom application master.
+				]]>
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="type" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				Shortcut for selecting appmaster class. Currently only 'event' is supported which maps to StaticEventingAppmaster.
+				]]>
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="configuration" default="yarnConfiguration">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				A reference to configuration bean name, default is 'yarnConfiguration'
+				]]>
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="resource-localizer" default="yarnLocalresources">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				A reference to resource localizer bean name, default is 'yarnLocalresources'.
+				]]>
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="environment" default="yarnEnvironment">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				A reference to environment bean name, default is 'yarnEnvironment'.
+				]]>
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
 	</xsd:complexType>
 
 	<xsd:complexType name="containerType">

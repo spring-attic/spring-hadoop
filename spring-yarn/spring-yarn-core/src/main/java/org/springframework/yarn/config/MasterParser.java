@@ -113,10 +113,6 @@ public class MasterParser extends AbstractBeanDefinitionParser {
 
 		// launcher - for now, defaulting to DefaultContainerLauncher
 		defBuilder = BeanDefinitionBuilder.genericBeanDefinition(DefaultContainerLauncher.class);
-		Element launchElement = DomUtils.getChildElementByTagName(element, "container-launcher");
-		if(launchElement != null) {
-			YarnNamespaceUtils.setValueIfAttributeDefined(defBuilder, allocElement, "username");
-		}
 		YarnNamespaceUtils.setReferenceIfAttributeDefined(defBuilder, element, "configuration", YarnSystemConstants.DEFAULT_ID_CONFIGURATION);
 		YarnNamespaceUtils.setReferenceIfAttributeDefined(defBuilder, element, "environment", YarnSystemConstants.DEFAULT_ID_ENVIRONMENT);
 		YarnNamespaceUtils.setReferenceIfAttributeDefined(defBuilder, element, "resource-localizer", YarnSystemConstants.DEFAULT_ID_LOCAL_RESOURCES);
