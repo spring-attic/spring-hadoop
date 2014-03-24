@@ -21,6 +21,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kitesdk.data.DatasetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.hadoop.test.tests.Assume;
+import org.springframework.data.hadoop.test.tests.Version;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -72,6 +74,8 @@ public class DatasetTemplateTestsParquet {
 
 	@Test
 	public void testSavePojo() {
+		//Kite SDK and parquet currently uses some Hadoop 2.0 only methods
+		Assume.hadoopVersion(Version.HADOOP2X);
 		datasetOperations.write(records);
 		assertTrue("Dataset path created", new File(path).exists());
 		assertTrue("Dataset storage created",
