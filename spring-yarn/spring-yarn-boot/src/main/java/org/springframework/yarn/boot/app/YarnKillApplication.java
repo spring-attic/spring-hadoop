@@ -88,7 +88,7 @@ public class YarnKillApplication extends AbstractClientApplication<YarnKillAppli
 		return this;
 	}
 
-	@ConfigurationProperties(name = "spring.yarn.internal.YarnKillApplication")
+	@ConfigurationProperties(value = "spring.yarn.internal.YarnKillApplication")
 	public static class OperationProperties {
 		String applicationId;
 		public void setApplicationId(String applicationId) {

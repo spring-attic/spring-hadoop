@@ -17,7 +17,7 @@ package org.springframework.yarn.boot.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties(name = "spring.yarn.client.launchcontext")
+@ConfigurationProperties(value = "spring.yarn.client.launchcontext")
 public class SpringYarnClientLaunchContextProperties extends AbstractLaunchContextProperties {
 
 

@@ -27,7 +27,7 @@ import org.springframework.util.StringUtils;
  * @author Janne Valkealahti
  *
  */
-@ConfigurationProperties(name = "spring.hadoop")
+@ConfigurationProperties(value = "spring.hadoop")
 public class SpringHadoopProperties {
 
 	private final static Log log = LogFactory.getLog(SpringHadoopProperties.class);

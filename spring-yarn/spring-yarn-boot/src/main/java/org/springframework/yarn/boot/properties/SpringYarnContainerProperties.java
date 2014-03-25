@@ -24,7 +24,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @author Janne Valkealahti
  *
  */
-@ConfigurationProperties(name = "spring.yarn.container")
+@ConfigurationProperties(value = "spring.yarn.container")
 public class SpringYarnContainerProperties {
 
 	private String containerClass;

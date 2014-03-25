@@ -19,7 +19,7 @@ import java.util.Map;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties(name = "spring.yarn.client.localizer")
+@ConfigurationProperties(value = "spring.yarn.client.localizer")
 public class SpringYarnClientLocalizerProperties extends AbstractLocalizerProperties {
 
 	private Map<String, byte[]> rawFileContents;

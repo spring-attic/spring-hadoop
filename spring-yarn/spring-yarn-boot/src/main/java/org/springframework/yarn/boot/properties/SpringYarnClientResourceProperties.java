@@ -17,7 +17,7 @@ package org.springframework.yarn.boot.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties(name = "spring.yarn.client.resource")
+@ConfigurationProperties(value = "spring.yarn.client.resource")
 public class SpringYarnClientResourceProperties extends AbstractResourceProperties {
 
 }

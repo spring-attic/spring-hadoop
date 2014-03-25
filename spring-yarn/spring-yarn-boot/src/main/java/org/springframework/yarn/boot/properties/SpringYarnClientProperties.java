@@ -26,7 +26,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @author Janne Valkealahti
  *
  */
-@ConfigurationProperties(name = "spring.yarn.client")
+@ConfigurationProperties(value = "spring.yarn.client")
 public class SpringYarnClientProperties {
 
 	private List<String> files;
