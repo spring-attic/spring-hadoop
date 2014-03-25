@@ -14,6 +14,7 @@ General
 Store
 * Refactor HdfsFileSplitItemReader to use store classes [SHDP-295]
 * Add split reader for TextFileReader [SHDP-294]
+* Add options to the Kite SDK dataset support for format and nulls allowed [SHDP-310]
 
 YARN
 * Consolidate boot launcher exit and latch wait [SHDP-266]
@@ -25,6 +26,7 @@ YARN
 * Set allocator poll interval to 1 sec [SHDP-301]
 * Register embedded container as track service [SHDP-305]
 * Fix ClusterBaseTestClassSubmitTests for Hadoop 2.3.0 based distros [SHDP-308]
+* Fix Yarn testing framework breaking with 2.3.x [SHDP-309]
 
 
 Changes in version 2.0.0 M6 (2014-03-05)
