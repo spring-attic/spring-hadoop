@@ -74,8 +74,6 @@ public class DatasetTemplateTestsParquet {
 
 	@Test
 	public void testSavePojo() {
-		//Kite SDK and parquet currently uses some Hadoop 2.0 only methods
-		Assume.hadoopVersion(Version.HADOOP2X);
 		datasetOperations.write(records);
 		assertTrue("Dataset path created", new File(path).exists());
 		assertTrue("Dataset storage created",

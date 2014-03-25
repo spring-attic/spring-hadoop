@@ -64,8 +64,6 @@ public class DatasetTemplateTestsNoNulls extends AbstractDatasetTemplateTests {
 
 	@Test(expected = org.apache.avro.file.DataFileWriter.AppendWriteException.class)
 	public void testWritePojoWithNullValuesShouldFail() {
-		//Kite SDK currently uses some Hadoop 2.0 only methods
-		Assume.hadoopVersion(Version.HADOOP2X);
 		datasetOperations.write(records);
 		TestPojo pojo4 = new TestPojo();
 		pojo4.setId(33L);

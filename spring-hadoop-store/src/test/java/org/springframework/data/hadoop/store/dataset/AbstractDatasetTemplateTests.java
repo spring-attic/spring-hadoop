@@ -44,8 +44,6 @@ public abstract class AbstractDatasetTemplateTests {
 
 	@Test
 	public void testReadSavedPojoWithCallback() {
-		//CDK currently uses 2.0 only org.apache.hadoop.fs.FileStatus.isDirectory()
-		Assume.hadoopVersion(Version.HADOOP2X);
 		datasetOperations.write(records);
 		final List<TestPojo> results = new ArrayList<TestPojo>();
 		datasetOperations.read(TestPojo.class, new RecordCallback<TestPojo>() {
@@ -68,8 +66,6 @@ public abstract class AbstractDatasetTemplateTests {
 
 	@Test
 	public void testReadSavedPojoCollection() {
-		//Kite SDK currently uses some Hadoop 2.0 only methods
-		Assume.hadoopVersion(Version.HADOOP2X);
 		datasetOperations.write(records);
 		TestPojo pojo3 = new TestPojo();
 		pojo3.setId(31L);

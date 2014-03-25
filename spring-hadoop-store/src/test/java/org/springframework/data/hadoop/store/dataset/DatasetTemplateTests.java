@@ -68,8 +68,6 @@ public class DatasetTemplateTests extends AbstractDatasetTemplateTests {
 
 	@Test
 	public void testReadSavedPojoWithNullValues() {
-		//Kite SDK currently uses some Hadoop 2.0 only methods
-		Assume.hadoopVersion(Version.HADOOP2X);
 		datasetOperations.write(records);
 		TestPojo pojo4 = new TestPojo();
 		pojo4.setId(33L);
@@ -90,8 +88,6 @@ public class DatasetTemplateTests extends AbstractDatasetTemplateTests {
 
 	@Test
 	public void testSaveAndReadMultiplePojoClasses() {
-		//Kite SDK currently uses some Hadoop 2.0 only methods
-		Assume.hadoopVersion(Version.HADOOP2X);
 		List<AnotherPojo> others = new ArrayList<AnotherPojo>();
 		AnotherPojo other1 = new AnotherPojo();
 		other1.setId(111L);
