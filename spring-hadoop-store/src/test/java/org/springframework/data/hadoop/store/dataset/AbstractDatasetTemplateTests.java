@@ -1,15 +1,9 @@
 package org.springframework.data.hadoop.store.dataset;
 
-import org.apache.avro.Schema;
-import org.junit.Before;
 import org.junit.Test;
-import org.kitesdk.data.DatasetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.hadoop.test.tests.Assume;
-import org.springframework.data.hadoop.test.tests.Version;
 
 import java.io.File;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -17,7 +11,6 @@ import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public abstract class AbstractDatasetTemplateTests {

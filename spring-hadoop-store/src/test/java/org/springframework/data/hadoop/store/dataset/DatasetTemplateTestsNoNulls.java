@@ -21,8 +21,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kitesdk.data.DatasetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.hadoop.test.tests.Assume;
-import org.springframework.data.hadoop.test.tests.Version;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;

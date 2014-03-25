@@ -70,7 +70,7 @@ public class DatasetDefinition{
 		return partitionStrategy;
 	}
 
-	public Schema getSchema(Class datasetClass) {
+	public Schema getSchema(Class<?> datasetClass) {
 		Schema schema;
 		if (allowNullValues) {
 			schema = ReflectData.AllowNull.get().getSchema(datasetClass);

@@ -18,8 +18,6 @@ package org.springframework.data.hadoop.store.dataset;
 
 import java.util.Collection;
 
-import org.kitesdk.data.PartitionStrategy;
-
 /**
  * Interface specifying a basic set of {@link org.kitesdk.data.Dataset} operations against a specific
  * {@link org.kitesdk.data.DatasetRepository}. Implemented by DatasetTemplate.

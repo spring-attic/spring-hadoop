@@ -16,7 +16,6 @@
 
 package org.springframework.data.hadoop.store.dataset;
 
-import java.beans.PropertyDescriptor;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -150,7 +149,7 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 		}
 	}
 
-	private <T> Dataset<T> getOrCreateDataset(Class pojoClass, Class<T> recordClass) {
+	private <T> Dataset<T> getOrCreateDataset(Class<?> pojoClass, Class<T> recordClass) {
 		String repoName = getDatasetName(pojoClass);
 		DatasetDefinition datasetDefinition = getDefaultDatasetDefinition();
 		Dataset<T> dataset;
@@ -189,7 +188,6 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 			for (T record : records) {
 				GenericRecordBuilder builder = new GenericRecordBuilder(schema);
 				BeanWrapper beanWrapper = PropertyAccessorFactory.forBeanPropertyAccess(record);
-				PropertyDescriptor[] props = beanWrapper.getPropertyDescriptors();
 				for (Schema.Field f : schema.getFields()) {
 					if (beanWrapper.isReadableProperty(f.name())) {
 						Schema fieldSchema = f.schema();
