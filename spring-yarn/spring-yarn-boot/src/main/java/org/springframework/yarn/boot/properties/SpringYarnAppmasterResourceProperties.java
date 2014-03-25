@@ -17,7 +17,7 @@ package org.springframework.yarn.boot.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties(name = "spring.yarn.appmaster.resource")
+@ConfigurationProperties(value = "spring.yarn.appmaster.resource")
 public class SpringYarnAppmasterResourceProperties extends AbstractResourceProperties {
 
 	private Integer priority;

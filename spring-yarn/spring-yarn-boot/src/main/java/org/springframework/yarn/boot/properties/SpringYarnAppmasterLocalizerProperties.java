@@ -17,7 +17,7 @@ package org.springframework.yarn.boot.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties(name = "spring.yarn.appmaster.localizer")
+@ConfigurationProperties(value = "spring.yarn.appmaster.localizer")
 public class SpringYarnAppmasterLocalizerProperties extends AbstractLocalizerProperties {
 
 }

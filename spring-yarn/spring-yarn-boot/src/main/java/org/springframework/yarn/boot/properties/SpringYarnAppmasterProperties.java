@@ -9,7 +9,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @author Janne Valkealahti
  *
  */
-@ConfigurationProperties(name = "spring.yarn.appmaster")
+@ConfigurationProperties(value = "spring.yarn.appmaster")
 public class SpringYarnAppmasterProperties {
 
 	private boolean keepContextAlive = true;

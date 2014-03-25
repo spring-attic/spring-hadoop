@@ -31,7 +31,7 @@ import org.springframework.yarn.boot.support.YarnJobLauncherCommandLineRunner;
  * @author Janne Valkealahti
  *
  */
-@ConfigurationProperties(name = "spring.yarn.batch")
+@ConfigurationProperties(value = "spring.yarn.batch")
 public class SpringYarnBatchProperties {
 
 	private String name;

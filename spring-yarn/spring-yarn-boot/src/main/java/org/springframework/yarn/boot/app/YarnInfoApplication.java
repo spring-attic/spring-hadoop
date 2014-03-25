@@ -158,7 +158,7 @@ public class YarnInfoApplication extends AbstractClientApplication<YarnInfoAppli
 		return this;
 	}
 
-	@ConfigurationProperties(name = "spring.yarn.internal.YarnInfoApplication")
+	@ConfigurationProperties(value = "spring.yarn.internal.YarnInfoApplication")
 	public static class OperationProperties {
 		private Operation operation;
 		private boolean verbose;

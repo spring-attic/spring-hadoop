@@ -24,7 +24,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @author Janne Valkealahti
  *
  */
-@ConfigurationProperties(name = "spring.yarn")
+@ConfigurationProperties(value = "spring.yarn")
 public class SpringYarnProperties {
 
 	private String applicationDir;
