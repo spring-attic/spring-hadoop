@@ -97,15 +97,49 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 
 	@Override
 	public <T> Collection<T> read(Class<T> targetClass) {
+		if (Formats.PARQUET.getName().equals(defaultDatasetDefinition.getFormat().getName())) {
+			return readGenericRecords(targetClass);
+		} else {
+			return readPojo(targetClass);
+		}
+	}
+
+	private <T> Collection<T> readPojo(Class<T> targetClass) {
 		DatasetReader<T> reader = getDataset(targetClass).newReader();
 		List<T> results = new ArrayList<T>();
 		try {
 			reader.open();
-			for (T t : reader) {
-				results.add(t);
+			for (T r : reader) {
+				results.add(r);
 			}
 		}
 		finally {
+			reader.close();
+		}
+		return results;
+	}
+
+	private <T> Collection<T> readGenericRecords(Class<T> targetClass) {
+		Dataset<GenericRecord> dataset = getOrCreateDataset(targetClass, GenericRecord.class);
+		DatasetReader<GenericRecord> reader = dataset.newReader();
+		List<T> results = new ArrayList<T>();
+		try {
+			reader.open();
+			for (GenericRecord r : reader) {
+				T data = targetClass.newInstance();
+				BeanWrapper beanWrapper = PropertyAccessorFactory.forBeanPropertyAccess(data);
+				for (Schema.Field f : r.getSchema().getFields()) {
+					if (beanWrapper.isWritableProperty(f.name())) {
+						beanWrapper.setPropertyValue(f.name(), r.get(f.name()));
+					}
+				}
+				results.add(data);
+			}
+		} catch (InstantiationException e) {
+			throw new StoreException("Unable to read records for class: " + targetClass.getName(), e);
+		} catch (IllegalAccessException e) {
+			throw new StoreException("Unable to read records for class: " + targetClass.getName(), e);
+		} finally {
 			reader.close();
 		}
 		return results;
@@ -158,6 +192,19 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 		}
 		catch (DatasetNotFoundException ex) {
 			Schema schema = datasetDefinition.getSchema(pojoClass);
+			if (recordClass != null && recordClass.isAssignableFrom(GenericRecord.class)) {
+				Schema genericSchema = Schema.createRecord(
+						"Generic"+schema.getName(),
+						"Generic representation of " + schema.getName(),
+						schema.getNamespace(),
+						false);
+				List<Schema.Field> fields = new ArrayList<Schema.Field>();
+				for (Schema.Field f : schema.getFields()) {
+					fields.add(new Schema.Field(f.name(), f.schema(), f.doc(), f.defaultValue()));
+				}
+				genericSchema.setFields(fields);
+				schema = genericSchema;
+			}
 			DatasetDescriptor descriptor;
 			if (datasetDefinition.getPartitionStrategy() == null) {
 				descriptor = new DatasetDescriptor.Builder()
@@ -199,17 +246,19 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 							}
 						}
 						if (fieldSchema.getType().equals(Schema.Type.RECORD)) {
-							//TODO: add support for java.util.Date etc.
-							// something like: builder.set(f.name(), new SpecificData().newRecord(value, fieldSchema));
-							Object value = beanWrapper.getPropertyValue(f.name());
-							throw new StoreException("Unsupported object type: " + value.getClass().getName() +
-									" for field: " + f.name());
+							throw new StoreException("Nested record currently not supported for field: " + f.name() +
+							" of type: " + beanWrapper.getPropertyDescriptor(f.name()).getPropertyType().getName());
 						} else {
 							builder.set(f.name(), beanWrapper.getPropertyValue(f.name()));
 						}
 					}
 				}
-				writer.write(builder.build());
+				try {
+					writer.write(builder.build());
+				} catch (ClassCastException cce) {
+					throw new StoreException("Failed to write record with schema: " +
+							schema, cce);
+				}
 			}
 		} finally {
 			writer.close();

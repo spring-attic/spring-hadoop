@@ -27,9 +27,14 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -59,7 +64,7 @@ public class DatasetTemplateTestsParquet {
 		ParquetPojo pojo2 = new ParquetPojo();
 		pojo2.setId(48L);
 		pojo2.setName("Nisse");
-		pojo2.setBirthDate(new Date().getTime());
+		//pojo2.setBirthDate(new Date().getTime());
 		records.add(pojo2);
 
 		datasetOperations.execute(new DatasetRepositoryCallback() {
@@ -78,7 +83,16 @@ public class DatasetTemplateTestsParquet {
 				new File(path + "/" + datasetOperations.getDatasetName(ParquetPojo.class)).exists());
 		assertTrue("Dataset metadata created",
 				new File(path + "/" + datasetOperations.getDatasetName(ParquetPojo.class) + "/.metadata").exists());
+		Collection<ParquetPojo> results = datasetOperations.read(ParquetPojo.class);
+		assertEquals(2, results.size());
+		List<ParquetPojo> sorted = new ArrayList<ParquetPojo>(results);
+		Collections.sort(sorted);
+		assertTrue(sorted.get(0).getName().equals("Sven"));
+		assertTrue(sorted.get(0).getId().equals(22L));
+		assertNotNull(sorted.get(0).getBirthDate());
+		assertTrue(sorted.get(1).getName().equals("Nisse"));
+		assertTrue(sorted.get(1).getId().equals(48L));
+		assertNull(sorted.get(1).getBirthDate());
 	}
-
 
 }
