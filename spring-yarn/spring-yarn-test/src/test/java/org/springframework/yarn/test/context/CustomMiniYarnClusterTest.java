@@ -37,6 +37,8 @@ import org.springframework.test.context.ContextConfiguration;
 @MiniYarnCluster
 public @interface CustomMiniYarnClusterTest {
 
+	Class<?>[] classes() default { CustomMiniYarnClusterTest.Config.class };
+
 	@Configuration
 	public static class Config {
 		@Bean
