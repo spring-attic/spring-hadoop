@@ -25,7 +25,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
-import org.springframework.data.hadoop.configuration.ConfigurationUtils;
+import org.springframework.data.hadoop.configuration.JobConfUtils;
 import org.springframework.data.hadoop.mapreduce.ExecutionUtils.ExitTrapped;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
@@ -116,7 +116,7 @@ abstract class HadoopCodeExecutor<T> extends JobGenericOptions implements Initia
 
 
 	protected Configuration resolveConfiguration() throws Exception {
-		Configuration cfg = ConfigurationUtils.createFrom(configuration, properties);
+		Configuration cfg = JobConfUtils.createFrom(configuration, properties);
 		// add the jar if present
 		if (jar != null) {
 			String jarUrl = jar.getURL().toString();

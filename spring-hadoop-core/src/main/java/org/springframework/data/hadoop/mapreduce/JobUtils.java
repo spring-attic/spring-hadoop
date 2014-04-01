@@ -26,7 +26,7 @@ import org.apache.hadoop.mapred.RunningJob;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Job.JobState;
 import org.apache.hadoop.mapreduce.JobID;
-import org.springframework.data.hadoop.configuration.ConfigurationUtils;
+import org.springframework.data.hadoop.configuration.JobConfUtils;
 import org.springframework.data.hadoop.util.VersionUtils;
 import org.springframework.util.ReflectionUtils;
 
@@ -197,7 +197,7 @@ public abstract class JobUtils {
 			return (JobConf) configuration;
 		}
 
-		return (JobConf) ConfigurationUtils.createFrom(configuration, null);
+		return JobConfUtils.createFrom(configuration, null);
 	}
 
 	/**

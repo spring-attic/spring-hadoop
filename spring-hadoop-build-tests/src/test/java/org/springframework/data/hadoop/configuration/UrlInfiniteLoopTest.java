@@ -68,19 +68,4 @@ public class UrlInfiniteLoopTest {
 		assertNotNull(fs);
 	}
 
-	@Test
-	public void testConfigurationProperties() throws Exception {
-		Properties prop = new Properties();
-		prop.setProperty("mapred.reduce.tasks", "8");
-		prop.setProperty("mapred.map.tasks", "4");
-
-		Configuration cfg = ConfigurationUtils.createFrom(null, prop);
-
-		assertEquals("8", cfg.get("mapred.reduce.tasks"));
-		assertEquals("4", cfg.get("mapred.map.tasks"));
-		@SuppressWarnings("deprecation")
-		Job j = new Job(cfg);
-		assertEquals("8", j.getConfiguration().get("mapred.reduce.tasks"));
-		assertEquals("4", j.getConfiguration().get("mapred.map.tasks"));
-	}
 }

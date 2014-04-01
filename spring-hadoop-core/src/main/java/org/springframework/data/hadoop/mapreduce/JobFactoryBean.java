@@ -43,7 +43,7 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
-import org.springframework.data.hadoop.configuration.ConfigurationUtils;
+import org.springframework.data.hadoop.configuration.JobConfUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
@@ -118,7 +118,7 @@ public class JobFactoryBean extends JobGenericOptions implements InitializingBea
 
 	@SuppressWarnings({ "rawtypes", "deprecation" })
 	public void afterPropertiesSet() throws Exception {
-		final Configuration cfg = ConfigurationUtils.createFrom(configuration, properties);
+		final Configuration cfg = JobConfUtils.createFrom(configuration, properties);
 
 		buildGenericOptions(cfg);
 
