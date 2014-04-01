@@ -43,11 +43,10 @@ abstract class YarnClusterInjectUtils {
 				testClass, MiniYarnCluster.class);
 
 		if (annotationDescriptor != null && annotationDescriptor.getAnnotation() != null) {
-			MiniYarnCluster annotation = annotationDescriptor.getAnnotation();
-			String clusterName = annotation.clusterName();
-			String configName = annotation.configName();
-			String id = annotation.id();
-			int nodeCount = annotation.nodes();
+			String clusterName = annotationDescriptor.getAnnotationAttributes().getString("clusterName");
+			String configName = annotationDescriptor.getAnnotationAttributes().getString("configName");
+			String id = annotationDescriptor.getAnnotationAttributes().getString("id");
+			int nodeCount = annotationDescriptor.getAnnotationAttributes().getNumber("nodes");
 
 			BeanDefinitionBuilder builder = BeanDefinitionBuilder
 					.genericBeanDefinition(ClusterDelegatingFactoryBean.class);
