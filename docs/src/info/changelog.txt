@@ -5,6 +5,20 @@ http://projects.spring.io/spring-hadoop/
 Commit changelog: http://github.com/spring-projects/spring-hadoop/tree/v[version]
 Issues changelog: http://jira.springsource.org/secure/ReleaseNote.jspa?projectId=10801
 
+Changes in version 2.0.0 RC2 (2014-04-02)
+-----------------------------------------
+General
+* Update to latest dependency versions [SHDP-315]
+* Remove ConfigurationUtils dependency on JobConf class [SHDP-316]
+* Add Pivotal HD 2.0 as a supported build version [SHDP-313]
+
+Store
+* Add basic parquet support to the Kite SDK dataset support [SHDP-312]
+
+YARN
+* Fix MiniYarnCluster based on changes in Spring 4.0.3 [SHDP-318]
+
+
 Changes in version 2.0.0 RC1 (2014-03-25)
 -----------------------------------------
 General
