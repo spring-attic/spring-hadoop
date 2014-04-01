@@ -32,7 +32,7 @@ import org.apache.hadoop.streaming.StreamJob;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.data.hadoop.configuration.ConfigurationUtils;
+import org.springframework.data.hadoop.configuration.JobConfUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.ReflectionUtils;
@@ -80,7 +80,7 @@ public class StreamJobFactoryBean extends JobGenericOptions implements Initializ
 		Assert.isTrue(!ObjectUtils.isEmpty(input), "at least one input required");
 		Assert.hasText(output, "the output is required");
 
-		final Configuration cfg = ConfigurationUtils.createFrom(configuration, properties);
+		final Configuration cfg = JobConfUtils.createFrom(configuration, properties);
 
 		buildGenericOptions(cfg);
 
