@@ -46,7 +46,7 @@ abstract class YarnClusterInjectUtils {
 			String clusterName = annotationDescriptor.getAnnotationAttributes().getString("clusterName");
 			String configName = annotationDescriptor.getAnnotationAttributes().getString("configName");
 			String id = annotationDescriptor.getAnnotationAttributes().getString("id");
-			int nodeCount = annotationDescriptor.getAnnotationAttributes().getNumber("nodes");
+			int nodeCount = annotationDescriptor.getAnnotationAttributes().getNumber("nodes").intValue();
 
 			BeanDefinitionBuilder builder = BeanDefinitionBuilder
 					.genericBeanDefinition(ClusterDelegatingFactoryBean.class);
