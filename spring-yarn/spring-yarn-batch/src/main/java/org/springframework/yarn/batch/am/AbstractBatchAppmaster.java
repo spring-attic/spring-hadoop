@@ -23,7 +23,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -147,15 +146,17 @@ public abstract class AbstractBatchAppmaster extends AbstractEventingAppmaster i
 
 		log.debug("stepExecution after racks match: " + stepExecution);
 
-		try {
-			if (stepExecution == null) {
-				stepExecution = requestData.entrySet().iterator().next().getKey();
-			}
+		iterator = requestData.entrySet().iterator();
+		if (stepExecution == null && iterator.hasNext()) {
+			stepExecution = iterator.next().getKey();
+		}
+
+		if (stepExecution != null) {
 			requestData.remove(stepExecution);
 			containerToStepMap.put(container.getId(), stepExecution);
 			getLauncher().launchContainer(container, getCommands());
-		} catch (NoSuchElementException e) {
-			log.error("We didn't have step execution in request map.", e);
+		} else {
+			getAllocator().releaseContainer(container.getId());
 		}
 	}
 

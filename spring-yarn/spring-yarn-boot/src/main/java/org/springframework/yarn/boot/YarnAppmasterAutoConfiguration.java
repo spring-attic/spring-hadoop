@@ -247,6 +247,7 @@ public class YarnAppmasterAutoConfiguration {
 				.appmasterClass(syap.getAppmasterClass() != null ? syap.getAppmasterClass() : appmasterClass)
 				.containerCommands(createContainerCommands(syalcp))
 				.withContainerAllocator()
+					.locality(syalcp.isLocality())
 					.memory(syarp.getMemory())
 					.priority(syarp.getPriority())
 					.virtualCores(syarp.getVirtualCores());

@@ -15,6 +15,7 @@ spring:
                 options:
                   - "options1Foo"
                   - "options2Foo"
+                locality: true
                 includeLocalSystemEnv: true
                 useDefaultYarnClasspath: false
                 includeBaseDirectory: false

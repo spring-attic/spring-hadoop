@@ -407,22 +407,6 @@
 	</xsd:complexType>
 
 	<xsd:complexType name="containerAllocatorType" mixed="true">
-		<xsd:attribute name="hosts" type="xsd:string" use="optional">
-			<xsd:annotation>
-				<xsd:documentation><![CDATA[
-				Preferred hostname of nodes for allocation.
-				]]>
-				</xsd:documentation>
-			</xsd:annotation>
-		</xsd:attribute>
-		<xsd:attribute name="racks" type="xsd:string" use="optional">
-			<xsd:annotation>
-				<xsd:documentation><![CDATA[
-				Preferred name of racks for allocation.
-				]]>
-				</xsd:documentation>
-			</xsd:annotation>
-		</xsd:attribute>
 		<xsd:attribute name="virtualcores" type="xsd:string" use="optional">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[
@@ -443,6 +427,14 @@
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[
 				Assigned priority of a request.
+				]]>
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="locality" type="xsd:boolean" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				If set to true indicates that resources are not relaxed.
 				]]>
 				</xsd:documentation>
 			</xsd:annotation>

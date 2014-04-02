@@ -169,4 +169,34 @@ public interface MasterContainerAllocatorConfigurer extends AnnotationConfigurer
 	 */
 	MasterContainerAllocatorConfigurer memory(int memory);
 
+	/**
+	 * Specify a locality relaxing for {@link ContainerAllocator}. Setting
+	 * this flag <code>true</code> means that resource requests will
+	 * not use locality relaxing. Default for this flag is <code>false</code>.
+	 *
+	 * <p>
+	 * <p>JavaConfig:
+	 * <p>
+	 * <pre>
+	 *
+	 * public void configure(YarnAppmasterConfigure master) throws Exception {
+	 *   master
+	 *     .withContainerAllocator()
+	 *       .locality(false);
+	 * }
+	 * </pre>
+	 *
+	 * <p>XML:
+	 * <p>
+	 * <pre>
+	 * &lt;yarn:master>
+	 *   &lt;yarn:container-allocator locality="false"/>
+	 * &lt;/yarn:master>
+	 * </pre>
+	 *
+	 * @param locality the locality flag for resource relaxing
+	 * @return {@link MasterContainerAllocatorConfigurer} for chaining
+	 */
+	MasterContainerAllocatorConfigurer locality(boolean locality);
+
 }

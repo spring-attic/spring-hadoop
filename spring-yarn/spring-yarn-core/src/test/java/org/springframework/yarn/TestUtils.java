@@ -16,6 +16,9 @@
 package org.springframework.yarn;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+
+import org.springframework.util.ReflectionUtils;
 
 /**
  * Testing utilities.
@@ -43,6 +46,37 @@ public abstract class TestUtils {
 					+ target.getClass());
 		field.setAccessible(true);
 		return (T) field.get(target);
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T> T callMethod(String name, Object target) throws Exception {
+		Class<?> clazz = target.getClass();
+		Method method = ReflectionUtils.findMethod(clazz, name);
+
+		if (method == null)
+			throw new IllegalArgumentException("Cannot find method '" + method + "' in the class hierarchy of "
+					+ target.getClass());
+		method.setAccessible(true);
+		return (T) ReflectionUtils.invokeMethod(method, target);
+	}
+
+	public static void setField(String name, Object target, Object value) throws Exception {
+		Field field = null;
+		Class<?> clazz = target.getClass();
+		do {
+			try {
+				field = clazz.getDeclaredField(name);
+			} catch (Exception ex) {
+			}
+
+			clazz = clazz.getSuperclass();
+		} while (field == null && !clazz.equals(Object.class));
+
+		if (field == null)
+			throw new IllegalArgumentException("Cannot find field '" + name + "' in the class hierarchy of "
+					+ target.getClass());
+		field.setAccessible(true);
+		field.set(target, value);
 	}
 
 }

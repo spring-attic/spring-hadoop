@@ -29,6 +29,7 @@ public class DefaultMasterContainerAllocatorConfigurer
 	private Integer priority;
 	private String memory;
 	private Integer virtualCores;
+	private boolean locality;
 
 	@Override
 	public void configure(YarnAppmasterBuilder builder) throws Exception {
@@ -42,6 +43,7 @@ public class DefaultMasterContainerAllocatorConfigurer
 		if (memory != null) {
 			containerAllocator.setMemory(ParsingUtils.parseBytesAsMegs(memory));
 		}
+		containerAllocator.setLocality(locality);
 		builder.setContainerAllocator(containerAllocator);
 	}
 
@@ -66,6 +68,11 @@ public class DefaultMasterContainerAllocatorConfigurer
 	@Override
 	public MasterContainerAllocatorConfigurer memory(int memory) {
 		this.memory = Integer.toString(memory);
+		return this;
+	}
+
+	public MasterContainerAllocatorConfigurer locality(boolean locality) {
+		this.locality = locality;
 		return this;
 	}
 
