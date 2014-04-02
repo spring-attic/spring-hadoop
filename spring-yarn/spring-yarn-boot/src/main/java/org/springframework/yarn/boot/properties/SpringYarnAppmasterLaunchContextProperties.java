@@ -20,5 +20,14 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(value = "spring.yarn.appmaster.launchcontext")
 public class SpringYarnAppmasterLaunchContextProperties extends AbstractLaunchContextProperties {
 
+	private boolean locality = false;
+
+	public boolean isLocality() {
+		return locality;
+	}
+
+	public void setLocality(boolean locality) {
+		this.locality = locality;
+	}
 
 }

@@ -1026,7 +1026,7 @@ public class ClientConfiguration extends SpringYarnConfigurerAdapter {
     launching and monitoring.</para>
 
     <programlisting language="xml"><![CDATA[<yarn:master>
-  <yarn:container-allocator hosts="host1,host2" racks="rack1,rack2" virtualcores="1" memory="64" priority="0"/>    
+  <yarn:container-allocator virtualcores="1" memory="64" priority="0"/>    
   <yarn:container-launcher username="whoami"/>    
   <yarn:container-command>
     <![CDATA[
@@ -1129,16 +1129,6 @@ public class ClientConfiguration extends SpringYarnConfigurerAdapter {
             </thead>
             <tbody>
                 <row>
-                    <entry><literal>hosts</literal></entry>
-                    <entry>List of hosts</entry>
-                    <entry>Preferred hostname of nodes for allocation.</entry>
-                </row>
-                <row>
-                    <entry><literal>racks</literal></entry>
-                    <entry>List of racks</entry>
-                    <entry>Preferred name of racks for allocation.</entry>
-                </row>
-                <row>
                     <entry><literal>virtualcores</literal></entry>
                     <entry>Integer</entry>
                     <entry><emphasis>number of virtual cpu cores</emphasis> of the resource.</entry>
@@ -1153,8 +1143,14 @@ public class ClientConfiguration extends SpringYarnConfigurerAdapter {
                     <entry>Integer</entry>
                     <entry>Assigned priority of a request.</entry>
                 </row>
+                <row>
+                    <entry><literal>locality</literal></entry>
+                    <entry>Boolean</entry>
+                    <entry>If set to true indicates that resources are not relaxed.
+                    Default is <emphasis>FALSE</emphasis>.</entry>
+                </row>
             </tbody>
-        </tgroup>  
+        </tgroup>
     </table>
 
     <table id="yarn:master:containerlauncherflags" pgwide="1" align="center">
@@ -2858,6 +2854,12 @@ public void publicVoidNoArgsMethod(@YarnParameter("key") String value) {
                       <entry>Boolean</entry>
                       <entry>true</entry>
                   </row>
+                  <row>
+                      <entry><literal>spring.yarn.appmaster.launchcontext.locality</literal></entry>
+                      <entry>No</entry>
+                      <entry>Boolean</entry>
+                      <entry>false</entry>
+                </row>
               </tbody>
           </tgroup>
       </table>
@@ -2906,6 +2908,11 @@ public void publicVoidNoArgsMethod(@YarnParameter("key") String value) {
           <varlistentry><term><filename>spring.yarn.appmaster.launchcontext.includeSystemEnv</filename></term>
               <listitem><para>
               If system environment variables are added to a container environment.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.appmaster.launchcontext.locality</filename></term>
+              <listitem><para>
+              If set to true indicates that resources are not relaxed.
               </para></listitem>
           </varlistentry>
       </variablelist>

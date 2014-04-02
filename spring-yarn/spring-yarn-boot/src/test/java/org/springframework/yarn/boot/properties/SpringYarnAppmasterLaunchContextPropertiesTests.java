@@ -60,6 +60,7 @@ public class SpringYarnAppmasterLaunchContextPropertiesTests {
 		assertThat(options.get(0), is("options1Foo"));
 		assertThat(options.get(1), is("options2Foo"));
 
+		assertThat(properties.isLocality(), is(true));
 		assertThat(properties.isUseDefaultYarnClasspath(), is(false));
 		assertThat(properties.isIncludeBaseDirectory(), is(false));
 		assertThat(properties.isIncludeLocalSystemEnv(), is(true));
