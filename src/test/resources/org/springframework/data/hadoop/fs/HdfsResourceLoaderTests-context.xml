@@ -1,0 +1,29 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:c="http://www.springframework.org/schema/c"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:hdp="http://www.springframework.org/schema/hadoop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
+
+    <!--make sure we have a /user directory with the correct permissions -->
+    <hdp:script language="javascript" run-at-startup="true">
+        if (!fsh.test("/user")) fsh.mkdir("/user")
+        fsh.chmod(777, "/user")
+    </hdp:script>
+
+	<!--use the bean definition to go beyond the configuration options provided by the namespace -->
+	<bean name="ppc" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
+		p:valueSeparator="|" p:location="test.properties" p:systemPropertiesModeName="SYSTEM_PROPERTIES_MODE_OVERRIDE" p:order="100"/>
+
+	<hdp:configuration register-url-handler="false" file-system-uri="${hadoop.fs}" />
+
+	<hdp:file-system />
+
+	<hdp:resource-loader file-system-ref="hadoopFs" use-codecs="true" handle-noprefix="true" />
+
+	<hdp:resource-loader id="loaderWithUser" user="usernotexist" uri="${hadoop.fs}" use-codecs="true" handle-noprefix="true" />
+
+	<hdp:resource-loader id="loaderHandleNoprefix" file-system-ref="hadoopFs" use-codecs="true" handle-noprefix="false" />
+
+</beans>

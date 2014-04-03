@@ -18,6 +18,7 @@ package org.springframework.data.hadoop;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
 import java.util.Properties;
 
 import org.apache.hadoop.conf.Configuration;
@@ -137,6 +138,26 @@ public class TestUtils {
 
 	public static boolean isHadoop1X() {
 		return !isHadoop2X();
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T> T readField(String name, Object target) throws Exception {
+		Field field = null;
+		Class<?> clazz = target.getClass();
+		do {
+			try {
+				field = clazz.getDeclaredField(name);
+			} catch (Exception ex) {
+			}
+
+			clazz = clazz.getSuperclass();
+		} while (field == null && !clazz.equals(Object.class));
+
+		if (field == null)
+			throw new IllegalArgumentException("Cannot find field '" + name
+					+ "' in the class hierarchy of " + target.getClass());
+		field.setAccessible(true);
+		return (T) field.get(target);
 	}
 
 }
