@@ -155,31 +155,6 @@ switch (hadoopDistro) {
 
   break;
 
-  // Hadoop 2.0 Alpha
-  case "hadoop20":
-    hadoopVersion = hd20Version
-    println "Using Apache Hadoop 2.0 - [$hadoopVersion]"
-
-    hadoop = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
-              "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
-              "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
-              "org.apache.hadoop:hadoop-streaming:$hadoopVersion",
-              "org.apache.hadoop:hadoop-distcp:$hadoopVersion"]
-
-    dependencies {
-        testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
-        testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
-        testRuntime "dk.brics.automaton:automaton:1.11-8"
-    }
-
-    hbaseVersion = hd20HbaseVersion
-    hiveVersion = hd20HiveVersion
-    pigVersion = hd20PigVersion
-    pigQualifier = ':h2'
-    thriftVersion = hd20ThriftVersion
-
-  break;
-
   // Hadoop 1.1.x
   case "hadoop11":
     hadoopVersion = hd11Version
@@ -226,7 +201,7 @@ switch (hadoopDistro) {
             println "Using Apache Hadoop 1.2.x [$hadoopVersion]"
         } else {
             println "Failing build: $hadoopDistro is not a supported distro"
-            println "Supported distros: hadoop10, hadoop11, hadoop12[*], hadoop20, hdp13, chd3, chd4 and phd1"
+            println "Supported distros: hadoop10, hadoop11, hadoop12[*], hadoop22, hdp13, chd3, chd4 and phd1"
             println "* default"
             throw new InvalidUserDataException("$hadoopDistro is not a supported distro")
         }
