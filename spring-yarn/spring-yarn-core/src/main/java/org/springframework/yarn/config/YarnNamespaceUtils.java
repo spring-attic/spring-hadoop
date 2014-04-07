@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,11 @@ import java.util.List;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
+import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.config.TypedStringValue;
 import org.springframework.beans.factory.parsing.BeanComponentDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.core.Conventions;
@@ -301,6 +303,30 @@ public class YarnNamespaceUtils {
 			elementId += " with id='" + id + "'";
 		}
 		return elementId;
+	}
+
+	/**
+	 * Sets the reference property as list from a comma delimited string.
+	 *
+	 * @param element the element
+	 * @param builder the builder
+	 * @param attrName the attr name
+	 * @param propertyName the property name
+	 * @return true, if successful
+	 */
+	public static boolean setCSVReferenceProperty(Element element, BeanDefinitionBuilder builder, String attrName,
+			String propertyName) {
+		String attr = element.getAttribute(attrName);
+		if (StringUtils.hasText(attr)) {
+			String[] strs = StringUtils.commaDelimitedListToStringArray(attr);
+			ManagedList<RuntimeBeanReference> list = new ManagedList<RuntimeBeanReference>(strs.length);
+			for (int i = 0; i < strs.length; i++) {
+				list.add(new RuntimeBeanReference(strs[i].trim()));
+			}
+			builder.addPropertyValue(propertyName, list);
+			return true;
+		}
+		return false;
 	}
 
 }

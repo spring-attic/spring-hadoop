@@ -15,23 +15,26 @@
  */
 package org.springframework.yarn.batch.am;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.yarn.api.records.FinalApplicationStatus;
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
+import org.springframework.batch.core.partition.PartitionHandler;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.SmartLifecycle;
-import org.springframework.util.StringUtils;
 import org.springframework.yarn.am.AppmasterService;
 import org.springframework.yarn.am.YarnAppmaster;
 import org.springframework.yarn.am.allocate.AbstractAllocator;
 import org.springframework.yarn.batch.event.JobExecutionEvent;
+import org.springframework.yarn.batch.partition.AbstractPartitionHandler;
 import org.springframework.yarn.batch.repository.BatchAppmasterService;
 //import org.springframework.yarn.batch.repository.BatchAppmasterService;
 import org.springframework.yarn.batch.repository.JobRepositoryRemoteServiceInterceptor;
@@ -57,13 +60,14 @@ import org.springframework.yarn.integration.ip.mind.binding.BaseResponseObject;
  * @author Janne Valkealahti
  *
  */
-public class BatchAppmaster extends AbstractBatchAppmaster
-		implements YarnAppmaster, ApplicationContextAware {
+public class BatchAppmaster extends AbstractBatchAppmaster implements YarnAppmaster {
 
 	private static final Log log = LogFactory.getLog(BatchAppmaster.class);
 
-	/** Context used to find the job */
-	private ApplicationContext applicationContext;
+	@Autowired(required = false)
+	private final Collection<PartitionHandler> partitionHandlers = Collections.emptySet();
+
+	private List<JobExecution> jobExecutions = new ArrayList<JobExecution>();
 
 	@Override
 	public void submitApplication() {
@@ -74,39 +78,33 @@ public class BatchAppmaster extends AbstractBatchAppmaster
 			log.info("about to set app attempt id");
 			((AbstractAllocator) getAllocator()).setApplicationAttemptId(getApplicationAttemptId());
 		}
-		log.info("submitApplication done");
-		// TODO: doesn't look nice, refactor
-		if (StringUtils.hasText(getJobName())) {
-			try {
-				Job job = (Job) applicationContext.getBean(getJobName());
-				log.info("launching job:" + job);
-				runJob(job);
-			} catch (Exception e) {
-				log.error("Error running job", e);
-			}
-			if (log.isDebugEnabled()) {
-				log.debug("finished job");
-			}
 
+		for (PartitionHandler handler : partitionHandlers) {
+			if (handler instanceof AbstractPartitionHandler) {
+				((AbstractPartitionHandler)handler).setBatchAppmaster(this);
+			}
 		}
+
+		try {
+			getYarnJobLauncher().run(getParameters());
+		} catch (JobExecutionException e) {
+			log.error("Error in jobLauncherHelper", e);
+			setFinalApplicationStatus(FinalApplicationStatus.FAILED);
+		}
+		for (JobExecution jobExecution : jobExecutions) {
+			if (jobExecution.getStatus().equals(BatchStatus.FAILED)) {
+				setFinalApplicationStatus(FinalApplicationStatus.FAILED);
+				break;
+			}
+		}
+		notifyCompleted();
 	}
 
 	@Override
 	public void onApplicationEvent(AbstractYarnEvent event) {
 		super.onApplicationEvent(event);
-
 		if (event instanceof JobExecutionEvent) {
-			JobExecution jobExecution = ((JobExecutionEvent)event).getJobExecution();
-
-			if (jobExecution.getStatus().equals(BatchStatus.COMPLETED)) {
-				log.info("Batch status complete, notify listeners");
-				notifyCompleted();
-			} else if (jobExecution.getStatus().equals(BatchStatus.FAILED)) {
-				log.info("Batch status failed, notify listeners");
-				setFinalApplicationStatus(FinalApplicationStatus.FAILED);
-				notifyCompleted();
-			}
-
+			jobExecutions.add(((JobExecutionEvent)event).getJobExecution());
 		}
 	}
 
@@ -164,20 +162,6 @@ public class BatchAppmaster extends AbstractBatchAppmaster
 			((SmartLifecycle)getAppmasterService()).start();
 		}
 
-	}
-
-	@Override
-	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-		this.applicationContext = applicationContext;
-	}
-
-	@Override
-	public JobLauncher getJobLauncher() {
-		JobLauncher jl = super.getJobLauncher();
-		if (jl == null) {
-			jl = applicationContext.getBean(JobLauncher.class);
-		}
-		return jl;
 	}
 
 }

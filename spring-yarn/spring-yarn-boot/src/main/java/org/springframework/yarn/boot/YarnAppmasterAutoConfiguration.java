@@ -38,6 +38,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.yarn.YarnSystemConstants;
 import org.springframework.yarn.am.AppmasterTrackService;
 import org.springframework.yarn.am.YarnAppmaster;
+import org.springframework.yarn.batch.support.YarnJobLauncher;
 import org.springframework.yarn.boot.condition.ConditionalOnYarnAppmaster;
 import org.springframework.yarn.boot.properties.SpringHadoopProperties;
 import org.springframework.yarn.boot.properties.SpringYarnAppmasterLaunchContextProperties;
@@ -53,7 +54,6 @@ import org.springframework.yarn.boot.support.BootLocalResourcesSelector;
 import org.springframework.yarn.boot.support.BootLocalResourcesSelector.Mode;
 import org.springframework.yarn.boot.support.EmbeddedAppmasterTrackService;
 import org.springframework.yarn.boot.support.SpringYarnBootUtils;
-import org.springframework.yarn.boot.support.YarnJobLauncherCommandLineRunner;
 import org.springframework.yarn.config.annotation.EnableYarn;
 import org.springframework.yarn.config.annotation.EnableYarn.Enable;
 import org.springframework.yarn.config.annotation.SpringYarnConfigurerAdapter;
@@ -165,14 +165,14 @@ public class YarnAppmasterAutoConfiguration {
 		}
 
 		@Bean
-		@ConditionalOnMissingBean(YarnJobLauncherCommandLineRunner.class)
+		@ConditionalOnMissingBean(YarnJobLauncher.class)
 		@ConditionalOnBean(JobLauncher.class)
-		public YarnJobLauncherCommandLineRunner jobLauncherCommandLineRunner() {
-			YarnJobLauncherCommandLineRunner runner = new YarnJobLauncherCommandLineRunner();
+		public YarnJobLauncher yarnJobLauncher() {
+			YarnJobLauncher launcher = new YarnJobLauncher();
 			if (StringUtils.hasText(jobName)) {
-				runner.setJobName(jobName);
+				launcher.setJobName(jobName);
 			}
-			return runner;
+			return launcher;
 		}
 
 	}

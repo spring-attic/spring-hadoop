@@ -32,6 +32,7 @@ import org.springframework.yarn.am.allocate.DefaultContainerAllocator;
 import org.springframework.yarn.am.container.DefaultContainerLauncher;
 import org.springframework.yarn.am.monitor.DefaultContainerMonitor;
 import org.springframework.yarn.batch.am.BatchAppmaster;
+import org.springframework.yarn.batch.support.YarnJobLauncher;
 import org.springframework.yarn.config.YarnNamespaceUtils;
 import org.springframework.yarn.container.CommandLineContainerRunner;
 import org.springframework.yarn.launch.LaunchCommandsFactoryBean;
@@ -116,12 +117,21 @@ public class BatchMasterParser extends AbstractBeanDefinitionParser {
 		parserContext.registerBeanComponent(new BeanComponentDefinition(beanDef, beanName));
 		builder.addPropertyReference("monitor", beanName);
 
+		// yarn specific job launcher
+		defBuilder = BeanDefinitionBuilder.genericBeanDefinition(YarnJobLauncher.class);
+		YarnNamespaceUtils.setReferenceIfAttributeDefined(defBuilder, element, "job-launcher");
+
+		YarnNamespaceUtils.setCSVReferenceProperty(element, defBuilder, "jobs", "jobs");
+		YarnNamespaceUtils.setValueIfAttributeDefined(defBuilder, element, "job-name", false, "job");
+		beanDef = defBuilder.getBeanDefinition();
+		beanName = BeanDefinitionReaderUtils.generateBeanName(beanDef, parserContext.getRegistry());
+		parserContext.registerBeanComponent(new BeanComponentDefinition(beanDef, beanName));
+		builder.addPropertyReference("yarnJobLauncher", beanName);
+
 		// for appmaster bean
 		YarnNamespaceUtils.setReferenceIfAttributeDefined(builder, element, "resource-localizer", YarnSystemConstants.DEFAULT_ID_LOCAL_RESOURCES);
 		YarnNamespaceUtils.setReferenceIfAttributeDefined(builder, element, "configuration", YarnSystemConstants.DEFAULT_ID_CONFIGURATION);
 		YarnNamespaceUtils.setReferenceIfAttributeDefined(builder, element, "environment", YarnSystemConstants.DEFAULT_ID_ENVIRONMENT);
-		YarnNamespaceUtils.setReferenceIfAttributeDefined(builder, element, "job-launcher");
-		YarnNamespaceUtils.setValueIfAttributeDefined(builder, element, "job-name", false, "job");
 
 		return builder.getBeanDefinition();
 	}

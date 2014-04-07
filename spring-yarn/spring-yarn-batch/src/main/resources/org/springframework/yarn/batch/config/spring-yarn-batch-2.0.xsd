@@ -62,8 +62,7 @@
 		<xsd:attribute name="environment" default="yarnEnvironment"/>
 		<xsd:attribute name="job-name" default="job"/>
 		<xsd:attribute name="job-launcher" default="jobLauncher"/>
+		<xsd:attribute name="jobs" use="optional"/>
 	</xsd:complexType>
-
-
 
 </xsd:schema>

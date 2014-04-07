@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.yarn.boot.support;
+package org.springframework.yarn.batch.support;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,18 +41,16 @@ import org.springframework.batch.core.launch.JobExecutionNotFailedException;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.JobParametersNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.autoconfigure.batch.JobExecutionEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.stereotype.Component;
 import org.springframework.util.PatternMatchUtils;
 import org.springframework.util.StringUtils;
-import org.springframework.yarn.boot.properties.SpringYarnBatchProperties;
-import org.springframework.yarn.boot.properties.SpringYarnBatchProperties.JobProperties;
+import org.springframework.yarn.batch.event.JobExecutionEvent;
+import org.springframework.yarn.batch.support.YarnBatchProperties.JobProperties;
 
 /**
- * {@link CommandLineRunner} to {@link JobLauncher launch} Spring Batch jobs.
+ * Utility class to {@link JobLauncher launch} Spring Batch jobs.
  * Runs all jobs in the surrounding context by default. Can also be used to
  * launch a specific job by providing a jobName
  *
@@ -60,27 +58,21 @@ import org.springframework.yarn.boot.properties.SpringYarnBatchProperties.JobPro
  * @author Janne Valkealahti
  */
 @Component
-public class YarnJobLauncherCommandLineRunner implements CommandLineRunner, ApplicationEventPublisherAware {
+public class YarnJobLauncher implements ApplicationEventPublisherAware {
 
-	private static Log logger = LogFactory.getLog(YarnJobLauncherCommandLineRunner.class);
+	private static final Log log = LogFactory.getLog(YarnJobLauncher.class);
 
-	@Autowired(required = false)
-	private final JobParametersConverter converter = new DefaultJobParametersConverter();
+	private JobParametersConverter converter = new DefaultJobParametersConverter();
 
-	@Autowired
 	private JobLauncher jobLauncher;
 
-	@Autowired(required = false)
 	private JobRegistry jobRegistry;
 
-	@Autowired(required = false)
 	private JobExplorer jobExplorer;
 
-	@Autowired
-	private SpringYarnBatchProperties batchProperties;
+	private YarnBatchProperties yarnBatchProperties;
 
-	@Autowired(required = false)
-	private final Collection<Job> jobs = Collections.emptySet();
+	private Collection<Job> jobs = Collections.emptySet();
 
 	private String jobName;
 
@@ -91,10 +83,25 @@ public class YarnJobLauncherCommandLineRunner implements CommandLineRunner, Appl
 		this.publisher = publisher;
 	}
 
-	@Override
+	/**
+	 * Run the jobs.
+	 *
+	 * @param args the args
+	 * @throws JobExecutionException the job execution exception
+	 */
 	public void run(String... args) throws JobExecutionException {
-		logger.info("Running default command line with: " + Arrays.asList(args));
+		log.info("Running default command line with: " + Arrays.asList(args));
 		launchJobFromProperties(StringUtils.splitArrayElementsIntoProperties(args, "="));
+	}
+
+	/**
+	 * Run the jobs.
+	 *
+	 * @param properties the job properties
+	 * @throws JobExecutionException the job execution exception
+	 */
+	public void run(Properties properties) throws JobExecutionException {
+		launchJobFromProperties(properties);
 	}
 
 	/**
@@ -107,6 +114,82 @@ public class YarnJobLauncherCommandLineRunner implements CommandLineRunner, Appl
 	 */
 	public void setJobName(String jobName) {
 		this.jobName = jobName;
+	}
+
+	/**
+	 * Gets the enabled job name.
+	 *
+	 * @return the job name
+	 * @see #setJobName(String)
+	 */
+	public String getJobName() {
+		return jobName;
+	}
+
+	/**
+	 * Sets the job launcher.
+	 *
+	 * @param jobLauncher the new job launcher
+	 */
+	@Autowired
+	public void setJobLauncher(JobLauncher jobLauncher) {
+		this.jobLauncher = jobLauncher;
+	}
+
+	/**
+	 * Gets the job launcher.
+	 *
+	 * @return the job launcher
+	 */
+	public JobLauncher getJobLauncher() {
+		return jobLauncher;
+	}
+
+	@Autowired(required = false)
+	public void setJobRegistry(JobRegistry jobRegistry) {
+		this.jobRegistry = jobRegistry;
+	}
+
+	public JobRegistry getJobRegistry() {
+		return jobRegistry;
+	}
+
+	@Autowired(required = false)
+	public void setJobParametersConverter(JobParametersConverter converter) {
+		this.converter = converter;
+	}
+
+	@Autowired(required = false)
+	public void setJobExplorer(JobExplorer jobExplorer) {
+		this.jobExplorer = jobExplorer;
+	}
+
+	public JobExplorer getJobExplorer() {
+		return jobExplorer;
+	}
+
+	/**
+	 * Sets the jobs.
+	 *
+	 * @param jobs the new jobs
+	 */
+	@Autowired(required = false)
+	public void setJobs(Collection<Job> jobs) {
+		this.jobs = jobs;
+	}
+
+	/**
+	 * Gets the jobs.
+	 *
+	 * @return the jobs
+	 */
+	public Collection<Job> getJobs() {
+		return jobs;
+	}
+
+	@Autowired(required = false)
+	public void setYarnBatchProperties(YarnBatchProperties yarnBatchProperties) {
+		this.yarnBatchProperties = yarnBatchProperties;
 	}
 
 	/**
@@ -123,7 +206,7 @@ public class YarnJobLauncherCommandLineRunner implements CommandLineRunner, Appl
 
 	private void executeRegisteredJobs(JobParameters jobParameters) throws JobExecutionException {
 		if (this.jobRegistry == null) {
-			logger.info("No jobRegistry defined, skipping registered jobs");
+			log.info("No jobRegistry defined, skipping registered jobs");
 		}
 		if (this.jobRegistry != null && StringUtils.hasText(this.jobName)) {
 			for (String name : this.jobRegistry.getJobNames()) {
@@ -131,7 +214,7 @@ public class YarnJobLauncherCommandLineRunner implements CommandLineRunner, Appl
 					Job job = this.jobRegistry.getJob(name);
 					executeJob(job, jobParameters);
 				} else {
-					logger.debug("Skipped registered job: " + name);
+					log.debug("Skipped registered job: " + name);
 				}
 
 			}
@@ -139,11 +222,15 @@ public class YarnJobLauncherCommandLineRunner implements CommandLineRunner, Appl
 	}
 
 	private void executeLocalJobs(JobParameters jobParameters) throws JobExecutionException {
-		for (Job job : this.jobs) {
+		if (jobs.size() == 0) {
+			log.info("No local jobs defined");
+		}
+		for (Job job : jobs) {
 			if (StringUtils.hasText(this.jobName) && jobMatches(this.jobName, job.getName())) {
+				log.debug("Executing local job: " + job.getName());
 				executeJob(job, jobParameters);
 			} else {
-				logger.debug("Skipped local job: " + job.getName());
+				log.debug("Skipped local job: " + job.getName());
 			}
 		}
 	}
@@ -157,14 +244,14 @@ public class YarnJobLauncherCommandLineRunner implements CommandLineRunner, Appl
 		return false;
 	}
 
-	private void executeJob(Job job, JobParameters jobParameters) throws JobExecutionException {
+	protected void executeJob(Job job, JobParameters jobParameters) throws JobExecutionException {
 		String jobIdentifier = job.getName();
-		JobProperties jobProperties = batchProperties.getJobProperties(jobIdentifier);
+		JobProperties jobProperties = yarnBatchProperties != null ? yarnBatchProperties.getJobProperties(jobIdentifier) : null;
 		boolean restart = false;
 
 		// re-create by adding props from a boot JobProperties
-		logger.info("Job parameters from boot properties, parameters" + jobProperties.getParameters());
-		if (jobProperties.getParameters() != null) {
+		if (jobProperties != null && jobProperties.getParameters() != null) {
+			log.info("Job parameters from boot properties, parameters" + jobProperties.getParameters());
 			Properties tmpProperties = new Properties();
 			Map<String, Object> tmpParameters = jobProperties.getParameters();
 			tmpProperties.putAll(tmpParameters);
@@ -172,22 +259,22 @@ public class YarnJobLauncherCommandLineRunner implements CommandLineRunner, Appl
 			Map<String, JobParameter> map1 = new HashMap<String, JobParameter>(tmpJobParameters.getParameters());
 			map1.putAll(jobParameters.getParameters());
 			jobParameters = new JobParameters(map1);
-			logger.info("Modified jobParameters=" + jobParameters);
+			log.info("Modified jobParameters=" + jobParameters);
 		}
 
-		if (jobProperties.isRestart()) {
+		if (jobProperties != null && jobProperties.isRestart()) {
 			if (jobExplorer == null) {
 				throw new JobExecutionException("A JobExplorer must be provided for a restart or start next operation.");
 			}
 			JobExecution jobExecution = getLastFailedJobExecution(jobIdentifier);
-			if (logger.isDebugEnabled()) {
-				logger.info("Last failed JobExecution: " + jobExecution);
+			if (log.isDebugEnabled()) {
+				log.info("Last failed JobExecution: " + jobExecution);
 			}
 			if (jobExecution == null && jobProperties.isFailRestart()) {
 				throw new JobExecutionNotFailedException("No failed or stopped execution found for job="
 						+ jobIdentifier);
 			} else {
-				logger.info("No failed or stopped execution found for job=" + jobIdentifier
+				log.info("No failed or stopped execution found for job=" + jobIdentifier
 						+ ", batch properties flag for failRestart=" + jobProperties.isFailRestart()
 						+ " so we don't fail restart.");
 			}
@@ -197,7 +284,7 @@ public class YarnJobLauncherCommandLineRunner implements CommandLineRunner, Appl
 			}
 		}
 
-		if (jobProperties.isNext() && !restart) {
+		if (jobProperties != null && jobProperties.isNext() && !restart) {
 			if (jobExplorer == null) {
 				throw new JobExecutionException("A JobExplorer must be provided for a restart or start next operation.");
 			}
@@ -205,14 +292,14 @@ public class YarnJobLauncherCommandLineRunner implements CommandLineRunner, Appl
 			Map<String, JobParameter> map = new HashMap<String, JobParameter>(nextParameters.getParameters());
 			map.putAll(jobParameters.getParameters());
 			jobParameters = new JobParameters(map);
-			if (logger.isDebugEnabled()) {
-				logger.info("JobParameter for job=[" + job + "] next=" + nextParameters + " used=" + jobParameters);
+			if (log.isDebugEnabled()) {
+				log.info("JobParameter for job=[" + job + "] next=" + nextParameters + " used=" + jobParameters);
 			}
 		}
 
 		JobExecution execution = this.jobLauncher.run(job, jobParameters);
 		if (this.publisher != null) {
-			this.publisher.publishEvent(new JobExecutionEvent(execution));
+			this.publisher.publishEvent(new JobExecutionEvent(this, execution));
 		}
 	}
 
@@ -293,7 +380,6 @@ public class YarnJobLauncherCommandLineRunner implements CommandLineRunner, Appl
 
 			start += count;
 			lastInstances = jobExplorer.getJobInstances(jobIdentifier, start, count);
-
 		}
 
 		return executions;
