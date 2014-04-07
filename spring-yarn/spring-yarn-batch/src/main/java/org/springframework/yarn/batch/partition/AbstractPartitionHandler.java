@@ -29,7 +29,6 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.partition.StepExecutionSplitter;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.yarn.am.YarnAppmaster;
 import org.springframework.yarn.am.container.ContainerRequestHint;
 import org.springframework.yarn.batch.BatchSystemConstants;
@@ -117,7 +116,7 @@ public abstract class AbstractPartitionHandler implements PartitionHandler {
 	 * @param yarnAppmaster the new yarn appmaster
 	 * @see #setBatchAppmaster(BatchYarnAppmaster)
 	 */
-	@Autowired(required=false)
+//	@Autowired(required=false)
 	public void setYarnAppmaster(YarnAppmaster yarnAppmaster) {
 		if (yarnAppmaster instanceof BatchYarnAppmaster) {
 			setBatchAppmaster((BatchYarnAppmaster) yarnAppmaster);

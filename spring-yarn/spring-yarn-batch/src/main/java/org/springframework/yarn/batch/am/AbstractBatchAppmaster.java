@@ -32,18 +32,9 @@ import org.apache.hadoop.yarn.api.records.Container;
 import org.apache.hadoop.yarn.api.records.ContainerId;
 import org.apache.hadoop.yarn.api.records.ContainerLaunchContext;
 import org.apache.hadoop.yarn.api.records.ContainerStatus;
-import org.apache.hadoop.yarn.api.records.FinalApplicationStatus;
 import org.apache.hadoop.yarn.util.RackResolver;
-import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobExecutionListener;
-import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.converter.DefaultJobParametersConverter;
-import org.springframework.batch.core.converter.JobParametersConverter;
-import org.springframework.batch.core.job.AbstractJob;
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.yarn.YarnSystemConstants;
 import org.springframework.yarn.am.AbstractEventingAppmaster;
 import org.springframework.yarn.am.AppmasterService;
@@ -55,6 +46,7 @@ import org.springframework.yarn.batch.event.PartitionedStepExecutionEvent;
 import org.springframework.yarn.batch.listener.CompositePartitionedStepExecutionStateListener;
 import org.springframework.yarn.batch.listener.PartitionedStepExecutionStateListener;
 import org.springframework.yarn.batch.listener.PartitionedStepExecutionStateListener.PartitionedStepExecutionState;
+import org.springframework.yarn.batch.support.YarnJobLauncher;
 
 /**
  * Base application master for running batch jobs.
@@ -66,11 +58,8 @@ public abstract class AbstractBatchAppmaster extends AbstractEventingAppmaster i
 
 	private static final Log log = LogFactory.getLog(AbstractBatchAppmaster.class);
 
-	/** Batch job launcher */
-	private JobLauncher jobLauncher;
-
-	/** Name of the job to run */
-	private String jobName;
+	/** Yarn specific job launcher */
+	private YarnJobLauncher yarnJobLauncher;
 
 	/** Step executions as reported back from containers */
 	private List<StepExecution> stepExecutions = new ArrayList<StepExecution>();
@@ -86,9 +75,6 @@ public abstract class AbstractBatchAppmaster extends AbstractEventingAppmaster i
 
 	/** Mapping containers to assigned executions */
 	private Map<ContainerId, StepExecution> containerToStepMap = new HashMap<ContainerId, StepExecution>();
-
-	/** Converter for job parameters  */
-	private JobParametersConverter jobParametersConverter = new DefaultJobParametersConverter();
 
 	/** Listener for partitioned step execution statuses */
 	private CompositePartitionedStepExecutionStateListener stepExecutionStateListener =
@@ -230,34 +216,13 @@ public abstract class AbstractBatchAppmaster extends AbstractEventingAppmaster i
 		}
 	}
 
-	/**
-	 * Runs the given job.
-	 *
-	 * @param job the job to run
-	 */
-	public void runJob(Job job) {
-		if (job instanceof AbstractJob) {
-			((AbstractJob)job).registerJobExecutionListener(new JobExecutionListener() {
-				@Override
-				public void beforeJob(JobExecution jobExecution) {
-				}
-				@Override
-				public void afterJob(JobExecution jobExecution) {
-					if (jobExecution.getStatus().equals(BatchStatus.COMPLETED)) {
-						log.info("Batch status complete, notify listeners");
-						notifyCompleted();
-					}
-				}
-			});
-		}
-		JobParameters jobParameters = getJobParametersConverter().getJobParameters(getParameters());
-		try {
-			getJobLauncher().run(job, jobParameters);
-		} catch (Exception e) {
-			log.error("Error running job=" + job, e);
-			setFinalApplicationStatus(FinalApplicationStatus.FAILED);
-			notifyCompleted();
-		}
+	@Autowired(required = false)
+	public void setYarnJobLauncher(YarnJobLauncher yarnJobLauncher) {
+		this.yarnJobLauncher = yarnJobLauncher;
+	}
+
+	public YarnJobLauncher getYarnJobLauncher() {
+		return yarnJobLauncher;
 	}
 
 	/**
@@ -267,42 +232,6 @@ public abstract class AbstractBatchAppmaster extends AbstractEventingAppmaster i
 	 */
 	public void addPartitionedStepExecutionStateListener(PartitionedStepExecutionStateListener listener) {
 		stepExecutionStateListener.register(listener);
-	}
-
-	/**
-	 * Gets the job launcher.
-	 *
-	 * @return the job launcher
-	 */
-	public JobLauncher getJobLauncher() {
-		return jobLauncher;
-	}
-
-	/**
-	 * Sets the job launcher.
-	 *
-	 * @param jobLauncher the new job launcher
-	 */
-	public void setJobLauncher(JobLauncher jobLauncher) {
-		this.jobLauncher = jobLauncher;
-	}
-
-	/**
-	 * Gets the job name.
-	 *
-	 * @return the job name
-	 */
-	public String getJobName() {
-		return jobName;
-	}
-
-	/**
-	 * Sets the job name.
-	 *
-	 * @param jobName the new job name
-	 */
-	public void setJobName(String jobName) {
-		this.jobName = jobName;
 	}
 
 	/**
@@ -374,24 +303,6 @@ public abstract class AbstractBatchAppmaster extends AbstractEventingAppmaster i
 
 		getAllocator().allocateContainers(remaining);
 		getAllocator().allocateContainers(containerAllocateData);
-	}
-
-	/**
-	 * Gets the job parameters converter.
-	 *
-	 * @return the job parameters converter
-	 */
-	public JobParametersConverter getJobParametersConverter() {
-		return jobParametersConverter;
-	}
-
-	/**
-	 * Injection setter for {@link JobParametersConverter}.
-	 *
-	 * @param jobParametersConverter
-	 */
-	public void setJobParametersConverter(JobParametersConverter jobParametersConverter) {
-		this.jobParametersConverter = jobParametersConverter;
 	}
 
 }

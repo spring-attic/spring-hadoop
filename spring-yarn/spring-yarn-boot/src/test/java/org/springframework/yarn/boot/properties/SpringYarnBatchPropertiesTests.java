@@ -24,7 +24,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.yarn.boot.properties.SpringYarnBatchProperties.JobProperties;
+import org.springframework.yarn.batch.support.YarnBatchProperties.JobProperties;
 
 /**
  * Tests for {@link SpringYarnBatchProperties} bindings.
