@@ -979,19 +979,19 @@ if (gradle.ext.mr2) {
 	}
 
 	project('spring-yarn') {
-		description = 'Spring for Apache Hadoop YARN'	
+		description = 'Spring for Apache Hadoop YARN'
 		dependencies {
 			compile project("spring-yarn-batch")
 		}
 	}
-	
+
 	project('spring-yarn:spring-yarn-core') {
 		description = 'Spring Yarn Core'
 		dependencies {
 			compile project(":spring-data-hadoop")
 			compile "org.apache.hadoop:hadoop-yarn-client:$hadoopVersion"
 			compile("org.apache.hadoop:hadoop-common:$hadoopVersion") { dep ->
-				exclude module: "junit"
+				exclude group: "junit", module: "junit"
 			}
 			testCompile("org.mockito:mockito-core:$mockitoVersion") { dep ->
 				exclude group: "org.hamcrest"
@@ -1110,7 +1110,7 @@ if (gradle.ext.mr2) {
 			compile "junit:junit:$junitVersion"
 			compile "org.apache.hadoop:hadoop-yarn-client:$hadoopVersion"
 			compile("org.apache.hadoop:hadoop-common:$hadoopVersion") { dep ->
-				exclude module: "junit"
+				exclude group: "junit", module: "junit"
 			}
 			compile "org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion"
 			compile "org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion:tests"
