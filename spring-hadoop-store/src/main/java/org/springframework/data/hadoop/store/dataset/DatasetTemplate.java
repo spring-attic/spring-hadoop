@@ -29,6 +29,7 @@ import org.kitesdk.data.DatasetNotFoundException;
 import org.kitesdk.data.DatasetReader;
 import org.kitesdk.data.DatasetWriter;
 import org.kitesdk.data.Formats;
+import org.kitesdk.data.PartitionKey;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.PropertyAccessorFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -83,64 +84,113 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 
 	@Override
 	public <T> void read(Class<T> targetClass, RecordCallback<T> callback) {
-		DatasetReader<T> reader = getDataset(targetClass).newReader();
-		try {
-			reader.open();
-			for (T t : reader) {
-				callback.doInRecord(t);
-			}
-		}
-		finally {
-			reader.close();
-		}
+		readWithCallback(targetClass, callback, null);
 	}
 
 	@Override
 	public <T> Collection<T> read(Class<T> targetClass) {
 		if (Formats.PARQUET.getName().equals(defaultDatasetDefinition.getFormat().getName())) {
-			return readGenericRecords(targetClass);
+			return readGenericRecords(targetClass, null);
 		} else {
-			return readPojo(targetClass);
+			return readPojo(targetClass, null);
 		}
 	}
 
-	private <T> Collection<T> readPojo(Class<T> targetClass) {
-		DatasetReader<T> reader = getDataset(targetClass).newReader();
-		List<T> results = new ArrayList<T>();
-		try {
-			reader.open();
-			for (T r : reader) {
-				results.add(r);
+	@Override
+	public <T> void read(Class<T> targetClass, RecordCallback<T> callback, PartitionKey partitionKey) {
+		readWithCallback(targetClass, callback, partitionKey);
+	}
+
+	@Override
+	public <T> Collection<T> read(Class<T> targetClass, PartitionKey partitionKey) {
+		if (Formats.PARQUET.getName().equals(defaultDatasetDefinition.getFormat().getName())) {
+			return readGenericRecords(targetClass, partitionKey);
+		} else {
+			return readPojo(targetClass, partitionKey);
+		}
+	}
+
+	private <T> void readWithCallback(Class<T> targetClass, RecordCallback<T> callback, PartitionKey partitionKey) {
+		Dataset dataset = getDataset(targetClass);
+		DatasetReader<T> reader = null;
+		if (partitionKey == null) {
+			reader = dataset.newReader();
+		} else {
+			Dataset partition = dataset.getPartition(partitionKey, false);
+			if (partition != null) {
+				reader = partition.newReader();
 			}
 		}
-		finally {
-			reader.close();
+		if (reader != null) {
+			try {
+				reader.open();
+				for (T t : reader) {
+					callback.doInRecord(t);
+				}
+			} finally {
+				reader.close();
+			}
+		}
+	}
+
+	private <T> Collection<T> readPojo(Class<T> targetClass, PartitionKey partitionKey) {
+		Dataset dataset = getDataset(targetClass);
+		DatasetReader<T> reader = null;
+		if (partitionKey == null) {
+			reader = dataset.newReader();
+		} else {
+			Dataset partition = dataset.getPartition(partitionKey, false);
+			if (partition != null) {
+				reader = partition.newReader();
+			}
+		}
+		List<T> results = new ArrayList<T>();
+		if (reader != null) {
+			try {
+				reader.open();
+				for (T r : reader) {
+					results.add(r);
+				}
+			}
+			finally {
+				reader.close();
+			}
 		}
 		return results;
 	}
 
-	private <T> Collection<T> readGenericRecords(Class<T> targetClass) {
+	private <T> Collection<T> readGenericRecords(Class<T> targetClass, PartitionKey partitionKey) {
 		Dataset<GenericRecord> dataset = getOrCreateDataset(targetClass, GenericRecord.class);
-		DatasetReader<GenericRecord> reader = dataset.newReader();
-		List<T> results = new ArrayList<T>();
-		try {
-			reader.open();
-			for (GenericRecord r : reader) {
-				T data = targetClass.newInstance();
-				BeanWrapper beanWrapper = PropertyAccessorFactory.forBeanPropertyAccess(data);
-				for (Schema.Field f : r.getSchema().getFields()) {
-					if (beanWrapper.isWritableProperty(f.name())) {
-						beanWrapper.setPropertyValue(f.name(), r.get(f.name()));
-					}
-				}
-				results.add(data);
+		DatasetReader<GenericRecord> reader = null;
+		if (partitionKey == null) {
+			reader = dataset.newReader();
+		} else {
+			Dataset partition = dataset.getPartition(partitionKey, false);
+			if (partition != null) {
+				reader = partition.newReader();
 			}
-		} catch (InstantiationException e) {
-			throw new StoreException("Unable to read records for class: " + targetClass.getName(), e);
-		} catch (IllegalAccessException e) {
-			throw new StoreException("Unable to read records for class: " + targetClass.getName(), e);
-		} finally {
-			reader.close();
+		}
+		List<T> results = new ArrayList<T>();
+		if (reader != null) {
+			try {
+				reader.open();
+				for (GenericRecord r : reader) {
+					T data = targetClass.newInstance();
+					BeanWrapper beanWrapper = PropertyAccessorFactory.forBeanPropertyAccess(data);
+					for (Schema.Field f : r.getSchema().getFields()) {
+						if (beanWrapper.isWritableProperty(f.name())) {
+							beanWrapper.setPropertyValue(f.name(), r.get(f.name()));
+						}
+					}
+					results.add(data);
+				}
+			} catch (InstantiationException e) {
+				throw new StoreException("Unable to read records for class: " + targetClass.getName(), e);
+			} catch (IllegalAccessException e) {
+				throw new StoreException("Unable to read records for class: " + targetClass.getName(), e);
+			} finally {
+				reader.close();
+			}
 		}
 		return results;
 	}

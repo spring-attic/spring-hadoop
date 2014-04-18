@@ -17,6 +17,7 @@
 package org.springframework.data.hadoop.store.dataset;
 
 import org.kitesdk.data.DatasetDescriptor;
+import org.kitesdk.data.PartitionKey;
 
 import java.util.Collection;
 
@@ -44,6 +45,24 @@ public interface DatasetOperations {
 	 * @return collection containing the records as the specified target class
 	 */
 	<T> Collection<T> read(Class<T> targetClass);
+
+	/**
+	 * Read records in the dataset partition based on the {@link PartitionKey} and call the provided callback for each record.
+	 *
+	 * @param targetClass the class that is stored in the dataset
+	 * @param callback the callback to be called for each record
+	 * @param partitionKey the partition key to use for the read
+	 */
+	<T> void read(Class<T> targetClass, RecordCallback<T> callback, PartitionKey partitionKey);
+
+	/**
+	 * Read records in the dataset  partition based on the {@link PartitionKey} and return as a collection.
+	 *
+	 * @param targetClass the class that is stored in the dataset
+	 * @param partitionKey the partition key to use for the read
+	 * @return collection containing the records as the specified target class
+	 */
+	<T> Collection<T> read(Class<T> targetClass, PartitionKey partitionKey);
 
 	/**
 	 * Write all records provided in the record collection

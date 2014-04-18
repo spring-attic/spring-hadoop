@@ -18,7 +18,7 @@ package org.springframework.data.hadoop.store.dataset;
 
 /**
  */
-public class ParquetPojo implements Comparable<ParquetPojo> {
+public class SimplePojo implements Comparable<SimplePojo> {
 
 	private Long id;
 
@@ -56,7 +56,7 @@ public class ParquetPojo implements Comparable<ParquetPojo> {
 	}
 
 	@Override
-	public int compareTo(ParquetPojo other) {
+	public int compareTo(SimplePojo other) {
 		if (id.longValue() < other.getId().longValue()) {
 			return -1;
 		}
