@@ -163,6 +163,16 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 	}
 
 	@Override
+	public <T> DatasetDescriptor getDatasetDescriptor(Class<T> targetClass) {
+		try {
+			return getDataset(targetClass).getDescriptor();
+		}
+		catch (DatasetNotFoundException e) {
+			return null;
+		}
+	}
+
+	@Override
 	public <T> String getDatasetName(Class<T> clazz) {
 		return clazz.getSimpleName().toLowerCase();
 	}

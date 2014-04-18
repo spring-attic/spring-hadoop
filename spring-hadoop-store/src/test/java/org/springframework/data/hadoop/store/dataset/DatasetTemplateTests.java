@@ -17,6 +17,7 @@
 package org.springframework.data.hadoop.store.dataset;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -30,6 +31,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.kitesdk.data.DatasetDescriptor;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -120,6 +122,15 @@ public class DatasetTemplateTests extends AbstractDatasetTemplateTests {
 		assertTrue(sorted.get(2).getId().equals(333L));
 		Collection<TestPojo> testPojos = datasetOperations.read(TestPojo.class);
 		assertEquals(2, testPojos.size());
+	}
+
+	@Test
+	public void testGetDatasetDescriptor() {
+		datasetOperations.write(records);
+		DatasetDescriptor desc1 = datasetOperations.getDatasetDescriptor(TestPojo.class);
+		assertNotNull(desc1);
+		DatasetDescriptor desc2 = datasetOperations.getDatasetDescriptor(RandomPojo.class);
+		assertNull(desc2);
 	}
 
 }

@@ -16,6 +16,8 @@
 
 package org.springframework.data.hadoop.store.dataset;
 
+import org.kitesdk.data.DatasetDescriptor;
+
 import java.util.Collection;
 
 /**
@@ -58,11 +60,19 @@ public interface DatasetOperations {
 	void execute(DatasetRepositoryCallback callback);
 
 	/**
-	 * Get the dataset name to be used for the given class
+	 * Get the {@link org.kitesdk.data.DatasetDescriptor} for the given class
 	 * 
-	 * @param clazz the class stored in the dataset
+	 * @param targetClass the class stored in the dataset
+	 * @return the DatasetDescriptor
+	 */
+	<T> DatasetDescriptor getDatasetDescriptor(Class<T> targetClass);
+
+	/**
+	 * Get the dataset name to be used for the given class
+	 *
+	 * @param targetClass the class stored in the dataset
 	 * @return the dataset name
 	 */
-	<T> String getDatasetName(Class<T> clazz);
+	<T> String getDatasetName(Class<T> targetClass);
 
 }
