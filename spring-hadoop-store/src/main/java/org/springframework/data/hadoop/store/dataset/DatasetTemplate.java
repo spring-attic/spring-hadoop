@@ -18,6 +18,7 @@ package org.springframework.data.hadoop.store.dataset;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.avro.Schema;
@@ -49,6 +50,8 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 
 	private DatasetDefinition defaultDatasetDefinition;
 
+	private HashMap<String, DatasetDefinition> datasetDefinitions = new HashMap<String, DatasetDefinition>();
+
 	/**
 	 * The {@link DatasetRepositoryFactory} to use for this template.
 	 * 
@@ -59,7 +62,7 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 	}
 
 	/**
-	 * The default {@link DatasetDefinition} to use for this template.
+	 * The default {@link DatasetDefinition} used for this template.
 	 */
 	public DatasetDefinition getDefaultDatasetDefinition() {
 		return defaultDatasetDefinition;
@@ -72,13 +75,38 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 	 */
 	public void setDefaultDatasetDefinition(DatasetDefinition defaultDatasetDefinition) {
 		this.defaultDatasetDefinition = defaultDatasetDefinition;
+		if (defaultDatasetDefinition.getTargetClass() != null) {
+			datasetDefinitions.put(getDatasetName(defaultDatasetDefinition.getTargetClass()), defaultDatasetDefinition);
+		}
+	}
+
+	/**
+	 * The {@link DatasetDefinition}s used for this template.
+	 */
+	public Collection<DatasetDefinition> getDatasetDefinitions() {
+		return datasetDefinitions.values();
+	}
+
+	/**
+	 * The list of {@link DatasetDefinition}s to use for this template.
+	 *
+	 * @param datasetDefinitions the DatasetDefinitions to use
+	 */
+	public void setDatasetDefinitions(Collection<DatasetDefinition> datasetDefinitions) {
+		for (DatasetDefinition def : datasetDefinitions) {
+			if (def.getTargetClass() != null) {
+				this.datasetDefinitions.put(getDatasetName(def.getTargetClass()), def);
+			} else {
+				throw new StoreException("Target class is required for dataset definitions, invalid definition: " + def);
+			}
+		}
 	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(dsFactory, "The datasetRepositoryFactory property is required");
 		if (defaultDatasetDefinition == null) {
-			defaultDatasetDefinition = new DatasetDefinition(true);
+			defaultDatasetDefinition = new DatasetDefinition();
 		}
 	}
 
@@ -89,7 +117,11 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 
 	@Override
 	public <T> Collection<T> read(Class<T> targetClass) {
-		if (Formats.PARQUET.getName().equals(defaultDatasetDefinition.getFormat().getName())) {
+		DatasetDescriptor descriptor = getDatasetDescriptor(targetClass);
+		if (descriptor == null) {
+			throw new StoreException("Unable to locate dataset for target class " + targetClass.getName());
+		}
+		if (Formats.PARQUET.equals(descriptor.getFormat())) {
 			return readGenericRecords(targetClass, null);
 		} else {
 			return readPojo(targetClass, null);
@@ -103,7 +135,11 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 
 	@Override
 	public <T> Collection<T> read(Class<T> targetClass, PartitionKey partitionKey) {
-		if (Formats.PARQUET.getName().equals(defaultDatasetDefinition.getFormat().getName())) {
+		DatasetDescriptor descriptor = getDatasetDescriptor(targetClass);
+		if (descriptor == null) {
+			throw new StoreException("Unable to locate dataset for target class " + targetClass.getName());
+		}
+		if (Formats.PARQUET.equals(descriptor.getFormat())) {
 			return readGenericRecords(targetClass, partitionKey);
 		} else {
 			return readPojo(targetClass, partitionKey);
@@ -112,6 +148,9 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 
 	private <T> void readWithCallback(Class<T> targetClass, RecordCallback<T> callback, PartitionKey partitionKey) {
 		Dataset dataset = getDataset(targetClass);
+		if (dataset == null) {
+			throw new StoreException("Unable to locate dataset for target class " + targetClass.getName());
+		}
 		DatasetReader<T> reader = null;
 		if (partitionKey == null) {
 			reader = dataset.newReader();
@@ -135,6 +174,9 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 
 	private <T> Collection<T> readPojo(Class<T> targetClass, PartitionKey partitionKey) {
 		Dataset dataset = getDataset(targetClass);
+		if (dataset == null) {
+			throw new StoreException("Unable to locate dataset for target class " + targetClass.getName());
+		}
 		DatasetReader<T> reader = null;
 		if (partitionKey == null) {
 			reader = dataset.newReader();
@@ -200,7 +242,9 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 		if (records == null || records.size() < 1) {
 			return;
 		}
-		if (Formats.PARQUET.getName().equals(defaultDatasetDefinition.getFormat().getName())) {
+		Class targetClass = records.toArray()[0].getClass();
+		DatasetDefinition datasetDefinition = getDatasetDefinitionToUseFor(targetClass);
+		if (Formats.PARQUET.getName().equals(datasetDefinition.getFormat().getName())) {
 			writeGenericRecords(records);
 		} else {
 			writePojo(records);
@@ -245,7 +289,7 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 
 	private <T> Dataset<T> getOrCreateDataset(Class<?> pojoClass, Class<T> recordClass) {
 		String repoName = getDatasetName(pojoClass);
-		DatasetDefinition datasetDefinition = getDefaultDatasetDefinition();
+		DatasetDefinition datasetDefinition = getDatasetDefinitionToUseFor(pojoClass);
 		Dataset<T> dataset;
 		try {
 			dataset = dsFactory.getDatasetRepository().load(repoName);
@@ -285,6 +329,7 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 	}
 
 	private <T> void writeGenericRecords(Collection<T> records) {
+		//ToDo: add partitioning?
 		@SuppressWarnings("unchecked")
 		Class<T> pojoClass = (Class<T>) records.iterator().next().getClass();
 		Dataset<GenericRecord> dataset = getOrCreateDataset(pojoClass, GenericRecord.class);
@@ -331,4 +376,12 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 		return dsFactory.getDatasetRepository().load(repoName);
 	}
 
+	private DatasetDefinition getDatasetDefinitionToUseFor(Class<?> targetClass) {
+		String datasetName = getDatasetName(targetClass);
+		if (datasetDefinitions.containsKey(datasetName)) {
+			return datasetDefinitions.get(datasetName);
+		} else {
+			return defaultDatasetDefinition;
+		}
+	}
 }

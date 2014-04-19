@@ -16,29 +16,45 @@ import org.springframework.util.Assert;
  */
 public class DatasetDefinition{
 
+	private Class targetClass;
+
 	private boolean allowNullValues;
 
 	private Format format;
 
 	private PartitionStrategy partitionStrategy;
 
-	public DatasetDefinition(boolean allowNullValues) {
-		this(allowNullValues, Formats.AVRO.getName(), null);
+	public DatasetDefinition() {
+		this(null, true, Formats.AVRO.getName());
 	}
 
-	public DatasetDefinition() {
-		this(true, Formats.AVRO.getName(), null);
+	public DatasetDefinition(boolean allowNullValues) {
+		this(null, allowNullValues, Formats.AVRO.getName());
 	}
 
 	public DatasetDefinition(boolean allowNullValues, String format) {
-		this(allowNullValues, format, null);
+		this(null, allowNullValues, format);
 	}
 
-	public DatasetDefinition(boolean allowNullValues, String format, PartitionStrategy partitionStrategy) {
-		Assert.notNull(format, "The format can't be null");
+	public DatasetDefinition(Class targetClass, boolean allowNullValues, String format) {
+		setTargetClass(targetClass);
 		setAllowNullValues(allowNullValues);
 		setFormat(format);
+	}
+
+	public DatasetDefinition(Class targetClass, PartitionStrategy partitionStrategy) {
+		this(targetClass, Formats.AVRO.getName(), partitionStrategy);
+	}
+
+	public DatasetDefinition(Class targetClass, String format, PartitionStrategy partitionStrategy) {
+		setTargetClass(targetClass);
+		setAllowNullValues(false);
+		setFormat(format);
 		setPartitionStrategy(partitionStrategy);
+	}
+
+	public void setTargetClass(Class targetClass) {
+		this.targetClass = targetClass;
 	}
 
 	public void setAllowNullValues(boolean allowNullValues) {
@@ -56,6 +72,10 @@ public class DatasetDefinition{
 
 	public void setPartitionStrategy(PartitionStrategy partitionStrategy) {
 		this.partitionStrategy = partitionStrategy;
+	}
+
+	public Class getTargetClass() {
+		return targetClass;
 	}
 
 	public boolean isAllowNullValues() {

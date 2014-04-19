@@ -30,6 +30,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -54,8 +55,8 @@ public class DatasetTemplateTestsPartitioning {
 	public void setDatasetOperations(DatasetOperations datasetOperations) {
 		PartitionStrategy partitionStrategy =
 				new PartitionStrategy.Builder().year("birthDate").month("birthDate").build();
-		((DatasetTemplate) datasetOperations)
-				.setDefaultDatasetDefinition(new DatasetDefinition(false, "avro", partitionStrategy));
+		((DatasetTemplate) datasetOperations).setDatasetDefinitions(Arrays.asList(
+						new DatasetDefinition[] {new DatasetDefinition(SimplePojo.class, "avro", partitionStrategy)}));
 		this.datasetOperations = datasetOperations;
 	}
 
