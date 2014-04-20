@@ -562,7 +562,11 @@ configure(hadoopProjects()) {
 	}
 
 	dependencies {
-		compile hadoopArtifacts
+		hadoopArtifacts.each {
+			compile(it) { dep ->
+				exclude group: "org.slf4j", module: "slf4j-log4j12"
+			}
+		}
 
 		// Logging - using commons-logging from spring-core
 		testRuntime("log4j:log4j:$log4jVersion")
