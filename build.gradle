@@ -76,6 +76,7 @@ switch (hadoopDistro) {
 				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-yarn-common:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-streaming:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-distcp:$hadoopVersion"]
 		hadoopTestArtifacts = ["org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion:tests",
@@ -114,6 +115,7 @@ switch (hadoopDistro) {
 				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-yarn-common:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-streaming:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-distcp:$hadoopVersion"]
 		hadoopTestArtifacts = ["org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion:tests",
@@ -151,6 +153,7 @@ switch (hadoopDistro) {
 				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-yarn-common:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-streaming:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-distcp:$hadoopVersion"]
 		hadoopTestArtifacts = ["org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion:tests",
@@ -170,6 +173,7 @@ switch (hadoopDistro) {
 				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-yarn-common:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-streaming:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-distcp:$hadoopVersion"]
 		hadoopTestArtifacts = ["org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion:tests",
@@ -209,6 +213,7 @@ switch (hadoopDistro) {
 				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-yarn-common:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-streaming:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-distcp:$hadoopVersion"]
 		hadoopTestArtifacts = ["org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion:tests",
@@ -235,6 +240,7 @@ switch (hadoopDistro) {
 				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-yarn-common:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-streaming:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-distcp:$hadoopVersion"]
 		hadoopTestArtifacts = ["org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion:tests",
@@ -285,6 +291,7 @@ switch (hadoopDistro) {
 				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-yarn-common:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-streaming:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-distcp:$hadoopVersion"]
 		hadoopTestArtifacts = ["org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion:tests",
@@ -385,7 +392,7 @@ configure(javaProjects()) {
   
 			links = [
 				"http://docs.spring.io/spring/docs/4.0.x/javadoc-api/",
-				"http://download.oracle.com/javase/6/docs/api",
+				"http://docs.oracle.com/javase/6/docs/api",
 				"http://commons.apache.org/proper/commons-logging/apidocs/",
 				"http://logging.apache.org/log4j/1.2/apidocs/",
 				"http://hadoop.apache.org/common/docs/current/api/",
@@ -393,8 +400,7 @@ configure(javaProjects()) {
 				"http://pig.apache.org/docs/r0.12.0/api/",
 				"http://hive.apache.org/javadocs/r0.12.0/api",
 				"http://docs.spring.io/spring-batch/apidocs/",
-				"http://docs.spring.io/spring-integration/api/",
-				"https://builds.apache.org/job/Thrift/javadoc/",
+				"http://docs.spring.io/spring-integration/api/"
 			]
 
 			exclude "org/springframework/data/hadoop/config/**"
@@ -564,7 +570,18 @@ configure(hadoopProjects()) {
 	dependencies {
 		hadoopArtifacts.each {
 			compile(it) { dep ->
-				exclude group: "org.slf4j", module: "slf4j-log4j12"
+				if (it.contains("hadoop-common") || 
+					it.contains("hadoop-yarn-common") ||
+					it.contains("hadoop-mapreduce-client-jobclient") || 
+					it.contains("hadoop-mapreduce-client-core")) {
+					exclude group: "org.slf4j", module: "slf4j-log4j12"
+				}
+				if (it.contains("hadoop-hdfs") ||
+					it.contains("hadoop-common") ||
+					it.contains("hadoop-yarn-common") ||
+					it.contains("hadoop-mapreduce-client-core")) {
+					exclude group: "log4j", module: "log4j"
+				}
 			}
 		}
 
@@ -771,7 +788,9 @@ project('spring-data-hadoop-store') {
 	description = 'Spring for Apache Hadoop Store Features'
 
 	dependencies {
-		compile "org.kitesdk:kite-data-core:$kiteVersion"
+		compile("org.kitesdk:kite-data-core:$kiteVersion") { dep ->
+			exclude group: "log4j", module: "log4j"
+		}
 		testCompile project(":spring-data-hadoop")
 		testCompile project(path:":spring-data-hadoop-test", configuration:"testArtifacts")
 		testCompile "org.springframework:spring-test:$springVersion"
@@ -993,7 +1012,9 @@ if (gradle.ext.mr2) {
 		description = 'Spring Yarn Core'
 		dependencies {
 			compile project(":spring-data-hadoop")
-			compile "org.apache.hadoop:hadoop-yarn-client:$hadoopVersion"
+			compile("org.apache.hadoop:hadoop-yarn-client:$hadoopVersion") { dep ->
+				exclude group: "org.slf4j", module: "slf4j-log4j12"
+			}
 			compile("org.apache.hadoop:hadoop-common:$hadoopVersion") { dep ->
 				exclude group: "junit", module: "junit"
 			}
@@ -1112,15 +1133,26 @@ if (gradle.ext.mr2) {
             compile project(":spring-yarn:spring-yarn-core")
 			compile "org.springframework:spring-test:$springVersion"
 			compile "junit:junit:$junitVersion"
-			compile "org.apache.hadoop:hadoop-yarn-client:$hadoopVersion"
+			compile("org.apache.hadoop:hadoop-yarn-client:$hadoopVersion") { dep ->
+				exclude group: "org.slf4j", module: "slf4j-log4j12"
+			}
 			compile("org.apache.hadoop:hadoop-common:$hadoopVersion") { dep ->
 				exclude group: "junit", module: "junit"
 			}
-			compile "org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion"
-			compile "org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion:tests"
+			compile("org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion") { dep ->
+				exclude group: "org.slf4j", module: "slf4j-log4j12"
+			}
+			compile("org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion:tests") { dep ->
+				exclude group: "org.slf4j", module: "slf4j-log4j12"
+			}
 			compile "org.apache.hadoop:hadoop-hdfs:$hadoopVersion"
-			compile "org.apache.hadoop:hadoop-hdfs:$hadoopVersion:tests"
-			compile "org.apache.hadoop:hadoop-common:$hadoopVersion:tests"
+			compile("org.apache.hadoop:hadoop-hdfs:$hadoopVersion:tests") { dep ->
+				exclude group: "log4j", module: "log4j"
+			}
+			compile("org.apache.hadoop:hadoop-common:$hadoopVersion:tests") { dep ->
+				exclude group: "log4j", module: "log4j"
+				exclude group: "org.slf4j", module: "slf4j-log4j12"
+			}
 			hadoopruntime configurations.runtime
 			hadoopruntimenotest configurations.runtime
 		}
