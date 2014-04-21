@@ -352,6 +352,12 @@ configure(javaProjects()) {
 		testRuntime "com.google.guava:guava:$guavaVersion"
 	}
 
+	configurations.all {
+		resolutionStrategy {
+			force "com.google.guava:guava:$guavaVersion"
+		}
+	}
+
 	task sourcesJar(type: Jar) {
 		classifier = 'sources'
 		from sourceSets.main.allJava
@@ -1207,6 +1213,6 @@ if (gradle.ext.mr2) {
 
 task wrapper(type: Wrapper) {
 	description = "Generates gradlew[.bat] scripts"
-	gradleVersion = "1.8"
+	gradleVersion = "1.11"
 }
 
