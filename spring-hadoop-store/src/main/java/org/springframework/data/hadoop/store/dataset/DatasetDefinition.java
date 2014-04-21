@@ -16,7 +16,7 @@ import org.springframework.util.Assert;
  */
 public class DatasetDefinition{
 
-	private Class targetClass;
+	private Class<?> targetClass;
 
 	private boolean allowNullValues;
 
@@ -36,24 +36,24 @@ public class DatasetDefinition{
 		this(null, allowNullValues, format);
 	}
 
-	public DatasetDefinition(Class targetClass, boolean allowNullValues, String format) {
+	public DatasetDefinition(Class<?> targetClass, boolean allowNullValues, String format) {
 		setTargetClass(targetClass);
 		setAllowNullValues(allowNullValues);
 		setFormat(format);
 	}
 
-	public DatasetDefinition(Class targetClass, PartitionStrategy partitionStrategy) {
+	public DatasetDefinition(Class<?> targetClass, PartitionStrategy partitionStrategy) {
 		this(targetClass, Formats.AVRO.getName(), partitionStrategy);
 	}
 
-	public DatasetDefinition(Class targetClass, String format, PartitionStrategy partitionStrategy) {
+	public DatasetDefinition(Class<?> targetClass, String format, PartitionStrategy partitionStrategy) {
 		setTargetClass(targetClass);
 		setAllowNullValues(false);
 		setFormat(format);
 		setPartitionStrategy(partitionStrategy);
 	}
 
-	public void setTargetClass(Class targetClass) {
+	public void setTargetClass(Class<?> targetClass) {
 		this.targetClass = targetClass;
 	}
 
@@ -74,7 +74,7 @@ public class DatasetDefinition{
 		this.partitionStrategy = partitionStrategy;
 	}
 
-	public Class getTargetClass() {
+	public Class<?> getTargetClass() {
 		return targetClass;
 	}
 

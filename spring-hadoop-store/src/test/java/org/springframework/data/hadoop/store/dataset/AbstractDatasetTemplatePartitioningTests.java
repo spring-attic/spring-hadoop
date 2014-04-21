@@ -22,7 +22,6 @@ import org.junit.runner.RunWith;
 import org.kitesdk.data.DatasetDescriptor;
 import org.kitesdk.data.DatasetRepository;
 import org.kitesdk.data.PartitionKey;
-import org.kitesdk.data.PartitionStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
@@ -30,7 +29,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -38,27 +36,17 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"DatasetTemplateTests-context.xml"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-public class DatasetTemplateTestsPartitioning {
+public abstract class AbstractDatasetTemplatePartitioningTests {
 
 	protected DatasetOperations datasetOperations;
 	protected List<Object> records = new ArrayList<Object>();
 	@Autowired
 	protected String path;
-
-	@Autowired
-	public void setDatasetOperations(DatasetOperations datasetOperations) {
-		PartitionStrategy partitionStrategy =
-				new PartitionStrategy.Builder().year("birthDate").month("birthDate").build();
-		((DatasetTemplate) datasetOperations).setDatasetDefinitions(Arrays.asList(
-						new DatasetDefinition[] {new DatasetDefinition(SimplePojo.class, "avro", partitionStrategy)}));
-		this.datasetOperations = datasetOperations;
-	}
 
 	@Before
 	public void setUp() {

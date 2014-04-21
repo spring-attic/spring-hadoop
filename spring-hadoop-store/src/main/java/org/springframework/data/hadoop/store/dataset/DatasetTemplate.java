@@ -147,7 +147,7 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 	}
 
 	private <T> void readWithCallback(Class<T> targetClass, RecordCallback<T> callback, PartitionKey partitionKey) {
-		Dataset dataset = getDataset(targetClass);
+		Dataset<T> dataset = getDataset(targetClass);
 		if (dataset == null) {
 			throw new StoreException("Unable to locate dataset for target class " + targetClass.getName());
 		}
@@ -155,7 +155,7 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 		if (partitionKey == null) {
 			reader = dataset.newReader();
 		} else {
-			Dataset partition = dataset.getPartition(partitionKey, false);
+			Dataset<T> partition = dataset.getPartition(partitionKey, false);
 			if (partition != null) {
 				reader = partition.newReader();
 			}
@@ -173,7 +173,7 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 	}
 
 	private <T> Collection<T> readPojo(Class<T> targetClass, PartitionKey partitionKey) {
-		Dataset dataset = getDataset(targetClass);
+		Dataset<T> dataset = getDataset(targetClass);
 		if (dataset == null) {
 			throw new StoreException("Unable to locate dataset for target class " + targetClass.getName());
 		}
@@ -181,7 +181,7 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 		if (partitionKey == null) {
 			reader = dataset.newReader();
 		} else {
-			Dataset partition = dataset.getPartition(partitionKey, false);
+			Dataset<T> partition = dataset.getPartition(partitionKey, false);
 			if (partition != null) {
 				reader = partition.newReader();
 			}
@@ -207,7 +207,7 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 		if (partitionKey == null) {
 			reader = dataset.newReader();
 		} else {
-			Dataset partition = dataset.getPartition(partitionKey, false);
+			Dataset<GenericRecord> partition = dataset.getPartition(partitionKey, false);
 			if (partition != null) {
 				reader = partition.newReader();
 			}
@@ -242,7 +242,7 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 		if (records == null || records.size() < 1) {
 			return;
 		}
-		Class targetClass = records.toArray()[0].getClass();
+		Class<?> targetClass = records.toArray()[0].getClass();
 		DatasetDefinition datasetDefinition = getDatasetDefinitionToUseFor(targetClass);
 		if (Formats.PARQUET.getName().equals(datasetDefinition.getFormat().getName())) {
 			writeGenericRecords(records);
@@ -329,7 +329,6 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 	}
 
 	private <T> void writeGenericRecords(Collection<T> records) {
-		//ToDo: add partitioning?
 		@SuppressWarnings("unchecked")
 		Class<T> pojoClass = (Class<T>) records.iterator().next().getClass();
 		Dataset<GenericRecord> dataset = getOrCreateDataset(pojoClass, GenericRecord.class);
