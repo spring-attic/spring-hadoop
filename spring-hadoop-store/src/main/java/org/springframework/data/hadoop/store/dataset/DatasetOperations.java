@@ -16,6 +16,9 @@
 
 package org.springframework.data.hadoop.store.dataset;
 
+import org.kitesdk.data.DatasetDescriptor;
+import org.kitesdk.data.PartitionKey;
+
 import java.util.Collection;
 
 /**
@@ -44,6 +47,24 @@ public interface DatasetOperations {
 	<T> Collection<T> read(Class<T> targetClass);
 
 	/**
+	 * Read records in the dataset partition based on the {@link PartitionKey} and call the provided callback for each record.
+	 *
+	 * @param targetClass the class that is stored in the dataset
+	 * @param callback the callback to be called for each record
+	 * @param partitionKey the partition key to use for the read
+	 */
+	<T> void read(Class<T> targetClass, RecordCallback<T> callback, PartitionKey partitionKey);
+
+	/**
+	 * Read records in the dataset  partition based on the {@link PartitionKey} and return as a collection.
+	 *
+	 * @param targetClass the class that is stored in the dataset
+	 * @param partitionKey the partition key to use for the read
+	 * @return collection containing the records as the specified target class
+	 */
+	<T> Collection<T> read(Class<T> targetClass, PartitionKey partitionKey);
+
+	/**
 	 * Write all records provided in the record collection
 	 * 
 	 * @param records the records to write
@@ -58,11 +79,19 @@ public interface DatasetOperations {
 	void execute(DatasetRepositoryCallback callback);
 
 	/**
-	 * Get the dataset name to be used for the given class
+	 * Get the {@link org.kitesdk.data.DatasetDescriptor} for the given class
 	 * 
-	 * @param clazz the class stored in the dataset
+	 * @param targetClass the class stored in the dataset
+	 * @return the DatasetDescriptor
+	 */
+	<T> DatasetDescriptor getDatasetDescriptor(Class<T> targetClass);
+
+	/**
+	 * Get the dataset name to be used for the given class
+	 *
+	 * @param targetClass the class stored in the dataset
 	 * @return the dataset name
 	 */
-	<T> String getDatasetName(Class<T> clazz);
+	<T> String getDatasetName(Class<T> targetClass);
 
 }

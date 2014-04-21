@@ -18,6 +18,7 @@ package org.springframework.data.hadoop.store.dataset;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.avro.Schema;
@@ -29,6 +30,7 @@ import org.kitesdk.data.DatasetNotFoundException;
 import org.kitesdk.data.DatasetReader;
 import org.kitesdk.data.DatasetWriter;
 import org.kitesdk.data.Formats;
+import org.kitesdk.data.PartitionKey;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.PropertyAccessorFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -48,6 +50,8 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 
 	private DatasetDefinition defaultDatasetDefinition;
 
+	private HashMap<String, DatasetDefinition> datasetDefinitions = new HashMap<String, DatasetDefinition>();
+
 	/**
 	 * The {@link DatasetRepositoryFactory} to use for this template.
 	 * 
@@ -58,7 +62,7 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 	}
 
 	/**
-	 * The default {@link DatasetDefinition} to use for this template.
+	 * The default {@link DatasetDefinition} used for this template.
 	 */
 	public DatasetDefinition getDefaultDatasetDefinition() {
 		return defaultDatasetDefinition;
@@ -71,76 +75,164 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 	 */
 	public void setDefaultDatasetDefinition(DatasetDefinition defaultDatasetDefinition) {
 		this.defaultDatasetDefinition = defaultDatasetDefinition;
+		if (defaultDatasetDefinition.getTargetClass() != null) {
+			datasetDefinitions.put(getDatasetName(defaultDatasetDefinition.getTargetClass()), defaultDatasetDefinition);
+		}
+	}
+
+	/**
+	 * The {@link DatasetDefinition}s used for this template.
+	 */
+	public Collection<DatasetDefinition> getDatasetDefinitions() {
+		return datasetDefinitions.values();
+	}
+
+	/**
+	 * The list of {@link DatasetDefinition}s to use for this template.
+	 *
+	 * @param datasetDefinitions the DatasetDefinitions to use
+	 */
+	public void setDatasetDefinitions(Collection<DatasetDefinition> datasetDefinitions) {
+		for (DatasetDefinition def : datasetDefinitions) {
+			if (def.getTargetClass() != null) {
+				this.datasetDefinitions.put(getDatasetName(def.getTargetClass()), def);
+			} else {
+				throw new StoreException("Target class is required for dataset definitions, invalid definition: " + def);
+			}
+		}
 	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(dsFactory, "The datasetRepositoryFactory property is required");
 		if (defaultDatasetDefinition == null) {
-			defaultDatasetDefinition = new DatasetDefinition(true);
+			defaultDatasetDefinition = new DatasetDefinition();
 		}
 	}
 
 	@Override
 	public <T> void read(Class<T> targetClass, RecordCallback<T> callback) {
-		DatasetReader<T> reader = getDataset(targetClass).newReader();
-		try {
-			reader.open();
-			for (T t : reader) {
-				callback.doInRecord(t);
-			}
-		}
-		finally {
-			reader.close();
-		}
+		readWithCallback(targetClass, callback, null);
 	}
 
 	@Override
 	public <T> Collection<T> read(Class<T> targetClass) {
-		if (Formats.PARQUET.getName().equals(defaultDatasetDefinition.getFormat().getName())) {
-			return readGenericRecords(targetClass);
+		DatasetDescriptor descriptor = getDatasetDescriptor(targetClass);
+		if (descriptor == null) {
+			throw new StoreException("Unable to locate dataset for target class " + targetClass.getName());
+		}
+		if (Formats.PARQUET.equals(descriptor.getFormat())) {
+			return readGenericRecords(targetClass, null);
 		} else {
-			return readPojo(targetClass);
+			return readPojo(targetClass, null);
 		}
 	}
 
-	private <T> Collection<T> readPojo(Class<T> targetClass) {
-		DatasetReader<T> reader = getDataset(targetClass).newReader();
-		List<T> results = new ArrayList<T>();
-		try {
-			reader.open();
-			for (T r : reader) {
-				results.add(r);
+	@Override
+	public <T> void read(Class<T> targetClass, RecordCallback<T> callback, PartitionKey partitionKey) {
+		readWithCallback(targetClass, callback, partitionKey);
+	}
+
+	@Override
+	public <T> Collection<T> read(Class<T> targetClass, PartitionKey partitionKey) {
+		DatasetDescriptor descriptor = getDatasetDescriptor(targetClass);
+		if (descriptor == null) {
+			throw new StoreException("Unable to locate dataset for target class " + targetClass.getName());
+		}
+		if (Formats.PARQUET.equals(descriptor.getFormat())) {
+			return readGenericRecords(targetClass, partitionKey);
+		} else {
+			return readPojo(targetClass, partitionKey);
+		}
+	}
+
+	private <T> void readWithCallback(Class<T> targetClass, RecordCallback<T> callback, PartitionKey partitionKey) {
+		Dataset<T> dataset = getDataset(targetClass);
+		if (dataset == null) {
+			throw new StoreException("Unable to locate dataset for target class " + targetClass.getName());
+		}
+		DatasetReader<T> reader = null;
+		if (partitionKey == null) {
+			reader = dataset.newReader();
+		} else {
+			Dataset<T> partition = dataset.getPartition(partitionKey, false);
+			if (partition != null) {
+				reader = partition.newReader();
 			}
 		}
-		finally {
-			reader.close();
+		if (reader != null) {
+			try {
+				reader.open();
+				for (T t : reader) {
+					callback.doInRecord(t);
+				}
+			} finally {
+				reader.close();
+			}
+		}
+	}
+
+	private <T> Collection<T> readPojo(Class<T> targetClass, PartitionKey partitionKey) {
+		Dataset<T> dataset = getDataset(targetClass);
+		if (dataset == null) {
+			throw new StoreException("Unable to locate dataset for target class " + targetClass.getName());
+		}
+		DatasetReader<T> reader = null;
+		if (partitionKey == null) {
+			reader = dataset.newReader();
+		} else {
+			Dataset<T> partition = dataset.getPartition(partitionKey, false);
+			if (partition != null) {
+				reader = partition.newReader();
+			}
+		}
+		List<T> results = new ArrayList<T>();
+		if (reader != null) {
+			try {
+				reader.open();
+				for (T r : reader) {
+					results.add(r);
+				}
+			}
+			finally {
+				reader.close();
+			}
 		}
 		return results;
 	}
 
-	private <T> Collection<T> readGenericRecords(Class<T> targetClass) {
+	private <T> Collection<T> readGenericRecords(Class<T> targetClass, PartitionKey partitionKey) {
 		Dataset<GenericRecord> dataset = getOrCreateDataset(targetClass, GenericRecord.class);
-		DatasetReader<GenericRecord> reader = dataset.newReader();
-		List<T> results = new ArrayList<T>();
-		try {
-			reader.open();
-			for (GenericRecord r : reader) {
-				T data = targetClass.newInstance();
-				BeanWrapper beanWrapper = PropertyAccessorFactory.forBeanPropertyAccess(data);
-				for (Schema.Field f : r.getSchema().getFields()) {
-					if (beanWrapper.isWritableProperty(f.name())) {
-						beanWrapper.setPropertyValue(f.name(), r.get(f.name()));
-					}
-				}
-				results.add(data);
+		DatasetReader<GenericRecord> reader = null;
+		if (partitionKey == null) {
+			reader = dataset.newReader();
+		} else {
+			Dataset<GenericRecord> partition = dataset.getPartition(partitionKey, false);
+			if (partition != null) {
+				reader = partition.newReader();
 			}
-		} catch (InstantiationException e) {
-			throw new StoreException("Unable to read records for class: " + targetClass.getName(), e);
-		} catch (IllegalAccessException e) {
-			throw new StoreException("Unable to read records for class: " + targetClass.getName(), e);
-		} finally {
-			reader.close();
+		}
+		List<T> results = new ArrayList<T>();
+		if (reader != null) {
+			try {
+				reader.open();
+				for (GenericRecord r : reader) {
+					T data = targetClass.newInstance();
+					BeanWrapper beanWrapper = PropertyAccessorFactory.forBeanPropertyAccess(data);
+					for (Schema.Field f : r.getSchema().getFields()) {
+						if (beanWrapper.isWritableProperty(f.name())) {
+							beanWrapper.setPropertyValue(f.name(), r.get(f.name()));
+						}
+					}
+					results.add(data);
+				}
+			} catch (InstantiationException e) {
+				throw new StoreException("Unable to read records for class: " + targetClass.getName(), e);
+			} catch (IllegalAccessException e) {
+				throw new StoreException("Unable to read records for class: " + targetClass.getName(), e);
+			} finally {
+				reader.close();
+			}
 		}
 		return results;
 	}
@@ -150,7 +242,9 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 		if (records == null || records.size() < 1) {
 			return;
 		}
-		if (Formats.PARQUET.getName().equals(defaultDatasetDefinition.getFormat().getName())) {
+		Class<?> targetClass = records.toArray()[0].getClass();
+		DatasetDefinition datasetDefinition = getDatasetDefinitionToUseFor(targetClass);
+		if (Formats.PARQUET.getName().equals(datasetDefinition.getFormat().getName())) {
 			writeGenericRecords(records);
 		} else {
 			writePojo(records);
@@ -160,6 +254,16 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 	@Override
 	public void execute(DatasetRepositoryCallback callback) {
 		callback.doInRepository(dsFactory.getDatasetRepository());
+	}
+
+	@Override
+	public <T> DatasetDescriptor getDatasetDescriptor(Class<T> targetClass) {
+		try {
+			return getDataset(targetClass).getDescriptor();
+		}
+		catch (DatasetNotFoundException e) {
+			return null;
+		}
 	}
 
 	@Override
@@ -185,7 +289,7 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 
 	private <T> Dataset<T> getOrCreateDataset(Class<?> pojoClass, Class<T> recordClass) {
 		String repoName = getDatasetName(pojoClass);
-		DatasetDefinition datasetDefinition = getDefaultDatasetDefinition();
+		DatasetDefinition datasetDefinition = getDatasetDefinitionToUseFor(pojoClass);
 		Dataset<T> dataset;
 		try {
 			dataset = dsFactory.getDatasetRepository().load(repoName);
@@ -271,4 +375,12 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 		return dsFactory.getDatasetRepository().load(repoName);
 	}
 
+	private DatasetDefinition getDatasetDefinitionToUseFor(Class<?> targetClass) {
+		String datasetName = getDatasetName(targetClass);
+		if (datasetDefinitions.containsKey(datasetName)) {
+			return datasetDefinitions.get(datasetName);
+		} else {
+			return defaultDatasetDefinition;
+		}
+	}
 }
