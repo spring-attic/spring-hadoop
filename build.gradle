@@ -376,7 +376,6 @@ configure(javaProjects()) {
 		compile "org.springframework:spring-context-support:$springVersion"
 		compile "org.springframework:spring-jdbc:$springVersion"
 		compile "org.springframework:spring-tx:$springVersion"
-		testRuntime "com.google.guava:guava:$guavaVersion"
 	}
 
 	task sourcesJar(type: Jar) {
@@ -654,11 +653,6 @@ configure(hadoopProjects()) {
 				exclude module: "thrift"
 			}
 		}
-
-		// Libs dependencies (specified to cope with incompatibilities between them)
-		// testRuntime "org.antlr:antlr:$antlrVersion"
-		// testRuntime "org.antlr:antlr-runtime:$antlrVersion"
-
 	
 		// Testing
 		testCompile "junit:junit:$junitVersion"
@@ -900,7 +894,7 @@ project('spring-data-hadoop-build-tests') {
 		testRuntime "org.jruby:jruby:$jrubyVersion"
 		testRuntime "org.python:jython-standalone:$jythonVersion"
 	
-		// specify a version of antlr that works with both hive and pig (works only during compilation)
+		// specify a version of antlr that works with both hive and pig
 		testRuntime "org.antlr:antlr-runtime:$antlrVersion"
 	}
 
@@ -1243,6 +1237,6 @@ if (gradle.ext.mr2) {
 
 task wrapper(type: Wrapper) {
 	description = "Generates gradlew[.bat] scripts"
-	gradleVersion = "1.8"
+	gradleVersion = "1.11"
 }
 
