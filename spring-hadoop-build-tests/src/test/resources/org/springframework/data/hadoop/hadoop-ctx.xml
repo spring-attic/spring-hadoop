@@ -34,6 +34,7 @@
 	<!--  properties-location="s3.properties" -->
 	<!--  -->
 	<hdp:configuration register-url-handler="false" depends-on="cfg-init" file-system-uri="${hadoop.fs}" job-tracker-uri="${hadoop.jt}">
+		mapreduce.framework.name=yarn
 		cfg=main
 		someparam=somevalue
 	</hdp:configuration>
