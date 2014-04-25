@@ -292,8 +292,8 @@ dependencies {
     // Comment out the following two lines or specify a version of antlr that works 
     // with both the Hive and Pig versions in use. 
     // (for Hive 0.10.0 antlr 3.0.1 seems to work).
-    //testRuntime "org.antlr:antlr:$antlrVersion"
-    //testRuntime "org.antlr:antlr-runtime:$antlrVersion"
+    testRuntime "org.antlr:antlr:$antlrVersion"
+    testRuntime "org.antlr:antlr-runtime:$antlrVersion"
     
 }
 
