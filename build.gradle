@@ -253,19 +253,6 @@ dependencies {
     // Hive
     optional("$hiveGroup:hive-service:$hiveVersion")
     
-    // needed by JDBC test
-    testRuntime "$hiveGroup:hive-jdbc:$hiveVersion"
-    
-    // needed by the Hive Server tests
-    // testRuntime "$hiveGroup:hive-builtins:$hiveVersion" 
-    // testRuntime("$hiveGroup:hive-metastore:$hiveVersion") 
-
-    //testRuntime "$hiveGroup:hive-common:$hiveVersion"
-    //testRuntime "$hiveGroup:hive-shims:$hiveVersion"
-    //testRuntime "$hiveGroup:hive-serde:$hiveVersion"
-    //testRuntime "org.apache.thrift:libthrift:$thriftVersion"
-    //testRuntime "org.apache.thrift:libfb303:$thriftVersion"
-
     // Pig
     optional("org.apache.pig:pig:$pigVersion$pigQualifier")
     
@@ -274,12 +261,16 @@ dependencies {
         exclude module: "thrift"
     }
 
-    // Libs dependencies (specified to cope with incompatibilities between them)
-    // testRuntime "org.antlr:antlr:$antlrVersion"
-    // testRuntime "org.antlr:antlr-runtime:$antlrVersion"
-
-    
     // Testing
+ 
+    // needed by JDBC test
+    testRuntime "$hiveGroup:hive-jdbc:$hiveVersion"
+    
+    // needed by the Hive Server tests
+    testRuntime "$hiveGroup:hive-builtins:$hiveVersion" 
+    testRuntime "org.apache.thrift:libthrift:$thriftVersion"
+    testRuntime "org.apache.thrift:libfb303:$thriftVersion"
+
     testCompile "junit:junit:$junitVersion"
     testCompile "org.hamcrest:hamcrest-core:$hamcrestVersion"
     testCompile "org.hamcrest:hamcrest-library:$hamcrestVersion"
@@ -295,9 +286,15 @@ dependencies {
     testRuntime "org.jruby:jruby:$jrubyVersion"
     testRuntime "org.python:jython-standalone:$jythonVersion"
     
-    // specify a version of antlr that works with both hive and pig (works only during compilation)
-    testRuntime "org.antlr:antlr-runtime:$antlrVersion"
     testCompile "cascading:cascading-local:$cascadingVersion"
+
+    // Conflict resolution for dependency incompatibilities between Pig and Hive
+    // Comment out the following two lines or specify a version of antlr that works 
+    // with both the Hive and Pig versions in use. 
+    // (for Hive 0.10.0 antlr 3.0.1 seems to work).
+    //testRuntime "org.antlr:antlr:$antlrVersion"
+    //testRuntime "org.antlr:antlr-runtime:$antlrVersion"
+    
 }
 
 // exclude poms from the classpath (pulled in by Cloudera)
@@ -457,10 +454,6 @@ javadoc {
       author = true
       showFromProtected()
       
-//      groups = [
-//        'Spring Data Hadoop' : ['org.springframework.data.hadoop*'],
-//      ]
-  
      links = [
         "http://static.springframework.org/spring/docs/3.0.x/javadoc-api",
         "http://download.oracle.com/javase/6/docs/api",

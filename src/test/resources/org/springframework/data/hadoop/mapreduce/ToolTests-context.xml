@@ -12,6 +12,11 @@
 	<import resource="../hadoop-ctx.xml"/>
 	<import resource="../batch-common.xml"/>
 
+	<hdp:script id="script" language="javascript" run-at-startup="true">
+		if (fsh.test("/ide-test/input/word")) { fsh.rmr("/ide-test/input/word") }
+		fsh.put("src/test/resources/input/word", "/ide-test/input/word")
+	</hdp:script>
+
 	<hdp:tool-runner id="simple" tool-class="org.springframework.data.hadoop.mapreduce.ToolTests$TestTool" />
 	
 	<bean id="test-tool" class="org.springframework.data.hadoop.mapreduce.ToolTests$TestTool">
