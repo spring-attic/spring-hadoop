@@ -48,12 +48,6 @@ switch (hadoopDistro) {
     hadoopVersion = cdh3Version
     println "Using Cloudera CDH3 [$hadoopVersion]"
     
-    dependencies {
-        optional("org.apache.hadoop:hadoop-streaming:$hadoopVersion") 
-        optional("org.apache.hadoop:hadoop-tools:$hadoopVersion")
-        testCompile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
-    }
-    
     hbaseVersion = cdh3HbaseVersion
     // Hive in CDH3 is too old and does not allow Hive Server to be compiled
     // Note that the POMs and repo are incomplete (hive-builtin is missing)
@@ -61,12 +55,23 @@ switch (hadoopDistro) {
     // hiveGroup = "org.apache.hadoop.hive"
     pigVersion = cdh3PigVersion
 
+    dependencies {
+        optional("org.apache.hadoop:hadoop-streaming:$hadoopVersion") 
+        optional("org.apache.hadoop:hadoop-tools:$hadoopVersion")
+        testCompile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
+    }
+    
   break;    
 
   // Cloudera CDH4
   case "cdh4":
     hadoopVersion = cdh4MR1Version
     println "Using Cloudera CDH4 [$hadoopVersion]"
+
+    hbaseVersion = cdh4HbaseVersion
+    hiveVersion = cdh4HiveVersion
+    pigVersion = cdh4PigVersion
+    thriftVersion = cdh4ThriftVersion
 
     dependencies {
         optional("org.apache.hadoop:hadoop-streaming:$cdh4MR1Version") 
@@ -75,11 +80,6 @@ switch (hadoopDistro) {
         optional("org.apache.hadoop:hadoop-hdfs:$cdh4Version")
         testCompile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
     }
-
-    hbaseVersion = cdh4HbaseVersion
-    hiveVersion = cdh4HiveVersion
-    pigVersion = cdh4PigVersion
-    thriftVersion = cdh4ThriftVersion
 
   break;    
 
@@ -118,15 +118,15 @@ switch (hadoopDistro) {
     hadoop = ["org.apache.hadoop:hadoop-streaming:$hadoopVersion",
               "org.apache.hadoop:hadoop-tools:$hadoopVersion"]
 
-    dependencies {
-        testCompile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
-        testRuntime "dk.brics.automaton:automaton:1.11-8"
-    }
-
     hbaseVersion = hdp13HbaseVersion
     hiveVersion = hdp13HiveVersion
     pigVersion = hdp13PigVersion
     thriftVersion = hdp13ThriftVersion
+
+    dependencies {
+        testCompile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
+        testRuntime "dk.brics.automaton:automaton:1.11-8"
+    }
 
   break;
 
@@ -141,17 +141,18 @@ switch (hadoopDistro) {
               "org.apache.hadoop:hadoop-streaming:$hadoopVersion",
               "org.apache.hadoop:hadoop-distcp:$hadoopVersion"]
 
-    dependencies {
-        testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
-        testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
-        testRuntime "dk.brics.automaton:automaton:1.11-8"
-    }
-
     hbaseVersion = hd22HbaseVersion
     hiveVersion = hd22HiveVersion
     pigVersion = hd22PigVersion
     pigQualifier = ':h2'
     thriftVersion = hd22ThriftVersion
+
+    dependencies {
+        testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
+        testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
+        testRuntime "dk.brics.automaton:automaton:1.11-8"
+        testRuntime "$hiveGroup:hive-builtins:$hiveVersion" 
+    }
 
   break;
 
@@ -164,13 +165,15 @@ switch (hadoopDistro) {
     hadoop = ["org.apache.hadoop:hadoop-streaming:$hadoopVersion",
               "org.apache.hadoop:hadoop-tools:$hadoopVersion"]
 
-    dependencies {
-        testCompile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
-    }
-
     hbaseVersion = hd11HbaseVersion
     hiveVersion = hd11HiveVersion
     pigVersion = hd11PigVersion
+
+    dependencies {
+        testCompile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
+        testRuntime "$hiveGroup:hive-builtins:$hiveVersion" 
+    }
+
 
   break;
 
@@ -183,13 +186,14 @@ switch (hadoopDistro) {
     hadoop = ["org.apache.hadoop:hadoop-streaming:$hadoopVersion",
               "org.apache.hadoop:hadoop-tools:$hadoopVersion"]
 
-    dependencies {
-        testCompile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
-    }
-
     hbaseVersion = hd10HbaseVersion
     hiveVersion = hd10HiveVersion
     pigVersion = hd10PigVersion
+
+    dependencies {
+        testCompile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
+        testRuntime "$hiveGroup:hive-builtins:$hiveVersion" 
+    }
 
   break;
 
@@ -211,14 +215,15 @@ switch (hadoopDistro) {
     hadoop = ["org.apache.hadoop:hadoop-streaming:$hadoopVersion",
               "org.apache.hadoop:hadoop-tools:$hadoopVersion"]
 
-    dependencies {
-        testCompile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
-    }
-
     hbaseVersion = hd12HbaseVersion
     hiveVersion = hd12HiveVersion
     pigVersion = hd12PigVersion
     thriftVersion = hd12ThriftVersion
+
+    dependencies {
+        testCompile "org.apache.hadoop:hadoop-examples:$hadoopVersion"
+        testRuntime "$hiveGroup:hive-builtins:$hiveVersion" 
+    }
 
 }
 // Common dependencies
@@ -267,7 +272,6 @@ dependencies {
     testRuntime "$hiveGroup:hive-jdbc:$hiveVersion"
     
     // needed by the Hive Server tests
-    testRuntime "$hiveGroup:hive-builtins:$hiveVersion" 
     testRuntime "org.apache.thrift:libthrift:$thriftVersion"
     testRuntime "org.apache.thrift:libfb303:$thriftVersion"
 
