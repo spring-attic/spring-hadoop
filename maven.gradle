@@ -21,7 +21,7 @@ def customizePom(pom, gradleProject) {
             description = gradleProject.description
             url = 'https://github.com/spring-projects/spring-hadoop'
             organization {
-                name = 'Spring by Pivotal’
+                name = 'Spring by Pivotal'
                 url = 'http://projects.spring.io/spring-hadoop/'
             }
             licenses {
