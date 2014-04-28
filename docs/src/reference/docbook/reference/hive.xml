@@ -57,7 +57,7 @@
 	    
 	    <para>Another attractive option for accessing Hive is through its JDBC driver. This exposes Hive through the <ulink url="http://docs.oracle.com/javase/6/docs/technotes/guides/jdbc/">JDBC API</ulink> meaning 
 	    one can use the standard API or its derived utilities to interact with Hive, such as the rich 
-	    <ulink url="http://static.springsource.org/spring/docs/current/spring-framework-reference/html/jdbc.html">JDBC support</ulink> in Spring Framework.</para>
+	    <ulink url="http://docs.spring.io/spring/docs/current/spring-framework-reference/html/jdbc.html">JDBC support</ulink> in Spring Framework.</para>
 	    
 	    <warning>
 	    	<para>Note that the JDBC driver is a work-in-progress and not all the JDBC features are available (and probably never will since Hive cannot support all of them as it is not the typical relational database).
@@ -89,7 +89,7 @@
 </beans>]]></programlisting>
 	
 		<para>And that is it! Following the example above, one can use the <literal>hive-ds</literal> <interfacename>DataSource</interfacename> bean to manually get a hold of <interfacename>Connection</interfacename>s 
-		or better yet, use Spring's <ulink url="http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/jdbc.html#jdbc-JdbcTemplate"><classname>JdbcTemplate</classname></ulink> as in the example above.</para>
+		or better yet, use Spring's <ulink url="http://docs.spring.io/spring/docs/3.1.x/spring-framework-reference/html/jdbc.html#jdbc-JdbcTemplate"><classname>JdbcTemplate</classname></ulink> as in the example above.</para>
 	</section>
 	
 	<section id="hive:runner">

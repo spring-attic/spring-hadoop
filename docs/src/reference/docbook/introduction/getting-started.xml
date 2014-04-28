@@ -26,16 +26,17 @@
     application. It used in production in many mission critical environments
     across a range of industriers.</para>
 
-    <para>Spring Batch It is developed by SpringSource in collaboration with
+    <para>Spring Batch It was initially developed by SpringSource in collaboration with
     Accenture. The first 1.0 release was made in 2007 and is now at version
-    2.2.x. It has been designed with extensibility in mind. The Spring for Apache Hadoop
+    2.2.x.  It forms the basis for JSR-352 “Batch Applications for the Java Platform”. 
+    Spring Batch has been designed with extensibility in mind. The Spring for Apache Hadoop
     hooks into those extensibility points so that in addition to interacting
     with traditional data sources in an enterprise batch job, Spring Batch
     jobs can now interact with a wide range of Hadoop projects, from HDFS and
     map-reduce, to Hive, Pig, and HBase. </para>
 
     <para>To learn more about Spring Batch, visit the <link
-    ns6:href="http://static.springsource.org/spring-batch/">Spring Batch
+    ns6:href="http://projects.spring.io/spring-batch/">Spring Batch
     project page</link>. There are also two books available.</para>
 
     <itemizedlist>

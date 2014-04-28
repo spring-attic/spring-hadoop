@@ -60,16 +60,10 @@
     scheduler, not replace a scheduler. As a lightweight solution, you can use
     Spring's built in scheduling support that will give you cron-like and
     other basic scheduling trigger functionality. See the <link
-    xlink:href="http://static.springsource.org/spring-batch/faq.html#schedulers">Task
-    Execution and Scheduling</link> documention for more info. A middle
+    xlink:href="http://docs.spring.io/spring-batch/faq.html#schedulers">How do I schedule a job with Spring Batch?</link> documention for more info. A middle
     ground it to use Spring's Quartz integration, see <link
-    xlink:href="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/scheduling.html#scheduling-quartz">Using
-    the OpenSymphony Quartz Scheduler</link> for more information. The Spring
-    Batch distribution contains an example, but this documentation will be
-    updated to provide some more directed examples with Hadoop, check for
-    updates on the <link
-    xlink:href="http://www.springsource.org/spring-data/hadoop">main web site
-    of Spring for Apache Hadoop</link>.</para>
+    xlink:href="http://docs.spring.io/spring/docs/3.0.x/spring-framework-reference/html/scheduling.html#scheduling-quartz">Using
+    the OpenSymphony Quartz Scheduler</link> for more information.</para>
   </section>
 
   <section>
@@ -79,7 +73,7 @@
     to perform additional processing. For example, at the end of a job you can
     perform some notification or perhaps even start another Spring Batch job.
     As a brief example, implement the interface <link
-    xlink:href="http://static.springsource.org/spring-batch/apidocs/org/springframework/batch/core/JobExecutionListener.html">JobExecutionListener</link>
+    xlink:href="http://docs.spring.io/spring-batch/apidocs/org/springframework/batch/core/JobExecutionListener.html">JobExecutionListener</link>
     and configure it into the Spring Batch job as shown below.</para>
 
     <programlisting language="xml">&lt;batch:job id="job1"&gt;

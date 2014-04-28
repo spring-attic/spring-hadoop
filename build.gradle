@@ -1,6 +1,6 @@
 buildscript {
     repositories {
-        maven { url 'http://repo.springsource.org/plugins-release' }
+        maven { url 'http://repo.spring.io/plugins-release' }
     }
     dependencies {
         classpath 'org.springframework.build.gradle:docbook-reference-plugin:0.2.4'
@@ -13,7 +13,7 @@ group = 'org.springframework.data'
 
 repositories {
     mavenCentral()
-    maven { url "http://repo.springsource.org/libs-snapshot" }
+    maven { url "http://repo.spring.io/libs-snapshot" }
 }
 
 apply plugin: "java"
@@ -463,8 +463,8 @@ javadoc {
         "http://hbase.apache.org/apidocs/",
         "http://pig.apache.org/docs/r0.10.0/api/",
         "http://hive.apache.org/javadocs/r0.10.0/api/",
-        "http://static.springsource.org/spring-batch/apidocs/",
-        "http://static.springsource.org/spring-integration/api/",
+        "http://docs.spring.io/spring-batch/apidocs/",
+        "http://docs.spring.io/spring-integration/api/",
         "https://builds.apache.org/job/Thrift/javadoc/",
         "http://docs.cascading.org/cascading/2.1/javadoc/"
      ]
@@ -479,8 +479,8 @@ jar {
     manifest.attributes["Created-By"] = "${System.getProperty("java.version")} (${System.getProperty("java.specification.vendor")})"
     manifest.attributes['Implementation-Title'] = 'spring-data-hadoop'
     manifest.attributes['Implementation-Version'] = project.version
-    manifest.attributes['Implementation-URL'] = "http://www.springsource.org/spring-data/hadoop"
-    manifest.attributes['Implementation-Vendor'] = "SpringSource"
+    manifest.attributes['Implementation-URL'] = "http://projects.spring.io/spring-hadoop/"
+    manifest.attributes['Implementation-Vendor'] = "Spring by Pivotal"
     manifest.attributes['Implementation-Vendor-Id'] = "org.springframework"
     
     def build = System.env['SHDP.BUILD']

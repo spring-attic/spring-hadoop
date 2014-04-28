@@ -9,12 +9,12 @@
   <title>Requirements</title>
 
   <para>Spring for Apache Hadoop requires JDK level 6.0 (just like Hadoop) and
-  above, Spring <ulink
-  url="http://www.springsource.org/about">Framework</ulink> 3.0 (3.2
+  above, <ulink
+  url="http://spring.io/">Spring Framework</ulink> 3.0 (3.2
   recommended) and above and is built against <ulink
   url="http://hadoop.apache.org/">Apache Hadoop</ulink> 1.2.1. SHDP supports
   and is <ulink
-  url="https://build.springsource.org/browse/SPRINGDATAHADOOP">tested</ulink>
+  url="https://build.spring.io/browse/SPRINGDATAHADOOP">tested</ulink>
   daily against Apache Hadoop 1.2.1 and also against 1.1.2 and
   2.0.x alpha as well as against various Hadoop distributions: <itemizedlist>
       <listitem>
@@ -51,7 +51,7 @@
   distributions are provided on the Spring for Apache Hadoop wiki -<ulink
   url="http://cascading.org/" /><ulink url="http://hbase.apache.org/" /><ulink
   url="http://hive.apache.org/" /> <ulink
-  url="https://github.com/SpringSource/spring-hadoop/wiki">https://github.com/SpringSource/spring-hadoop/wiki</ulink></para>
+  url="https://github.com/spring-projects/spring-hadoop/wiki">https://github.com/spring-projects/spring-hadoop/wiki</ulink></para>
 
   <para>Regarding Hadoop-related projects, SDHP supports <ulink
   url="http://cascading.org/">Cascading</ulink> 2.1, <ulink

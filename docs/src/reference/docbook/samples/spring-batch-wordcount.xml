@@ -23,7 +23,7 @@
 
     <para>The sample uses the Spring for Apache Hadoop namespace to define a Spring Batch
     Tasklet that runs a Hadoop job. A <link
-    xlink:href="http://static.springsource.org/spring-batch/reference/html/domain.html#domainJob">Spring
+    xlink:href="http://docs.spring.io/spring-batch/reference/html/domain.html#domainJob">Spring
     Batch Job</link> (not to be confused with a Hadoop job) combines multiple
     steps together to create a flow of execution, a small workflow. Each step
     in the flow does some processing which can be as complex or as simple as
@@ -31,7 +31,7 @@
     very simple, a linear sequence of steps, or complex using conditional and
     programmatic branching as well as sequential and parallel step execution.
     A <link
-    xlink:href="http://static.springsource.org/spring-batch/apidocs/org/springframework/batch/core/step/tasklet/Tasklet.html">Spring
+    xlink:href="http://docs.spring.io/spring-batch/apidocs/org/springframework/batch/core/step/tasklet/Tasklet.html">Spring
     Batch Tasklet</link> is the abstraction that represents the processing for
     a Step and is an extensible part of Spring Batch. You can write your own
     implementation of a Tasklet to perform arbitrary processing, but often you
@@ -72,7 +72,7 @@
     definitions that will be shown a little later.</para>
 
     <para>The <link
-    xlink:href="http://www.springsource.com/developer/sts">Spring Source
+    xlink:href="http://spring.io/tools">Spring 
     Toolsuite</link> is a free Eclipse-powered development environment which
     provides a nice visualization and authoring help for Spring Batch
     workflows as shown below.<mediaobject>
@@ -106,7 +106,7 @@
     <para>The script makes use of the predefined variable fsh, which is the
     embedded <link linkend="scripting-fssh">Filesystem Shell</link> that
     Spring for Apache Hadoop provides. It also uses Spring's <link
-    xlink:href="http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/beans.html#beans-factory-placeholderconfigurer">Property
+    xlink:href="http://docs.spring.io/spring/docs/3.1.x/spring-framework-reference/html/beans.html#beans-factory-placeholderconfigurer">Property
     Placeholder</link> functionality so that the input and out paths can be
     configured external to the application, for example using property files.
     The syntax for variables recognized by Spring's Property Placeholder is
@@ -114,9 +114,9 @@
     <literal>/user/gutenberg/input/word</literal> and
     <literal>/user/gutenberg/output/word</literal> are the default input and
     output paths. Note you can also use <link
-    xlink:href="http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/expressions.html">Spring's
+    xlink:href="http://docs.spring.io/spring/docs/3.1.x/spring-framework-reference/html/expressions.html">Spring's
     Expression Language</link> to configure values in the script or in <link
-    xlink:href="http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/expressions.html#expressions-beandef">other
+    xlink:href="http://docs.spring.io/spring/docs/3.1.x/spring-framework-reference/html/expressions.html#expressions-beandef">other
     XML definitions</link>.</para>
 
     <para>The configuration of the tasklet to execute the Hadoop MapReduce
@@ -197,7 +197,7 @@
 
     <note>
       <para>If you run into some issues, drop us a line in the <link
-      xlink:href="http://forum.springsource.org/forumdisplay.php?27-Data">Spring
+      xlink:href="http://forum.spring.io/forum/spring-projects/data/hadoop">Spring
       Forums</link>.</para>
     </note>
   </section>
@@ -220,9 +220,9 @@
     <classname>org.springframework.batch.core.launch.support.CommandLineJobRunner</classname>.
     This main app requires you to specify at least a Spring configuration file
     and a job instance name. You can read the <literal>CommandLineJobRunner</literal> <link
-    xlink:href="http://static.springsource.org/spring-batch/apidocs/org/springframework/batch/core/launch/support/CommandLineJobRunner.html">JavaDocs</link>
+    xlink:href="http://docs.spring.io/spring-batch/apidocs/org/springframework/batch/core/launch/support/CommandLineJobRunner.html">JavaDocs</link>
     for more information as well as <link
-    xlink:href="http://static.springsource.org/spring-batch/reference/html/configureJob.html#runningJobsFromCommandLine">this
+    xlink:href="http://docs.spring.io/spring-batch/reference/html/configureJob.html#runningJobsFromCommandLine">this
     section in the reference docs</link> for Spring Batch to find out more of
     what command line options it supports.</para>
 

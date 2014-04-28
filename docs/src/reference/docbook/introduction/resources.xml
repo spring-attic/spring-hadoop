@@ -15,7 +15,7 @@
       <listitem>
         <formalpara>
           <title>Spring for Apache Hadoop samples <ulink
-          url="https://github.com/SpringSource/spring-hadoop-samples/">https://github.com/SpringSource/spring-hadoop-samples/</ulink></title>
+          url="https://github.com/spring-projects/spring-hadoop-samples/">https://github.com/spring-projects/spring-hadoop-samples/</ulink></title>
 
           <para>Official repository full of SHDP samples demonstrating the
           various project features.</para>
@@ -39,7 +39,7 @@
       <listitem>
         <formalpara>
           <title>Spring Data Book Hadoop examples <ulink
-          url="https://github.com/SpringSource/spring-data-book/tree/master/hadoop">https://github.com/SpringSource/spring-data-book/tree/master/hadoop</ulink></title>
+          url="https://github.com/spring-projects/spring-data-book/tree/master/hadoop">https://github.com/spring-projects/spring-data-book/tree/master/hadoop</ulink></title>
 
           <para>Complete running samples for the Spring Data book. Note that
           some of them are available inside Spring for Apache Hadoop samples

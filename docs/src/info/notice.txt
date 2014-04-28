@@ -1,6 +1,3 @@
-   Spring for Apache Hadoop ${version}
-   Copyright (c) 2002-${copyright} SpringSource, a division of VMware, Inc.
-
    ======================================================================
    == NOTICE file corresponding to section 4 d of the Apache License,  ==
    == Version 2.0, for the Spring Framework distribution.              ==

@@ -24,7 +24,7 @@
     directly through the usual <literal>&lt;bean&gt;</literal> definition. For
     more information about XML Schema-based configuration in Spring, see
     <ulink
-    url="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/xsd-config.html">this</ulink>
+    url="http://docs.spring.io/spring/docs/3.0.x/spring-framework-reference/html/xsd-config.html">this</ulink>
     appendix in the Spring Framework reference documentation.</para>
 
     <para>To use the SHDP namespace, one just needs to import it inside the
@@ -149,7 +149,7 @@
 
     <note>
       <para>Note that the configuration makes use of Spring's <ulink
-          url="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/resources.html">
+          url="http://docs.spring.io/spring/docs/3.0.x/spring-framework-reference/html/resources.html">
           <interfacename>Resource</interfacename>
         </ulink> abstraction to locate the file. This allows various search
       patterns to be used, depending on the running environment or the prefix
@@ -199,11 +199,11 @@
 &lt;/beans&gt;</programlisting>
 
     <para>Through Spring's property placeholder <ulink
-    url="http://static.springsource.org/spring/docs/3.0.x/reference/beans.html#beans-factory-placeholderconfigurer">support</ulink>,
+    url="http://docs.spring.io/spring/docs/3.0.x/reference/beans.html#beans-factory-placeholderconfigurer">support</ulink>,
     <ulink
-    url="http://static.springsource.org/spring/docs/3.0.x/reference/expressions.html">SpEL</ulink>
+    url="http://docs.spring.io/spring/docs/3.0.x/reference/expressions.html">SpEL</ulink>
     and the <ulink
-    url="http://blog.springsource.com/2011/06/09/spring-framework-3-1-m2-released/">environment
+    url="http://spring.io/blog/2011/06/09/spring-framework-3-1-m2-released/">environment
     abstraction</ulink> (available in Spring 3.1). one can externalize
     environment specific properties from the main code base easing the
     deployment across multiple machines. In the example above, the default
@@ -220,7 +220,7 @@
     <literal>Properties</literal> beans (typically declared through Spring's
     <literal>
         <ulink
-        url="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/xsd-config.html#xsd-config-body-schemas-util-properties">util</ulink>
+        url="http://docs.spring.io/spring/docs/3.0.x/spring-framework-reference/html/xsd-config.html#xsd-config-body-schemas-util-properties">util</ulink>
       </literal> namespace). Along with the nested properties declaration,
     this allows customized configurations to be easily declared:</para>
 
@@ -253,7 +253,7 @@
     using the System as a source or fallback, or control over the merging
     order, consider using Spring's <literal>
         <ulink
-        url="http://static.springsource.org/spring/docs/3.0.x/api/org/springframework/beans/factory/config/PropertiesFactoryBean.html">PropertiesFactoryBean</ulink>
+        url="http://docs.spring.io/spring/docs/3.0.x/api/org/springframework/beans/factory/config/PropertiesFactoryBean.html">PropertiesFactoryBean</ulink>
       </literal> (which is what Spring for Apache Hadoop and
     <literal>util:properties</literal> use underneath).</note></para>
 
@@ -630,9 +630,9 @@ hadoop jar job10.jar ...</programlisting>
       the classpath or any url for that matter. In fact, the whole
       configuration can be externalized and parameterized (through Spring's
       <ulink
-      url="http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/beans.html#beans-factory-placeholderconfigurer">property
+      url="http://docs.spring.io/spring/docs/3.1.x/spring-framework-reference/html/beans.html#beans-factory-placeholderconfigurer">property
       placeholder</ulink> and/or <ulink
-      url="http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/new-in-3.1.html#d0e1313">Environment
+      url="http://docs.spring.io/spring/docs/3.1.x/spring-framework-reference/html/new-in-3.1.html#d0e1313">Environment
       abstraction</ulink>). Moreover, each job can be ran by itself (through
       the <classname>JobRunner</classname>) or as part of a workflow - either
       through Spring's <literal>depends-on</literal> or the much more powerful

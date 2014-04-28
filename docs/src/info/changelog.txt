@@ -1,16 +1,16 @@
 SPRING for APACHE HADOOP CHANGELOG
 ==================================
-http://www.springsource.org/spring-data/hadoop
+http://projects.spring.io/spring-hadoop/
 
-Commit changelog: http://github.com/SpringSource/spring-hadoop/tree/v[version]
-Issues changelog: http://jira.springsource.org/secure/ReleaseNote.jspa?projectId=10801
+Commit changelog: http://github.com/spring-projects/spring-hadoop/tree/v[version]
+Issues changelog: https://jira.spring.io/secure/ReleaseNote.jspa?projectId=10801
 
 Changes in version 1.0.2 RELEASE (2013-10-31)
 ---------------------------------------------
 
 General
 * Updating to Hadoop 2.2.0 as the Hadoop 2.x stable version for build
-* Updating to Pivotal HD 1.1.0 as the Pivotak HD version for build
+* Updating to Pivotal HD 1.1.0 as the Pivotal HD version for build
 * Updating Spring Integration version to 2.1.6.RELEASE
 
 

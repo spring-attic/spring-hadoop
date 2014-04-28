@@ -70,7 +70,7 @@ You can disable all tests by skipping the `test` task:
 
 # CI Builds
 
-The results for CI builds are available at [Spring Data Hadoop: Project Summary - Spring CI](https://build.springsource.org/browse/SPRINGDATAHADOOP)
+The results for CI builds are available at [Spring Data Hadoop: Project Summary - Spring CI](https://build.spring.io/browse/SPRINGDATAHADOOP)
 
 
 # Contributing
@@ -86,4 +86,4 @@ Github is for social coding: if you want to write code, we encourage contributio
 
 Follow the project team ([Costin](http://twitter.com/costinl), [Mark](http://twitter.com/markpollack), [Thomas](http://twitter.com/trisberg)) on Twitter. 
 
-In-depth articles can be found at the SpringSource [team blog](http://spring.io/blog), and releases are announced via our [news feed](http://spring.io/blog/category/news).
+In-depth articles can be found at the Spring [blog](http://spring.io/blog), and releases are announced via our [news feed](http://spring.io/blog/category/news).

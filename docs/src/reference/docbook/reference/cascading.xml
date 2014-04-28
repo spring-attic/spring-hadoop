@@ -8,13 +8,13 @@
 	In addition, dedicated <literal>Tap</literal>s for Spring environments are available.</para>
 	
 	<para>As Cascading is aimed at code configuration, typically one would configure the library programatically. Such code can easily be integrated into Spring in various ways - through 
-	<literal><ulink url="http://static.springsource.org/spring/docs/3.2.x/spring-framework-reference/html/beans.html#beans-factory-class-static-factory-method">factory methods</ulink></literal> or 
-	<literal>@Configuration</literal> and <literal>@Bean</literal> (see <ulink url="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/beans.html#beans-java">this chapter
+	<literal><ulink url="http://docs.spring.io/spring/docs/3.2.x/spring-framework-reference/html/beans.html#beans-factory-class-static-factory-method">factory methods</ulink></literal> or 
+	<literal>@Configuration</literal> and <literal>@Bean</literal> (see <ulink url="http://docs.spring.io/spring/docs/3.0.x/spring-framework-reference/html/beans.html#beans-java">this chapter
 	</ulink> for more information). In short one uses Java code (or any JVM language for that matter) to create beans.</para>
 	
 	<para>For example, looking at the official Cascading sample (<ulink url="http://www.cascading.org/2012/07/09/cascading-for-the-impatient-part-2/">Cascading for the Impatient, Part2</ulink>)
 	one can simply call the Cascading setup method from within the Spring container (<ulink url="http://github.com/Cascading/Impatient/blob/5c19c2d02fcf26b7c63ca6548a9239a9a764f302/part2/src/main/java/impatient/Main.java#L57">original</ulink> vs 
-	<ulink url="http://github.com/SpringSource/spring-hadoop-samples/blob/6b2365ae80c84b6b037e18e1fe8749e839fcf33f/original-samples/cascading/src/main/java/impatient/Main.java#L67">updated</ulink>):</para>
+	<ulink url="http://github.com/spring-projects/spring-hadoop-samples/blob/6b2365ae80c84b6b037e18e1fe8749e839fcf33f/original-samples/cascading/src/main/java/impatient/Main.java#L67">updated</ulink>):</para>
 	
 	<programlisting language="java"><![CDATA[public class Impatient {
     public static FlowDef createFlowDef(String docPath, String wcPath) {
@@ -216,19 +216,19 @@ public class CascadingAnalysisConfig {
           	   <row>
           	      <entry><literal>ResourceTap</literal></entry>
           	      <entry>Source</entry>
-          	      <entry>Spring <literal><ulink url="http://static.springsource.org/spring/docs/3.0.x/javadoc-api/org/springframework/core/io/Resource.html">Resource</ulink></literal></entry>
-          	      <entry>classpath, file-system, URL-based or even in-memory <ulink url="http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/resources.html#resources-implementations">content</ulink></entry>
+          	      <entry>Spring <literal><ulink url="http://docs.spring.io/spring/docs/3.0.x/javadoc-api/org/springframework/core/io/Resource.html">Resource</ulink></literal></entry>
+          	      <entry>classpath, file-system, URL-based or even in-memory <ulink url="http://docs.spring.io/spring/docs/3.1.x/spring-framework-reference/html/resources.html#resources-implementations">content</ulink></entry>
           	    </row>
           	   <row>
           	      <entry><literal>MessageSourceTap</literal></entry>
           	      <entry>Source</entry>
-          	      <entry>Spring Integration <ulink url="http://static.springsource.org/spring-integration/api/org/springframework/integration/core/MessageSource.html">MessageSource</ulink></entry>
+          	      <entry>Spring Integration <ulink url="http://docs.spring.io/spring-integration/api/org/springframework/integration/core/MessageSource.html">MessageSource</ulink></entry>
           	      <entry>Inbound adapter for anything from arbitrary streams, FTP or JDBC to RSS/Atom and Twitter</entry>
           	    </row>
           	   <row>
           	      <entry><literal>MessageHandlerTap</literal></entry>
           	      <entry>Sink</entry>
-          	      <entry>Spring Integration <ulink url="http://static.springsource.org/spring-integration/api/index.html?org/springframework/integration/core/MessageSource.html">MessageHandler</ulink></entry>
+          	      <entry>Spring Integration <ulink url="http://docs.spring.io/spring-integration/api/index.html?org/springframework/integration/core/MessageSource.html">MessageHandler</ulink></entry>
           	      <entry>The opposite of <literal>MessageSourceTap</literal>: Outbound adapter for Files, JMS, TCP, etc...</entry>
           	    </row>
           	</tbody>
