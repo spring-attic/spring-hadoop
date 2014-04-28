@@ -45,11 +45,11 @@ def customizePom(pom, gradleProject) {
                     }
                 }
                 developer {
-                    id = ‘trisberg
-                    name = ‘Thomas’ Risberg
-                    email = ‘trisberg@gopivotal.com'
+                    id = 'trisberg'
+                    name = 'Thomas Risberg'
+                    email = 'trisberg@gopivotal.com'
                     properties {
-                        twitter = ‘trisberg
+                        twitter = 'trisberg'
                     }
                 }
                 developer {
