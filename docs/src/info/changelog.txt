@@ -5,6 +5,22 @@ http://projects.spring.io/spring-hadoop/
 Commit changelog: http://github.com/spring-projects/spring-hadoop/tree/v[version]
 Issues changelog: https://jira.spring.io/secure/ReleaseNote.jspa?projectId=10801
 
+Changes in version 1.1.0 RC1 (2014-04-29)
+-----------------------------------------
+
+General
+* Updating all links to use spring.io and github.com/spring-projects references
+* Updating the Cloudera CDH4 version to cdh4.6.0 [SHDP-322]
+* Removing Hadoop 2.0 Alpha version [SHDP-324]
+* Backport of resource loader fixes from SHDP 2.0 [SHDP-201]
+  - XSD Schema change, new version is 1.1 
+  - HadoopResourceLoaderParser now honors user attribute [SHDP-162]
+  - Allow hdfs prefix for resource loader location [SHDP-203]
+  - AntPathMatcher with HdfsResourceLoader improvements [SHDP-205]
+  - Add option for HdfsResourceLoader bypass path without prefix [SHDP-207]
+* Improved the test coverage for Hive [SHDP-185]
+
+
 Changes in version 1.0.2 RELEASE (2013-10-31)
 ---------------------------------------------
 
