@@ -71,7 +71,7 @@ public class TextFileWriter extends AbstractDataStreamWriter implements DataStor
 
 	@Override
 	public synchronized  void flush() throws IOException {
-		if (streamsHolder == null) {
+		if (streamsHolder != null) {
 			streamsHolder.getStream().flush();
 		}
 	}
