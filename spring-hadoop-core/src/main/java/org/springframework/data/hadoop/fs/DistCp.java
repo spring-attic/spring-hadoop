@@ -114,14 +114,13 @@ public class DistCp {
 	}
 
 	/**
-	 * Copy operation.
-	 * 
-	 * @param preserve
-	 * @param ignoreFailures
-	 * @param overwrite
-	 * @param update
-	 * @param delete
-	 * @param uris
+	 *
+	 * @param preserve preserve
+	 * @param ignoreFailures ignoreFailures
+	 * @param overwrite overwrite
+	 * @param update update
+	 * @param delete delete
+	 * @param uris uris
 	 */
 	public void copy(EnumSet<Preserve> preserve, Boolean ignoreFailures, Boolean overwrite, Boolean update, Boolean delete, String... uris) {
 		copy(preserve, ignoreFailures, Boolean.FALSE, null, null, overwrite, update, delete, null, null, null, uris);
@@ -130,18 +129,18 @@ public class DistCp {
 	/**
 	 * Copies the given resources using the given parameters.
 	 * 
-	 * @param preserve
-	 * @param ignoreFailures
-	 * @param skipCrc
-	 * @param logDir
-	 * @param mappers
-	 * @param overwrite
-	 * @param update
-	 * @param delete
-	 * @param fileLimit
-	 * @param sizeLimit
-	 * @param fileList
-	 * @param uris
+	 * @param preserve preserve
+	 * @param ignoreFailures ignoreFailures
+	 * @param skipCrc skipCrc
+	 * @param logDir logDir
+	 * @param mappers mappers
+	 * @param overwrite overwrite
+	 * @param update update
+	 * @param delete delete
+	 * @param fileLimit fileLimit
+	 * @param sizeLimit sizeLimit
+	 * @param fileList fileList
+	 * @param uris uris
 	 */
 	public void copy(EnumSet<Preserve> preserve, Boolean ignoreFailures, Boolean skipCrc, String logDir, Integer mappers, Boolean overwrite, Boolean update, Boolean delete, Long fileLimit, Long sizeLimit, String fileList, String... uris) {
 		Boolean r = (preserve != null && preserve.contains(Preserve.REPLICATION));
@@ -157,22 +156,22 @@ public class DistCp {
 	/**
 	 * Copies the given resources using the given parameters.
 	 * 
-	 * @param preserveReplication
-	 * @param preserveBlockSize
-	 * @param preserveUser
-	 * @param preserveGroup
-	 * @param preservePermission
-	 * @param ignoreFailures
-	 * @param skipCrc
-	 * @param logDir
-	 * @param mappers
-	 * @param overwrite
-	 * @param update
-	 * @param delete
-	 * @param fileLimit
-	 * @param sizeLimit
-	 * @param fileList
-	 * @param uris
+	 * @param preserveReplication preserveReplication
+	 * @param preserveBlockSize preserveBlockSize
+	 * @param preserveUser preserveUser
+	 * @param preserveGroup preserveGroup
+	 * @param preservePermission preservePermission
+	 * @param ignoreFailures ignoreFailures
+	 * @param skipCrc skipCrc
+	 * @param logDir logDir
+	 * @param mappers mappers
+	 * @param overwrite overwrite
+	 * @param update update
+	 * @param delete delete
+	 * @param fileLimit fileLimit
+	 * @param sizeLimit sizeLimit
+	 * @param fileList fileList
+	 * @param uris uris
 	 */
 	public void copy(Boolean preserveReplication, Boolean preserveBlockSize, Boolean preserveUser, Boolean preserveGroup, Boolean preservePermission, Boolean ignoreFailures, Boolean skipCrc, String logDir, Integer mappers, Boolean overwrite, Boolean update, Boolean delete, Long fileLimit, Long sizeLimit, String fileList, String... uris) {
 
@@ -220,8 +219,8 @@ public class DistCp {
 	/**
 	 * Basic copy operation, between a source and a destination using the defaults.
 	 * 
-	 * @param arg1
-	 * @param arg2
+	 * @param arg1 arg1
+	 * @param arg2 arg2
 	 */
 	public void copy(String arg1, String arg2) {
 		copy(new String[] { arg1, arg2 });
@@ -230,9 +229,9 @@ public class DistCp {
 	/**
 	 * Basic copy operation, between a source and a destination using the defaults.
 	 * 
-	 * @param arg1
-	 * @param arg2
-	 * @param arg3
+	 * @param arg1 arg1
+	 * @param arg2 arg2
+	 * @param arg3 arg3
 	 */
 	public void copy(String arg1, String arg2, String arg3) {
 		copy(new String[] { arg1, arg2, arg3 });

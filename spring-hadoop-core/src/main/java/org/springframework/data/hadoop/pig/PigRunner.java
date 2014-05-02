@@ -23,8 +23,8 @@ import org.apache.pig.backend.executionengine.ExecJob;
 
 /**
  * Basic runner of Pig scripts inside a Spring environment. For more advanced functionality, consider using Spring Batch and the PigTasklet.
- *
- * <p/>To make the runner execute at startup, use {@link #setRunAtStartup(boolean)}.
+ * <p>
+ * To make the runner execute at startup, use {@link #setRunAtStartup(boolean)}.
  *
  * @author Costin Leau
  */
@@ -65,7 +65,7 @@ public class PigRunner extends PigExecutor implements Callable<List<ExecJob>> {
 	/**
 	 * Actions to be invoked before running the action.
 	 *
-	 * @param actions
+	 * @param actions actions
 	 */
 	public void setPreAction(Collection<Callable<?>> actions) {
 		this.preActions = actions;
@@ -74,7 +74,7 @@ public class PigRunner extends PigExecutor implements Callable<List<ExecJob>> {
 	/**
 	 * Actions to be invoked after running the action.
 	 *
-	 * @param actions
+	 * @param actions actions
 	 */
 	public void setPostAction(Collection<Callable<?>> actions) {
 		this.postActions = actions;

@@ -204,7 +204,7 @@ public abstract class JobUtils {
 	 * Returns the status of the given job. May return null indicating accessing the job
 	 * caused exceptions. 
 	 * 
-	 * @param job
+	 * @param job the job
 	 * @return the job status
 	 */
 	public static JobStatus getStatus(Job job) {

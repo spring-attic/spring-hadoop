@@ -70,7 +70,7 @@ public class PigTemplate implements InitializingBean, PigOperations, ResourceLoa
 	 * 
 	 * @param action callback object that specifies the Hive action
 	 * @return the action result object
-	 * @throws DataAccessException
+	 * @throws DataAccessException exception
 	 */
 	@Override
 	public <T> T execute(PigCallback<T> action) throws DataAccessException {
@@ -117,7 +117,7 @@ public class PigTemplate implements InitializingBean, PigOperations, ResourceLoa
 	 *  
 	 * @param script script URL or pig latin statement
 	 * @return list of job executions
-	 * @throws DataAccessException
+	 * @throws DataAccessException exception
 	 */
 	@Override
 	public List<ExecJob> executeScript(String script) throws DataAccessException {
@@ -131,7 +131,7 @@ public class PigTemplate implements InitializingBean, PigOperations, ResourceLoa
 	 * @param script script URL or pig latin statement
 	 * @param arguments script arguments
 	 * @return list of job executions
-	 * @throws DataAccessException
+	 * @throws DataAccessException exception
 	 */
 	@Override
 	public List<ExecJob> executeScript(String script, Map<?, ?> arguments) throws DataAccessException {
@@ -156,7 +156,7 @@ public class PigTemplate implements InitializingBean, PigOperations, ResourceLoa
 	 * 
 	 * @param script script location and arguments
 	 * @return list of job executions
-	 * @throws DataAccessException
+	 * @throws DataAccessException exception
 	 */
 	@Override
 	public List<ExecJob> executeScript(PigScript script) throws DataAccessException {
@@ -168,7 +168,7 @@ public class PigTemplate implements InitializingBean, PigOperations, ResourceLoa
 	 * 
 	 * @param scripts scripts location and arguments
 	 * @return list of job executions
-	 * @throws DataAccessException
+	 * @throws DataAccessException exception
 	 */
 	@Override
 	public List<ExecJob> executeScript(final Iterable<PigScript> scripts) throws DataAccessException {
@@ -187,7 +187,7 @@ public class PigTemplate implements InitializingBean, PigOperations, ResourceLoa
 	/**
 	 * Sets the {@link PigServer} factory.
 	 * 
-	 * @param pigServerFactory
+	 * @param pigServerFactory pig server factory
 	 */
 	public void setPigFactory(PigServerFactory pigServerFactory) {
 		this.pigServerFactory = pigServerFactory;

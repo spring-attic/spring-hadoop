@@ -25,7 +25,6 @@ import org.apache.hadoop.yarn.api.records.ContainerStatus;
  *
  * @author Janne Valkealahti
  * @see org.springframework.yarn.am.AppmasterCmTemplate
- * @see org.apache.hadoop.yarn.api.ContainerManager
  *
  */
 public interface AppmasterCmOperations {

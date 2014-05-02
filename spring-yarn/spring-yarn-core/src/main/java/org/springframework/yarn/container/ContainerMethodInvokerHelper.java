@@ -59,7 +59,7 @@ import org.springframework.yarn.support.UniqueMethodFilter;
  *
  * @author Janne Valkealahti
  *
- * @param <T>
+ * @param <T> type
  */
 public class ContainerMethodInvokerHelper<T> extends AbstractExpressionEvaluator {
 

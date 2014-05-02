@@ -65,8 +65,8 @@ public class PigScript {
 	/**
 	 * Constructs a new <code>PigScript</code> instance.
 	 *
-	 * @param resource
-	 * @param args
+	 * @param resource resource
+	 * @param args arguments
 	 */
 	public PigScript(Resource resource, Map<?, ?> args) {
 		Assert.notNull(resource, "a valid resource is required");

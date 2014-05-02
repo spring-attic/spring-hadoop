@@ -34,8 +34,9 @@ public interface PigOperations {
 	 * Executes the action specified by the given callback object within an active {@link PigServer}. 
 	 * 
 	 * @param action callback object that specifies the Hive action
+	 * @param <T> action type
 	 * @return the action result object
-	 * @throws DataAccessException
+	 * @throws DataAccessException exception
 	 */
 	<T> T execute(PigCallback<T> action) throws DataAccessException;
 
@@ -45,7 +46,7 @@ public interface PigOperations {
 	 *  
 	 * @param script script URL or pig latin statement
 	 * @return list of job executions
-	 * @throws DataAccessException
+	 * @throws DataAccessException exception
 	 */
 	List<ExecJob> executeScript(String script) throws DataAccessException;
 
@@ -56,7 +57,7 @@ public interface PigOperations {
 	 * @param script script URL or pig latin statement
 	 * @param arguments script arguments
 	 * @return list of job executions
-	 * @throws DataAccessException
+	 * @throws DataAccessException exception
 	 */
 	List<ExecJob> executeScript(String script, Map<?, ?> arguments) throws DataAccessException;
 
@@ -65,7 +66,7 @@ public interface PigOperations {
 	 * 
 	 * @param script script location and arguments
 	 * @return list of job executions
-	 * @throws DataAccessException
+	 * @throws DataAccessException exception
 	 */
 	List<ExecJob> executeScript(PigScript script) throws DataAccessException;
 
@@ -74,7 +75,7 @@ public interface PigOperations {
 	 * 
 	 * @param scripts scripts location and arguments
 	 * @return list of job executions
-	 * @throws DataAccessException
+	 * @throws DataAccessException exception
 	 */
 	List<ExecJob> executeScript(Iterable<PigScript> scripts) throws DataAccessException;
 

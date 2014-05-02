@@ -41,14 +41,14 @@ import org.springframework.util.StringUtils;
  * The general idea of this launcher concept is to provide
  * a way to define context config location, bean name for execution
  * handling, options and a arguments. Possible examples are:
- * <p>
+ * <br>
  * <pre>
  * contextConfig
  * contextConfig,childContextConfig beanIdentifier
- * contextConfig beanIdentifier &lt;arguments>
- * contextConfig &lt;options> beanIdentifier
- * contextConfig &lt;options> beanIdentifier &lt;arguments>
- * &lt;options> contextConfig &lt;options> beanIdentifier &lt;arguments>
+ * contextConfig beanIdentifier &lt;arguments&gt;
+ * contextConfig &lt;options&gt; beanIdentifier
+ * contextConfig &lt;options&gt; beanIdentifier &lt;arguments&gt;
+ * &lt;options&gt; contextConfig &lt;options&gt; beanIdentifier &lt;arguments&gt;
  * </pre>
  *
  * @author Janne Valkealahti

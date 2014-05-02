@@ -28,12 +28,13 @@ public interface HbaseOperations {
 
 	/**
 	 * Executes the given action against the specified table handling resource management.
-	 * <p/>
+	 * <p>
 	 * Application exceptions thrown by the action object get propagated to the caller (can only be unchecked). 
 	 * Allows for returning a result object (typically a domain object or collection of domain objects).
 	 * 
 	 * @param tableName the target table
 	 * @param action callback object that specifies the action
+	 * @param <T> action type
 	 * @return the result object of the callback action, or null
 	 */
 	<T> T execute(String tableName, TableCallback<T> action);
@@ -45,6 +46,7 @@ public interface HbaseOperations {
 	 * @param tableName target table
 	 * @param family column family
 	 * @param action action handling the scanner results
+	 * @param <T> action type
 	 * @return the result object of the callback action, or null
 	 */
 	<T> T find(String tableName, String family, final ResultsExtractor<T> action);
@@ -57,6 +59,7 @@ public interface HbaseOperations {
 	 * @param family column family
 	 * @param qualifier column qualifier
 	 * @param action action handling the scanner results
+	 * @param <T> action type
 	 * @return the result object of the callback action, or null
 	 */
 	<T> T find(String tableName, String family, String qualifier, final ResultsExtractor<T> action);
@@ -69,6 +72,7 @@ public interface HbaseOperations {
 	 * @param tableName target table
 	 * @param scan table scanner
 	 * @param action action handling the scanner results
+	 * @param <T> action type
 	 * @return the result object of the callback action, or null
 	 */
 	<T> T find(String tableName, final Scan scan, final ResultsExtractor<T> action);
@@ -80,6 +84,7 @@ public interface HbaseOperations {
 	 * @param tableName target table
 	 * @param family column family
 	 * @param action row mapper handling the scanner results
+	 * @param <T> action type
 	 * @return a list of objects mapping the scanned rows
 	 */
 	<T> List<T> find(String tableName, String family, final RowMapper<T> action);
@@ -92,6 +97,7 @@ public interface HbaseOperations {
 	 * @param family column family
 	 * @param qualifier column qualifier
 	 * @param action row mapper handling the scanner results
+	 * @param <T> action type
 	 * @return a list of objects mapping the scanned rows
 	 */
 	<T> List<T> find(String tableName, String family, String qualifier, final RowMapper<T> action);
@@ -104,6 +110,7 @@ public interface HbaseOperations {
 	 * @param tableName target table
 	 * @param scan table scanner
 	 * @param action row mapper handling the scanner results
+	 * @param <T> action type
 	 * @return a list of objects mapping the scanned rows
 	 */
 	<T> List<T> find(String tableName, final Scan scan, final RowMapper<T> action);
@@ -114,6 +121,7 @@ public interface HbaseOperations {
 	 * @param tableName target table
 	 * @param rowName row name
 	 * @param mapper row mapper
+	 * @param <T> mapper type
 	 * @return object mapping the target row
 	 */
 	<T> T get(String tableName, String rowName, final RowMapper<T> mapper);
@@ -125,6 +133,7 @@ public interface HbaseOperations {
 	 * @param rowName row name
 	 * @param familyName column family
 	 * @param mapper row mapper
+	 * @param <T> mapper type
 	 * @return object mapping the target row
 	 */
 	<T> T get(String tableName, String rowName, String familyName, final RowMapper<T> mapper);
@@ -137,6 +146,7 @@ public interface HbaseOperations {
 	 * @param familyName family 
 	 * @param qualifier column qualifier
 	 * @param mapper row mapper
+	 * @param <T> mapper type
 	 * @return object mapping the target row
 	 */
 	<T> T get(String tableName, final String rowName, final String familyName, final String qualifier, final RowMapper<T> mapper);

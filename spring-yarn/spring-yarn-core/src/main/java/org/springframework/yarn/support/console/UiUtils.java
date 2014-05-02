@@ -52,6 +52,7 @@ public abstract class UiUtils {
 	 * Renders a textual representation of the list of provided Map data
 	 *
 	 * @param columns List of Maps
+	 * @param data the data
 	 * @return The rendered table representation as String
 	 *
 	 */
@@ -131,6 +132,7 @@ public abstract class UiUtils {
 	 * Renders a textual representation of the provided {@link Table}
 	 *
 	 * @param table Table data {@link Table}
+	 * @param withHeader with header
 	 * @return The rendered table representation as String
 	 */
 	public static String renderTextTable(Table table, boolean withHeader) {

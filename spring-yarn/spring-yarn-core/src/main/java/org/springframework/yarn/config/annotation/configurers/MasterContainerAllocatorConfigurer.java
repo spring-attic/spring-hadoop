@@ -22,9 +22,9 @@ import org.springframework.yarn.config.annotation.builders.YarnAppmasterConfigur
 /**
  * {@link AnnotationConfigurerBuilder} for configuring {@link ContainerAllocator}.
  *
- * <p>
+ * <br>
  * Typically configuration is shown below.
- * <p>
+ * <br>
  * <pre>
  * &#064;Configuration
  * &#064;EnableYarn(enable=Enable.APPMASTER)
@@ -47,9 +47,9 @@ public interface MasterContainerAllocatorConfigurer extends AnnotationConfigurer
 	/**
 	 * Specify a container priority for {@link ContainerAllocator}.
 	 *
-	 * <p>
-	 * <p>JavaConfig:
-	 * <p>
+	 * <br>
+	 * <br>JavaConfig:
+	 * <br>
 	 * <pre>
 	 *
 	 * public void configure(YarnAppmasterConfigure master) throws Exception {
@@ -59,12 +59,12 @@ public interface MasterContainerAllocatorConfigurer extends AnnotationConfigurer
 	 * }
 	 * </pre>
 	 *
-	 * <p>XML:
-	 * <p>
+	 * <br>XML:
+	 * <br>
 	 * <pre>
-	 * &lt;yarn:master>
-	 *   &lt;yarn:container-allocator priority="0"/>
-	 * &lt;/yarn:master>
+	 * &lt;yarn:master&gt;
+	 *   &lt;yarn:container-allocator priority="0"/&gt;
+	 * &lt;/yarn:master&gt;
 	 * </pre>
 	 *
 	 * @param priority the priority
@@ -75,9 +75,9 @@ public interface MasterContainerAllocatorConfigurer extends AnnotationConfigurer
 	/**
 	 * Specify a container virtual cores for {@link ContainerAllocator}.
 	 *
-	 * <p>
-	 * <p>JavaConfig:
-	 * <p>
+	 * <br>
+	 * <br>JavaConfig:
+	 * <br>
 	 * <pre>
 	 *
 	 * public void configure(YarnAppmasterConfigure master) throws Exception {
@@ -87,12 +87,12 @@ public interface MasterContainerAllocatorConfigurer extends AnnotationConfigurer
 	 * }
 	 * </pre>
 	 *
-	 * <p>XML:
-	 * <p>
+	 * <br>XML:
+	 * <br>
 	 * <pre>
-	 * &lt;yarn:master>
-	 *   &lt;yarn:container-allocator virtualcores="1"/>
-	 * &lt;/yarn:master>
+	 * &lt;yarn:master&gt;
+	 *   &lt;yarn:container-allocator virtualcores="1"/&gt;
+	 * &lt;/yarn:master&gt;
 	 * </pre>
 	 *
 	 * @param virtualCores the virtual cores
@@ -115,9 +115,9 @@ public interface MasterContainerAllocatorConfigurer extends AnnotationConfigurer
 	 * down to full <code>MB</code>s and thus becomes a zero. Also too
 	 * high values may make resource allocation to behave badly.
 	 *
-	 * <p>
-	 * <p>JavaConfig:
-	 * <p>
+	 * <br>
+	 * <br>JavaConfig:
+	 * <br>
 	 * <pre>
 	 *
 	 * public void configure(YarnAppmasterConfigure master) throws Exception {
@@ -127,12 +127,12 @@ public interface MasterContainerAllocatorConfigurer extends AnnotationConfigurer
 	 * }
 	 * </pre>
 	 *
-	 * <p>XML:
-	 * <p>
+	 * <br>XML:
+	 * <br>
 	 * <pre>
-	 * &lt;yarn:master>
-	 *   &lt;yarn:container-allocator memory="1024"/>
-	 * &lt;/yarn:master>
+	 * &lt;yarn:master&gt;
+	 *   &lt;yarn:container-allocator memory="1024"/&gt;
+	 * &lt;/yarn:master&gt;
 	 * </pre>
 	 *
 	 * @param memory the memory
@@ -143,9 +143,9 @@ public interface MasterContainerAllocatorConfigurer extends AnnotationConfigurer
 	/**
 	 * Specify a container memory for {@link ContainerAllocator}.
 	 *
-	 * <p>
-	 * <p>JavaConfig:
-	 * <p>
+	 * <br>
+	 * <br>JavaConfig:
+	 * <br>
 	 * <pre>
 	 *
 	 * public void configure(YarnAppmasterConfigure master) throws Exception {
@@ -155,12 +155,12 @@ public interface MasterContainerAllocatorConfigurer extends AnnotationConfigurer
 	 * }
 	 * </pre>
 	 *
-	 * <p>XML:
-	 * <p>
+	 * <br>XML:
+	 * <br>
 	 * <pre>
-	 * &lt;yarn:master>
-	 *   &lt;yarn:container-allocator memory="1024"/>
-	 * &lt;/yarn:master>
+	 * &lt;yarn:master&gt;
+	 *   &lt;yarn:container-allocator memory="1024"/&gt;
+	 * &lt;/yarn:master&gt;
 	 * </pre>
 	 *
 	 * @param memory the memory
@@ -174,9 +174,9 @@ public interface MasterContainerAllocatorConfigurer extends AnnotationConfigurer
 	 * this flag <code>true</code> means that resource requests will
 	 * not use locality relaxing. Default for this flag is <code>false</code>.
 	 *
-	 * <p>
-	 * <p>JavaConfig:
-	 * <p>
+	 * <br>
+	 * <br>JavaConfig:
+	 * <br>
 	 * <pre>
 	 *
 	 * public void configure(YarnAppmasterConfigure master) throws Exception {
@@ -186,12 +186,12 @@ public interface MasterContainerAllocatorConfigurer extends AnnotationConfigurer
 	 * }
 	 * </pre>
 	 *
-	 * <p>XML:
-	 * <p>
+	 * <br>XML:
+	 * <br>
 	 * <pre>
-	 * &lt;yarn:master>
-	 *   &lt;yarn:container-allocator locality="false"/>
-	 * &lt;/yarn:master>
+	 * &lt;yarn:master&gt;
+	 *   &lt;yarn:container-allocator locality="false"/&gt;
+	 * &lt;/yarn:master&gt;
 	 * </pre>
 	 *
 	 * @param locality the locality flag for resource relaxing

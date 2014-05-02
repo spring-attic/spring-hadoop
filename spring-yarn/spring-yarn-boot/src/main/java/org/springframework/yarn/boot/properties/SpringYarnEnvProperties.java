@@ -43,6 +43,8 @@ public class SpringYarnEnvProperties {
 
 	/**
 	 * Sets the value from an environment variable <code>SHDP_HD_FS</code>.
+	 *
+	 * @param fs file system URL
 	 */
 	public void setSHDP_HD_FS(String fs) {
 		this.fs = fs;
@@ -59,6 +61,8 @@ public class SpringYarnEnvProperties {
 
 	/**
 	 * Sets the value from an environment variable <code>SHDP_HD_RM</code>.
+	 *
+	 * @param rm resource manager address
 	 */
 	public void setSHDP_HD_RM(String rm) {
 		this.rm = rm;
@@ -76,6 +80,8 @@ public class SpringYarnEnvProperties {
 	/**
 	 * Sets the value from an environment variable
 	 * <code>SHDP_HD_SCHEDULER</code>.
+	 *
+	 * @param scheduler scheduler address
 	 */
 	public void setSHDP_HD_SCHEDULER(String scheduler) {
 		this.scheduler = scheduler;

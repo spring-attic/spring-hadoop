@@ -99,7 +99,7 @@ class Jsr223ScriptRunner implements InitializingBean, BeanClassLoaderAware, Call
 	 * Method for post-processing arguments. Useful for enhancing (adding) new arguments to scripts
 	 * being executed.
 	 * 
-	 * @param arguments
+	 * @param arguments The arguments.
 	 */
 	protected void postProcess(Map<String, Object> arguments) {
 	}
@@ -139,7 +139,7 @@ class Jsr223ScriptRunner implements InitializingBean, BeanClassLoaderAware, Call
 	/**
 	 * Sets the way the script is evaluated.
 	 * 
-	 * @param evaluation
+	 * @param evaluation The evaluation.
 	 */
 	public void setEvaluate(EvaluationPolicy evaluation) {
 		this.evaluation = evaluation;
@@ -176,7 +176,7 @@ class Jsr223ScriptRunner implements InitializingBean, BeanClassLoaderAware, Call
 	/**
 	 * Actions to be invoked before running the action.
 	 * 
-	 * @param actions
+	 * @param actions The actions.
 	 */
 	public void setPreAction(Collection<Callable<?>> actions) {
 		this.preActions = actions;
@@ -185,7 +185,7 @@ class Jsr223ScriptRunner implements InitializingBean, BeanClassLoaderAware, Call
 	/**
 	 * Actions to be invoked after running the action.
 	 * 
-	 * @param actions
+	 * @param actions The actions.
 	 */
 	public void setPostAction(Collection<Callable<?>> actions) {
 		this.postActions = actions;

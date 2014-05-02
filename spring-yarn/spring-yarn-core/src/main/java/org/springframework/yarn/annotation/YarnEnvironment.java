@@ -34,6 +34,8 @@ public @interface YarnEnvironment {
 
 	/**
 	 * The name of the parameter to bind to.
+	 *
+	 * @return value
 	 */
 	String value() default "";
 
@@ -43,6 +45,8 @@ public @interface YarnEnvironment {
 	 * Default is {@code true}, leading to an exception if the environment variable is
 	 * missing. Switch this to {@code false} if you prefer a {@code null} in
 	 * case of the environment variable missing.
+	 *
+	 * @return required
 	 */
 	boolean required() default true;
 

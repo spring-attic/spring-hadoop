@@ -51,8 +51,9 @@ public class TableRow {
 	/**
 	 * Add a value to the to the specified column within this row.
 	 *
-	 * @param column
-	 * @param value
+	 * @param column column
+	 * @param value value
+	 * @return the row
 	 */
 	public TableRow addValue(Integer column, String value) {
 		this.data.put(column, value);

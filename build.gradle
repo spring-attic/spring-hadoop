@@ -36,6 +36,7 @@ def yarnProjects() {
 }
 
 println "Using Spring Framework version: [$springVersion]"
+println "Using Java version: [" + System.getProperty("java.version") + "]"
 
 //
 //  Select the Hadoop distribution used for building the binaries
@@ -418,13 +419,13 @@ configure(javaProjects()) {
   
 			links = [
 				"http://docs.spring.io/spring/docs/4.0.x/javadoc-api/",
-				"http://docs.oracle.com/javase/6/docs/api",
+				"http://docs.oracle.com/javase/6/docs/api/",
 				"http://commons.apache.org/proper/commons-logging/apidocs/",
 				"http://logging.apache.org/log4j/1.2/apidocs/",
 				"http://hadoop.apache.org/common/docs/current/api/",
 				"http://hbase.apache.org/apidocs/",
 				"http://pig.apache.org/docs/r0.12.0/api/",
-				"http://hive.apache.org/javadocs/r0.12.0/api",
+				"http://hive.apache.org/javadocs/r0.12.0/api/",
 				"http://docs.spring.io/spring-batch/apidocs/",
 				"http://docs.spring.io/spring-integration/api/"
 			]

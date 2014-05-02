@@ -22,7 +22,7 @@ package org.springframework.yarn.container;
  *
  * @author Janne Valkealahti
  *
- * @param <T>
+ * @param <T> type
  */
 public interface YarnContainerRuntimeProcessor<T> {
 

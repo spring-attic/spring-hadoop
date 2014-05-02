@@ -34,8 +34,8 @@ public interface YarnRpcCallback<T, P> {
 	 *
 	 * @param proxy rpc proxy instance
 	 * @return Value returned by callback
-	 * @throws YarnException
-	 * @throws IOException
+	 * @throws YarnException YarnException
+	 * @throws IOException IOException
 	 */
 	T doInYarn(P proxy) throws YarnException, IOException;
 

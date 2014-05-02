@@ -63,7 +63,7 @@ public class HiveRunner extends HiveExecutor implements Callable<List<String>> {
 	/**
 	 * Actions to be invoked before running the action.
 	 *
-	 * @param actions
+	 * @param actions actions
 	 */
 	public void setPreAction(Collection<Callable<?>> actions) {
 		this.preActions = actions;
@@ -72,7 +72,7 @@ public class HiveRunner extends HiveExecutor implements Callable<List<String>> {
 	/**
 	 * Actions to be invoked after running the action.
 	 *
-	 * @param actions
+	 * @param actions actions
 	 */
 	public void setPostAction(Collection<Callable<?>> actions) {
 		this.postActions = actions;

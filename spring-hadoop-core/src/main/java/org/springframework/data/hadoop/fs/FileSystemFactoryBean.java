@@ -122,7 +122,7 @@ public class FileSystemFactoryBean implements InitializingBean, DisposableBean, 
 	 * Indicates whether the Hadoop file systems should be closed once this factory is destroyed.
 	 * True by default - should be turned off when running 'embedded' or if long running operations outlive the application context.
 	 *
-	 * @param close
+	 * @param close close
 	 * @see FileSystem#close()
 	 */
 	public void setClose(boolean close) {

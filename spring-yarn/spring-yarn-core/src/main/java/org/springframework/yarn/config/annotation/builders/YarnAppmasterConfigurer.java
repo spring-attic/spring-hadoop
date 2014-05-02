@@ -27,7 +27,7 @@ import org.springframework.yarn.config.annotation.configurers.MasterContainerRun
  * exposed to user via {@link SpringYarnConfigurerAdapter}.
  * <p>
  * Typically configuration is shown below.
- * <p>
+ * <br>
  * <pre>
  * &#064;Configuration
  * &#064;EnableYarn(enable=Enable.APPMASTER)
@@ -52,9 +52,9 @@ public interface YarnAppmasterConfigurer {
 	 * Specify a container runner for Appmaster. Applies a new
 	 * {@link DefaultMasterContainerRunnerConfigurer} into a current builder.
 	 *
-	 * <p>
-	 * <p>JavaConfig:
-	 * <p>
+	 * <br>
+	 * <br>JavaConfig:
+	 * <br>
 	 * <pre>
 	 *
 	 * public void configure(YarnAppmasterConfigure master) throws Exception {
@@ -67,20 +67,21 @@ public interface YarnAppmasterConfigurer {
 	 * }
 	 * </pre>
 	 *
-	 * <p>XML:
-	 * <p>
+	 * <br>XML:
+	 * <br>
 	 * <pre>
-	 * &lt;util:properties id="arguments">
-	 *   &lt;prop key="foo1">bar1&lt;/prop>
-	 *   &lt;prop key="foo2">bar2&lt;/prop>
-	 * &lt;/util:properties>
+	 * &lt;util:properties id="arguments"&gt;
+	 *   &lt;prop key="foo1"&gt;bar1&lt;/prop&gt;
+	 *   &lt;prop key="foo2"&gt;bar2&lt;/prop&gt;
+	 * &lt;/util:properties&gt;
 	 *
-	 * &lt;yarn:master>
-	 *   &lt;yarn:container-runner arguments="arguments"/>
-	 * &lt;/yarn:master>
+	 * &lt;yarn:master&gt;
+	 *   &lt;yarn:container-runner arguments="arguments"/&gt;
+	 * &lt;/yarn:master&gt;
 	 * </pre>
 	 *
 	 * @return {@link MasterContainerRunnerConfigurer} for chaining
+	 * @throws Exception exception
 	 */
 	MasterContainerRunnerConfigurer withContainerRunner() throws Exception;
 
@@ -88,9 +89,9 @@ public interface YarnAppmasterConfigurer {
 	 * Specify a container allocator for Appmaster. Applies a new
 	 * {@link DefaultMasterContainerAllocatorConfigurer} into a current builder.
 	 *
-	 * <p>
-	 * <p>JavaConfig:
-	 * <p>
+	 * <br>
+	 * <br>JavaConfig:
+	 * <br>
 	 * <pre>
 	 *
 	 * public void configure(YarnAppmasterConfigure master) throws Exception {
@@ -102,43 +103,44 @@ public interface YarnAppmasterConfigurer {
 	 * }
 	 * </pre>
 	 *
-	 * <p>XML:
-	 * <p>
+	 * <br>XML:
+	 * <br>
 	 * <pre>
-	 * &lt;yarn:master>
-	 *   &lt;yarn:container-allocator priority="0" virtualcores="1" memory="1024"/>
-	 * &lt;/yarn:master>
+	 * &lt;yarn:master&gt;
+	 *   &lt;yarn:container-allocator priority="0" virtualcores="1" memory="1024"/&gt;
+	 * &lt;/yarn:master&gt;
 	 * </pre>
 	 *
 	 * @return {@link MasterContainerAllocatorConfigurer} for chaining
+	 * @throws Exception exception
 	 */
 	MasterContainerAllocatorConfigurer withContainerAllocator() throws Exception;
 
 	/**
 	 * Specify a raw array of commands used to start a container.
 	 *
-	 * <p>
-	 * <p>JavaConfig:
-	 * <p>
+	 * <br>
+	 * <br>JavaConfig:
+	 * <br>
 	 * <pre>
 	 * public void configure(YarnAppmasterConfigure master) throws Exception {
 	 *   master
-	 *     .containerCommands("date", "1><LOG_DIR>/Container.stdout", "2><LOG_DIR>/Container.stderr");
+	 *     .containerCommands("date", "1&gt;&lt;LOG_DIR&gt;/Container.stdout", "2&gt;&lt;LOG_DIR&gt;/Container.stderr");
 	 * }
 	 * </pre>
 	 *
-	 * <p>XML:
-	 * <p>
+	 * <br>XML:
+	 * <br>
 	 * <pre>
-	 * &lt;yarn:master>
-	 *   &lt;yarn:container-command>
+	 * &lt;yarn:master&gt;
+	 *   &lt;yarn:container-command&gt;
 	 *     &lt;![CDATA[
 	 *     date
-	 *     1><LOG_DIR>/Container.stdout
-	 *     2><LOG_DIR>/Container.stderr
-	 *     ]]>
-	 *   &lt;/yarn:container-command>
-	 * &lt;/yarn:master>
+	 *     1&gt;&lt;LOG_DIR&gt;/Container.stdout
+	 *     2&gt;&lt;LOG_DIR&gt;/Container.stderr
+	 *     ]]&gt;
+	 *   &lt;/yarn:container-command&gt;
+	 * &lt;/yarn:master&gt;
 	 * </pre>
 	 *
 	 * @param commands The Yarn container commands
@@ -149,9 +151,9 @@ public interface YarnAppmasterConfigurer {
 	/**
 	 * Specify a {@code YarnAppmaster} class.
 	 *
-	 * <p>
-	 * <p>JavaConfig:
-	 * <p>
+	 * <br>
+	 * <br>JavaConfig:
+	 * <br>
 	 * <pre>
 	 * public void configure(YarnAppmasterConfigure master) throws Exception {
 	 *   master
@@ -159,10 +161,10 @@ public interface YarnAppmasterConfigurer {
 	 * }
 	 * </pre>
 	 *
-	 * <p>XML:
-	 * <p>
+	 * <br>XML:
+	 * <br>
 	 * <pre>
-	 * &lt;yarn:master appmaster-class="com.example.MyYarnAppmaster"/>
+	 * &lt;yarn:master appmaster-class="com.example.MyYarnAppmaster"/&gt;
 	 * </pre>
 	 *
 	 * @param clazz The Yarn appmaster class
@@ -173,9 +175,9 @@ public interface YarnAppmasterConfigurer {
 	/**
 	 * Specify a {@code YarnAppmaster} as a fully qualified class name.
 	 *
-	 * <p>
-	 * <p>JavaConfig:
-	 * <p>
+	 * <br>
+	 * <br>JavaConfig:
+	 * <br>
 	 * <pre>
 	 * public void configure(YarnAppmasterConfigure master) throws Exception {
 	 *   master
@@ -183,8 +185,8 @@ public interface YarnAppmasterConfigurer {
 	 * }
 	 * </pre>
 	 *
-	 * <p>XML:
-	 * <p>
+	 * <br>XML:
+	 * <br>
 	 * No equivalent
 	 *
 	 * @param clazz The Yarn appmaster class

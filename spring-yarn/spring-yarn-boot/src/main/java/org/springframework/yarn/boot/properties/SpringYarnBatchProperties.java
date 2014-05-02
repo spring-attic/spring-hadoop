@@ -20,9 +20,7 @@ import org.springframework.yarn.batch.support.YarnBatchProperties;
 
 /**
  * Spring Boot {@link ConfigurationProperties} for
- * <em>spring.yarn.batch</em>. These configuration properties
- * are used together with {@link YarnJobLauncherCommandLineRunner}
- * to define base functionality to execute jobs.
+ * <em>spring.yarn.batch</em>.
  *
  * @author Janne Valkealahti
  *

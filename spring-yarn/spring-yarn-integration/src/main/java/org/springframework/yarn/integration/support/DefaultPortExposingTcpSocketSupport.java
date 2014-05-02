@@ -21,7 +21,7 @@ import java.net.Socket;
 import org.springframework.yarn.support.NetworkUtils;
 
 /**
- * Implementation of {@link org.springframework.integration.ip.tcp.connection.support.TcpSocketSupport}
+ * Implementation of {@link org.springframework.integration.ip.tcp.connection.TcpSocketSupport}
  * which extends its base functionality by catching socket information, like listen address and port.
  *
  * @author Janne Valkealahti

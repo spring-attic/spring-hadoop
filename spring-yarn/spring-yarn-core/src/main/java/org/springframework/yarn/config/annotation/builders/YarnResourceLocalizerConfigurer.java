@@ -25,7 +25,7 @@ import org.springframework.yarn.config.annotation.configurers.LocalResourcesHdfs
  * a {@link SpringYarnConfigurerAdapter}.
  * <p>
  * Typically configuration is used as shown below.
- * <p>
+ * <br>
  * <pre>
  * &#064;Configuration
  * &#064;EnableYarn
@@ -52,7 +52,7 @@ public interface YarnResourceLocalizerConfigurer {
 	/**
 	 * Specify configuration options as properties with a {@link DefaultLocalResourcesCopyConfigurer}.
 	 *
-	 * <p>JavaConfig:
+	 * <br>JavaConfig:
 	 * <pre>
 	 * public void configure(YarnResourceLocalizerConfigure localizer) throws Exception {
 	 *   localizer
@@ -61,11 +61,11 @@ public interface YarnResourceLocalizerConfigurer {
 	 * }
 	 * </pre>
 	 *
-	 * <p>XML:
+	 * <br>XML:
 	 * <pre>
-	 * &lt;yarn:localresources>
-	 *   &lt;:hdfs path="/tmp/foo.jar" staging="false"/>
-	 * &lt;/yarn:localresources>
+	 * &lt;yarn:localresources&gt;
+	 *   &lt;:hdfs path="/tmp/foo.jar" staging="false"/&gt;
+	 * &lt;/yarn:localresources&gt;
 	 * </pre>
 	 *
 	 * @return {@link LocalResourcesCopyConfigurer} for chaining
@@ -76,7 +76,7 @@ public interface YarnResourceLocalizerConfigurer {
 	/**
 	 * Specify configuration options as properties with a {@link DefaultLocalResourcesCopyConfigurer}.
 	 *
-	 * <p>JavaConfig:
+	 * <br>JavaConfig:
 	 * <pre>
 	 * public void configure(YarnResourceLocalizerConfigure localizer) throws Exception {
 	 *   localizer
@@ -85,11 +85,11 @@ public interface YarnResourceLocalizerConfigurer {
 	 * }
 	 * </pre>
 	 *
-	 * <p>XML:
+	 * <br>XML:
 	 * <pre>
-	 * &lt;yarn:localresources>
-	 *   &lt;:hdfs path="/tmp/foo.jar" staging="false"/>
-	 * &lt;/yarn:localresources>
+	 * &lt;yarn:localresources&gt;
+	 *   &lt;:hdfs path="/tmp/foo.jar" staging="false"/&gt;
+	 * &lt;/yarn:localresources&gt;
 	 * </pre>
 	 *
 	 * @return {@link LocalResourcesCopyConfigurer} for chaining

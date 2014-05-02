@@ -36,6 +36,7 @@ public class IntegrationContextUtils {
 	 * available.
 	 *
 	 * @param beanFactory BeanFactory for lookup, must not be null.
+	 * @return task scheduler
 	 */
 	public static TaskScheduler getTaskScheduler(BeanFactory beanFactory) {
 		return getBeanOfType(beanFactory, TASK_SCHEDULER_BEAN_NAME, TaskScheduler.class);
@@ -45,6 +46,7 @@ public class IntegrationContextUtils {
 	 * Return the {@link TaskScheduler} bean whose name is "taskScheduler".
 	 *
 	 * @param beanFactory BeanFactory for lookup, must not be null.
+	 * @return task scheduler
 	 * @throws IllegalStateException if no such bean is available
 	 */
 	public static TaskScheduler getRequiredTaskScheduler(BeanFactory beanFactory) {
@@ -58,6 +60,7 @@ public class IntegrationContextUtils {
 	 * "integrationConversionService" if available.
 	 *
 	 * @param beanFactory BeanFactory for lookup, must not be null.
+	 * @return conversion service
 	 */
 	public static ConversionService getConversionService(BeanFactory beanFactory) {
 		return getBeanOfType(beanFactory, YARN_INTEGRATION_CONVERSION_SERVICE_BEAN_NAME, ConversionService.class);

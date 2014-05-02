@@ -44,24 +44,32 @@ public @interface MiniHadoopCluster {
 	 * {@link org.apache.hadoop.conf.Configuration}
 	 * bean based on mini cluster runtime config.
 	 * Default is "hadoopConfiguration"
+	 *
+	 * @return config name
 	 */
 	String configName() default HadoopTestSystemConstants.DEFAULT_ID_MINIHADOOPCLUSTER_CONFIG;
 
 	/**
 	 * Value defining a name used to set the
 	 * cluster bean. Default is "hadoopCluster"
+	 *
+	 * @return cluster name
 	 */
 	String clusterName() default HadoopTestSystemConstants.DEFAULT_ID_MINIHADOOPCLUSTER;
 
 	/**
 	 * Unique id for the cluster. Default
 	 * is "default".
+	 *
+	 * @return default
 	 */
 	String id() default HadoopTestSystemConstants.DEFAULT_ID_CLUSTER;
 
 	/**
 	 * Number of nodes for the cluster.
 	 * Default size is one node.
+	 *
+	 * @return nodes
 	 */
 	int nodes() default 1;
 

@@ -23,7 +23,7 @@ import org.springframework.yarn.container.YarnContainer;
  * exposed to user via {@link SpringYarnConfigurerAdapter}.
  * <p>
  * Typically configuration is shown below.
- * <p>
+ * <br>
  * <pre>
  * &#064;Configuration
  * &#064;EnableYarn(enable=Enable.CONTAINER)
@@ -46,9 +46,9 @@ public interface YarnContainerConfigurer {
 	/**
 	 * Specify a {@code YarnContainer} class.
 	 *
-	 * <p>
-	 * <p>JavaConfig:
-	 * <p>
+	 * <br>
+	 * <br>JavaConfig:
+	 * <br>
 	 * <pre>
 	 * public void configure(YarnContainerConfigure container) throws Exception {
 	 *   container
@@ -56,10 +56,10 @@ public interface YarnContainerConfigurer {
 	 * }
 	 * </pre>
 	 *
-	 * <p>XML:
-	 * <p>
+	 * <br>XML:
+	 * <br>
 	 * <pre>
-	 * &lt;yarn:container container-class="com.example.MyYarnContainer"/>
+	 * &lt;yarn:container container-class="com.example.MyYarnContainer"/&gt;
 	 * </pre>
 	 *
 	 * @param clazz The Yarn container class
@@ -70,9 +70,9 @@ public interface YarnContainerConfigurer {
 	/**
 	 * Specify a {@code YarnContainer} as a fully qualified class name.
 	 *
-	 * <p>
-	 * <p>JavaConfig:
-	 * <p>
+	 * <br>
+	 * <br>JavaConfig:
+	 * <br>
 	 * <pre>
 	 * public void configure(YarnContainerConfigure container) throws Exception {
 	 *   container
@@ -80,8 +80,8 @@ public interface YarnContainerConfigurer {
 	 * }
 	 * </pre>
 	 *
-	 * <p>XML:
-	 * <p>
+	 * <br>XML:
+	 * <br>
 	 * No equivalent
 	 *
 	 * @param clazz The Yarn container class
@@ -92,9 +92,9 @@ public interface YarnContainerConfigurer {
 	/**
 	 * Specify a {@code YarnContainer} reference.
 	 *
-	 * <p>
-	 * <p>JavaConfig:
-	 * <p>
+	 * <br>
+	 * <br>JavaConfig:
+	 * <br>
 	 * <pre>
 	 * &#064;Autowired
 	 * private YarnContainer yarnContainer;
@@ -105,11 +105,11 @@ public interface YarnContainerConfigurer {
 	 * }
 	 * </pre>
 	 *
-	 * <p>XML:
-	 * <p>
+	 * <br>XML:
+	 * <br>
 	 * <pre>
-	 * &lt;bean id="myYarnContainer" class="com.example.MyYarnContainer"/>
-	 * &lt;yarn:container container-ref="myYarnContainer"/>
+	 * &lt;bean id="myYarnContainer" class="com.example.MyYarnContainer"/&gt;
+	 * &lt;yarn:container container-ref="myYarnContainer"/&gt;
 	 * </pre>
 	 *
 	 * @param ref The Yarn container reference

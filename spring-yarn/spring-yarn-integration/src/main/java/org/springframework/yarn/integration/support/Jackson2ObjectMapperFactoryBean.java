@@ -46,19 +46,19 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
  * {@link #setFeaturesToEnable(Object[])} and {@link #setFeaturesToDisable(Object[])}.
  *
  * <pre>
- * &lt;bean class="org.springframework.yarn.integration.support.Jackson2ObjectMapperFactoryBean">
- *   &lt;property name="featuresToEnable">
- *     &lt;array>
- *       &lt;util:constant static-field="com.fasterxml.jackson.databind.SerializationFeature$WRAP_ROOT_VALUE"/>
- *       &lt;util:constant static-field="com.fasterxml.jackson.databind.SerializationFeature$CLOSE_CLOSEABLE"/>
- *     &lt;/array>
- *   &lt;/property>
- *   &lt;property name="featuresToDisable">
- *     &lt;array>
- *       &lt;util:constant static-field="com.fasterxml.jackson.databind.MapperFeature$USE_ANNOTATIONS"/>
- *     &lt;/array>
- *   &lt;/property>
- * &lt;/bean>
+ * &lt;bean class="org.springframework.yarn.integration.support.Jackson2ObjectMapperFactoryBean"&gt;
+ *   &lt;property name="featuresToEnable"&gt;
+ *     &lt;array&gt;
+ *       &lt;util:constant static-field="com.fasterxml.jackson.databind.SerializationFeature$WRAP_ROOT_VALUE"/&gt;
+ *       &lt;util:constant static-field="com.fasterxml.jackson.databind.SerializationFeature$CLOSE_CLOSEABLE"/&gt;
+ *     &lt;/array&gt;
+ *   &lt;/property&gt;
+ *   &lt;property name="featuresToDisable"&gt;
+ *     &lt;array&gt;
+ *       &lt;util:constant static-field="com.fasterxml.jackson.databind.MapperFeature$USE_ANNOTATIONS"/&gt;
+ *     &lt;/array&gt;
+ *   &lt;/property&gt;
+ * &lt;/bean&gt;
  * </pre>
  *
  * <p>Note: This BeanFctory is singleton, so if you need more than one you'll need
@@ -87,6 +87,8 @@ public class Jackson2ObjectMapperFactoryBean implements FactoryBean<ObjectMapper
 	/**
 	 * Set the ObjectMapper instance to use. If not set, the ObjectMapper will
 	 * be created using its default constructor.
+	 *
+	 * @param objectMapper object mapper
 	 */
 	public void setObjectMapper(ObjectMapper objectMapper) {
 		this.objectMapper = objectMapper;
@@ -95,6 +97,8 @@ public class Jackson2ObjectMapperFactoryBean implements FactoryBean<ObjectMapper
 	/**
 	 * Define the format for date/time with the given {@link DateFormat}.
 	 * @see #setSimpleDateFormat(String)
+	 *
+	 * @param dateFormat date format
 	 */
 	public void setDateFormat(DateFormat dateFormat) {
 		this.dateFormat = dateFormat;
@@ -103,6 +107,8 @@ public class Jackson2ObjectMapperFactoryBean implements FactoryBean<ObjectMapper
 	/**
 	 * Define the date/time format with a {@link SimpleDateFormat}.
 	 * @see #setDateFormat(DateFormat)
+	 *
+	 * @param format format
 	 */
 	public void setSimpleDateFormat(String format) {
 		this.dateFormat = new SimpleDateFormat(format);
@@ -111,6 +117,8 @@ public class Jackson2ObjectMapperFactoryBean implements FactoryBean<ObjectMapper
 	/**
 	 * Set the {@link AnnotationIntrospector} for both serialization and
 	 * deserialization.
+	 *
+	 * @param annotationIntrospector the AnnotationIntrospector
 	 */
 	public void setAnnotationIntrospector(AnnotationIntrospector annotationIntrospector) {
 		this.annotationIntrospector = annotationIntrospector;
@@ -121,6 +129,8 @@ public class Jackson2ObjectMapperFactoryBean implements FactoryBean<ObjectMapper
 	 * returned by {@link JsonSerializer#handledType()}, which must not be
 	 * {@code null}.
 	 * @see #setSerializersByType(Map)
+	 *
+	 * @param serializers serializers
 	 */
 	public void setSerializers(JsonSerializer<?>... serializers) {
 		if (serializers != null) {
@@ -136,6 +146,8 @@ public class Jackson2ObjectMapperFactoryBean implements FactoryBean<ObjectMapper
 	/**
 	 * Configure custom serializers for the given types.
 	 * @see #setSerializers(JsonSerializer...)
+	 *
+	 * @param serializers serializers
 	 */
 	public void setSerializersByType(Map<Class<?>, JsonSerializer<?>> serializers) {
 		if (serializers != null) {
@@ -145,6 +157,8 @@ public class Jackson2ObjectMapperFactoryBean implements FactoryBean<ObjectMapper
 
 	/**
 	 * Configure custom deserializers for the given types.
+	 *
+	 * @param deserializers deserializers
 	 */
 	public void setDeserializersByType(Map<Class<?>, JsonDeserializer<?>> deserializers) {
 		if (deserializers != null) {
@@ -154,6 +168,8 @@ public class Jackson2ObjectMapperFactoryBean implements FactoryBean<ObjectMapper
 
 	/**
 	 * Shortcut for {@link MapperFeature#AUTO_DETECT_FIELDS} option.
+	 *
+	 * @param autoDetectFields autoDetectFields
 	 */
 	public void setAutoDetectFields(boolean autoDetectFields) {
 		this.features.put(MapperFeature.AUTO_DETECT_FIELDS, autoDetectFields);
@@ -162,6 +178,8 @@ public class Jackson2ObjectMapperFactoryBean implements FactoryBean<ObjectMapper
 	/**
 	 * Shortcut for {@link MapperFeature#AUTO_DETECT_SETTERS}/
 	 * {@link MapperFeature#AUTO_DETECT_GETTERS} option.
+	 *
+	 * @param autoDetectGettersSetters autoDetectGettersSetters
 	 */
 	public void setAutoDetectGettersSetters(boolean autoDetectGettersSetters) {
 		this.features.put(MapperFeature.AUTO_DETECT_SETTERS, autoDetectGettersSetters);
@@ -170,6 +188,8 @@ public class Jackson2ObjectMapperFactoryBean implements FactoryBean<ObjectMapper
 
 	/**
 	 * Shortcut for {@link SerializationFeature#FAIL_ON_EMPTY_BEANS} option.
+	 *
+	 * @param failOnEmptyBeans failOnEmptyBeans
 	 */
 	public void setFailOnEmptyBeans(boolean failOnEmptyBeans) {
 		this.features.put(SerializationFeature.FAIL_ON_EMPTY_BEANS, failOnEmptyBeans);
@@ -177,6 +197,8 @@ public class Jackson2ObjectMapperFactoryBean implements FactoryBean<ObjectMapper
 
 	/**
 	 * Shortcut for {@link SerializationFeature#INDENT_OUTPUT} option.
+	 *
+	 * @param indentOutput indentOutput
 	 */
 	public void setIndentOutput(boolean indentOutput) {
 		this.features.put(SerializationFeature.INDENT_OUTPUT, indentOutput);
@@ -190,6 +212,8 @@ public class Jackson2ObjectMapperFactoryBean implements FactoryBean<ObjectMapper
 	 * @see com.fasterxml.jackson.databind.DeserializationFeature
 	 * @see com.fasterxml.jackson.core.JsonParser.Feature
 	 * @see com.fasterxml.jackson.core.JsonGenerator.Feature
+	 *
+	 * @param featuresToEnable featuresToEnable
 	 */
 	public void setFeaturesToEnable(Object... featuresToEnable) {
 		if (featuresToEnable != null) {
@@ -207,6 +231,8 @@ public class Jackson2ObjectMapperFactoryBean implements FactoryBean<ObjectMapper
 	 * @see com.fasterxml.jackson.databind.DeserializationFeature
 	 * @see com.fasterxml.jackson.core.JsonParser.Feature
 	 * @see com.fasterxml.jackson.core.JsonGenerator.Feature
+	 *
+	 * @param featuresToDisable featuresToDisable
 	 */
 	public void setFeaturesToDisable(Object... featuresToDisable) {
 		if (featuresToDisable != null) {
@@ -278,6 +304,8 @@ public class Jackson2ObjectMapperFactoryBean implements FactoryBean<ObjectMapper
 
 	/**
 	 * Return the singleton ObjectMapper.
+	 *
+	 * @return object mapper
 	 */
 	public ObjectMapper getObject() {
 		return this.objectMapper;

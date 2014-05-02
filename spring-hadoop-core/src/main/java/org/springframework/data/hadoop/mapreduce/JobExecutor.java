@@ -99,7 +99,6 @@ public abstract class JobExecutor implements InitializingBean, DisposableBean, B
 	 * Stops running job.
 	 * 
 	 * @return list of stopped jobs.
-	 * @throws Exception
 	 */
 	protected Collection<Job> stopJobs() {
 		return stopJobs(null);
@@ -110,7 +109,6 @@ public abstract class JobExecutor implements InitializingBean, DisposableBean, B
 	 *
 	 * @param listener job listener
 	 * @return list of stopped jobs.
-	 * @throws Exception
 	 */
 	protected Collection<Job> stopJobs(final JobListener listener) {
 		shuttingDown = true;

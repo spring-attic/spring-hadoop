@@ -70,7 +70,7 @@ public class HiveTemplate implements InitializingBean, HiveOperations, ResourceL
 	 * 
 	 * @param action callback object that specifies the Hive action
 	 * @return the action result object
-	 * @throws DataAccessException
+	 * @throws DataAccessException exception
 	 */
 	@Override
 	public <T> T execute(HiveClientCallback<T> action) throws DataAccessException {
@@ -105,7 +105,7 @@ public class HiveTemplate implements InitializingBean, HiveOperations, ResourceL
 	 *  
 	 * @param query HiveQL
 	 * @return list of values returned by the query
-	 * @throws DataAccessException
+	 * @throws DataAccessException exception
 	 */
 	@Override
 	public List<String> query(String query) throws DataAccessException {
@@ -119,7 +119,7 @@ public class HiveTemplate implements InitializingBean, HiveOperations, ResourceL
 	 * @param query HiveQL
 	 * @param arguments query arguments
 	 * @return list of values returned by the query
-	 * @throws DataAccessException
+	 * @throws DataAccessException exception
 	 */
 	@Override
 	public List<String> query(String query, Map<?, ?> arguments) throws DataAccessException {
@@ -145,7 +145,7 @@ public class HiveTemplate implements InitializingBean, HiveOperations, ResourceL
 	 * 
 	 * @param query HiveQL
 	 * @return query result
-	 * @throws DataAccessException
+	 * @throws DataAccessException exception
 	 */
 	@Override
 	public String queryForString(String query) throws DataAccessException {
@@ -159,7 +159,7 @@ public class HiveTemplate implements InitializingBean, HiveOperations, ResourceL
 	 * @param query HiveQL
 	 * @param arguments query arguments
 	 * @return query result
-	 * @throws DataAccessException
+	 * @throws DataAccessException exception
 	 */
 	@Override
 	public String queryForString(String query, Map<?, ?> arguments) throws DataAccessException {
@@ -172,7 +172,7 @@ public class HiveTemplate implements InitializingBean, HiveOperations, ResourceL
 	 * 
 	 * @param query HiveQL
 	 * @return query int result
-	 * @throws DataAccessException
+	 * @throws DataAccessException exception
 	 */
 	@Override
 	public Integer queryForInt(String query) throws DataAccessException {
@@ -186,7 +186,7 @@ public class HiveTemplate implements InitializingBean, HiveOperations, ResourceL
 	 * @param query HiveQL
 	 * @param arguments query arguments
 	 * @return query int result
-	 * @throws DataAccessException
+	 * @throws DataAccessException exception
 	 */
 	@Override
 	public Integer queryForInt(String query, Map<?, ?> arguments) throws DataAccessException {
@@ -207,7 +207,7 @@ public class HiveTemplate implements InitializingBean, HiveOperations, ResourceL
 	 * 
 	 * @param query HiveQL
 	 * @return query long result
-	 * @throws DataAccessException
+	 * @throws DataAccessException exception
 	 */
 	@Override
 	public Long queryForLong(String query) throws DataAccessException {
@@ -221,7 +221,7 @@ public class HiveTemplate implements InitializingBean, HiveOperations, ResourceL
 	 * @param query HiveQL
 	 * @param arguments query arguments
 	 * @return query long result
-	 * @throws DataAccessException
+	 * @throws DataAccessException exception
 	 */
 	@Override
 	public Long queryForLong(String query, Map<?, ?> arguments) throws DataAccessException {
@@ -242,7 +242,7 @@ public class HiveTemplate implements InitializingBean, HiveOperations, ResourceL
 	 * 
 	 * @param script script resource and arguments
 	 * @return script result
-	 * @throws DataAccessException
+	 * @throws DataAccessException exception
 	 */
 	@Override
 	public List<String> executeScript(HiveScript script) throws DataAccessException {
@@ -254,7 +254,7 @@ public class HiveTemplate implements InitializingBean, HiveOperations, ResourceL
 	 * 
 	 * @param scripts scripts resources and arguments
 	 * @return scripts results
-	 * @throws DataAccessException
+	 * @throws DataAccessException exception
 	 */
 	@Override
 	public List<String> executeScript(final Iterable<HiveScript> scripts) throws DataAccessException {

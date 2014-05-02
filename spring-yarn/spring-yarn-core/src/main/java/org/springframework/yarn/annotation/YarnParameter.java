@@ -34,6 +34,8 @@ public @interface YarnParameter {
 
 	/**
 	 * The name of the parameter to bind to.
+	 *
+	 * @return the value
 	 */
 	String value() default "";
 
@@ -43,6 +45,8 @@ public @interface YarnParameter {
 	 * Default is {@code true}, leading to an exception if the parameter is
 	 * missing. Switch this to {@code false} if you prefer a {@code null} in
 	 * case of the parameter missing.
+	 *
+	 * @return required
 	 */
 	boolean required() default true;
 

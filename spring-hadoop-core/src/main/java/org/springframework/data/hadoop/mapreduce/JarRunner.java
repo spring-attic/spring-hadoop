@@ -25,8 +25,8 @@ import org.springframework.beans.factory.InitializingBean;
  * Factory bean for executing Hadoop jars. Tries a best-effort in passing the configuration to the jar and preventing malicious behaviour (such as System.exit()).
  * See the reference documentation for more details.
  * Using the {@link Tool} interface is highly recommended in all cases.
- * 
- * <p/>To make the runner execute at startup, use {@link #setRunAtStartup(boolean)}.
+ * <p>
+ * To make the runner execute at startup, use {@link #setRunAtStartup(boolean)}.
  * 
  * @author Costin Leau
  */
@@ -66,7 +66,7 @@ public class JarRunner extends JarExecutor implements Callable<Integer>, Initial
 	/**
 	 * Actions to be invoked before running the action.
 	 * 
-	 * @param actions
+	 * @param actions actions
 	 */
 	public void setPreAction(Collection<Callable<?>> actions) {
 		this.preActions = actions;
@@ -75,7 +75,7 @@ public class JarRunner extends JarExecutor implements Callable<Integer>, Initial
 	/**
 	 * Actions to be invoked after running the action.
 	 * 
-	 * @param actions
+	 * @param actions actions
 	 */
 	public void setPostAction(Collection<Callable<?>> actions) {
 		this.postActions = actions;

@@ -25,7 +25,7 @@ import org.springframework.yarn.config.annotation.builders.YarnEnvironmentConfig
  *
  * <p>
  * Typically configuration is shown below.
- * <p>
+ * <br>
  * <pre>
  * &#064;Configuration
  * &#064;EnableYarn(enable=Enable.APPMASTER)

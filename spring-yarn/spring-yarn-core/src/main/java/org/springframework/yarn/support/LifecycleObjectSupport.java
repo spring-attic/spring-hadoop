@@ -259,6 +259,8 @@ public abstract class LifecycleObjectSupport implements InitializingBean, SmartL
 	 * Subclasses may implement this for initialization logic. Called
 	 * during the {@link InitializingBean} phase. Implementor should
 	 * always call super method not to break initialization chain.
+	 *
+	 * @throws Exception exception
 	 */
 	protected void onInit() throws Exception {}
 

@@ -23,10 +23,10 @@ package org.springframework.data.hadoop;
  */
 public abstract class HadoopSystemConstants {
 
-	/** Default bean id for resource loader. */
+	/* Default bean id for resource loader. */
 	public static final String DEFAULT_ID_RESOURCE_LOADER = "hadoopResourceLoader";
 
-	/** Default bean id for resource loader registrar. */
+	/* Default bean id for resource loader registrar. */
 	public static final String DEFAULT_ID_RESOURCE_LOADER_REGISTRAR = "hadoopResourceLoaderRegistrar";
 
 }

@@ -33,8 +33,6 @@ import org.apache.hadoop.yarn.api.records.YarnApplicationState;
  *
  * @author Janne Valkealahti
  * @see org.springframework.yarn.client.ClientRmTemplate
- * @see org.apache.hadoop.yarn.api.ClientRMProtocol
- *
  */
 public interface ClientRmOperations {
 

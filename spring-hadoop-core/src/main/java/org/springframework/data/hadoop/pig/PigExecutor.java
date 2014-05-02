@@ -74,7 +74,7 @@ public abstract class PigExecutor implements InitializingBean {
 
 	/**
 	 * Sets the pig template used by this class.
-	 * @param pigTemplate
+	 * @param pigTemplate the pigTemplate
 	 */
 	public void setPigTemplate(PigOperations pigTemplate) {
 		this.pigTemplate = pigTemplate;

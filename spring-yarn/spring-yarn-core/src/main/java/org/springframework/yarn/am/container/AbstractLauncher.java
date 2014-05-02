@@ -194,6 +194,7 @@ public abstract class AbstractLauncher extends LifecycleObjectSupport {
 		 * Handles the pre launch calls.
 		 *
 		 * @param context the container launch context
+		 * @param container the container
 		 * @return the final modified context or <code>null</code> if interceptor broke the chain
 		 */
 		public ContainerLaunchContext preLaunch(Container container, ContainerLaunchContext context) {

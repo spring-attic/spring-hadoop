@@ -59,6 +59,8 @@ public class YarnInfoApplication extends AbstractClientApplication<YarnInfoAppli
 	 * {@link SpringApplicationBuilder} using an empty args.
 	 *
 	 * @see #run(String...)
+	 *
+	 * @return report
 	 */
 	public String run() {
 		return run(new String[0]);
@@ -68,6 +70,7 @@ public class YarnInfoApplication extends AbstractClientApplication<YarnInfoAppli
 	 * Run a {@link SpringApplication} build by a {@link SpringApplicationBuilder}.
 	 *
 	 * @param args the Spring Application args
+	 * @return report
 	 */
 	public String run(String... args) {
 		SpringApplicationBuilder builder = new SpringApplicationBuilder();

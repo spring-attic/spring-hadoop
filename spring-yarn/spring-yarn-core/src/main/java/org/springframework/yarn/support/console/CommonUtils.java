@@ -73,7 +73,7 @@ public abstract class CommonUtils {
 	/**
 	 * Convert a List of Strings to a comma delimited String.
 	 *
-	 * @param list
+	 * @param list list
 	 * @return Returns the List as a comma delimited String. Returns an empty String for a Null or empty list.
 	 */
 	public static String collectionToCommaDelimitedString(Collection<String> list) {
@@ -81,7 +81,7 @@ public abstract class CommonUtils {
 	}
 
 	/**
-	 * @param reader
+	 * @param reader reader
 	 */
 	public static void closeReader(Reader reader) {
 		if (reader != null) {
@@ -106,6 +106,7 @@ public abstract class CommonUtils {
 	 * Simple method to replace characters in a String with asterisks to mask the password.
 	 *
 	 * @param password The password to mask
+	 * @return masked password
 	 */
 	public static String maskPassword(String password) {
 		int lengthOfPassword = password.length();

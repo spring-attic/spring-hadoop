@@ -25,7 +25,7 @@ import org.springframework.yarn.config.annotation.SpringYarnConfigurerAdapter;
  * exposed to user via {@link SpringYarnConfigurerAdapter}.
  * <p>
  * Typically configuration is shown below.
- * <p>
+ * <br>
  * <pre>
  * &#064;Configuration
  * &#064;EnableYarn
@@ -54,9 +54,9 @@ public interface YarnConfigConfigurer {
 	/**
 	 * Specify configuration options as resource properties with a {@link org.springframework.data.hadoop.config.common.annotation.configurers.ResourceConfigurer}.
 	 *
-	 * <p>
-	 * <p>JavaConfig:
-	 * <p>
+	 * <br>
+	 * <br>JavaConfig:
+	 * <br>
 	 * <pre>
 	 * public void configure(YarnConfigConfigure config) throws Exception {
 	 *   Properties props = new Properties();
@@ -68,10 +68,10 @@ public interface YarnConfigConfigurer {
 	 * }
 	 * </pre>
 	 *
-	 * <p>XML:
-	 * <p>
+	 * <br>XML:
+	 * <br>
 	 * <pre>
-	 * &lt;yarn:configuration properties-location="cfg-1.properties, cfg-2.properties"/>
+	 * &lt;yarn:configuration properties-location="cfg-1.properties, cfg-2.properties"/&gt;
 	 * </pre>
 	 *
 	 * @return {@link org.springframework.data.hadoop.config.common.annotation.configurers.ResourceConfigurer} for chaining
@@ -82,9 +82,9 @@ public interface YarnConfigConfigurer {
 	/**
 	 * Specify configuration options as properties with a {@link org.springframework.data.hadoop.config.common.annotation.configurers.PropertiesConfigurer}.
 	 *
-	 * <p>
-	 * <p>JavaConfig:
-	 * <p>
+	 * <br>
+	 * <br>JavaConfig:
+	 * <br>
 	 * <pre>
 	 * public void configure(YarnConfigConfigure config) throws Exception {
 	 *   Properties props = new Properties();
@@ -96,13 +96,13 @@ public interface YarnConfigConfigurer {
 	 * }
 	 * </pre>
 	 *
-	 * <p>XML:
-	 * <p>
+	 * <br>XML:
+	 * <br>
 	 * <pre>
-	 * &lt;util:properties id="props" location="props.properties"/>
-	 *   <prop key="myKey1">myValue1</prop>
-	 * &lt;/util:properties>
-	 * &lt;yarn:configuration properties-ref="props"/>
+	 * &lt;util:properties id="props" location="props.properties"/&gt;
+	 *   &lt;prop key="myKey1"&gt;myValue1&lt;/prop&gt;
+	 * &lt;/util:properties&gt;
+	 * &lt;yarn:configuration properties-ref="props"/&gt;
 	 * </pre>
 	 *
 	 * @return {@link org.springframework.data.hadoop.config.common.annotation.configurers.PropertiesConfigurer} for chaining
@@ -113,9 +113,9 @@ public interface YarnConfigConfigurer {
 	/**
 	 * Specify a Hdfs file system uri.
 	 *
-	 * <p>
-	 * <p>JavaConfig:
-	 * <p>
+	 * <br>
+	 * <br>JavaConfig:
+	 * <br>
 	 * <pre>
 	 * public void configure(YarnConfigConfigure config) throws Exception {
 	 *   config
@@ -123,10 +123,10 @@ public interface YarnConfigConfigurer {
 	 * }
 	 * </pre>
 	 *
-	 * <p>XML:
-	 * <p>
+	 * <br>XML:
+	 * <br>
 	 * <pre>
-	 * &lt;yarn:configuration fs-uri="hdfs://myhost:8020"/>
+	 * &lt;yarn:configuration fs-uri="hdfs://myhost:8020"/&gt;
 	 * </pre>
 	 *
 	 * @param uri The Hdfs uri
@@ -137,9 +137,9 @@ public interface YarnConfigConfigurer {
 	/**
 	 * Specify a Yarn resource manager address.
 	 *
-	 * <p>
-	 * <p>JavaConfig:
-	 * <p>
+	 * <br>
+	 * <br>JavaConfig:
+	 * <br>
 	 * <pre>
 	 * public void configure(YarnConfigConfigure config) throws Exception {
 	 *   config
@@ -147,10 +147,10 @@ public interface YarnConfigConfigurer {
 	 * }
 	 * </pre>
 	 *
-	 * <p>XML:
-	 * <p>
+	 * <br>XML:
+	 * <br>
 	 * <pre>
-	 * &lt;yarn:configuration rm-address="myRmHost:8032"/>
+	 * &lt;yarn:configuration rm-address="myRmHost:8032"/&gt;
 	 * </pre>
 	 *
 	 * @param address The Yarn resource manager address
@@ -161,9 +161,9 @@ public interface YarnConfigConfigurer {
 	/**
 	 * Specify a Yarn resource manager scheduler address.
 	 *
-	 * <p>
-	 * <p>JavaConfig:
-	 * <p>
+	 * <br>
+	 * <br>JavaConfig:
+	 * <br>
 	 * <pre>
 	 * public void configure(YarnConfigConfigure config) throws Exception {
 	 *   config
@@ -171,10 +171,10 @@ public interface YarnConfigConfigurer {
 	 * }
 	 * </pre>
 	 *
-	 * <p>XML:
-	 * <p>
+	 * <br>XML:
+	 * <br>
 	 * <pre>
-	 * &lt;yarn:configuration scheduler-address="myRmHost:8030"/>
+	 * &lt;yarn:configuration scheduler-address="myRmHost:8030"/&gt;
 	 * </pre>
 	 *
 	 * @param address The Yarn resource manager scheduler address
@@ -186,9 +186,9 @@ public interface YarnConfigConfigurer {
 	 * Specify if Hadoop {@link Configuration} is initially
 	 * based on default values. Default is <code>true</code>.
 	 *
-	 * <p>
-	 * <p>JavaConfig:
-	 * <p>
+	 * <br>
+	 * <br>JavaConfig:
+	 * <br>
 	 * <pre>
 	 * public void configure(YarnConfigConfigure config) throws Exception {
 	 *   config
@@ -196,8 +196,8 @@ public interface YarnConfigConfigurer {
 	 * }
 	 * </pre>
 	 *
-	 * <p>XML:
-	 * <p>
+	 * <br>XML:
+	 * <br>
 	 * No equivalent
 	 *
 	 * @param loadDefaults The flag if defaults should be loaded

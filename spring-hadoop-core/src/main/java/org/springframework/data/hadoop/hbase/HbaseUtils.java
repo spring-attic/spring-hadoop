@@ -90,8 +90,8 @@ public class HbaseUtils {
 	/**
 	 * Releases (or closes) the given table, created via the given configuration if it is not managed externally (or bound to the thread).
 	 * 
-	 * @param tableName
-	 * @param table
+	 * @param tableName table name
+	 * @param table table
 	 */
 	public static void releaseTable(String tableName, HTableInterface table) {
 		releaseTable(tableName, table, null);
@@ -100,9 +100,9 @@ public class HbaseUtils {
 	/**
 	 * Releases (or closes) the given table, created via the given configuration if it is not managed externally (or bound to the thread).
 	 * 
-	 * @param tableName
-	 * @param table
-	 * @param tableFactory
+	 * @param tableName table name
+	 * @param table table
+	 * @param tableFactory table factory
 	 */
 	public static void releaseTable(String tableName, HTableInterface table, HTableInterfaceFactory tableFactory) {
 		try {

@@ -98,11 +98,11 @@ public abstract class AbstractHadoopClusterTests implements ApplicationContextAw
 	/**
 	 * Returns a configured {@link FileSystem} instance for
 	 * test cases to read and write files to it.
-	 * <p/>
+	 * <p>
 	 * Tests should use this {@link FileSystem} instance.
 	 *
 	 * @return the filesystem configured by mini cluster.
-	 * @throws IOException
+	 * @throws IOException exception
 	 */
 	protected FileSystem getFileSystem() throws IOException {
 		return hadoopCluster.getFileSystem();

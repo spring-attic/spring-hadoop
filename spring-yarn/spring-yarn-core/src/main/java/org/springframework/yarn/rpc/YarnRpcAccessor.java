@@ -132,7 +132,7 @@ public abstract class YarnRpcAccessor<P> implements InitializingBean, Disposable
 	 * a {@link PrivilegedAction}.
 	 *
 	 * @return the proxy
-	 * @throws IOException
+	 * @throws IOException if creation fails
 	 */
 	@SuppressWarnings("unchecked")
 	protected P createProxy() throws IOException {

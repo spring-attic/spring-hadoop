@@ -37,15 +37,12 @@ import org.springframework.util.Assert;
  *
  * The instances exposes are reused from the enclosing context (using naming conventions or autowiring strategies)
  * or created on demand (in case of lightweight objects).
- * <p/>
+ * <p>
  * These are :
  *
  * <table>
- *  <th>
- *  <tr>
- *    <td>Name</td><td>Type</td><td>Description</td>
- *  </tr>
- *  </th>
+ *  <caption>variables</caption>
+ *  <tr><th>Name</th><th>Type</th><th>Description</th></tr>
  *  <tr><td>cfg</td><td>org.apache.hadoop.conf.Configuration</td><td>Hadoop Configuration (relies on 'hadoop-configuration' bean or singleton type match)</td></tr>
  *  <tr><td>cl</td><td>java.lang.ClassLoader</td><td>ClassLoader used for executing this script</td></tr>
  *  <tr><td>ctx</td><td>org.springframework.context.ApplicationContext</td><td>Enclosing application context</td></tr>
@@ -56,7 +53,7 @@ import org.springframework.util.Assert;
  *  <tr><td>hdfsRL</td><td>org.springframework.data.hadoop.io.HdfsResourceLoader</td><td>HdfsResourceLoader (relies on 'hadoop-resource-loader' or singleton type match, falls back to creating one automatically based on 'cfg')</td></tr>
  * </table>
  *
- * <p/>
+ * <p>
  * Note that the above variables are added only if found (have a non-null value) and the keys are not bound already.
  * To make the runner execute at startup, use {@link #setRunAtStartup(boolean)}.
  *

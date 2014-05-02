@@ -211,7 +211,7 @@ abstract class HadoopCodeExecutor<T> extends JobGenericOptions implements Initia
 	/**
 	 * Sets the target code jar.
 	 * 
-	 * @param jar
+	 * @param jar target jar
 	 */
 	public void setJar(Resource jar) {
 		this.jar = jar;
@@ -264,7 +264,7 @@ abstract class HadoopCodeExecutor<T> extends JobGenericOptions implements Initia
 	/**
 	 * Sets the target class.
 	 *
-	 * @param tool The target class to set.
+	 * @param target The target class to set.
 	 */
 	void setTargetObject(T target) {
 		Assert.isNull(targetClassName, "a target class already set");

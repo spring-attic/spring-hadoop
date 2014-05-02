@@ -44,24 +44,32 @@ public @interface MiniYarnCluster {
 	 * {@link org.apache.hadoop.conf.Configuration}
 	 * bean based on mini cluster runtime config.
 	 * Default is "yarnConfiguration"
+	 *
+	 * @return config name
 	 */
 	String configName() default YarnTestSystemConstants.DEFAULT_ID_MINIYARNCLUSTER_CONFIG;
 	
 	/**
 	 * Value defining a name used to set the
 	 * cluster bean. Default is "yarnCluster"
+	 *
+	 * @return cluster name
 	 */
 	String clusterName() default YarnTestSystemConstants.DEFAULT_ID_MINIYARNCLUSTER;
 	
 	/**
 	 * Unique id for the cluster. Default
 	 * is "default".
+	 *
+	 * @return id
 	 */
 	String id() default YarnTestSystemConstants.DEFAULT_ID_CLUSTER;
 	
 	/**
 	 * Number of nodes for the cluster.
 	 * Default size is one node.
+	 *
+	 * @return number of nodes
 	 */
 	int nodes() default 1;
 

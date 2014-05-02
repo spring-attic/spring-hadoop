@@ -40,7 +40,7 @@ import org.springframework.util.StringUtils;
  * HDFS.  Due to the HDFS limitation that files cannot be deleted or modified, the
  * ability to roll back a file to a previously known state is not possible.  This
  * prevents the ability to restart using this {@link ItemWriter}.
- * <br/>
+ * <br>
  * This {@link ItemWriter} is <em>not</em> thread-safe.
  *
  * @author Michael Minella

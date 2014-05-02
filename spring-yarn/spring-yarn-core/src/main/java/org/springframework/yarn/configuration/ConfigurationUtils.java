@@ -90,6 +90,7 @@ public abstract class ConfigurationUtils {
 	 * Returns a static {@link Properties} copy of the given configuration.
 	 *
 	 * @param configuration Hadoop configuration
+	 * @return the properties
 	 */
 	public static Properties asProperties(Configuration configuration) {
 		Properties props = new Properties();

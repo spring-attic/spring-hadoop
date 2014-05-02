@@ -353,6 +353,7 @@ public abstract class AbstractYarnClient implements YarnClient, InitializingBean
 	/**
 	 * Gets the submission context for application master.
 	 *
+	 * @param applicationId application id
 	 * @return the submission context
 	 */
 	protected ApplicationSubmissionContext getSubmissionContext(ApplicationId applicationId) {

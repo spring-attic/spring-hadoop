@@ -23,10 +23,10 @@ import org.apache.hadoop.mapreduce.Job;
 /**
  * Simple runner for submitting Hadoop jobs sequentially. By default, the runner waits for the jobs to finish and returns a boolean indicating
  * whether all the jobs succeeded or not (when there's no waiting, the status cannot be determined and null is returned).
- * 
- * <p/>
+ * <p>
  * For more control over the job execution and outcome consider querying the {@link Job}s or using Spring Batch (see the reference documentation for more info).
- * <p/>To make the runner execute at startup, use {@link #setRunAtStartup(boolean)}.
+ * <p>
+ * To make the runner execute at startup, use {@link #setRunAtStartup(boolean)}.
  * 
  * @author Costin Leau
  */
@@ -67,7 +67,7 @@ public class JobRunner extends JobExecutor implements Callable<Void> {
 	/**
 	 * Actions to be invoked before running the action.
 	 * 
-	 * @param actions
+	 * @param actions actions
 	 */
 	public void setPreAction(Collection<Callable<?>> actions) {
 		this.preActions = actions;
@@ -76,7 +76,7 @@ public class JobRunner extends JobExecutor implements Callable<Void> {
 	/**
 	 * Actions to be invoked after running the action.
 	 * 
-	 * @param actions
+	 * @param actions actions
 	 */
 	public void setPostAction(Collection<Callable<?>> actions) {
 		this.postActions = actions;

@@ -26,7 +26,7 @@ import java.util.UUID;
 /**
  * Utility for generating date-based paths.
  * Relies on the {@link java.util.Formatter} style.
- * <p/>
+ * <p>
  * For example, to generate the following path "/user/hadoop/data/2012/2/22/17/20/10"
  * the input format can be "/user/hadoop/data/%1$tY/%1$tm/%1$td/%1$tH/%1$tM/%1$tS"
  *
@@ -66,6 +66,7 @@ public abstract class PathUtils {
 	 *
 	 * @param pathFormat Path format, the variable in the path will be
 	 * 					 replaced by {@link java.util.Date}.
+	 * @param date date to use
 	 * @return generated path
 	 */
 	public static String format(String pathFormat, Date date) {

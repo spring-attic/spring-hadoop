@@ -94,6 +94,8 @@ public class HbaseInterceptor extends HbaseAccessor implements MethodInterceptor
 	 * <p>Default is "true". Turn this flag off to let the caller receive raw exceptions
 	 * as-is, without any wrapping.
 	 * @see org.springframework.dao.DataAccessException
+	 *
+	 * @param exceptionConversionEnabled enable exceptionConversion
 	 */
 	public void setExceptionConversionEnabled(boolean exceptionConversionEnabled) {
 		this.exceptionConversionEnabled = exceptionConversionEnabled;

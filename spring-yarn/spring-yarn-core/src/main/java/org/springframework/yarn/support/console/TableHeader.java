@@ -35,8 +35,8 @@ public class TableHeader {
 	/**
 	 * Constructor that initializes the table header with the provided header name and the with of the table header.
 	 *
-	 * @param name
-	 * @param width
+	 * @param name name
+	 * @param width width
 	 */
 	public TableHeader(String name, int width) {
 
@@ -50,7 +50,7 @@ public class TableHeader {
 	 * Constructor that initializes the table header with the provided header name. The with of the table header is
 	 * calculated and assigned based on the provided header name.
 	 *
-	 * @param name
+	 * @param name name
 	 */
 	public TableHeader(String name) {
 		super();
@@ -77,7 +77,7 @@ public class TableHeader {
 	 * Updated the width for this particular column, but only if the value of the passed-in width is higher than the
 	 * value of the pre-existing width.
 	 *
-	 * @param width
+	 * @param width width
 	 */
 	public void updateWidth(int width) {
 		if (this.width < width) {

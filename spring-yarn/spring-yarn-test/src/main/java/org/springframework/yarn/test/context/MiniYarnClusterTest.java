@@ -32,7 +32,7 @@ import org.springframework.yarn.test.YarnTestSystemConstants;
  * and empty Spring &#064;{@link Configuration}.
  * <p>
  * Typical use for this annotation would look like:
- * <p>
+ * <br>
  * <pre>
  * &#064;MiniYarnClusterTest
  * public class AppTests extends AbstractBootYarnClusterTests {
@@ -51,7 +51,7 @@ import org.springframework.yarn.test.YarnTestSystemConstants;
  * <p>
  * Use classes attribute with &#064;{@link MiniYarnCluster} to override
  * default context configuration class.
- * <p>
+ * <br>
  * <pre>
  * &#064;MiniYarnClusterTest(classes = AppTests.Config.class)
  * public class AppTests extends AbstractBootYarnClusterTests {
@@ -72,7 +72,7 @@ import org.springframework.yarn.test.YarnTestSystemConstants;
  * <p>
  * If more functionality is needed for composed annotation, one can simply duplicate
  * functionality of this &#064;{@code MiniYarnClusterTest} annotation.
- * <p>
+ * <br>
  * <pre>
  * &#064;Retention(RetentionPolicy.RUNTIME)
  * &#064;Target(ElementType.TYPE)
@@ -80,7 +80,7 @@ import org.springframework.yarn.test.YarnTestSystemConstants;
  * &#064;MiniYarnCluster
  * public &#064;interface CustomMiniYarnClusterTest {
  *
- *   Class<?>[] classes() default { CustomMiniYarnClusterTest.Config.class };
+ *   Class&lt;?&gt;[] classes() default { CustomMiniYarnClusterTest.Config.class };
  *
  *   &#064;Configuration
  *   public static class Config {
@@ -110,26 +110,36 @@ public @interface MiniYarnClusterTest {
 
 	/**
 	 * @see MiniYarnCluster#configName()
+	 *
+	 * @return config name
 	 */
 	String configName() default YarnTestSystemConstants.DEFAULT_ID_MINIYARNCLUSTER_CONFIG;
 
 	/**
 	 * @see MiniYarnCluster#clusterName()
+	 *
+	 * @return cluster name
 	 */
 	String clusterName() default YarnTestSystemConstants.DEFAULT_ID_MINIYARNCLUSTER;
 
 	/**
 	 * @see MiniYarnCluster#id()
+	 *
+	 * @return id
 	 */
 	String id() default YarnTestSystemConstants.DEFAULT_ID_CLUSTER;
 
 	/**
 	 * @see MiniYarnCluster#nodes()
+	 *
+	 * @return number of nodes
 	 */
 	int nodes() default 1;
 
 	/**
 	 * @see ContextConfiguration#locations()
+	 *
+	 * @return locations
 	 */
 	String[] locations() default {};
 
@@ -137,26 +147,36 @@ public @interface MiniYarnClusterTest {
 	 * Defaults to empty configuration.
 	 *
 	 * @see ContextConfiguration#classes()
+	 *
+	 * @return classes
 	 */
 	Class<?>[] classes() default { MiniYarnClusterTest.Config.class };
 
 	/**
 	 * @see ContextConfiguration#initializers()
+	 *
+	 * @return initializers
 	 */
 	Class<? extends ApplicationContextInitializer<? extends ConfigurableApplicationContext>>[] initializers() default {};
 
 	/**
 	 * @see ContextConfiguration#inheritLocations()
+	 *
+	 * @return inheritLocations
 	 */
 	boolean inheritLocations() default true;
 
 	/**
 	 * @see ContextConfiguration#inheritInitializers()
+	 *
+	 * @return inheritInitializers
 	 */
 	boolean inheritInitializers() default true;
 
 	/**
 	 * @see ContextConfiguration#name()
+	 *
+	 * @return name
 	 */
 	String name() default "";
 

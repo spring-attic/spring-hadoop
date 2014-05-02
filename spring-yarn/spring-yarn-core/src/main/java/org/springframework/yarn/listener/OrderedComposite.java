@@ -49,7 +49,7 @@ public class OrderedComposite<S> {
 	/**
 	 * Public setter for the listeners.
 	 *
-	 * @param items
+	 * @param items items
 	 */
 	public void setItems(List<? extends S> items) {
 		unordered.clear();
@@ -62,7 +62,7 @@ public class OrderedComposite<S> {
 	/**
 	 * Register additional item.
 	 *
-	 * @param item
+	 * @param item item
 	 */
 	public void add(S item) {
 		if (item instanceof Ordered) {

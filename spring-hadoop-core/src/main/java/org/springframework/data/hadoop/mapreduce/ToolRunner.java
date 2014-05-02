@@ -25,8 +25,8 @@ import org.springframework.beans.factory.InitializingBean;
  * Wrapper around {@link org.apache.hadoop.util.ToolRunner} allowing for an easier configuration and execution
  * of {@link Tool}  instances inside Spring.
  * Optionally returns the execution result (as an int per {@link Tool#run(String[])}).
- * 
- * <p/>To make the runner execute at startup, use {@link #setRunAtStartup(boolean)}.
+ * <p>
+ * To make the runner execute at startup, use {@link #setRunAtStartup(boolean)}.
  * 
  * @author Costin Leau
  */
@@ -66,7 +66,7 @@ public class ToolRunner extends ToolExecutor implements Callable<Integer>, Initi
 	/**
 	 * Actions to be invoked before running the action.
 	 * 
-	 * @param actions
+	 * @param actions actions
 	 */
 	public void setPreAction(Collection<Callable<?>> actions) {
 		this.preActions = actions;
@@ -75,7 +75,7 @@ public class ToolRunner extends ToolExecutor implements Callable<Integer>, Initi
 	/**
 	 * Actions to be invoked after running the action.
 	 * 
-	 * @param actions
+	 * @param actions actions
 	 */
 	public void setPostAction(Collection<Callable<?>> actions) {
 		this.postActions = actions;
