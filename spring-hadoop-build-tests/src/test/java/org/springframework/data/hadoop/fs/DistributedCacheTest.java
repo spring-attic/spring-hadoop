@@ -44,7 +44,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 /**
  * @author Costin Leau
  */
-@SuppressWarnings("deprecation")
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -78,6 +77,7 @@ public class DistributedCacheTest {
 
 	// we do extra parsing since the classpath url behaves different on cloudera then Apache Vanilla
 	@Test
+	@SuppressWarnings("deprecation")
 	public void testClassPathArchives() throws Exception {
 		if (System.getProperty("os.name").toLowerCase().startsWith("win")) {
 			System.setProperty("path.separator", ":");
@@ -89,6 +89,7 @@ public class DistributedCacheTest {
 
 	// we do extra parsing since the classpath url behaves different on cloudera  then Apache Vanilla
 	@Test
+	@SuppressWarnings("deprecation")
 	public void testClassPathFiles() throws Exception {
 		Path[] files = DistributedCache.getFileClassPaths(cfg);
 		assertEquals(1, files.length);
@@ -103,6 +104,7 @@ public class DistributedCacheTest {
 	}
 
 	@Test
+	@SuppressWarnings("deprecation")
 	public void testCacheArchives() throws Exception {
 		URI[] archives = DistributedCache.getCacheArchives(cfg);
 		System.out.println(Arrays.toString(archives));
@@ -115,6 +117,7 @@ public class DistributedCacheTest {
 	}
 
 	@Test
+	@SuppressWarnings("deprecation")
 	public void testCacheFiles() throws Exception {
 		URI[] files = DistributedCache.getCacheFiles(cfg);
 		System.out.println(Arrays.toString(files));
@@ -126,6 +129,7 @@ public class DistributedCacheTest {
 	}
 
 	@Test
+	@SuppressWarnings("deprecation")
 	public void testLocalFiles() throws Exception {
 		assumeTrue(!VersionUtils.isHadoop2X()); // TODO: need to figure out a way to support this
 		Path[] files = DistributedCache.getLocalCacheFiles(cfg);
@@ -136,6 +140,7 @@ public class DistributedCacheTest {
 	}
 
 	@Test
+	@SuppressWarnings("deprecation")
 	public void testLocalArchives() throws Exception {
 		assumeTrue(!VersionUtils.isHadoop2X()); // TODO: need to figure out a way to support this
 		Path[] archives = DistributedCache.getLocalCacheArchives(cfg);
@@ -145,6 +150,7 @@ public class DistributedCacheTest {
 	}
 
 	@Test
+	@SuppressWarnings("deprecation")
 	public void testMisc() throws Exception {
 		assertTrue(ctx.containsBean("hadoopCache"));
 		assertTrue(DistributedCache.getSymlink(cfg));

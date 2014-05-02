@@ -48,6 +48,7 @@ public class SpringApplicationTemplate {
 	 *
 	 * @param action the action callback
 	 * @param args the boot application args
+	 * @param <T> return type
 	 * @return the value from an execution
 	 */
 	public <T> T execute(SpringApplicationCallback<T> action, String... args) throws SpringApplicationException {
