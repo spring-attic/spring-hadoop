@@ -54,6 +54,7 @@ public class TextFileWriter extends AbstractDataStreamWriter implements DataStor
 	 */
 	public TextFileWriter(Configuration configuration, Path basePath, CodecInfo codec) {
 		this(configuration, basePath, codec, StoreUtils.getUTF8DefaultDelimiter());
+		
 	}
 
 	/**
@@ -67,6 +68,11 @@ public class TextFileWriter extends AbstractDataStreamWriter implements DataStor
 	public TextFileWriter(Configuration configuration, Path basePath, CodecInfo codec, byte[] delimiter) {
 		super(configuration, basePath, codec);
 		this.delimiter = delimiter;
+	}
+	
+	public TextFileWriter(Configuration configuration, Path basePath, CodecInfo codec, byte[] delimiter, long idleTimeout ) {
+		this(configuration, basePath, codec, delimiter);
+		setIdleTimeout(idleTimeout);
 	}
 
 	@Override
@@ -100,10 +106,10 @@ public class TextFileWriter extends AbstractDataStreamWriter implements DataStor
 		OutputStream out = streamsHolder.getStream();
 		out.write(entity.getBytes());
 		out.write(delimiter);
-
 		setWritePosition(getPosition(streamsHolder));
 
 		OutputContext context = getOutputContext();
+		log.info("My context " + context + " - " + this);
 		if (context.getRolloverState()) {
 			log.info("after write, rollever state is true");
 			close();

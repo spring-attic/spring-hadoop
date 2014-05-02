@@ -48,11 +48,16 @@ public class PartitionTextFileWriter extends AbstractDataStreamWriter implements
 	private RolloverStrategy rollOver;
 	protected TextFileWriter nextWriter; 
 	protected FileSystem fs;
-	protected TextFileWriterFactoryBean writerFactory;
-	
+	protected String internalWriterName;
+	protected long idleTimeout;
 	@Override
 	public void setRolloverStrategy(RolloverStrategy rolloverStrategy) {
 		this.rollOver = rolloverStrategy;
+	}
+	
+	@Override
+	public void setIdleTimeout(long idleTimeout) {
+		this.idleTimeout = idleTimeout;
 	}
 	
 	@Override
@@ -62,35 +67,25 @@ public class PartitionTextFileWriter extends AbstractDataStreamWriter implements
 	protected TextFileWriter createWriterForDirectory (String directory) {
 		//TODO: here, we're creating the TextFileWriter instead of having the spring context to create it for us. 
 		//we can alwasy do getBean getBeanFactory().getBean to have the spring context to create it. Pros and cons ?
-		Path finalDir = Path.mergePaths(basePath, new Path(directory));
+		Path finalDir = Path.mergePaths(basePath, new Path(directory));	
+		TextFileWriter writer = (TextFileWriter) getBeanFactory().getBean(internalWriterName, configuration, finalDir, codec, delimiter, idleTimeout);
 		
 		
 		
-		TextFileWriter writer = null;
-		try {
-			writer = writerFactory.getObject();
-		}
-		catch (Exception e) {
-			log.error("Error creating TextFileWriter using factory bean",e);
-			Assert.fail();
-		}
-		
-		
-		log.info("Setting file naming strategy "+this.strategy);
 		writer.setFileNamingStrategy(this.strategy);
-		log.info("Setting roll over strategy "+this.rollOver);
 		writer.setRolloverStrategy(this.rollOver);
+		writer.start();
 		this.createDirectoryIfNotExist(finalDir);
-		
 		return writer;
 	}
 	
-	public TextFileWriterFactoryBean getWriterFactory() {
-		return writerFactory;
+
+	public String getInternalWriterName() {
+		return internalWriterName;
 	}
 
-	public void setWriterFactory(TextFileWriterFactoryBean writerFactory) {
-		this.writerFactory = writerFactory;
+	public void setInternalWriterName(String internalWriterName) {
+		this.internalWriterName = internalWriterName;
 	}
 
 	/**
