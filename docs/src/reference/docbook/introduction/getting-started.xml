@@ -26,7 +26,7 @@
     application. It used in production in many mission critical environments
     across a range of industriers.</para>
 
-    <para>Spring Batch It is developed by SpringSource in collaboration with
+    <para>Spring Batch was initially developed by SpringSource in collaboration with
     Accenture. The first 1.0 release was made in 2007 and is now at version
     3.0.x. It has been designed with extensibility in mind. The Spring for Apache Hadoop
     hooks into those extensibility points so that in addition to interacting

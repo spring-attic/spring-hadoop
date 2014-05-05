@@ -54,7 +54,7 @@
 	<emphasis>Yarn</emphasis> components. However, one can opt to configure the beans
   	directly through the usual <literal>&lt;bean&gt;</literal> definition.
 	For more information about XML Schema-based configuration in Spring, see 
-  	<ulink url="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/xsd-config.html">this</ulink>
+  	<ulink url="http://docs.spring.io/spring/docs/4.0.x/spring-framework-reference/html/xsd-config.html">this</ulink>
 	appendix in the Spring Framework reference documentation.</para>
 	  	
   	<para>To use the SHDP namespace, one just needs to import
@@ -299,7 +299,7 @@ public class ClientConfiguration extends SpringYarnConfigurerAdapter {
    	 
     <note>
       <para>Note that the configuration makes use of Spring's <ulink
-      url="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/resources.html"><interfacename>Resource</interfacename></ulink>
+      url="http://docs.spring.io/spring/docs/4.0.x/spring-framework-reference/html/resources.html"><interfacename>Resource</interfacename></ulink>
       abstraction to locate the file. This allows various search patterns
 	  to be used, depending on the running environment or the prefix
 	  specified(if any) by the value - in this example the classpath is used.</para>
@@ -346,7 +346,7 @@ public class ClientConfiguration extends SpringYarnConfigurerAdapter {
   <context:property-placeholder location="classpath:hadoop.properties" />     
 </beans>]]></programlisting>
      
-    <para>Through Spring's property placeholder <ulink url="http://static.springsource.org/spring/docs/3.0.x/reference/beans.html#beans-factory-placeholderconfigurer">support</ulink>, <ulink url="http://static.springsource.org/spring/docs/3.0.x/reference/expressions.html">SpEL</ulink> and the <ulink url="http://blog.springsource.com/2011/06/09/spring-framework-3-1-m2-released/">environment 
+    <para>Through Spring's property placeholder <ulink url="http://docs.spring.io/spring/docs/4.0.x/spring-framework-reference/html/beans.html#beans-factory-placeholderconfigurer">support</ulink>, <ulink url="docs.spring.io/spring/docs/4.0.x/spring-framework-reference/html/expressions.html">SpEL</ulink> and the <ulink url="http://spring.io/blog/2011/06/09/spring-framework-3-1-m2-released/">environment 
     abstraction</ulink> (available in Spring 3.1). one can externalize
 	environment specific properties from the main code base easing the
 	deployment across multiple machines. In the example above, the default
@@ -360,7 +360,7 @@ public class ClientConfiguration extends SpringYarnConfigurerAdapter {
     <para>
       <anchor id="yarn:config:properties"/>
       Additionally, external <literal>Properties</literal> files can be loaded, <literal>Properties</literal> beans (typically declared through Spring's <literal>
-      <ulink url="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/xsd-config.html#xsd-config-body-schemas-util-properties">util</ulink></literal> namespace). 
+      <ulink url="http://docs.spring.io/spring/docs/4.0.x/spring-framework-reference/html/xsd-config.html#xsd-config-body-schemas-util-properties">util</ulink></literal> namespace). 
       Along with the nested properties declaration, this allows customized configurations to be easily declared:
     </para>
      
@@ -392,7 +392,7 @@ public class ClientConfiguration extends SpringYarnConfigurerAdapter {
 	
     <note>For more properties utilities, including using the System as a source or
 	fallback, or control over the merging order, consider using Spring's <literal>
-    <ulink url="http://static.springsource.org/spring/docs/3.0.x/api/org/springframework/beans/factory/config/PropertiesFactoryBean.html">PropertiesFactoryBean</ulink></literal> (which is what Spring for
+    <ulink url="http://docs.spring.io/spring/docs/4.0.x/javadoc-api/org/springframework/beans/factory/config/PropertiesFactoryBean.html">PropertiesFactoryBean</ulink></literal> (which is what Spring for
 	Apache Hadoop Yarn and <literal>util:properties</literal> use underneath).</note>
      
     <para><anchor id="yarn:config:inherit"/>It is possible to create configuration

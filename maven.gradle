@@ -19,10 +19,10 @@ def customizePom(pom, gradleProject) {
         generatedPom.project {
             name = gradleProject.description
             description = gradleProject.description
-            url = 'http://github.com/SpringSource/spring-hadoop'
+            url = 'http://github.com/spring-projects/spring-hadoop'
             organization {
-                name = 'SpringSource'
-                url = 'http://www.springsource.org/spring-data/hadoop'
+                name = 'Spring by Pivotal'
+                url = 'http://projects.spring.io/spring-hadoop/'
             }
             licenses {
                 license {
@@ -32,17 +32,32 @@ def customizePom(pom, gradleProject) {
                 }
             }
             scm {
-                url = 'http://github.com/SpringSource/spring-hadoop'
-                connection = 'scm:git:git://github.com/SpringSource/spring-hadoop'
-                developerConnection = 'scm:git:git://github.com/SpringSource/spring-hadoop'
+                url = 'http://github.com/spring-projects/spring-hadoop'
+                connection = 'scm:git:git://github.com/spring-projects/spring-hadoop'
+                developerConnection = 'scm:git:git://github.com/spring-projects/spring-hadoop'
             }
             developers {
                 developer {
                     id = 'costin'
                     name = 'Costin Leau'
-                    email = 'cleau@vmware.com'
                     properties {
                         twitter = 'costinl'
+                    }
+                }
+                developer {
+                    id = 'trisberg'
+                    name = 'Thomas Risberg'
+                    email = 'trisberg@gopivotal.com'
+                    properties {
+                        twitter = 'trisberg'
+                    }
+                }
+                developer {
+                    id = 'jvalkeal'
+                    name = 'Janne Valkealahti'
+                    email = 'jvalkealahti@gopivotal.com'
+                    properties {
+                        twitter = 'tunebluez'
                     }
                 }
             }

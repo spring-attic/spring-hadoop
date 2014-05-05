@@ -11,7 +11,7 @@
   <itemizedlist>
 	<listitem>
 	  <formalpara>
-	  <title>Spring for Apache Hadoop <ulink url="https://github.com/SpringSource/spring-hadoop-samples/">samples</ulink></title>
+	  <title>Spring for Apache Hadoop <ulink url="https://github.com/spring-projects/spring-hadoop-samples/">samples</ulink></title>
 	  <para>Official repository full of SHDP samples demonstrating the various project features.</para>
 	  </formalpara>
 	</listitem>
@@ -27,7 +27,7 @@
 	
 	<listitem>
 	  <formalpara>
-	  <title>Spring Data Book <ulink url="https://github.com/SpringSource/spring-hadoop-samples/">examples</ulink></title>
+	  <title>Spring Data Book <ulink url="https://github.com/spring-projects/spring-data-book/tree/master/hadoop">examples</ulink></title>
 	  
 	  <para>Complete running samples for the Spring Data book. Note that some of them are available inside Spring for Apache Hadoop samples
 	  as well.</para>

@@ -558,7 +558,7 @@ fsh.rmr(dir)
 		Their semantics are exactly the same as in the command-line version however one has access to a native Java API that returns
 		actual objects (rather than <literal>String</literal>s) making it easy to use them programmatically whether in Java or another language. Furthermore, the class offers enhanced methods (such as <literal>chmodr</literal>
 		which stands for <emphasis>recursive</emphasis> <literal>chmod</literal>) and multiple overloaded methods taking advantage of <ulink url="http://docs.oracle.com/javase/1.5.0/docs/guide/language/varargs.html">varargs</ulink> 
-		so that multiple parameters can be specified. Consult the <ulink url="http://static.springsource.org/spring-hadoop/docs/current/api/index.html?org/springframework/data/hadoop/fs/FsShell.html">API</ulink> for more information.
+		so that multiple parameters can be specified. Consult the <ulink url="http://docs.spring.io/spring-hadoop/docs/current/api/index.html?org/springframework/data/hadoop/fs/FsShell.html">API</ulink> for more information.
 		</para>
 		
 		<para>To be as close as possible to the command-line shell, <literal>FsShell</literal> mimics even the messages being displayed. Take a look at line 9 which prints the result of <literal>fsh.cat()</literal>. The
@@ -597,7 +597,7 @@ print $fsh.ls(dir).to_s]]></programlisting>
 			
 			<para>Similar to the <literal>FsShell</literal>, SHDP provides a lightweight, fully embeddable <ulink url="http://hadoop.apache.org/common/docs/stable/distcp.html"><literal>DistCp</literal></ulink> version 
 			that builds on top of the <literal>distcp</literal> from the Hadoop distro.	The semantics and configuration options are the same however, one can use it from within a Java application without having to use 
-			the command-line. See the <ulink url="http://static.springsource.org/spring-hadoop/docs/current/api/index.html?org/springframework/data/hadoop/fs/DistCp.html">API</ulink> for more information:</para>
+			the command-line. See the <ulink url="http://docs.spring.io/spring-hadoop/docs/current/api/index.html?org/springframework/data/hadoop/fs/DistCp.html">API</ulink> for more information:</para>
 			
 			<programlisting language="xml"><![CDATA[<hdp:script language="groovy">distcp.copy("${distcp.src}", "${distcp.dst}")</hdp:script>]]></programlisting>
 			
