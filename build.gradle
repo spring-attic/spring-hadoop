@@ -167,8 +167,8 @@ switch (hadoopDistro) {
 		break;
 
 	// Pivotal HD 2.0
-	case "phd2":
-		hadoopVersion = phd2Version
+	case "phd20":
+		hadoopVersion = phd20Version
 		println "Using Pivotal HD 2.0 - [$hadoopVersion]"
 		hadoopArtifacts = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
@@ -184,12 +184,12 @@ switch (hadoopDistro) {
 					"org.apache.hadoop:hadoop-mapreduce-client-hs:$hadoopVersion",
 					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion",
 					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion:tests"]
-		hbaseVersion = phd2HbaseVersion
+		hbaseVersion = phd20HbaseVersion
 		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion",
 				  "org.apache.hbase:hbase-common:$hbaseVersion",
 				  "org.apache.hbase:hbase-client:$hbaseVersion"]
-		hiveVersion = phd2HiveVersion
-		pigVersion = phd2PigVersion
+		hiveVersion = phd20HiveVersion
+		pigVersion = phd20PigVersion
 		pigQualifier = ':h2'
 		break;
 
@@ -309,7 +309,7 @@ switch (hadoopDistro) {
 				println "Using Apache Hadoop 2.2 - [$hadoopVersion]"
 			} else {
 				println "Failing build: $hadoopDistro is not a supported distro"
-				println "Supported distros: hadoop12, hadoop22[*], hadoop24, hdp13, hdp20, cdh4, cdh4yarn, cdh5, cdh5mr1 and phd1"
+				println "Supported distros: hadoop12, hadoop22[*], hadoop24, hdp13, hdp20, cdh4, cdh4yarn, cdh5, cdh5mr1, phd1 and phd20"
 				println "* default"
 				throw new InvalidUserDataException("$hadoopDistro is not a supported distro")
 			}
@@ -543,7 +543,7 @@ configure(hadoopProjects()) {
 			break;
 
 		// Pivotal HD 2.0
-		case "phd2":
+		case "phd20":
 			dependencies {
 				testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
 				testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
