@@ -3,7 +3,27 @@ SPRING for APACHE HADOOP CHANGELOG
 http://projects.spring.io/spring-hadoop/
 
 Commit changelog: http://github.com/spring-projects/spring-hadoop/tree/v[version]
-Issues changelog: http://jira.springsource.org/secure/ReleaseNote.jspa?projectId=10801
+Issues changelog: https://jira.spring.io/secure/ReleaseNote.jspa?projectId=10801
+
+Changes in version 2.0.0 RC3 (2014-05-05)
+-----------------------------------------
+General
+* Add support for Hortonworks Data Platform 2.1 [SHDP-319]
+* Update CDH5 support with GA release [SHDP-320]
+* Add Hadoop 2.4.0 as a supported version [SHDP-326]
+* Update Hive/Pig versions for Hadoop 2.2.0 [SHDP-330]
+* Update Spring Projects to current versions [SHDP-336]
+* Update Pivotal HD 2.0 to version 2.0.1 [SHDP-337]
+* Update to Kite SDK 0.13.0 [SHDP-338]
+
+Store
+* Add support for reading a partition of a Dataset [SHDP-327]
+* Fix NPE in TextFileWriter class [SHDP-335]
+
+YARN
+* BatchAppmaster should not need keepContextAlive [SHDP-325]
+* Support allocation relax localization [SHDP-317]
+
 
 Changes in version 2.0.0 RC2 (2014-04-02)
 -----------------------------------------
