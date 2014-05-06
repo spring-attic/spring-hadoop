@@ -4,10 +4,9 @@
     xmlns:xi="http://www.w3.org/2001/XInclude"
     xmlns:xlink="http://www.w3.org/1999/xlink">
   <bookinfo>
-    <title>Spring for Apache Hadoop Reference Manual</title>
+    <title>Spring for Apache Hadoop - Reference Documentation</title>
     <releaseinfo>${version}</releaseinfo>
-    <productname>Spring Hadoop</productname>
-
+    <productname>Spring for Apache Hadoop</productname>
     
     <authorgroup>
       <author>
@@ -27,6 +26,10 @@
       </author>
     </authorgroup>
 
+    <copyright>
+      <year>2011-2014</year>
+      <holder>Spring by Pivotal</holder>
+    </copyright>
 
     <legalnotice>
       <para>Copies of this document may be made for your own use and for
