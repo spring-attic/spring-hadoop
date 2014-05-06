@@ -46,6 +46,24 @@ public class PartitionTextFileWriter extends AbstractDataStreamWriter implements
 	private CodecInfo codec;
 	private FileNamingStrategy strategy;
 	private RolloverStrategy rollOver;
+	private String strategyBeanName;
+	private String rollOverBeanName;
+	public String getStrategyBeanName() {
+		return strategyBeanName;
+	}
+
+	public void setStrategyBeanName(String strategyBeanName) {
+		this.strategyBeanName = strategyBeanName;
+	}
+
+	public String getRollOverBeanName() {
+		return rollOverBeanName;
+	}
+
+	public void setRollOverBeanName(String rollOverBeanName) {
+		this.rollOverBeanName = rollOverBeanName;
+	}
+
 	protected TextFileWriter nextWriter; 
 	protected FileSystem fs;
 	protected String internalWriterName;
@@ -69,9 +87,8 @@ public class PartitionTextFileWriter extends AbstractDataStreamWriter implements
 		//we can alwasy do getBean getBeanFactory().getBean to have the spring context to create it. Pros and cons ?
 		Path finalDir = Path.mergePaths(basePath, new Path(directory));	
 		TextFileWriter writer = (TextFileWriter) getBeanFactory().getBean(internalWriterName, configuration, finalDir, codec, delimiter, idleTimeout);
-		
-		
-		
+		this.strategy = getBeanFactory().getBean(strategyBeanName, FileNamingStrategy.class);
+		this.rollOver = getBeanFactory().getBean(rollOverBeanName, RolloverStrategy.class);
 		writer.setFileNamingStrategy(this.strategy);
 		writer.setRolloverStrategy(this.rollOver);
 		writer.start();
@@ -117,9 +134,7 @@ public class PartitionTextFileWriter extends AbstractDataStreamWriter implements
 		try {
 			this.fs = FileSystem.get(configuration);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		
+			log.error("Error creating FS hadoop instance in partition writer", e);
 		}
 	}
 	

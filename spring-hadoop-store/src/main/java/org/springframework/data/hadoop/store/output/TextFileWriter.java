@@ -45,6 +45,7 @@ public class TextFileWriter extends AbstractDataStreamWriter implements DataStor
 
 	private final byte[] delimiter;
 
+	
 	/**
 	 * Instantiates a new text file writer.
 	 *
@@ -109,7 +110,6 @@ public class TextFileWriter extends AbstractDataStreamWriter implements DataStor
 		setWritePosition(getPosition(streamsHolder));
 
 		OutputContext context = getOutputContext();
-		log.info("My context " + context + " - " + this);
 		if (context.getRolloverState()) {
 			log.info("after write, rollever state is true");
 			close();
