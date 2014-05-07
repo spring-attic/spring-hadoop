@@ -635,7 +635,7 @@ configure(hadoopProjects()) {
 		// Missing dependency in Hadoop 1.0.3
 		testRuntime "commons-io:commons-io:$commonsioVersion"
 		testRuntime "org.codehaus.jackson:jackson-mapper-asl:$jacksonVersion"
-		testRuntime "cglib:cglib:$cglibVersion"
+		testRuntime "cglib:cglib-nodep:$cglibVersion"
 
 		// Hive
 		optional("$hiveGroup:hive-service:$hiveVersion")
@@ -648,6 +648,11 @@ configure(hadoopProjects()) {
 			exclude group: "junit", module: "junit"
 		}
 	
+		// HBase
+		hbaseArtifacts.each {
+			optional(it)
+		}
+
 		// Testing
 		testCompile "junit:junit:$junitVersion"
 	}
@@ -880,7 +885,7 @@ project('spring-data-hadoop-build-tests') {
 		testCompile "org.springframework.integration:spring-integration-file:$springIntVersion"
 		testRuntime "org.springframework.integration:spring-integration-event:$springIntVersion"
 
-		testRuntime "cglib:cglib:$cglibVersion"
+		testRuntime "cglib:cglib-nodep:$cglibVersion"
 		testRuntime "commons-io:commons-io:$commonsioVersion"
 
 		// Testing
