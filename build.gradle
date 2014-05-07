@@ -645,14 +645,7 @@ configure(hadoopProjects()) {
 	
 		// Pig
 		optional("org.apache.pig:pig:$pigVersion$pigQualifier") { dep ->
-			exclude module: "junit"
-		}
-	
-		// HBase
-		hbaseArtifacts.each {
-			optional(it) { dep ->
-				exclude module: "thrift"
-			}
+			exclude group: "junit", module: "junit"
 		}
 	
 		// Testing
