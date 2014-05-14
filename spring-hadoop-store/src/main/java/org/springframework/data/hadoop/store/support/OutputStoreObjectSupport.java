@@ -70,26 +70,40 @@ public abstract class OutputStoreObjectSupport extends StoreObjectSupport {
     @Override
     protected void onInit() throws Exception {
     	super.onInit();
-
-    	FileSystem fileSystem = getPath().getFileSystem(getConfiguration());
-    	Path initPath = null;
-    	if (fileSystem.exists(getPath())) {
-        	FileStatus[] fileStatuses = fileSystem.listStatus(getPath());
-
-    		Arrays.sort(fileStatuses, new Comparator<FileStatus>() {
-    			public int compare(FileStatus f1, FileStatus f2) {
-    				// newest first
-    				return -Long.valueOf(f1.getModificationTime()).compareTo(f2.getModificationTime());
-    			}
-    		});
-
-    		if (fileStatuses.length > 0) {
-    			initPath = fileStatuses[0].getPath();
-    		}
-    	}
-
-    	outputContext.init(initPath);
+    	initOutputContext();
     }
+
+    protected void initOutputContext() throws Exception {
+		for (FileStatus status : findInitFiles(getPath())) {
+			String name = status.getPath().getName();
+			if (StringUtils.hasText(prefix) && name.startsWith(prefix)) {
+				name = name.substring(prefix.length());
+			}
+			if (StringUtils.hasText(suffix) && name.endsWith(suffix)) {
+				name = name.substring(0, name.length() - suffix.length());
+			}
+			Path path = new Path(status.getPath().getParent(), name);
+			if (outputContext.init(path) == null) {
+				break;
+			}
+		}
+    }
+
+	protected FileStatus[] findInitFiles(Path basePath) throws Exception {
+		FileSystem fileSystem = basePath.getFileSystem(getConfiguration());
+		if (fileSystem.exists(basePath)) {
+			FileStatus[] fileStatuses = fileSystem.listStatus(basePath);
+			Arrays.sort(fileStatuses, new Comparator<FileStatus>() {
+				public int compare(FileStatus f1, FileStatus f2) {
+					// newest first
+					return -Long.valueOf(f1.getModificationTime()).compareTo(f2.getModificationTime());
+				}
+			});
+			return fileStatuses;
+		} else {
+			return new FileStatus[0];
+		}
+	}
 
     /**
      * Gets the strategy context.

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,7 +73,7 @@ public class OutputContext {
 			rolloverStrategy.reset();
 		}
 		if (fileNamingStrategy != null) {
-			fileNamingStrategy.reset();
+			fileNamingStrategy.next();
 		}
 	}
 
@@ -91,11 +91,22 @@ public class OutputContext {
 		return p != null ? new Path(path, p) : path;
 	}
 
-	public void init(Path path) {
-		log.info("init path=" + path);
+	/**
+	 * Inits the context from a {@link Path}
+	 *
+	 * @param path the path
+	 * @return the path
+	 */
+	public Path init(Path path) {
+		log.info("Init from path=" + path);
 		if (fileNamingStrategy != null) {
-			fileNamingStrategy.init(path);
+			Path p = fileNamingStrategy.init(path);
+			if (p != null) {
+				fileNamingStrategy.reset();
+			}
+			return p;
 		}
+		return null;
 	}
 
 	/**
@@ -104,6 +115,7 @@ public class OutputContext {
 	 * @param codecInfo the new codec info
 	 */
 	public void setCodecInfo(CodecInfo codecInfo) {
+		log.info("Setting codecInfo=" + codecInfo);
 		if (fileNamingStrategy != null) {
 			fileNamingStrategy.setCodecInfo(codecInfo);
 		}
@@ -115,8 +127,8 @@ public class OutputContext {
 	 * @param fileNamingStrategy the new file naming strategy
 	 */
 	public void setFileNamingStrategy(FileNamingStrategy fileNamingStrategy) {
-		this.fileNamingStrategy = fileNamingStrategy;
 		log.info("Setting fileNamingStrategy=" + fileNamingStrategy);
+		this.fileNamingStrategy = fileNamingStrategy;
 	}
 
 	/**
@@ -125,8 +137,8 @@ public class OutputContext {
 	 * @param rolloverStrategy the new rollover strategy
 	 */
 	public void setRolloverStrategy(RolloverStrategy rolloverStrategy) {
-		this.rolloverStrategy = rolloverStrategy;
 		log.info("Setting rolloverStrategy=" + rolloverStrategy);
+		this.rolloverStrategy = rolloverStrategy;
 	}
 
 }

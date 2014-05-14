@@ -1,11 +1,11 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -26,6 +26,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.compress.CompressionCodec;
 import org.apache.hadoop.util.ReflectionUtils;
+import org.springframework.data.hadoop.store.StoreException;
 import org.springframework.data.hadoop.store.codec.CodecInfo;
 import org.springframework.data.hadoop.store.support.OutputStoreObjectSupport;
 import org.springframework.data.hadoop.store.support.StreamsHolder;
@@ -42,6 +43,10 @@ public abstract class AbstractDataStreamWriter extends OutputStoreObjectSupport 
 
 	private final static Log log = LogFactory.getLog(AbstractDataStreamWriter.class);
 
+	public final static int DEFAULT_MAX_OPEN_ATTEMPTS = 10;
+
+	private volatile int maxOpenAttempts = DEFAULT_MAX_OPEN_ATTEMPTS;
+
 	/**
 	 * Instantiates a new abstract data stream writer.
 	 *
@@ -54,6 +59,18 @@ public abstract class AbstractDataStreamWriter extends OutputStoreObjectSupport 
 	}
 
 	/**
+	 * Sets the max open attempts trying to find a suitable
+	 * path for output stream. Only positive values are
+	 * allowed and any attempt to set this to less than 1
+	 * will automatically reset value to exactly 1.
+	 *
+	 * @param maxOpenAttempts the new max open attempts
+	 */
+	public void setMaxOpenAttempts(int maxOpenAttempts) {
+		this.maxOpenAttempts = maxOpenAttempts < 1 ? 1 : maxOpenAttempts;
+	}
+
+	/**
 	 * Gets the output.
 	 *
 	 * @return the output
@@ -62,18 +79,43 @@ public abstract class AbstractDataStreamWriter extends OutputStoreObjectSupport 
 	protected StreamsHolder<OutputStream> getOutput() throws IOException {
 		StreamsHolder<OutputStream> holder = new StreamsHolder<OutputStream>();
 		FileSystem fs = FileSystem.get(getConfiguration());
-		Path p = getResolvedPath();
+
+		// Using maxOpenAttempts try to resolve path and open
+		// an output stream and automatically rolling strategies
+		// to find a next candidate. Effectively if maxOpenAttempts
+		// is set to roughly same count as expected number of writers
+		// and strategy init is accurate enough to find a good starting
+		// position for naming, we should always get a next available
+		// path and its stream.
+		Path p = null;
+		FSDataOutputStream wout = null;
+		int openAttempt = 0;
+		do {
+			try {
+				p = getResolvedPath();
+				wout = fs.create(p);
+				break;
+			} catch (Exception e) {
+				getOutputContext().rollStrategies();
+			}
+
+		} while (++openAttempt < maxOpenAttempts);
+
+		if (wout == null) {
+			throw new StoreException("We've reached maxOpenAttempts=" + maxOpenAttempts
+					+ " to find suitable output path. Last path tried was path=[" + p + "]");
+		}
+
 		log.info("Creating output for path " + p);
 		holder.setPath(p);
+
 		if (!isCompressed()) {
-			OutputStream out = fs.create(p);
-			holder.setStream(out);
+			holder.setStream(wout);
 		} else {
 			// TODO: will isCompressed() really guard for npe against getCodec()
 			Class<?> clazz = ClassUtils.resolveClassName(getCodec().getCodecClass(), getClass().getClassLoader());
 			CompressionCodec compressionCodec = (CompressionCodec) ReflectionUtils.newInstance(clazz,
 					getConfiguration());
-			FSDataOutputStream wout = fs.create(p);
 			OutputStream out = compressionCodec.createOutputStream(wout);
 			holder.setWrappedStream(wout);
 			holder.setStream(out);

@@ -24,29 +24,34 @@ import org.springframework.data.hadoop.store.codec.CodecInfo;
  * @author Janne Valkealahti
  *
  */
-public interface FileNamingStrategy {
+public interface FileNamingStrategy extends FileNamingStrategyFactory<FileNamingStrategy> {
 
 	/**
-	 * Resolve a current filename.
+	 * Resolve a current file path denoted by this strategy.
 	 *
-	 * @return the filename
+	 * @return the path
 	 */
 	Path resolve(Path path);
 
 	/**
-	 * Resets the strategy. This method should be called to prepare next filename in case
+	 * This method should be called to prepare next filename in case
 	 * strategy doesn't know how to do it automatically.
+	 */
+	void next();
+
+	/**
+	 * Resets the strategy to its original state.
 	 */
 	void reset();
 
 	/**
 	 * Initialises a starting state of a strategy. Implementor of this
 	 * method needs to check the final part of the {@code Path} and
-	 * remove it's own handled part if possible. Returned {@code Path}
+	 * remove its own handled part if possible. Returned {@code Path}
 	 * is then passed into next strategy for it to able to
 	 * do its own initialisation logic.
-	 * <p>
-	 * {@code Path} passed to this method may be null indicating
+	 *
+	 * <p>{@code Path} passed to this method may be null indicating
 	 * that no further processing should be done or simply we don't
 	 * have information about the initialised path.
 	 *
