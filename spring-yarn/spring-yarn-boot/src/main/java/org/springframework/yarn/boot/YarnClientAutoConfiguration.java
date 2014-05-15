@@ -121,7 +121,9 @@ public class YarnClientAutoConfiguration {
 			config
 				.fileSystemUri(shp.getFsUri())
 				.resourceManagerAddress(shp.getResourceManagerAddress())
-				.schedulerAddress(shp.getResourceManagerSchedulerAddress());
+				.schedulerAddress(shp.getResourceManagerSchedulerAddress())
+				.withResources()
+					.resources(shp.getResources());
 		}
 
 		@Override
