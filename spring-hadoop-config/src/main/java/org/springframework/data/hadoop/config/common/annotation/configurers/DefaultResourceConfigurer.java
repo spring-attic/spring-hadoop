@@ -16,6 +16,7 @@
 package org.springframework.data.hadoop.config.common.annotation.configurers;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.core.io.DefaultResourceLoader;
@@ -55,7 +56,8 @@ public class DefaultResourceConfigurer<O,I,B extends AnnotationBuilder<O>>
 	 * @param resources the resources
 	 * @return the {@link ResourceConfigurer} for chaining
 	 */
-	public ResourceConfigurer<I> resource(Set<Resource> resources) {
+	@Override
+	public ResourceConfigurer<I> resources(Set<Resource> resources) {
 		this.resources.addAll(resources);
 		return this;
 	}
@@ -66,6 +68,7 @@ public class DefaultResourceConfigurer<O,I,B extends AnnotationBuilder<O>>
 	 * @param resource the resource
 	 * @return the {@link ResourceConfigurer} for chaining
 	 */
+	@Override
 	public ResourceConfigurer<I> resource(Resource resource) {
 		resources.add(resource);
 		return this;
@@ -77,8 +80,25 @@ public class DefaultResourceConfigurer<O,I,B extends AnnotationBuilder<O>>
 	 * @param resource the resource
 	 * @return the {@link ResourceConfigurer} for chaining
 	 */
+	@Override
 	public ResourceConfigurer<I> resource(String resource) {
 		resources.add(resourceLoader.getResource(resource));
+		return this;
+	}
+
+	/**
+	 * Adds a {@link Resource}s to this builder.
+	 *
+	 * @param resources the resources
+	 * @return the {@link ResourceConfigurer} for chaining
+	 */
+	@Override
+	public ResourceConfigurer<I> resources(List<String> resources) {
+		if (resources != null) {
+			for (String resource : resources) {
+				resource(resource);
+			}
+		}
 		return this;
 	}
 

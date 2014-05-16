@@ -50,7 +50,8 @@ public class DefaultConfigurationAnnotationTests {
 		assertEquals("jee", yarnConfiguration.get("test.foo"));
 		assertNull(yarnConfiguration.get("test.foo.2"));
 		assertNull(yarnConfiguration.get("resource.property"));
-		assertNull(yarnConfiguration.get("resource.property.2"));
+		assertNotNull(yarnConfiguration.get("resource.property.2"));
+		assertEquals("test-site-2.xml", yarnConfiguration.get("resource.property.2"));
 		assertEquals("10.10.10.10:8032", yarnConfiguration.get("yarn.resourcemanager.address"));
 	}
 
@@ -63,6 +64,9 @@ public class DefaultConfigurationAnnotationTests {
 			config
 				.fileSystemUri("hdfs://foo.uri")
 				.resourceManagerAddress("10.10.10.10:8032")
+				.withResources()
+					.resource("classpath:/test-site-2.xml")
+					.and()
 				.withProperties()
 					.property("test.foo", "jee");
 		}

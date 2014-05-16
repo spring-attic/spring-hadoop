@@ -15,6 +15,8 @@
  */
 package org.springframework.yarn.boot.properties;
 
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +39,7 @@ public class SpringHadoopProperties {
 	private String resourceManagerSchedulerHost;
 	private Integer resourceManagerPort = 8032;
 	private Integer resourceManagerSchedulerPort = 8030;
+	private List<String> resources;
 
 	@Autowired
 	private SpringYarnEnvProperties syep;
@@ -106,6 +109,14 @@ public class SpringHadoopProperties {
 
 	public void setResourceManagerSchedulerPort(Integer resourceManagerSchedulerPort) {
 		this.resourceManagerSchedulerPort = resourceManagerSchedulerPort;
+	}
+
+	public List<String> getResources() {
+		return resources;
+	}
+
+	public void setResources(List<String> resources) {
+		this.resources = resources;
 	}
 
 }

@@ -15,6 +15,7 @@
  */
 package org.springframework.data.hadoop.config.common.annotation.configurers;
 
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.core.io.Resource;
@@ -31,7 +32,9 @@ import org.springframework.data.hadoop.config.common.annotation.AnnotationConfig
  */
 public interface ResourceConfigurer<I> extends AnnotationConfigurerBuilder<I> {
 
-	ResourceConfigurer<I> resource(Set<Resource> resources);
+	ResourceConfigurer<I> resources(Set<Resource> resources);
+
+	ResourceConfigurer<I> resources(List<String> resources);
 
 	ResourceConfigurer<I> resource(Resource resource);
 

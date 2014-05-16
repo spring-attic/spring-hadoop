@@ -69,7 +69,7 @@ public interface YarnEnvironmentConfigurer {
 	 * <br>XML:
 	 * <pre>
 	 * &lt;yarn:environment&gt;
-	 *   &lt;yarn:classpath use-default-yarn-classpath="true" delimiter=":"&gt;
+	 *   &lt;yarn:classpath use-yarn-app-classpath="true" delimiter=":"&gt;
 	 *     cpEntry1
 	 *     cpEntry2
 	 *   &lt;/yarn:classpath&gt;

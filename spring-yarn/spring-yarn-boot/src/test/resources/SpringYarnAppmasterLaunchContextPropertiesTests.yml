@@ -9,7 +9,7 @@ spring:
                   : argumentsValFoo1
                   ? argumentsKeyFoo2
                   : argumentsValFoo2
-                classpath:
+                containerAppClasspath:
                   - "classpath1Foo"
                   - "classpath2Foo"
                 options:
@@ -17,6 +17,7 @@ spring:
                   - "options2Foo"
                 locality: true
                 includeLocalSystemEnv: true
-                useDefaultYarnClasspath: false
+                useYarnAppClasspath: true
+                useMapreduceAppClasspath: true
                 includeBaseDirectory: false
                 pathSeparator: ":"
