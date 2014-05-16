@@ -45,9 +45,11 @@ public final class YarnEnvironmentBuilder
 
 	private Configuration configuration;
 	private boolean useDefaultYarnClasspath = true;
+	private boolean useDefaultMapreduceClasspath = true;
 	private boolean includeBaseDirectory = true;
 	private boolean includeLocalSystemEnv = false;
 	private String defaultYarnAppClasspath;
+	private String defaultMapreduceAppClasspath;
 	private String delimiter = ":";
 	private Properties properties = new Properties();
 	private ArrayList<String> classpathEntries = new ArrayList<String>();
@@ -65,7 +67,9 @@ public final class YarnEnvironmentBuilder
 		fb.setClasspath(StringUtils.collectionToDelimitedString(classpathEntries, delimiter));
 		fb.setDelimiter(delimiter);
 		fb.setDefaultYarnAppClasspath(defaultYarnAppClasspath);
+		fb.setDefaultMapreduceAppClasspath(defaultMapreduceAppClasspath);
 		fb.setUseDefaultYarnClasspath(useDefaultYarnClasspath);
+		fb.setUseDefaultMapreduceClasspath(useDefaultMapreduceClasspath);
 		fb.setIncludeLocalSystemEnv(includeLocalSystemEnv);
 		fb.setIncludeBaseDirectory(includeBaseDirectory);
 		fb.afterPropertiesSet();
@@ -138,6 +142,15 @@ public final class YarnEnvironmentBuilder
 	}
 
 	/**
+	 * Sets the default classpath.
+	 *
+	 * @param useDefaultClasspath the new default classpath
+	 */
+	public void setUseDefaultMapreduceClasspath(boolean useDefaultClasspath) {
+		this.useDefaultMapreduceClasspath = useDefaultClasspath;
+	}
+
+	/**
 	 * Sets the include base directory.
 	 *
 	 * @param includeBaseDirectory the new include base directory
@@ -162,6 +175,15 @@ public final class YarnEnvironmentBuilder
 	 */
 	public void setDefaultYarnAppClasspath(String defaultYarnAppClasspath) {
 		this.defaultYarnAppClasspath = defaultYarnAppClasspath;
+	}
+
+	/**
+	 * Sets the default mr app classpath.
+	 *
+	 * @param defaultMapreduceAppClasspath the new default mr app classpath
+	 */
+	public void setDefaultMapreduceAppClasspath(String defaultMapreduceAppClasspath) {
+		this.defaultMapreduceAppClasspath = defaultMapreduceAppClasspath;
 	}
 
 }

@@ -24,10 +24,11 @@ public abstract class AbstractLaunchContextProperties {
 	private String runnerClass;
 	private List<String> options;
 	private Map<String, String> arguments;
-	private List<String> classpath;
+	private List<String> containerAppClasspath;
 	private String pathSeparator;
 	private boolean includeBaseDirectory = true;
-	private boolean useDefaultYarnClasspath = true;
+	private boolean useYarnAppClasspath = false;
+	private boolean useMapreduceAppClasspath = false;
 	private boolean includeLocalSystemEnv = false;
 
 	public String getArchiveFile() {
@@ -62,12 +63,12 @@ public abstract class AbstractLaunchContextProperties {
 		this.arguments = arguments;
 	}
 
-	public List<String> getClasspath() {
-		return classpath;
+	public List<String> getContainerAppClasspath() {
+		return containerAppClasspath;
 	}
 
-	public void setClasspath(List<String> classpath) {
-		this.classpath = classpath;
+	public void setContainerAppClasspath(List<String> containerAppClasspath) {
+		this.containerAppClasspath = containerAppClasspath;
 	}
 
 	public String getPathSeparator() {
@@ -86,12 +87,20 @@ public abstract class AbstractLaunchContextProperties {
 		this.includeBaseDirectory = includeBaseDirectory;
 	}
 
-	public boolean isUseDefaultYarnClasspath() {
-		return useDefaultYarnClasspath;
+	public boolean isUseYarnAppClasspath() {
+		return useYarnAppClasspath;
 	}
 
-	public void setUseDefaultYarnClasspath(boolean useDefaultYarnClasspath) {
-		this.useDefaultYarnClasspath = useDefaultYarnClasspath;
+	public void setUseYarnAppClasspath(boolean useYarnAppClasspath) {
+		this.useYarnAppClasspath = useYarnAppClasspath;
+	}
+
+	public boolean isUseMapreduceAppClasspath() {
+		return useMapreduceAppClasspath;
+	}
+
+	public void setUseMapreduceAppClasspath(boolean useMapreduceAppClasspath) {
+		this.useMapreduceAppClasspath = useMapreduceAppClasspath;
 	}
 
 	public boolean isIncludeLocalSystemEnv() {

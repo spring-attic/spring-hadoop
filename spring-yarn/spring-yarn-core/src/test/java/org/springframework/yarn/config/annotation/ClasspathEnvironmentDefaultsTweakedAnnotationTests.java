@@ -89,8 +89,8 @@ public class ClasspathEnvironmentDefaultsTweakedAnnotationTests {
 					.withProperties()
 						.and()
 					.withClasspath()
-						.useDefaultYarnClasspath(true)
-						.defaultYarnAppClasspath("/tmp/fake1", "/tmp/fake2")
+						.useYarnAppClasspath(true)
+						.siteYarnAppClasspath("/tmp/fake1", "/tmp/fake2")
 						.and()
 					.entry("myvar1", "myvalue1")
 					.entry("foo", "jee");

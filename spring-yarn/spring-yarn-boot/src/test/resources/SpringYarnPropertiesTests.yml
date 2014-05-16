@@ -6,4 +6,5 @@ spring:
         applicationDir: applicationDirFoo
         applicationBaseDir: applicationBaseDirFoo
         applicationVersion: applicationVersionFoo
-        defaultYarnAppClasspath: defaultYarnAppClasspathFoo
+        siteYarnAppClasspath: siteYarnAppClasspathFoo
+        siteMapreduceAppClasspath: siteMapreduceAppClasspathFoo

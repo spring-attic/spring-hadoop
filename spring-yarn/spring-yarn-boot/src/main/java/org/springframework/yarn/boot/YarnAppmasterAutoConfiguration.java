@@ -236,10 +236,12 @@ public class YarnAppmasterAutoConfiguration {
 				.includeLocalSystemEnv(syalcp.isIncludeLocalSystemEnv())
 				.withClasspath()
 					.includeBaseDirectory(syalcp.isIncludeBaseDirectory())
-					.useDefaultYarnClasspath(syalcp.isUseDefaultYarnClasspath())
-					.defaultYarnAppClasspath(syp.getDefaultYarnAppClasspath())
+					.useYarnAppClasspath(syalcp.isUseYarnAppClasspath())
+					.useMapreduceAppClasspath(syalcp.isUseMapreduceAppClasspath())
+					.siteYarnAppClasspath(syp.getSiteYarnAppClasspath())
+					.siteMapreduceAppClasspath(syp.getSiteMapreduceAppClasspath())
 					.delimiter(syalcp.getPathSeparator())
-					.entries(syalcp.getClasspath())
+					.entries(syalcp.getContainerAppClasspath())
 					.entry(explodedEntryIfZip(syalcp));
 		}
 

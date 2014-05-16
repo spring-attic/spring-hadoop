@@ -78,19 +78,36 @@ public interface EnvironmentClasspathConfigurer extends AnnotationConfigurerBuil
 	/**
 	 * Specify if default yarn classpath entries should be added.
 	 *
-	 * @param useDefaultClasspath the use default classpath
+	 * @param useYarnAppClasspath the use default yarn classpath
 	 * @return {@link EnvironmentClasspathConfigurer} for chaining
 	 */
-	EnvironmentClasspathConfigurer useDefaultYarnClasspath(boolean useDefaultClasspath);
+	EnvironmentClasspathConfigurer useYarnAppClasspath(boolean useYarnAppClasspath);
+
+	/**
+	 * Specify if default mr classpath entries should be added.
+	 *
+	 * @param useMapreduceAppClasspath the use default mr classpath
+	 * @return {@link EnvironmentClasspathConfigurer} for chaining
+	 */
+	EnvironmentClasspathConfigurer useMapreduceAppClasspath(boolean useMapreduceAppClasspath);
 
 	/**
 	 * Specify a default yarn application classpath. Given classpath
 	 * entry can be a comma delimited list.
 	 *
-	 * @param defaultClasspath the default classpath
+	 * @param defaultClasspath the default yarn classpath
 	 * @return {@link EnvironmentClasspathConfigurer} for chaining
 	 */
-	EnvironmentClasspathConfigurer defaultYarnAppClasspath(String defaultClasspath);
+	EnvironmentClasspathConfigurer siteYarnAppClasspath(String defaultClasspath);
+
+	/**
+	 * Specify a default mr application classpath. Given classpath
+	 * entry can be a comma delimited list.
+	 *
+	 * @param defaultClasspath the default mr classpath
+	 * @return {@link EnvironmentClasspathConfigurer} for chaining
+	 */
+	EnvironmentClasspathConfigurer siteMapreduceAppClasspath(String defaultClasspath);
 
 	/**
 	 * Specify a default yarn application classpath entries.
@@ -98,7 +115,15 @@ public interface EnvironmentClasspathConfigurer extends AnnotationConfigurerBuil
 	 * @param defaultClasspath the default classpath entries.
 	 * @return {@link EnvironmentClasspathConfigurer} for chaining
 	 */
-	EnvironmentClasspathConfigurer defaultYarnAppClasspath(String... defaultClasspath);
+	EnvironmentClasspathConfigurer siteYarnAppClasspath(String... defaultClasspath);
+
+	/**
+	 * Specify a default mr application classpath entries.
+	 *
+	 * @param defaultClasspath the default classpath entries.
+	 * @return {@link EnvironmentClasspathConfigurer} for chaining
+	 */
+	EnvironmentClasspathConfigurer siteMapreduceAppClasspath(String... defaultClasspath);
 
 	/**
 	 * Specify if base directory should be added in classpath.

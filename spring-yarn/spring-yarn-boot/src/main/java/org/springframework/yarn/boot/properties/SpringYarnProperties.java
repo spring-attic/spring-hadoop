@@ -33,7 +33,8 @@ public class SpringYarnProperties {
 	private String stagingDir;
 	private String appName;
 	private String appType;
-	private String defaultYarnAppClasspath;
+	private String siteYarnAppClasspath;
+	private String siteMapreduceAppClasspath;
 
 	@Autowired
 	private SpringYarnEnvProperties syep;
@@ -86,12 +87,20 @@ public class SpringYarnProperties {
 		this.appType = appType;
 	}
 
-	public String getDefaultYarnAppClasspath() {
-		return defaultYarnAppClasspath;
+	public String getSiteYarnAppClasspath() {
+		return siteYarnAppClasspath;
 	}
 
-	public void setDefaultYarnAppClasspath(String defaultYarnAppClasspath) {
-		this.defaultYarnAppClasspath = defaultYarnAppClasspath;
+	public void setSiteYarnAppClasspath(String siteYarnAppClasspath) {
+		this.siteYarnAppClasspath = siteYarnAppClasspath;
+	}
+
+	public String getSiteMapreduceAppClasspath() {
+		return siteMapreduceAppClasspath;
+	}
+
+	public void setSiteMapreduceAppClasspath(String siteMapreduceAppClasspath) {
+		this.siteMapreduceAppClasspath = siteMapreduceAppClasspath;
 	}
 
 }
