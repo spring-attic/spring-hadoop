@@ -1,12 +1,12 @@
 /*
  * Copyright 2011-2013 the original author or authors.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,7 +17,6 @@ package org.springframework.data.hadoop.util;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
@@ -29,7 +28,7 @@ import org.springframework.util.Assert;
 
 /**
  * Utility class for dealing or location resources for Hadoop jobs.
- * 
+ *
  * @author Costin Leau
  * @author Arjen Poutsma
  */
@@ -49,7 +48,7 @@ public abstract class ResourceUtils {
 	 * Locates the jar (within the classpath) containing the given class.
 	 * As this method requires loading a class, it's recommended to use {@link #findContainingJar(ClassLoader, String)}
 	 * instead.
-	 * 
+	 *
 	 * @param clazz the class to look for
 	 * @return the containing jar.
 	 */
@@ -59,7 +58,7 @@ public abstract class ResourceUtils {
 
 	/**
 	 * Locates a jar (within the classpath) containing the given resource.
-	 * 
+	 *
 	 * @param loader class loader to use for locating the jar
 	 * @param resourceName resource to look for
 	 * @return the containing jar

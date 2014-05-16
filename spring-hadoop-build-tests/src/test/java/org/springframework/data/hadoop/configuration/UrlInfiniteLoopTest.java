@@ -16,11 +16,9 @@
 package org.springframework.data.hadoop.configuration;
 
 import java.lang.reflect.Method;
-import java.util.Properties;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.mapreduce.Job;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.data.hadoop.util.VersionUtils;
