@@ -252,7 +252,7 @@ public class EnvironmentFactoryBean implements InitializingBean, FactoryBean<Map
 	/**
 	 * Sets the default mr app classpath.
 	 *
-	 * @param defaultYarnAppClasspath the new default yarn app classpath
+	 * @param defaultMapreduceAppClasspath the new default mr app classpath
 	 */
 	public void setDefaultMapreduceAppClasspath(String defaultMapreduceAppClasspath) {
 		this.defaultMapreduceAppClasspath = defaultMapreduceAppClasspath;
