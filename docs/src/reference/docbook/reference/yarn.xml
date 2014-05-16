@@ -2238,17 +2238,17 @@ spring:
         <programlisting language="text"><![CDATA[
 spring:
   yarn:
-    defaultYarnAppClasspath: "/path/to/hadoop/libs/*"
+    siteYarnAppClasspath: "/path/to/hadoop/libs/*"
     appmaster:
       launchcontext:
-        useDefaultYarnClasspath: true
+        useYarnAppClasspath: true
         archiveFile: yarn-boot-container-0.1.0.zip
 ]]></programlisting>
 
         <para>In above example you can have a zip archive which
         doesn't bundle all dependant Hadoop YARN libraries. Default
         classpath entries are then resolved from
-        <literal>defaultYarnAppClasspath</literal> property.</para>
+        <literal>siteYarnAppClasspath</literal> property.</para>
 
         <programlisting language="text"><![CDATA[
 spring:
@@ -2256,7 +2256,7 @@ spring:
     appmaster:
       launchcontext:
         archiveFile: yarn-boot-container-0.1.0.zip
-        classpath:
+        containerAppClasspath:
          - "./yarn-boot-container-0.1.0.zip/config"
          - "./yarn-boot-container-0.1.0.zip/lib"
 ]]></programlisting>
@@ -2576,6 +2576,12 @@ public void publicVoidNoArgsMethod(@YarnParameter("key") String value) {
                       <entry>Integer</entry>
                       <entry>8030</entry>
                   </row>
+                  <row>
+                      <entry><literal>spring.hadoop.resources</literal></entry>
+                      <entry>No</entry>
+                      <entry>List</entry>
+                      <entry>null</entry>
+                  </row>
               </tbody>
           </tgroup>
       </table>
@@ -2610,6 +2616,15 @@ public void publicVoidNoArgsMethod(@YarnParameter("key") String value) {
               <listitem><para>
               Port of a YARN resource manager scheduler. This property is only
               needed for an application master.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.hadoop.resources</filename></term>
+              <listitem><para>
+              List of Spring resource locations to be initialized in Hadoop configuration.
+              These resources should be in Hadoop's own site xml format and location
+              format can be anything Spring supports. For example,
+              <emphasis>classpath:/myentry.xml</emphasis> from a classpath or
+              <emphasis>file:/myentry.xml</emphasis> from a file system.
               </para></listitem>
           </varlistentry>
       </variablelist>
@@ -2667,7 +2682,13 @@ public void publicVoidNoArgsMethod(@YarnParameter("key") String value) {
                       <entry>YARN</entry>
                   </row>
                   <row>
-                      <entry><literal>spring.yarn.defaultYarnAppClasspath</literal></entry>
+                      <entry><literal>spring.yarn.siteYarnAppClasspath</literal></entry>
+                      <entry>No</entry>
+                      <entry>String</entry>
+                      <entry>null</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.siteMapreduceAppClasspath</literal></entry>
                       <entry>No</entry>
                       <entry>String</entry>
                       <entry>null</entry>
@@ -2715,9 +2736,14 @@ public void publicVoidNoArgsMethod(@YarnParameter("key") String value) {
               Defines a registered application type used in YARN resource manager.
               </para></listitem>
           </varlistentry>
-          <varlistentry><term><filename>spring.yarn.defaultYarnAppClasspath</filename></term>
+          <varlistentry><term><filename>spring.yarn.siteYarnAppClasspath</filename></term>
               <listitem><para>
               Defines a default base YARN application classpath entries.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.siteMapreduceAppClasspath</filename></term>
+              <listitem><para>
+              Defines a default base MR application classpath entries.
               </para></listitem>
           </varlistentry>
       </variablelist>
@@ -2825,7 +2851,7 @@ public void publicVoidNoArgsMethod(@YarnParameter("key") String value) {
                       <entry>null</entry>
                   </row>
                   <row>
-                      <entry><literal>spring.yarn.appmaster.launchcontext.classpath</literal></entry>
+                      <entry><literal>spring.yarn.appmaster.launchcontext.containerAppClasspath</literal></entry>
                       <entry>No</entry>
                       <entry>List</entry>
                       <entry>null</entry>
@@ -2843,7 +2869,13 @@ public void publicVoidNoArgsMethod(@YarnParameter("key") String value) {
                       <entry>true</entry>
                   </row>
                   <row>
-                      <entry><literal>spring.yarn.appmaster.launchcontext.useDefaultYarnClasspath</literal></entry>
+                      <entry><literal>spring.yarn.appmaster.launchcontext.useYarnAppClasspath</literal></entry>
+                      <entry>No</entry>
+                      <entry>Boolean</entry>
+                      <entry>true</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.appmaster.launchcontext.useMapreduceAppClasspath</literal></entry>
                       <entry>No</entry>
                       <entry>Boolean</entry>
                       <entry>true</entry>
@@ -2885,7 +2917,7 @@ public void publicVoidNoArgsMethod(@YarnParameter("key") String value) {
               Application arguments.
               </para></listitem>
           </varlistentry>
-          <varlistentry><term><filename>spring.yarn.appmaster.launchcontext.classpath</filename></term>
+          <varlistentry><term><filename>spring.yarn.appmaster.launchcontext.containerAppClasspath</filename></term>
               <listitem><para>
               Additional classpath entries.
               </para></listitem>
@@ -2900,9 +2932,14 @@ public void publicVoidNoArgsMethod(@YarnParameter("key") String value) {
               If base directory should be added in a classpath.
               </para></listitem>
           </varlistentry>
-          <varlistentry><term><filename>spring.yarn.appmaster.launchcontext.useDefaultYarnClasspath</filename></term>
+          <varlistentry><term><filename>spring.yarn.appmaster.launchcontext.useYarnAppClasspath</filename></term>
               <listitem><para>
               If default yarn application classpath should be added.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.appmaster.launchcontext.useMapreduceAppClasspath</filename></term>
+              <listitem><para>
+              If default mr application classpath should be added.
               </para></listitem>
           </varlistentry>
           <varlistentry><term><filename>spring.yarn.appmaster.launchcontext.includeSystemEnv</filename></term>
@@ -3151,7 +3188,7 @@ public void publicVoidNoArgsMethod(@YarnParameter("key") String value) {
                       <entry>null</entry>
                   </row>
                   <row>
-                      <entry><literal>spring.yarn.client.launchcontext.classpath</literal></entry>
+                      <entry><literal>spring.yarn.client.launchcontext.containerAppClasspath</literal></entry>
                       <entry>No</entry>
                       <entry>List</entry>
                       <entry>null</entry>
@@ -3169,7 +3206,13 @@ public void publicVoidNoArgsMethod(@YarnParameter("key") String value) {
                       <entry>true</entry>
                   </row>
                   <row>
-                      <entry><literal>spring.yarn.client.launchcontext.useDefaultYarnClasspath</literal></entry>
+                      <entry><literal>spring.yarn.client.launchcontext.useYarnAppClasspath</literal></entry>
+                      <entry>No</entry>
+                      <entry>Boolean</entry>
+                      <entry>true</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.client.launchcontext.useMapreduceAppClasspath</literal></entry>
                       <entry>No</entry>
                       <entry>Boolean</entry>
                       <entry>true</entry>
@@ -3205,7 +3248,7 @@ public void publicVoidNoArgsMethod(@YarnParameter("key") String value) {
               Application arguments.
               </para></listitem>
           </varlistentry>
-          <varlistentry><term><filename>spring.yarn.client.launchcontext.classpath</filename></term>
+          <varlistentry><term><filename>spring.yarn.client.launchcontext.containerAppClasspath</filename></term>
               <listitem><para>
               Additional classpath entries.
               </para></listitem>
@@ -3220,9 +3263,14 @@ public void publicVoidNoArgsMethod(@YarnParameter("key") String value) {
               If base directory should be added in a classpath.
               </para></listitem>
           </varlistentry>
-          <varlistentry><term><filename>spring.yarn.client.launchcontext.useDefaultYarnClasspath</filename></term>
+          <varlistentry><term><filename>spring.yarn.client.launchcontext.useYarnAppClasspath</filename></term>
               <listitem><para>
               If default yarn application classpath should be added.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.client.launchcontext.useMapreduceAppClasspath</filename></term>
+              <listitem><para>
+              If default mr application classpath should be added.
               </para></listitem>
           </varlistentry>
           <varlistentry><term><filename>spring.yarn.client.launchcontext.includeSystemEnv</filename></term>
