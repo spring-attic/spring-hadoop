@@ -445,7 +445,7 @@
 	</xsd:complexType>
 
 	<xsd:complexType name="classpathType" mixed="true">
-		<xsd:attribute name="use-default-yarn-classpath" type="xsd:boolean" default="true">
+		<xsd:attribute name="use-yarn-app-classpath" type="xsd:boolean" default="false">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[
 				Configures whether default Hadoop Yarn app classpath entries will be added to a classpath.
@@ -453,10 +453,26 @@
 				</xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
-		<xsd:attribute name="default-yarn-app-classpath" type="xsd:string" use="optional">
+		<xsd:attribute name="use-mapreduce-app-classpath" type="xsd:boolean" default="false">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				Configures whether default Hadoop MR app classpath entries will be added to a classpath.
+				]]>
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="site-yarn-app-classpath" type="xsd:string" use="optional">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[
 				Configures default Hadoop Yarn app classpath entries which potentially might be added to a classpath.
+				]]>
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="site-mapreduce-app-classpath" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				Configures default Hadoop MR app classpath entries which potentially might be added to a classpath.
 				]]>
 				</xsd:documentation>
 			</xsd:annotation>

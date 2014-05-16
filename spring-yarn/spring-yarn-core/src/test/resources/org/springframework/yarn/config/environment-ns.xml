@@ -31,21 +31,21 @@
 	</yarn:environment>
 
 	<yarn:environment id="defClasspathEnvCustomDefaultClasspath">
-		<yarn:classpath use-default-yarn-classpath="true" default-yarn-app-classpath="/tmp/fake1,/tmp/fake2"/>
+		<yarn:classpath use-yarn-app-classpath="true" site-yarn-app-classpath="/tmp/fake1,/tmp/fake2"/>
 	</yarn:environment>
 
 	<yarn:environment id="defClasspathEnvCustomDefaultClasspathFromYarn">
-		<yarn:classpath use-default-yarn-classpath="true"/>
+		<yarn:classpath use-yarn-app-classpath="true"/>
 	</yarn:environment>
 
 	<yarn:environment id="defClasspathEnvMixed">
-		<yarn:classpath use-default-yarn-classpath="true" delimiter=":" />
+		<yarn:classpath use-yarn-app-classpath="true" delimiter=":" />
 		foo=jee
 		test-myvar1=${myvar1}
 	</yarn:environment>
 
 	<yarn:environment id="defClasspathEnvNoBaseIncluded">
-		<yarn:classpath include-base-directory="false"/>
+		<yarn:classpath use-yarn-app-classpath="true" include-base-directory="false"/>
 	</yarn:environment>
 
 </beans>
