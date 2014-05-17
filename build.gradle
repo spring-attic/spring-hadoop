@@ -11,6 +11,7 @@ buildscript {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:$springBootVersion")
 		classpath("org.springframework.build.gradle:propdeps-plugin:0.0.5")
 		classpath("org.springframework.build.gradle:docbook-reference-plugin:0.2.8")
+		classpath("org.springframework.build.gradle:spring-io-plugin:0.0.3.RELEASE")
 	}
 }
 
@@ -347,6 +348,18 @@ configure(javaProjects()) {
 	apply plugin: 'propdeps'
 	apply plugin: 'propdeps-idea'
 	apply plugin: 'propdeps-eclipse'
+
+	if (project.hasProperty('platformVersion')) {
+		apply plugin: 'spring-io'
+
+		repositories {
+			maven { url "https://repo.spring.io/libs-snapshot" }
+		}
+
+		dependencies {
+			springIoVersions "io.spring.platform:platform-versions:${platformVersion}@properties"
+		}
+	}
 
 	sourceCompatibility=1.6
 	targetCompatibility=1.6
@@ -951,7 +964,7 @@ project('spring-data-hadoop-build-tests') {
 		}
 	}
 
-	test {
+	tasks.withType(Test).all {
 		if (project.hasProperty('test.forkEvery')) {
 			forkEvery = project.getProperty('test.forkEvery').toInteger()
 		}
@@ -1018,7 +1031,7 @@ if (gradle.ext.mr2) {
 		task integrationTest(type: Test) {
 			include '**/*IntegrationTests.*'
 		}
-		test {
+		tasks.withType(Test).all {
 			exclude '**/*IntegrationTests.*'
 		}
 		dependencies {
@@ -1052,7 +1065,7 @@ if (gradle.ext.mr2) {
 			}
 		}
 
-		test {
+		tasks.withType(Test).all {
 
 			doFirst() {
 				// check prefix for hd.fs
@@ -1138,7 +1151,8 @@ if (gradle.ext.mr2) {
 			mainClass = 'org.springframework.yarn.boot.app.SpringYarnBootApplication'
 		}
 		bootRepackage.enabled = false
-		test.dependsOn(appmasterBootJar)
+		tasks.withType(Test).all { dependsOn(appmasterBootJar) }
+
 		// boot plugin imports gradle application plugin
 		// which creates distZip task which fails
 		// because we don't need mainClassname, so
@@ -1193,7 +1207,7 @@ if (gradle.ext.mr2) {
 			into "$buildDir/dependency-all-libs"
 			from configurations.hadoopruntimenotest
 		}
-		test.dependsOn([copyHadoopRuntimeDeps,copyHadoopRuntimeDepsAll])
+		tasks.withType(Test).all { dependsOn([copyHadoopRuntimeDeps,copyHadoopRuntimeDepsAll]) }
 	}
 
 	project('spring-yarn:spring-yarn-build-tests') {
@@ -1221,7 +1235,7 @@ if (gradle.ext.mr2) {
 			into "$buildDir/dependency-all-libs"
 			from configurations.hadoopruntimenotest
 		}
-		test.dependsOn([copyHadoopRuntimeDeps,copyHadoopRuntimeDepsAll])
+		tasks.withType(Test).all { dependsOn([copyHadoopRuntimeDeps,copyHadoopRuntimeDepsAll]) }
 	}
 
 	project('spring-yarn:spring-yarn-boot-test') {
@@ -1236,6 +1250,6 @@ if (gradle.ext.mr2) {
 
 task wrapper(type: Wrapper) {
 	description = "Generates gradlew[.bat] scripts"
-	gradleVersion = "1.11"
+	gradleVersion = "1.8"
 }
 
