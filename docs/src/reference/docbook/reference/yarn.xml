@@ -2022,7 +2022,7 @@ public class ContainerApplication {
     method.</para>
 
     <programlisting language="java"><![CDATA[
-@YarnContainer
+@YarnComponent
 public class HelloPojo {
 
   private static final Log log = LogFactory.getLog(HelloPojo.class);
@@ -2030,7 +2030,7 @@ public class HelloPojo {
   @Autowired
   private Configuration configuration;
 
-  @OnYarnContainerStart
+  @OnContainerStart
   public void publicVoidNoArgsMethod() {
     log.info("Hello from HelloPojo");
     log.info("About to list from hdfs root content");
@@ -2049,11 +2049,11 @@ public class HelloPojo {
 
     <itemizedlist>
       <listitem>
-          <para>We've added a class level<interfacename>@YarnContainer</interfacename>
+          <para>We've added a class level<interfacename>@YarnComponent</interfacename>
           annotation.</para>
       </listitem>
       <listitem>
-          <para>We've added a method level <interfacename>@OnYarnContainerStart</interfacename>
+          <para>We've added a method level <interfacename>@OnContainerStart</interfacename>
           annotation.</para>
       </listitem>
       <listitem>
@@ -2425,17 +2425,17 @@ public class AppmasterApplication {
       which expects to find a <literal>POJO</literal> created as a bean
       having a specific annotations instructing the actual functionality.</para>
 
-      <para><interfacename>@YarnContainer</interfacename> is a stereotype annotation itself
+      <para><interfacename>@YarnComponent</interfacename> is a stereotype annotation itself
       having a Spring's <interfacename>@Component</interfacename> defined in it. This is
       automatically marking a class to be a candidate having
-      a <interfacename>@YarnContainer</interfacename> functionality.</para>
+      a <interfacename>@YarnComponent</interfacename> functionality.</para>
 
       <para>Within a <literal>POJO</literal> class we can use
-      <interfacename>@OnYarnContainerStart</interfacename> annotation to mark a public
+      <interfacename>@OnContainerStart</interfacename> annotation to mark a public
       method to act as an activator for a method endpoint.</para>
 
      <programlisting language="java"><![CDATA[
-@OnYarnContainerStart
+@OnContainerStart
 public void publicVoidNoArgsMethod() {
 }
 ]]></programlisting>
@@ -2444,7 +2444,7 @@ public void publicVoidNoArgsMethod() {
       in a <emphasis>YarnContainer</emphasis> exit value.</para>
 
       <programlisting language="java"><![CDATA[
-@OnYarnContainerStart
+@OnContainerStart
 public int publicIntNoArgsMethod() {
   return 0;
 }
@@ -2456,7 +2456,7 @@ public int publicIntNoArgsMethod() {
       <emphasis>false</emphasis> failed container.</para>
 
   <programlisting language="java"><![CDATA[
-@OnYarnContainerStart
+@OnContainerStart
 public boolean publicBooleanNoArgsMethod() {
   return true;
 }
@@ -2468,8 +2468,8 @@ public boolean publicBooleanNoArgsMethod() {
       from <interfacename>ExitCodeMapper</interfacename>.</para>
 
       <programlisting language="java"><![CDATA[
-@OnYarnContainerStart
-public String publicVoidNoArgsMethod() {
+@OnContainerStart
+public String publicStringNoArgsMethod() {
   return "COMPLETE";
 }
 ]]></programlisting>
@@ -2478,7 +2478,7 @@ public String publicVoidNoArgsMethod() {
       <emphasis>YarnContainer</emphasis> is marked as failed.</para>
 
       <programlisting language="java"><![CDATA[
-@OnYarnContainerStart
+@OnContainerStart
 public void publicThrowsException() {
   throw new RuntimeExection("My Error");
 }
@@ -2490,8 +2490,8 @@ public void publicThrowsException() {
       variables.</para>
 
       <programlisting language="java"><![CDATA[
-@OnYarnContainerStart
-public void publicVoidNoArgsMethod(@YarnEnvironments Map<String,String> env) {
+@OnContainerStart
+public void publicVoidEnvironmentsArgsMethod(@YarnEnvironments Map<String,String> env) {
 }
 ]]></programlisting>
 
@@ -2501,8 +2501,8 @@ public void publicVoidNoArgsMethod(@YarnEnvironments Map<String,String> env) {
       variable.</para>
 
       <programlisting language="java"><![CDATA[
-@OnYarnContainerStart
-public void publicVoidNoArgsMethod(@YarnEnvironment("key") String value) {
+@OnContainerStart
+public void publicVoidEnvironmentArgsMethod(@YarnEnvironment("key") String value) {
 }
 ]]></programlisting>
 
@@ -2511,8 +2511,8 @@ public void publicVoidNoArgsMethod(@YarnEnvironment("key") String value) {
       to current <emphasis>YarnContainer</emphasis> arguments.</para>
 
       <programlisting language="java"><![CDATA[
-@OnYarnContainerStart
-public void publicVoidNoArgsMethod(@YarnParameters Properties properties) {
+@OnContainerStart
+public void publicVoidParametersArgsMethod(@YarnParameters Properties properties) {
 }
 ]]></programlisting>
 
@@ -2521,8 +2521,8 @@ public void publicVoidNoArgsMethod(@YarnParameters Properties properties) {
       to a specific <emphasis>YarnContainer</emphasis> arguments.</para>
 
       <programlisting language="java"><![CDATA[
-@OnYarnContainerStart
-public void publicVoidNoArgsMethod(@YarnParameter("key") String value) {
+@OnContainerStart
+public void publicVoidParameterArgsMethod(@YarnParameter("key") String value) {
 }
 ]]></programlisting>
 
