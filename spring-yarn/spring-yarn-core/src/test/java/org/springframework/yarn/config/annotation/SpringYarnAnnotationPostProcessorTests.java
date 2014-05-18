@@ -32,7 +32,7 @@ import org.springframework.yarn.container.ContainerHandler;
 public class SpringYarnAnnotationPostProcessorTests {
 
 	@Test
-	public void testSimpleOnYarnContainerStart() {
+	public void testSimpleOnContainerStart() {
 		@SuppressWarnings("resource")
 		GenericApplicationContext context = new GenericApplicationContext();
 		SpringYarnAnnotationPostProcessor postProcessor = new SpringYarnAnnotationPostProcessor();
@@ -41,8 +41,8 @@ public class SpringYarnAnnotationPostProcessorTests {
 		TestBean testBean = new TestBean();
 		postProcessor.postProcessAfterInitialization(testBean, "testBean");
 		context.refresh();
-		assertTrue(context.containsBean("testBean.test.onYarnContainerStart"));
-		Object endpoint = context.getBean("testBean.test.onYarnContainerStart");
+		assertTrue(context.containsBean("testBean.test.onContainerStart"));
+		Object endpoint = context.getBean("testBean.test.onContainerStart");
 		assertTrue(endpoint instanceof ContainerHandler);
 		context.stop();
 	}
