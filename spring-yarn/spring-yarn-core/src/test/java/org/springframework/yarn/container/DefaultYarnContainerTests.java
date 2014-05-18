@@ -23,8 +23,8 @@ import org.junit.Test;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.yarn.annotation.OnYarnContainerStart;
-import org.springframework.yarn.annotation.YarnContainer;
+import org.springframework.yarn.annotation.OnContainerStart;
+import org.springframework.yarn.annotation.YarnComponent;
 import org.springframework.yarn.config.annotation.SpringYarnAnnotationPostProcessor;
 import org.springframework.yarn.launch.ExitStatus;
 import org.springframework.yarn.listener.ContainerStateListener;
@@ -239,57 +239,57 @@ public class DefaultYarnContainerTests {
 		}
 	}
 
-	@YarnContainer
+	@YarnComponent
 	private static class TestBean1 {
 
-		@OnYarnContainerStart
+		@OnContainerStart
 		public void test() {
 		}
 	}
 
-	@YarnContainer
+	@YarnComponent
 	private static class TestBean2 {
 
-		@OnYarnContainerStart
+		@OnContainerStart
 		public boolean test() {
 			return true;
 		}
 	}
 
-	@YarnContainer
+	@YarnComponent
 	private static class TestBean3 {
 
-		@OnYarnContainerStart
+		@OnContainerStart
 		public int test() {
 			return 10;
 		}
 	}
 
-	@YarnContainer
+	@YarnComponent
 	private static class TestBean4 {
 
-		@OnYarnContainerStart
+		@OnContainerStart
 		public void test() {
 			throw new RuntimeException("failing");
 		}
 	}
 
-	@YarnContainer
+	@YarnComponent
 	private static class TestBean5 {
 
-		@OnYarnContainerStart
+		@OnContainerStart
 		public void test1() {
 		}
 
-		@OnYarnContainerStart
+		@OnContainerStart
 		public void test2() {
 		}
 	}
 
-	@YarnContainer
+	@YarnComponent
 	private static class TestBean6 {
 
-		@OnYarnContainerStart
+		@OnContainerStart
 		public String test() {
 			return ExitStatus.UNKNOWN.getExitCode();
 		}

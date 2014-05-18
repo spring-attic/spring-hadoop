@@ -36,5 +36,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Documented
-public @interface OnYarnContainerStart {
+public @interface OnContainerStart {
 }

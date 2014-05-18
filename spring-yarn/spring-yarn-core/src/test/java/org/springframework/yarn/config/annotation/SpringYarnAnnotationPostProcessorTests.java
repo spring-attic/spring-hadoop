@@ -19,8 +19,8 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 import org.springframework.context.support.GenericApplicationContext;
-import org.springframework.yarn.annotation.OnYarnContainerStart;
-import org.springframework.yarn.annotation.YarnContainer;
+import org.springframework.yarn.annotation.OnContainerStart;
+import org.springframework.yarn.annotation.YarnComponent;
 import org.springframework.yarn.container.ContainerHandler;
 
 /**
@@ -47,10 +47,10 @@ public class SpringYarnAnnotationPostProcessorTests {
 		context.stop();
 	}
 
-	@YarnContainer
+	@YarnComponent
 	private static class TestBean {
 
-		@OnYarnContainerStart
+		@OnContainerStart
 		public void test() {
 		}
 	}

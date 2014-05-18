@@ -17,13 +17,13 @@ package org.springframework.yarn.container;
 
 import java.lang.reflect.Method;
 
-import org.springframework.yarn.annotation.OnYarnContainerStart;
-import org.springframework.yarn.annotation.YarnContainer;
+import org.springframework.yarn.annotation.OnContainerStart;
+import org.springframework.yarn.annotation.YarnComponent;
 
 /**
  * Handler for a common object representing something to be run.
- * This is usually used when a plain pojo is configured with @{@link YarnContainer}
- * and @{@link OnYarnContainerStart} annotations.
+ * This is usually used when a plain pojo is configured with @{@link YarnComponent}
+ * and @{@link OnContainerStart} annotations.
  *
  * @author Janne Valkealahti
  *
@@ -38,7 +38,7 @@ public class ContainerHandler {
 	 * @param target the target bean
 	 */
 	public ContainerHandler(Object target) {
-		this(new MethodInvokingYarnContainerRuntimeProcessor<Object>(target, OnYarnContainerStart.class));
+		this(new MethodInvokingYarnContainerRuntimeProcessor<Object>(target, OnContainerStart.class));
 	}
 
 	/**

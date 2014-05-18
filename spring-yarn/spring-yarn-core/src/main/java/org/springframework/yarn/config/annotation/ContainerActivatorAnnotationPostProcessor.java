@@ -19,16 +19,16 @@ import java.lang.reflect.Method;
 
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.ListableBeanFactory;
-import org.springframework.yarn.annotation.OnYarnContainerStart;
+import org.springframework.yarn.annotation.OnContainerStart;
 import org.springframework.yarn.container.ContainerHandler;
 
 /**
- * Post-processor for Methods annotated with @{@link OnYarnContainerStart}.
+ * Post-processor for Methods annotated with @{@link OnContainerStart}.
  *
  * @author Janne Valkealahti
  *
  */
-public class ContainerActivatorAnnotationPostProcessor implements MethodAnnotationPostProcessor<OnYarnContainerStart>{
+public class ContainerActivatorAnnotationPostProcessor implements MethodAnnotationPostProcessor<OnContainerStart>{
 
 	protected final BeanFactory beanFactory;
 
@@ -37,7 +37,7 @@ public class ContainerActivatorAnnotationPostProcessor implements MethodAnnotati
 	}
 
 	@Override
-	public Object postProcess(Object bean, String beanName, Method method, OnYarnContainerStart annotation) {
+	public Object postProcess(Object bean, String beanName, Method method, OnContainerStart annotation) {
 		return new ContainerHandler(bean, method);
 	}
 
