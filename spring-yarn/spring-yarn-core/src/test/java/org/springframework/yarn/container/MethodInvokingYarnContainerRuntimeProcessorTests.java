@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.junit.Test;
-import org.springframework.yarn.annotation.OnYarnContainerStart;
+import org.springframework.yarn.annotation.OnContainerStart;
 import org.springframework.yarn.annotation.YarnEnvironment;
 import org.springframework.yarn.annotation.YarnEnvironments;
 import org.springframework.yarn.annotation.YarnParameter;
@@ -88,7 +88,7 @@ public class MethodInvokingYarnContainerRuntimeProcessorTests {
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testShoulFailWithTwoOnYarnContainerStartAnnotations() throws Exception {
-		new MethodInvokingYarnContainerRuntimeProcessor<Object>(new TestBean5(), OnYarnContainerStart.class);
+		new MethodInvokingYarnContainerRuntimeProcessor<Object>(new TestBean5(), OnContainerStart.class);
 	}
 
 	@Test(expected = IllegalStateException.class)
@@ -100,7 +100,7 @@ public class MethodInvokingYarnContainerRuntimeProcessorTests {
 	public void testVoidWithOnYarnContainerStartAnnotations() throws Exception {
 		TestBean6 bean = new TestBean6();
 		MethodInvokingYarnContainerRuntimeProcessor<Object> processor =
-				new MethodInvokingYarnContainerRuntimeProcessor<Object>(bean, OnYarnContainerStart.class);
+				new MethodInvokingYarnContainerRuntimeProcessor<Object>(bean, OnContainerStart.class);
 		Object process = processor.process(new TestYarnContainerRuntime());
 		assertNull(process);
 		assertTrue(bean.testCalled);
@@ -143,17 +143,17 @@ public class MethodInvokingYarnContainerRuntimeProcessorTests {
 	}
 
 	private static class TestBean5 {
-		@OnYarnContainerStart
+		@OnContainerStart
 		public void test1() {
 		}
-		@OnYarnContainerStart
+		@OnContainerStart
 		public void test2() {
 		}
 	}
 
 	private static class TestBean6 {
 		boolean testCalled;
-		@OnYarnContainerStart
+		@OnContainerStart
 		public void test() {
 			testCalled = true;
 		}

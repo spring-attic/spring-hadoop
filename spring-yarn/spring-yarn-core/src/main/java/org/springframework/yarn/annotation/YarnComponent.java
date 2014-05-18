@@ -39,7 +39,7 @@ import org.springframework.stereotype.Component;
 @Inherited
 @Documented
 @Component
-public @interface YarnContainer {
+public @interface YarnComponent {
 
 	/**
 	 * The value may indicate a suggestion for a logical component name,

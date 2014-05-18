@@ -28,7 +28,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import org.springframework.yarn.YarnSystemConstants;
-import org.springframework.yarn.annotation.OnYarnContainerStart;
+import org.springframework.yarn.annotation.OnContainerStart;
 import org.springframework.yarn.config.annotation.EnableYarn.Enable;
 import org.springframework.yarn.container.DefaultYarnContainer;
 import org.springframework.yarn.container.YarnContainer;
@@ -64,11 +64,11 @@ public class SpringYarnConfigurationContainerActivatorTests {
 
 	}
 
-	@org.springframework.yarn.annotation.YarnContainer
+	@org.springframework.yarn.annotation.YarnComponent
 	public static class TestContainerPojo {
 		boolean executed;
 
-		@OnYarnContainerStart
+		@OnContainerStart
 		public void doSomething() {
 			executed = true;
 		}

@@ -45,12 +45,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
-import org.springframework.yarn.annotation.OnYarnContainerStart;
+import org.springframework.yarn.annotation.OnContainerStart;
 import org.springframework.yarn.container.ContainerHandler;
 
 /**
  * A {@link BeanPostProcessor} implementation that processes method-level
- * annotations such as @{@link OnYarnContainerStart}.
+ * annotations such as @{@link OnContainerStart}.
  *
  * @author Mark Fisher
  * @author Marius Bogoevici
@@ -94,7 +94,7 @@ public class SpringYarnAnnotationPostProcessor implements BeanPostProcessor, Bea
 	@Override
 	public void afterPropertiesSet() {
 		Assert.notNull(beanFactory, "BeanFactory must not be null");
-		postProcessors.put(OnYarnContainerStart.class, new ContainerActivatorAnnotationPostProcessor(beanFactory));
+		postProcessors.put(OnContainerStart.class, new ContainerActivatorAnnotationPostProcessor(beanFactory));
 	}
 
 	@Override
