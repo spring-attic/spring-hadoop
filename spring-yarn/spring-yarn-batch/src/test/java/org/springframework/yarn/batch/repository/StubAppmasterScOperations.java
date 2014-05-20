@@ -42,7 +42,7 @@ public class StubAppmasterScOperations implements AppmasterMindScOperations {
 		MapJobRepositoryFactoryBean factory = new MapJobRepositoryFactoryBean();
 		try {
 			factory.afterPropertiesSet();
-			jobRepository = factory.getJobRepository();
+			jobRepository = factory.getObject();
 			jobRepositoryService = new JobRepositoryService();
 			jobRepositoryService.setJobRepository(jobRepository);
 		} catch (Exception e) {
