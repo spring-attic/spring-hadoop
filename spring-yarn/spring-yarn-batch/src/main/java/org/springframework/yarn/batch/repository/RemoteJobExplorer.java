@@ -27,6 +27,8 @@ import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.yarn.batch.repository.bindings.JobExecutionType;
 import org.springframework.yarn.batch.repository.bindings.JobInstanceType;
+import org.springframework.yarn.batch.repository.bindings.exp.FindJobInstancesByJobNameReq;
+import org.springframework.yarn.batch.repository.bindings.exp.FindJobInstancesByJobNameRes;
 import org.springframework.yarn.batch.repository.bindings.exp.FindRunningJobExecutionsReq;
 import org.springframework.yarn.batch.repository.bindings.exp.FindRunningJobExecutionsRes;
 import org.springframework.yarn.batch.repository.bindings.exp.GetJobExecutionReq;
@@ -135,6 +137,21 @@ public class RemoteJobExplorer extends AbstractRemoteDao implements JobExplorer 
 			return response.count;
 		}
 		return 0;
+	}
+
+	@Override
+	public List<JobInstance> getJobInstancesByJobName(String jobName, int start, int count) {
+		List<JobInstance> jobInstances = new ArrayList<JobInstance>();
+		try {
+			FindJobInstancesByJobNameReq request = JobRepositoryRpcFactory.buildFindJobInstancesByJobNameReq(jobName, start, count);
+			FindJobInstancesByJobNameRes response = (FindJobInstancesByJobNameRes) getAppmasterScOperations().doMindRequest(request);
+			for (JobInstanceType j : response.jobInstances) {
+				jobInstances.add(JobRepositoryRpcFactory.convertJobInstanceType(j));
+			}
+		} catch (Exception e) {
+			throw convertException(e);
+		}
+		return jobInstances;
 	}
 
 }

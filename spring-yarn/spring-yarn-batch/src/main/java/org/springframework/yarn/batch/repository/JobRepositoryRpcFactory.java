@@ -38,6 +38,7 @@ import org.springframework.yarn.batch.repository.bindings.JobInstanceType;
 import org.springframework.yarn.batch.repository.bindings.JobParameterType;
 import org.springframework.yarn.batch.repository.bindings.JobParametersType;
 import org.springframework.yarn.batch.repository.bindings.StepExecutionType;
+import org.springframework.yarn.batch.repository.bindings.exp.FindJobInstancesByJobNameReq;
 import org.springframework.yarn.batch.repository.bindings.exp.FindRunningJobExecutionsReq;
 import org.springframework.yarn.batch.repository.bindings.exp.GetJobExecutionReq;
 import org.springframework.yarn.batch.repository.bindings.exp.GetJobExecutionsReq;
@@ -500,6 +501,14 @@ public class JobRepositoryRpcFactory {
 	 */
 	public static GetJobInstancesReq buildGetJobInstancesReq(String jobName, int start, int count) {
 		GetJobInstancesReq req = new GetJobInstancesReq();
+		req.jobName = jobName;
+		req.count = count;
+		req.start = start;
+		return req;
+	}
+
+	public static FindJobInstancesByJobNameReq buildFindJobInstancesByJobNameReq(String jobName, int start, int count) {
+		FindJobInstancesByJobNameReq req = new FindJobInstancesByJobNameReq();
 		req.jobName = jobName;
 		req.count = count;
 		req.start = start;

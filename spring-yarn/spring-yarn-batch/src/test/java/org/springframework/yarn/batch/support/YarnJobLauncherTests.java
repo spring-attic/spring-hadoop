@@ -155,7 +155,7 @@ public class YarnJobLauncherTests {
 				this.transactionManager);
 
 		public BatchConfiguration() throws Exception {
-			this.jobRepository = this.jobRepositoryFactory.getJobRepository();
+			this.jobRepository = this.jobRepositoryFactory.getObject();
 		}
 
 		public void clear() {
