@@ -39,17 +39,23 @@ public class RollingFileNamingStrategy extends AbstractFileNamingStrategy {
 
 	@Override
 	public Path resolve(Path path) {
-		if (path != null) {
+		if (!isEnabled()) {
+			return path;
+		} else if (path != null) {
 			return new Path(path.getParent(), path.getName() + prefix + Integer.toString(counter));
-		}
-		else {
+		} else {
 			return new Path(Integer.toString(counter));
 		}
 	}
 
 	@Override
-	public void reset() {
+	public void next() {
 		counter++;
+	}
+
+	@Override
+	public void reset() {
+		counter = 0;
 	}
 
 	@Override
@@ -60,12 +66,12 @@ public class RollingFileNamingStrategy extends AbstractFileNamingStrategy {
 			String name = path.getName();
 
 			// find numeric part
-			Pattern counterPattern = Pattern.compile(prefix + "(" + "\\d+" + ").*");
+			Pattern counterPattern = Pattern.compile(prefix + "(" + "\\d+" + ")");
 			Matcher m = counterPattern.matcher(name);
-			if (m.find()) {
+			while (m.find()) {
 				counter = Integer.parseInt(m.group(1)) + 1;
-				log.debug("Initialized counter starting from " + counter);
 			}
+			log.debug("Initialized counter starting from " + counter);
 
 			// find complete part handled by this strategy
 			Pattern replacePattern = Pattern.compile("(" + prefix + "\\d+" + ")(.*)");
@@ -91,6 +97,16 @@ public class RollingFileNamingStrategy extends AbstractFileNamingStrategy {
 	 */
 	public void setPrefix(String prefix) {
 		this.prefix = prefix;
+	}
+
+	@Override
+	public RollingFileNamingStrategy createInstance() {
+		RollingFileNamingStrategy instance = new RollingFileNamingStrategy();
+		instance.setCodecInfo(getCodecInfo());
+		instance.setOrder(getOrder());
+		instance.setEnabled(isEnabled());
+		instance.setPrefix(prefix);
+		return instance;
 	}
 
 }

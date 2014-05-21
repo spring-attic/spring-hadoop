@@ -23,7 +23,7 @@ package org.springframework.data.hadoop.store.strategy.rollover;
  * @author Janne Valkealahti
  *
  */
-public interface RolloverStrategy {
+public interface RolloverStrategy extends RolloverStrategyFactory<RolloverStrategy> {
 
 	/**
 	 * Checks if strategy wants to rollover.

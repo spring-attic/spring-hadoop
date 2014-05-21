@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,30 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.hadoop.store.strategy.rollover;
+package org.springframework.data.hadoop.store.strategy.naming;
 
 /**
- * A {@code RolloverStrategy} which simply never does a rollover.
+ * Factory interface creating instances of {@link FileNamingStrategy}s.
  *
  * @author Janne Valkealahti
  *
+ * @param <T> the type of a FileNamingStrategy
  */
-public class NoRolloverStrategy extends AbstractRolloverStrategy {
+public interface FileNamingStrategyFactory<T extends FileNamingStrategy> {
 
-	@Override
-	public boolean hasRolled() {
-		return false;
-	}
-
-	@Override
-	public void reset() {
-	}
-
-	@Override
-	public NoRolloverStrategy createInstance() {
-		NoRolloverStrategy instance = new NoRolloverStrategy();
-		instance.setOrder(getOrder());
-		return instance;
-	}
+	/**
+	 * Creates a new instance of {@link FileNamingStrategy}.
+	 *
+	 * @return a new instance of file naming strategy
+	 */
+	T createInstance();
 
 }
