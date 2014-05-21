@@ -47,6 +47,9 @@ public abstract class AbstractRolloverStrategy implements RolloverStrategy, Orde
 		this.position = position;
 	}
 
+	@Override
+	public abstract RolloverStrategy createInstance();
+
 	/**
 	 * Sets the order.
 	 *
