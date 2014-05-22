@@ -111,7 +111,7 @@ public class PartitionKeyMethodResolver implements MethodResolver {
 	}
 
 	/**
-	 * Create a {@link MethodExecutor} using {@link PathCombineMethodExecutor}.
+	 * Create a {@link MethodExecutor} using {@link PathCombiningMethodExecutor}.
 	 *
 	 * @param context the current evaluation context
 	 * @param targetObject the object upon which the method is being called
@@ -121,7 +121,7 @@ public class PartitionKeyMethodResolver implements MethodResolver {
 	 */
 	protected MethodExecutor doPath(EvaluationContext context, Object targetObject, String name,
 			List<TypeDescriptor> argumentTypes) throws AccessException {
-		return new PathCombineMethodExecutor();
+		return new PathCombiningMethodExecutor();
 	}
 
 	/**

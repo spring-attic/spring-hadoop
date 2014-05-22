@@ -27,7 +27,7 @@ import org.springframework.expression.TypedValue;
  * @author Janne Valkealahti
  *
  */
-public class PathCombineMethodExecutor implements MethodExecutor {
+public class PathCombiningMethodExecutor implements MethodExecutor {
 
 	private final static String DEFAULT_PATH_DELIMITER = "/";
 
@@ -37,7 +37,7 @@ public class PathCombineMethodExecutor implements MethodExecutor {
 	 * Instantiates a new path combine method executor with
 	 * default delimiter '/'.
 	 */
-	public PathCombineMethodExecutor() {
+	public PathCombiningMethodExecutor() {
 		this(DEFAULT_PATH_DELIMITER);
 	}
 
@@ -46,7 +46,7 @@ public class PathCombineMethodExecutor implements MethodExecutor {
 	 *
 	 * @param delimiter the delimiter for paths
 	 */
-	public PathCombineMethodExecutor(String delimiter) {
+	public PathCombiningMethodExecutor(String delimiter) {
 		this.delimiter = delimiter;
 	}
 

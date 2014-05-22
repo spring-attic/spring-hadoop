@@ -45,7 +45,7 @@ public abstract class AbstractDataStreamWriter extends OutputStoreObjectSupport 
 
 	public final static int DEFAULT_MAX_OPEN_ATTEMPTS = 10;
 
-	private volatile int maxOpenAttempts = DEFAULT_MAX_OPEN_ATTEMPTS;
+	private int maxOpenAttempts = DEFAULT_MAX_OPEN_ATTEMPTS;
 
 	/**
 	 * Instantiates a new abstract data stream writer.

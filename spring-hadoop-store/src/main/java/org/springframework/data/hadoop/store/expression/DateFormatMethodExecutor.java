@@ -33,7 +33,7 @@ import org.springframework.expression.TypedValue;
  */
 public class DateFormatMethodExecutor implements MethodExecutor {
 
-	private final static String DEFAULT_FORMAT = "yyyyMMdd";
+	private final static String DEFAULT_FORMAT = "yyyy-MM-dd";
 
 	private String key;
 

@@ -57,7 +57,7 @@ public class DefaultPartitionStrategy<T extends Object> extends AbstractPartitio
 	 * A {@link PartitionResolver} which uses an {@link Expression} together with
 	 * {@link MessageExpressionMethods} to evaluate new {@link Path}s.
 	 */
-	public static class MapPartitionResolver implements PartitionResolver<Map<String,Object>> {
+	private static class MapPartitionResolver implements PartitionResolver<Map<String,Object>> {
 
 		private final Expression expression;
 		private final MapExpressionMethods methods;
@@ -86,7 +86,7 @@ public class DefaultPartitionStrategy<T extends Object> extends AbstractPartitio
 	 * A {@link PartitionKeyResolver} which simply creates a new {@link Map}
 	 * as a partition key using an passed in entity.
 	 */
-	public static class MapPartitionKeyResolver<T extends Object> implements PartitionKeyResolver<T,Map<String,Object>> {
+	private static class MapPartitionKeyResolver<T extends Object> implements PartitionKeyResolver<T,Map<String,Object>> {
 
 		@Override
 		public Map<String,Object> resolvePartitionKey(T entity) {

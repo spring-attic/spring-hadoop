@@ -45,25 +45,35 @@ public abstract class AbstractPartitionDataStoreWriter<T, K> extends LifecycleOb
 
 	private final static Log log = LogFactory.getLog(AbstractPartitionDataStoreWriter.class);
 
+	/** Hadoop configuration */
 	private final Configuration configuration;
 
+	/** Hdfs path into a store */
 	private final Path basePath;
 
+	/** Codec info for store */
 	private final CodecInfo codec;
 
+	/** Used partition strategy if any */
 	private PartitionStrategy<T, K> partitionStrategy;
 
+	/** Current partition writers identified by a path */
 	private final Map<Path, DataStoreWriter<T>> writers = new ConcurrentHashMap<Path, DataStoreWriter<T>>();
 
+	/** Writer for unknown partitions */
 	private DataStoreWriter<T> fallbackWriter;
 
+	/** Reduced factory interface for naming strategy */
 	private FileNamingStrategyFactory<FileNamingStrategy> fileNamingStrategyFactory;
 
+	/** Reduced factory interface for rollover strategy */
 	private RolloverStrategyFactory<RolloverStrategy> rolloverStrategyFactory;
 
+	/** Idle timeout for writers */
 	private long idleTimeout;
 
-	private volatile int maxOpenAttempts = AbstractDataStreamWriter.DEFAULT_MAX_OPEN_ATTEMPTS;
+	/** Max number of free file path open/find attempts guard against infinite loop */
+	private int maxOpenAttempts = AbstractDataStreamWriter.DEFAULT_MAX_OPEN_ATTEMPTS;
 
 	/** Used in-writing suffix if any */
 	private String suffix;
@@ -142,7 +152,7 @@ public abstract class AbstractPartitionDataStoreWriter<T, K> extends LifecycleOb
 			path = partitionStrategy.getPartitionResolver().resolvePath(partitionKey);
 			writer = writers.get(path);
 		} else if (fallbackWriter == null){
-			writer = createWriter(getConfiguration(), null, getCodec());
+			fallbackWriter = writer = createWriter(getConfiguration(), null, getCodec());
 		}
 		if (writer == null) {
 			writer = createWriter(getConfiguration(), path, getCodec());
@@ -224,6 +234,11 @@ public abstract class AbstractPartitionDataStoreWriter<T, K> extends LifecycleOb
 		this.suffix = suffix;
 	}
 
+    /**
+     * Gets the in writing suffix.
+     *
+     * @return the in writing suffix
+     */
     public String getInWritingSuffix() {
 		return suffix;
 	}
@@ -237,6 +252,11 @@ public abstract class AbstractPartitionDataStoreWriter<T, K> extends LifecycleOb
 		this.prefix = prefix;
 	}
 
+    /**
+     * Gets the in writing prefix.
+     *
+     * @return the in writing prefix
+     */
     public String getInWritingPrefix() {
 		return prefix;
 	}
@@ -266,22 +286,47 @@ public abstract class AbstractPartitionDataStoreWriter<T, K> extends LifecycleOb
 		return idleTimeout;
 	}
 
+	/**
+	 * Gets the hadoop configuration.
+	 *
+	 * @return the configuration
+	 */
 	public Configuration getConfiguration() {
 		return configuration;
 	}
 
+	/**
+	 * Gets the base path.
+	 *
+	 * @return the base path
+	 */
 	public Path getBasePath() {
 		return basePath;
 	}
 
+	/**
+	 * Gets the codec.
+	 *
+	 * @return the codec
+	 */
 	public CodecInfo getCodec() {
 		return codec;
 	}
 
+	/**
+	 * Sets the max open attempts.
+	 *
+	 * @param maxOpenAttempts the new max open attempts
+	 */
 	public void setMaxOpenAttempts(int maxOpenAttempts) {
 		this.maxOpenAttempts = maxOpenAttempts;
 	}
 
+	/**
+	 * Gets the max open attempts.
+	 *
+	 * @return the max open attempts
+	 */
 	public int getMaxOpenAttempts() {
 		return maxOpenAttempts;
 	}

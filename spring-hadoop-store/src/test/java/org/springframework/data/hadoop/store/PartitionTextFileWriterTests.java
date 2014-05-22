@@ -90,6 +90,27 @@ public class PartitionTextFileWriterTests extends AbstractStoreTests {
 	}
 
 	@Test
+	public void testFallbackWriter() throws IOException {
+		String expression = "headers[region] + '/' + dateFormat('yyyy/MM', headers[timestamp])";
+		String[] dataArray = new String[] { DATA10 };
+		MessagePartitionStrategy<String> strategy = new MessagePartitionStrategy<String>(expression);
+
+		Map<String, Object> headers = new HashMap<String, Object>();
+		headers.put("region", "foo");
+
+		PartitionTextFileWriter<Message<?>> writer =
+				new PartitionTextFileWriter<Message<?>>(testConfig, testDefaultPath, null, strategy);
+		writer.setFileNamingStrategyFactory(new StaticFileNamingStrategy("bar"));
+
+		writer.write(dataArray[0], null);
+		writer.flush();
+		writer.close();
+
+		TextFileReader reader = new TextFileReader(testConfig, new Path(testDefaultPath, "bar"), null);
+		TestUtils.readDataAndAssert(reader, dataArray);
+	}
+
+	@Test
 	public void testWriteReadManyLinesWithNamingAndRollover() throws IOException {
 
 		String expression = "headers[region] + '/' + dateFormat('yyyy/MM', headers[timestamp])";
