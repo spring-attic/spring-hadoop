@@ -140,7 +140,7 @@ public class RemoteJobExplorer extends AbstractRemoteDao implements JobExplorer 
 	}
 
 	@Override
-	public List<JobInstance> getJobInstancesByJobName(String jobName, int start, int count) {
+	public List<JobInstance> findJobInstancesByJobName(String jobName, int start, int count) {
 		List<JobInstance> jobInstances = new ArrayList<JobInstance>();
 		try {
 			FindJobInstancesByJobNameReq request = JobRepositoryRpcFactory.buildFindJobInstancesByJobNameReq(jobName, start, count);
