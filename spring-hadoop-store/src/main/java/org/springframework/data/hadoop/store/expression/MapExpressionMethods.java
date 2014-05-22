@@ -17,6 +17,8 @@ package org.springframework.data.hadoop.store.expression;
 
 import java.util.Map;
 
+import org.springframework.context.expression.MapAccessor;
+import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.EvaluationException;
 import org.springframework.expression.Expression;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
@@ -34,12 +36,26 @@ public class MapExpressionMethods {
 	private final StandardEvaluationContext context;
 
 	/**
-	 * Instantiates a new message expression methods.
+	 * Instantiates a new map expression methods.
 	 */
 	public MapExpressionMethods() {
-		context = new StandardEvaluationContext();
-		context.addMethodResolver(new PartitionKeyMethodResolver());
-		context.addPropertyAccessor(new MapPartitionKeyPropertyAccessor());
+		this(null);
+	}
+
+	/**
+	 * Instantiates a new message expression methods with
+	 * a {@link EvaluationContext} which is expected to be
+	 * a {@link StandardEvaluationContext}.
+	 */
+	public MapExpressionMethods(EvaluationContext evaluationContext) {
+		if (evaluationContext instanceof StandardEvaluationContext) {
+			// we were given a context, so don't register anything
+			context = (StandardEvaluationContext) evaluationContext;
+		} else {
+			context = new StandardEvaluationContext();
+			context.addMethodResolver(new PartitionKeyMethodResolver());
+			context.addPropertyAccessor(new MapAccessor());
+		}
 	}
 
 	/**

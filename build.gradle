@@ -833,7 +833,7 @@ project('spring-data-hadoop-store') {
 		compile("org.kitesdk:kite-data-core:$kiteVersion") { dep ->
 			exclude group: "log4j", module: "log4j"
 		}
-		compile "org.springframework:spring-messaging:$springVersion"
+		testCompile "org.springframework:spring-messaging:$springVersion"
 		testCompile project(":spring-data-hadoop")
 		testCompile project(path:":spring-data-hadoop-test", configuration:"testArtifacts")
 		testCompile "org.springframework:spring-test:$springVersion"

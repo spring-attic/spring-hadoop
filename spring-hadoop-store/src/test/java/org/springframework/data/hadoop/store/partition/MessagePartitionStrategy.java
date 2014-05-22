@@ -19,6 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.fs.Path;
 import org.springframework.data.hadoop.store.expression.MessageExpressionMethods;
+import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
@@ -41,7 +42,18 @@ public class MessagePartitionStrategy<T extends Object> extends AbstractPartitio
 	 * @param expression the expression
 	 */
 	public MessagePartitionStrategy(Expression expression) {
-		super(new MessagePartitionResolver(expression), new MessagePartitionKeyResolver<T>());
+		this(expression, null);
+	}
+
+	/**
+	 * Instantiates a new message partition strategy with
+	 * {@link EvaluationContext}.
+	 *
+	 * @param expression the expression
+	 * @param evaluationContext the evaluation context
+	 */
+	public MessagePartitionStrategy(Expression expression, EvaluationContext evaluationContext) {
+		super(new MessagePartitionResolver(expression, evaluationContext), new MessagePartitionKeyResolver<T>());
 	}
 
 	/**
@@ -50,28 +62,39 @@ public class MessagePartitionStrategy<T extends Object> extends AbstractPartitio
 	 * @param expression the expression
 	 */
 	public MessagePartitionStrategy(String expression) {
-		super(new MessagePartitionResolver(expression), new MessagePartitionKeyResolver<T>());
+		this(expression, null);
+	}
+
+	/**
+	 * Instantiates a new message partition strategy with
+	 * {@link EvaluationContext}.
+	 *
+	 * @param expression the expression
+	 * @param evaluationContext the evaluation context
+	 */
+	public MessagePartitionStrategy(String expression, EvaluationContext evaluationContext) {
+		super(new MessagePartitionResolver(expression, evaluationContext), new MessagePartitionKeyResolver<T>());
 	}
 
 	/**
 	 * A {@link PartitionResolver} which uses an {@link Expression} together with
 	 * {@link MessageExpressionMethods} to evaluate new {@link Path}s.
 	 */
-	public static class MessagePartitionResolver implements PartitionResolver<Message<?>> {
+	private static class MessagePartitionResolver implements PartitionResolver<Message<?>> {
 
 		private final Expression expression;
 		private final MessageExpressionMethods methods;
 
-		public MessagePartitionResolver(String expression) {
+		public MessagePartitionResolver(String expression, EvaluationContext evaluationContext) {
 			ExpressionParser parser = new SpelExpressionParser();
 			this.expression = parser.parseExpression(expression);
-			this.methods = new MessageExpressionMethods();
+			this.methods = new MessageExpressionMethods(evaluationContext);
 			log.info("Using expression=[" + this.expression.getExpressionString() + "]");
 		}
 
-		public MessagePartitionResolver(Expression expression) {
+		public MessagePartitionResolver(Expression expression, EvaluationContext evaluationContext) {
 			this.expression = expression;
-			this.methods = new MessageExpressionMethods();
+			this.methods = new MessageExpressionMethods(evaluationContext);
 			log.info("Using expression=[" + this.expression.getExpressionString() + "]");
 		}
 
@@ -86,7 +109,7 @@ public class MessagePartitionStrategy<T extends Object> extends AbstractPartitio
 	 * A {@link PartitionKeyResolver} which simply creates a new {@link Message}
 	 * as a partition key using an passed in entity.
 	 */
-	public static class MessagePartitionKeyResolver<T extends Object> implements PartitionKeyResolver<T,Message<?>> {
+	private static class MessagePartitionKeyResolver<T extends Object> implements PartitionKeyResolver<T,Message<?>> {
 
 		@Override
 		public Message<?> resolvePartitionKey(T entity) {

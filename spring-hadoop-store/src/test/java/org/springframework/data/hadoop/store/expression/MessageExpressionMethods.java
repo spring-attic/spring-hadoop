@@ -15,6 +15,7 @@
  */
 package org.springframework.data.hadoop.store.expression;
 
+import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.EvaluationException;
 import org.springframework.expression.Expression;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
@@ -36,9 +37,23 @@ public class MessageExpressionMethods {
 	 * Instantiates a new message expression methods.
 	 */
 	public MessageExpressionMethods() {
-		context = new StandardEvaluationContext();
-		context.addMethodResolver(new MessagePartitionKeyMethodResolver());
-		context.addPropertyAccessor(new MessagePartitionKeyPropertyAccessor());
+		this(null);
+	}
+
+	/**
+	 * Instantiates a new message expression methods with
+	 * a {@link EvaluationContext} which is expected to be
+	 * a {@link StandardEvaluationContext}.
+	 */
+	public MessageExpressionMethods(EvaluationContext evaluationContext) {
+		if (evaluationContext instanceof StandardEvaluationContext) {
+			// we were given a context, so don't register anything
+			context = (StandardEvaluationContext) evaluationContext;
+		} else {
+			context = new StandardEvaluationContext();
+			context.addMethodResolver(new MessagePartitionKeyMethodResolver());
+			context.addPropertyAccessor(new MessagePartitionKeyPropertyAccessor());
+		}
 	}
 
 	/**

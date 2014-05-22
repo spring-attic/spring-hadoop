@@ -72,7 +72,7 @@ public class MessageExpressionMethodsTests {
 		String nowYYYYMM = new SimpleDateFormat("yyyy/MM").format(new Date());
 		String nowYYYY = new SimpleDateFormat("yyyy").format(new Date());
 
-		String defaultFormat = "yyyyMMdd";
+		String defaultFormat = "yyyy-MM-dd";
 		String stringDateDefaultFormat = new SimpleDateFormat(defaultFormat).format(new Date());
 		String customDateFormat = "yyyy-MM-dd";
 		String stringDateCustomFormat = new SimpleDateFormat(customDateFormat).format(new Date());
@@ -97,7 +97,7 @@ public class MessageExpressionMethodsTests {
 		assertThat(methods.getValue(parser.parseExpression("payload"), message, String.class), is("jee"));
 		assertThat(methods.getValue(parser.parseExpression("dateFormat('yyyy/MM', '" + stringDateDefaultFormat + "')"), message, String.class), is(nowYYYYMM));
 		assertThat(methods.getValue(parser.parseExpression("dateFormat('yyyy/MM', '" + stringDateCustomFormat + "', '" + customDateFormat + "')"), message, String.class), is(nowYYYYMM));
-		assertThat(methods.getValue(parser.parseExpression("dateFormat('yyyy/MM', payload.substring(0,8))"), dateMessage, String.class), is(nowYYYYMM));
+		assertThat(methods.getValue(parser.parseExpression("dateFormat('yyyy/MM', payload.substring(0,10))"), dateMessage, String.class), is(nowYYYYMM));
 	}
 
 	@Test

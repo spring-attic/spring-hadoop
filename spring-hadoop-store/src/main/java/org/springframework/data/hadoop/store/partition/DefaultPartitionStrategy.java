@@ -21,6 +21,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.fs.Path;
 import org.springframework.data.hadoop.store.expression.MapExpressionMethods;
+import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
@@ -41,7 +42,18 @@ public class DefaultPartitionStrategy<T extends Object> extends AbstractPartitio
 	 * @param expression the expression
 	 */
 	public DefaultPartitionStrategy(Expression expression) {
-		super(new MapPartitionResolver(expression), new MapPartitionKeyResolver<T>());
+		this(expression, null);
+	}
+
+	/**
+	 * Instantiates a new default partition strategy with
+	 * {@link EvaluationContext}.
+	 *
+	 * @param expression the expression
+	 * @param evaluationContext the evaluation context
+	 */
+	public DefaultPartitionStrategy(Expression expression, EvaluationContext evaluationContext) {
+		super(new MapPartitionResolver(expression, evaluationContext), new MapPartitionKeyResolver<T>());
 	}
 
 	/**
@@ -50,7 +62,18 @@ public class DefaultPartitionStrategy<T extends Object> extends AbstractPartitio
 	 * @param expression the expression
 	 */
 	public DefaultPartitionStrategy(String expression) {
-		super(new MapPartitionResolver(expression), new MapPartitionKeyResolver<T>());
+		this(expression, null);
+	}
+
+	/**
+	 * Instantiates a new default partition strategy with
+	 * {@link EvaluationContext}.
+	 *
+	 * @param expression the expression
+	 * @param evaluationContext the evaluation context
+	 */
+	public DefaultPartitionStrategy(String expression, EvaluationContext evaluationContext) {
+		super(new MapPartitionResolver(expression, evaluationContext), new MapPartitionKeyResolver<T>());
 	}
 
 	/**
@@ -62,16 +85,16 @@ public class DefaultPartitionStrategy<T extends Object> extends AbstractPartitio
 		private final Expression expression;
 		private final MapExpressionMethods methods;
 
-		public MapPartitionResolver(String expression) {
+		public MapPartitionResolver(String expression, EvaluationContext evaluationContext) {
 			ExpressionParser parser = new SpelExpressionParser();
 			this.expression = parser.parseExpression(expression);
-			this.methods = new MapExpressionMethods();
+			this.methods = new MapExpressionMethods(evaluationContext);
 			log.info("Using expression=[" + this.expression.getExpressionString() + "]");
 		}
 
-		public MapPartitionResolver(Expression expression) {
+		public MapPartitionResolver(Expression expression, EvaluationContext evaluationContext) {
 			this.expression = expression;
-			this.methods = new MapExpressionMethods();
+			this.methods = new MapExpressionMethods(evaluationContext);
 			log.info("Using expression=[" + this.expression.getExpressionString() + "]");
 		}
 
