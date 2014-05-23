@@ -96,6 +96,13 @@ public class SizeRolloverStrategy extends AbstractRolloverStrategy {
 		// nothing to do
 	}
 
+	@Override
+	public SizeRolloverStrategy createInstance() {
+		SizeRolloverStrategy instance = new SizeRolloverStrategy(rolloverSize);
+		instance.setOrder(getOrder());
+		return instance;
+	}
+
 	private static long parseValue(final String string) {
 		final Matcher matcher = VALUE_PATTERN.matcher(string);
 		if (matcher.matches()) {
