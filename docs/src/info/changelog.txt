@@ -5,6 +5,22 @@ http://projects.spring.io/spring-hadoop/
 Commit changelog: http://github.com/spring-projects/spring-hadoop/tree/v[version]
 Issues changelog: https://jira.spring.io/secure/ReleaseNote.jspa?projectId=10801
 
+Changes in version 2.0.0 RC4 (2014-05-23)
+-----------------------------------------
+General
+* Upgrade Spring Farmework, Batch and Integration versions [SHDP-344]
+* Updating cglib dependency, fixing hbase dependencies and dependency exclusions
+
+Store
+* Support for store writer partitioning [SHDP-334]
+
+YARN
+* Rename yarn container annotations [SHDP-343]
+* Modify boot config props for classpaths [SHDP-340]
+* Add boot config property Configuration [SHDP-341]	
+* Add configurable YarnClient action [SHDP-348]
+
+
 Changes in version 2.0.0 RC3 (2014-05-05)
 -----------------------------------------
 General
