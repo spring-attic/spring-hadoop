@@ -55,6 +55,8 @@ public class SpringYarnClientPropertiesTests {
 
 		assertThat(properties.getClientClass(), is("clientClassFoo"));
 
+		assertThat(properties.getStartup().getAction(), is("submit"));
+
 		context.close();
 	}
 

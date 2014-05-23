@@ -19,6 +19,7 @@ import java.util.Properties;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -35,6 +36,7 @@ import org.springframework.yarn.boot.properties.SpringYarnEnvProperties;
 import org.springframework.yarn.boot.properties.SpringYarnProperties;
 import org.springframework.yarn.boot.support.BootLocalResourcesSelector;
 import org.springframework.yarn.boot.support.BootLocalResourcesSelector.Mode;
+import org.springframework.yarn.boot.support.ClientLauncherRunner;
 import org.springframework.yarn.boot.support.SpringYarnBootUtils;
 import org.springframework.yarn.client.YarnClient;
 import org.springframework.yarn.config.annotation.EnableYarn;
@@ -61,6 +63,21 @@ import org.springframework.yarn.launch.LaunchCommandsFactoryBean;
 @ConditionalOnClass(EnableYarn.class)
 @ConditionalOnMissingBean(YarnClient.class)
 public class YarnClientAutoConfiguration {
+
+	@Configuration
+	@EnableConfigurationProperties({ SpringYarnClientProperties.class })
+	public static class RunnerConfig {
+
+		@Autowired
+		private SpringYarnClientProperties sycp;
+
+		@Bean
+		@ConditionalOnMissingBean(ClientLauncherRunner.class)
+		@ConditionalOnBean(YarnClient.class)
+		public ClientLauncherRunner clientLauncherRunner() {
+			return new ClientLauncherRunner(sycp.getStartup() != null ? sycp.getStartup().getAction() : null);
+		}
+	}
 
 	@Configuration
 	@EnableConfigurationProperties({ SpringYarnClientLocalizerProperties.class })

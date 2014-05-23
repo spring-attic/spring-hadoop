@@ -3131,6 +3131,12 @@ public void publicVoidParameterArgsMethod(@YarnParameter("key") String value) {
                       <entry>Class</entry>
                       <entry>null</entry>
                   </row>
+                  <row>
+                      <entry><literal>spring.yarn.client.startup.action</literal></entry>
+                      <entry>No</entry>
+                      <entry>String</entry>
+                      <entry>null</entry>
+                  </row>
               </tbody>
           </tgroup>
       </table>
@@ -3155,6 +3161,14 @@ public void publicVoidParameterArgsMethod(@YarnParameter("key") String value) {
               <listitem><para>
               Fully qualified classname which auto-configuration can automatically
               instantiate as a custom client.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.client.startup.action</filename></term>
+              <listitem><para>
+              Default action to perform on <interfacename>YarnClient</interfacename>.
+              Currently only one action named <emphasis>submit</emphasis> is supported.
+              This action is simply calling <literal>submitApplication</literal> method
+              on <interfacename>YarnClient</interfacename>.
               </para></listitem>
           </varlistentry>
       </variablelist>

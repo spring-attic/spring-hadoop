@@ -7,3 +7,5 @@ spring:
             priority: 234
             queue: queueFoo
             clientClass: clientClassFoo
+            startup:
+                action: submit
