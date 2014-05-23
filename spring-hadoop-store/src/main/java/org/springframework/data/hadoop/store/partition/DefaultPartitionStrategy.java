@@ -37,7 +37,7 @@ public class DefaultPartitionStrategy<T extends Object> extends AbstractPartitio
 	private final static Log log = LogFactory.getLog(DefaultPartitionStrategy.class);
 
 	/**
-	 * Instantiates a new message partition strategy.
+	 * Instantiates a new default partition strategy.
 	 *
 	 * @param expression the expression
 	 */
@@ -57,7 +57,7 @@ public class DefaultPartitionStrategy<T extends Object> extends AbstractPartitio
 	}
 
 	/**
-	 * Instantiates a new message partition strategy.
+	 * Instantiates a new default partition strategy.
 	 *
 	 * @param expression the expression
 	 */
@@ -78,7 +78,7 @@ public class DefaultPartitionStrategy<T extends Object> extends AbstractPartitio
 
 	/**
 	 * A {@link PartitionResolver} which uses an {@link Expression} together with
-	 * {@link MessageExpressionMethods} to evaluate new {@link Path}s.
+	 * {@link MapExpressionMethods} to evaluate new {@link Path}s.
 	 */
 	private static class MapPartitionResolver implements PartitionResolver<Map<String,Object>> {
 

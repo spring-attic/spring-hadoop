@@ -43,9 +43,11 @@ public class MapExpressionMethods {
 	}
 
 	/**
-	 * Instantiates a new message expression methods with
+	 * Instantiates a new map expression methods with
 	 * a {@link EvaluationContext} which is expected to be
 	 * a {@link StandardEvaluationContext}.
+	 *
+	 * @param evaluationContext the passed evaluation context
 	 */
 	public MapExpressionMethods(EvaluationContext evaluationContext) {
 		if (evaluationContext instanceof StandardEvaluationContext) {
@@ -63,13 +65,14 @@ public class MapExpressionMethods {
 	 *
 	 * @param <T> the generic return type
 	 * @param expression the expression
+	 * @param map the map to evaluate against
 	 * @param desiredResultType the desired result type
 	 * @return the value of expression evaluation
 	 * @throws EvaluationException the evaluation exception
 	 */
-	public <T> T getValue(Expression expression, Map<String,Object> message, Class<T> desiredResultType) throws EvaluationException {
+	public <T> T getValue(Expression expression, Map<String,Object> map, Class<T> desiredResultType) throws EvaluationException {
 		Assert.notNull(expression, "Expression cannot be null");
-		return expression.getValue(context, message, desiredResultType);
+		return expression.getValue(context, map, desiredResultType);
 	}
 
 }
