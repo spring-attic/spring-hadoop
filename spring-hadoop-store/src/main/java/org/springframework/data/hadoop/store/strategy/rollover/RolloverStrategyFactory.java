@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,27 +16,19 @@
 package org.springframework.data.hadoop.store.strategy.rollover;
 
 /**
- * A {@code RolloverStrategy} which simply never does a rollover.
+ * Factory interface creating instances of {@link RolloverStrategy}s.
  *
  * @author Janne Valkealahti
  *
+ * @param <T> the type of a RolloverStrategy
  */
-public class NoRolloverStrategy extends AbstractRolloverStrategy {
+public interface RolloverStrategyFactory<T extends RolloverStrategy> {
 
-	@Override
-	public boolean hasRolled() {
-		return false;
-	}
-
-	@Override
-	public void reset() {
-	}
-
-	@Override
-	public NoRolloverStrategy createInstance() {
-		NoRolloverStrategy instance = new NoRolloverStrategy();
-		instance.setOrder(getOrder());
-		return instance;
-	}
+	/**
+	 * Creates a new instance of {@link RolloverStrategy}.
+	 *
+	 * @return a new instance of rollover strategy
+	 */
+	T createInstance();
 
 }

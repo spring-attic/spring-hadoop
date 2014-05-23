@@ -1,11 +1,11 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,9 +20,13 @@ import org.springframework.core.Ordered;
 import org.springframework.data.hadoop.store.codec.CodecInfo;
 
 /**
- * Base class for {@code FileNamingStrategy} implementations. This class
- * also implements {@code Ordered} interface to be useful with
+ * Base class for {@code FileNamingStrategy} implementations.
+ *
+ * <p>Also implements {@code Ordered} interface to be useful with
  * {@code ChainedFileNamingStrategy} and {@code OrderedComposite}.
+ *
+ * <p>Enable information from method {@link #isEnabled()} can be used in cases
+ * where strategy needs to be in place but perhaps should not be activated.
  *
  * @author Janne Valkealahti
  *
@@ -32,6 +36,8 @@ public abstract class AbstractFileNamingStrategy implements FileNamingStrategy, 
 	private volatile int order = 0;
 
 	private volatile CodecInfo codecInfo;
+
+	private volatile boolean enabled = true;
 
 	/**
 	 * Implementation should override this method to define a chaining order.
@@ -54,6 +60,13 @@ public abstract class AbstractFileNamingStrategy implements FileNamingStrategy, 
 		return path;
 	}
 
+	@Override
+	public void reset() {
+	}
+
+	@Override
+	public abstract FileNamingStrategy createInstance();
+
 	/**
 	 * Sets the order.
 	 *
@@ -71,6 +84,24 @@ public abstract class AbstractFileNamingStrategy implements FileNamingStrategy, 
 	 */
 	public CodecInfo getCodecInfo() {
 		return codecInfo;
+	}
+
+	/**
+	 * Sets if this strategy is enabled.
+	 *
+	 * @param enabled the new enabled
+	 */
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+
+	/**
+	 * Checks if strategy is enabled.
+	 *
+	 * @return true, if is enabled
+	 */
+	public boolean isEnabled() {
+		return enabled;
 	}
 
 }

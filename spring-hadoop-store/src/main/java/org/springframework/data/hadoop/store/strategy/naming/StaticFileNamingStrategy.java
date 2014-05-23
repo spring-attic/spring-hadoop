@@ -52,10 +52,15 @@ public class StaticFileNamingStrategy extends AbstractFileNamingStrategy {
 		this.name = name;
 	}
 
+	public StaticFileNamingStrategy(String name, String prefix) {
+		this.name = name;
+		this.prefix = prefix;
+	}
+
 	@Override
 	public Path resolve(Path path) {
 		String part = getNamingPart();
-		if (!StringUtils.hasText(part)) {
+		if (!isEnabled() || !StringUtils.hasText(part)) {
 			return path;
 		}
 		if (path != null) {
@@ -67,14 +72,14 @@ public class StaticFileNamingStrategy extends AbstractFileNamingStrategy {
 	}
 
 	@Override
-	public void reset() {
+	public void next() {
 		// we're static, nothing to do
 	}
 
 	@Override
 	public Path init(Path path) {
 		path = super.init(path);
-		log.debug("Initialising from path=" + path);
+		log.debug("Init using path=[" + path + "]");
 		if (path != null) {
 			String part = getNamingPart();
 			if (path.getName().startsWith(part)) {
@@ -90,6 +95,17 @@ public class StaticFileNamingStrategy extends AbstractFileNamingStrategy {
 			}
 		}
 		return path;
+	}
+
+	@Override
+	public StaticFileNamingStrategy createInstance() {
+		StaticFileNamingStrategy instance = new StaticFileNamingStrategy();
+		instance.setCodecInfo(getCodecInfo());
+		instance.setOrder(getOrder());
+		instance.setName(name);
+		instance.setPrefix(prefix);
+		instance.setEnabled(isEnabled());
+		return instance;
 	}
 
 	/**
