@@ -418,7 +418,7 @@ configure(javaProjects()) {
 		ext.srcDir = file("${projectDir}/docs/src/api")
 	  
 		configure(options) {
-			stylesheetFile = file("${rootProject.projectDir}/docs/src/api/spring-javadoc.css")
+			stylesheetFile = file("${rootProject.projectDir}/docs/src/api/stylesheet.css")
 			overview = "${rootProject.projectDir}/docs/src/api/overview.html"
 			docFilesSubDirs = true
 			outputLevel = org.gradle.external.javadoc.JavadocOutputLevel.QUIET
@@ -701,7 +701,7 @@ configure(rootProject) {
 		options.author = true
 		options.header = rootProject.description
 		options.overview = "docs/src/api/overview.html"
-		options.stylesheetFile = file("docs/src/api/spring-javadoc.css")
+		options.stylesheetFile = file("docs/src/api/stylesheet.css")
 		options.splitIndex = true
 		//options.links(project.ext.javadocLinks)
 
