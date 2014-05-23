@@ -60,6 +60,13 @@ public class ChainedFileNamingStrategy implements FileNamingStrategy {
 	}
 
 	@Override
+	public void next() {
+		for (Iterator<? extends FileNamingStrategy> iterator = strategies.iterator(); iterator.hasNext();) {
+			iterator.next().next();
+		}
+	}
+
+	@Override
 	public void reset() {
 		for (Iterator<? extends FileNamingStrategy> iterator = strategies.iterator(); iterator.hasNext();) {
 			iterator.next().reset();
@@ -79,6 +86,15 @@ public class ChainedFileNamingStrategy implements FileNamingStrategy {
 		for (Iterator<? extends FileNamingStrategy> iterator = strategies.iterator(); iterator.hasNext();) {
 			iterator.next().setCodecInfo(codecInfo);
 		}
+	}
+
+	@Override
+	public ChainedFileNamingStrategy createInstance() {
+		ChainedFileNamingStrategy instance = new ChainedFileNamingStrategy();
+		for (FileNamingStrategy strategy : strategies.getItems()) {
+			instance.register(((FileNamingStrategyFactory<? extends FileNamingStrategy>)strategy).createInstance());
+		}
+		return instance;
 	}
 
 	/**

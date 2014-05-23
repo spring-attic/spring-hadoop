@@ -73,6 +73,15 @@ public class ChainedRolloverStrategy implements RolloverStrategy {
 		}
 	}
 
+	@Override
+	public ChainedRolloverStrategy createInstance() {
+		ChainedRolloverStrategy instance = new ChainedRolloverStrategy();
+		for (RolloverStrategy strategy : strategies.getItems()) {
+			instance.register(((RolloverStrategyFactory<? extends RolloverStrategy>)strategy).createInstance());
+		}
+		return instance;
+	}
+
 	/**
 	 * Sets the list of strategies. This clears all existing strategies.
 	 *
