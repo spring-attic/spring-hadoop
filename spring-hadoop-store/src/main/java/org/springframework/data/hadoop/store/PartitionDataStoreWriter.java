@@ -17,9 +17,13 @@ package org.springframework.data.hadoop.store;
 
 import java.io.IOException;
 
+import org.springframework.data.hadoop.store.partition.PartitionStrategy;
+
 /**
  * A {@code DataStorePartitionWriter} is an extension of {@link DataStoreWriter}
  * adding functionality to write entities using a partition key.
+ * A partition key is an object which is used by a {@link PartitionStrategy}
+ * to determine a partition path to write to.
  *
  * @author Janne Valkealahti
  * @author Rodrigo Meneses

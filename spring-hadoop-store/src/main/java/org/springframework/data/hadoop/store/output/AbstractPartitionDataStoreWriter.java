@@ -32,6 +32,7 @@ import org.springframework.data.hadoop.store.strategy.naming.FileNamingStrategyF
 import org.springframework.data.hadoop.store.strategy.rollover.RolloverStrategy;
 import org.springframework.data.hadoop.store.strategy.rollover.RolloverStrategyFactory;
 import org.springframework.data.hadoop.store.support.LifecycleObjectSupport;
+import org.springframework.util.Assert;
 
 /**
  * Base implementation of {@link PartitionDataStoreWriter}.
@@ -55,7 +56,7 @@ public abstract class AbstractPartitionDataStoreWriter<T, K> extends LifecycleOb
 	private final CodecInfo codec;
 
 	/** Used partition strategy if any */
-	private PartitionStrategy<T, K> partitionStrategy;
+	private final PartitionStrategy<T, K> partitionStrategy;
 
 	/** Current partition writers identified by a path */
 	private final Map<Path, DataStoreWriter<T>> writers = new ConcurrentHashMap<Path, DataStoreWriter<T>>();
@@ -99,6 +100,7 @@ public abstract class AbstractPartitionDataStoreWriter<T, K> extends LifecycleOb
 		this.basePath = basePath;
 		this.codec = codec;
 		this.partitionStrategy = partitionStrategy;
+		Assert.notNull(partitionStrategy, "Partition strategy must be set");
 	}
 
 	@Override

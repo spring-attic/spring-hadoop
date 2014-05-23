@@ -19,7 +19,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *
+ * A default partition key which simply is a {@link Map}. This
+ * key can be used together with {@link DefaultPartitionStrategy}.
  *
  * @author Janne Valkealahti
  *
@@ -32,30 +33,58 @@ public class DefaultPartitionKey extends HashMap<String, Object> {
 
 	public static final String KEY_CONTENT = "content";
 
+	/**
+	 * Instantiates a new default partition key.
+	 */
 	public DefaultPartitionKey() {
 		super();
 		put(KEY_TIMESTAMP, System.currentTimeMillis());
 	}
 
+	/**
+	 * Instantiates a new default partition key using
+	 * a given timestamp.
+	 *
+	 * @param timestamp the timestamp
+	 */
 	public DefaultPartitionKey(long timestamp) {
 		super();
 		put(KEY_TIMESTAMP, timestamp);
 	}
 
+	/**
+	 * Instantiates a new default partition key using
+	 * a given timestamp and a content object.
+	 *
+	 * @param timestamp the timestamp
+	 * @param content the content
+	 */
 	public DefaultPartitionKey(long timestamp, Object content) {
 		super();
 		put(KEY_TIMESTAMP, timestamp);
 		put(KEY_CONTENT, content);
 	}
 
+	/**
+	 * Instantiates a new default partition key using
+	 * a content object.
+	 *
+	 * @param content the content
+	 */
 	public DefaultPartitionKey(Object content) {
 		super();
 		put(KEY_TIMESTAMP, System.currentTimeMillis());
 		put(KEY_CONTENT, content);
 	}
 
-	public DefaultPartitionKey(Map<? extends String, ? extends Object> m) {
-		super(m);
+	/**
+	 * Instantiates a new default partition key
+	 * with a {@link Map}.
+	 *
+	 * @param map the instance of map
+	 */
+	public DefaultPartitionKey(Map<? extends String, ? extends Object> map) {
+		super(map);
 	}
 
 }
