@@ -75,7 +75,7 @@ public class YarnInfoApplication extends AbstractClientApplication<YarnInfoAppli
 	public String run(String... args) {
 		SpringApplicationBuilder builder = new SpringApplicationBuilder();
 		builder.web(false);
-		builder.sources(YarnPushApplication.class, OperationProperties.class);
+		builder.sources(YarnInfoApplication.class, OperationProperties.class);
 		SpringYarnBootUtils.addSources(builder, sources.toArray(new Object[0]));
 		SpringYarnBootUtils.addProfiles(builder, profiles.toArray(new String[0]));
 		if (StringUtils.hasText(applicationBaseDir)) {
