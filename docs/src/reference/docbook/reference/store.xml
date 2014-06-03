@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0"  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" 
+  xml:id="store">
+
+    <title>Writing and reading data using the Hadoop File System</title>
+    
+    <para>The Store sub-project of Spring for Apache Hadoop provides abstractions for writing and reading various types of data residing in HDFS. 
+    We currently support different files types either via our own store accessors or using the Kite SDK. Currently the store sub-project doesn’t have any xml namespace or javaconfig based configuration as these classes are considered to be a foundational library. However, this may change in future releases.
+    </para>
+    
+ 	<section id="store:abstractions">
+ 		<title>Store Abstraction</title>
+ 	
+ 		<para>...</para> 
+ 		
+  </section>
+
+  <section id="store:dataset">
+    <title>Writing POJO datasets using Kite SDK</title>
+  
+    <para>...</para> 
+    
+  </section>
+</chapter>

@@ -54,6 +54,7 @@
       <xi:include href="reference/introduction.xml"/>
       <xi:include href="reference/hadoop.xml"/>
       <xi:include href="reference/fs.xml"/>
+      <xi:include href="reference/store.xml"/>
       <xi:include href="reference/hbase.xml"/>
       <xi:include href="reference/hive.xml"/>
       <xi:include href="reference/pig.xml"/>
