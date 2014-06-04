@@ -1,0 +1,86 @@
+/*
+ * Copyright 2014 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.springframework.data.hadoop.store.dataset;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.BeanWrapperImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+@ContextConfiguration({"/org/springframework/data/hadoop/store/dataset/DatasetStoreWriterTests-context.xml"})
+public abstract class AbstractDatasetStoreWriterTests<T extends Comparable<T>> {
+
+	protected DatasetOperations datasetOperations;
+	protected AbstractDatasetStoreWriter<T> datasetStoreWriter;
+	protected List<T> records = new ArrayList<T>();
+	protected Class<T> recordClass;
+
+	@Autowired
+	protected String path;
+
+	public abstract void setDatasetRepositoryFactory(DatasetRepositoryFactory datasetRepositoryFactory);
+
+	@Before
+	public abstract void setUp();
+
+	@Test
+	public void testSavePojo() throws IOException {
+		for (T pojo: records) {
+			datasetStoreWriter.write(pojo);
+		}
+		datasetStoreWriter.flush();
+		datasetStoreWriter.close();
+		assertTrue("Dataset path created", new File(path).exists());
+		assertTrue("Dataset storage created",
+				new File(path + "/" + DatasetUtils.getDatasetName(recordClass)).exists());
+		assertTrue("Dataset metadata created",
+				new File(path + "/" + DatasetUtils.getDatasetName(recordClass) + "/.metadata").exists());
+		Collection<T> results = datasetOperations.read(recordClass);
+		assertEquals(2, results.size());
+		List<T> sorted = new ArrayList<T>(results);
+		Collections.sort(sorted);
+		BeanWrapper result = new BeanWrapperImpl(sorted.get(0));
+		assertTrue(result.isReadableProperty("name"));
+		assertTrue(result.getPropertyValue("name").equals("Sven"));
+		assertTrue(result.isReadableProperty("id"));
+		assertTrue(result.getPropertyValue("id").equals(22L));
+		result = new BeanWrapperImpl(sorted.get(1));
+		assertTrue(result.isReadableProperty("name"));
+		assertTrue(result.getPropertyValue("name").equals("Nisse"));
+		assertTrue(result.isReadableProperty("id"));
+		assertTrue(result.getPropertyValue("id").equals(48L));
+	}
+
+
+}
