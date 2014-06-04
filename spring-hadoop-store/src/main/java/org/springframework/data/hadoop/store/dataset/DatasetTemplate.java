@@ -16,6 +16,7 @@
 
 package org.springframework.data.hadoop.store.dataset;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -23,7 +24,6 @@ import java.util.List;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
-import org.apache.avro.generic.GenericRecordBuilder;
 import org.kitesdk.data.Dataset;
 import org.kitesdk.data.DatasetDescriptor;
 import org.kitesdk.data.DatasetNotFoundException;
@@ -51,6 +51,18 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 	private DatasetDefinition defaultDatasetDefinition;
 
 	private HashMap<String, DatasetDefinition> datasetDefinitions = new HashMap<String, DatasetDefinition>();
+
+	public DatasetTemplate() {
+	}
+
+	public DatasetTemplate(DatasetRepositoryFactory dsFactory) {
+		this.dsFactory = dsFactory;
+	}
+
+	public DatasetTemplate(DatasetRepositoryFactory dsFactory, DatasetDefinition defaultDatasetDefinition) {
+		this.dsFactory = dsFactory;
+		this.defaultDatasetDefinition = defaultDatasetDefinition;
+	}
 
 	/**
 	 * The {@link DatasetRepositoryFactory} to use for this template.
@@ -147,7 +159,7 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 	}
 
 	private <T> void readWithCallback(Class<T> targetClass, RecordCallback<T> callback, PartitionKey partitionKey) {
-		Dataset<T> dataset = getDataset(targetClass);
+		Dataset<T> dataset = DatasetUtils.getDataset(dsFactory, targetClass);
 		if (dataset == null) {
 			throw new StoreException("Unable to locate dataset for target class " + targetClass.getName());
 		}
@@ -173,7 +185,7 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 	}
 
 	private <T> Collection<T> readPojo(Class<T> targetClass, PartitionKey partitionKey) {
-		Dataset<T> dataset = getDataset(targetClass);
+		Dataset<T> dataset = DatasetUtils.getDataset(dsFactory, targetClass);
 		if (dataset == null) {
 			throw new StoreException("Unable to locate dataset for target class " + targetClass.getName());
 		}
@@ -202,7 +214,8 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 	}
 
 	private <T> Collection<T> readGenericRecords(Class<T> targetClass, PartitionKey partitionKey) {
-		Dataset<GenericRecord> dataset = getOrCreateDataset(targetClass, GenericRecord.class);
+		Dataset<GenericRecord> dataset =
+				DatasetUtils.getOrCreateDataset(dsFactory, getDatasetDefinitionToUseFor(targetClass), targetClass, GenericRecord.class);
 		DatasetReader<GenericRecord> reader = null;
 		if (partitionKey == null) {
 			reader = dataset.newReader();
@@ -242,13 +255,26 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 		if (records == null || records.size() < 1) {
 			return;
 		}
-		Class<?> targetClass = records.toArray()[0].getClass();
-		DatasetDefinition datasetDefinition = getDatasetDefinitionToUseFor(targetClass);
+		//TODO: add support for using Spring Data Commons MappingContext
+		@SuppressWarnings("unchecked")
+		Class<T> pojoClass = (Class<T>) records.iterator().next().getClass();
+		DatasetDefinition datasetDefinition = getDatasetDefinitionToUseFor(pojoClass);
+		AbstractDatasetStoreWriter<T> writer;
 		if (Formats.PARQUET.getName().equals(datasetDefinition.getFormat().getName())) {
-			writeGenericRecords(records);
+			writer = new ParquetDatasetStoreWriter<T>(pojoClass, dsFactory, datasetDefinition);
 		} else {
-			writePojo(records);
+			writer = new AvroPojoDatasetStoreWriter<T>(pojoClass, dsFactory, datasetDefinition);
 		}
+		try {
+			for (T rec : records) {
+				writer.write(rec);
+			}
+			writer.flush();
+			writer.close();
+		} catch (IOException e) {
+			throw new StoreException("Error writing " + pojoClass.getName(), e);
+		}
+
 	}
 
 	@Override
@@ -259,7 +285,7 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 	@Override
 	public <T> DatasetDescriptor getDatasetDescriptor(Class<T> targetClass) {
 		try {
-			return getDataset(targetClass).getDescriptor();
+			return DatasetUtils.getDataset(dsFactory, targetClass).getDescriptor();
 		}
 		catch (DatasetNotFoundException e) {
 			return null;
@@ -268,111 +294,7 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 
 	@Override
 	public <T> String getDatasetName(Class<T> clazz) {
-		return clazz.getSimpleName().toLowerCase();
-	}
-
-	private <T> void writePojo(Collection<T> records) {
-		@SuppressWarnings("unchecked")
-		Class<T> pojoClass = (Class<T>) records.iterator().next().getClass();
-		Dataset<T> dataset = getOrCreateDataset(pojoClass, pojoClass);
-		DatasetWriter<T> writer = dataset.newWriter();
-		try {
-			writer.open();
-			for (T record : records) {
-				writer.write(record);
-			}
-		}
-		finally {
-			writer.close();
-		}
-	}
-
-	private <T> Dataset<T> getOrCreateDataset(Class<?> pojoClass, Class<T> recordClass) {
-		String repoName = getDatasetName(pojoClass);
-		DatasetDefinition datasetDefinition = getDatasetDefinitionToUseFor(pojoClass);
-		Dataset<T> dataset;
-		try {
-			dataset = dsFactory.getDatasetRepository().load(repoName);
-		}
-		catch (DatasetNotFoundException ex) {
-			Schema schema = datasetDefinition.getSchema(pojoClass);
-			if (recordClass != null && recordClass.isAssignableFrom(GenericRecord.class)) {
-				Schema genericSchema = Schema.createRecord(
-						"Generic"+schema.getName(),
-						"Generic representation of " + schema.getName(),
-						schema.getNamespace(),
-						false);
-				List<Schema.Field> fields = new ArrayList<Schema.Field>();
-				for (Schema.Field f : schema.getFields()) {
-					fields.add(new Schema.Field(f.name(), f.schema(), f.doc(), f.defaultValue()));
-				}
-				genericSchema.setFields(fields);
-				schema = genericSchema;
-			}
-			DatasetDescriptor descriptor;
-			if (datasetDefinition.getPartitionStrategy() == null) {
-				descriptor = new DatasetDescriptor.Builder()
-						.schema(schema)
-						.format(datasetDefinition.getFormat())
-						.build();
-			}
-			else {
-				descriptor = new DatasetDescriptor.Builder()
-						.schema(schema)
-						.format(datasetDefinition.getFormat())
-						.partitionStrategy(datasetDefinition.getPartitionStrategy())
-						.build();
-			}
-			dataset = dsFactory.getDatasetRepository().create(repoName, descriptor);
-		}
-		return dataset;
-	}
-
-	private <T> void writeGenericRecords(Collection<T> records) {
-		@SuppressWarnings("unchecked")
-		Class<T> pojoClass = (Class<T>) records.iterator().next().getClass();
-		Dataset<GenericRecord> dataset = getOrCreateDataset(pojoClass, GenericRecord.class);
-		DatasetWriter<GenericRecord> writer = dataset.newWriter();
-		try {
-			writer.open();
-			Schema schema = dataset.getDescriptor().getSchema();
-			for (T record : records) {
-				GenericRecordBuilder builder = new GenericRecordBuilder(schema);
-				BeanWrapper beanWrapper = PropertyAccessorFactory.forBeanPropertyAccess(record);
-				for (Schema.Field f : schema.getFields()) {
-					if (beanWrapper.isReadableProperty(f.name())) {
-						Schema fieldSchema = f.schema();
-						if (f.schema().getType().equals(Schema.Type.UNION)) {
-							for (Schema s : f.schema().getTypes()) {
-								if (!s.getName().equals("null")) {
-									fieldSchema = s;
-								}
-							}
-						}
-						if (fieldSchema.getType().equals(Schema.Type.RECORD)) {
-							throw new StoreException("Nested record currently not supported for field: " + f.name() +
-							" of type: " + beanWrapper.getPropertyDescriptor(f.name()).getPropertyType().getName());
-						} else {
-							builder.set(f.name(), beanWrapper.getPropertyValue(f.name()));
-						}
-					}
-				}
-				try {
-					writer.write(builder.build());
-				} catch (ClassCastException cce) {
-					throw new StoreException("Failed to write record with schema: " +
-							schema, cce);
-				}
-			}
-		} finally {
-			writer.close();
-		}
-
-	}
-
-	private <T> Dataset<T> getDataset(Class<T> clazz) {
-		String repoName = getDatasetName(clazz);
-		return dsFactory.getDatasetRepository().load(repoName);
+		return DatasetUtils.getDatasetName(clazz);
 	}
 
 	private DatasetDefinition getDatasetDefinitionToUseFor(Class<?> targetClass) {
