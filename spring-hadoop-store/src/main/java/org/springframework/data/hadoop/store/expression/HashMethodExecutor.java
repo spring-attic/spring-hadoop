@@ -26,7 +26,8 @@ import org.springframework.expression.TypedValue;
  * be an Integer to calculate a simple bucket name.
  *
  * <p>Spel expression "hash(region,2)" would create either key
- * "0_hash" or "1_hash".
+ * "0_hash" or "1_hash". Using a bucketsize 0 results
+ * an {@link AccessException}.
  *
  * @author Janne Valkealahti
  *
@@ -38,7 +39,7 @@ public class HashMethodExecutor implements MethodExecutor {
 		if (arguments[1] instanceof Integer) {
 			try {
 				Integer buckets = ((Integer)arguments[1]);
-				return new TypedValue(arguments[0].hashCode() % buckets + "_hash");
+				return new TypedValue(Math.abs(arguments[0].hashCode()) % buckets + "_hash");
 			} catch (Exception e) {
 				throw new AccessException("Error creating hash", e);
 			}
