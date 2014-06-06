@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * 
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *	  http://www.apache.org/licenses/LICENSE-2.0
  * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,8 +18,10 @@ package org.springframework.data.hadoop.mapreduce;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.mapred.JobClient;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.RunningJob;
@@ -214,10 +216,17 @@ public abstract class JobUtils {
 
 		// attempt to capture the original status
 		JobStatus originalStatus = JobStatus.DEFINED;
-		try {
-			JobStatus currentStatus = JobStatus.fromRunState(job.getJobState().getValue());
-			originalStatus = currentStatus;
-		} catch (Exception ignore) {}
+		if (VersionUtils.isHadoop2X()) {
+			try {
+				Method getJobState =
+						ReflectionUtils.findMethod(Job.class, "getJobState");
+				Object state = getJobState.invoke(job);
+				if (state instanceof Enum) {
+					int value = ((Enum)state).ordinal();
+					originalStatus = JobStatus.fromRunState(value + 1);
+				}
+			} catch (Exception ignore) {}
+		}
 
 		// go for the running info if available
 		RunningJob runningJob = getRunningJob(job);
