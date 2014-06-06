@@ -212,7 +212,14 @@ public abstract class JobUtils {
 			return JobStatus.UNKNOWN;
 		}
 
-		// go first for the running info
+		// attempt to capture the original status
+		JobStatus originalStatus = JobStatus.DEFINED;
+		try {
+			JobStatus currentStatus = JobStatus.fromRunState(job.getJobState().getValue());
+			originalStatus = currentStatus;
+		} catch (Exception ignore) {}
+
+		// go for the running info if available
 		RunningJob runningJob = getRunningJob(job);
 		if (runningJob != null) {
 			try {
@@ -222,7 +229,7 @@ public abstract class JobUtils {
 			}
 		}
 
-		// no running info found, assume it's being defined
-		return JobStatus.DEFINED;
+		// no running info found, assume we can use the original status
+		return originalStatus;
 	}
 }
