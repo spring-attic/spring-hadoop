@@ -14,6 +14,7 @@ import org.springframework.data.hadoop.store.StoreException;
 import org.springframework.util.Assert;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 /**
  * A {@code DataStoreWriter} for writing Datasets using the Parquet format.
@@ -90,7 +91,21 @@ public class ParquetDatasetStoreWriter<T> extends AbstractDatasetStoreWriter<T> 
 					throw new StoreException("Nested record currently not supported for field: " + f.name() +
 							" of type: " + beanWrapper.getPropertyDescriptor(f.name()).getPropertyType().getName());
 				} else {
-					builder.set(f.name(), beanWrapper.getPropertyValue(f.name()));
+					if (fieldSchema.getType().equals(Schema.Type.BYTES)) {
+						ByteBuffer buffer = null;
+						Object value = beanWrapper.getPropertyValue(f.name());
+						if (value == null || value instanceof byte[]) {
+							if(value != null) {
+								byte[] bytes = (byte[]) value;
+								buffer = ByteBuffer.wrap(bytes);
+							}
+							builder.set(f.name(), buffer);
+						} else {
+							throw new StoreException("Don't know how to handle " + value.getClass() + " for " + fieldSchema);
+						}
+					} else {
+						builder.set(f.name(), beanWrapper.getPropertyValue(f.name()));
+				    }
 				}
 			}
 		}
