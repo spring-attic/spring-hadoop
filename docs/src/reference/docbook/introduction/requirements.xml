@@ -8,9 +8,8 @@
          xmlns:ns="http://docbook.org/ns/docbook">
   <title>Requirements</title>
 
-  <para>Spring for Apache Hadoop 2.0 requires JDK level 6.0 (just like Hadoop)
-  and above, <ulink
-  url="http://projects.spring.io/spring-framework/">Spring Framework</ulink> 4.0 and above and
+  <para>Spring for Apache Hadoop 2.0 is built and tested with JDK 7.0 (generated jars are usable in JDK 6.0 and above), <ulink
+  url="http://projects.spring.io/spring-framework/">Spring Framework</ulink> 4.0 and
   is by default built against <ulink url="http://hadoop.apache.org/">Apache
   Hadoop</ulink> 2.2.0.</para>
 
@@ -27,7 +26,7 @@
 
       <listitem>
         <para><ulink url="http://hadoop.apache.org/">Apache Hadoop</ulink> 
-        2.3.0 *</para>
+        2.4.0 *</para>
       </listitem>
 
       <listitem>
@@ -70,7 +69,7 @@
     <note>
       <para>Spring for Apache Hadoop has been certified to work on Pivotal HD 1.0
       and 1.1, Hortonworks HDP 1.3 and Cloudera CDH 4.4 distributions. Further certifications will be done 
-      once Spring for Apache 2.0 reaches GA.</para>
+      soon now that Spring for Apache 2.0 has reached GA.</para>
     </note>
   </para>
 
