@@ -5,10 +5,25 @@ http://projects.spring.io/spring-hadoop/
 Commit changelog: http://github.com/spring-projects/spring-hadoop/tree/v[version]
 Issues changelog: https://jira.spring.io/secure/ReleaseNote.jspa?projectId=10801
 
+Changes in version 2.0.0 RELEASE (2014-06-10)
+---------------------------------------------
+General
+* Upgrade Spring Boot and Spring Integration versions [SHDP-344]
+* Improve JobUtils job status logic [SHDP-351]
+* Update docs with current info [SHDP-255]
+
+Store
+* Create Writer class that keep resource open for dataset support [SHDP-346]
+* HashMethodExecutor doesn't work with negative values [SHDP-350]
+
+YARN
+* YarnInfoApplication using wrong source [SHDP-349]
+
+
 Changes in version 2.0.0 RC4 (2014-05-23)
 -----------------------------------------
 General
-* Upgrade Spring Farmework, Batch and Integration versions [SHDP-344]
+* Upgrade Spring Framework, Batch and Integration versions [SHDP-344]
 * Updating cglib dependency, fixing hbase dependencies and dependency exclusions
 
 Store
