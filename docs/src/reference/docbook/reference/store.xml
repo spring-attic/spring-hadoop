@@ -6,31 +6,34 @@
 
   <para>The Store sub-project of Spring for Apache Hadoop provides abstractions for
   writing and reading various types of data residing in HDFS. We currently support
-  different files types either via our own store accessors or using the Kite SDK.
-  Currently the store sub-project doesn’t have any xml namespace or javaconfig
-  based configuration as these classes are considered to be a foundational library.
-  However, this may change in future releases.</para>
+  different file types either via our own store accessors or by using the Dataset 
+  support in <emphasis>Kite SDK</emphasis>.</para>
+
+  <para>Currently, the Store sub-project doesn’t 
+  have an XML namespace or javaconfig based configuration classes as it's
+  considered to be a foundational library. However, this may change in future 
+  releases.</para>
 
   <section id="store:abstractions">
     <title>Store Abstraction</title>
-    <para>Native store abstraction provides a various writer and reader interfaces
-    so that user is fairly unaware of what is the actual implementation working
-    against files in HDFS. Implementations are usually strongly typed and provides
+    <para>Native store abstractions provide various writer and reader interfaces
+    so that the end user don't have to worry about the underlying implementation actually 
+    doing the work on files in HDFS. Implementations are usually strongly typed and provides
     constructors and setters for additional setup to work with naming, compression
     codecs and everything else defining the behaviour. Interfaces are meant to be
-    used from an integration components which doesn’t need to know internals
+    used from integration components which don’t need to know the internal workings
     of writers and readers.</para>
 
     <section id="store:abstractionswritingdata">
       <title>Writing Data</title>
       <para>Main interface writing into a store is a <interfacename>DataWriter</interfacename>
-      which have one method write which simply writes an entity and backing
+      which have one method <classname>write</classname> which simply writes an entity and the backing
       implementation will handle the rest.</para>
       <programlisting language="java"><![CDATA[public interface DataWriter<T> {
   void write(T entity) throws IOException;
 }]]></programlisting>
 
-      <para><interfacename>DataStoreWriter</interfacename> is adding methods to close and
+      <para>The <interfacename>DataStoreWriter</interfacename> interface adds methods to close and
       flush a writer. Some of the writers have a property to close a stream after
       an idle time has been reached but generally this interface is meant for
       programmatic control of these operations.</para>
@@ -39,15 +42,15 @@
 
       <section id="store:abstractionsfilenaming">
         <title>File Naming</title>
-        <para>Different file naming strategies are used to automatically determine name
+        <para>Different file naming strategies are used to automatically determine the name
         of a file to be used. Writers without additional naming configuration will usually
         use a given base path as is. As soon as any type of a strategy is configured, given
-        base path is considered to be a base directory for writer and name of the file is
+        base path is considered to be a base directory and the name of the file is
         resolved by file naming strategies.</para>
 
-        <para>For example if defined base path is <literal>“/tmp/path”</literal> and
-        <classname>StaticFileNamingStrategy</classname> with <literal>“data”</literal>,
-        actual file path resolved would be <literal>“/tmp/path/data”</literal>.</para>
+        <para>For example, if defined base path is <literal>“/tmp/path”</literal> and the
+        <classname>StaticFileNamingStrategy</classname> with <literal>“data”</literal> parameter is used
+        then the actual file path resolved would be <literal>“/tmp/path/data”</literal>.</para>
 
         <programlisting language="java"><![CDATA[Path path = new Path("/tmp/path");
 Configuration config = new Configuration();
@@ -55,12 +58,12 @@ TextFileWriter writer = new TextFileWriter(config, path, null);
 StaticFileNamingStrategy fileNamingStrategy = new StaticFileNamingStrategy("data")
 writer.setFileNamingStrategy(fileNamingStrategy);]]></programlisting>
 
-        <para>At first look this may feel a little complicated but will make sense after
-        more file naming strategies are added. These will also provide facilities for
-        parallel writers or simple re-launched writer to be able to continue from next
-        to be expected file name. For example, <classname>RollingFileNamingStrategy</classname>
+        <para>At first look this may feel a little complicated, but it will make sense after
+        more file naming strategies are added. These will also provide facilities for using
+        writers in parallel, or for a re-launched writer to be able to create a new file based on already
+        existing files in the directry. For example, <classname>RollingFileNamingStrategy</classname>
         will add a simple increasing value to a file name and will try to initialize
-        itself with a correct position.</para>
+        itself with the correct position.</para>
 
         <para>Built-in strategies currently supported are
         <classname>StaticFileNamingStrategy</classname>,
@@ -75,19 +78,19 @@ writer.setFileNamingStrategy(fileNamingStrategy);]]></programlisting>
       <section id="store:abstractionsfilerollover">
         <title>File Rollover</title>
         <para>File rolling strategy is used to determine a condition in a writer
-        when a current stream should be automatically closed and next file to be opened.
+        when a current stream should be automatically closed and the next file should be opened.
         This is usually done together with <classname>RollingFileNamingStrategy</classname>
-        to rollover when certain file size limit has been reached.</para>
-        <para>Currently only one strategy <classname>SizeRolloverStrategy</classname>
+        to rollover when a certain file size limit has been reached.</para>
+        <para>Currently, only one strategy <classname>SizeRolloverStrategy</classname>
         is supported.</para>
       </section>
 
       <section id="store:abstractionspartitioning">
         <title>Partitioning</title>
         <para>Partitioning is a concept of choosing a target file on demand either based on
-        content to be written or any other information available to a writer at a time
-        of a write operation. While it would be perfectly alright to use multiple writers
-        manually, framework already does all the heavy lifting around partitioning. We work
+        content to be written or any other information available to a writer at the time
+        of the write operation. While it would be perfectly alright to use multiple writers
+        manually, the framework already does all the heavy lifting around partitioning. We work
         through interfaces and provide a generic default implementation still allowing to
         plug a customized version if there’s a need for it.</para>
 
@@ -100,25 +103,25 @@ writer.setFileNamingStrategy(fileNamingStrategy);]]></programlisting>
   PartitionKeyResolver<T, K> getPartitionKeyResolver();
 }]]></programlisting>
 
-        <para><interfacename>PartitionResolver</interfacename> is an interface knowing
-        how to resolve arbitrary partition key into a Path. We don’t force any specific
-        partition key type in an interface level itself but usually the implementation
+        <para><interfacename>PartitionResolver</interfacename> is an interface used
+        to resolve arbitrary partition keys into a path. We don’t force any specific
+        partition key type in the interface level itself but usually the implementation
         needs to be aware of its type.</para>
 
         <programlisting language="java"><![CDATA[public interface PartitionResolver<K> {
   Path resolvePath(K partitionKey);
 }]]></programlisting>
 
-        <para><interfacename>PartitionKeyResolver</interfacename> in an interface which knows
-        how to create a partition key from an entity. This is needed because writer interfaces
-        allow to write entities without an explicit partition key.</para>
+        <para><interfacename>PartitionKeyResolver</interfacename> is an interface which is
+        responsible for creating a partition key from an entity. This is needed because writer 
+        interfaces allow us to write entities without an explicit partition key.</para>
 
         <programlisting language="java"><![CDATA[public interface PartitionKeyResolver<T, K> {
   K resolvePartitionKey(T entity);
 }]]></programlisting>
 
         <para><interfacename>PartitionDataStoreWriter</interfacename> is an extension of
-        <interfacename>DataStoreWriter</interfacename> adding method to write an entity
+        <interfacename>DataStoreWriter</interfacename> adding a method to write an entity
         with a partition key. In this context the partition key is something what the
         partition strategy is able to use.</para>
 
@@ -130,7 +133,7 @@ writer.setFileNamingStrategy(fileNamingStrategy);]]></programlisting>
           <title>DefaultPartitionStrategy</title>
 
           <para><classname>DefaultPartitionStrategy</classname> is a generic default
-          implementation meant to be used together with a Spring SpEL expression language.
+          implementation meant to be used together with an expression using Spring's <emphasis>SpEL</emphasis> expression language.
           <interfacename>PartitionResolver</interfacename> used in
           <classname>DefaultPartitionStrategy</classname> expects partition key to be a type
           of Map&#60;String,Object&#62; and partition key created by
@@ -138,7 +141,7 @@ writer.setFileNamingStrategy(fileNamingStrategy);]]></programlisting>
           <classname>DefaultPartitionKey</classname> which itself is a
           Map&#60;String,Object&#62;.</para>
 
-          <para>Order to make it easy to work with SpEL and partitioning, map values can be
+          <para>In order to make it easy to work with SpEL and partitioning, map values can be
           directly accessed with keys and additional partitioning methods has
           been registered.</para>
 
@@ -155,16 +158,16 @@ writer.setFileNamingStrategy(fileNamingStrategy);]]></programlisting>
 
             <section>
               <title>Custom Methods</title>
-              <para>Addition to a normal SpEL functionality, few custom methods has been
+              <para>In addition to normal SpEL functionality, a few custom methods have been
               added to make it easier to build partition paths. These custom methods
-              can be used to work with a normal partition concepts like date formatting,
+              can be used to work with normal partition concepts like date formatting,
               lists, ranges and hashes.</para>
 
               <section>
                 <title>path</title>
                 <programlisting language="java"><![CDATA[path(String... paths)]]></programlisting>
 
-                <para>Concatenates paths together with a delimiter <emphasis>/</emphasis>.
+                <para>You can concatenate paths together with a <literal>/</literal> delimiter.
                 This method can be used to make the expression less verbose than using a
                 native SpEL functionality to combine path parts together. To create a path
                 <emphasis>part1/part2</emphasis>, expression
@@ -180,7 +183,7 @@ writer.setFileNamingStrategy(fileNamingStrategy);]]></programlisting>
                 </section>
                 <section>
                   <title>Return Value</title>
-                  <para>Concatenated value of paths delimited with /.</para>
+                  <para>Concatenated value of paths delimited with <literal>/</literal>.</para>
                 </section>
 
               </section>
@@ -194,7 +197,7 @@ dateFormat(String pattern, String datestring)
 dateFormat(String pattern, String datestring, String dateformat)]]></programlisting>
 
                 <para>Creates a path using date formatting. Internally this method delegates
-                into <classname>SimpleDateFormat</classname> and needs a Date and a pattern.</para>
+                to <classname>SimpleDateFormat</classname> and needs a Date and a pattern.</para>
 
                 <para>Method signature with three parameters can be used to create a custom
                 <classname>Date</classname> object which is then passed to
@@ -240,13 +243,13 @@ list(Object source, List<List<Object>> lists)
                 <para>Creates a partition path part by matching a source against a lists
                 denoted by <emphasis>lists</emphasis>.</para>
 
-                <para>Lets assume that data is being written and it’s possible to extrace
-                an appid from a content. We can automatically do a list based
+                <para>Lets assume that data is being written and it’s possible to extract
+                an <emphasis>appid</emphasis> from the content. We can automatically do a list based
                 partition by using a partition method
                 <emphasis>list(appid,{{'1TO3','APP1','APP2','APP3'},{'4TO6','APP4','APP5','APP6'}})</emphasis>.
                 This method would create three partitions, <emphasis>1TO3_list</emphasis>,
                 <emphasis>4TO6_list</emphasis> and <emphasis>list</emphasis>.
-                Latter is used if no match is found from partition lists passed to lists.</para>
+                The latter is used if no match is found from partition lists passed to lists.</para>
 
                 <section>
                   <title>Parameters</title>
@@ -275,8 +278,8 @@ range(Object source, List<Object> list)
                 <para>Creates a partition path part by matching a source against a list denoted by
                 <emphasis>list</emphasis> using a simple binary search.</para>
 
-                <para>The partition method takes a source as first argument and list as a
-                second argument. Behind the scenes this is using jvm’s binarySearch which
+                <para>The partition method takes source as first argument and a list as the
+                second argument. Behind the scenes this is using the JVM’s binarySearch which
                 works on an Object level so we can pass in anything. Remember that meaningful
                 range match only works if passed in Object and types in list are of same type
                 like <classname>Integer</classname>. Range is defined by a binarySearch itself
@@ -396,33 +399,48 @@ public class CustomerPartitionKeyResolver implements PartitionKeyResolver<String
 
       </section>
 
-      <section>
-        <title>TextFileWriter</title>
-        <para><classname>TextFileWriter</classname> is an implementation meant to write a
-        simple text data where entities are separated by a delimiter. Simple example for this
-        is a text file with line terminations.</para>
-      </section>
 
       <section>
-        <title>DelimitedTextFileWriter</title>
-        <para><classname>DelimitedTextFileWriter</classname> is an extension atop of 
-        <classname>TextFileWriter</classname> where written entity itself is also delimited.
-        Simple example for this is a csv file.</para>
-      </section>
+        <title>Writer Implementations</title>
+        <para>We provide a number of writer implementations to be used based on the type of file to write.</para>
 
-      <section>
-        <title>TextSequenceFileWriter</title>
-        <para><classname>TextSequenceFileWriter</classname> is a similar implementation
-        than <classname>TextFileWriter</classname> except that backing file is a
-        Hadoop's <classname>SequenceFile</classname>.</para>
-      </section>
+        <itemizedlist>
+        <listitem>
+          <formalpara>
+            <title><classname>TextFileWriter</classname></title>
+            <para>an implementation meant to write a
+            simple text data where entities are separated by a delimiter. Simple example for this
+            is a text file with line terminations.</para>
+          </formalpara>
+        </listitem>
+        <listitem>
+          <formalpara>
+            <title><classname>DelimitedTextFileWriter</classname></title>
+            <para>an extension atop of 
+            <classname>TextFileWriter</classname> where written entity itself is also delimited.
+            Simple example for this is a csv file.</para>
+          </formalpara>
+        </listitem>
+        
+        <listitem>
+          <formalpara>
+            <title><classname>TextSequenceFileWriter</classname></title>
+            <para>a similar implementation
+            to <classname>TextFileWriter</classname> except that backing file is a
+            Hadoop's <classname>SequenceFile</classname>.</para>
+          </formalpara>
+        </listitem>
 
-      <section>
-        <title>PartitionTextFileWriter</title>
-        <para><classname>PartitionTextFileWriter</classname> is wrapping multiple
-        <classname>TextFileWriter</classname>s providing automatic partitioning functionality.</para>
-      </section>
+        <listitem>
+          <formalpara>
+            <title><classname>PartitionTextFileWriter</classname></title>
+            <para>wraps multiple
+            <classname>TextFileWriter</classname>s providing automatic partitioning functionality.</para>
+          </formalpara>
+        </listitem>
+        </itemizedlist>
 
+      </section>
 
     </section>
 
@@ -481,21 +499,34 @@ public class CustomerPartitionKeyResolver implements PartitionKeyResolver<String
       </section>
 
       <section>
-        <title>TextFileReader</title>
-        <para><classname>TextFileReader</classname> is used to read data written by
-        a <classname>TextFileWriter</classname>.</para>
-      </section>
+        <title>Reader Implementations</title>
+        <para>We provide a number of reader implementations to be used based on the type of file to read.</para>
 
-      <section>
-        <title>DelimitedTextFileReader</title>
-        <para><classname>DelimitedTextFileReader</classname> is used to read data writte
-        by a <classname>DelimitedTextFileWriter</classname>.</para>
-      </section>
+        <itemizedlist>
+        <listitem>
+          <formalpara>
+            <title><classname>TextFileReader</classname></title>
+            <para>used to read data written by
+            a <classname>TextFileWriter</classname>.</para>
+          </formalpara>
+        </listitem>
+        <listitem>
+          <formalpara>
+            <title><classname>DelimitedTextFileReader</classname></title>
+            <para>used to read data writte
+            by a <classname>DelimitedTextFileWriter</classname>.</para>
+          </formalpara>
+        </listitem>
+        
+        <listitem>
+          <formalpara>
+            <title><classname>TextSequenceFileReader</classname></title>
+            <para>used to read data written
+            by a <classname>TextSequenceFileWriter</classname>.</para>
+          </formalpara>
+        </listitem>
+        </itemizedlist>
 
-      <section>
-        <title>TextSequenceFileReader</title>
-        <para><classname>TextSequenceFileReader</classname> is used to read data written
-        by a <classname>TextSequenceFileWriter</classname>.</para>
       </section>
 
     </section>
@@ -809,10 +840,11 @@ public class FileInfo {
 
     <para>To create a writer add the following bean definition to your configuration class:</para>
 
-    <programlisting language="java"><![CDATA[    @Bean
-    public DataStoreWriter<FileInfo> dataStoreWriter() {
-        return new AvroPojoDatasetStoreWriter<FileInfo>(FileInfo.class, datasetRepositoryFactory(), fileInfoDatasetDefinition());
-    }
+    <programlisting language="java"><![CDATA[  @Bean
+  public DataStoreWriter<FileInfo> dataStoreWriter() {
+    return new AvroPojoDatasetStoreWriter<FileInfo>(FileInfo.class, 
+        datasetRepositoryFactory(), fileInfoDatasetDefinition());
+  }
 ]]></programlisting>
 
     <para>Next, have your class use the writer bean:</para>
@@ -827,25 +859,26 @@ public class FileInfo {
 
     <para>Now we can use the writer, it will be opened automatically once we start writing to it:</para>
 
-    <programlisting language="java"><![CDATA[            FileInfo fileInfo = new FileInfo(file.getName(), file.getParent(), (int)file.length(), file.lastModified());
-            writer.write(fileInfo);
+    <programlisting language="java"><![CDATA[      FileInfo fileInfo = new FileInfo(file.getName(), 
+          file.getParent(), (int)file.length(), file.lastModified());
+      writer.write(fileInfo);
 ]]></programlisting>
 
     <para>Once we are done writing we should close the writer:</para>
 
-    <programlisting language="java"><![CDATA[        try {
-            writer.close();
-        } catch (IOException e) {
-            throw new StoreException("Error closing FileInfo", e);
-        }
+    <programlisting language="java"><![CDATA[    try {
+      writer.close();
+    } catch (IOException e) {
+      throw new StoreException("Error closing FileInfo", e);
+    }
 ]]></programlisting>
 
     <para>We should now have dataset containing all the <emphasis>FileInfo</emphasis> entries in a <filename>/user/spring/demo/fileinfo</filename> directory:</para>
 
     <programlisting><![CDATA[$ hdfs dfs -ls /user/spring/*
 Found 2 items
-drwxr-xr-x   - trisberg supergroup          0 2014-06-09 17:09 /user/spring/fileinfo/.metadata
--rw-r--r--   3 trisberg supergroup   13824695 2014-06-09 17:10 /user/spring/fileinfo/6876f250-010a-404a-b8c8-0ce1ee759206.avro
+drwxr-xr-x   - spring supergroup          0 2014-06-09 17:09 /user/spring/fileinfo/.metadata
+-rw-r--r--   3 spring supergroup   13824695 2014-06-09 17:10 /user/spring/fileinfo/6876f250-010a-404a-b8c8-0ce1ee759206.avro
 ]]></programlisting>
 
     <para>The <filename>.metadata</filename> directory contains dataset information including the Avro schema:</para>
@@ -911,7 +944,6 @@ drwxr-xr-x   - trisberg supergroup          0 2014-06-09 17:09 /user/spring/file
             }
         });
         System.out.println("File count: " + count.get());
-
 ]]></programlisting>
 
     </section>
@@ -919,12 +951,70 @@ drwxr-xr-x   - trisberg supergroup          0 2014-06-09 17:09 /user/spring/file
     <section id="store:dataset:partition">
     <title>Partitioning datasets</title>
 
-    <para>To create datasets that are partitioned on one or more data fields we use the <classname>PartitionStrategy.Builder</classname> class that <emphasis>Kite</emphasis> provides.</para>
+    <para>To create datasets that are partitioned on one or more data fields we use the <classname>PartitionStrategy.Builder</classname> class that the <emphasis>Kite SDK</emphasis> project provides.</para>
     
-    <programlisting language="java"><![CDATA[        DatasetDefinition definition = new DatasetDefinition();
-        definition.setPartitionStrategy(new PartitionStrategy.Builder().year("modified").build());
+    <programlisting language="java"><![CDATA[DatasetDefinition definition = new DatasetDefinition();
+definition.setPartitionStrategy(new PartitionStrategy.Builder().year("modified").build());
 ]]></programlisting>
 
+    <para>This option lets you specify one or more paths that will be used to partition the files that the data is written to based on the content of the data. You can use any of the <classname>FieldPartitioner</classname>s that are available for the <emphasis>Kite SDK</emphasis> project. We simply use what is specified to create the corresponding partition strategy. The following partitioning functions are available:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para><emphasis>year, month, day, hour, minute</emphasis> creates partitions based on the value of a timestamp and creates 
+        directories named like "YEAR=2014" (works well with fields of datatype long)</para>
+        <itemizedlist>
+          <listitem>
+            <para>specify function plus field name like: <programlisting><![CDATA[year("timestamp")]]></programlisting></para>
+          </listitem>
+          <listitem>
+            <para>optionally, specify a partition name to replace the default one: <programlisting><![CDATA[year("timestamp", "YY")]]></programlisting></para>
+          </listitem>
+        </itemizedlist>
+      </listitem>
+      <listitem>
+        <para><emphasis>dateformat</emphasis> creates partitions based on a timestamp and a dateformat expression provided - creates 
+        directories based on the name provided (works well with fields of datatype long)</para>
+        <itemizedlist>
+          <listitem>
+            <para>specify function plus field name, a name for the partition and the date format like: 
+            <programlisting><![CDATA[dateFormat("timestamp", "Y-M", "yyyyMM")]]></programlisting></para>
+          </listitem>
+        </itemizedlist>
+      </listitem>
+      <listitem>
+        <para><emphasis>range</emphasis> creates partitions based on a field value and the upper bounds for each bucket that is 
+        specified (works well with fields of datatype int and string)</para>
+        <itemizedlist>
+          <listitem>
+            <para>specify function plus field name and the upper bounds for each partition bucket like: 
+            <programlisting><![CDATA[range("age", 20, 50, 80, Integer.MAX_VALUE)]]></programlisting></para>
+          </listitem>
+        </itemizedlist>
+      </listitem>
+      <listitem>
+        <para><emphasis>identity</emphasis> creates partitions based on the exact value of a field (works well with fields of datatype 
+        string, long and int)</para>
+        <itemizedlist>
+          <listitem>
+            <para>specify function plus field name, a name for the partition, the type of the field (String or Integer) and the number 
+            of values/buckets for the partition like: <programlisting><![CDATA[identity("region", "R", String.class, 10)]]></programlisting></para>
+          </listitem>
+        </itemizedlist>
+      </listitem>
+      <listitem>
+        <para><emphasis>hash</emphasis> creates partitions based on the hash calculated from the value of a field divided into a number 
+        of buckets that is specified (works well with all data types)</para>
+        <itemizedlist>
+          <listitem>
+            <para>specify function plus field name and number of buckets like: <programlisting><![CDATA[hash("lastname", 10)]]></programlisting></para>
+          </listitem>
+        </itemizedlist>
+      </listitem>
+    </itemizedlist>
+
+    <para>Multiple expressions can be specified by simply chaining them like: </para>
+    <programlisting><![CDATA[identity("region", "R", String.class, 10).year("timestamp").month("timestamp")]]></programlisting>
     </section>
   </section>
 </chapter>
