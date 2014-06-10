@@ -1,6 +1,6 @@
 The [Spring for Apache Hadoop](http://projects.spring.io/spring-hadoop/) project provides extensions to [Spring](http://projects.spring.io/spring-framework/), [Spring Batch](http://projects.spring.io/spring-batch/), and [Spring Integration](http://projects.spring.io/spring-integration/) to build manageable and robust pipeline solutions around Hadoop.
 
-Spring for Apache Hadoop extends Spring Batch by providing support for reading from and writing to HDFS, running various types of Hadoop jobs (Java MapReduce, Streaming, [Hive](http://hive.apache.org),  [Pig](http://pig.apache.org)), [HBase](http://hbase.apache.org) and [Cascading](http://cascading.org) interactions. An important goal is to provide excellent support for non-Java based developers to be productive using Spring Hadoop and not have to write any Java code to use the core feature set.
+Spring for Apache Hadoop extends Spring Batch by providing support for reading from and writing to HDFS, running various types of Hadoop jobs (Java MapReduce, Streaming, [Hive](http://hive.apache.org),  [Pig](http://pig.apache.org)) and [HBase](http://hbase.apache.org). An important goal is to provide excellent support for non-Java based developers to be productive using Spring Hadoop and not have to write any Java code to use the core feature set.
 
 Spring for Apache Hadoop also applies the familiar Spring programming model to Java MapReduce jobs by providing support for dependency injection of simple jobs as well as a POJO based MapReduce programming model that decouples your MapReduce classes from Hadoop specific details such as base classes and data types.
 
@@ -58,10 +58,10 @@ The results for CI builds are available at [Spring Data Hadoop: Project Summary 
 We are currently running tests against the following distributions:
 * Apache Hadoop 1.2.1
 * Apache Hadoop 2.2.0
-* Cloudera CDH4
+* Cloudera CDH5
 * Hortonworks HDP 1.3
-* Hortonworks HDP 2.0
-* Pivotal HD 1.1
+* Hortonworks HDP 2.1
+* Pivotal HD 2.0
 
 # Testing
 
@@ -90,7 +90,7 @@ You can disable all tests by skipping the `test` task:
 
 Here are some ways for you to get involved in the community:
 
-* Get involved with the Spring community on the Spring Community Forums.  Please help out on the [forum](http://forum.spring.io/forum/spring-projects/data/hadoop) by responding to questions and joining the debate.
+* Get involved with the Spring community on StackOverflow using the [spring-data-hadoop](http://stackoverflow.com/questions/tagged/spring-data-hadoop) tag to post and answer questions.
 * Create [JIRA](https://jira.springframework.org/browse/SHDP) tickets for bugs and new features and comment and vote on the ones that you are interested in.
 * Watch for upcoming articles on Spring by [subscribing](http://spring.io/blog.atom) to the Spring Blog.
 
@@ -98,6 +98,6 @@ Github is for social coding: if you want to write code, we encourage contributio
 
 # Staying in touch
 
-Follow the project team ([Costin](http://twitter.com/costinl), [Mark](http://twitter.com/markpollack), [Thomas](http://twitter.com/trisberg)) on Twitter. 
+Follow the project team ([Mark](http://twitter.com/markpollack), [Thomas](http://twitter.com/trisberg)) or [Janne](https://twitter.com/tunebluez)) on Twitter.
 
 In-depth articles can be found at the Spring [blog](http://spring.io/blog), and releases are announced via our [news feed](http://spring.io/blog/category/news).
