@@ -40,27 +40,28 @@ import org.springframework.util.StringUtils;
  */
 public abstract class OutputStoreObjectSupport extends StoreObjectSupport {
 
-	private final static Log log = LogFactory.getLog(OutputStoreObjectSupport.class);
+    private final static Log log = LogFactory.getLog(OutputStoreObjectSupport.class);
 
     /** Context holder for strategies */
     private OutputContext outputContext;
 
-	/** Used in-writing suffix if any */
-	private String suffix;
+    /** Used in-writing suffix if any */
+    private String suffix;
 
-	/** Used in-writing prefix if any */
-	private String prefix;
+    /** Used in-writing prefix if any */
+    private String prefix;
 
-	/** Flag guarding if files can be overwritten */
-	private boolean overwrite = false;
-
-	/**
-	 * Instantiates a new abstract output store support.
-	 *
-	 * @param configuration the hadoop configuration
-	 * @param basePath the hdfs path
-	 * @param codec the compression codec info
-	 */
+    /** Flag guarding if files can be overwritten */
+    private boolean overwrite = false;
+    /** Flag guarding if file is appended or not */
+    private boolean append=false;
+    /**
+     * Instantiates a new abstract output store support.
+     *
+     * @param configuration the hadoop configuration
+     * @param basePath the hdfs path
+     * @param codec the compression codec info
+     */
     public OutputStoreObjectSupport(Configuration configuration, Path basePath, CodecInfo codec) {
         super(configuration, basePath, codec);
         this.outputContext = new OutputContext();
@@ -69,41 +70,41 @@ public abstract class OutputStoreObjectSupport extends StoreObjectSupport {
 
     @Override
     protected void onInit() throws Exception {
-    	super.onInit();
-    	initOutputContext();
+        super.onInit();
+        initOutputContext();
     }
 
     protected void initOutputContext() throws Exception {
-		for (FileStatus status : findInitFiles(getPath())) {
-			String name = status.getPath().getName();
-			if (StringUtils.hasText(prefix) && name.startsWith(prefix)) {
-				name = name.substring(prefix.length());
-			}
-			if (StringUtils.hasText(suffix) && name.endsWith(suffix)) {
-				name = name.substring(0, name.length() - suffix.length());
-			}
-			Path path = new Path(status.getPath().getParent(), name);
-			if (outputContext.init(path) == null) {
-				break;
-			}
-		}
+        for (FileStatus status : findInitFiles(getPath())) {
+            String name = status.getPath().getName();
+            if (StringUtils.hasText(prefix) && name.startsWith(prefix)) {
+                name = name.substring(prefix.length());
+            }
+            if (StringUtils.hasText(suffix) && name.endsWith(suffix)) {
+                name = name.substring(0, name.length() - suffix.length());
+            }
+            Path path = new Path(status.getPath().getParent(), name);
+            if (outputContext.init(path) == null) {
+                break;
+            }
+        }
     }
 
-	protected FileStatus[] findInitFiles(Path basePath) throws Exception {
-		FileSystem fileSystem = basePath.getFileSystem(getConfiguration());
-		if (fileSystem.exists(basePath)) {
-			FileStatus[] fileStatuses = fileSystem.listStatus(basePath);
-			Arrays.sort(fileStatuses, new Comparator<FileStatus>() {
-				public int compare(FileStatus f1, FileStatus f2) {
-					// newest first
-					return -Long.valueOf(f1.getModificationTime()).compareTo(f2.getModificationTime());
-				}
-			});
-			return fileStatuses;
-		} else {
-			return new FileStatus[0];
-		}
-	}
+    protected FileStatus[] findInitFiles(Path basePath) throws Exception {
+        FileSystem fileSystem = basePath.getFileSystem(getConfiguration());
+        if (fileSystem.exists(basePath)) {
+            FileStatus[] fileStatuses = fileSystem.listStatus(basePath);
+            Arrays.sort(fileStatuses, new Comparator<FileStatus>() {
+                public int compare(FileStatus f1, FileStatus f2) {
+                    // newest first
+                    return -Long.valueOf(f1.getModificationTime()).compareTo(f2.getModificationTime());
+                }
+            });
+            return fileStatuses;
+        } else {
+            return new FileStatus[0];
+        }
+    }
 
     /**
      * Gets the strategy context.
@@ -141,8 +142,8 @@ public abstract class OutputStoreObjectSupport extends StoreObjectSupport {
      * @param suffix the new in writing suffix
      */
     public void setInWritingSuffix(String suffix) {
-		this.suffix = suffix;
-	}
+        this.suffix = suffix;
+    }
 
     /**
      * Sets the in writing prefix.
@@ -150,8 +151,8 @@ public abstract class OutputStoreObjectSupport extends StoreObjectSupport {
      * @param prefix the new in writing prefix
      */
     public void setInWritingPrefix(String prefix) {
-		this.prefix = prefix;
-	}
+        this.prefix = prefix;
+    }
 
     /**
      * Sets the flag indicating if written files may be overwritten.
@@ -161,9 +162,9 @@ public abstract class OutputStoreObjectSupport extends StoreObjectSupport {
      * @param overwrite the new overwrite
      */
     public void setOverwrite(boolean overwrite) {
-		this.overwrite = overwrite;
-		log.info("Setting overwrite to " + overwrite);
-	}
+        this.overwrite = overwrite;
+        log.info("Setting overwrite to " + overwrite);
+    }
 
     /**
      * Gets the resolved path.
@@ -171,7 +172,7 @@ public abstract class OutputStoreObjectSupport extends StoreObjectSupport {
      * @return the resolved path
      */
     protected Path getResolvedPath() {
-    	Path p;
+        Path p;
         if (outputContext != null) {
             p = outputContext.resolvePath(getPath());
         } else {
@@ -179,19 +180,23 @@ public abstract class OutputStoreObjectSupport extends StoreObjectSupport {
         }
 
         // check for file without inuse prefix/suffix
-        if (!overwrite && pathExists(p)) {
-        	throw new StoreException("Path [" + p + "] exists and overwritten not allowed");
+        if (isFileWriteable(p)) {
+            throw new StoreException("Path [" + p + "] exists and overwritten not allowed");
         }
 
         String name = (StringUtils.hasText(prefix) ? prefix : "") + p.getName()
-        		+ (StringUtils.hasText(suffix) ? suffix : "");
+                + (StringUtils.hasText(suffix) ? suffix : "");
 
         p = new Path(p.getParent(), name);
         // check for file with inuse prefix/suffix
-        if (!overwrite && pathExists(p)) {
-        	throw new StoreException("Path [" + p + "] exists and overwritten not allowed");
+        if (isFileWriteable(p)) {
+            throw new StoreException("Path [" + p + "] exists and overwritten not allowed");
         }
         return p;
+    }
+
+    protected boolean isFileWriteable(Path p){
+        return !overwrite && pathExists(p) && !append;
     }
 
     /**
@@ -204,50 +209,58 @@ public abstract class OutputStoreObjectSupport extends StoreObjectSupport {
         resetIdleTimeout();
     }
 
-	/**
-	 * Rename file using prefix and suffix settings.
-	 *
-	 * @param path the path to rename
-	 */
-	protected void renameFile(Path path) {
-		// bail out if there's no in-writing settings
-		if (!StringUtils.hasText(prefix) && !StringUtils.hasText(suffix)) {
-			return;
-		}
-		String name = path.getName();
-		if (StringUtils.startsWithIgnoreCase(name, prefix)) {
-			name = name.substring(prefix.length());
-		}
-		if (StringUtils.endsWithIgnoreCase(name, suffix)) {
-			name = name.substring(0, name.length() - suffix.length());
-		}
-		Path toPath = new Path(path.getParent(), name);
-		try {
-			FileSystem fs = path.getFileSystem(getConfiguration());
+    /**
+     * Rename file using prefix and suffix settings.
+     *
+     * @param path the path to rename
+     */
+    protected void renameFile(Path path) {
+        // bail out if there's no in-writing settings
+        if (!StringUtils.hasText(prefix) && !StringUtils.hasText(suffix)) {
+            return;
+        }
+        String name = path.getName();
+        if (StringUtils.startsWithIgnoreCase(name, prefix)) {
+            name = name.substring(prefix.length());
+        }
+        if (StringUtils.endsWithIgnoreCase(name, suffix)) {
+            name = name.substring(0, name.length() - suffix.length());
+        }
+        Path toPath = new Path(path.getParent(), name);
+        try {
+            FileSystem fs = path.getFileSystem(getConfiguration());
 
-			boolean succeed;
-			try {
-				fs.delete(toPath, false);
-				succeed = fs.rename(path, toPath);
-			} catch (Exception e) {
-				throw new StoreException("Failed renaming from " + path + " to " + toPath, e);
-			}
-			if (!succeed) {
-				throw new StoreException("Failed renaming from " + path + " to " + toPath + " because hdfs returned false");
-			}
-		}
-		catch (IOException e) {
-			log.error("Error renaming file", e);
-			throw new StoreException("Error renaming file", e);
-		}
-	}
+            boolean succeed;
+            try {
+                fs.delete(toPath, false);
+                succeed = fs.rename(path, toPath);
+            } catch (Exception e) {
+                throw new StoreException("Failed renaming from " + path + " to " + toPath, e);
+            }
+            if (!succeed) {
+                throw new StoreException("Failed renaming from " + path + " to " + toPath + " because hdfs returned false");
+            }
+        }
+        catch (IOException e) {
+            log.error("Error renaming file", e);
+            throw new StoreException("Error renaming file", e);
+        }
+    }
 
-	private boolean pathExists(Path path) {
-		try {
-			return path.getFileSystem(getConfiguration()).exists(path);
-		} catch (IOException e) {
-		}
-		return false;
-	}
+    private boolean pathExists(Path path) {
+        try {
+            return path.getFileSystem(getConfiguration()).exists(path);
+        } catch (IOException e) {
+        }
+        return false;
+    }
+
+    public boolean isAppendable() {
+        return append;
+    }
+
+    public void setAppendable(boolean append) {
+        this.append = append;
+    }
 
 }
