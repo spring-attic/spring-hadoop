@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:int-hadoop="http://www.springframework.org/schema/integration/hadoop"
+	xmlns:hdp="http://www.springframework.org/schema/hadoop"
+	xsi:schemaLocation="http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+		http://www.springframework.org/schema/integration/hadoop http://www.springframework.org/schema/integration/hadoop/spring-integration-hadoop.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd
+		http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
+
+	<task:executor id="taskExecutor" pool-size="2"/>
+	<task:scheduler id="taskScheduler" pool-size="2"/>
+
+	<bean id="hadoopConfiguration" class="org.apache.hadoop.conf.Configuration"/>
+
+	<bean id="storeEventPublisher" class="org.springframework.data.hadoop.store.event.DefaultStoreEventPublisher"/>
+
+	<bean id="loggingListener" class="org.springframework.data.hadoop.store.event.LoggingListener">
+		<constructor-arg value="INFO"/>
+	</bean>
+
+	<bean id="fileNamingStrategy" class="org.springframework.data.hadoop.store.strategy.naming.RollingFileNamingStrategy"/>
+
+	<bean id="tmpdir" class="java.lang.String">
+		<constructor-arg value="hdfs://localhost:9000/tmp112"/>
+	</bean>
+
+	<bean id="testBasePath" class="org.apache.hadoop.fs.Path">
+        <constructor-arg ref="tmpdir"/>
+        <constructor-arg value="TextFileStoreAppendCtxTests"/>
+	</bean>
+
+	<bean id="writer" class="org.springframework.data.hadoop.store.output.TextFileWriter">
+		<constructor-arg ref="hadoopConfiguration"/>
+		<constructor-arg ref="testBasePath"/>
+		<constructor-arg><null/></constructor-arg>
+		<property name="idleTimeout" value="1"/>
+
+	</bean>
+
+</beans>
