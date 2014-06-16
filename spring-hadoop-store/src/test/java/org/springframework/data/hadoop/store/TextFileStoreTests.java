@@ -20,12 +20,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataOutputStream;
-import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.junit.Test;
 import org.springframework.data.hadoop.store.codec.Codecs;
@@ -46,33 +41,16 @@ import org.springframework.data.hadoop.store.strategy.rollover.SizeRolloverStrat
 public class TextFileStoreTests extends AbstractStoreTests {
 
     @Test
-    public void testAppend() throws IOException {
-        String dataArray =  DATA10 ;
-
-        FileSystem fs = FileSystem.get(new Configuration());
-        FSDataOutputStream tmp = fs.append(new Path("hdfs://localhost:9000/tmp12"));
-        tmp.write(dataArray.getBytes());
-
-    }
-    @Test
     public void testWriteReadTextOneLine() throws IOException {
-        ExecutorService pool = Executors.newFixedThreadPool(2);
-        WriterThread thread=new WriterThread();
+        String[] dataArray = new String[] { DATA10 };
 
-        ReaderThread thread2=new ReaderThread();
-        pool.execute(thread);
-        pool.execute(thread2);
+        TextFileWriter writer = new TextFileWriter(testConfig, testDefaultPath, null);
+        TestUtils.writeData(writer, dataArray);
 
+        TextFileReader reader = new TextFileReader(testConfig, testDefaultPath, null);
+        TestUtils.readDataAndAssert(reader, dataArray);
     }
-    public static void main(String[] args) {
-        // TODO Auto-generated method stub
-        ExecutorService pool = Executors.newFixedThreadPool(2);
-        WriterThread thread=new WriterThread();
 
-        ReaderThread thread2=new ReaderThread();
-        pool.execute(thread);
-        pool.execute(thread2);
-    }
     @Test
     public void testWriteReadTextManyLines() throws IOException {
         TextFileWriter writer = new TextFileWriter(testConfig, testDefaultPath, null);
