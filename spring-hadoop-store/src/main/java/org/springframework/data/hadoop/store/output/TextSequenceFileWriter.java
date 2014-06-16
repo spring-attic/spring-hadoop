@@ -101,12 +101,18 @@ public class TextSequenceFileWriter extends AbstractSequenceFileWriter implement
 
 	@Override
 	protected void handleIdleTimeout() {
-		log.info("Idle timeout detected for this writer, closing stream");
-		try {
-			close();
-		} catch (IOException e) {
-			log.error("error closing", e);
-		}
+        try {
+            if(isAppendable()){
+                log.info("Idle timeout detected for this writer, flushing stream");
+                hflush();
+            }
+            else{
+                log.info("Idle timeout detected for this writer, closing stream");
+                close();
+            }
+        } catch (IOException e) {
+            log.error("error closing", e);
+        }
 		getOutputContext().rollStrategies();
 	}
 

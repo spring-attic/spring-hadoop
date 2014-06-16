@@ -66,26 +66,7 @@ public class TextFileStoreAppendCtxTests extends AbstractStoreTests {
         writer.resetIdleTimeout();
         Thread.sleep(5000);
         reader = new TextFileReader(testConfig, writer.getPath(), null);
-//        TestUtils.readDataAndAssert(reader, dataArray);
         TestUtils.readDataAndAssert(reader, (String[])ArrayUtils.addAll(strings,dataArray));
-//
-//
-//		TestUtils.writeData(writer, new String[] { DATA10 }, false);
-//		Thread.sleep(2000);
-//		TestUtils.writeData(writer, new String[] { DATA11 }, false);
-//		Thread.sleep(2000);
-//		TestUtils.writeData(writer, new String[] { DATA12 }, true);
-//
-//		TextFileReader reader1 = new TextFileReader(testConfig, new Path(testDefaultPath, "0"), null);
-//		List<String> splitData1 = TestUtils.readData(reader1);
-//
-//		TextFileReader reader2 = new TextFileReader(testConfig, new Path(testDefaultPath, "1"), null);
-//		List<String> splitData2 = TestUtils.readData(reader2);
-//
-//		TextFileReader reader3 = new TextFileReader(testConfig, new Path(testDefaultPath, "2"), null);
-//		List<String> splitData3 = TestUtils.readData(reader3);
-//
-//		assertThat(splitData1.size() + splitData2.size() + splitData3.size(), is(3));
 	}
 
 }

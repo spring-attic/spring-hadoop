@@ -19,8 +19,9 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
@@ -34,10 +35,7 @@ import org.springframework.data.hadoop.store.strategy.naming.ChainedFileNamingSt
 import org.springframework.data.hadoop.store.strategy.naming.CodecFileNamingStrategy;
 import org.springframework.data.hadoop.store.strategy.naming.RollingFileNamingStrategy;
 import org.springframework.data.hadoop.store.strategy.naming.StaticFileNamingStrategy;
-import org.springframework.data.hadoop.store.strategy.rollover.ChainedRolloverStrategy;
-import org.springframework.data.hadoop.store.strategy.rollover.RolloverStrategy;
 import org.springframework.data.hadoop.store.strategy.rollover.SizeRolloverStrategy;
-import org.springframework.data.hadoop.store.strategy.rollover.TimeRolloverStrategy;
 
 /**
  * Tests for writing and reading text using text file.
@@ -48,227 +46,222 @@ import org.springframework.data.hadoop.store.strategy.rollover.TimeRolloverStrat
 public class TextFileStoreTests extends AbstractStoreTests {
 
     @Test
-    public void testAppendWriteReadTextOneLine() throws IOException, InterruptedException {
-        String[] dataArray = new String[] { DATA10,DATA11 };
-        Path tmp=new Path("hdfs://localhost:9000/tmp112");
-        TextFileWriter writer = new TextFileWriter(testConfig, tmp, null);
-        writer.setAppendable(true);
-//        ChainedRolloverStrategy strategy=new ChainedRolloverStrategy();
-//        List<RolloverStrategy> strategyList=new ArrayList<RolloverStrategy>();
-//        strategyList.add(new SizeRolloverStrategy(150));
-//        strategyList.add(new TimeRolloverStrategy(1));
-//        strategy.setStrategies(strategyList);
-//        writer.setRolloverStrategy(strategy);
-        writer.setIdleTimeout(1);
+    public void testAppend() throws IOException {
+        String dataArray =  DATA10 ;
 
-        writer.start();
-        for(String data:dataArray) {
-            writer.write(data);
-        }
-        Thread.sleep(1000);
-        TextFileReader reader = new TextFileReader(testConfig, tmp, null);
-        TestUtils.readDataAndAssert(reader, dataArray);
+        FileSystem fs = FileSystem.get(new Configuration());
+        FSDataOutputStream tmp = fs.append(new Path("hdfs://localhost:9000/tmp12"));
+        tmp.write(dataArray.getBytes());
+
     }
-	//@Test
-	public void testWriteReadTextOneLine() throws IOException {
-		String[] dataArray = new String[] { DATA10 };
+    @Test
+    public void testWriteReadTextOneLine() throws IOException {
+        ExecutorService pool = Executors.newFixedThreadPool(2);
+        WriterThread thread=new WriterThread();
 
-		TextFileWriter writer = new TextFileWriter(testConfig, testDefaultPath, null);
-		TestUtils.writeData(writer, dataArray);
+        ReaderThread thread2=new ReaderThread();
+        pool.execute(thread);
+        pool.execute(thread2);
 
-		TextFileReader reader = new TextFileReader(testConfig, testDefaultPath, null);
-		TestUtils.readDataAndAssert(reader, dataArray);
-	}
+    }
+    public static void main(String[] args) {
+        // TODO Auto-generated method stub
+        ExecutorService pool = Executors.newFixedThreadPool(2);
+        WriterThread thread=new WriterThread();
 
-	//@Test
-	public void testWriteReadTextManyLines() throws IOException {
-		TextFileWriter writer = new TextFileWriter(testConfig, testDefaultPath, null);
-		TestUtils.writeData(writer, DATA09ARRAY);
+        ReaderThread thread2=new ReaderThread();
+        pool.execute(thread);
+        pool.execute(thread2);
+    }
+    @Test
+    public void testWriteReadTextManyLines() throws IOException {
+        TextFileWriter writer = new TextFileWriter(testConfig, testDefaultPath, null);
+        TestUtils.writeData(writer, DATA09ARRAY);
 
-		TextFileReader reader = new TextFileReader(testConfig, testDefaultPath, null);
-		TestUtils.readDataAndAssert(reader, DATA09ARRAY);
-	}
+        TextFileReader reader = new TextFileReader(testConfig, testDefaultPath, null);
+        TestUtils.readDataAndAssert(reader, DATA09ARRAY);
+    }
 
-	@Test
-	public void testWriteReadManyLinesWithGzip() throws IOException {
-		TextFileWriter writer = new TextFileWriter(testConfig, testDefaultPath,
-				Codecs.GZIP.getCodecInfo());
-		TestUtils.writeData(writer, DATA09ARRAY);
+    @Test
+    public void testWriteReadManyLinesWithGzip() throws IOException {
+        TextFileWriter writer = new TextFileWriter(testConfig, testDefaultPath,
+                Codecs.GZIP.getCodecInfo());
+        TestUtils.writeData(writer, DATA09ARRAY);
 
-		TextFileReader reader = new TextFileReader(testConfig, testDefaultPath,
-				Codecs.GZIP.getCodecInfo());
-		TestUtils.readDataAndAssert(reader, DATA09ARRAY);
-	}
+        TextFileReader reader = new TextFileReader(testConfig, testDefaultPath,
+                Codecs.GZIP.getCodecInfo());
+        TestUtils.readDataAndAssert(reader, DATA09ARRAY);
+    }
 
-	@Test
-	public void testWriteReadManyLinesWithBzip2() throws IOException {
-		TextFileWriter writer = new TextFileWriter(testConfig, testDefaultPath,
-				Codecs.BZIP2.getCodecInfo());
-		TestUtils.writeData(writer, DATA09ARRAY);
+    @Test
+    public void testWriteReadManyLinesWithBzip2() throws IOException {
+        TextFileWriter writer = new TextFileWriter(testConfig, testDefaultPath,
+                Codecs.BZIP2.getCodecInfo());
+        TestUtils.writeData(writer, DATA09ARRAY);
 
-		TextFileReader reader = new TextFileReader(testConfig, testDefaultPath,
-				Codecs.BZIP2.getCodecInfo());
-		TestUtils.readDataAndAssert(reader, DATA09ARRAY);
-	}
+        TextFileReader reader = new TextFileReader(testConfig, testDefaultPath,
+                Codecs.BZIP2.getCodecInfo());
+        TestUtils.readDataAndAssert(reader, DATA09ARRAY);
+    }
 
-	//@Test
-	public void testWriteReadManyLinesWithGzipWithCodecNaming() throws IOException {
-		TextFileWriter writer = new TextFileWriter(testConfig, testDefaultPath,
-				Codecs.GZIP.getCodecInfo());
-		ChainedFileNamingStrategy fileNamingStrategy = new ChainedFileNamingStrategy();
-		fileNamingStrategy.register(new CodecFileNamingStrategy());
-		fileNamingStrategy.register(new StaticFileNamingStrategy());
-		writer.setFileNamingStrategy(fileNamingStrategy);
-		TestUtils.writeData(writer, DATA09ARRAY);
+    @Test
+    public void testWriteReadManyLinesWithGzipWithCodecNaming() throws IOException {
+        TextFileWriter writer = new TextFileWriter(testConfig, testDefaultPath,
+                Codecs.GZIP.getCodecInfo());
+        ChainedFileNamingStrategy fileNamingStrategy = new ChainedFileNamingStrategy();
+        fileNamingStrategy.register(new CodecFileNamingStrategy());
+        fileNamingStrategy.register(new StaticFileNamingStrategy());
+        writer.setFileNamingStrategy(fileNamingStrategy);
+        TestUtils.writeData(writer, DATA09ARRAY);
 
-		TextFileReader reader = new TextFileReader(testConfig, new Path(testDefaultPath, "data.gzip"),
-				Codecs.GZIP.getCodecInfo());
-		TestUtils.readDataAndAssert(reader, DATA09ARRAY);
-	}
+        TextFileReader reader = new TextFileReader(testConfig, new Path(testDefaultPath, "data.gzip"),
+                Codecs.GZIP.getCodecInfo());
+        TestUtils.readDataAndAssert(reader, DATA09ARRAY);
+    }
 
-	//@Test
-	public void testWriteReadManyLinesWithNamingAndRollover() throws IOException {
+    @Test
+    public void testWriteReadManyLinesWithNamingAndRollover() throws IOException {
 
-		TextFileWriter writer = new TextFileWriter(testConfig, testDefaultPath, null);
-		writer.setFileNamingStrategy(new RollingFileNamingStrategy());
-		writer.setRolloverStrategy(new SizeRolloverStrategy(40));
-		writer.setIdleTimeout(10000);
+        TextFileWriter writer = new TextFileWriter(testConfig, testDefaultPath, null);
+        writer.setFileNamingStrategy(new RollingFileNamingStrategy());
+        writer.setRolloverStrategy(new SizeRolloverStrategy(40));
+        writer.setIdleTimeout(10000);
 
-		TestUtils.writeData(writer, DATA09ARRAY);
+        TestUtils.writeData(writer, DATA09ARRAY);
 
-		TextFileReader reader1 = new TextFileReader(testConfig, new Path(testDefaultPath, "0"), null);
-		List<String> splitData1 = TestUtils.readData(reader1);
+        TextFileReader reader1 = new TextFileReader(testConfig, new Path(testDefaultPath, "0"), null);
+        List<String> splitData1 = TestUtils.readData(reader1);
 
-		TextFileReader reader2 = new TextFileReader(testConfig, new Path(testDefaultPath, "1"), null);
-		List<String> splitData2 = TestUtils.readData(reader2);
+        TextFileReader reader2 = new TextFileReader(testConfig, new Path(testDefaultPath, "1"), null);
+        List<String> splitData2 = TestUtils.readData(reader2);
 
-		TextFileReader reader3 = new TextFileReader(testConfig, new Path(testDefaultPath, "2"), null);
-		List<String> splitData3 = TestUtils.readData(reader3);
+        TextFileReader reader3 = new TextFileReader(testConfig, new Path(testDefaultPath, "2"), null);
+        List<String> splitData3 = TestUtils.readData(reader3);
 
-		assertThat(splitData1.size() + splitData2.size() + splitData3.size(), is(DATA09ARRAY.length));
-	}
+        assertThat(splitData1.size() + splitData2.size() + splitData3.size(), is(DATA09ARRAY.length));
+    }
 
-	@Test
-	public void testWriteReadManyLinesWithNamingAndRolloverWithGzip() throws IOException {
+    @Test
+    public void testWriteReadManyLinesWithNamingAndRolloverWithGzip() throws IOException {
 
-		TextFileWriter writer = new TextFileWriter(testConfig, testDefaultPath, Codecs.GZIP.getCodecInfo());
-		writer.setFileNamingStrategy(new RollingFileNamingStrategy());
-		writer.setRolloverStrategy(new SizeRolloverStrategy(40));
+        TextFileWriter writer = new TextFileWriter(testConfig, testDefaultPath, Codecs.GZIP.getCodecInfo());
+        writer.setFileNamingStrategy(new RollingFileNamingStrategy());
+        writer.setRolloverStrategy(new SizeRolloverStrategy(40));
 
-		// codec is buffering so we need to write some amount of
-		// data before anything is actually written into a file/stream
-		// writing same data over and over again is compressing a lot
-		for (int i = 0; i<45000; i++) {
-			TestUtils.writeData(writer, DATA09ARRAY, false);
-		}
-		TestUtils.writeData(writer, DATA09ARRAY, true);
+        // codec is buffering so we need to write some amount of
+        // data before anything is actually written into a file/stream
+        // writing same data over and over again is compressing a lot
+        for (int i = 0; i<45000; i++) {
+            TestUtils.writeData(writer, DATA09ARRAY, false);
+        }
+        TestUtils.writeData(writer, DATA09ARRAY, true);
 
-		TextFileReader reader1 = new TextFileReader(testConfig, new Path(testDefaultPath, "0"), Codecs.GZIP.getCodecInfo());
-		List<String> splitData1 = TestUtils.readData(reader1);
+        TextFileReader reader1 = new TextFileReader(testConfig, new Path(testDefaultPath, "0"), Codecs.GZIP.getCodecInfo());
+        List<String> splitData1 = TestUtils.readData(reader1);
 
-		TextFileReader reader2 = new TextFileReader(testConfig, new Path(testDefaultPath, "1"), Codecs.GZIP.getCodecInfo());
-		List<String> splitData2 = TestUtils.readData(reader2);
+        TextFileReader reader2 = new TextFileReader(testConfig, new Path(testDefaultPath, "1"), Codecs.GZIP.getCodecInfo());
+        List<String> splitData2 = TestUtils.readData(reader2);
 
-		assertThat(splitData1.size() + splitData2.size(), is(450010));
-	}
+        assertThat(splitData1.size() + splitData2.size(), is(450010));
+    }
 
-	//@Test
-	public void testContinueStrategies() throws IOException, InterruptedException {
-		String[] dataArray = new String[] { DATA10 };
+    @Test
+    public void testContinueStrategies() throws IOException, InterruptedException {
+        String[] dataArray = new String[] { DATA10 };
 
-		TextFileWriter writer = new TextFileWriter(testConfig, testDefaultPath, null);
+        TextFileWriter writer = new TextFileWriter(testConfig, testDefaultPath, null);
 
-		ChainedFileNamingStrategy fileNamingStrategy = new ChainedFileNamingStrategy();
-		fileNamingStrategy.register(new StaticFileNamingStrategy("data"));
-		fileNamingStrategy.register(new RollingFileNamingStrategy());
-		writer.setFileNamingStrategy(fileNamingStrategy);
-		writer.setInWritingSuffix(".tmp");
-		writer.afterPropertiesSet();
-		TestUtils.writeData(writer, dataArray);
+        ChainedFileNamingStrategy fileNamingStrategy = new ChainedFileNamingStrategy();
+        fileNamingStrategy.register(new StaticFileNamingStrategy("data"));
+        fileNamingStrategy.register(new RollingFileNamingStrategy());
+        writer.setFileNamingStrategy(fileNamingStrategy);
+        writer.setInWritingSuffix(".tmp");
+        writer.afterPropertiesSet();
+        TestUtils.writeData(writer, dataArray);
 
-		Thread.sleep(1000);
+        Thread.sleep(1000);
 
-		writer = new TextFileWriter(testConfig, testDefaultPath, null);
-		fileNamingStrategy = new ChainedFileNamingStrategy();
-		fileNamingStrategy.register(new StaticFileNamingStrategy("data"));
-		fileNamingStrategy.register(new RollingFileNamingStrategy());
-		writer.setFileNamingStrategy(fileNamingStrategy);
-		writer.setInWritingSuffix(".tmp");
-		writer.afterPropertiesSet();
-		TestUtils.writeData(writer, dataArray);
+        writer = new TextFileWriter(testConfig, testDefaultPath, null);
+        fileNamingStrategy = new ChainedFileNamingStrategy();
+        fileNamingStrategy.register(new StaticFileNamingStrategy("data"));
+        fileNamingStrategy.register(new RollingFileNamingStrategy());
+        writer.setFileNamingStrategy(fileNamingStrategy);
+        writer.setInWritingSuffix(".tmp");
+        writer.afterPropertiesSet();
+        TestUtils.writeData(writer, dataArray);
 
-		Thread.sleep(1000);
+        Thread.sleep(1000);
 
-		writer = new TextFileWriter(testConfig, testDefaultPath, null);
-		fileNamingStrategy = new ChainedFileNamingStrategy();
-		fileNamingStrategy.register(new StaticFileNamingStrategy("data"));
-		fileNamingStrategy.register(new RollingFileNamingStrategy());
-		writer.setFileNamingStrategy(fileNamingStrategy);
-		writer.setInWritingSuffix(".tmp");
-		writer.afterPropertiesSet();
-		TestUtils.writeData(writer, dataArray);
+        writer = new TextFileWriter(testConfig, testDefaultPath, null);
+        fileNamingStrategy = new ChainedFileNamingStrategy();
+        fileNamingStrategy.register(new StaticFileNamingStrategy("data"));
+        fileNamingStrategy.register(new RollingFileNamingStrategy());
+        writer.setFileNamingStrategy(fileNamingStrategy);
+        writer.setInWritingSuffix(".tmp");
+        writer.afterPropertiesSet();
+        TestUtils.writeData(writer, dataArray);
 
-		TextFileReader reader1 = new TextFileReader(testConfig, new Path(testDefaultPath, "data-0"), null);
-		List<String> splitData1 = TestUtils.readData(reader1);
+        TextFileReader reader1 = new TextFileReader(testConfig, new Path(testDefaultPath, "data-0"), null);
+        List<String> splitData1 = TestUtils.readData(reader1);
 
-		TextFileReader reader2 = new TextFileReader(testConfig, new Path(testDefaultPath, "data-1"), null);
-		List<String> splitData2 = TestUtils.readData(reader2);
+        TextFileReader reader2 = new TextFileReader(testConfig, new Path(testDefaultPath, "data-1"), null);
+        List<String> splitData2 = TestUtils.readData(reader2);
 
-		TextFileReader reader3 = new TextFileReader(testConfig, new Path(testDefaultPath, "data-2"), null);
-		List<String> splitData3 = TestUtils.readData(reader3);
+        TextFileReader reader3 = new TextFileReader(testConfig, new Path(testDefaultPath, "data-2"), null);
+        List<String> splitData3 = TestUtils.readData(reader3);
 
-		assertThat(splitData1.size() + splitData2.size() + splitData3.size(), is(3));
-	}
+        assertThat(splitData1.size() + splitData2.size() + splitData3.size(), is(3));
+    }
 
-	//@Test
-	public void testContinueStrategiesWithCodec() throws IOException, InterruptedException {
-		String[] dataArray = new String[] { DATA10 };
+    @Test
+    public void testContinueStrategiesWithCodec() throws IOException, InterruptedException {
+        String[] dataArray = new String[] { DATA10 };
 
-		TextFileWriter writer = new TextFileWriter(testConfig, testDefaultPath, Codecs.GZIP.getCodecInfo());
+        TextFileWriter writer = new TextFileWriter(testConfig, testDefaultPath, Codecs.GZIP.getCodecInfo());
 
-		ChainedFileNamingStrategy fileNamingStrategy = new ChainedFileNamingStrategy();
-		fileNamingStrategy.register(new StaticFileNamingStrategy("data"));
-		fileNamingStrategy.register(new RollingFileNamingStrategy());
-		fileNamingStrategy.register(new CodecFileNamingStrategy());
-		writer.setFileNamingStrategy(fileNamingStrategy);
-		writer.setInWritingSuffix(".tmp");
-		writer.afterPropertiesSet();
-		TestUtils.writeData(writer, dataArray);
+        ChainedFileNamingStrategy fileNamingStrategy = new ChainedFileNamingStrategy();
+        fileNamingStrategy.register(new StaticFileNamingStrategy("data"));
+        fileNamingStrategy.register(new RollingFileNamingStrategy());
+        fileNamingStrategy.register(new CodecFileNamingStrategy());
+        writer.setFileNamingStrategy(fileNamingStrategy);
+        writer.setInWritingSuffix(".tmp");
+        writer.afterPropertiesSet();
+        TestUtils.writeData(writer, dataArray);
 
-		Thread.sleep(1000);
+        Thread.sleep(1000);
 
-		writer = new TextFileWriter(testConfig, testDefaultPath, Codecs.GZIP.getCodecInfo());
-		fileNamingStrategy = new ChainedFileNamingStrategy();
-		fileNamingStrategy.register(new StaticFileNamingStrategy("data"));
-		fileNamingStrategy.register(new RollingFileNamingStrategy());
-		fileNamingStrategy.register(new CodecFileNamingStrategy());
-		writer.setFileNamingStrategy(fileNamingStrategy);
-		writer.setInWritingSuffix(".tmp");
-		writer.afterPropertiesSet();
-		TestUtils.writeData(writer, dataArray);
+        writer = new TextFileWriter(testConfig, testDefaultPath, Codecs.GZIP.getCodecInfo());
+        fileNamingStrategy = new ChainedFileNamingStrategy();
+        fileNamingStrategy.register(new StaticFileNamingStrategy("data"));
+        fileNamingStrategy.register(new RollingFileNamingStrategy());
+        fileNamingStrategy.register(new CodecFileNamingStrategy());
+        writer.setFileNamingStrategy(fileNamingStrategy);
+        writer.setInWritingSuffix(".tmp");
+        writer.afterPropertiesSet();
+        TestUtils.writeData(writer, dataArray);
 
-		Thread.sleep(1000);
+        Thread.sleep(1000);
 
-		writer = new TextFileWriter(testConfig, testDefaultPath, Codecs.GZIP.getCodecInfo());
-		fileNamingStrategy = new ChainedFileNamingStrategy();
-		fileNamingStrategy.register(new StaticFileNamingStrategy("data"));
-		fileNamingStrategy.register(new RollingFileNamingStrategy());
-		fileNamingStrategy.register(new CodecFileNamingStrategy());
-		writer.setFileNamingStrategy(fileNamingStrategy);
-		writer.setInWritingSuffix(".tmp");
-		writer.afterPropertiesSet();
-		TestUtils.writeData(writer, dataArray);
+        writer = new TextFileWriter(testConfig, testDefaultPath, Codecs.GZIP.getCodecInfo());
+        fileNamingStrategy = new ChainedFileNamingStrategy();
+        fileNamingStrategy.register(new StaticFileNamingStrategy("data"));
+        fileNamingStrategy.register(new RollingFileNamingStrategy());
+        fileNamingStrategy.register(new CodecFileNamingStrategy());
+        writer.setFileNamingStrategy(fileNamingStrategy);
+        writer.setInWritingSuffix(".tmp");
+        writer.afterPropertiesSet();
+        TestUtils.writeData(writer, dataArray);
 
-		TextFileReader reader1 = new TextFileReader(testConfig, new Path(testDefaultPath, "data-0.gzip"), Codecs.GZIP.getCodecInfo());
-		List<String> splitData1 = TestUtils.readData(reader1);
+        TextFileReader reader1 = new TextFileReader(testConfig, new Path(testDefaultPath, "data-0.gzip"), Codecs.GZIP.getCodecInfo());
+        List<String> splitData1 = TestUtils.readData(reader1);
 
-		TextFileReader reader2 = new TextFileReader(testConfig, new Path(testDefaultPath, "data-1.gzip"), Codecs.GZIP.getCodecInfo());
-		List<String> splitData2 = TestUtils.readData(reader2);
+        TextFileReader reader2 = new TextFileReader(testConfig, new Path(testDefaultPath, "data-1.gzip"), Codecs.GZIP.getCodecInfo());
+        List<String> splitData2 = TestUtils.readData(reader2);
 
-		TextFileReader reader3 = new TextFileReader(testConfig, new Path(testDefaultPath, "data-2.gzip"), Codecs.GZIP.getCodecInfo());
-		List<String> splitData3 = TestUtils.readData(reader3);
+        TextFileReader reader3 = new TextFileReader(testConfig, new Path(testDefaultPath, "data-2.gzip"), Codecs.GZIP.getCodecInfo());
+        List<String> splitData3 = TestUtils.readData(reader3);
 
-		assertThat(splitData1.size() + splitData2.size() + splitData3.size(), is(3));
-	}
+        assertThat(splitData1.size() + splitData2.size() + splitData3.size(), is(3));
+    }
 
 }
