@@ -24,14 +24,14 @@
 
 	<bean id="fileNamingStrategy" class="org.springframework.data.hadoop.store.strategy.naming.RollingFileNamingStrategy"/>
 
-	<bean id="tmpdir" class="java.lang.String">
-		<constructor-arg value="hdfs://localhost:9000/tmp112"/>
-	</bean>
+    <bean id="tmpdir" class="java.lang.String">
+        <constructor-arg value="hdfs://localhost:8020/"/>
+    </bean>
 
-	<bean id="testBasePath" class="org.apache.hadoop.fs.Path">
+    <bean id="testBasePath" class="org.apache.hadoop.fs.Path">
         <constructor-arg ref="tmpdir"/>
         <constructor-arg value="TextFileStoreAppendCtxTests"/>
-	</bean>
+    </bean>
 
 	<bean id="writer" class="org.springframework.data.hadoop.store.output.TextFileWriter">
 		<constructor-arg ref="hadoopConfiguration"/>
