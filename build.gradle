@@ -56,6 +56,9 @@ def List hbaseArtifacts = []
 // handle older Hive version
 def hiveGroup = "org.apache.hive"
 
+// make it possible to use Pig jars compiled for Hadoop 2.0
+def pigQualifier = ''
+
 // default is Hadoop 2.2.x
 switch (hadoopDistro) {
 
@@ -157,6 +160,7 @@ switch (hadoopDistro) {
 				  "org.apache.hbase:hbase-client:$hbaseVersion"]
 		hiveVersion = phd20HiveVersion
 		pigVersion = phd20PigVersion
+		pigQualifier = ':h2'
 		break;
 
 	// Hortonworks Data Platform 2.0
@@ -183,6 +187,7 @@ switch (hadoopDistro) {
 				  "org.apache.hbase:hbase-client:$hbaseVersion"]
 		hiveVersion = hdp20HiveVersion
 		pigVersion = hdp20PigVersion
+		pigQualifier = ':h2'
 		break;
 
 	// Hortonworks Data Platform 2.1
@@ -209,6 +214,7 @@ switch (hadoopDistro) {
 				  "org.apache.hbase:hbase-client:$hbaseVersion"]
 		hiveVersion = hdp21HiveVersion
 		pigVersion = hdp21PigVersion
+		pigQualifier = ':h2'
 		break;
 
 	// Hadoop 2.4.x
@@ -235,6 +241,7 @@ switch (hadoopDistro) {
 				  "org.apache.hbase:hbase-client:$hbaseVersion"]
 		hiveVersion = hd24HiveVersion
 		pigVersion = hd24PigVersion
+		pigQualifier = ':h2'
 		break;
 
 	// Hadoop 2.2.x Stable
@@ -272,6 +279,7 @@ switch (hadoopDistro) {
 				  "org.apache.hbase:hbase-client:$hbaseVersion"]
 		hiveVersion = hd22HiveVersion
 		pigVersion = hd22PigVersion
+		pigQualifier = ':h2'
 }
 
 configure(javaProjects()) {
@@ -549,7 +557,7 @@ configure(hadoopProjects()) {
 		testRuntime "$hiveGroup:hive-jdbc:$hiveVersion"
 	
 		// Pig
-		optional("org.apache.pig:pig:$pigVersion:h2") { dep ->
+		optional("org.apache.pig:pig:$pigVersion$pigQualifier") { dep ->
 			exclude group: "junit", module: "junit"
 		}
 	
