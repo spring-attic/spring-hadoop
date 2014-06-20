@@ -27,8 +27,18 @@ import java.util.List;
 import org.junit.Test;
 import org.springframework.data.hadoop.store.input.DelimitedTextFileReader;
 import org.springframework.data.hadoop.store.output.DelimitedTextFileWriter;
+import org.springframework.data.hadoop.test.context.HadoopDelegatingSmartContextLoader;
+import org.springframework.data.hadoop.test.context.MiniHadoopCluster;
+import org.springframework.test.context.ContextConfiguration;
 
+@ContextConfiguration(loader=HadoopDelegatingSmartContextLoader.class)
+@MiniHadoopCluster
 public class DelimitedTextFileStoreTests extends AbstractStoreTests {
+
+	@org.springframework.context.annotation.Configuration
+	static class Config {
+		// just empty to survive without xml configs
+	}
 
 	@Test
 	public void testWriteReadTextOneDelimitedLine() throws IOException {
@@ -36,10 +46,10 @@ public class DelimitedTextFileStoreTests extends AbstractStoreTests {
 		List<List<String>> data = new ArrayList<List<String>>();
 		data.add(Arrays.asList(DATA09ARRAY));
 
-		DelimitedTextFileWriter writer = new DelimitedTextFileWriter(testConfig, testDefaultPath, null);
+		DelimitedTextFileWriter writer = new DelimitedTextFileWriter(getConfiguration(), testDefaultPath, null);
 		TestUtils.writeData(writer, data);
 
-		DelimitedTextFileReader reader = new DelimitedTextFileReader(testConfig, testDefaultPath, null);
+		DelimitedTextFileReader reader = new DelimitedTextFileReader(getConfiguration(), testDefaultPath, null);
 		List<List<String>> list = TestUtils.readDataList(reader);
 		assertThat(list, notNullValue());
 		assertThat(list.size(), is(1));
@@ -54,10 +64,10 @@ public class DelimitedTextFileStoreTests extends AbstractStoreTests {
 		data.add(Arrays.asList(DATA09ARRAY));
 		data.add(Arrays.asList(DATA09ARRAY));
 
-		DelimitedTextFileWriter writer = new DelimitedTextFileWriter(testConfig, testDefaultPath, null);
+		DelimitedTextFileWriter writer = new DelimitedTextFileWriter(getConfiguration(), testDefaultPath, null);
 		TestUtils.writeData(writer, data);
 
-		DelimitedTextFileReader reader = new DelimitedTextFileReader(testConfig, testDefaultPath, null);
+		DelimitedTextFileReader reader = new DelimitedTextFileReader(getConfiguration(), testDefaultPath, null);
 		List<List<String>> list = TestUtils.readDataList(reader);
 		assertThat(list, notNullValue());
 		assertThat(list.size(), is(3));

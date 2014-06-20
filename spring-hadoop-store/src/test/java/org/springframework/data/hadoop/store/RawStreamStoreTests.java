@@ -32,6 +32,9 @@ import org.springframework.data.hadoop.store.strategy.naming.ChainedFileNamingSt
 import org.springframework.data.hadoop.store.strategy.naming.CodecFileNamingStrategy;
 import org.springframework.data.hadoop.store.strategy.naming.StaticFileNamingStrategy;
 import org.springframework.data.hadoop.store.support.StoreUtils;
+import org.springframework.data.hadoop.test.context.HadoopDelegatingSmartContextLoader;
+import org.springframework.data.hadoop.test.context.MiniHadoopCluster;
+import org.springframework.test.context.ContextConfiguration;
 
 /**
  * Tests for writing raw byte arrays.
@@ -39,7 +42,14 @@ import org.springframework.data.hadoop.store.support.StoreUtils;
  * @author Janne Valkealahti
  *
  */
+@ContextConfiguration(loader=HadoopDelegatingSmartContextLoader.class)
+@MiniHadoopCluster
 public class RawStreamStoreTests extends AbstractStoreTests {
+
+	@org.springframework.context.annotation.Configuration
+	static class Config {
+		// just empty to survive without xml configs
+	}
 
 	@Test
 	public void testWriteReadTextTwoLines() throws IOException {
@@ -51,22 +61,22 @@ public class RawStreamStoreTests extends AbstractStoreTests {
 		data[2] = DATA11.getBytes();
 		data[3] = "\n".getBytes();
 
-		OutputStreamWriter writer = new OutputStreamWriter(testConfig, testDefaultPath, null);
+		OutputStreamWriter writer = new OutputStreamWriter(getConfiguration(), testDefaultPath, null);
 		TestUtils.writeData(writer, data, true);
 
-		TextFileReader reader = new TextFileReader(testConfig, testDefaultPath, null);
+		TextFileReader reader = new TextFileReader(getConfiguration(), testDefaultPath, null);
 		TestUtils.readDataAndAssert(reader, dataArray);
 	}
 
 	@Test
 	public void testStreamSmall() throws IOException {
 		ByteArrayInputStream stream = new ByteArrayInputStream(DATA10.getBytes());
-		OutputStreamWriter writer = new OutputStreamWriter(testConfig, testDefaultPath, null);
+		OutputStreamWriter writer = new OutputStreamWriter(getConfiguration(), testDefaultPath, null);
 
 		doWithInputStream(stream, writer);
 
 		String[] dataArray = new String[] { DATA10 };
-		TextFileReader reader = new TextFileReader(testConfig, testDefaultPath, null);
+		TextFileReader reader = new TextFileReader(getConfiguration(), testDefaultPath, null);
 		TestUtils.readDataAndAssert(reader, dataArray);
 	}
 
@@ -78,11 +88,11 @@ public class RawStreamStoreTests extends AbstractStoreTests {
 			buf.append("\n");
 		}
 		ByteArrayInputStream stream = new ByteArrayInputStream(buf.toString().getBytes());
-		OutputStreamWriter writer = new OutputStreamWriter(testConfig, testDefaultPath, null);
+		OutputStreamWriter writer = new OutputStreamWriter(getConfiguration(), testDefaultPath, null);
 
 		doWithInputStream(stream, writer);
 
-		TextFileReader reader = new TextFileReader(testConfig, testDefaultPath, null);
+		TextFileReader reader = new TextFileReader(getConfiguration(), testDefaultPath, null);
 		List<String> data = TestUtils.readData(reader);
 		assertThat(data.size(), is(1000));
 	}
@@ -95,11 +105,11 @@ public class RawStreamStoreTests extends AbstractStoreTests {
 			buf.append("\n");
 		}
 		ByteArrayInputStream stream = new ByteArrayInputStream(buf.toString().getBytes());
-		OutputStreamWriter writer = new OutputStreamWriter(testConfig, testDefaultPath, Codecs.GZIP.getCodecInfo());
+		OutputStreamWriter writer = new OutputStreamWriter(getConfiguration(), testDefaultPath, Codecs.GZIP.getCodecInfo());
 
 		doWithInputStream(stream, writer);
 
-		TextFileReader reader = new TextFileReader(testConfig, testDefaultPath, Codecs.GZIP.getCodecInfo());
+		TextFileReader reader = new TextFileReader(getConfiguration(), testDefaultPath, Codecs.GZIP.getCodecInfo());
 		List<String> data = TestUtils.readData(reader);
 		assertThat(data.size(), is(1000));
 	}
@@ -112,7 +122,7 @@ public class RawStreamStoreTests extends AbstractStoreTests {
 			buf.append("\n");
 		}
 		ByteArrayInputStream stream = new ByteArrayInputStream(buf.toString().getBytes());
-		OutputStreamWriter writer = new OutputStreamWriter(testConfig, testDefaultPath, Codecs.GZIP.getCodecInfo());
+		OutputStreamWriter writer = new OutputStreamWriter(getConfiguration(), testDefaultPath, Codecs.GZIP.getCodecInfo());
 
 		ChainedFileNamingStrategy fileNamingStrategy = new ChainedFileNamingStrategy();
 		fileNamingStrategy.register(new StaticFileNamingStrategy("data"));
@@ -121,7 +131,7 @@ public class RawStreamStoreTests extends AbstractStoreTests {
 
 		doWithInputStream(stream, writer);
 
-		TextFileReader reader = new TextFileReader(testConfig, new Path(testDefaultPath, "data.gzip"), Codecs.GZIP.getCodecInfo());
+		TextFileReader reader = new TextFileReader(getConfiguration(), new Path(testDefaultPath, "data.gzip"), Codecs.GZIP.getCodecInfo());
 		List<String> data = TestUtils.readData(reader);
 		assertThat(data.size(), is(1000));
 	}

@@ -14,8 +14,6 @@
 	<task:executor id="taskExecutor" pool-size="2"/>
 	<task:scheduler id="taskScheduler" pool-size="2"/>
 
-	<bean id="hadoopConfiguration" class="org.apache.hadoop.conf.Configuration"/>
-
 	<bean id="storeEventPublisher" class="org.springframework.data.hadoop.store.event.DefaultStoreEventPublisher"/>
 
 	<bean id="loggingListener" class="org.springframework.data.hadoop.store.event.LoggingListener">

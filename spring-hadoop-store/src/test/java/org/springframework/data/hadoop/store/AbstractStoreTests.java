@@ -17,18 +17,18 @@ package org.springframework.data.hadoop.store;
 
 import java.io.IOException;
 
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.junit.After;
 import org.junit.Before;
+import org.springframework.data.hadoop.test.junit.AbstractHadoopClusterTests;
 
 /**
  * Base class for store tests.
  *
  * @author Janne Valkealahti
  */
-public abstract class AbstractStoreTests {
+public abstract class AbstractStoreTests extends AbstractHadoopClusterTests {
 
 	protected final static String DATA10 = "0123456789";
 
@@ -72,18 +72,16 @@ public abstract class AbstractStoreTests {
 	protected final static String[] DATA79ARRAY = new String[] {
 		DATA17, DATA18, DATA19 };
 
-	private static final String tmpDirName = System.getProperty("java.io.tmpdir");
+	private static final String tmpDirName = "/tmp/";
 
 	protected final Path testBasePath = new Path(tmpDirName + (tmpDirName.endsWith("/") ? "" : "/")
 			+ getClass().getSimpleName());
 
 	protected final Path testDefaultPath = new Path(testBasePath, "default");
 
-	protected final Configuration testConfig = new Configuration();
-
 	@Before
 	public void setup() throws IOException {
-		FileSystem fs = testBasePath.getFileSystem(testConfig);
+		FileSystem fs = testBasePath.getFileSystem(getConfiguration());
 		fs.delete(testBasePath, true);
 	}
 

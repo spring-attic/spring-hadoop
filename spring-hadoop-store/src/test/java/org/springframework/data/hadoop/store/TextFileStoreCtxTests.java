@@ -24,13 +24,13 @@ import java.util.List;
 
 import org.apache.hadoop.fs.Path;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.hadoop.store.input.TextFileReader;
 import org.springframework.data.hadoop.store.output.TextFileWriter;
+import org.springframework.data.hadoop.test.context.HadoopDelegatingSmartContextLoader;
+import org.springframework.data.hadoop.test.context.MiniHadoopCluster;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * Tests for reading and writing text using context configuration.
@@ -38,8 +38,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @author Janne Valkealahti
  *
  */
-@ContextConfiguration
-@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(loader=HadoopDelegatingSmartContextLoader.class)
+@MiniHadoopCluster
 public class TextFileStoreCtxTests extends AbstractStoreTests {
 
 	@Autowired
@@ -57,13 +57,13 @@ public class TextFileStoreCtxTests extends AbstractStoreTests {
 		Thread.sleep(2000);
 		TestUtils.writeData(writer, new String[] { DATA12 }, true);
 
-		TextFileReader reader1 = new TextFileReader(testConfig, new Path(testDefaultPath, "0"), null);
+		TextFileReader reader1 = new TextFileReader(getConfiguration(), new Path(testDefaultPath, "0"), null);
 		List<String> splitData1 = TestUtils.readData(reader1);
 
-		TextFileReader reader2 = new TextFileReader(testConfig, new Path(testDefaultPath, "1"), null);
+		TextFileReader reader2 = new TextFileReader(getConfiguration(), new Path(testDefaultPath, "1"), null);
 		List<String> splitData2 = TestUtils.readData(reader2);
 
-		TextFileReader reader3 = new TextFileReader(testConfig, new Path(testDefaultPath, "2"), null);
+		TextFileReader reader3 = new TextFileReader(getConfiguration(), new Path(testDefaultPath, "2"), null);
 		List<String> splitData3 = TestUtils.readData(reader3);
 
 		assertThat(splitData1.size() + splitData2.size() + splitData3.size(), is(3));
