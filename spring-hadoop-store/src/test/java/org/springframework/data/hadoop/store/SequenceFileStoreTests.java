@@ -28,6 +28,9 @@ import org.springframework.data.hadoop.store.input.TextSequenceFileReader;
 import org.springframework.data.hadoop.store.output.TextSequenceFileWriter;
 import org.springframework.data.hadoop.store.strategy.naming.RollingFileNamingStrategy;
 import org.springframework.data.hadoop.store.strategy.rollover.SizeRolloverStrategy;
+import org.springframework.data.hadoop.test.context.HadoopDelegatingSmartContextLoader;
+import org.springframework.data.hadoop.test.context.MiniHadoopCluster;
+import org.springframework.test.context.ContextConfiguration;
 
 /**
  * Tests for writing and reading text using sequence file.
@@ -35,25 +38,32 @@ import org.springframework.data.hadoop.store.strategy.rollover.SizeRolloverStrat
  * @author Janne Valkealahti
  *
  */
+@ContextConfiguration(loader=HadoopDelegatingSmartContextLoader.class)
+@MiniHadoopCluster
 public class SequenceFileStoreTests extends AbstractStoreTests {
+
+	@org.springframework.context.annotation.Configuration
+	static class Config {
+		// just empty to survive without xml configs
+	}
 
 	@Test
 	public void testWriteReadSequenceFileOneLine() throws IOException {
 		String[] dataArray = new String[] { DATA10 };
 
-		TextSequenceFileWriter writer = new TextSequenceFileWriter(testConfig, testDefaultPath, null);
+		TextSequenceFileWriter writer = new TextSequenceFileWriter(getConfiguration(), testDefaultPath, null);
 		TestUtils.writeData(writer, dataArray);
 
-		TextSequenceFileReader reader = new TextSequenceFileReader(testConfig, testDefaultPath, null);
+		TextSequenceFileReader reader = new TextSequenceFileReader(getConfiguration(), testDefaultPath, null);
 		TestUtils.readDataAndAssert(reader, dataArray);
 	}
 
 	@Test
 	public void testWriteReadSequenceFileManyLines() throws IOException {
-		TextSequenceFileWriter writer = new TextSequenceFileWriter(testConfig, testDefaultPath, null);
+		TextSequenceFileWriter writer = new TextSequenceFileWriter(getConfiguration(), testDefaultPath, null);
 		TestUtils.writeData(writer, DATA09ARRAY);
 
-		TextSequenceFileReader reader = new TextSequenceFileReader(testConfig, testDefaultPath, null);
+		TextSequenceFileReader reader = new TextSequenceFileReader(getConfiguration(), testDefaultPath, null);
 		TestUtils.readDataAndAssert(reader, DATA09ARRAY);
 	}
 
@@ -71,31 +81,31 @@ public class SequenceFileStoreTests extends AbstractStoreTests {
 
 	@Test
 	public void testWriteReadManyLinesWithBzip2() throws IOException {
-		TextSequenceFileWriter writer = new TextSequenceFileWriter(testConfig, testDefaultPath,
+		TextSequenceFileWriter writer = new TextSequenceFileWriter(getConfiguration(), testDefaultPath,
 				Codecs.BZIP2.getCodecInfo());
 		TestUtils.writeData(writer, DATA09ARRAY);
 
-		TextSequenceFileReader reader = new TextSequenceFileReader(testConfig, testDefaultPath,
+		TextSequenceFileReader reader = new TextSequenceFileReader(getConfiguration(), testDefaultPath,
 				Codecs.BZIP2.getCodecInfo());
 		TestUtils.readDataAndAssert(reader, DATA09ARRAY);
 	}
 
 	@Test
 	public void testWriteReadManyLinesWithNamingAndRollover() throws IOException {
-		TextSequenceFileWriter writer = new TextSequenceFileWriter(testConfig, testDefaultPath, null);
+		TextSequenceFileWriter writer = new TextSequenceFileWriter(getConfiguration(), testDefaultPath, null);
 		writer.setFileNamingStrategy(new RollingFileNamingStrategy());
 		writer.setRolloverStrategy(new SizeRolloverStrategy(150));
 		writer.setIdleTimeout(10000);
 
 		TestUtils.writeData(writer, DATA09ARRAY);
 
-		TextSequenceFileReader reader1 = new TextSequenceFileReader(testConfig, new Path(testDefaultPath, "0"), null);
+		TextSequenceFileReader reader1 = new TextSequenceFileReader(getConfiguration(), new Path(testDefaultPath, "0"), null);
 		List<String> splitData1 = TestUtils.readData(reader1);
 
-		TextSequenceFileReader reader2 = new TextSequenceFileReader(testConfig, new Path(testDefaultPath, "1"), null);
+		TextSequenceFileReader reader2 = new TextSequenceFileReader(getConfiguration(), new Path(testDefaultPath, "1"), null);
 		List<String> splitData2 = TestUtils.readData(reader2);
 
-		TextSequenceFileReader reader3 = new TextSequenceFileReader(testConfig, new Path(testDefaultPath, "2"), null);
+		TextSequenceFileReader reader3 = new TextSequenceFileReader(getConfiguration(), new Path(testDefaultPath, "2"), null);
 		List<String> splitData3 = TestUtils.readData(reader3);
 
 		assertThat(splitData1.size() + splitData2.size() + splitData3.size(), is(DATA09ARRAY.length));

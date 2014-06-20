@@ -37,10 +37,20 @@ import org.springframework.data.hadoop.store.partition.PartitionStrategy;
 import org.springframework.data.hadoop.store.strategy.naming.RollingFileNamingStrategy;
 import org.springframework.data.hadoop.store.strategy.naming.StaticFileNamingStrategy;
 import org.springframework.data.hadoop.store.strategy.rollover.SizeRolloverStrategy;
+import org.springframework.data.hadoop.test.context.HadoopDelegatingSmartContextLoader;
+import org.springframework.data.hadoop.test.context.MiniHadoopCluster;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.test.context.ContextConfiguration;
 
+@ContextConfiguration(loader=HadoopDelegatingSmartContextLoader.class)
+@MiniHadoopCluster
 public class PartitionTextFileWriterTests extends AbstractStoreTests {
+
+	@org.springframework.context.annotation.Configuration
+	static class Config {
+		// just empty to survive without xml configs
+	}
 
 	@Test
 	public void testMapWriteReadTextOneLine() throws IOException {
@@ -55,14 +65,14 @@ public class PartitionTextFileWriterTests extends AbstractStoreTests {
 		String nowYYYYMM = new SimpleDateFormat("yyyy/MM").format(new Date());
 
 		PartitionTextFileWriter<Map<String, Object>> writer =
-				new PartitionTextFileWriter<Map<String, Object>>(testConfig, testDefaultPath, null, strategy);
+				new PartitionTextFileWriter<Map<String, Object>>(getConfiguration(), testDefaultPath, null, strategy);
 		writer.setFileNamingStrategyFactory(new StaticFileNamingStrategy("bar"));
 
 		writer.write(dataArray[0], headers);
 		writer.flush();
 		writer.close();
 
-		TextFileReader reader = new TextFileReader(testConfig, new Path(testDefaultPath, "foo/" + nowYYYYMM + "/0_hash/jee_list/10_range/bar"), null);
+		TextFileReader reader = new TextFileReader(getConfiguration(), new Path(testDefaultPath, "foo/" + nowYYYYMM + "/0_hash/jee_list/10_range/bar"), null);
 		TestUtils.readDataAndAssert(reader, dataArray);
 	}
 
@@ -78,14 +88,14 @@ public class PartitionTextFileWriterTests extends AbstractStoreTests {
 		String nowYYYYMM = new SimpleDateFormat("yyyy/MM").format(new Date());
 
 		PartitionTextFileWriter<Message<?>> writer =
-				new PartitionTextFileWriter<Message<?>>(testConfig, testDefaultPath, null, strategy);
+				new PartitionTextFileWriter<Message<?>>(getConfiguration(), testDefaultPath, null, strategy);
 		writer.setFileNamingStrategyFactory(new StaticFileNamingStrategy("bar"));
 
 		writer.write(dataArray[0], message);
 		writer.flush();
 		writer.close();
 
-		TextFileReader reader = new TextFileReader(testConfig, new Path(testDefaultPath, "foo/" + nowYYYYMM + "/bar"), null);
+		TextFileReader reader = new TextFileReader(getConfiguration(), new Path(testDefaultPath, "foo/" + nowYYYYMM + "/bar"), null);
 		TestUtils.readDataAndAssert(reader, dataArray);
 	}
 
@@ -99,14 +109,14 @@ public class PartitionTextFileWriterTests extends AbstractStoreTests {
 		headers.put("region", "foo");
 
 		PartitionTextFileWriter<Message<?>> writer =
-				new PartitionTextFileWriter<Message<?>>(testConfig, testDefaultPath, null, strategy);
+				new PartitionTextFileWriter<Message<?>>(getConfiguration(), testDefaultPath, null, strategy);
 		writer.setFileNamingStrategyFactory(new StaticFileNamingStrategy("bar"));
 
 		writer.write(dataArray[0], null);
 		writer.flush();
 		writer.close();
 
-		TextFileReader reader = new TextFileReader(testConfig, new Path(testDefaultPath, "bar"), null);
+		TextFileReader reader = new TextFileReader(getConfiguration(), new Path(testDefaultPath, "bar"), null);
 		TestUtils.readDataAndAssert(reader, dataArray);
 	}
 
@@ -117,7 +127,7 @@ public class PartitionTextFileWriterTests extends AbstractStoreTests {
 		MessagePartitionStrategy<String> strategy = new MessagePartitionStrategy<String>(expression);
 
 		PartitionTextFileWriter<Message<?>> writer =
-				new PartitionTextFileWriter<Message<?>>(testConfig, testDefaultPath, null, strategy);
+				new PartitionTextFileWriter<Message<?>>(getConfiguration(), testDefaultPath, null, strategy);
 
 		writer.setFileNamingStrategyFactory(new RollingFileNamingStrategy());
 		writer.setRolloverStrategyFactory(new SizeRolloverStrategy(40));
@@ -133,13 +143,13 @@ public class PartitionTextFileWriterTests extends AbstractStoreTests {
 
 		String nowYYYYMM = new SimpleDateFormat("yyyy/MM").format(new Date());
 
-		TextFileReader reader1 = new TextFileReader(testConfig, new Path(testDefaultPath, "foo/" + nowYYYYMM + "/0"), null);
+		TextFileReader reader1 = new TextFileReader(getConfiguration(), new Path(testDefaultPath, "foo/" + nowYYYYMM + "/0"), null);
 		List<String> splitData1 = TestUtils.readData(reader1);
 
-		TextFileReader reader2 = new TextFileReader(testConfig, new Path(testDefaultPath, "foo/" + nowYYYYMM + "/1"), null);
+		TextFileReader reader2 = new TextFileReader(getConfiguration(), new Path(testDefaultPath, "foo/" + nowYYYYMM + "/1"), null);
 		List<String> splitData2 = TestUtils.readData(reader2);
 
-		TextFileReader reader3 = new TextFileReader(testConfig, new Path(testDefaultPath, "foo/" + nowYYYYMM + "/2"), null);
+		TextFileReader reader3 = new TextFileReader(getConfiguration(), new Path(testDefaultPath, "foo/" + nowYYYYMM + "/2"), null);
 		List<String> splitData3 = TestUtils.readData(reader3);
 
 		assertThat(splitData1.size() + splitData2.size() + splitData3.size(), is(DATA09ARRAY.length));
@@ -152,7 +162,7 @@ public class PartitionTextFileWriterTests extends AbstractStoreTests {
 		String[] dataArray3 = new String[] { "customer3-1", "customer3-2", "customer3-3" };
 		CustomerPartitionStrategy strategy = new CustomerPartitionStrategy();
 		PartitionTextFileWriter<String> writer =
-				new PartitionTextFileWriter<String>(testConfig, testDefaultPath, null, strategy);
+				new PartitionTextFileWriter<String>(getConfiguration(), testDefaultPath, null, strategy);
 
 		writer.write(dataArray1[0], "customer1");
 		writer.write(dataArray1[1], "customer1");
@@ -167,15 +177,15 @@ public class PartitionTextFileWriterTests extends AbstractStoreTests {
 		writer.close();
 
 		// /tmp/TextFilePartitionedWriterTests/default/customer1
-		TextFileReader reader1 = new TextFileReader(testConfig, new Path(testDefaultPath, "customer1"), null);
+		TextFileReader reader1 = new TextFileReader(getConfiguration(), new Path(testDefaultPath, "customer1"), null);
 		TestUtils.readDataAndAssert(reader1, dataArray1);
 
 		// /tmp/TextFilePartitionedWriterTests/default/customer2
-		TextFileReader reader2 = new TextFileReader(testConfig, new Path(testDefaultPath, "customer2"), null);
+		TextFileReader reader2 = new TextFileReader(getConfiguration(), new Path(testDefaultPath, "customer2"), null);
 		TestUtils.readDataAndAssert(reader2, dataArray2);
 
 		// /tmp/TextFilePartitionedWriterTests/default/customer3
-		TextFileReader reader3 = new TextFileReader(testConfig, new Path(testDefaultPath, "customer3"), null);
+		TextFileReader reader3 = new TextFileReader(getConfiguration(), new Path(testDefaultPath, "customer3"), null);
 		TestUtils.readDataAndAssert(reader3, dataArray3);
 	}
 
@@ -186,7 +196,7 @@ public class PartitionTextFileWriterTests extends AbstractStoreTests {
 		String[] dataArray3 = new String[] { "customer3-1", "customer3-2", "customer3-3" };
 		CustomerPartitionStrategy strategy = new CustomerPartitionStrategy();
 		PartitionTextFileWriter<String> writer =
-				new PartitionTextFileWriter<String>(testConfig, testDefaultPath, null, strategy);
+				new PartitionTextFileWriter<String>(getConfiguration(), testDefaultPath, null, strategy);
 
 		writer.write(dataArray1[0]);
 		writer.write(dataArray1[1]);
@@ -201,15 +211,15 @@ public class PartitionTextFileWriterTests extends AbstractStoreTests {
 		writer.close();
 
 		// /tmp/TextFilePartitionedWriterTests/default/customer1
-		TextFileReader reader1 = new TextFileReader(testConfig, new Path(testDefaultPath, "customer1"), null);
+		TextFileReader reader1 = new TextFileReader(getConfiguration(), new Path(testDefaultPath, "customer1"), null);
 		TestUtils.readDataAndAssert(reader1, dataArray1);
 
 		// /tmp/TextFilePartitionedWriterTests/default/customer2
-		TextFileReader reader2 = new TextFileReader(testConfig, new Path(testDefaultPath, "customer2"), null);
+		TextFileReader reader2 = new TextFileReader(getConfiguration(), new Path(testDefaultPath, "customer2"), null);
 		TestUtils.readDataAndAssert(reader2, dataArray2);
 
 		// /tmp/TextFilePartitionedWriterTests/default/customer3
-		TextFileReader reader3 = new TextFileReader(testConfig, new Path(testDefaultPath, "customer3"), null);
+		TextFileReader reader3 = new TextFileReader(getConfiguration(), new Path(testDefaultPath, "customer3"), null);
 		TestUtils.readDataAndAssert(reader3, dataArray3);
 	}
 

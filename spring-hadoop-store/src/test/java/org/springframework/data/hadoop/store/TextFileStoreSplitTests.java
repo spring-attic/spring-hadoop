@@ -29,6 +29,9 @@ import org.springframework.data.hadoop.store.output.TextFileWriter;
 import org.springframework.data.hadoop.store.split.Split;
 import org.springframework.data.hadoop.store.split.Splitter;
 import org.springframework.data.hadoop.store.split.StaticLengthSplitter;
+import org.springframework.data.hadoop.test.context.HadoopDelegatingSmartContextLoader;
+import org.springframework.data.hadoop.test.context.MiniHadoopCluster;
+import org.springframework.test.context.ContextConfiguration;
 
 /**
  * Tests for writing and reading text using text file.
@@ -36,29 +39,36 @@ import org.springframework.data.hadoop.store.split.StaticLengthSplitter;
  * @author Janne Valkealahti
  *
  */
+@ContextConfiguration(loader=HadoopDelegatingSmartContextLoader.class)
+@MiniHadoopCluster
 public class TextFileStoreSplitTests extends AbstractStoreTests {
+
+	@org.springframework.context.annotation.Configuration
+	static class Config {
+		// just empty to survive without xml configs
+	}
 
 	@Test
 	public void testWriteReadSplitTextManyLines() throws IOException {
-		TextFileWriter writer = new TextFileWriter(testConfig, testDefaultPath, null);
+		TextFileWriter writer = new TextFileWriter(getConfiguration(), testDefaultPath, null);
 		TestUtils.writeData(writer, DATA09ARRAY, false);
 		TestUtils.writeData(writer, DATA09ARRAY, false);
 		TestUtils.writeData(writer, DATA09ARRAY, true);
 
-		Splitter splitter = new StaticLengthSplitter(testConfig, 110l);
+		Splitter splitter = new StaticLengthSplitter(getConfiguration(), 110l);
 		List<Split> inputSplits = splitter.getSplits(testDefaultPath);
 		assertNotNull(inputSplits);
 		assertThat(inputSplits.size(), is(3));
 
-		TextFileReader reader1 = new TextFileReader(testConfig, testDefaultPath, null, inputSplits.get(0), null);
+		TextFileReader reader1 = new TextFileReader(getConfiguration(), testDefaultPath, null, inputSplits.get(0), null);
 		List<String> readData1 = TestUtils.readData(reader1);
 		assertNotNull(readData1);
 
-		TextFileReader reader2 = new TextFileReader(testConfig, testDefaultPath, null, inputSplits.get(1), null);
+		TextFileReader reader2 = new TextFileReader(getConfiguration(), testDefaultPath, null, inputSplits.get(1), null);
 		List<String> readData2 = TestUtils.readData(reader2);
 		assertNotNull(readData2);
 
-		TextFileReader reader3 = new TextFileReader(testConfig, testDefaultPath, null, inputSplits.get(2), null);
+		TextFileReader reader3 = new TextFileReader(getConfiguration(), testDefaultPath, null, inputSplits.get(2), null);
 		List<String> readData3 = TestUtils.readData(reader3);
 		assertNotNull(readData3);
 
@@ -67,25 +77,25 @@ public class TextFileStoreSplitTests extends AbstractStoreTests {
 
 	@Test
 	public void testWriteReadBZip2WithSplitSmallData() throws IOException {
-		TextFileWriter writer = new TextFileWriter(testConfig, testDefaultPath, Codecs.BZIP2.getCodecInfo());
+		TextFileWriter writer = new TextFileWriter(getConfiguration(), testDefaultPath, Codecs.BZIP2.getCodecInfo());
 		TestUtils.writeData(writer, DATA09ARRAY, false);
 		TestUtils.writeData(writer, DATA09ARRAY, false);
 		TestUtils.writeData(writer, DATA09ARRAY, true);
 
-		Splitter splitter = new StaticLengthSplitter(testConfig, 30l);
+		Splitter splitter = new StaticLengthSplitter(getConfiguration(), 30l);
 		List<Split> inputSplits = splitter.getSplits(testDefaultPath);
 		assertNotNull(inputSplits);
 		assertThat(inputSplits.size(), is(3));
 
-		TextFileReader reader1 = new TextFileReader(testConfig, testDefaultPath, Codecs.BZIP2.getCodecInfo(), inputSplits.get(0), null);
+		TextFileReader reader1 = new TextFileReader(getConfiguration(), testDefaultPath, Codecs.BZIP2.getCodecInfo(), inputSplits.get(0), null);
 		List<String> readData1 = TestUtils.readData(reader1);
 		assertNotNull(readData1);
 
-		TextFileReader reader2 = new TextFileReader(testConfig, testDefaultPath, Codecs.BZIP2.getCodecInfo(), inputSplits.get(1), null);
+		TextFileReader reader2 = new TextFileReader(getConfiguration(), testDefaultPath, Codecs.BZIP2.getCodecInfo(), inputSplits.get(1), null);
 		List<String> readData2 = TestUtils.readData(reader2);
 		assertNotNull(readData2);
 
-		TextFileReader reader3 = new TextFileReader(testConfig, testDefaultPath, Codecs.BZIP2.getCodecInfo(), inputSplits.get(2), null);
+		TextFileReader reader3 = new TextFileReader(getConfiguration(), testDefaultPath, Codecs.BZIP2.getCodecInfo(), inputSplits.get(2), null);
 		List<String> readData3 = TestUtils.readData(reader3);
 		assertNotNull(readData3);
 
