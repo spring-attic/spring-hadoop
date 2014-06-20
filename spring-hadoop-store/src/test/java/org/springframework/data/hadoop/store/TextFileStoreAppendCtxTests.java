@@ -23,6 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.hadoop.store.input.TextFileReader;
 import org.springframework.data.hadoop.store.output.TextFileWriter;
+import org.springframework.data.hadoop.test.context.HadoopDelegatingSmartContextLoader;
+import org.springframework.data.hadoop.test.context.MiniHadoopCluster;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -39,8 +41,8 @@ import static org.junit.Assert.assertNotNull;
  * @author liu jiong
  *
  */
-@ContextConfiguration
-@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(loader=HadoopDelegatingSmartContextLoader.class)
+@MiniHadoopCluster
 public class TextFileStoreAppendCtxTests extends AbstractStoreTests {
 
 	@Autowired
@@ -53,7 +55,7 @@ public class TextFileStoreAppendCtxTests extends AbstractStoreTests {
 		assertNotNull(writer);
         String[] dataArray = new String[] { DATA10,DATA11 };
         writer.setAppendable(true);
-        TextFileReader reader = new TextFileReader(testConfig, writer.getPath(), null);
+        TextFileReader reader = new TextFileReader(getConfiguration(), writer.getPath(), null);
         String[] strings =null;
         if(writer.getPath().getFileSystem(writer.getConfiguration()).exists(writer.getPath())) {
             List<String> tmpList = TestUtils.readData(reader);
@@ -65,7 +67,7 @@ public class TextFileStoreAppendCtxTests extends AbstractStoreTests {
         }
         writer.resetIdleTimeout();
         Thread.sleep(5000);
-        reader = new TextFileReader(testConfig, writer.getPath(), null);
+        reader = new TextFileReader(getConfiguration(), writer.getPath(), null);
         TestUtils.readDataAndAssert(reader, (String[])ArrayUtils.addAll(strings,dataArray));
 	}
 

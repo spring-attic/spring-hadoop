@@ -14,8 +14,6 @@
 	<task:executor id="taskExecutor" pool-size="2"/>
 	<task:scheduler id="taskScheduler" pool-size="2"/>
 
-	<bean id="hadoopConfiguration" class="org.apache.hadoop.conf.Configuration"/>
-
 	<bean id="storeEventPublisher" class="org.springframework.data.hadoop.store.event.DefaultStoreEventPublisher"/>
 
 	<bean id="loggingListener" class="org.springframework.data.hadoop.store.event.LoggingListener">
@@ -25,7 +23,7 @@
 	<bean id="fileNamingStrategy" class="org.springframework.data.hadoop.store.strategy.naming.RollingFileNamingStrategy"/>
 
     <bean id="tmpdir" class="java.lang.String">
-        <constructor-arg value="hdfs://localhost:8020/"/>
+        <constructor-arg value="/tmp"/>
     </bean>
 
     <bean id="testBasePath" class="org.apache.hadoop.fs.Path">
