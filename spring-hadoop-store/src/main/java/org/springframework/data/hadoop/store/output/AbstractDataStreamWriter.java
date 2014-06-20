@@ -41,109 +41,114 @@ import org.springframework.util.ClassUtils;
  */
 public abstract class AbstractDataStreamWriter extends OutputStoreObjectSupport {
 
-	private final static Log log = LogFactory.getLog(AbstractDataStreamWriter.class);
+    private final static Log log = LogFactory.getLog(AbstractDataStreamWriter.class);
 
-	public final static int DEFAULT_MAX_OPEN_ATTEMPTS = 10;
+    public final static int DEFAULT_MAX_OPEN_ATTEMPTS = 10;
 
-	private int maxOpenAttempts = DEFAULT_MAX_OPEN_ATTEMPTS;
+    private int maxOpenAttempts = DEFAULT_MAX_OPEN_ATTEMPTS;
 
-	/**
-	 * Instantiates a new abstract data stream writer.
-	 *
-	 * @param configuration the hadoop configuration
-	 * @param basePath the hdfs path
-	 * @param codec the compression codec info
-	 */
-	public AbstractDataStreamWriter(Configuration configuration, Path basePath, CodecInfo codec) {
-		super(configuration, basePath, codec);
-	}
+    /**
+     * Instantiates a new abstract data stream writer.
+     *
+     * @param configuration the hadoop configuration
+     * @param basePath the hdfs path
+     * @param codec the compression codec info
+     */
+    public AbstractDataStreamWriter(Configuration configuration, Path basePath, CodecInfo codec) {
+        super(configuration, basePath, codec);
+    }
 
-	/**
-	 * Sets the max open attempts trying to find a suitable
-	 * path for output stream. Only positive values are
-	 * allowed and any attempt to set this to less than 1
-	 * will automatically reset value to exactly 1.
-	 *
-	 * @param maxOpenAttempts the new max open attempts
-	 */
-	public void setMaxOpenAttempts(int maxOpenAttempts) {
-		this.maxOpenAttempts = maxOpenAttempts < 1 ? 1 : maxOpenAttempts;
-	}
+    /**
+     * Sets the max open attempts trying to find a suitable
+     * path for output stream. Only positive values are
+     * allowed and any attempt to set this to less than 1
+     * will automatically reset value to exactly 1.
+     *
+     * @param maxOpenAttempts the new max open attempts
+     */
+    public void setMaxOpenAttempts(int maxOpenAttempts) {
+        this.maxOpenAttempts = maxOpenAttempts < 1 ? 1 : maxOpenAttempts;
+    }
 
-	/**
-	 * Gets the output.
-	 *
-	 * @return the output
-	 * @throws IOException Signals that an I/O exception has occurred.
-	 */
-	protected StreamsHolder<OutputStream> getOutput() throws IOException {
-		StreamsHolder<OutputStream> holder = new StreamsHolder<OutputStream>();
-		FileSystem fs = FileSystem.get(getConfiguration());
+    /**
+     * Gets the output.
+     *
+     * @return the output
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
+    protected StreamsHolder<OutputStream> getOutput() throws IOException {
+        StreamsHolder<OutputStream> holder = new StreamsHolder<OutputStream>();
+        FileSystem fs = FileSystem.get(getConfiguration());
 
-		// Using maxOpenAttempts try to resolve path and open
-		// an output stream and automatically rolling strategies
-		// to find a next candidate. Effectively if maxOpenAttempts
-		// is set to roughly same count as expected number of writers
-		// and strategy init is accurate enough to find a good starting
-		// position for naming, we should always get a next available
-		// path and its stream.
-		Path p = null;
-		FSDataOutputStream wout = null;
-		int openAttempt = 0;
-		do {
-			try {
-				p = getResolvedPath();
-				wout = fs.create(p);
-				break;
-			} catch (Exception e) {
-				getOutputContext().rollStrategies();
-			}
+        // Using maxOpenAttempts try to resolve path and open
+        // an output stream and automatically rolling strategies
+        // to find a next candidate. Effectively if maxOpenAttempts
+        // is set to roughly same count as expected number of writers
+        // and strategy init is accurate enough to find a good starting
+        // position for naming, we should always get a next available
+        // path and its stream.
+        Path p = null;
+        FSDataOutputStream wout = null;
+        int openAttempt = 0;
+        do {
+            try {
+                p = getResolvedPath();
+                if(true==isAppendable()&&p.getFileSystem(getConfiguration()).exists(p)){
+                    wout = fs.append(p);
+                }
+                else {
+                    wout = fs.create(p);
+                }
+                break;
+            } catch (Exception e) {
+                getOutputContext().rollStrategies();
+            }
 
-		} while (++openAttempt < maxOpenAttempts);
+        } while (++openAttempt < maxOpenAttempts);
 
-		if (wout == null) {
-			throw new StoreException("We've reached maxOpenAttempts=" + maxOpenAttempts
-					+ " to find suitable output path. Last path tried was path=[" + p + "]");
-		}
+        if (wout == null) {
+            throw new StoreException("We've reached maxOpenAttempts=" + maxOpenAttempts
+                    + " to find suitable output path. Last path tried was path=[" + p + "]");
+        }
 
-		log.info("Creating output for path " + p);
-		holder.setPath(p);
+        log.info("Creating output for path " + p);
+        holder.setPath(p);
 
-		if (!isCompressed()) {
-			holder.setStream(wout);
-		} else {
-			// TODO: will isCompressed() really guard for npe against getCodec()
-			Class<?> clazz = ClassUtils.resolveClassName(getCodec().getCodecClass(), getClass().getClassLoader());
-			CompressionCodec compressionCodec = (CompressionCodec) ReflectionUtils.newInstance(clazz,
-					getConfiguration());
-			OutputStream out = compressionCodec.createOutputStream(wout);
-			holder.setWrappedStream(wout);
-			holder.setStream(out);
-		}
-		return holder;
-	}
+        if (!isCompressed()) {
+            holder.setStream(wout);
+        } else {
+            // TODO: will isCompressed() really guard for npe against getCodec()
+            Class<?> clazz = ClassUtils.resolveClassName(getCodec().getCodecClass(), getClass().getClassLoader());
+            CompressionCodec compressionCodec = (CompressionCodec) ReflectionUtils.newInstance(clazz,
+                    getConfiguration());
+            OutputStream out = compressionCodec.createOutputStream(wout);
+            holder.setWrappedStream(wout);
+            holder.setStream(out);
+        }
+        return holder;
+    }
 
-	/**
-	 * Gets the current stream writing position.
-	 *
-	 * @param holder the holder for output streams
-	 * @return the position
-	 * @throws IOException Signals that an I/O exception has occurred.
-	 */
-	protected long getPosition(StreamsHolder<OutputStream> holder) throws IOException {
-		if (holder != null) {
-			OutputStream out = holder.getStream();
-			OutputStream wout = holder.getWrappedStream();
-			if (out instanceof FSDataOutputStream) {
-				return ((FSDataOutputStream) out).getPos();
-			} else if (wout instanceof FSDataOutputStream) {
-				return ((FSDataOutputStream) wout).getPos();
-			} else {
-				return -1;
-			}
-		} else {
-			return -1;
-		}
-	}
+    /**
+     * Gets the current stream writing position.
+     *
+     * @param holder the holder for output streams
+     * @return the position
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
+    protected long getPosition(StreamsHolder<OutputStream> holder) throws IOException {
+        if (holder != null) {
+            OutputStream out = holder.getStream();
+            OutputStream wout = holder.getWrappedStream();
+            if (out instanceof FSDataOutputStream) {
+                return ((FSDataOutputStream) out).getPos();
+            } else if (wout instanceof FSDataOutputStream) {
+                return ((FSDataOutputStream) wout).getPos();
+            } else {
+                return -1;
+            }
+        } else {
+            return -1;
+        }
+    }
 
 }

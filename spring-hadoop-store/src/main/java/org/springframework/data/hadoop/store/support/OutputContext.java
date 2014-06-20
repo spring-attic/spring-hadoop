@@ -30,115 +30,117 @@ import org.springframework.data.hadoop.store.strategy.rollover.RolloverStrategy;
  */
 public class OutputContext {
 
-	private final static Log log = LogFactory.getLog(OutputContext.class);
+    private final static Log log = LogFactory.getLog(OutputContext.class);
 
-	private FileNamingStrategy fileNamingStrategy;
+    private FileNamingStrategy fileNamingStrategy;
 
-	private RolloverStrategy rolloverStrategy;
+    private RolloverStrategy rolloverStrategy;
 
-	/**
-	 * Instantiates a new strategy context.
-	 */
-	public OutputContext() {}
 
-	/**
-	 * Sets the write position.
-	 *
-	 * @param position the new write position
-	 */
-	public void setWritePosition(long position) {
-		if (rolloverStrategy != null) {
-			rolloverStrategy.setWritePosition(position);
-		}
-	}
+    /**
+     * Instantiates a new strategy context.
+     */
+    public OutputContext() {}
 
-	/**
-	 * Gets the rollover state.
-	 *
-	 * @return the rollover state
-	 */
-	public boolean getRolloverState() {
-		if (rolloverStrategy != null) {
-			return rolloverStrategy.hasRolled();
-		} else {
-			return false;
-		}
-	}
+    /**
+     * Sets the write position.
+     *
+     * @param position the new write position
+     */
+    public void setWritePosition(long position) {
+        if (rolloverStrategy != null) {
+            rolloverStrategy.setWritePosition(position);
+        }
+    }
 
-	/**
-	 * Roll strategies.
-	 */
-	public void rollStrategies() {
-		if (rolloverStrategy != null) {
-			rolloverStrategy.reset();
-		}
-		if (fileNamingStrategy != null) {
-			fileNamingStrategy.next();
-		}
-	}
+    /**
+     * Gets the rollover state.
+     *
+     * @return the rollover state
+     */
+    public boolean getRolloverState() {
+        if (rolloverStrategy != null) {
+            return rolloverStrategy.hasRolled();
+        } else {
+            return false;
+        }
+    }
 
-	/**
-	 * Resolve path.
-	 *
-	 * @param path the path
-	 * @return the path
-	 */
-	public Path resolvePath(Path path) {
-		// start by passing null indicating we're starting with
-		// empty path. paths are then appended and we combine
-		// returned path with base path given to this method.
-		Path p =  fileNamingStrategy != null ? fileNamingStrategy.resolve(null) : null;
-		return p != null ? new Path(path, p) : path;
-	}
+    /**
+     * Roll strategies.
+     */
+    public void rollStrategies() {
+        if (rolloverStrategy != null) {
+            rolloverStrategy.reset();
+        }
+        if (fileNamingStrategy != null) {
+            fileNamingStrategy.next();
+        }
+    }
 
-	/**
-	 * Inits the context from a {@link Path}
-	 *
-	 * @param path the path
-	 * @return the path
-	 */
-	public Path init(Path path) {
-		log.info("Init from path=" + path);
-		if (fileNamingStrategy != null) {
-			Path p = fileNamingStrategy.init(path);
-			if (p != null) {
-				fileNamingStrategy.reset();
-			}
-			return p;
-		}
-		return null;
-	}
+    /**
+     * Resolve path.
+     *
+     * @param path the path
+     * @return the path
+     */
+    public Path resolvePath(Path path) {
+        // start by passing null indicating we're starting with
+        // empty path. paths are then appended and we combine
+        // returned path with base path given to this method.
+        Path p =  fileNamingStrategy != null ? fileNamingStrategy.resolve(null) : null;
+        return p != null ? new Path(path, p) : path;
+    }
 
-	/**
-	 * Sets the codec info.
-	 *
-	 * @param codecInfo the new codec info
-	 */
-	public void setCodecInfo(CodecInfo codecInfo) {
-		log.info("Setting codecInfo=" + codecInfo);
-		if (fileNamingStrategy != null) {
-			fileNamingStrategy.setCodecInfo(codecInfo);
-		}
-	}
+    /**
+     * Inits the context from a {@link Path}
+     *
+     * @param path the path
+     * @return the path
+     */
+    public Path init(Path path) {
+        log.info("Init from path=" + path);
+        if (fileNamingStrategy != null) {
+            Path p = fileNamingStrategy.init(path);
+            if (p != null) {
+                fileNamingStrategy.reset();
+            }
+            return p;
+        }
+        return null;
+    }
 
-	/**
-	 * Sets the file naming strategy.
-	 *
-	 * @param fileNamingStrategy the new file naming strategy
-	 */
-	public void setFileNamingStrategy(FileNamingStrategy fileNamingStrategy) {
-		log.info("Setting fileNamingStrategy=" + fileNamingStrategy);
-		this.fileNamingStrategy = fileNamingStrategy;
-	}
+    /**
+     * Sets the codec info.
+     *
+     * @param codecInfo the new codec info
+     */
+    public void setCodecInfo(CodecInfo codecInfo) {
+        log.info("Setting codecInfo=" + codecInfo);
+        if (fileNamingStrategy != null) {
+            fileNamingStrategy.setCodecInfo(codecInfo);
+        }
+    }
 
-	/**
-	 * Sets the rollover strategy.
-	 *
-	 * @param rolloverStrategy the new rollover strategy
-	 */
-	public void setRolloverStrategy(RolloverStrategy rolloverStrategy) {
-		log.info("Setting rolloverStrategy=" + rolloverStrategy);
-		this.rolloverStrategy = rolloverStrategy;
-	}
+    /**
+     * Sets the file naming strategy.
+     *
+     * @param fileNamingStrategy the new file naming strategy
+     */
+    public void setFileNamingStrategy(FileNamingStrategy fileNamingStrategy) {
+        log.info("Setting fileNamingStrategy=" + fileNamingStrategy);
+        this.fileNamingStrategy = fileNamingStrategy;
+    }
+
+    /**
+     * Sets the rollover strategy.
+     *
+     * @param rolloverStrategy the new rollover strategy
+     */
+    public void setRolloverStrategy(RolloverStrategy rolloverStrategy) {
+        log.info("Setting rolloverStrategy=" + rolloverStrategy);
+        this.rolloverStrategy = rolloverStrategy;
+    }
+
 
 }
