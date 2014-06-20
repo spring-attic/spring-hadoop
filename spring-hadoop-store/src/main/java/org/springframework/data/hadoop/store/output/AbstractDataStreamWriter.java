@@ -33,8 +33,8 @@ import org.springframework.data.hadoop.store.support.StreamsHolder;
 import org.springframework.util.ClassUtils;
 
 /**
- * A {@code AbstractDataStreamWriter} is a base implementation handling
- * streams with a raw hdfs files.
+ * A {@code AbstractDataStreamWriter} is a base implementation handling streams
+ * with a raw hdfs files.
  *
  * @author Janne Valkealahti
  *
@@ -59,10 +59,9 @@ public abstract class AbstractDataStreamWriter extends OutputStoreObjectSupport 
 	}
 
 	/**
-	 * Sets the max open attempts trying to find a suitable
-	 * path for output stream. Only positive values are
-	 * allowed and any attempt to set this to less than 1
-	 * will automatically reset value to exactly 1.
+	 * Sets the max open attempts trying to find a suitable path for output
+	 * stream. Only positive values are allowed and any attempt to set this to
+	 * less than 1 will automatically reset value to exactly 1.
 	 *
 	 * @param maxOpenAttempts the new max open attempts
 	 */
@@ -93,7 +92,11 @@ public abstract class AbstractDataStreamWriter extends OutputStoreObjectSupport 
 		do {
 			try {
 				p = getResolvedPath();
-				wout = fs.create(p);
+				if (isAppendable() && p.getFileSystem(getConfiguration()).exists(p)) {
+					wout = fs.append(p);
+				} else {
+					wout = fs.create(p);
+				}
 				break;
 			} catch (Exception e) {
 				getOutputContext().rollStrategies();

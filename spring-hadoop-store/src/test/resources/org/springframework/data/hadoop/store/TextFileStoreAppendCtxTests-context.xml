@@ -22,18 +22,17 @@
 
 	<bean id="fileNamingStrategy" class="org.springframework.data.hadoop.store.strategy.naming.RollingFileNamingStrategy"/>
 
-	<bean id="testBasePath" class="org.apache.hadoop.fs.Path">
-		<constructor-arg value="/tmp"/>
-		<constructor-arg value="TextFileStoreCtxTests/default"/>
-	</bean>
+    <bean id="testBasePath" class="org.apache.hadoop.fs.Path">
+        <constructor-arg value="/tmp"/>
+        <constructor-arg value="TextFileStoreAppendCtxTests"/>
+    </bean>
 
 	<bean id="writer" class="org.springframework.data.hadoop.store.output.TextFileWriter">
 		<constructor-arg ref="hadoopConfiguration"/>
 		<constructor-arg ref="testBasePath"/>
 		<constructor-arg><null/></constructor-arg>
-		<property name="idleTimeout" value="1000"/>
-		<property name="fileNamingStrategy" ref="fileNamingStrategy"/>
-		<property name="inWritingSuffix" value=".tmp"/>
+		<property name="idleTimeout" value="1"/>
+
 	</bean>
 
 </beans>

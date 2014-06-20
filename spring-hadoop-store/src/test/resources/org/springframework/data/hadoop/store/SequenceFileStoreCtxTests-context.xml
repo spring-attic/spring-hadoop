@@ -22,12 +22,8 @@
 
 	<bean id="fileNamingStrategy" class="org.springframework.data.hadoop.store.strategy.naming.RollingFileNamingStrategy"/>
 
-	<bean id="tmpdir" class="java.lang.String">
-		<constructor-arg value="/tmp"/>
-	</bean>
-
 	<bean id="testBasePath" class="org.apache.hadoop.fs.Path">
-		<constructor-arg ref="tmpdir"/>
+		<constructor-arg value="/tmp"/>
 		<constructor-arg value="SequenceFileStoreCtxTests/default"/>
 	</bean>
 

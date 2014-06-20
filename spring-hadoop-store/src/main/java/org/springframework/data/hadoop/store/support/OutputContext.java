@@ -39,7 +39,8 @@ public class OutputContext {
 	/**
 	 * Instantiates a new strategy context.
 	 */
-	public OutputContext() {}
+	public OutputContext() {
+	}
 
 	/**
 	 * Sets the write position.
@@ -87,7 +88,7 @@ public class OutputContext {
 		// start by passing null indicating we're starting with
 		// empty path. paths are then appended and we combine
 		// returned path with base path given to this method.
-		Path p =  fileNamingStrategy != null ? fileNamingStrategy.resolve(null) : null;
+		Path p = fileNamingStrategy != null ? fileNamingStrategy.resolve(null) : null;
 		return p != null ? new Path(path, p) : path;
 	}
 

@@ -58,7 +58,12 @@ public class TextSequenceFileWriter extends AbstractSequenceFileWriter implement
 
 	@Override
 	public void flush() throws IOException {
+    	// nothing to do
 	}
+
+    public synchronized  void hflush() throws IOException {
+    	// nothing to do
+    }
 
 	@Override
 	public synchronized void close() throws IOException {
@@ -96,12 +101,18 @@ public class TextSequenceFileWriter extends AbstractSequenceFileWriter implement
 
 	@Override
 	protected void handleIdleTimeout() {
-		log.info("Idle timeout detected for this writer, closing stream");
-		try {
-			close();
-		} catch (IOException e) {
-			log.error("error closing", e);
-		}
+        try {
+            if(isAppendable()){
+                log.info("Idle timeout detected for this writer, flushing stream");
+                hflush();
+            }
+            else{
+                log.info("Idle timeout detected for this writer, closing stream");
+                close();
+            }
+        } catch (IOException e) {
+            log.error("error closing", e);
+        }
 		getOutputContext().rollStrategies();
 	}
 

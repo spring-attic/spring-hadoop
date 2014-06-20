@@ -22,6 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.Syncable;
 import org.springframework.data.hadoop.store.DataStoreWriter;
 import org.springframework.data.hadoop.store.codec.CodecInfo;
 import org.springframework.data.hadoop.store.event.FileWrittenEvent;
@@ -60,6 +61,12 @@ public class OutputStreamWriter extends AbstractDataStreamWriter implements Data
 		}
 	}
 
+    public synchronized  void hflush() throws IOException {
+        if (streamsHolder != null) {
+            ((Syncable)streamsHolder.getStream()).hflush();
+        }
+    }
+
 	@Override
 	public synchronized void close() throws IOException {
 		if (streamsHolder != null) {
@@ -97,9 +104,14 @@ public class OutputStreamWriter extends AbstractDataStreamWriter implements Data
 
 	@Override
 	protected void handleIdleTimeout() {
-		log.info("Idle timeout detected for this writer, closing stream");
 		try {
-			close();
+			if (isAppendable()) {
+				log.info("Idle timeout detected for this writer, flushing stream");
+				hflush();
+			} else {
+				log.info("Idle timeout detected for this writer, closing stream");
+				close();
+			}
 		} catch (IOException e) {
 			log.error("error closing", e);
 		}

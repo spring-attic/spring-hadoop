@@ -253,3 +253,4 @@ public class TextFileStoreTests extends AbstractStoreTests {
 	}
 
 }
+
