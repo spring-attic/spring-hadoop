@@ -52,10 +52,11 @@ public class SequenceFileStoreCtxTests extends AbstractStoreTests {
 		assertNotNull(writer);
 
 		TestUtils.writeData(writer, new String[] { DATA10 }, false);
-		Thread.sleep(2000);
+		Thread.sleep(3000);
 		TestUtils.writeData(writer, new String[] { DATA11 }, false);
-		Thread.sleep(2000);
+		Thread.sleep(3000);
 		TestUtils.writeData(writer, new String[] { DATA12 }, true);
+		Thread.sleep(3000);
 
 		TextSequenceFileReader reader1 = new TextSequenceFileReader(getConfiguration(), new Path(testDefaultPath, "0"), null);
 		List<String> splitData1 = TestUtils.readData(reader1);

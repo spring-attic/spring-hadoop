@@ -23,7 +23,7 @@
 	<bean id="fileNamingStrategy" class="org.springframework.data.hadoop.store.strategy.naming.RollingFileNamingStrategy"/>
 
 	<bean id="tmpdir" class="java.lang.String">
-		<constructor-arg value="#{systemProperties['java.io.tmpdir']}"/>
+		<constructor-arg value="/tmp"/>
 	</bean>
 
 	<bean id="testBasePath" class="org.apache.hadoop.fs.Path">
