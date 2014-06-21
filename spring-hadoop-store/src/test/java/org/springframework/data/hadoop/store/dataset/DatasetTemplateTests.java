@@ -21,26 +21,30 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kitesdk.data.DatasetDescriptor;
+import org.springframework.data.hadoop.test.context.HadoopDelegatingSmartContextLoader;
+import org.springframework.data.hadoop.test.context.MiniHadoopCluster;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
 import org.kitesdk.data.DatasetRepository;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+@ContextConfiguration(loader=HadoopDelegatingSmartContextLoader.class)
+@MiniHadoopCluster
 public class DatasetTemplateTests extends AbstractDatasetTemplateTests {
 
 	@Before
@@ -86,7 +90,7 @@ public class DatasetTemplateTests extends AbstractDatasetTemplateTests {
 	}
 
 	@Test
-	public void testSaveAndReadMultiplePojoClasses() {
+	public void testSaveAndReadMultiplePojoClasses() throws IOException {
 		List<AnotherPojo> others = new ArrayList<AnotherPojo>();
 		AnotherPojo other1 = new AnotherPojo();
 		other1.setId(111L);
@@ -102,14 +106,16 @@ public class DatasetTemplateTests extends AbstractDatasetTemplateTests {
 		others.add(other3);
 		datasetOperations.write(others);
 		datasetOperations.write(records);
+
+		FileSystem fs = FileSystem.get(getConfiguration());
 		assertTrue("Dataset storage created for AnotherPojo",
-				new File(path + "/" + datasetOperations.getDatasetName(AnotherPojo.class)).exists());
+				fs.exists(new Path(path + "/" + datasetOperations.getDatasetName(AnotherPojo.class))));
 		assertTrue("Dataset metadata created for AnotherPojo",
-				new File(path + "/" + datasetOperations.getDatasetName(AnotherPojo.class) + "/.metadata").exists());
+				fs.exists(new Path(path + "/" + datasetOperations.getDatasetName(AnotherPojo.class) + "/.metadata")));
 		assertTrue("Dataset storage created for TestPojo",
-				new File(path + "/" + datasetOperations.getDatasetName(TestPojo.class)).exists());
+				fs.exists(new Path(path + "/" + datasetOperations.getDatasetName(TestPojo.class))));
 		assertTrue("Dataset metadata created for TestPojo",
-				new File(path + "/" + datasetOperations.getDatasetName(TestPojo.class) + "/.metadata").exists());
+				fs.exists(new Path(path + "/" + datasetOperations.getDatasetName(TestPojo.class) + "/.metadata")));
 		Collection<AnotherPojo> otherPojos = datasetOperations.read(AnotherPojo.class);
 		assertEquals(3, otherPojos.size());
 		List<AnotherPojo> sorted = new ArrayList<AnotherPojo>(otherPojos);

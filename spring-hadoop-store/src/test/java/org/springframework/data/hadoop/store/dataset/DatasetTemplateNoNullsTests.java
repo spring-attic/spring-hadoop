@@ -21,6 +21,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kitesdk.data.DatasetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.hadoop.test.context.HadoopDelegatingSmartContextLoader;
+import org.springframework.data.hadoop.test.context.MiniHadoopCluster;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -29,8 +31,9 @@ import java.util.Collections;
 import java.util.Date;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"DatasetTemplateTests-context.xml"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+@ContextConfiguration(loader=HadoopDelegatingSmartContextLoader.class, locations={"DatasetTemplateTests-context.xml"})
+@MiniHadoopCluster
 public class DatasetTemplateNoNullsTests extends AbstractDatasetTemplateTests {
 
 	@Autowired

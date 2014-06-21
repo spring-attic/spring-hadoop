@@ -1,9 +1,12 @@
 package org.springframework.data.hadoop.store.dataset;
 
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.hadoop.test.junit.AbstractHadoopClusterTests;
 
-import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -13,7 +16,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public abstract class AbstractDatasetTemplateTests {
+public abstract class AbstractDatasetTemplateTests extends AbstractHadoopClusterTests {
 
 	protected DatasetOperations datasetOperations;
 	protected List<Object> records = new ArrayList<Object>();
@@ -26,13 +29,14 @@ public abstract class AbstractDatasetTemplateTests {
 	}
 
 	@Test
-	public void testSavePojo() {
+	public void testSavePojo() throws IOException {
 		datasetOperations.write(records);
-		assertTrue("Dataset path created", new File(path).exists());
+		FileSystem fs = FileSystem.get(getConfiguration());
+		assertTrue("Dataset path created", fs.exists(new Path(path)));
 		assertTrue("Dataset storage created",
-				new File(path + "/" + datasetOperations.getDatasetName(TestPojo.class)).exists());
+				fs.exists(new Path(path + "/" + datasetOperations.getDatasetName(TestPojo.class))));
 		assertTrue("Dataset metadata created",
-				new File(path + "/" + datasetOperations.getDatasetName(TestPojo.class) + "/.metadata").exists());
+				fs.exists(new Path(path + "/" + datasetOperations.getDatasetName(TestPojo.class) + "/.metadata")));
 	}
 
 	@Test

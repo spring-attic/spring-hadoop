@@ -16,17 +16,21 @@
 
 package org.springframework.data.hadoop.store.dataset;
 
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.hadoop.test.context.HadoopDelegatingSmartContextLoader;
+import org.springframework.data.hadoop.test.context.MiniHadoopCluster;
+import org.springframework.data.hadoop.test.junit.AbstractHadoopClusterTests;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,8 +42,9 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-@ContextConfiguration({"/org/springframework/data/hadoop/store/dataset/DatasetStoreWriterTests-context.xml"})
-public abstract class AbstractDatasetStoreWriterTests<T extends Comparable<T>> {
+@ContextConfiguration(loader=HadoopDelegatingSmartContextLoader.class, locations={"/org/springframework/data/hadoop/store/dataset/DatasetStoreWriterTests-context.xml"})
+@MiniHadoopCluster
+public abstract class AbstractDatasetStoreWriterTests<T extends Comparable<T>> extends AbstractHadoopClusterTests {
 
 	protected DatasetOperations datasetOperations;
 	protected AbstractDatasetStoreWriter<T> datasetStoreWriter;
@@ -61,11 +66,13 @@ public abstract class AbstractDatasetStoreWriterTests<T extends Comparable<T>> {
 		}
 		datasetStoreWriter.flush();
 		datasetStoreWriter.close();
-		assertTrue("Dataset path created", new File(path).exists());
+
+		FileSystem fs = FileSystem.get(getConfiguration());
+		assertTrue("Dataset path created", fs.exists(new Path(path)));
 		assertTrue("Dataset storage created",
-				new File(path + "/" + DatasetUtils.getDatasetName(recordClass)).exists());
+				fs.exists(new Path(path + "/" + DatasetUtils.getDatasetName(recordClass))));
 		assertTrue("Dataset metadata created",
-				new File(path + "/" + DatasetUtils.getDatasetName(recordClass) + "/.metadata").exists());
+				fs.exists(new Path(path + "/" + DatasetUtils.getDatasetName(recordClass) + "/.metadata")));
 		Collection<T> results = datasetOperations.read(recordClass);
 		assertEquals(2, results.size());
 		List<T> sorted = new ArrayList<T>(results);

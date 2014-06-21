@@ -16,16 +16,21 @@
 
 package org.springframework.data.hadoop.store.dataset;
 
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kitesdk.data.DatasetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.hadoop.test.context.HadoopDelegatingSmartContextLoader;
+import org.springframework.data.hadoop.test.context.MiniHadoopCluster;
+import org.springframework.data.hadoop.test.junit.AbstractHadoopClusterTests;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -38,9 +43,10 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"DatasetTemplateTests-context.xml"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-public class DatasetTemplateParquetTests {
+@ContextConfiguration(loader=HadoopDelegatingSmartContextLoader.class, locations={"DatasetTemplateTests-context.xml"})
+@MiniHadoopCluster
+public class DatasetTemplateParquetTests extends AbstractHadoopClusterTests {
 
 	protected DatasetOperations datasetOperations;
 	protected List<Object> records = new ArrayList<Object>();
@@ -76,13 +82,15 @@ public class DatasetTemplateParquetTests {
 	}
 
 	@Test
-	public void testSavePojo() {
+	public void testSavePojo() throws IOException {
 		datasetOperations.write(records);
-		assertTrue("Dataset path created", new File(path).exists());
+
+		FileSystem fs = FileSystem.get(getConfiguration());
+		assertTrue("Dataset path created", fs.exists(new Path(path)));
 		assertTrue("Dataset storage created",
-				new File(path + "/" + datasetOperations.getDatasetName(SimplePojo.class)).exists());
+				fs.exists(new Path(path + "/" + datasetOperations.getDatasetName(SimplePojo.class))));
 		assertTrue("Dataset metadata created",
-				new File(path + "/" + datasetOperations.getDatasetName(SimplePojo.class) + "/.metadata").exists());
+				fs.exists(new Path(path + "/" + datasetOperations.getDatasetName(SimplePojo.class) + "/.metadata")));
 		Collection<SimplePojo> results = datasetOperations.read(SimplePojo.class);
 		assertEquals(2, results.size());
 		List<SimplePojo> sorted = new ArrayList<SimplePojo>(results);
