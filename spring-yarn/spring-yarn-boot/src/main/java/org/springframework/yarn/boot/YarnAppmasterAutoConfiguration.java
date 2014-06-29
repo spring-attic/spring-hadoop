@@ -133,6 +133,7 @@ public class YarnAppmasterAutoConfiguration {
 			AppmasterLauncherRunner runner = new AppmasterLauncherRunner();
 			runner.setWaitLatch(syap.isKeepContextAlive());
 			runner.setContainerCount(syap.getContainerCount());
+			runner.setContainerMemory(syap.getContainerMemory());
 			return runner;
 		}
 	}

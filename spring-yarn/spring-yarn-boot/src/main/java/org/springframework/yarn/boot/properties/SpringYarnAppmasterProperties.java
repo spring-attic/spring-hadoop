@@ -14,6 +14,15 @@ public class SpringYarnAppmasterProperties {
 
 	private boolean keepContextAlive = true;
 	private int containerCount = 1;
+	private int containerMemory = 512;
+	public int getContainerMemory() {
+		return containerMemory;
+	}
+
+	public void setContainerMemory(int containerMemory) {
+		this.containerMemory = containerMemory;
+	}
+
 	private String appmasterClass;
 
 	public String getAppmasterClass() {

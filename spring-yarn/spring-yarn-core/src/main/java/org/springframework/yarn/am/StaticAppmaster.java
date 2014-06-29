@@ -49,6 +49,7 @@ public class StaticAppmaster extends AbstractProcessingAppmaster implements Yarn
 		containerCount = Integer.parseInt(getParameters().getProperty(AppmasterConstants.CONTAINER_COUNT, "1"));
 		log.info("count: " + containerCount);
 		getAllocator().allocateContainers(containerCount);
+		getAllocator().allocateContainerMemory(memory);
 	}
 
 	@Override
