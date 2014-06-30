@@ -25,5 +25,5 @@ public class AppmasterConstants {
 
 	/** Constant used to indicate number of container launched */
 	public final static String CONTAINER_COUNT = "container-count";
-
+	public final static String CONTAINER_MEMORY = "container-memory";
 }

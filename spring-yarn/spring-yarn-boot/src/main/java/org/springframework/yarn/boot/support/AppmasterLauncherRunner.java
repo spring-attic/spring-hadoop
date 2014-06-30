@@ -38,6 +38,7 @@ public class AppmasterLauncherRunner extends CommandLineRunnerSupport implements
 	private static final Log log = LogFactory.getLog(AppmasterLauncherRunner.class);
 
 	private int containerCount = 1;
+	private int containerMemory=512;
 
 	@Autowired(required = false)
 	private YarnAppmaster yarnAppmaster;
@@ -62,6 +63,10 @@ public class AppmasterLauncherRunner extends CommandLineRunnerSupport implements
 		if (!properties.containsKey(AppmasterConstants.CONTAINER_COUNT)) {
 			log.info("Setting container count set externally " + containerCount);
 			properties.put(AppmasterConstants.CONTAINER_COUNT, Integer.toString(containerCount));
+		}
+		if (!properties.containsKey(AppmasterConstants.CONTAINER_MEMORY)) {
+			log.info("Setting container memory set externally " + containerMemory);
+			properties.put(AppmasterConstants.CONTAINER_MEMORY, Integer.toString(containerMemory));
 		}
 		appmaster.setParameters(properties);
 		appmaster.setEnvironment(System.getenv());
@@ -89,6 +94,10 @@ public class AppmasterLauncherRunner extends CommandLineRunnerSupport implements
 			waitLatch();
 			log.info("YarnAppmaster complete");
 		}
+	}
+
+	public void setContainerMemory(int containerMemory) {
+		this.containerMemory = containerMemory;
 	}
 
 }

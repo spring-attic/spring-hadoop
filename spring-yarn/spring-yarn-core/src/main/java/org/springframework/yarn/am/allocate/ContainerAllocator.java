@@ -70,5 +70,11 @@ public interface ContainerAllocator {
 	 * @param progress the current progress of application
 	 */
 	void setProgress(float progress);
+	/**
+	 * Allocate container memory.
+	 *
+	 * @param count the new container memory to allocate
+	 */
+	void allocateContainerMemory(int num);
 
 }
