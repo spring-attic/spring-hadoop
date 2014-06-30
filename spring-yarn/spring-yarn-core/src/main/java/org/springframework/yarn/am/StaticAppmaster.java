@@ -37,6 +37,9 @@ public class StaticAppmaster extends AbstractProcessingAppmaster implements Yarn
 
 	/** Static count of containers to run */
 	private int containerCount;
+	/** memory of containers */
+	private int containerMemory;
+	
 
 	@Override
 	public void submitApplication() {
@@ -47,9 +50,10 @@ public class StaticAppmaster extends AbstractProcessingAppmaster implements Yarn
 			((AbstractAllocator)getAllocator()).setApplicationAttemptId(getApplicationAttemptId());
 		}
 		containerCount = Integer.parseInt(getParameters().getProperty(AppmasterConstants.CONTAINER_COUNT, "1"));
+		containerMemory = Integer.parseInt(getParameters().getProperty(AppmasterConstants.CONTAINER_MEMORY, "512"));
 		log.info("count: " + containerCount);
 		getAllocator().allocateContainers(containerCount);
-		getAllocator().allocateContainerMemory(memory);
+		getAllocator().allocateContainerMemory(containerMemory);
 	}
 
 	@Override

@@ -348,4 +348,11 @@ public class DefaultContainerAllocator extends AbstractPollingAllocator implemen
         return request;
     }
 
+	@Override
+	public void allocateContainerMemory(int num) {
+		memory=num;
+	}
+
+
+
 }

@@ -54,7 +54,8 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 	private String fsUri;
 	private String jtUri;
 	private String rmUri;
-
+	
+	
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		internalConfig = createConfiguration(configuration);
