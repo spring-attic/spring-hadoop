@@ -17,10 +17,12 @@ package org.springframework.data.hadoop.store;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.instanceOf;
 
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.junit.Test;
 import org.springframework.data.hadoop.store.codec.Codecs;
@@ -250,6 +252,53 @@ public class TextFileStoreTests extends AbstractStoreTests {
 		List<String> splitData3 = TestUtils.readData(reader3);
 
 		assertThat(splitData1.size() + splitData2.size() + splitData3.size(), is(3));
+	}
+
+	@Test
+	public void testHdfsAvailableAfterWriterInits() throws Exception {
+		Configuration failConfiguration = new Configuration();
+		failConfiguration.set("fs.defaultFS", "hdfs://localhost:12345");
+		String[] dataArray = new String[] { DATA10 };
+
+		// use configuration which would not work for hdfs
+		TextFileWriter writer = new TextFileWriter(failConfiguration, testDefaultPath, null);
+		writer.afterPropertiesSet();
+		writer.start();
+
+		// restore configuration after writer lifecycle has been started
+		TestUtils.setField("configuration", writer, getConfiguration());
+		TestUtils.writeData(writer, dataArray);
+
+		TextFileReader reader = new TextFileReader(getConfiguration(), testDefaultPath, null);
+		TestUtils.readDataAndAssert(reader, dataArray);
+	}
+
+	@Test
+	public void testHdfsAvailableAfterWriterInitsSeeWriteException() throws Exception {
+		Configuration failConfiguration = new Configuration();
+		failConfiguration.set("fs.defaultFS", "hdfs://localhost:12345");
+		String[] dataArray = new String[] { DATA10 };
+
+		// use configuration which would not work for hdfs
+		TextFileWriter writer = new TextFileWriter(failConfiguration, testDefaultPath, null);
+		writer.afterPropertiesSet();
+		writer.start();
+
+		// test write exception before we switch configuration
+		Exception e = null;
+		try {
+			TestUtils.writeData(writer, dataArray, false);
+		} catch (Exception ee) {
+			e = ee;
+		}
+		assertThat(e, instanceOf(StoreException.class));
+
+		// restore configuration after writer lifecycle has been started
+		TestUtils.setField("configuration", writer, getConfiguration());
+		TestUtils.writeData(writer, dataArray);
+
+		TextFileReader reader = new TextFileReader(getConfiguration(), testDefaultPath, null);
+		TestUtils.readDataAndAssert(reader, dataArray);
 	}
 
 }

@@ -45,6 +45,9 @@ public abstract class OutputStoreObjectSupport extends StoreObjectSupport {
 	/** Context holder for strategies */
 	private OutputContext outputContext;
 
+	/** Internal flag for initOutputContext */
+	private boolean internalInitDone;
+
 	/** Used in-writing suffix if any */
 	private String suffix;
 
@@ -73,10 +76,17 @@ public abstract class OutputStoreObjectSupport extends StoreObjectSupport {
 	@Override
 	protected void onInit() throws Exception {
 		super.onInit();
-		initOutputContext();
+		try {
+			initOutputContext();
+		} catch (Exception e) {
+			// silently fail and try again later
+		}
 	}
 
-	protected void initOutputContext() throws Exception {
+	synchronized protected void initOutputContext() throws Exception {
+		if (internalInitDone) {
+			return;
+		}
 		for (FileStatus status : findInitFiles(getPath())) {
 			String name = status.getPath().getName();
 			if (StringUtils.hasText(prefix) && name.startsWith(prefix)) {
@@ -90,6 +100,7 @@ public abstract class OutputStoreObjectSupport extends StoreObjectSupport {
 				break;
 			}
 		}
+		internalInitDone = true;
 	}
 
 	protected FileStatus[] findInitFiles(Path basePath) throws Exception {
@@ -114,6 +125,13 @@ public abstract class OutputStoreObjectSupport extends StoreObjectSupport {
 	 * @return the strategy context
 	 */
 	public OutputContext getOutputContext() {
+		if (!internalInitDone) {
+			try {
+				initOutputContext();
+			} catch (Exception e) {
+				throw new StoreException("Store output context not yet initialized", e);
+			}
+		}
 		return outputContext;
 	}
 
