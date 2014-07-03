@@ -909,11 +909,9 @@ task applyPatch(dependsOn: 'downloadPatchLibs') << {
 		                       exclude "META-INF/*.DSA"
 				        exclude "META-INF/*.RSA"
 			}
-
+                         archiveName = "minikdcsecure.jar"
                                  manifest {
-		                     attributes 'Implementation-Title': 'minikdc',
-		                     'Implementation-Version': '1.0',
-		                    'Main-Class': 'org.apache.hadoop.minikdc.MiniKdc'
+		                     attributes 'Main-Class': 'org.apache.hadoop.minikdc.MiniKdc'
                                   }
                          }
                        build.dependsOn(jar)
