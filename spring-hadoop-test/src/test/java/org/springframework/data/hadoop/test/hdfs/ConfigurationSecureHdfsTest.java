@@ -38,8 +38,6 @@ public class ConfigurationSecureHdfsTest extends KerberosSecurityTestcase {
 		AbstractApplicationContext context = new ClassPathXmlApplicationContext(
 				"ConfigurationSecureHdfsTest-context.xml",
 				ConfigurationSecureHdfsTest.class);
-		System.out.println("---------------------------------------------");
-		System.out.println(context.getBean("secureHdfsConfig"));
 		Assert.notNull(context.getBean("secureHdfsConfig"));
 	}
 
