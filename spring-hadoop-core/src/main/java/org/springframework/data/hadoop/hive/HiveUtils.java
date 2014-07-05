@@ -32,6 +32,10 @@ import org.apache.hadoop.hive.service.HiveServerException;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.thrift.TBase;
 import org.apache.thrift.TException;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.scope.context.StepContext;
+import org.springframework.batch.core.scope.context.StepSynchronizationManager;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -53,6 +57,7 @@ import org.springframework.util.StringUtils;
 abstract class HiveUtils {
 
 	static DataAccessException convert(Exception ex) {
+//		saveHiveScriptStats(hive,command);
 		if (ex == null) {
 			return null;
 		}
@@ -226,6 +231,7 @@ abstract class HiveUtils {
 							command += token.concat(" ");
 							if (nrCmds > 0) {
 								results.addAll(runCommand(hive, command));
+								saveHiveScriptStats(hive,command,State.SUCCESS);
 								nrCmds--;
 								command = "";
 							}
@@ -246,6 +252,27 @@ abstract class HiveUtils {
 		return results;
 	}
 
+	public enum State {
+		 SUCCESS, FAIL;  
+		}	
+	private static void saveHiveScriptStats(HiveClient client,String command,State state) {
+		StepContext context = StepSynchronizationManager.getContext();
+		final StepExecution stepExecution = (context != null) ? context.getStepExecution() : null;
+		if (stepExecution == null) {
+			return;
+		}
+		ExecutionContext executionContext = stepExecution.getExecutionContext();
+		String statusPrefix = "Hive command Status::";
+		executionContext.put(statusPrefix + "command", command);
+		try {
+			executionContext.put(statusPrefix + "client name", client.getName());
+			executionContext.put(statusPrefix + "State", state.toString());
+		} catch (TException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	private static List<String> runCommand(HiveClient hive, String command) throws Exception {
 		try {
 			hive.execute(command);
@@ -253,6 +280,7 @@ abstract class HiveUtils {
 		} catch (Exception ex) {
 			try {
 				hive.clean();
+				saveHiveScriptStats(hive,command,State.FAIL);
 			} catch (Exception exc) {
 			}
 			throw ex;
