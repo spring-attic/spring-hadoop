@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 the original author or authors.
+ * Copyright 2011-2013 the original author or authors.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,8 +52,7 @@ public class DistCpTest {
 
 	@Before
 	public void init() {
-		//TODO: remove this after SHDP-364 Rewrite DistCp for Hadoop v2 API
-		assumeThat(false, Is.is(Boolean.TRUE));
+		assumeThat(TestUtils.isHadoop1X(), Is.is(Boolean.TRUE));
 	}
 
 	@After

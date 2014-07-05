@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 the original author or authors.
+ * Copyright 2011-2013 the original author or authors.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Job.JobState;
 import org.apache.hadoop.mapreduce.JobID;
 import org.springframework.data.hadoop.configuration.JobConfUtils;
+import org.springframework.data.hadoop.util.VersionUtils;
 import org.springframework.util.ReflectionUtils;
 
 /**
@@ -124,7 +125,15 @@ public abstract class JobUtils {
 	static Field JOB_CLIENT_STATE;
 
 	static {
-		//TODO: remove the need for this
+		if (!VersionUtils.isHadoop2X()) {
+			JOB_INFO = ReflectionUtils.findField(Job.class, "info");
+			if (JOB_INFO == null) {
+				throw new IllegalStateException(
+						"Invalid Job.class detected, probably caused by a Hadoop YARN library, which is NOT supported yet.\n"
+								+ "See the Requirements chapter in the reference documentation for more information.");
+			}
+			ReflectionUtils.makeAccessible(JOB_INFO);
+		}
 		JOB_CLIENT_STATE = ReflectionUtils.findField(Job.class, "state");
 		ReflectionUtils.makeAccessible(JOB_CLIENT_STATE);
 	}
@@ -134,24 +143,28 @@ public abstract class JobUtils {
 			return null;
 		}
 
-		try {
-			Configuration cfg = job.getConfiguration();
-			cfg.set("mapreduce.framework.name", "yarn");
-			JobClient jobClient = null;
+		if (VersionUtils.isHadoop2X()) {
 			try {
-				Constructor<JobClient> constr = JobClient.class.getConstructor(Configuration.class);
-				jobClient = constr.newInstance(cfg);
-			} catch (Exception e) {
-				jobClient = new JobClient();
-			}
-			org.apache.hadoop.mapred.JobID id = getOldJobId(job);
-			if (id != null) {
-				return jobClient.getJob(id);
-			} else {
+				Configuration cfg = job.getConfiguration();
+				cfg.set("mapreduce.framework.name", "yarn");
+				JobClient jobClient = null;
+				try {
+					Constructor<JobClient> constr = JobClient.class.getConstructor(Configuration.class);
+					jobClient = constr.newInstance(cfg);
+				} catch (Exception e) {
+					jobClient = new JobClient();
+				}
+				org.apache.hadoop.mapred.JobID id = getOldJobId(job);
+				if (id != null) {
+					return jobClient.getJob(id);
+				} else {
+					return null;
+				}
+			} catch (IOException e) {
 				return null;
 			}
-		} catch (IOException e) {
-			return null;
+		} else {
+			return (RunningJob) ReflectionUtils.getField(JOB_INFO, job);
 		}
 	}
 
@@ -202,15 +215,17 @@ public abstract class JobUtils {
 
 		// attempt to capture the original status
 		JobStatus originalStatus = JobStatus.DEFINED;
-		try {
-			Method getJobState =
-					ReflectionUtils.findMethod(Job.class, "getJobState");
-			Object state = getJobState.invoke(job);
-			if (state instanceof Enum) {
-				int value = ((Enum)state).ordinal();
-				originalStatus = JobStatus.fromRunState(value + 1);
-			}
-		} catch (Exception ignore) {}
+		if (VersionUtils.isHadoop2X()) {
+			try {
+				Method getJobState =
+						ReflectionUtils.findMethod(Job.class, "getJobState");
+				Object state = getJobState.invoke(job);
+				if (state instanceof Enum) {
+					int value = ((Enum)state).ordinal();
+					originalStatus = JobStatus.fromRunState(value + 1);
+				}
+			} catch (Exception ignore) {}
+		}
 
 		// go for the running info if available
 		RunningJob runningJob = getRunningJob(job);

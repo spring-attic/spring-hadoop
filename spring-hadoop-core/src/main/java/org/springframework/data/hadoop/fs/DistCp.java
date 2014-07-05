@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 the original author or authors.
+ * Copyright 2011-2013 the original author or authors.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.ipc.RemoteException;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.springframework.data.hadoop.configuration.ConfigurationUtils;
+import org.springframework.data.hadoop.util.VersionUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
@@ -44,8 +45,6 @@ import org.springframework.util.StringUtils;
  * @author Thomas Risberg
  */
 public class DistCp {
-
-	//TODO: SHDP-364 Rewrite DistCp for Hadoop v2 API
 
 	private final Configuration configuration;
 	private String user;
@@ -289,15 +288,14 @@ public class DistCp {
 
 			if (throwable instanceof IOException) {
 				IOException ioe = ((IOException) throwable);
-//TODO: SHDP-364 Rewrite DistCp for Hadoop v2 API
-//				if (!VersionUtils.isHadoop2X()) {
-//					try {
-//						Class<?> duplicationException = Class.forName("org.apache.hadoop.tools.DistCp.DuplicationException");
-//						if (duplicationException.isAssignableFrom(ioe.getClass())) {
-//							throw new IllegalStateException("Duplicated files found...", ioe);
-//						}
-//					} catch (ClassNotFoundException e) {}
-//				}
+				if (!VersionUtils.isHadoop2X()) {
+					try {
+						Class<?> duplicationException = Class.forName("org.apache.hadoop.tools.DistCp.DuplicationException");
+						if (duplicationException.isAssignableFrom(ioe.getClass())) {
+							throw new IllegalStateException("Duplicated files found...", ioe);
+						}
+					} catch (ClassNotFoundException e) {}
+				}
 				if (ioe instanceof RemoteException) {
 					throw new IllegalStateException("Cannot distCopy", ((RemoteException) ioe).unwrapRemoteException());
 				}
