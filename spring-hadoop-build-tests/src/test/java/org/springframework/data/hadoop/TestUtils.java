@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 the original author or authors.
+ * Copyright 2011-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,13 +24,11 @@ import java.util.Properties;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.mapred.JobClient;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.data.hadoop.fs.HdfsResourceLoader;
 import org.springframework.data.hadoop.util.PermissionUtils;
-import org.springframework.util.ClassUtils;
 
 /**
  * Testing utilities.
@@ -134,14 +132,6 @@ public abstract class TestUtils {
 			} catch (Exception ex) {
 			}
 		}
-	}
-
-	public static boolean isHadoop2X() {
-		return ClassUtils.isPresent("org.apache.hadoop.fs.FsShellPermissions$Chmod", JobClient.class.getClassLoader());
-	}
-
-	public static boolean isHadoop1X() {
-		return !isHadoop2X();
 	}
 
 	@SuppressWarnings("unchecked")

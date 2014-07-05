@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 the original author or authors.
+ * Copyright 2011-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,25 +34,23 @@ public class UrlInfiniteLoopTest {
 
     @Before
     public void setUp() {
-        if (VersionUtils.isHadoop2X()) {
-            // Avoid potential StackOverflowError for Hadoop 2.0.x (see SHDP-111)
-            if (VersionUtils.isYarnAvailable()) {
-                try {
-                    Configuration conf = (Configuration) Class.forName("org.apache.hadoop.yarn.conf.YarnConfiguration").newInstance();
-                    Method getFileSystemClass =
-                            ReflectionUtils.findMethod(FileSystem.class, "getFileSystemClass",
-                                    String.class, Configuration.class);
-                    getFileSystemClass.invoke(null, "hdfs", conf);
-                } catch (Exception e) {}
-            } else {
-                try {
-                    Configuration conf = (Configuration) Class.forName("org.apache.hadoop.conf.Configuration").newInstance();
-                    Method getFileSystemClass =
-                            ReflectionUtils.findMethod(FileSystem.class, "getFileSystemClass",
-                                    String.class, Configuration.class);
-                    getFileSystemClass.invoke(null, "hdfs", conf);
-                } catch (Exception e) {}
-            }
+        // Avoid potential StackOverflowError for Hadoop 2.0.x (see SHDP-111)
+        if (VersionUtils.isYarnAvailable()) {
+            try {
+                Configuration conf = (Configuration) Class.forName("org.apache.hadoop.yarn.conf.YarnConfiguration").newInstance();
+                Method getFileSystemClass =
+                        ReflectionUtils.findMethod(FileSystem.class, "getFileSystemClass",
+                                String.class, Configuration.class);
+                getFileSystemClass.invoke(null, "hdfs", conf);
+            } catch (Exception e) {}
+        } else {
+            try {
+                Configuration conf = (Configuration) Class.forName("org.apache.hadoop.conf.Configuration").newInstance();
+                Method getFileSystemClass =
+                        ReflectionUtils.findMethod(FileSystem.class, "getFileSystemClass",
+                                String.class, Configuration.class);
+                getFileSystemClass.invoke(null, "hdfs", conf);
+            } catch (Exception e) {}
         }
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 the original author or authors.
+ * Copyright 2011-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsAction;
 import org.apache.hadoop.fs.permission.FsPermission;
-import org.hamcrest.core.Is;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,7 +38,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.util.Assert;
 
 import static org.junit.Assert.*;
-import static org.junit.Assume.*;
 
 /**
  * FsShell ReadOnly integration tests.
@@ -104,12 +102,10 @@ public abstract class AbstractROFsShellTest {
 		String name = res.getURI().getPath();
 		Collection<Path> cat = shell.cat(name);
 		assertEquals(name, cat.iterator().next().toUri().getPath());
-		// falls on GPHD due to HADOOP-9095
-		// assertEquals(originalName, cat.toString());
+		assertEquals(originalName, cat.toString());
 	}
 
 	@Test
-	// falls on GPHD due to HADOOP-9095
 	public void testCatMulti() throws Exception {
 		String originalName1 = "local/" + UUID.randomUUID() + ".txt";
 		String originalName2 = "local/" + UUID.randomUUID() + ".txt";
@@ -119,8 +115,7 @@ public abstract class AbstractROFsShellTest {
 		String name2 = res2.getURI().getPath();
 		Collection<Path> cat = shell.cat(name1, name2);
 
-		// falls on GPHD due to HADOOP-9095
-		// assertEquals(originalName1 + "\n" + originalName2, cat.toString());
+		assertEquals(originalName1 + "\n" + originalName2, cat.toString());
 
 		Iterator<Path> it = cat.iterator();
 		assertEquals(name1, it.next().toUri().getPath());
@@ -170,7 +165,6 @@ public abstract class AbstractROFsShellTest {
 	@Test
 	// TODO: FsShell most likely needs to be rewritten for Hadoop 2
 	public void testDUS() throws Exception {
-		assumeThat(TestUtils.isHadoop1X(), Is.is(Boolean.TRUE));
 		String fName1 = UUID.randomUUID() + ".txt";
 		String name1 = "local/" + fName1;
 		int length1 = name1.length();
@@ -182,8 +176,8 @@ public abstract class AbstractROFsShellTest {
 		Resource res2 = TestUtils.writeToFS(cfg, name2);
 		name2 = res2.getURI().getPath();
 
-		assertEquals(stripPrefix(res1.getURI()) + "\t" + length1, stripPrefix(shell.dus(name1)));
-		assertEquals(stripPrefix(res2.getURI()) + "\t" + length1, stripPrefix(shell.dus(name2)));
+		assertTrue(shell.dus(name1).toString().endsWith(stripPrefix(res1.getURI()) + "\t" + length1));
+		assertTrue(shell.dus(name2).toString().endsWith(stripPrefix(res2.getURI()) + "\t" + length1));
 	}
 
 	@Test
