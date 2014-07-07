@@ -57,7 +57,6 @@ import org.springframework.util.StringUtils;
 abstract class HiveUtils {
 
 	static DataAccessException convert(Exception ex) {
-//		saveHiveScriptStats(hive,command);
 		if (ex == null) {
 			return null;
 		}
