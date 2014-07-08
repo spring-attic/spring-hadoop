@@ -111,7 +111,7 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 				internalConfig.set("yarn.resourcemanager.principal", "yarn/_HOST@EXAMPLE.COM");
 				UserGroupInformation.setConfiguration(internalConfig);
 				if(isUserKinit==false&&StringUtils.hasText(keytab)&&StringUtils.hasText(principal)){
-					SecurityUtil.login(internalConfig, keytab, principal);
+					SecurityUtil.login(internalConfig, KEYTAB, PRINCIPAL);
 				}
 			}
 		}
