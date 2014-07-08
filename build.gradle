@@ -783,7 +783,7 @@ project('spring-data-hadoop-test') {
 
 project('spring-data-hadoop-build-tests') {
 	apply plugin: 'groovy'
-	description = 'Spring for Apache Hadoop Tests Core'
+	description = 'Spring for Apache Hadoop Integration Tests'
 	configurations {
 		patch
 	}
