@@ -5,6 +5,15 @@ http://projects.spring.io/spring-hadoop/
 Commit changelog: http://github.com/spring-projects/spring-hadoop/tree/v[version]
 Issues changelog: https://jira.spring.io/secure/ReleaseNote.jspa?projectId=10801
 
+Changes in version 2.0.1 RELEASE (2014-07-08)
+---------------------------------------------
+General
+* Update Spring Framework to 4.0.6 [SHDP-369]
+* Update Spring Batch to 3.0.1 [SHDP-369]
+* Update Spring Boot to 1.1.4 [SHDP-369]
+* Update build to use Apache Hadoop 2.4.1 [SHDP-366] 
+
+
 Changes in version 2.0.0 RELEASE (2014-06-10)
 ---------------------------------------------
 General
