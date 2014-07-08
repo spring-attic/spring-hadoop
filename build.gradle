@@ -821,6 +821,7 @@ project('spring-data-hadoop-batch') {
 		compile project(":spring-data-hadoop-core")
 		compile "org.springframework.batch:spring-batch-core:$springBatchVersion"
 		testRuntime "org.springframework.integration:spring-integration-file:$springIntVersion"
+		testRuntime "org.springframework:spring-messaging:$springVersion"
 	}
 
 }
@@ -893,6 +894,7 @@ project('spring-data-hadoop-build-tests') {
 			exclude group: "org.hamcrest"
 		}
 		testCompile "org.springframework:spring-test:$springVersion"
+		testCompile "org.springframework:spring-messaging:$springVersion"
 		testCompile("javax.annotation:jsr250-api:1.0")
 		testCompile "org.springframework.integration:spring-integration-stream:$springIntVersion"
 		testCompile "org.springframework.integration:spring-integration-file:$springIntVersion"
@@ -1098,6 +1100,7 @@ if (gradle.ext.mr2) {
 		dependencies {
 			compile project(":spring-yarn:spring-yarn-core")
 			compile "org.springframework.integration:spring-integration-ip:$springIntVersion"
+			compile "org.springframework:spring-messaging:$springVersion"
 			compile "com.fasterxml.jackson.core:jackson-core:$jackson2Version"
 			compile "com.fasterxml.jackson.core:jackson-databind:$jackson2Version"
 			testCompile "org.springframework.integration:spring-integration-test:$springIntVersion"

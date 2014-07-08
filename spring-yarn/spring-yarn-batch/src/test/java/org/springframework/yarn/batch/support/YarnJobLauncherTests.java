@@ -180,9 +180,9 @@ public class YarnJobLauncherTests {
 			return launcher;
 		}
 
-		@Bean
-		public JobExplorer jobExplorer() throws Exception {
-			return (JobExplorer) new MapJobExplorerFactoryBean(this.jobRepositoryFactory).getObject();
+		@Override
+		public JobExplorer getJobExplorer() throws Exception {
+			return new MapJobExplorerFactoryBean(this.jobRepositoryFactory).getObject();
 		}
 	}
 
