@@ -1,2 +1,3 @@
 http\://www.springframework.org/schema/yarn/integration/spring-yarn-integration-2.0.xsd=/org/springframework/yarn/integration/config/spring-yarn-integration-2.0.xsd
-http\://www.springframework.org/schema/yarn/integration/spring-yarn-integration.xsd=/org/springframework/yarn/integration/config/spring-yarn-integration-2.0.xsd
+http\://www.springframework.org/schema/yarn/integration/spring-yarn-integration-2.1.xsd=/org/springframework/yarn/integration/config/spring-yarn-integration-2.1.xsd
+http\://www.springframework.org/schema/yarn/integration/spring-yarn-integration.xsd=/org/springframework/yarn/integration/config/spring-yarn-integration-2.1.xsd

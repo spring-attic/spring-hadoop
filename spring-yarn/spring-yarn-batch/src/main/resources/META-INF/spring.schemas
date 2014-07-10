@@ -1,2 +1,3 @@
 http\://www.springframework.org/schema/yarn/batch/spring-yarn-batch-2.0.xsd=/org/springframework/yarn/batch/config/spring-yarn-batch-2.0.xsd
-http\://www.springframework.org/schema/yarn/batch/spring-yarn-batch.xsd=/org/springframework/yarn/batch/config/spring-yarn-batch-2.0.xsd
+http\://www.springframework.org/schema/yarn/batch/spring-yarn-batch-2.1.xsd=/org/springframework/yarn/batch/config/spring-yarn-batch-2.1.xsd
+http\://www.springframework.org/schema/yarn/batch/spring-yarn-batch.xsd=/org/springframework/yarn/batch/config/spring-yarn-batch-2.1.xsd

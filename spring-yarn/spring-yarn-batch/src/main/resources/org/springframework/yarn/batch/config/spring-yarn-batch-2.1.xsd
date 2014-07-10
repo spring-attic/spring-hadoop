@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.springframework.org/schema/yarn/batch"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:tool="http://www.springframework.org/schema/tool"
+	targetNamespace="http://www.springframework.org/schema/yarn/batch"
+	elementFormDefault="qualified"
+	attributeFormDefault="unqualified"
+	version="1.0.0">
+
+	<xsd:import namespace="http://www.springframework.org/schema/beans" />
+	<xsd:import namespace="http://www.springframework.org/schema/tool" />
+
+	<xsd:annotation>
+		<xsd:documentation><![CDATA[
+	Defines the configuration elements for Spring Yarn.
+		]]></xsd:documentation>
+	</xsd:annotation>
+
+	<!-- start of top level types -->
+
+	<xsd:element name="master">
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="masterType">
+					<xsd:sequence minOccurs="0" maxOccurs="unbounded">
+						<xsd:choice>
+							<xsd:element name="container-runner" type="runnerType"/>
+							<xsd:element name="container-command" type="containerCommandType"/>
+						</xsd:choice>
+					</xsd:sequence>
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:complexType name="runnerType" mixed="true">
+		<xsd:attribute name="command" type="xsd:string" use="optional"/>
+		<xsd:attribute name="runner" type="xsd:string" use="optional"/>
+		<xsd:attribute name="context-file" type="xsd:string" use="optional"/>
+		<xsd:attribute name="bean-name" type="xsd:string" use="optional"/>
+		<xsd:attribute name="arguments" type="xsd:string" use="optional"/>
+		<xsd:attribute name="stdout" type="xsd:string" use="optional"/>
+		<xsd:attribute name="stderr" type="xsd:string" use="optional"/>
+	</xsd:complexType>
+
+	<xsd:complexType name="containerCommandType" mixed="true">
+		<xsd:attribute name="command-impl-class" type="xsd:string" use="optional"/>
+	</xsd:complexType>
+
+	<xsd:complexType name="masterType">
+		<xsd:attribute name="id" type="xsd:ID" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+	Bean id.
+				]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="configuration" default="yarnConfiguration"/>
+		<xsd:attribute name="resource-localizer" default="yarnLocalresources"/>
+		<xsd:attribute name="environment" default="yarnEnvironment"/>
+		<xsd:attribute name="job-name" default="job"/>
+		<xsd:attribute name="job-launcher" default="jobLauncher"/>
+		<xsd:attribute name="jobs" use="optional"/>
+	</xsd:complexType>
+
+</xsd:schema>

@@ -1,0 +1,1664 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.springframework.org/schema/hadoop"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:tool="http://www.springframework.org/schema/tool"
+	targetNamespace="http://www.springframework.org/schema/hadoop"
+	elementFormDefault="qualified"
+	attributeFormDefault="unqualified"
+	version="1.0.0">
+
+	<xsd:import namespace="http://www.springframework.org/schema/beans" />
+	<xsd:import namespace="http://www.springframework.org/schema/tool" />
+
+	<xsd:annotation>
+		<xsd:documentation><![CDATA[
+Defines the configuration elements for Spring Data Hadoop.
+		]]></xsd:documentation>
+	</xsd:annotation>
+
+	<!-- common attributes shared by Job executors
+		 NOT meant for extensibility - do NOT rely on this type as it might be removed in the future -->
+	<xsd:complexType name="jobRunnerType">
+		<xsd:attribute name="id" type="xsd:ID" use="optional">
+			<xsd:annotation>
+			<xsd:documentation><![CDATA[
+Bean id.]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<!-- the job reference -->
+		<xsd:attribute name="job-ref">
+			<xsd:annotation>
+				<xsd:documentation source="java:org.apache.hadoop.mapreduce.Job"><![CDATA[
+Hadoop Job. Multiple names can be specified using comma (,) as a separator.]]></xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref">
+						<tool:expected-type type="org.apache.hadoop.mapreduce.Job" />
+					</tool:annotation>
+				</xsd:appinfo>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="wait-for-completion" type="xsd:string" use="optional" default="true">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+Whether to synchronously wait for the job(s) to finish (the default) or not.
+				]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="verbose" type="xsd:string" use="optional" default="true"/>
+		<xsd:attribute name="kill-job-at-shutdown" type="xsd:string" use="optional" default="true">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+Whether the configured jobs should be 'killed' when the application shuts down (default) or not.
+For long-running or fire-and-forget jobs that live beyond the starting application, set this to false.
+
+Note that if 'wait-for-job' is true, this flag is considered to be true as otherwise the application
+cannot shut down (since it has to keep waiting for the job).
+				]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="executor-ref" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation source="java:java.util.concurrent.Executor"><![CDATA[
+The task executor responsible for executing the task. By default SyncTaskExecutor is used, meaning the calling thread is used.
+While this replicates the Hadoop behavior, it prevents running jobs from being killed if the application shuts down.
+For fine-tuned control, a dedicated Executor is recommended.
+				]]></xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref">
+						<tool:expected-type type="java:java.util.concurrent.Executor" />
+					</tool:annotation>
+				</xsd:appinfo>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="scope" type="xsd:string" use="optional" />
+	</xsd:complexType>
+
+	<xsd:element name="job-runner">
+		<xsd:annotation>
+		   <xsd:documentation><![CDATA[
+Defines a runner for Hadoop jobs.
+				]]>
+          </xsd:documentation>
+	      <xsd:appinfo>
+	        <tool:annotation>
+	          <tool:exports type="org.springframework.data.hadoop.mapreduce.JobRunner"/>
+	        </tool:annotation>
+	      </xsd:appinfo>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="jobRunnerType">
+					<xsd:attribute name="run-at-startup" type="xsd:string" default="false">
+						<xsd:annotation>
+							<xsd:documentation><![CDATA[
+Whether the Job runs at startup or not (default).
+							]]></xsd:documentation>
+			         	</xsd:annotation>
+			       	</xsd:attribute>
+					<xsd:attribute name="pre-action" type="xsd:string" default="">
+						<xsd:annotation>
+						<xsd:documentation><![CDATA[
+Pre actions/beans to be called before running the action. Multiple bean names can be specified using comma-separated list.]]></xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="post-action" type="xsd:string" default="">
+						<xsd:annotation>
+						<xsd:documentation><![CDATA[
+Post actions/beans to be called before running the action. Multiple bean names can be specified using comma-separated list.]]></xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+
+    <xsd:element name="job-tasklet" type="jobRunnerType">
+        <xsd:annotation>
+            <xsd:documentation><![CDATA[
+Defines a Spring Batch tasklet for Hadoop Jobs.
+				]]>
+            </xsd:documentation>
+            <xsd:appinfo>
+                <tool:annotation>
+                    <tool:exports type="org.springframework.data.hadoop.batch.mapreduce.JobTasklet"/>
+                </tool:annotation>
+            </xsd:appinfo>
+        </xsd:annotation>
+    </xsd:element>
+
+    <!-- common attributes shared by properties based configurations
+         NOT meant for extensibility - do NOT rely on this type as it might be removed in the future -->
+	<xsd:complexType name="propertiesConfigurableType" mixed="true">
+		<xsd:attribute name="properties-ref" type="xsd:string">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+Reference to a Properties object.
+				]]></xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref">
+						<tool:expected-type type="java.util.Properties" />
+					</tool:annotation>
+				</xsd:appinfo>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="properties-location" type="xsd:string">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+Properties location(s). Multiple locations can be specified using comma (,) as a separator.
+				]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+
+	<xsd:element name="configuration">
+		<xsd:annotation>
+		   <xsd:documentation><![CDATA[
+Defines a Hadoop Configuration.
+				]]></xsd:documentation>
+	      <xsd:appinfo>
+	        <tool:annotation>
+	          <tool:exports type="org.apache.hadoop.conf.Configuration"/>
+	        </tool:annotation>
+	      </xsd:appinfo>
+		</xsd:annotation>
+		<xsd:complexType mixed="true">
+		<xsd:complexContent>
+		<xsd:extension base="propertiesConfigurableType">
+				<xsd:attribute name="id" type="xsd:ID" use="optional">
+				<xsd:annotation>
+				<xsd:documentation><![CDATA[
+Bean id (default is "hadoopConfiguration").
+				]]></xsd:documentation>
+				</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="configuration-ref">
+				<xsd:annotation>
+						<xsd:documentation source="java:org.apache.hadoop.conf.Configuration"><![CDATA[
+Reference to another Hadoop configuration (useful for chaining)]]></xsd:documentation>
+						<xsd:appinfo>
+							<tool:annotation kind="ref">
+								<tool:expected-type type="org.apache.hadoop.conf.Configuration" />
+							</tool:annotation>
+						</xsd:appinfo>
+			 	</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="resources">
+				<xsd:annotation>
+						<xsd:documentation source="java:org.springframework.core.io.Resource"><![CDATA[
+Hadoop Configuration resources. Multiple resources can be specified, using comma (,) as a separator.]]></xsd:documentation>
+						<xsd:appinfo>
+							<tool:annotation kind="direct">
+								<tool:expected-type type="org.springframework.core.io.Resource[]" />
+							</tool:annotation>
+						</xsd:appinfo>
+			 	</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="register-url-handler" use="optional" default="false">
+				<xsd:annotation>
+				<xsd:documentation><![CDATA[
+Registers an HDFS url handler in the running VM. Note that this operation can be executed at most once
+in a given JVM hence the default is false.
+				]]></xsd:documentation>
+				</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="depends-on" use="optional"><xsd:annotation><xsd:documentation>
+	The names of the beans that this bean depends on being initialized. Typically used to guarantee
+	the initialization of certain beans before the Hadoop cluster gets configured and started (directly
+	or not through the use of its configuration and file-system).
+				</xsd:documentation></xsd:annotation></xsd:attribute>
+				<xsd:attribute name="file-system-uri" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+The default file-system address (host:port). Equivalent to 'fs.default.name' and 'fs.defaultFS' propertys for HadoopV1 and HadoopV2 respectively.]]></xsd:documentation>
+			 	</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="job-tracker-uri" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+The MapReduce job tracker address (host:port) for HadoopV1. Equivalent to 'mapred.job.tracker' property.]]></xsd:documentation>
+			 	</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="rm-manager-uri" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+The Hadoop Yarn resource manager address (host:port) for HadoopV2. Equivalent to 'yarn.resourcemanager.address' property.]]></xsd:documentation>
+			 	</xsd:annotation>
+				</xsd:attribute>
+		</xsd:extension>
+		</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="file-system">
+		<xsd:annotation>
+		   <xsd:documentation><![CDATA[
+Defines a HDFS file system.
+				]]>
+          </xsd:documentation>
+	      <xsd:appinfo>
+	        <tool:annotation>
+	          <tool:exports type="org.apache.hadoop.fs.FileSystem"/>
+	        </tool:annotation>
+	      </xsd:appinfo>
+		</xsd:annotation>
+		<xsd:complexType>
+		<xsd:attribute name="id" type="xsd:ID" use="optional">
+		<xsd:annotation>
+		<xsd:documentation><![CDATA[
+Bean id (default is "hadoopFs").
+		]]></xsd:documentation>
+		</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="configuration-ref" use="optional" default="hadoopConfiguration">
+		<xsd:annotation>
+				<xsd:documentation source="java:org.apache.hadoop.conf.Configuration"><![CDATA[
+Reference to the Hadoop Configuration. Defaults to 'hadoopConfiguration'.]]></xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref">
+						<tool:expected-type type="org.apache.hadoop.conf.Configuration" />
+					</tool:annotation>
+				</xsd:appinfo>
+	 	</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="uri" use="optional">
+		<xsd:annotation>
+		<xsd:documentation><![CDATA[
+The underlying HDFS system URI (by default the configuration settings will be used).
+		]]></xsd:documentation>
+		</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="user" type="xsd:string">
+			<xsd:annotation>
+			<xsd:documentation><![CDATA[
+The security user (ugi) to use for impersonation at runtime.
+				]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="close" type="xsd:string" default="true">
+			<xsd:annotation>
+			<xsd:documentation><![CDATA[
+Whether or not the Hadoop file systems should be closed once this factory is destroyed.
+True by default - should be turned off when running 'embedded' or if long running operations outlive the application context.
+				]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="close-all" type="xsd:string" default="false">
+			<xsd:annotation>
+			<xsd:documentation><![CDATA[
+Whether or not to close all file-system instances inside a JVM at shutdown or not. Useful
+as a leak prevention when the app drives all of Hadoop.
+				]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="depends-on" use="optional"><xsd:annotation><xsd:documentation>
+	The names of the beans that this bean depends on being initialized. Typically used to guarantee
+	the initialization of certain beans before the Hadoop cluster gets configured and started (directly
+	or not through the use of its configuration and file-system).
+		</xsd:documentation></xsd:annotation></xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="resource-loader">
+		<xsd:annotation>
+		   <xsd:documentation><![CDATA[
+Defines a HDFS-aware resource loader.
+				]]>
+          </xsd:documentation>
+	      <xsd:appinfo>
+	        <tool:annotation>
+	          <tool:exports type="org.springframework.data.hadoop.fs.HdfsResourceLoader"/>
+	        </tool:annotation>
+	      </xsd:appinfo>
+		</xsd:annotation>
+		<xsd:complexType>
+		<xsd:attribute name="id" type="xsd:ID" use="optional">
+		<xsd:annotation>
+		<xsd:documentation><![CDATA[
+Bean id (default is "hadoopResourceLoader").
+		]]></xsd:documentation>
+		</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="configuration-ref" use="optional" default="hadoopConfiguration">
+		<xsd:annotation>
+				<xsd:documentation source="java:org.apache.hadoop.conf.Configuration"><![CDATA[
+Reference to the Hadoop Configuration. Defaults to 'hadoopConfiguration'.]]></xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref">
+						<tool:expected-type type="org.apache.hadoop.conf.Configuration" />
+					</tool:annotation>
+				</xsd:appinfo>
+	 	</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="uri" use="optional">
+		<xsd:annotation>
+		<xsd:documentation><![CDATA[
+The underlying HDFS system URI (by default the configuration settings will be used).
+		]]></xsd:documentation>
+		</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="file-system-ref">
+			<xsd:annotation>
+				<xsd:documentation source="java:org.apache.hadoop.fs.FileSystem"><![CDATA[
+Reference to the Hadoop FileSystem. Overrides the 'uri' or 'configuration-ref' properties.]]></xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref">
+						<tool:expected-type type="org.apache.hadoop.fs.FileSystem" />
+					</tool:annotation>
+				</xsd:appinfo>
+		 	</xsd:annotation>
+	 	</xsd:attribute>
+		<xsd:attribute name="user" type="xsd:string">
+			<xsd:annotation>
+			<xsd:documentation><![CDATA[
+The security user (ugi) to use for impersonation at runtime.
+				]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="use-codecs" type="xsd:string" use="optional" default="true">
+			<xsd:annotation>
+			<xsd:documentation><![CDATA[
+Indicates whether to use (or not) the codecs found inside the Hadoop configuration when accessing the resource input stream.
+By default, the codecs are used meaning the content of the stream backing the resource is decompressed on the fly (if a
+suitable decompressor is found).
+				]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+			<xsd:attribute name="handle-noprefix">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+Flag if loader should handle resource path without prefix.]]>
+					</xsd:documentation>
+					<xsd:appinfo>
+						<tool:annotation>
+							<tool:expected-type type="java.lang.Boolean" />
+						</tool:annotation>
+					</xsd:appinfo>
+		 		</xsd:annotation>
+ 		</xsd:attribute>
+		<xsd:attribute name="depends-on" use="optional"><xsd:annotation><xsd:documentation>
+	The names of the beans that this bean depends on being initialized. Typically used to guarantee
+	the initialization of certain beans before the Hadoop cluster gets configured and started (directly
+	or not through the use of its configuration and file-system).
+		</xsd:documentation></xsd:annotation></xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="resource-loader-registrar">
+		<xsd:annotation>
+			<xsd:documentation><![CDATA[
+Registeres Hadoop resource loader into context.
+				]]>
+			</xsd:documentation>
+			<xsd:appinfo>
+				<tool:annotation>
+					<tool:exports type="org.springframework.data.hadoop.fs.CustomResourceLoaderRegistrar"/>
+				</tool:annotation>
+			</xsd:appinfo>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:attribute name="id" type="xsd:ID" use="optional">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+Bean id (default is "hadoopResourceLoaderRegistrar").
+					]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="loader-ref">
+				<xsd:annotation>
+					<xsd:documentation source="org.springframework.data.hadoop.fs.HdfsResourceLoader"><![CDATA[
+Reference to the Hadoop Hdfs resource loader. Default value is 'hadoopResourceLoader'.]]></xsd:documentation>
+					<xsd:appinfo>
+						<tool:annotation kind="ref">
+							<tool:expected-type type="org.springframework.data.hadoop.fs.HdfsResourceLoader" />
+						</tool:annotation>
+					</xsd:appinfo>
+		 		</xsd:annotation>
+	 		</xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>
+
+	<!-- generic options shared by the various jobs
+	 NOT meant for extensibility - do NOT rely on this type as it might be removed in the future -->
+	<xsd:complexType name="genericOptionsType" mixed="true">
+		<xsd:complexContent>
+		<xsd:extension base="propertiesConfigurableType">
+		<xsd:attribute name="archives">
+		<xsd:annotation>
+			<xsd:appinfo>
+			<xsd:documentation source="java:org.springframework.core.io.Resource"><![CDATA[
+Archives to be unarchived to the cluster. Multiple resources can be specified, using comma (,) as a separator.]]></xsd:documentation>
+				<tool:annotation kind="direct">
+					<tool:expected-type type="java:org.springframework.core.io.Resource[]" />
+				</tool:annotation>
+			</xsd:appinfo>
+	 	</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="files">
+		<xsd:annotation>
+			<xsd:appinfo>
+			<xsd:documentation source="java:org.springframework.core.io.Resource"><![CDATA[
+File resources to be copied to the cluster. Multiple resources can be specified, using comma (,) as a separator.]]></xsd:documentation>
+				<tool:annotation kind="direct">
+					<tool:expected-type type="java:org.springframework.core.io.Resource[]" />
+				</tool:annotation>
+			</xsd:appinfo>
+	 	</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="libs">
+		<xsd:annotation>
+			<xsd:appinfo>
+			<xsd:documentation source="java:org.springframework.core.io.Resource"><![CDATA[
+Jar resources to include in the classpath. Multiple resources can be specified, using comma (,) as a separator.]]></xsd:documentation>
+				<tool:annotation kind="direct">
+					<tool:expected-type type="java:org.springframework.core.io.Resource[]" />
+				</tool:annotation>
+			</xsd:appinfo>
+	 	</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="user" type="xsd:string">
+			<xsd:annotation>
+			<xsd:documentation><![CDATA[
+The security user (ugi) to use for impersonation at runtime.
+				]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<!-- common attributes shared by properties based configurations
+		 NOT meant for extensibility - do NOT rely on this type as it might be removed in the future -->
+	<xsd:complexType name="jobType">
+		<xsd:complexContent>
+		<xsd:extension base="genericOptionsType">
+		<xsd:attribute name="id" type="xsd:ID" use="required" />
+		<xsd:attribute name="scope" type="xsd:string" use="optional" />
+		<xsd:attribute name="mapper" default="org.apache.hadoop.mapreduce.Mapper">
+		<xsd:annotation>
+			<xsd:appinfo>
+				<tool:annotation kind="direct">
+					<tool:expected-type type="java.lang.Class" />
+					<tool:assignable-to type="org.apache.hadoop.mapreduce.Mapper" />
+				</tool:annotation>
+			</xsd:appinfo>
+	 	</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="reducer" default="org.apache.hadoop.mapreduce.Reducer">
+		<xsd:annotation>
+			<xsd:appinfo>
+				<tool:annotation kind="direct">
+					<tool:expected-type type="java.lang.Class" />
+					<tool:assignable-to type="org.apache.hadoop.mapreduce.Reducer" />
+				</tool:annotation>
+			</xsd:appinfo>
+	 	</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="combiner">
+		<xsd:annotation>
+			<xsd:documentation><![CDATA[
+The combiner class name.
+			]]></xsd:documentation>
+			<xsd:appinfo>
+				<tool:annotation kind="direct">
+					<tool:expected-type type="java.lang.Class" />
+					<tool:assignable-to type="org.apache.hadoop.mapreduce.Reducer" />
+				</tool:annotation>
+			</xsd:appinfo>
+	 	</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="input-format">
+		<xsd:annotation>
+			<xsd:appinfo>
+				<tool:annotation kind="direct">
+					<tool:expected-type type="java.lang.Class" />
+					<tool:assignable-to type="org.apache.hadoop.mapreduce.InputFormat" />
+				</tool:annotation>
+			</xsd:appinfo>
+	 	</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="output-format">
+		<xsd:annotation>
+			<xsd:appinfo>
+				<tool:annotation kind="direct">
+					<tool:expected-type type="java.lang.Class" />
+					<tool:assignable-to type="org.apache.hadoop.mapreduce.OutputFormat" />
+				</tool:annotation>
+			</xsd:appinfo>
+	 	</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="partitioner">
+		<xsd:annotation>
+			<xsd:appinfo>
+				<tool:annotation kind="direct">
+					<tool:expected-type type="java.lang.Class" />
+					<tool:assignable-to type="org.apache.hadoop.mapreduce.Partitioner" />
+				</tool:annotation>
+			</xsd:appinfo>
+	 	</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="input-path" use="optional">
+		<xsd:annotation>
+			<xsd:appinfo>
+				<tool:annotation kind="direct">
+					<tool:expected-type type="java.lang.String[]" />
+				</tool:annotation>
+			</xsd:appinfo>
+	 	</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="output-path" use="optional">
+		<xsd:annotation>
+			<xsd:appinfo>
+				<tool:annotation kind="direct">
+					<tool:expected-type type="java.lang.String" />
+				</tool:annotation>
+			</xsd:appinfo>
+	 	</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="number-reducers">
+		<xsd:annotation>
+			<xsd:appinfo>
+				<tool:annotation kind="direct">
+					<tool:expected-type type="java.lang.Integer" />
+				</tool:annotation>
+			</xsd:appinfo>
+	 	</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="configuration-ref" default="hadoopConfiguration">
+		<xsd:annotation>
+				<xsd:documentation source="java:org.apache.hadoop.conf.Configuration"><![CDATA[
+Reference to the Hadoop Configuration. Defaults to 'hadoopConfiguration'.]]></xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref">
+						<tool:expected-type type="org.apache.hadoop.conf.Configuration" />
+					</tool:annotation>
+				</xsd:appinfo>
+	 	</xsd:annotation>
+		</xsd:attribute>
+		</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:element name="job">
+		<xsd:annotation>
+		   <xsd:documentation><![CDATA[
+Defines a Hadoop Job.
+				]]></xsd:documentation>
+	      <xsd:appinfo>
+	        <tool:annotation>
+	          <tool:exports type="org.apache.hadoop.mapreduce.Job"/>
+	        </tool:annotation>
+	      </xsd:appinfo>
+		</xsd:annotation>
+		<xsd:complexType>
+		<xsd:complexContent mixed="true">
+		<xsd:extension base="jobType">
+		<xsd:attribute name="sort-comparator">
+		<xsd:annotation>
+			<xsd:appinfo>
+				<tool:annotation kind="direct">
+					<tool:expected-type type="java.lang.Class" />
+					<tool:assignable-to type="org.apache.hadoop.io.RawComparator" />
+				</tool:annotation>
+			</xsd:appinfo>
+	 	</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="grouping-comparator">
+		<xsd:annotation>
+			<xsd:appinfo>
+				<tool:annotation kind="direct">
+					<tool:expected-type type="java.lang.Class" />
+					<tool:assignable-to type="org.apache.hadoop.io.RawComparator" />
+				</tool:annotation>
+			</xsd:appinfo>
+	 	</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="key">
+		<xsd:annotation>
+			<xsd:appinfo>
+				<tool:annotation kind="direct">
+					<tool:expected-type type="java.lang.Class" />
+				</tool:annotation>
+			</xsd:appinfo>
+	 	</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="value">
+		<xsd:annotation>
+			<xsd:appinfo>
+				<tool:annotation kind="direct">
+					<tool:expected-type type="java.lang.Class" />
+				</tool:annotation>
+			</xsd:appinfo>
+	 	</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="map-key">
+		<xsd:annotation>
+			<xsd:appinfo>
+				<tool:annotation kind="direct">
+					<tool:expected-type type="java.lang.Class" />
+				</tool:annotation>
+			</xsd:appinfo>
+	 	</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="map-value">
+		<xsd:annotation>
+			<xsd:appinfo>
+				<tool:annotation kind="direct">
+					<tool:expected-type type="java.lang.Class" />
+				</tool:annotation>
+			</xsd:appinfo>
+	 	</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="codec">
+		<xsd:annotation>
+			<xsd:appinfo>
+				<tool:annotation kind="direct">
+					<tool:expected-type type="java.lang.Class" />
+				</tool:annotation>
+			</xsd:appinfo>
+	 	</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="jar">
+		<xsd:annotation>
+			<xsd:documentation><![CDATA[
+Indicates the user jar for the map-reduce job.
+			]]></xsd:documentation>
+			<xsd:appinfo>
+				<tool:annotation>
+					<tool:expected-type type="org.springframework.core.io.Resource" />
+				</tool:annotation>
+			</xsd:appinfo>
+	 	</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="jar-by-class">
+		<xsd:annotation>
+			<xsd:documentation><![CDATA[
+Indicates the job's jar file by finding an example class location.
+			]]></xsd:documentation>
+			<xsd:appinfo>
+				<tool:annotation kind="direct">
+					<tool:expected-type type="java.lang.Class" />
+				</tool:annotation>
+			</xsd:appinfo>
+	 	</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="working-dir">
+		<xsd:annotation>
+			<xsd:documentation><![CDATA[
+Indicates the job's working directory.
+			]]></xsd:documentation>
+			<xsd:appinfo>
+				<tool:annotation kind="direct">
+					<tool:expected-type type="java.lang.String" />
+				</tool:annotation>
+			</xsd:appinfo>
+	 	</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="compress-output">
+		<xsd:annotation>
+			<xsd:documentation><![CDATA[
+Indicates whether the job output should be compressed or not. By default it is not set.
+			]]></xsd:documentation>
+			<xsd:appinfo>
+				<tool:annotation kind="direct">
+					<tool:expected-type type="java.lang.Boolean" />
+				</tool:annotation>
+			</xsd:appinfo>
+	 	</xsd:annotation>
+		</xsd:attribute>
+		</xsd:extension>
+		</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="streaming">
+		<xsd:annotation>
+		   <xsd:documentation><![CDATA[
+Defines a Hadoop Streaming Job.
+				]]></xsd:documentation>
+	      <xsd:appinfo>
+	        <tool:annotation>
+	          <tool:exports type="org.apache.hadoop.mapreduce.Job"/>
+	        </tool:annotation>
+	      </xsd:appinfo>
+		</xsd:annotation>
+		<xsd:complexType>
+		<xsd:complexContent mixed="true">
+		<xsd:extension base="jobType">
+		<xsd:sequence>
+			<xsd:element name="cmd-env" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+				<xsd:documentation><![CDATA[Environment variables (-cmdenv)]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		</xsd:extension>
+		</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+
+	<!-- common attributes shared by properties based configurations
+		 NOT meant for extensibility - do NOT rely on this type as it might be removed in the future -->
+	<xsd:complexType name="hadoopRunnerType">
+		<xsd:complexContent mixed="true">
+		<xsd:extension base="genericOptionsType">
+			<xsd:sequence>
+				<xsd:element name="arg" minOccurs="0" maxOccurs="unbounded">
+					<xsd:annotation>
+					<xsd:documentation><![CDATA[
+Tool argument.]]></xsd:documentation>
+					</xsd:annotation>
+					<xsd:complexType>
+						<xsd:attribute name="value" type="xsd:string" use="required"/>
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+			<xsd:attribute name="id" type="xsd:ID" use="optional">
+				<xsd:annotation>
+				<xsd:documentation><![CDATA[
+Bean id.]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="configuration-ref" default="hadoopConfiguration">
+			<xsd:annotation>
+				<xsd:documentation source="java:org.apache.hadoop.conf.Configuration"><![CDATA[
+Reference to the Hadoop Configuration. Defaults to 'hadoopConfiguration'.]]></xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref">
+						<tool:expected-type type="org.apache.hadoop.conf.Configuration" />
+					</tool:annotation>
+				</xsd:appinfo>
+		 	</xsd:annotation>
+			</xsd:attribute>
+		</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<!-- common attributes shared by properties based configurations
+		 NOT meant for extensibility - do NOT rely on this type as it might be removed in the future -->
+	<xsd:complexType name="jarRunnerType">
+		<xsd:complexContent mixed="true">
+		<xsd:extension base="hadoopRunnerType">
+	       	<xsd:attribute name="jar" type="xsd:string" use="required">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+Indicates the jar (not required to be in the classpath).
+					]]></xsd:documentation>
+					<xsd:appinfo>
+						<tool:annotation>
+							<tool:expected-type type="org.springframework.core.io.Resource" />
+						</tool:annotation>
+					</xsd:appinfo>
+			 	</xsd:annotation>
+	       	</xsd:attribute>
+	       	<xsd:attribute name="main-class" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+Indicates the Jar entry/main class name. If not specified, the Main-Class (specified in the MANIFEST.MF), if present,
+is used instead.
+					]]></xsd:documentation>
+					<xsd:appinfo>
+						<tool:annotation kind="direct">
+							<tool:expected-type type="java.lang.Class" />
+						</tool:annotation>
+					</xsd:appinfo>
+			 	</xsd:annotation>
+	       	</xsd:attribute>
+	       	<xsd:attribute name="close-fs" type="xsd:string" default="true">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+Wherther to close or not, any file-systems created by the Jar execution.
+Default is true. Turn this off, if the jar uses the same file-system as the rest of the application.
+					]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="scope" type="xsd:string" use="optional" />
+		</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:element name="jar-runner">
+		<xsd:annotation>
+		   <xsd:documentation><![CDATA[
+Executes a Hadoop Jar.]]></xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+		<xsd:complexContent mixed="true">
+		<xsd:extension base="jarRunnerType">
+			<xsd:attribute name="run-at-startup" type="xsd:string" default="false">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+Whether the Jar runs at startup or not (default).
+					]]></xsd:documentation>
+	         	</xsd:annotation>
+	       	</xsd:attribute>
+			<xsd:attribute name="pre-action" type="xsd:string" default="">
+				<xsd:annotation>
+				<xsd:documentation><![CDATA[
+Pre actions/beans to be called before running the action. Multiple bean names can be specified using comma-separated list.]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="post-action" type="xsd:string" default="">
+				<xsd:annotation>
+				<xsd:documentation><![CDATA[
+Post actions/beans to be called before running the action. Multiple bean names can be specified using comma-separated list.]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+		</xsd:extension>
+		</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+
+    <xsd:element name="jar-tasklet" type="jarRunnerType">
+        <xsd:annotation>
+            <xsd:documentation><![CDATA[
+Defines a Hadoop Jar Tasklet.]]></xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+	<!-- common attributes shared by properties based configurations
+		 NOT meant for extensibility - do NOT rely on this type as it might be removed in the future -->
+	<xsd:complexType name="toolRunnerType">
+		<xsd:complexContent mixed="true">
+		<xsd:extension base="hadoopRunnerType">
+			<xsd:sequence>
+				<xsd:element name="tool" minOccurs="0" maxOccurs="1">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:any namespace="##any" processContents="lax" minOccurs="1" maxOccurs="1"/>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+	       	<xsd:attribute name="jar" type="xsd:string" use="optional">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+Indicates the jar (not required to be in the classpath) providing the Tool (and its dependencies).
+					]]></xsd:documentation>
+					<xsd:appinfo>
+						<tool:annotation>
+							<tool:expected-type type="org.springframework.core.io.Resource" />
+						</tool:annotation>
+					</xsd:appinfo>
+			 	</xsd:annotation>
+	       	</xsd:attribute>
+	       	<xsd:attribute name="tool-class" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+Indicates the Tool class name. This is useful when referring to an external jar (not required
+in the classpath). If not specified, the Main-Class (specified in the MANIFEST.MF), if present,
+is used instead.
+					]]></xsd:documentation>
+					<xsd:appinfo>
+						<tool:annotation kind="direct">
+							<tool:expected-type type="java.lang.Class" />
+						</tool:annotation>
+					</xsd:appinfo>
+			 	</xsd:annotation>
+	       	</xsd:attribute>
+			<xsd:attribute name="tool-ref">
+			<xsd:annotation>
+					<xsd:documentation source="java:org.apache.hadoop.util.Tool"><![CDATA[
+Reference to a Hadoop Tool instance.]]></xsd:documentation>
+					<xsd:appinfo>
+						<tool:annotation kind="ref">
+							<tool:expected-type type="org.apache.hadoop.util.Tool" />
+						</tool:annotation>
+					</xsd:appinfo>
+		 	</xsd:annotation>
+		 	</xsd:attribute>
+	       	<xsd:attribute name="close-fs" type="xsd:string" default="true">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+Wherther to close or not, any file-systems created by the Tool execution.
+Default is true. Turn this off, if the jar uses the same file-system as the rest of the application.
+					]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="scope" type="xsd:string" use="optional" />
+		</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:element name="tool-runner">
+		<xsd:annotation>
+		   <xsd:documentation><![CDATA[
+Executes a Hadoop Tool.]]></xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+		<xsd:complexContent mixed="true">
+		<xsd:extension base="toolRunnerType">
+			<xsd:attribute name="run-at-startup" type="xsd:string" default="false">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+Whether the Tool runs at startup or not (default).
+					]]></xsd:documentation>
+	         	</xsd:annotation>
+	       	</xsd:attribute>
+			<xsd:attribute name="pre-action" type="xsd:string" default="">
+				<xsd:annotation>
+				<xsd:documentation><![CDATA[
+Pre actions/beans to be called before running the action. Multiple bean names can be specified using comma-separated list.]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="post-action" type="xsd:string" default="">
+				<xsd:annotation>
+				<xsd:documentation><![CDATA[
+Post actions/beans to be called before running the action. Multiple bean names can be specified using comma-separated list.]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+		</xsd:extension>
+		</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+
+    <xsd:element name="tool-tasklet" type="toolRunnerType">
+        <xsd:annotation>
+            <xsd:documentation><![CDATA[
+Defines a Hadoop Tool Tasklet.]]></xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+	<xsd:complexType name="entryType">
+		<xsd:attribute name="value" type="xsd:string" use="required"/>
+	</xsd:complexType>
+
+	<xsd:element name="cache">
+			<xsd:annotation>
+			   <xsd:documentation><![CDATA[
+Configures Hadoop Distributed Cache.
+					]]></xsd:documentation>
+		      <xsd:appinfo>
+		        <tool:annotation>
+		          <tool:exports type="org.apache.hadoop.io.DistributedCacheFactoryBean"/>
+		        </tool:annotation>
+		      </xsd:appinfo>
+			</xsd:annotation>
+		<xsd:complexType>
+			<xsd:sequence minOccurs="1" maxOccurs="unbounded">
+				<xsd:choice>
+					<xsd:element name="classpath" type="entryType"/>
+					<xsd:element name="cache" type="entryType"/>
+					<xsd:element name="local" type="entryType"/>
+				</xsd:choice>
+			</xsd:sequence>
+			<xsd:attribute name="id" type="xsd:ID" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+Bean id (default is "hadoopCache").
+				]]></xsd:documentation>
+			</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="create-symlink" type="xsd:string" default="false"/>
+			<xsd:attribute name="configuration-ref" default="hadoopConfiguration">
+			<xsd:annotation>
+					<xsd:documentation source="java:org.apache.hadoop.conf.Configuration"><![CDATA[
+Reference to the Hadoop Configuration. Defaults to 'hadoopConfiguration'.]]></xsd:documentation>
+					<xsd:appinfo>
+						<tool:annotation kind="ref">
+							<tool:expected-type type="org.apache.hadoop.conf.Configuration" />
+						</tool:annotation>
+					</xsd:appinfo>
+		 	</xsd:annotation>
+		 	</xsd:attribute>
+			<xsd:attribute name="file-system-ref">
+			<xsd:annotation>
+					<xsd:documentation source="java:org.apache.hadoop.fs.FileSystem"><![CDATA[
+Reference to the Hadoop FileSystem.]]></xsd:documentation>
+					<xsd:appinfo>
+						<tool:annotation kind="ref">
+							<tool:expected-type type="org.apache.hadoop.fs.FileSystem" />
+						</tool:annotation>
+					</xsd:appinfo>
+		 	</xsd:annotation>
+		 	</xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:complexType name="scriptType" mixed="true">
+			<xsd:attribute name="location" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+Location of the script. As an alternative one can inline the script by using a nested, text declaration.]]></xsd:documentation>
+					<xsd:appinfo>
+						<tool:annotation>
+							<tool:expected-type type="org.springframework.core.io.Resource"/>
+						</tool:annotation>
+					</xsd:appinfo>
+				</xsd:annotation>
+			</xsd:attribute>
+	</xsd:complexType>
+
+	<xsd:complexType name="scriptWithArgumentsType" mixed="true">
+		<xsd:complexContent>
+			<xsd:extension base="scriptType">
+			<xsd:sequence>
+				<xsd:element name="arguments" minOccurs="0" maxOccurs="1">
+					<xsd:annotation>
+		   			<xsd:documentation><![CDATA[
+Argument(s) to pass to this script. Defined in Properties format (key=value).
+				]]></xsd:documentation>
+				    </xsd:annotation>
+				</xsd:element>
+			</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:element name="pig-factory">
+		<xsd:annotation>
+		   <xsd:documentation><![CDATA[
+Defines a Pig (Server) factory. The factory is thread-safe and allows creation of PigServer instances (which are not thread-safe).
+				]]>
+          </xsd:documentation>
+	      <xsd:appinfo>
+	        <tool:annotation>
+	          <tool:exports type="org.springframework.data.hadoop.pig.PigServerFactory"/>
+	        </tool:annotation>
+	      </xsd:appinfo>
+		</xsd:annotation>
+		<xsd:complexType>
+		<xsd:complexContent mixed="true">
+		<xsd:extension base="propertiesConfigurableType">
+			<xsd:sequence>
+					<xsd:element name="script" type="scriptWithArgumentsType" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+						<xsd:documentation><![CDATA[
+Pig script.]]></xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+			</xsd:sequence>
+			<xsd:attribute name="id" type="xsd:ID" use="optional">
+				<xsd:annotation>
+				<xsd:documentation><![CDATA[
+Bean id (default is "pigFactory").
+				]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="paths-to-skip">
+				<xsd:annotation>
+						<xsd:documentation><![CDATA[
+The path to be skipped while automatically shipping binaries for streaming. Multiple resources can be specified, using comma (,) as a separator.
+						]]></xsd:documentation>
+			 	</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="parallelism" type="xsd:integer"/>
+			<xsd:attribute name="validate-each-statement" type="xsd:string"/>
+			<xsd:attribute name="job-priority" type="xsd:string"/>
+			<xsd:attribute name="job-name" type="xsd:string"/>
+			<xsd:attribute name="job-tracker" type="xsd:string"/>
+			<xsd:attribute name="configuration-ref" default="hadoopConfiguration">
+				<xsd:annotation>
+					<xsd:documentation source="java:org.apache.hadoop.conf.Configuration"><![CDATA[
+Reference to the Hadoop Configuration. Defaults to 'hadoopConfiguration'. Can be tweaked through the 'configuration' element or the other attributes.]]></xsd:documentation>
+					<xsd:appinfo>
+						<tool:annotation kind="ref">
+							<tool:expected-type type="org.apache.hadoop.conf.Configuration" />
+						</tool:annotation>
+					</xsd:appinfo>
+			 	</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="exec-type" default="MAPREDUCE">
+				<xsd:simpleType>
+				  <xsd:restriction base="xsd:string">
+				  	<xsd:enumeration value="MAPREDUCE"/>
+				  	<xsd:enumeration value="LOCAL"/>
+				  </xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+			<xsd:attribute name="user" type="xsd:string">
+				<xsd:annotation>
+				<xsd:documentation><![CDATA[
+The security user (ugi) to use for impersonation at runtime.
+				]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+		</xsd:extension>
+		</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+
+	<!-- common attributes shared by Pig executors
+		 NOT meant for extensibility - do NOT rely on this type as it might be removed in the future -->
+	<xsd:complexType name="pigRunnerType">
+		<xsd:sequence>
+			<xsd:element name="script" type="scriptWithArgumentsType" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+				<xsd:documentation><![CDATA[
+Pig script.]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="id" type="xsd:ID" use="optional">
+			<xsd:annotation>
+			<xsd:documentation><![CDATA[
+Bean id.]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="pig-factory-ref" type="xsd:string" use="optional" default="pigFactory">
+			<xsd:annotation>
+			<xsd:documentation source="java:org.springframework.data.hadoop.pig.PigServerFactory"><![CDATA[
+Reference to a PigServer factory. Defaults to 'pigFactory'.
+				]]></xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref">
+						<tool:expected-type type="org.springframework.data.hadoop.pig.PigServerFactory" />
+					</tool:annotation>
+				</xsd:appinfo>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="pig-template-ref" type="xsd:string" use="optional">
+			<xsd:annotation>
+			<xsd:documentation source="java:org.springframework.data.hadoop.pig.PigTemplate"><![CDATA[
+Reference to a PigTemplate. Alternative to 'pig-server-ref' attribute.
+				]]></xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref">
+						<tool:expected-type type="org.springframework.data.hadoop.pig.PigTemplate" />
+					</tool:annotation>
+				</xsd:appinfo>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="scope" type="xsd:string" use="optional" />
+	</xsd:complexType>
+
+	<xsd:element name="pig-runner">
+		<xsd:annotation>
+		   <xsd:documentation><![CDATA[
+Runs Pig scripts.
+				]]></xsd:documentation>
+	      <xsd:appinfo>
+	        <tool:annotation>
+	          <tool:exports type="org.springframework.data.hadoop.pig.PigRunner"/>
+	        </tool:annotation>
+	      </xsd:appinfo>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="pigRunnerType">
+					<xsd:attribute name="run-at-startup" type="xsd:string" default="false">
+						<xsd:annotation>
+							<xsd:documentation><![CDATA[
+Whether the Pig script runs at startup or not (default).
+							]]></xsd:documentation>
+			         	</xsd:annotation>
+			       	</xsd:attribute>
+					<xsd:attribute name="pre-action" type="xsd:string" default="">
+						<xsd:annotation>
+						<xsd:documentation><![CDATA[
+Pre actions/beans to be called before running the action. Multiple bean names can be specified using comma-separated list.]]></xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="post-action" type="xsd:string" default="">
+						<xsd:annotation>
+						<xsd:documentation><![CDATA[
+Post actions/beans to be called before running the action. Multiple bean names can be specified using comma-separated list.]]></xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="pig-template">
+			<xsd:annotation>
+			   <xsd:documentation><![CDATA[
+Creates a PigTemplate.
+					]]></xsd:documentation>
+		      <xsd:appinfo>
+		        <tool:annotation>
+		          <tool:exports type="org.springframework.data.hadoop.pig.PigTemplate"/>
+		        </tool:annotation>
+		      </xsd:appinfo>
+			</xsd:annotation>
+		<xsd:complexType>
+			<xsd:attribute name="id" type="xsd:ID" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+Bean id (default is "pigTemplate").
+				]]></xsd:documentation>
+			</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="pig-factory-ref" type="xsd:string" use="optional" default="pigFactory">
+				<xsd:annotation>
+				<xsd:documentation source="java:org.springframework.data.hadoop.pig.PigServerFactory"><![CDATA[
+Reference to a PigServer factory. Defaults to 'pigFactory'.
+				]]></xsd:documentation>
+					<xsd:appinfo>
+						<tool:annotation kind="ref">
+							<tool:expected-type type="org.springframework.data.hadoop.pig.PigServerFactory" />
+						</tool:annotation>
+					</xsd:appinfo>
+				</xsd:annotation>
+			</xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>
+
+    <xsd:element name="pig-tasklet" type="pigRunnerType">
+        <xsd:annotation>
+            <xsd:documentation><![CDATA[
+Defines a PigTasklet.
+				]]></xsd:documentation>
+            <xsd:appinfo>
+                <tool:annotation>
+                    <tool:exports type="org.springframework.data.hadoop.batch.pig.PigTasklet"/>
+                </tool:annotation>
+            </xsd:appinfo>
+        </xsd:annotation>
+    </xsd:element>
+
+	<!-- HBase -->
+	<xsd:element name="hbase-configuration">
+		<xsd:complexType>
+		<xsd:complexContent mixed="true">
+		<xsd:extension base="propertiesConfigurableType">
+			<xsd:annotation>
+			   <xsd:documentation><![CDATA[
+Defines an HBase configuration.
+					]]></xsd:documentation>
+		      <xsd:appinfo>
+		        <tool:annotation>
+		          <tool:exports type="org.apache.hadoop.conf.Configuration"/>
+		        </tool:annotation>
+		      </xsd:appinfo>
+			</xsd:annotation>
+			<xsd:attribute name="id" type="xsd:ID" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+Bean id (default is "hbaseConfiguration").
+				]]></xsd:documentation>
+			</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="zk-quorum" type="xsd:string">
+			<xsd:annotation>
+					<xsd:documentation><![CDATA[
+HBase Zookeeper Quorum host(s). If not specified, the default value (picked the the classpath) is used.]]></xsd:documentation>
+					<xsd:appinfo>
+						<tool:annotation kind="ref">
+							<tool:expected-type type="org.apache.hadoop.conf.Configuration" />
+						</tool:annotation>
+					</xsd:appinfo>
+		 	</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="zk-port" type="xsd:string">
+			<xsd:annotation>
+					<xsd:documentation source="java:org.apache.hadoop.conf.Configuration"><![CDATA[
+HBase Zookeeper port for clients to connect to. If not specified, the default value (picked from the classpath) is used.]]></xsd:documentation>
+					<xsd:appinfo>
+						<tool:annotation kind="ref">
+							<tool:expected-type type="org.apache.hadoop.conf.Configuration" />
+						</tool:annotation>
+					</xsd:appinfo>
+		 	</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="stop-proxy" type="xsd:string" default="true"/>
+			<xsd:attribute name="delete-connection" type="xsd:string" default="true"/>
+			<xsd:attribute name="configuration-ref" default="hadoopConfiguration">
+			<xsd:annotation>
+					<xsd:documentation source="java:org.apache.hadoop.conf.Configuration"><![CDATA[
+Reference to the Hadoop configuration. Defaults to 'hadoopConfiguration'.]]></xsd:documentation>
+					<xsd:appinfo>
+						<tool:annotation kind="ref">
+							<tool:expected-type type="org.apache.hadoop.conf.Configuration" />
+						</tool:annotation>
+					</xsd:appinfo>
+		 	</xsd:annotation>
+		 	</xsd:attribute>
+		</xsd:extension>
+		</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+
+	<!-- Hive -->
+	<xsd:element name="hive-client-factory">
+		<xsd:complexType>
+			<xsd:annotation>
+			   <xsd:documentation><![CDATA[
+Defines a HiveClient factory for connecting to a Hive server through the Thrift protocol. The factory is thread-safe and allows
+creation of HiveClient instances (which are not thread-safe).
+					]]></xsd:documentation>
+		      <xsd:appinfo>
+		        <tool:annotation>
+		          <tool:exports type="org.springframework.data.hadoop.hive.HiveClientFactory"/>
+		        </tool:annotation>
+		      </xsd:appinfo>
+			</xsd:annotation>
+			<xsd:sequence>
+				<xsd:element name="script" type="scriptWithArgumentsType" minOccurs="0" maxOccurs="unbounded">
+					<xsd:annotation>
+					<xsd:documentation><![CDATA[
+Hive script to be executed during start-up.]]></xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+			</xsd:sequence>
+			<xsd:attribute name="id" type="xsd:ID" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+Bean id (default is "hiveClientFactory").
+				]]></xsd:documentation>
+			</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="host" type="xsd:string" default="localhost"/>
+			<xsd:attribute name="port" type="xsd:string" default="10000"/>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="hive-server">
+		<xsd:complexType>
+		<xsd:complexContent mixed="true">
+		<xsd:extension base="propertiesConfigurableType">
+			<xsd:annotation>
+			   <xsd:documentation><![CDATA[
+Defines an embedded Hive Server instance opened for access through the Thrift protocol.
+					]]></xsd:documentation>
+		      <xsd:appinfo>
+		        <tool:annotation>
+		          <tool:exports type="org.apache.thrift.server.TServer"/>
+		        </tool:annotation>
+		      </xsd:appinfo>
+			</xsd:annotation>
+			<xsd:attribute name="id" type="xsd:ID" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+Bean id (default is "hiveServer").
+				]]></xsd:documentation>
+			</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="port" type="xsd:string" default="10000"/>
+			<xsd:attribute name="min-threads" type="xsd:string" default="5"/>
+			<xsd:attribute name="max-threads" type="xsd:string" default="100"/>
+			<xsd:attribute name="auto-startup" type="xsd:string" default="true"/>
+			<xsd:attribute name="configuration-ref" default="hadoopConfiguration">
+			<xsd:annotation>
+					<xsd:documentation source="java:org.apache.hadoop.conf.Configuration"><![CDATA[
+Reference to the Hadoop configuration. Defaults to 'hadoopConfiguration'.]]></xsd:documentation>
+					<xsd:appinfo>
+						<tool:annotation kind="ref">
+							<tool:expected-type type="org.apache.hadoop.conf.Configuration" />
+						</tool:annotation>
+					</xsd:appinfo>
+		 	</xsd:annotation>
+		 	</xsd:attribute>
+		</xsd:extension>
+		</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:complexType name="hiveRunnerType">
+		<xsd:sequence>
+			<xsd:element name="script" type="scriptWithArgumentsType" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+				<xsd:documentation><![CDATA[
+Hive script.]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="id" type="xsd:ID" use="optional">
+			<xsd:annotation>
+			<xsd:documentation><![CDATA[
+Bean id.]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="hive-client-factory-ref" type="xsd:string" use="optional" default="hiveClientFactory">
+			<xsd:annotation>
+			<xsd:documentation source="java:org.springframework.data.hadoop.hive.HiveClientFactory"><![CDATA[
+Reference to a HiveClient factory instance. Defaults to 'hiveClientFactory'.
+				]]></xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref">
+						<tool:expected-type type="org.springframework.data.hadoop.hive.HiveClientFactory" />
+					</tool:annotation>
+				</xsd:appinfo>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="hive-template-ref" type="xsd:string" use="optional">
+			<xsd:annotation>
+			<xsd:documentation source="java:org.springframework.data.hadoop.hive.HiveTemplate"><![CDATA[
+Reference to a HiveTemplate instance.   Alternative to 'hive-client-factory-ref' attribute..
+				]]></xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref">
+						<tool:expected-type type="org.springframework.data.hadoop.hive.HiveTemplate" />
+					</tool:annotation>
+				</xsd:appinfo>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="scope" type="xsd:string" use="optional" />
+	</xsd:complexType>
+
+	<xsd:element name="hive-runner">
+		<xsd:annotation>
+		   <xsd:documentation><![CDATA[
+Runs Hive scripts.
+				]]></xsd:documentation>
+	      <xsd:appinfo>
+	        <tool:annotation>
+	          <tool:exports type="org.springframework.data.hadoop.hive.HiveRunner"/>
+	        </tool:annotation>
+	      </xsd:appinfo>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="hiveRunnerType">
+					<xsd:attribute name="run-at-startup" type="xsd:string" default="false">
+						<xsd:annotation>
+							<xsd:documentation><![CDATA[
+Whether the Hive script runs at startup or not (default).
+							]]></xsd:documentation>
+			         	</xsd:annotation>
+			       	</xsd:attribute>
+					<xsd:attribute name="pre-action" type="xsd:string" default="">
+						<xsd:annotation>
+						<xsd:documentation><![CDATA[
+Pre actions/beans to be called before running the action. Multiple bean names can be specified using comma-separated list.]]></xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="post-action" type="xsd:string" default="">
+						<xsd:annotation>
+						<xsd:documentation><![CDATA[
+Post actions/beans to be called before running the action. Multiple bean names can be specified using comma-separated list.]]></xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="hive-template">
+			<xsd:annotation>
+			   <xsd:documentation><![CDATA[
+Creates a HiveTemplate.
+					]]></xsd:documentation>
+		      <xsd:appinfo>
+		        <tool:annotation>
+		          <tool:exports type="org.springframework.data.hadoop.hive.HiveTemplate"/>
+		        </tool:annotation>
+		      </xsd:appinfo>
+			</xsd:annotation>
+		<xsd:complexType>
+			<xsd:attribute name="id" type="xsd:ID" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+Bean id (default is "hiveTemplate").
+				]]></xsd:documentation>
+			</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="hive-client-factory-ref" default="hiveClientFactory">
+			<xsd:annotation>
+					<xsd:documentation source="java:org.springframework.data.hadoop.hive.HiveClientFactory"><![CDATA[
+Reference to HiveClient factory. Defaults to 'hiveClientFactory'.]]></xsd:documentation>
+					<xsd:appinfo>
+						<tool:annotation kind="ref">
+							<tool:expected-type type="org.springframework.data.hadoop.hive.HiveClientFactory" />
+						</tool:annotation>
+					</xsd:appinfo>
+		 	</xsd:annotation>
+		 	</xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>
+
+    <xsd:element name="hive-tasklet" type="hiveRunnerType">
+        <xsd:annotation>
+            <xsd:documentation><![CDATA[
+Defines a HiveTasklet.
+				]]></xsd:documentation>
+            <xsd:appinfo>
+                <tool:annotation>
+                    <tool:exports type="org.springframework.data.hadoop.batch.tasklet.HiveTasket"/>
+                </tool:annotation>
+            </xsd:appinfo>
+        </xsd:annotation>
+    </xsd:element>
+
+	<!-- Script type - NOT mean to be reused outside this schema -->
+	<xsd:complexType name="scriptingType" abstract="true" mixed="true">
+			<xsd:sequence>
+				<xsd:element name="property" type="beans:propertyType"  minOccurs="0" maxOccurs="unbounded">
+					<xsd:annotation>
+						<xsd:documentation><![CDATA[
+Property to pass to the script. Can be used to enhance or override the default properties.
+						]]></xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+			</xsd:sequence>
+			<xsd:attribute name="location" type="xsd:string">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+The location of the script. Can be any resource on the local filesystem, web or even hdfs.
+				]]>
+         		</xsd:documentation>
+			</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="language" type="xsd:string">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+The language used for executing the script. If no value is given, the script source extension
+is used to determine the scripting engine.
+				]]></xsd:documentation>
+         	</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="evaluate" default="ALWAYS">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+When to evaluate the script. 'ALWAYS' (default) evaluates the script on all invocations,
+'IF_MODIFIED' if the script source has been modified since the last invocation and 'ONCE'
+only once for the duration of the application.
+				]]></xsd:documentation>
+         	</xsd:annotation>
+         	<xsd:simpleType>
+         		<xsd:restriction base="xsd:string">
+         			<xsd:enumeration value="ONCE"/>
+         			<xsd:enumeration value="IF_MODIFIED"/>
+         			<xsd:enumeration value="ALWAYS"/>
+         		</xsd:restriction>
+         	</xsd:simpleType>
+			</xsd:attribute>
+	</xsd:complexType>
+
+	<xsd:element name="script">
+		<xsd:complexType mixed="true">
+			<xsd:complexContent>
+				<xsd:annotation>
+				   <xsd:documentation><![CDATA[
+Dedicated scripting facility for interacting with Hadoop. Allows Groovy, JavaScript (Rhino), Ruby (JRuby), Python (Jython)
+or any JSR-223 scripting language to be used for executing commands against Hadoop, in particular its file system.
+					]]></xsd:documentation>
+			      <xsd:appinfo>
+			        <tool:annotation>
+			          <tool:exports type="java.lang.Object"/>
+			        </tool:annotation>
+			      </xsd:appinfo>
+				</xsd:annotation>
+				<xsd:extension base="scriptingType">
+				<xsd:attribute name="id" type="xsd:ID" use="optional">
+					<xsd:annotation>
+						<xsd:documentation><![CDATA[
+Bean id (if no value is given, a name will be generated).
+						]]></xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="run-at-startup" type="xsd:string" default="false">
+					<xsd:annotation>
+						<xsd:documentation><![CDATA[
+Whether the script is evaluated automatically once the application context initializes or only when in use (the default).
+						]]></xsd:documentation>
+		         	</xsd:annotation>
+		       	</xsd:attribute>
+				<xsd:attribute name="scope" type="xsd:string" use="optional" />
+				<xsd:attribute name="configuration-ref" default="hadoopConfiguration">
+				<xsd:annotation>
+					<xsd:documentation source="java:org.apache.hadoop.conf.Configuration"><![CDATA[
+Reference to the Hadoop Configuration. Defaults to 'hadoopConfiguration'.]]></xsd:documentation>
+					<xsd:appinfo>
+						<tool:annotation kind="ref">
+							<tool:expected-type type="org.apache.hadoop.conf.Configuration" />
+						</tool:annotation>
+					</xsd:appinfo>
+			 	</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="pre-action" type="xsd:string" default="">
+					<xsd:annotation>
+					<xsd:documentation><![CDATA[
+Pre actions/beans to be called before running the action. Multiple bean names can be specified using comma-separated list.]]></xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="post-action" type="xsd:string" default="">
+					<xsd:annotation>
+					<xsd:documentation><![CDATA[
+Post actions/beans to be called before running the action. Multiple bean names can be specified using comma-separated list.]]></xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+
+    <xsd:element name="script-tasklet">
+        <xsd:complexType>
+            <xsd:annotation>
+                <xsd:documentation><![CDATA[
+Defines a scripting Tasklet for interacting with Hadoop. Allows Groovy, JavaScript (Rhino), Ruby (JRuby), Python (Jython)
+or any JSR-223 scripting language to be used for executing commands against Hadoop, in particular its file system.
+					]]>
+                </xsd:documentation>
+                <xsd:appinfo>
+                    <tool:annotation>
+                        <tool:exports type="java.lang.Object"/>
+                    </tool:annotation>
+                </xsd:appinfo>
+            </xsd:annotation>
+            <xsd:sequence>
+                <xsd:element name="script" minOccurs="0" maxOccurs="1">
+                    <xsd:annotation>
+                        <xsd:documentation><![CDATA[
+Nested script declaration.]]></xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:complexType mixed="true">
+                        <xsd:complexContent>
+                            <xsd:extension base="scriptingType"/>
+                        </xsd:complexContent>
+                    </xsd:complexType>
+                </xsd:element>
+            </xsd:sequence>
+            <xsd:attribute name="id" type="xsd:ID" use="optional">
+                <xsd:annotation>
+                    <xsd:documentation><![CDATA[
+Bean id.]]></xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="script-ref" type="xsd:string">
+                <xsd:annotation>
+                    <xsd:documentation><![CDATA[
+Reference to a script declaration.]]></xsd:documentation>
+                    <xsd:appinfo>
+                        <tool:annotation kind="ref">
+                            <tool:expected-type type="java.lang.Object" />
+                        </tool:annotation>
+                    </xsd:appinfo>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="scope" type="xsd:string" use="optional" />
+        </xsd:complexType>
+    </xsd:element>
+</xsd:schema>

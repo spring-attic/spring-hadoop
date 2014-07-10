@@ -1,2 +1,3 @@
 http\://www.springframework.org/schema/yarn/spring-yarn-2.0.xsd=/org/springframework/yarn/config/spring-yarn-2.0.xsd
-http\://www.springframework.org/schema/yarn/spring-yarn.xsd=/org/springframework/yarn/config/spring-yarn-2.0.xsd
+http\://www.springframework.org/schema/yarn/spring-yarn-2.1.xsd=/org/springframework/yarn/config/spring-yarn-2.1.xsd
+http\://www.springframework.org/schema/yarn/spring-yarn.xsd=/org/springframework/yarn/config/spring-yarn-2.1.xsd
