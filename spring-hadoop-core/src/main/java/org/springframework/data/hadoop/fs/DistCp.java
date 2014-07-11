@@ -52,11 +52,6 @@ public class DistCp {
 	public DistCp(Configuration configuration, String user) {
 		Assert.notNull(configuration, "configuration required");
 		this.configuration = ConfigurationUtils.createFrom(configuration, null);
-		// disable GenericOptionsParser
-//		this.configuration.setBoolean("mapred.used.genericoptionsparser", true);
-//		this.configuration.setBoolean(
-//				"mapreduce.client.genericoptionsparser.used", true);
-
 		this.user = user;
 	}
 
