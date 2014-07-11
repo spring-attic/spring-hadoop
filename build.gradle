@@ -313,6 +313,10 @@ configure(javaProjects()) {
 	ext.skipHBase = true
 	ext.skipWebHdfs = true
 
+	test {
+		systemProperty("testGroups", project.properties.get("testGroups"))
+	}
+
 	// exclude poms from the classpath (pulled in by Cloudera)
 	eclipse.classpath.file {
 		whenMerged { classpath ->
@@ -791,6 +795,7 @@ project('spring-data-hadoop-build-tests') {
 		compile project(":spring-data-hadoop-batch")
 		compile project(":spring-data-hadoop")
 		compile project(":spring-data-hadoop-test")
+		testCompile project(path:":spring-data-hadoop-test", configuration:"testArtifacts")
 
 		// Testing
 		testCompile "junit:junit:$junitVersion"

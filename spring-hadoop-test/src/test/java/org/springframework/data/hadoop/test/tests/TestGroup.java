@@ -49,6 +49,11 @@ public enum TestGroup {
 	PERFORMANCE,
 
 	/**
+	 * Tests that should only be run with a specific kerberized environment.
+	 */
+	KERBEROS,
+
+	/**
 	 * Tests that should only be run on the continuous integration server.
 	 */
 	CI;

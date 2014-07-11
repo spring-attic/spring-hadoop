@@ -65,7 +65,7 @@ public class TestGroupTests {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Unable to find test group 'missing' when parsing " +
                 "testGroups value: 'performance, missing'. Available groups include: " +
-                "[LONG_RUNNING,PERFORMANCE,CI]");
+                "[LONG_RUNNING,PERFORMANCE,KERBEROS,CI]");
         TestGroup.parse("performance, missing");
     }
 

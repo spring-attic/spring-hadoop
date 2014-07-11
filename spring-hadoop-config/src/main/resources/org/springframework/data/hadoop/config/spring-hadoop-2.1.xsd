@@ -203,6 +203,42 @@ in a given JVM hence the default is false.
 				]]></xsd:documentation>
 				</xsd:annotation>
 				</xsd:attribute>
+				<xsd:attribute name="user-keytab" type="xsd:string" use="optional">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+Security keytab.
+					]]></xsd:documentation>
+				</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="user-principal" type="xsd:string" use="optional">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+User Security Principal
+					]]></xsd:documentation>
+				</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="namenode-principal" type="xsd:string" use="optional">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+Namenode Security Principal
+					]]></xsd:documentation>
+				</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="rm-manager-principal" type="xsd:string" use="optional">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+Resource Manager Security Principal
+					]]></xsd:documentation>
+				</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="security-method" type="xsd:string" use="optional">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+The security method for hadoop
+					]]></xsd:documentation>
+				</xsd:annotation>
+				</xsd:attribute>
+
 				<xsd:attribute name="depends-on" use="optional"><xsd:annotation><xsd:documentation>
 	The names of the beans that this bean depends on being initialized. Typically used to guarantee
 	the initialization of certain beans before the Hadoop cluster gets configured and started (directly

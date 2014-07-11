@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/hadoop"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+	http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
+
+	<configuration id="secureHdfsConfig" file-system-uri="hdfs://localhost:8020" user-keytab="/usr/local/hadoops/janne.keytab"
+		user-principal="janne/neo" security-method="kerberos" rm-manager-principal="yarn/neo@LOCALDOMAIN"
+		namenode-principal="hdfs/neo@LOCALDOMAIN"/>
+
+</beans:beans>

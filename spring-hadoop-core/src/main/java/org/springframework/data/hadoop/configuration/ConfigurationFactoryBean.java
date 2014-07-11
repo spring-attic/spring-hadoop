@@ -25,6 +25,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FsUrlStreamHandlerFactory;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.springframework.beans.factory.BeanClassLoaderAware;
+import org.apache.hadoop.security.SecurityUtil;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
@@ -41,6 +42,10 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 
 	private static final Log log = LogFactory.getLog(ConfigurationFactoryBean.class);
 
+	public static final String USERKEYTAB = "spring.hadoop.userKeytab";
+
+	public static final String USERPRINCIPAL = "spring.hadoop.userPrincipal";
+
 	private Configuration internalConfig;
 	private Configuration configuration;
 	private boolean loadDefaults = true;
@@ -54,6 +59,12 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 	private String fsUri;
 	private String jtUri;
 	private String rmUri;
+
+	private String userKeytab;
+	private String userPrincipal;
+	private String namenodePrincipal;
+	private String rmManagerPrincipal;
+	private String securityMethod;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -85,6 +96,29 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 			internalConfig.set("yarn.resourcemanager.address", rmUri.trim());
 		}
 
+		if (StringUtils.hasText(userKeytab)) {
+			internalConfig.set(USERKEYTAB, userKeytab.trim());
+		}
+
+		if (StringUtils.hasText(userPrincipal)) {
+			internalConfig.set(USERPRINCIPAL, userPrincipal.trim());
+		}
+
+		if (StringUtils.hasText(securityMethod)) {
+			internalConfig.setBoolean("hadoop.security.authorization", true);
+			internalConfig.set("hadoop.security.authentication", securityMethod);
+			internalConfig.set("dfs.namenode.kerberos.principal", namenodePrincipal);
+			internalConfig.set("yarn.resourcemanager.principal", rmManagerPrincipal);
+			UserGroupInformation.setConfiguration(internalConfig);
+			if (StringUtils.hasText(userKeytab) && StringUtils.hasText(userPrincipal)) {
+				try {
+					SecurityUtil.login(internalConfig, USERKEYTAB, USERPRINCIPAL);
+				} catch (Exception e) {
+					log.warn("Cannot login using keytab " + userKeytab + " and principal " + userPrincipal, e);
+				}
+			}
+		}
+
 		if (initialize) {
 			internalConfig.size();
 		}
@@ -101,6 +135,15 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 				log.warn("Cannot register Hadoop URL stream handler - one is already registered");
 			}
 		}
+	}
+
+	/**
+	 * Sets the used security method.
+	 *
+	 * @param securityMethod the security method
+	 */
+	public void setSecurityMethod(String securityMethod) {
+		this.securityMethod = securityMethod;
 	}
 
 	@Override
@@ -121,6 +164,42 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 	@Override
 	public void setBeanClassLoader(ClassLoader classLoader) {
 		this.beanClassLoader = classLoader;
+	}
+
+	/**
+	 * Sets a path to a keytab file.
+	 *
+	 * @param userKeytab the path to a keytab file
+	 */
+	public void setUserKeytab(String userKeytab) {
+		this.userKeytab = userKeytab;
+	}
+
+	/**
+	 * Sets the the user login principal.
+	 *
+	 * @param userPrincipal the user login principal
+	 */
+	public void setUserPrincipal(String userPrincipal) {
+		this.userPrincipal = userPrincipal;
+	}
+
+	/**
+	 * Sets the used namenode principal.
+	 *
+	 * @param namenodePrincipal the namenode principal.
+	 */
+	public void setNamenodePrincipal(String namenodePrincipal) {
+		this.namenodePrincipal = namenodePrincipal;
+	}
+
+	/**
+	 * Sets the used resource manager principal.
+	 *
+	 * @param rmManagerPrincipal the resource manager principal
+	 */
+	public void setRmManagerPrincipal(String rmManagerPrincipal) {
+		this.rmManagerPrincipal = rmManagerPrincipal;
 	}
 
 	/**
