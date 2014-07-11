@@ -34,7 +34,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import static org.junit.Assume.assumeThat;
 
 /**
- * @author Costin Leau
+ * @author liujiong
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration
@@ -49,12 +49,6 @@ public class DistCpTest {
 	Configuration cfg;
 
 	private static final String dir = "distcp/";
-
-	@Before
-	public void init() {
-		//TODO: remove this after SHDP-364 Rewrite DistCp for Hadoop v2 API
-		assumeThat(false, Is.is(Boolean.TRUE));
-	}
 
 	@After
 	public void destroy() throws Exception {
@@ -97,20 +91,5 @@ public class DistCpTest {
 		new DistCp(cfg).copy(src1A, src2A, dstA);
 	}
 
-	@Test
-	public void testCopyPreserve() throws Exception {
-		String src = dir + UUID.randomUUID();
-		TestUtils.writeToFS(cfg, src);
-
-		HdfsResourceLoader loader = new HdfsResourceLoader(cfg);
-
-		String srcA = loader.getResource(src).getURI().toString();
-		String dstA = loader.getResource(dir + "dst/").getURI().toString();
-		loader.close();
-
-		System.out.println(srcA);
-		System.out.println(dstA);
-
-		new DistCp(cfg).copy(EnumSet.allOf(DistCp.Preserve.class), false, true, false, false, srcA, dstA);
-	}
+	
 }
