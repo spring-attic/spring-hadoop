@@ -1,0 +1,8 @@
+spring:
+    hadoop:
+        security:
+            authMethod: kerberos
+            userPrincipal: userPrincipalFoo
+            userKeytab: userKeytabFoo
+            namenodePrincipal: hdfs/foo@LOCALDOMAIN
+            rmManagerPrincipal: yarn/foo@LOCALDOMAIN

@@ -18,6 +18,7 @@ package org.springframework.yarn.config.annotation.builders;
 import org.apache.hadoop.conf.Configuration;
 import org.springframework.data.hadoop.config.common.annotation.configurers.PropertiesConfigurer;
 import org.springframework.data.hadoop.config.common.annotation.configurers.ResourceConfigurer;
+import org.springframework.data.hadoop.config.common.annotation.configurers.SecurityConfigurer;
 import org.springframework.yarn.config.annotation.SpringYarnConfigurerAdapter;
 
 /**
@@ -109,6 +110,31 @@ public interface YarnConfigConfigurer {
 	 * @throws Exception if error occurred
 	 */
 	PropertiesConfigurer<YarnConfigConfigurer> withProperties() throws Exception;
+
+	/**
+	 * Specify security options with a {@link SecurityConfigurer}.
+	 *
+	 * <p>
+	 * <p>JavaConfig:
+	 * <p>
+	 * <pre>
+	 * public void configure(YarnConfigConfigure config) throws Exception {
+	 *   config
+	 *     .withSecurity()
+	 *       .authMethod("kerberos")
+	 *       .namenodePrincipal("hdfs/myhost@LOCALDOMAIN")
+	 *       .rmManagerPrincipal("yarn/myhost@LOCALDOMAIN");
+	 * }
+	 * </pre>
+	 *
+	 * <p>XML:
+	 * <p>
+	 * No equivalent
+	 *
+	 * @return {@link SecurityConfigurer} for chaining
+	 * @throws Exception if error occurred
+	 */
+	SecurityConfigurer<YarnConfigConfigurer> withSecurity() throws Exception;
 
 	/**
 	 * Specify a Hdfs file system uri.

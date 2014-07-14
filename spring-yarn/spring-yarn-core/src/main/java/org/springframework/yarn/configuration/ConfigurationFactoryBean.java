@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,12 +24,16 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.CommonConfigurationKeysPublic;
 import org.apache.hadoop.fs.FsUrlStreamHandlerFactory;
+import org.apache.hadoop.security.Credentials;
+import org.apache.hadoop.security.SecurityUtil;
 import org.apache.hadoop.security.UserGroupInformation;
+import org.apache.hadoop.security.token.Token;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
+import org.springframework.data.hadoop.security.SecurityAuthMethod;
 import org.springframework.util.StringUtils;
 
 /**
@@ -43,14 +47,31 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 
 	private static final Log log = LogFactory.getLog(ConfigurationFactoryBean.class);
 
+	public static final String USERKEYTAB = "spring.hadoop.userKeytab";
+
+	public static final String USERPRINCIPAL = "spring.hadoop.userPrincipal";
+
+	/** Configuration built internally and the one returned from this factory */
 	private YarnConfiguration internalConfig;
+
+	/** Considered as parent configuration when initial internalConfig is created */
 	private YarnConfiguration configuration;
+
+	/** Resources added into config as supported by Hadoop Configuration class */
 	private Set<Resource> resources;
+
+	/** Properties added into configuration */
 	private Properties properties;
 
 	private ClassLoader beanClassLoader = getClass().getClassLoader();
 	private boolean initialize = true;
 	private boolean registerJvmUrl = false;
+
+	private SecurityAuthMethod securityAuthMethod;
+	private String userPrincipal;
+	private String userKeytab;
+	private String namenodePrincipal;
+	private String rmManagerPrincipal;
 
 	private String fsUri;
 	private String rmAddress;
@@ -104,20 +125,110 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 			internalConfig.set(YarnConfiguration.RM_SCHEDULER_ADDRESS, schedulerAddress.trim());
 		}
 
+		if (StringUtils.hasText(userKeytab)) {
+			internalConfig.set(USERKEYTAB, userKeytab.trim());
+		}
+
+		if (StringUtils.hasText(userPrincipal)) {
+			internalConfig.set(USERPRINCIPAL, userPrincipal.trim());
+		}
+
 		if (initialize) {
 			internalConfig.size();
 		}
 
+		if (securityAuthMethod != null) {
+			log.info("Enabling security using kerberos");
+			internalConfig.setBoolean("hadoop.security.authorization", true);
+			internalConfig.set("hadoop.security.authentication", "kerberos");
+			if (StringUtils.hasText(namenodePrincipal)) {
+				log.info("Using dfs.namenode.kerberos.principal=" + namenodePrincipal);
+				internalConfig.set("dfs.namenode.kerberos.principal", namenodePrincipal);
+			}
+			if (StringUtils.hasText(rmManagerPrincipal)) {
+				log.info("Using yarn.resourcemanager.principal=" + rmManagerPrincipal);
+				internalConfig.set("yarn.resourcemanager.principal", rmManagerPrincipal);
+			}
+		}
+
+		boolean ugiCalled = false;
 		if (registerJvmUrl) {
 			try {
 				// force UGI init to prevent infinite loop - see SHDP-92
 				UserGroupInformation.setConfiguration(internalConfig);
+				ugiCalled = true;
 				URL.setURLStreamHandlerFactory(new FsUrlStreamHandlerFactory(getObject()));
 				log.info("Registered HDFS URL stream handler");
 			} catch (Error err) {
 				log.warn("Cannot register Hadoop URL stream handler - one is already registered");
 			}
 		}
+
+		// don't call twice
+		if (!ugiCalled) {
+			UserGroupInformation.setConfiguration(internalConfig);
+		}
+
+		if (StringUtils.hasText(userKeytab) && StringUtils.hasText(userPrincipal)) {
+			try {
+				SecurityUtil.login(internalConfig, USERKEYTAB, USERPRINCIPAL);
+				log.info("Login using keytab " + userKeytab + " and principal " + userPrincipal);
+			} catch (Exception e) {
+				log.warn("Cannot login using keytab " + userKeytab + " and principal " + userPrincipal, e);
+			}
+		}
+
+		Credentials credentials = UserGroupInformation.getCurrentUser().getCredentials();
+		log.info("Executing with tokens:");
+		for (Token<?> token : credentials.getAllTokens()) {
+			log.info(token);
+		}
+
+	}
+
+	/**
+	 * Sets the security auth method.
+	 *
+	 * @param securityAuthMethod the new security auth method
+	 */
+	public void setSecurityAuthMethod(SecurityAuthMethod securityAuthMethod) {
+		this.securityAuthMethod = securityAuthMethod;
+	}
+
+	/**
+	 * Sets the user principal.
+	 *
+	 * @param userPrincipal the new user principal
+	 */
+	public void setUserPrincipal(String userPrincipal) {
+		this.userPrincipal = userPrincipal;
+	}
+
+	/**
+	 * Sets the user keytab.
+	 *
+	 * @param userKeytab the new user keytab
+	 */
+	public void setUserKeytab(String userKeytab) {
+		this.userKeytab = userKeytab;
+	}
+
+	/**
+	 * Sets the used namenode principal.
+	 *
+	 * @param namenodePrincipal the namenode principal.
+	 */
+	public void setNamenodePrincipal(String namenodePrincipal) {
+		this.namenodePrincipal = namenodePrincipal;
+	}
+
+	/**
+	 * Sets the used resource manager principal.
+	 *
+	 * @param rmManagerPrincipal the resource manager principal
+	 */
+	public void setRmManagerPrincipal(String rmManagerPrincipal) {
+		this.rmManagerPrincipal = rmManagerPrincipal;
 	}
 
 	/**

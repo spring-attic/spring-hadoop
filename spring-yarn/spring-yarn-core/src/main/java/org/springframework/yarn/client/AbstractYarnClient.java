@@ -31,6 +31,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.DataOutputBuffer;
 import org.apache.hadoop.security.Credentials;
 import org.apache.hadoop.security.UserGroupInformation;
+import org.apache.hadoop.security.token.Token;
 import org.apache.hadoop.yarn.api.records.ApplicationId;
 import org.apache.hadoop.yarn.api.records.ApplicationReport;
 import org.apache.hadoop.yarn.api.records.ApplicationSubmissionContext;
@@ -389,17 +390,22 @@ public abstract class AbstractYarnClient implements YarnClient, InitializingBean
 		context.setCommands(commands);
 
 		try {
-			// TODO: this still looks a bit dodgy!!
 			if (UserGroupInformation.isSecurityEnabled()) {
 				Credentials credentials = new Credentials();
 				final FileSystem fs = FileSystem.get(configuration);
-				fs.addDelegationTokens(YarnUtils.getPrincipal(configuration), credentials);
+				Token<?>[] tokens = fs.addDelegationTokens(YarnUtils.getPrincipal(configuration), credentials);
+				if (tokens != null) {
+					for (Token<?> token : tokens) {
+						log.info("Got delegation token for " + fs.getUri() + "; " + token);
+					}
+				}
 				DataOutputBuffer dob = new DataOutputBuffer();
 				credentials.writeTokenStorageToStream(dob);
 				ByteBuffer containerToken  = ByteBuffer.wrap(dob.getData(), 0, dob.getLength());
 				context.setTokens(containerToken);
 			}
 		} catch (IOException e) {
+			log.error("Error setting tokens for appmaster launch context", e);
 		}
 
 		return context;

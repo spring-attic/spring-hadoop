@@ -113,7 +113,13 @@ public class YarnContainerAutoConfiguration {
 		@Override
 		public void configure(YarnConfigConfigurer config) throws Exception {
 			config
-				.fileSystemUri(shp.getFsUri());
+				.fileSystemUri(shp.getFsUri())
+				.withSecurity()
+					.namenodePrincipal(shp.getSecurity() != null ? shp.getSecurity().getNamenodePrincipal() : null)
+					.rmManagerPrincipal(shp.getSecurity() != null ? shp.getSecurity().getRmManagerPrincipal() : null)
+					.authMethod(shp.getSecurity() != null ? shp.getSecurity().getAuthMethod() : null)
+					.userPrincipal(shp.getSecurity() != null ? shp.getSecurity().getUserPrincipal() : null)
+					.userKeytab(shp.getSecurity() != null ? shp.getSecurity().getUserKeytab() : null);
 		}
 
 		@Override

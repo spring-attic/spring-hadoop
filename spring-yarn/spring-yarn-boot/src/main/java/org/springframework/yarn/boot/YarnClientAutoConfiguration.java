@@ -140,7 +140,14 @@ public class YarnClientAutoConfiguration {
 				.resourceManagerAddress(shp.getResourceManagerAddress())
 				.schedulerAddress(shp.getResourceManagerSchedulerAddress())
 				.withResources()
-					.resources(shp.getResources());
+					.resources(shp.getResources())
+					.and()
+				.withSecurity()
+					.namenodePrincipal(shp.getSecurity() != null ? shp.getSecurity().getNamenodePrincipal() : null)
+					.rmManagerPrincipal(shp.getSecurity() != null ? shp.getSecurity().getRmManagerPrincipal() : null)
+					.authMethod(shp.getSecurity() != null ? shp.getSecurity().getAuthMethod() : null)
+					.userPrincipal(shp.getSecurity() != null ? shp.getSecurity().getUserPrincipal() : null)
+					.userKeytab(shp.getSecurity() != null ? shp.getSecurity().getUserKeytab() : null);
 		}
 
 		@Override
