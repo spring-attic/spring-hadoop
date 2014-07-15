@@ -23,9 +23,12 @@ import static org.junit.Assume.assumeTrue;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.integration.channel.QueueChannel;
 import org.springframework.integration.support.MessageBuilder;
@@ -51,12 +54,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
 public class MindIntegrationRawTests {
+	private static final Log log = LogFactory.getLog(MindIntegrationRawTests.class);
 
 	@Autowired
 	ApplicationContext ctx;
 
 	@Autowired
 	PortExposingTcpSocketSupport socketSupport;
+
+	@Autowired
+	@Qualifier("randomTestPort")
+	Integer randomTestPort;
 
 	@Autowired
 	MessageChannel serverChannel;
@@ -75,6 +83,8 @@ public class MindIntegrationRawTests {
 
 	@Test
 	public void testVanillaChannels() throws Exception {
+		log.info("randomTestPort=" + randomTestPort);
+        assumeTrue(mindAppmasterService.getPort() > 0); //TODO: if we didn't get a good port - skip test for now
 		assertNotNull(socketSupport);
 
 		SimpleTestRequest req = new SimpleTestRequest();
@@ -95,6 +105,7 @@ public class MindIntegrationRawTests {
 
 	@Test
 	public void testServiceInterfaces() throws Exception {
+		log.info("randomTestPort=" + randomTestPort);
 		assertNotNull(mindAppmasterService);
 		assertNotNull(mindAppmasterServiceClient);
 
