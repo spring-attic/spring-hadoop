@@ -15,6 +15,10 @@
  */
 package org.springframework.data.hadoop.batch.hive;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Iterator;
@@ -24,6 +28,9 @@ import java.util.concurrent.Callable;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.ByteArrayResource;
@@ -37,9 +44,6 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.ReflectionUtils;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Costin Leau
@@ -76,6 +80,23 @@ public class HiveBatchTest {
 	public void testTasklet() throws Exception {
 		HiveTasklet pt = ctx.getBean("tasklet", HiveTasklet.class);
 		pt.execute(null, null);
+	}
+	
+	@Test
+	public void testBatchContext() throws Exception {
+		assertTrue(ctx.isPrototype("hive-script"));
+		List<JobExecution> startJobs = JobsTrigger.startJobs(ctx);
+		assertFalse(startJobs.isEmpty());
+
+		// check records
+		Collection<StepExecution> steps = startJobs.get(0).getStepExecutions();
+		StepExecution mrStep = null;
+		for (StepExecution stepExecution : steps) {
+			ExecutionContext ec = stepExecution.getExecutionContext();
+			assertTrue("Looking for Hive command Status::State", ec.containsKey("Hive command Status::State"));
+			assertTrue("Looking for Hive command Status::command", ec.containsKey("Hive command Status::command"));
+			assertTrue("Looking for Hive command Status::client name", ec.containsKey("Hive command Status::client name"));
+		}
 	}
 
 	@Test
