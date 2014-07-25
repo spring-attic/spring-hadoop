@@ -83,6 +83,7 @@ public class ReadWriteHdfsTest extends AbstractHadoopClusterTests {
 		fs2.exists(p);
 	}
 	
+	// remove it for minihadoopcluster
 	// @Test
 	public void testWorkflowNS() throws Exception {
 		FileSystem fs = FileSystem.get(ctx.getBean(Configuration.class));
