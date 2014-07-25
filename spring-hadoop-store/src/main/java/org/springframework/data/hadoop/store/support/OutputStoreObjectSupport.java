@@ -183,6 +183,16 @@ public abstract class OutputStoreObjectSupport extends StoreObjectSupport {
 		log.info("Setting overwrite to " + overwrite);
 	}
 
+	/**
+	 * Checks if overwrite is enabled.
+	 *
+	 * @return true, if overwrite enabled
+	 * @see #setOverwrite(boolean)
+	 */
+	public boolean isOverwrite() {
+		return overwrite;
+	}
+
     /**
      * Gets the resolved path.
      *

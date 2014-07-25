@@ -93,7 +93,7 @@ public abstract class AbstractDataStreamWriter extends OutputStoreObjectSupport 
 		do {
 			try {
 				p = getResolvedPath();
-				wout = fs.create(p);
+				wout = fs.create(p, isOverwrite());
 				break;
 			} catch (Exception e) {
 				getOutputContext().rollStrategies();
