@@ -14,7 +14,9 @@
 			http://www.springframework.org/schema/integration/ip/spring-integration-ip.xsd">
 
 	<bean id="tcpIpUtils" class="org.springframework.integration.test.util.SocketUtils" />
-
+	<bean id="randomTestPort" class="java.lang.Integer" >
+		<constructor-arg index="0" value="#{tcpIpUtils.findAvailableServerSocket()}"/>
+	</bean>
 	<bean id="serializer" class="org.springframework.yarn.integration.ip.mind.MindRpcSerializer" />
 	<bean id="deserializer" class="org.springframework.yarn.integration.ip.mind.MindRpcSerializer" />
 
@@ -22,7 +24,7 @@
 
 	<ip:tcp-connection-factory id="serverConnectionFactory"
 		type="server"
-		port="#{tcpIpUtils.findAvailableServerSocket(7400)}"
+		port="#{randomTestPort}"
 		socket-support="socketSupport"
 		serializer="serializer"
 		deserializer="deserializer"/>
@@ -30,7 +32,7 @@
 	<ip:tcp-connection-factory id="clientConnectionFactory"
 		type="client"
 		host="localhost"
-		port="#{serverConnectionFactory.port}"
+		port="#{randomTestPort}"
 		serializer="serializer"
 		deserializer="deserializer"/>
 
