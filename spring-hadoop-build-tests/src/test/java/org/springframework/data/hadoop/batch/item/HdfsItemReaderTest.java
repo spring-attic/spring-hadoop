@@ -15,6 +15,8 @@
  */
 package org.springframework.data.hadoop.batch.item;
 
+import static org.junit.Assert.assertNotNull;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.item.ExecutionContext;
@@ -22,16 +24,17 @@ import org.springframework.batch.item.file.MultiResourceItemReader;
 import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.data.hadoop.test.context.HadoopDelegatingSmartContextLoader;
+import org.springframework.data.hadoop.test.context.MiniHadoopCluster;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import static org.junit.Assert.*;
 
 /**
  * @author Costin Leau
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration
+@ContextConfiguration(loader = HadoopDelegatingSmartContextLoader.class)
+@MiniHadoopCluster
 public class HdfsItemReaderTest {
 
 	@Autowired

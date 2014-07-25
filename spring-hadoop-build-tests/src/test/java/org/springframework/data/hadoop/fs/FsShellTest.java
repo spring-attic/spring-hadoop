@@ -18,6 +18,8 @@ package org.springframework.data.hadoop.fs;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.junit.runner.RunWith;
+import org.springframework.data.hadoop.test.context.HadoopDelegatingSmartContextLoader;
+import org.springframework.data.hadoop.test.context.MiniHadoopCluster;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -27,7 +29,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @author Costin Leau
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration
+@ContextConfiguration(loader = HadoopDelegatingSmartContextLoader.class)
+@MiniHadoopCluster
 public class FsShellTest extends AbstractFsShellTest {
 
 	@Override

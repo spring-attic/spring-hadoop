@@ -19,8 +19,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -35,6 +37,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.hadoop.TestUtils;
+import org.springframework.data.hadoop.test.context.HadoopDelegatingSmartContextLoader;
+import org.springframework.data.hadoop.test.context.MiniHadoopCluster;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -44,7 +48,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @SuppressWarnings("deprecation")
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration
+@ContextConfiguration(loader = HadoopDelegatingSmartContextLoader.class)
+@MiniHadoopCluster
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class DistributedCacheTest {
 
@@ -88,7 +93,14 @@ public class DistributedCacheTest {
 	// we do extra parsing since the classpath url behaves different on cloudera  then Apache Vanilla
 	@Test
 	public void testClassPathFiles() throws Exception {
-		Path[] files = DistributedCache.getFileClassPaths(cfg);
+		Path[] tmpFiles = DistributedCache.getFileClassPaths(cfg);
+		List<Path> fileList = new ArrayList<Path>();
+		for (Path file : tmpFiles) {
+			if (!file.toUri().getPath().contains("target")) {
+				fileList.add(file);
+			}
+		}
+		Path[] files = fileList.toArray(new Path[fileList.size()]);
 		assertEquals(1, files.length);
 		Path path = files[0];
 		String p = path.toUri().getPath();
@@ -114,13 +126,18 @@ public class DistributedCacheTest {
 
 	@Test
 	public void testCacheFiles() throws Exception {
-		URI[] files = DistributedCache.getCacheFiles(cfg);
-		System.out.println(Arrays.toString(files));
-		assertEquals(2, files.length);
-		assertEquals("/cp/some-library.jar", files[0].getPath());
-		assertEquals("library.jar", files[0].getFragment());
-		assertEquals("/cache/some-resource.res", files[1].getPath());
-		assertEquals("some-resource.res", files[1].getFragment());
+		URI[] tmpFiles = DistributedCache.getCacheFiles(cfg);
+		List<URI> fileList = new ArrayList<URI>();
+		for (URI file : tmpFiles) {
+			if (!file.getPath().contains("target")) {
+				fileList.add(file);
+			}
+		}
+		assertEquals(2, fileList.size());
+		assertEquals("/cp/some-library.jar", fileList.get(0).getPath());
+		assertEquals("library.jar", fileList.get(0).getFragment());
+		assertEquals("/cache/some-resource.res", fileList.get(1).getPath());
+		assertEquals("some-resource.res", fileList.get(1).getFragment());
 	}
 
 	@Test

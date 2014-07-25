@@ -15,6 +15,10 @@
  */
 package org.springframework.data.hadoop.fs;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
@@ -34,17 +38,18 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.data.hadoop.TestUtils;
+import org.springframework.data.hadoop.test.context.HadoopDelegatingSmartContextLoader;
+import org.springframework.data.hadoop.test.context.MiniHadoopCluster;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.util.Assert;
-
-import static org.junit.Assert.*;
 
 /**
  * FsShell ReadOnly integration tests.
  *
  * @author Costin Leau
  */
-@ContextConfiguration
+@ContextConfiguration(loader = HadoopDelegatingSmartContextLoader.class)
+@MiniHadoopCluster
 public abstract class AbstractROFsShellTest {
 	{
 		TestUtils.hackHadoopStagingOnWin();

@@ -18,6 +18,8 @@ package org.springframework.data.hadoop.fs;
 import org.apache.hadoop.fs.FileSystem;
 import org.junit.runner.RunWith;
 import org.springframework.data.hadoop.HadoopException;
+import org.springframework.data.hadoop.test.context.HadoopDelegatingSmartContextLoader;
+import org.springframework.data.hadoop.test.context.MiniHadoopCluster;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -28,11 +30,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @Thomas Risberg
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration
+@ContextConfiguration(loader = HadoopDelegatingSmartContextLoader.class)
+@MiniHadoopCluster
 public class HftpFsShellTest extends AbstractROFsShellTest {
 
 	public static final String HFTP_FILESYSTEM_CLASS_NAME_FOR_V1_THRU_V2_2 =
-			"org.apache.hadoop.hdfs.HftpFileSystem";
+ "org.apache.hadoop.hdfs.DistributedFileSystem";
 	public static final String HFTP_FILESYSTEM_CLASS_NAME_SINCE_V2_3 =
 			"org.apache.hadoop.hdfs.web.HftpFileSystem";
 

@@ -15,6 +15,8 @@
  */
 package org.springframework.data.hadoop.batch.scripting;
 
+import static org.junit.Assert.assertNotNull;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -22,17 +24,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.hadoop.TestUtils;
 import org.springframework.data.hadoop.batch.JobsTrigger;
+import org.springframework.data.hadoop.test.context.HadoopDelegatingSmartContextLoader;
+import org.springframework.data.hadoop.test.context.MiniHadoopCluster;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import static org.junit.Assert.*;
 
 /**
  *
  * @author Costin Leau
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration
+@ContextConfiguration(loader = HadoopDelegatingSmartContextLoader.class)
+@MiniHadoopCluster
 public class ScriptingBatchTest {
 
 	@Autowired

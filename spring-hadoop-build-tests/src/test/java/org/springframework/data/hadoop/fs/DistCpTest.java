@@ -15,6 +15,8 @@
  */
 package org.springframework.data.hadoop.fs;
 
+import static org.junit.Assume.assumeThat;
+
 import java.util.EnumSet;
 import java.util.UUID;
 
@@ -28,16 +30,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.hadoop.TestUtils;
+import org.springframework.data.hadoop.test.context.HadoopDelegatingSmartContextLoader;
+import org.springframework.data.hadoop.test.context.MiniHadoopCluster;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import static org.junit.Assume.assumeThat;
 
 /**
  * @author Costin Leau
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration
+@ContextConfiguration(loader = HadoopDelegatingSmartContextLoader.class)
+@MiniHadoopCluster
 public class DistCpTest {
 
 	{

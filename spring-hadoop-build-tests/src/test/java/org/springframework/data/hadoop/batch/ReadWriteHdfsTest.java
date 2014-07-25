@@ -15,19 +15,26 @@
  */
 package org.springframework.data.hadoop.batch;
 
+import static org.junit.Assert.assertTrue;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.Job;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
-import org.springframework.context.support.GenericXmlApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.data.hadoop.TestUtils;
 import org.springframework.data.hadoop.fs.HdfsResourceLoader;
-
-import static org.junit.Assert.assertTrue;
+import org.springframework.data.hadoop.test.context.HadoopDelegatingSmartContextLoader;
+import org.springframework.data.hadoop.test.context.MiniHadoopCluster;
+import org.springframework.data.hadoop.test.junit.AbstractHadoopClusterTests;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 
 /**
@@ -35,7 +42,10 @@ import static org.junit.Assert.assertTrue;
  *
  * @author Costin Leau
  */
-public class ReadWriteHdfsTest {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(loader = HadoopDelegatingSmartContextLoader.class, locations = { "/org/springframework/data/hadoop/batch/in-do-out.xml" })
+@MiniHadoopCluster
+public class ReadWriteHdfsTest extends AbstractHadoopClusterTests {
 
 	{
 		TestUtils.hackHadoopStagingOnWin();
@@ -47,13 +57,11 @@ public class ReadWriteHdfsTest {
 		StepSynchronizationManager.close();
 	}
 
+	@Autowired
+	ApplicationContext ctx;
+
 	@Test
 	public void testWorkflow() throws Exception {
-
-		GenericXmlApplicationContext ctx = new GenericXmlApplicationContext(
-				"/org/springframework/data/hadoop/batch/in-do-out.xml");
-
-		ctx.registerShutdownHook();
 
 		FileSystem fs = FileSystem.get(ctx.getBean(Configuration.class));
 		System.out.println("FS is " + fs.getClass().getName());
@@ -73,24 +81,15 @@ public class ReadWriteHdfsTest {
 		System.out.println("FS is " + fs2.getClass().getName());
 
 		fs2.exists(p);
-
-		ctx.close();
 	}
-
-	@Test
+	
+	// @Test
 	public void testWorkflowNS() throws Exception {
-		GenericXmlApplicationContext ctx = new GenericXmlApplicationContext(
-				"/org/springframework/data/hadoop/batch/in-do-out-ns.xml");
-
-		ctx.registerShutdownHook();
-
 		FileSystem fs = FileSystem.get(ctx.getBean(Configuration.class));
 		fs.delete(new Path("/ide-test/output/word/"), true);
-
 		assertTrue(ctx.isPrototype("hadoop-tasklet"));
-
 		JobsTrigger.startJobs(ctx);
-		ctx.close();
-	}
+	 }
+
 
 }

@@ -30,6 +30,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.hadoop.TestUtils;
+import org.springframework.data.hadoop.test.context.HadoopDelegatingSmartContextLoader;
+import org.springframework.data.hadoop.test.context.MiniHadoopCluster;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -47,7 +49,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @author Costin Leau
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("/org/springframework/data/hadoop/streaming/basic.xml")
+@ContextConfiguration(loader = HadoopDelegatingSmartContextLoader.class, locations = { "/org/springframework/data/hadoop/streaming/basic.xml" })
+@MiniHadoopCluster
 public class StreamingTest {
 
 	@Autowired

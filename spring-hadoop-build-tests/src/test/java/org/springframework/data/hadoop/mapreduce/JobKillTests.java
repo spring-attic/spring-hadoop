@@ -15,6 +15,9 @@
  */
 package org.springframework.data.hadoop.mapreduce;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.apache.hadoop.mapreduce.Job;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,17 +27,17 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.data.hadoop.TestUtils;
 import org.springframework.data.hadoop.batch.JobsTrigger;
 import org.springframework.data.hadoop.mapreduce.JobUtils.JobStatus;
+import org.springframework.data.hadoop.test.context.HadoopDelegatingSmartContextLoader;
+import org.springframework.data.hadoop.test.context.MiniHadoopCluster;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Costin Leau
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration
+@ContextConfiguration(loader = HadoopDelegatingSmartContextLoader.class)
+@MiniHadoopCluster
 public class JobKillTests {
 
 	@Autowired

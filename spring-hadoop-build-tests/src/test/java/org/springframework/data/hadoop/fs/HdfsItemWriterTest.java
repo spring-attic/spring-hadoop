@@ -16,7 +16,6 @@
 package org.springframework.data.hadoop.fs;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -34,14 +33,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.serializer.DefaultSerializer;
 import org.springframework.core.serializer.Serializer;
 import org.springframework.data.hadoop.batch.item.HdfsItemWriter;
@@ -217,19 +209,6 @@ public class HdfsItemWriterTest {
 		}
 
 		verifyZeroInteractions(fsDataOutputStream);
-	}
-
-	@Test
-	public void testWithinJob() throws Exception {
-		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("/org/springframework/data/hadoop/fs/HdfsItemWriterTest-context.xml");
-		JobLauncher launcher = context.getBean(JobLauncher.class);
-		Job job = context.getBean(Job.class);
-
-		JobParameters jobParameters = new JobParametersBuilder().toJobParameters();
-
-		JobExecution execution = launcher.run(job, jobParameters);
-		assertTrue("status was: " + execution.getStatus(), execution.getStatus() == BatchStatus.COMPLETED);
-		context.close();
 	}
 
 	@SuppressWarnings("unchecked")

@@ -15,6 +15,11 @@
  */
 package org.springframework.data.hadoop.scripting;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -30,19 +35,20 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.data.hadoop.TestUtils;
 import org.springframework.data.hadoop.fs.FsShell;
 import org.springframework.data.hadoop.fs.SimplerFileSystem;
+import org.springframework.data.hadoop.test.context.HadoopDelegatingSmartContextLoader;
+import org.springframework.data.hadoop.test.context.MiniHadoopCluster;
 import org.springframework.scripting.ScriptSource;
 import org.springframework.scripting.support.ResourceScriptSource;
 import org.springframework.scripting.support.StaticScriptSource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import static org.junit.Assert.*;
-
 /**
  * @author Costin Leau
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration
+@ContextConfiguration(loader = HadoopDelegatingSmartContextLoader.class)
+@MiniHadoopCluster
 public class ScriptingTest {
 
 	{
