@@ -72,4 +72,15 @@ public class RollingFileNamingStrategyTests {
 		assertThat(strategy.resolve(new Path("/foo/jee")).toString(), is("/foo/jee-0"));
 	}
 
+	@Test
+	public void testInitPaths() throws Exception {
+		RollingFileNamingStrategy strategy = new RollingFileNamingStrategy();
+		strategy.init(new Path("/foo/jee-123.txt"));
+		Integer counter = TestUtils.readField("counter", strategy);
+		assertThat(counter, is(124));
+		strategy.init(new Path("/projects/loganalysis/yarn/2014/07/24/00/logIngestion-98e327c1-5f24-463a-88d7-571195529825-0.txt"));
+		counter = TestUtils.readField("counter", strategy);
+		assertThat(counter, is(1));
+	}
+
 }
