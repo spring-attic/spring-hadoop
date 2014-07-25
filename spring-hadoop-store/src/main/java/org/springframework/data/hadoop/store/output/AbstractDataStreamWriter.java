@@ -78,7 +78,13 @@ public abstract class AbstractDataStreamWriter extends OutputStoreObjectSupport 
 	 */
 	protected StreamsHolder<OutputStream> getOutput() throws IOException {
 		StreamsHolder<OutputStream> holder = new StreamsHolder<OutputStream>();
-		FileSystem fs = FileSystem.get(getConfiguration());
+		FileSystem fs = null;
+		try {
+			fs = FileSystem.get(getConfiguration());
+		} catch (Exception e) {
+			// hadoop1 specific error so we throw it here
+			throw new StoreException("Unable to access FileSystem", e);
+		}
 
 		// Using maxOpenAttempts try to resolve path and open
 		// an output stream and automatically rolling strategies
