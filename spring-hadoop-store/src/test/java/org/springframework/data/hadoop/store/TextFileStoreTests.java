@@ -267,6 +267,8 @@ public class TextFileStoreTests extends AbstractStoreTests {
 	public void testHdfsAvailableAfterWriterInitsSeeWriteException() throws Exception {
 		Configuration failConfiguration = new Configuration();
 		failConfiguration.set("fs.defaultFS", "hdfs://localhost:12345");
+		// for hadoop1
+		failConfiguration.set("fs.default.name", "hdfs://localhost:12345");
 		String[] dataArray = new String[] { DATA10 };
 
 		// use configuration which would not work for hdfs
