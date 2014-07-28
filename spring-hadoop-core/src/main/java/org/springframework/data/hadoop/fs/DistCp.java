@@ -29,9 +29,10 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * Exposes the Hadoop command-line distcp as
- * an embeddable API.
+ * Exposes the Hadoop command-line distcp as an embeddable API.
  * 
+ * @author Costin Leau
+ * @author Thomas Risberg
  * @author liujiong
  */
 public class DistCp {

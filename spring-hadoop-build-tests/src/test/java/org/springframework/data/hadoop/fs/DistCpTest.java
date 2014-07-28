@@ -15,15 +15,12 @@
  */
 package org.springframework.data.hadoop.fs;
 
-import java.util.EnumSet;
 import java.util.UUID;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.hamcrest.core.Is;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,9 +28,8 @@ import org.springframework.data.hadoop.TestUtils;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import static org.junit.Assume.assumeThat;
-
 /**
+ * @author Costin Leau
  * @author liujiong
  */
 @RunWith(SpringJUnit4ClassRunner.class)
