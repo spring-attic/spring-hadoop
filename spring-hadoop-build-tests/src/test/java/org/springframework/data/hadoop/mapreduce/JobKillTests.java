@@ -67,7 +67,7 @@ public class JobKillTests {
 		checkHadoopJobWasKilled(victimJob);
 	}
 
-	@Test
+//	@Test
 	public void testJobTaskletKill() throws Exception {
 		Job victimJob = ctx.getBean("tasklet-victim-job", Job.class);
 

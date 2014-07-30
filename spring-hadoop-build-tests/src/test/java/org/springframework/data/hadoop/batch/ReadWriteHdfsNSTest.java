@@ -20,6 +20,7 @@ import static org.junit.Assert.assertTrue;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.mapreduce.v2.MiniMRYarnCluster;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -59,6 +60,8 @@ public class ReadWriteHdfsNSTest extends AbstractHadoopClusterTests {
 
 	@Test
 	public void testWorkflowNS() throws Exception {
+
+		// ctx.r
 
 		FileSystem fs = FileSystem.get(ctx.getBean(Configuration.class));
 		fs.delete(new Path("/ide-test/output/word/"), true);

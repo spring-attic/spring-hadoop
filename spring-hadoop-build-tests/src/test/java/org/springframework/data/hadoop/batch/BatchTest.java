@@ -18,6 +18,7 @@ package org.springframework.data.hadoop.batch;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.scope.context.ChunkContext;
@@ -25,12 +26,24 @@ import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericXmlApplicationContext;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.data.hadoop.test.context.HadoopDelegatingSmartContextLoader;
+import org.springframework.data.hadoop.test.context.MiniHadoopCluster;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * @author Costin Leau
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(loader = HadoopDelegatingSmartContextLoader.class, locations = { "/org/springframework/data/hadoop/batch/multi-thread.xml" })
+@MiniHadoopCluster
+@DirtiesContext(classMode=ClassMode.AFTER_CLASS)
 public class BatchTest {
 
 	public static class ThreadedTasklet implements Tasklet {
@@ -69,14 +82,12 @@ public class BatchTest {
 			return RepeatStatus.FINISHED;
 		}
 	}
+	
+	@Autowired
+	private ApplicationContext ctx;
 
 	@Test
 	public void testMultiThreadedBatch() throws Exception {
-		GenericXmlApplicationContext ctx = new GenericXmlApplicationContext(
-				"/org/springframework/data/hadoop/batch/multi-thread.xml");
-
-		ctx.registerShutdownHook();
-
 		JobsTrigger.startJobs(ctx);
 	}
 
@@ -84,4 +95,4 @@ public class BatchTest {
 	public void testMultiThreadedBatch2() throws Exception {
 		testMultiThreadedBatch();
 	}
-}
+ }

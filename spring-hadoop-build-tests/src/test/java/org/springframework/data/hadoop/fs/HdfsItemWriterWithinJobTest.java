@@ -16,7 +16,9 @@
 package org.springframework.data.hadoop.fs;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeThat;
 
+import org.hamcrest.core.Is;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
@@ -29,6 +31,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.hadoop.test.context.HadoopDelegatingSmartContextLoader;
 import org.springframework.data.hadoop.test.context.MiniHadoopCluster;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -39,12 +43,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(loader = HadoopDelegatingSmartContextLoader.class, locations = { "/org/springframework/data/hadoop/fs/HdfsItemWriterTest-context.xml" })
 @MiniHadoopCluster
+@DirtiesContext(classMode=ClassMode.AFTER_CLASS)
 public class HdfsItemWriterWithinJobTest {
-
 
 	@Autowired
 	ApplicationContext context;
-
+	
 	@Test
 	public void testWithinJob() throws Exception {
 		JobLauncher launcher = context.getBean(JobLauncher.class);
