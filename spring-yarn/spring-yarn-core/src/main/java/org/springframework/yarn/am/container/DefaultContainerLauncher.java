@@ -15,6 +15,8 @@
  */
 package org.springframework.yarn.am.container;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -26,6 +28,10 @@ import java.util.concurrent.ScheduledFuture;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.hadoop.io.DataOutputBuffer;
+import org.apache.hadoop.security.Credentials;
+import org.apache.hadoop.security.UserGroupInformation;
+import org.apache.hadoop.security.token.Token;
 import org.apache.hadoop.yarn.api.protocolrecords.StartContainerRequest;
 import org.apache.hadoop.yarn.api.protocolrecords.StartContainersRequest;
 import org.apache.hadoop.yarn.api.protocolrecords.StartContainersResponse;
@@ -35,6 +41,7 @@ import org.apache.hadoop.yarn.api.records.ContainerLaunchContext;
 import org.apache.hadoop.yarn.api.records.ContainerState;
 import org.apache.hadoop.yarn.api.records.ContainerStatus;
 import org.apache.hadoop.yarn.api.records.SerializedException;
+import org.apache.hadoop.yarn.security.AMRMTokenIdentifier;
 import org.apache.hadoop.yarn.util.ConverterUtils;
 import org.apache.hadoop.yarn.util.Records;
 import org.springframework.scheduling.Trigger;
@@ -115,6 +122,8 @@ public class DefaultContainerLauncher extends AbstractLauncher implements Contai
 		ctx.setEnvironment(env);
 		ctx = getInterceptors().preLaunch(container, ctx);
 
+		setupLaunchContextTokens(ctx);
+
 		StartContainerRequest startContainerRequest = Records.newRecord(StartContainerRequest.class);
 
 		if (log.isDebugEnabled()) {
@@ -151,6 +160,32 @@ public class DefaultContainerLauncher extends AbstractLauncher implements Contai
 					getYarnEventPublisher().publishContainerLaunchRequestFailed(this, container);
 				}
 			}
+		}
+	}
+
+	/**
+	 * Setup tokens for {@link ContainerLaunchContext}.
+	 *
+	 * @param ctx the container launch context
+	 */
+	protected void setupLaunchContextTokens(ContainerLaunchContext ctx) {
+		try {
+			Credentials credentials = UserGroupInformation.getCurrentUser().getCredentials();
+			DataOutputBuffer dob = new DataOutputBuffer();
+			credentials.writeTokenStorageToStream(dob);
+			// remove the AM-RM token containers should not access
+			Iterator<Token<?>> iterator = credentials.getAllTokens().iterator();
+			while (iterator.hasNext()) {
+				Token<?> token = iterator.next();
+				log.info("Token " + token);
+				if (token.getKind().equals(AMRMTokenIdentifier.KIND_NAME)) {
+					iterator.remove();
+				}
+			}
+			ByteBuffer allTokens = ByteBuffer.wrap(dob.getData(), 0, dob.getLength());
+			ctx.setTokens(allTokens);
+		} catch (IOException e) {
+			log.error("Error setting tokens for launch context", e);
 		}
 	}
 

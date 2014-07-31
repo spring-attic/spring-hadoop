@@ -95,7 +95,7 @@ public abstract class AbstractDataStreamWriter extends OutputStoreObjectSupport 
 				if (isAppendable() && p.getFileSystem(getConfiguration()).exists(p)) {
 					wout = fs.append(p);
 				} else {
-					wout = fs.create(p);
+					wout = fs.create(p, isOverwrite());
 				}
 				break;
 			} catch (Exception e) {

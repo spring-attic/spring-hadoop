@@ -18,19 +18,23 @@ package org.springframework.yarn.integration.ip.mind;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assume.assumeTrue;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.integration.channel.QueueChannel;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.yarn.am.AppmasterService;
@@ -50,13 +54,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
+@DirtiesContext(classMode=ClassMode.AFTER_EACH_TEST_METHOD)
 public class MindIntegrationRawTests {
+	private static final Log log = LogFactory.getLog(MindIntegrationRawTests.class);
 
 	@Autowired
 	ApplicationContext ctx;
 
 	@Autowired
 	PortExposingTcpSocketSupport socketSupport;
+
+	@Autowired
+	@Qualifier("randomTestPort")
+	Integer randomTestPort;
 
 	@Autowired
 	MessageChannel serverChannel;
@@ -75,6 +85,9 @@ public class MindIntegrationRawTests {
 
 	@Test
 	public void testVanillaChannels() throws Exception {
+		log.info("randomTestPort=" + randomTestPort);
+		waitPort();
+
 		assertNotNull(socketSupport);
 
 		SimpleTestRequest req = new SimpleTestRequest();
@@ -95,15 +108,32 @@ public class MindIntegrationRawTests {
 
 	@Test
 	public void testServiceInterfaces() throws Exception {
+		log.info("randomTestPort=" + randomTestPort);
+		waitPort();
 		assertNotNull(mindAppmasterService);
 		assertNotNull(mindAppmasterServiceClient);
 
-        assumeTrue(mindAppmasterService.getPort() > 0); //TODO: if we didn't get a good port - skip test for now
-        assertThat(mindAppmasterService.getPort(), greaterThan(0));
+		assertThat(mindAppmasterService.getPort(), greaterThan(0));
 
 		SimpleTestRequest request = new SimpleTestRequest();
 		BaseResponseObject response = mindAppmasterServiceClient.doMindRequest(request);
 		assertNotNull(response);
+	}
+
+	private void waitPort() {
+		assertNotNull(mindAppmasterService);
+		for (int i = 0; i<5; i++) {
+			log.info("waiting port " + i);
+			if (mindAppmasterService.getPort() > 0) {
+				log.info("found port " + mindAppmasterService.getPort());
+				return;
+			} else {
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+				}
+			}
+		}
 	}
 
 }

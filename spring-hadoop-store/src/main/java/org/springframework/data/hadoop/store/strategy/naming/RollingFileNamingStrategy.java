@@ -69,7 +69,11 @@ public class RollingFileNamingStrategy extends AbstractFileNamingStrategy {
 			Pattern counterPattern = Pattern.compile(prefix + "(" + "\\d+" + ")");
 			Matcher m = counterPattern.matcher(name);
 			while (m.find()) {
-				counter = Integer.parseInt(m.group(1)) + 1;
+				try {
+					counter = Integer.parseInt(m.group(1)) + 1;
+				} catch (NumberFormatException e) {
+					// we don't care about numeric parts we can't parse
+				}
 			}
 			log.debug("Initialized counter starting from " + counter);
 

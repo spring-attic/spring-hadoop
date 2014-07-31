@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -184,6 +184,16 @@ public abstract class OutputStoreObjectSupport extends StoreObjectSupport {
 	public void setOverwrite(boolean overwrite) {
 		this.overwrite = overwrite;
 		log.info("Setting overwrite to " + overwrite);
+	}
+
+	/**
+	 * Checks if overwrite is enabled.
+	 *
+	 * @return true, if overwrite enabled
+	 * @see #setOverwrite(boolean)
+	 */
+	public boolean isOverwrite() {
+		return overwrite;
 	}
 
 	/**
