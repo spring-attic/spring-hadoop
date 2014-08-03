@@ -16,6 +16,7 @@
 package org.springframework.yarn.boot.properties;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -42,6 +43,7 @@ public class SpringHadoopProperties {
 	private Integer resourceManagerSchedulerPort = 8030;
 	private List<String> resources;
 	private SpringHadoopSecurityProperties security;
+	private Map<String, String> config;
 
 	@Autowired
 	private SpringYarnEnvProperties syep;
@@ -127,6 +129,14 @@ public class SpringHadoopProperties {
 
 	public void setSecurity(SpringHadoopSecurityProperties security) {
 		this.security = security;
+	}
+
+	public Map<String, String> getConfig() {
+		return config;
+	}
+
+	public void setConfig(Map<String, String> config) {
+		this.config = config;
 	}
 
 	public static class SpringHadoopSecurityProperties {

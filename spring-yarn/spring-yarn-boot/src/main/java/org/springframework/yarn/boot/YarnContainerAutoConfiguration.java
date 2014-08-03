@@ -114,6 +114,9 @@ public class YarnContainerAutoConfiguration {
 		public void configure(YarnConfigConfigurer config) throws Exception {
 			config
 				.fileSystemUri(shp.getFsUri())
+				.withProperties()
+					.properties(shp.getConfig())
+					.and()
 				.withSecurity()
 					.namenodePrincipal(shp.getSecurity() != null ? shp.getSecurity().getNamenodePrincipal() : null)
 					.rmManagerPrincipal(shp.getSecurity() != null ? shp.getSecurity().getRmManagerPrincipal() : null)

@@ -73,6 +73,20 @@ public class SpringHadoopPropertiesTests {
 		context.close();
 	}
 
+	@Test
+	public void testHadoopConfig() {
+		SpringApplication app = new SpringApplication(TestConfiguration.class);
+		app.setWebEnvironment(false);
+		ConfigurableApplicationContext context = app
+				.run(new String[] { "--spring.config.name=SpringHadoopPropertiesTests3" });
+		SpringHadoopProperties properties = context.getBean(SpringHadoopProperties.class);
+		assertThat(properties, notNullValue());
+		assertThat(properties.getConfig(), notNullValue());
+		assertThat(properties.getConfig().get("key1"), is("value1"));
+		assertThat(properties.getConfig().get("key2"), is("value2"));
+		context.close();
+	}
+
 	@Configuration
 	@EnableConfigurationProperties({ SpringHadoopProperties.class, SpringYarnEnvProperties.class })
 	protected static class TestConfiguration {

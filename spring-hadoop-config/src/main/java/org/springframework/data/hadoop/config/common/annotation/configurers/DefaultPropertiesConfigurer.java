@@ -15,6 +15,7 @@
  */
 package org.springframework.data.hadoop.config.common.annotation.configurers;
 
+import java.util.Map;
 import java.util.Properties;
 
 import org.springframework.data.hadoop.config.common.annotation.AnnotationBuilder;
@@ -41,11 +42,21 @@ public class DefaultPropertiesConfigurer<O,I,B extends AnnotationBuilder<O>>
 	 * @param properties the properties
 	 * @return the {@link PropertiesConfigurer} for chaining
 	 */
+	@Override
 	public PropertiesConfigurer<I> properties(Properties properties) {
 		if (properties != null) {
 			this.properties.putAll(properties);
 		}
 		return this;
+	}
+
+	@Override
+	public PropertiesConfigurer<I> properties(Map<String, String> properties) {
+		Properties props = new Properties();
+		if (properties != null) {
+			props.putAll(properties);
+		}
+		return properties(props);
 	}
 
 	/**
@@ -55,6 +66,7 @@ public class DefaultPropertiesConfigurer<O,I,B extends AnnotationBuilder<O>>
 	 * @param value the value
 	 * @return the {@link PropertiesConfigurer} for chaining
 	 */
+	@Override
 	public PropertiesConfigurer<I> property(String key, String value) {
 		properties.put(key, value);
 		return this;

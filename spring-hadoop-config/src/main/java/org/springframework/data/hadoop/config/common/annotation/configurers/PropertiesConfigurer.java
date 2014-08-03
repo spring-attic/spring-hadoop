@@ -15,6 +15,7 @@
  */
 package org.springframework.data.hadoop.config.common.annotation.configurers;
 
+import java.util.Map;
 import java.util.Properties;
 
 import org.springframework.data.hadoop.config.common.annotation.AnnotationConfigurerBuilder;
@@ -31,6 +32,8 @@ import org.springframework.data.hadoop.config.common.annotation.AnnotationConfig
 public interface PropertiesConfigurer<I> extends AnnotationConfigurerBuilder<I> {
 
 	PropertiesConfigurer<I> properties(Properties properties);
+
+	PropertiesConfigurer<I> properties(Map<String, String> properties);
 
 	PropertiesConfigurer<I> property(String key, String value);
 
