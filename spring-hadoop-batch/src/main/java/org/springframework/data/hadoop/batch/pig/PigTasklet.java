@@ -20,10 +20,15 @@ import java.util.List;
 import org.apache.pig.PigServer;
 import org.apache.pig.backend.executionengine.ExecJob;
 import org.apache.pig.tools.pigstats.InputStats;
+import org.apache.pig.tools.pigstats.JobStats;
 import org.apache.pig.tools.pigstats.PigStats;
 import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.core.scope.context.StepContext;
+import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.data.hadoop.pig.PigExecutor;
 import org.springframework.util.CollectionUtils;
@@ -32,19 +37,21 @@ import org.springframework.util.CollectionUtils;
  * Pig tasklet. Note the same {@link PigServer} is shared between invocations. 
  * 
  * @author Costin Leau
+ * @author David Liu
  */
 public class PigTasklet extends PigExecutor implements Tasklet {
 
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		List<ExecJob> execs = executePigScripts();
-
+		StepContext context = StepSynchronizationManager.getContext();
+		final StepExecution stepExecution = (context != null) ? context.getStepExecution() : null;
 		// save stats
-		saveStats(execs, contribution);
+		saveStats(execs, contribution, stepExecution);
 
 		return RepeatStatus.FINISHED;
 	}
 
-	private void saveStats(List<ExecJob> execs, StepContribution contribution) throws Exception {
+	private void saveStats(List<ExecJob> execs, StepContribution contribution, StepExecution stepExecution) throws Exception {
 
 		if (CollectionUtils.isEmpty(execs) || contribution == null) {
 			return;
@@ -74,6 +81,11 @@ public class PigTasklet extends PigExecutor implements Tasklet {
 				//for (int i = 0; i < safeLongToInt(count.getValue()); i++) {
 				//	contribution.incrementWriteSkipCount();
 				//}
+			}
+			ExecutionContext executionContext = stepExecution.getExecutionContext();
+			for (JobStats stat : execJob.getStatistics().getJobGraph().getJobList()) {
+				executionContext.put("Job Id: ", stat.getJobId());
+				executionContext.put("JobState Id: ", stat.getState().toString());
 			}
 		}
 	}

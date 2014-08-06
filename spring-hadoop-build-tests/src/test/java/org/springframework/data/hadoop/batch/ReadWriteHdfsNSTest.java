@@ -20,7 +20,6 @@ import static org.junit.Assert.assertTrue;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.mapreduce.v2.MiniMRYarnCluster;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,6 +30,8 @@ import org.springframework.data.hadoop.TestUtils;
 import org.springframework.data.hadoop.test.context.HadoopDelegatingSmartContextLoader;
 import org.springframework.data.hadoop.test.context.MiniHadoopCluster;
 import org.springframework.data.hadoop.test.junit.AbstractHadoopClusterTests;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -43,6 +44,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(loader = HadoopDelegatingSmartContextLoader.class, locations = { "/org/springframework/data/hadoop/batch/in-do-out-ns.xml" })
 @MiniHadoopCluster
+@DirtiesContext(classMode=ClassMode.AFTER_EACH_TEST_METHOD)
 public class ReadWriteHdfsNSTest extends AbstractHadoopClusterTests {
 
 	{

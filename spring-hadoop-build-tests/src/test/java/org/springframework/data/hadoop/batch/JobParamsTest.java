@@ -38,6 +38,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.data.hadoop.TestUtils;
 import org.springframework.data.hadoop.test.context.HadoopDelegatingSmartContextLoader;
 import org.springframework.data.hadoop.test.context.MiniHadoopCluster;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -50,6 +52,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(loader = HadoopDelegatingSmartContextLoader.class)
 @MiniHadoopCluster
+@DirtiesContext(classMode=ClassMode.AFTER_EACH_TEST_METHOD)
 public class JobParamsTest {
 
 	{

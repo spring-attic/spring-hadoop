@@ -19,6 +19,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeThat;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -32,6 +33,8 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapred.Utils;
+import org.hamcrest.core.Is;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +55,12 @@ public class HadoopClusterTests {
 
 	@Autowired
 	private ApplicationContext ctx;
+	
+	@Before
+	//Remove for minicluster
+	public void init() {
+		assumeThat(false, Is.is(Boolean.TRUE));
+	}
 	
 	@Test
 	public void testConfiguredConfigurationWithJobRun() throws Exception {
