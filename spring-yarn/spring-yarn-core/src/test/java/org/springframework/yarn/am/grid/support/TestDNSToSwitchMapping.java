@@ -26,4 +26,9 @@ public class TestDNSToSwitchMapping implements DNSToSwitchMapping {
 	public void reloadCachedMappings() {
 	}
 
+	public void reloadCachedMappings(List<String> names) {
+		// this method added in hadoop 2.4, so keep it here
+		// and don't add override for compile not to fail with 2.2
+	}
+
 }
