@@ -15,18 +15,12 @@
  */
 package org.springframework.yarn.am.cluster;
 
-import org.springframework.yarn.support.statemachine.state.State;
-
 /**
  * Possible events controlling this machine.
  */
 public enum ClusterEvent {
 
-	/**
-	 * Command requesting {@link State#RUNNING} state.
-	 */
 	START,
-
 	CONFIGURE,
 	CONTINUE,
 	STOP,

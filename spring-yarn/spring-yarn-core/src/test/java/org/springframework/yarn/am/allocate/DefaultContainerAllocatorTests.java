@@ -292,10 +292,14 @@ public class DefaultContainerAllocatorTests {
 				ret = r1.getCapability().compareTo(r2.getCapability());
 			}
 			if (ret == 0) {
-				ret = Integer.compare(r1.getNumContainers(), r2.getNumContainers());
+				int x = r1.getNumContainers();
+				int y = r2.getNumContainers();
+				ret =  (x < y) ? -1 : ((x == y) ? 0 : 1);
 			}
 			if (ret == 0) {
-				Boolean.compare(r1.getRelaxLocality(), r2.getRelaxLocality());
+				boolean x = r1.getRelaxLocality();
+				boolean y = r2.getRelaxLocality();
+				ret = (x == y) ? 0 : (x ? 1 : -1);
 			}
 			return ret;
 		}

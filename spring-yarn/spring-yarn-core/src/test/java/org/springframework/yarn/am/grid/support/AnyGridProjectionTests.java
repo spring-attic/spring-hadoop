@@ -82,7 +82,7 @@ public class AnyGridProjectionTests {
 		AnyGridProjection projection = new AnyGridProjection();
 		projection.setPriority(0);
 		projection.setProjectionData(new ProjectionData(2));
-		int count = TestUtils.readField("count", projection);
+		Integer count = TestUtils.readField("count", projection);
 		assertThat(count, is(2));
 
 		Priority priority = MockUtils.getMockPriority(0);

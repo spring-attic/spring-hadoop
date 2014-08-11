@@ -273,7 +273,7 @@ public abstract class AbstractContainerClusterAppmaster extends AbstractEventing
 	 * Sets the {@link GridProjectionFactory} used to create an instances
 	 * of {@link GridProjection}s.
 	 *
-	 * @param factory the grid projection factory
+	 * @param gridProjectionFactory the grid projection factory
 	 */
 	@Autowired
 	public void setGridProjectionFactory(GridProjectionFactory gridProjectionFactory) {

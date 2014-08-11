@@ -160,9 +160,9 @@ public interface YarnEnvironmentConfigurer {
 	 *
 	 * @param id the identifier
 	 * @param locations the properties file locations
-	 * @return
+	 * @return {@link YarnEnvironmentConfigurer} for chaining
 	 * @throws IOException
-	 * @see {@link #propertiesLocation(String...)}
+	 * @see #propertiesLocation(String...)
 	 */
 	YarnEnvironmentConfigurer propertiesLocationId(String id, String[] locations) throws IOException;
 

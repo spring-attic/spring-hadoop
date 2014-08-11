@@ -32,7 +32,7 @@ import org.apache.hadoop.io.compress.SnappyCodec;
  * in a constructor are just keywords to do back mapping from a lookup table. Registering a mixing
  * abbreviations is not checked.
  * <p>
- * Codecs.get("gzip").getAbbreviation(); -> "GZIP"
+ * Codecs.get("gzip").getAbbreviation(); "GZIP"
  * <p>
  *
  * @author Janne Valkealahti
