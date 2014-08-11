@@ -76,10 +76,20 @@ public interface YarnEnvironmentConfigurer {
 	 * &lt;/yarn:environment&gt;
 	 * </pre>
 	 *
-	 * @return {@link DefaultEnvironmentClasspathConfigurer} for classpath
+	 * @return {@link EnvironmentClasspathConfigurer} for classpath
 	 * @throws Exception if error occurred
 	 */
 	EnvironmentClasspathConfigurer withClasspath() throws Exception;
+
+	/**
+	 * Specify a classpath environment variable using an identifier.
+	 *
+	 * @param id the identifier
+	 * @return {@link EnvironmentClasspathConfigurer} for classpath
+	 * @throws Exception if error occurred
+	 * @see #withClasspath()
+	 */
+	EnvironmentClasspathConfigurer withClasspath(String id) throws Exception;
 
 	/**
 	 * Specify an environment variable.
@@ -106,6 +116,17 @@ public interface YarnEnvironmentConfigurer {
 	 * @return {@link YarnEnvironmentConfigurer} for chaining
 	 */
 	YarnEnvironmentConfigurer entry(String key, String value);
+
+	/**
+	 * Specify an environment variable using an identifier.
+	 *
+	 * @param id the identifier
+	 * @param key The environment key
+	 * @param value The environment value
+	 * @return {@link YarnEnvironmentConfigurer} for chaining
+	 * @see #entry(String, String)
+	 */
+	YarnEnvironmentConfigurer entry(String id, String key, String value);
 
 	/**
 	 * Specify properties locations.
@@ -135,6 +156,17 @@ public interface YarnEnvironmentConfigurer {
 	YarnEnvironmentConfigurer propertiesLocation(String... locations) throws IOException;
 
 	/**
+	 * Specify properties locations with an identifier.
+	 *
+	 * @param id the identifier
+	 * @param locations the properties file locations
+	 * @return
+	 * @throws IOException
+	 * @see {@link #propertiesLocation(String...)}
+	 */
+	YarnEnvironmentConfigurer propertiesLocationId(String id, String[] locations) throws IOException;
+
+	/**
 	 * Specify if existing system environment variables should
 	 * be included automatically.
 	 *
@@ -155,6 +187,17 @@ public interface YarnEnvironmentConfigurer {
 	 * @return {@link YarnEnvironmentConfigurer} for chaining
 	 */
 	YarnEnvironmentConfigurer includeLocalSystemEnv(boolean includeLocalSystemEnv);
+
+	/**
+	 * Specify if existing system environment variables should
+	 * be included automatically with an identifier.
+	 *
+	 * @param id the identifier
+	 * @param includeLocalSystemEnv if system env variables should be included
+	 * @return {@link YarnEnvironmentConfigurer} for chaining
+	 * @see #includeLocalSystemEnv(boolean)
+	 */
+	YarnEnvironmentConfigurer includeLocalSystemEnv(String id, boolean includeLocalSystemEnv);
 
 	/**
 	 * Specify properties with a {@link org.springframework.data.hadoop.config.common.annotation.configurers.PropertiesConfigurer}.
@@ -183,5 +226,16 @@ public interface YarnEnvironmentConfigurer {
 	 * @throws Exception if error occurred
 	 */
 	PropertiesConfigurer<YarnEnvironmentConfigurer> withProperties() throws Exception;
+
+	/**
+	 * Specify properties with a {@link org.springframework.data.hadoop.config.common.annotation.configurers.PropertiesConfigurer}
+	 * with an identifier.
+	 *
+	 * @param id the identifier
+	 * @return {@link org.springframework.data.hadoop.config.common.annotation.configurers.PropertiesConfigurer} for chaining
+	 * @throws Exception if error occurred
+	 * @see #withProperties()
+	 */
+	PropertiesConfigurer<YarnEnvironmentConfigurer> withProperties(String id) throws Exception;
 
 }

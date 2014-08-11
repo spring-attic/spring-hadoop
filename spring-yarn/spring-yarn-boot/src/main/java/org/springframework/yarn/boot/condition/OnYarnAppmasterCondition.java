@@ -20,6 +20,7 @@ import org.springframework.boot.autoconfigure.condition.SpringBootCondition;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.core.type.AnnotatedTypeMetadata;
+import org.springframework.util.StringUtils;
 
 /**
  * {@link Condition} that checks for the presence of Hadoop Yarn appmaster.
@@ -34,6 +35,10 @@ class OnYarnAppmasterCondition extends SpringBootCondition {
 	@Override
 	public ConditionOutcome getMatchOutcome(ConditionContext context, AnnotatedTypeMetadata metadata) {
 		String tokenEnv = System.getenv(TOKEN_ENV);
+		// TODO: check that this is ok
+		if (!StringUtils.hasText(tokenEnv)) {
+			tokenEnv = System.getProperty(TOKEN_ENV);
+		}
 
 		if (tokenEnv != null) {
 			String[] split = tokenEnv.split("/");

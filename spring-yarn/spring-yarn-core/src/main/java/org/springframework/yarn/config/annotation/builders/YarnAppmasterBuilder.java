@@ -15,7 +15,9 @@
  */
 package org.springframework.yarn.config.annotation.builders;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.hadoop.conf.Configuration;
 import org.springframework.beans.BeanUtils;
@@ -54,7 +56,8 @@ public final class YarnAppmasterBuilder extends AbstractConfiguredAnnotationBuil
 	private ResourceLocalizer resourceLocalizer;
 	private ContainerAllocator containerAllocator;
 	private Map<String, String> environment;
-	private String[] commands;
+	private Map<String, Map<String, String>> environments = new HashMap<String, Map<String,String>>();
+	private final Map<String, String[]> commands = new HashMap<String, String[]>();
 
 	public YarnAppmasterBuilder() {
 		super();
@@ -71,8 +74,12 @@ public final class YarnAppmasterBuilder extends AbstractConfiguredAnnotationBuil
 
 		if (appmaster instanceof AbstractAppmaster) {
 			AbstractAppmaster abstractAppmaster = (AbstractAppmaster) appmaster;
-			if (commands != null) {
-				abstractAppmaster.setCommands(commands);
+			for (Entry<String, String[]> entry : commands.entrySet()) {
+				abstractAppmaster.setCommands(entry.getKey(), entry.getValue());
+			}
+
+			for (Entry<String, Map<String, String>> entry : environments.entrySet()) {
+				abstractAppmaster.setEnvironment(entry.getKey(), entry.getValue());
 			}
 
 			abstractAppmaster.setConfiguration(configuration);
@@ -127,6 +134,10 @@ public final class YarnAppmasterBuilder extends AbstractConfiguredAnnotationBuil
 		this.environment = environment;
 	}
 
+	public void setEnvironments(Map<String, Map<String, String>> environments) {
+		this.environments.putAll(environments);
+	}
+
 	@Override
 	public YarnAppmasterBuilder appmasterClass(Class<? extends YarnAppmaster> clazz) {
 		appmasterClass = clazz;
@@ -151,8 +162,15 @@ public final class YarnAppmasterBuilder extends AbstractConfiguredAnnotationBuil
 	}
 
 	@Override
-	public YarnAppmasterBuilder containerCommands(String... commands) {
-		this.commands = commands;
+	public YarnAppmasterBuilder containerCommands(String[] commands) {
+		// null indicates a default value
+		containerCommands(null, commands);
+		return this;
+	}
+
+	@Override
+	public YarnAppmasterBuilder containerCommands(String id, String[] commands) {
+		this.commands.put(id, commands);
 		return this;
 	}
 

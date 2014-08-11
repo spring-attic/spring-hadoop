@@ -61,7 +61,13 @@ public class DefaultAllocateCountTracker {
 	/** Counts for anys requested and not yet received */
 	private AtomicInteger requestedAny = new AtomicInteger();
 
-	private final Configuration configuration;
+	private Configuration configuration;
+
+	private String id;
+
+	public String getId() {
+		return id;
+	}
 
 	/**
 	 * Instantiates a new default allocate count tracker.
@@ -69,6 +75,15 @@ public class DefaultAllocateCountTracker {
 	 * @param configuration the hadoop configuration
 	 */
 	public DefaultAllocateCountTracker(Configuration configuration) {
+		this.configuration = configuration;
+	}
+
+	public DefaultAllocateCountTracker(String id, Configuration configuration) {
+		this.configuration = configuration;
+		this.id = id;
+	}
+
+	public void setConfiguration(Configuration configuration) {
 		this.configuration = configuration;
 	}
 

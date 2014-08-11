@@ -146,7 +146,19 @@ public interface YarnAppmasterConfigurer {
 	 * @param commands The Yarn container commands
 	 * @return {@link YarnAppmasterConfigurer} for chaining
 	 */
-	YarnAppmasterConfigurer containerCommands(String... commands);
+	YarnAppmasterConfigurer containerCommands(String[] commands);
+
+	/**
+	 * Specify a raw array of commands used to start a container. This method
+	 * also allows to associate commands with an identifier which is used
+	 * for example with container groups where different commands are used.
+	 *
+	 * @param id the commands identifier
+	 * @param commands The Yarn container commands
+	 * @return {@link YarnAppmasterConfigurer} for chaining
+	 * @see #containerCommands(String[])
+	 */
+	YarnAppmasterConfigurer containerCommands(String id, String[] commands);
 
 	/**
 	 * Specify a {@code YarnAppmaster} class.

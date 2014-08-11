@@ -1,0 +1,8 @@
+spring:
+    yarn:
+        appmaster:
+            containercluster:
+                clusters:
+                    cluster2:
+                        projectionType: any
+                        projectionAny: 2

@@ -33,7 +33,7 @@ import org.springframework.yarn.config.annotation.builders.YarnEnvironmentConfig
  *
  */
 public class DefaultEnvironmentClasspathConfigurer
-		extends AnnotationConfigurerAdapter<Map<String, String>, YarnEnvironmentConfigurer, YarnEnvironmentBuilder>
+		extends AnnotationConfigurerAdapter<Map<String, Map<String, String>>, YarnEnvironmentConfigurer, YarnEnvironmentBuilder>
 		implements EnvironmentClasspathConfigurer {
 
 	private boolean useDefaultYarnClasspath = false;
@@ -45,16 +45,25 @@ public class DefaultEnvironmentClasspathConfigurer
 
 	private ArrayList<String> classpathEntries = new ArrayList<String>();
 
+	private String id;
+
+	public DefaultEnvironmentClasspathConfigurer() {
+	}
+
+	public DefaultEnvironmentClasspathConfigurer(String id) {
+		this.id = id;
+	}
+
 	@Override
 	public void configure(YarnEnvironmentBuilder builder) throws Exception {
-		builder.addClasspathEntries(classpathEntries);
-		builder.setUseDefaultYarnClasspath(useDefaultYarnClasspath);
-		builder.setUseDefaultMapreduceClasspath(useDefaultMapreduceClasspath);
-		builder.setDefaultYarnAppClasspath(defaultYarnAppClasspath);
-		builder.setDefaultMapreduceAppClasspath(defaultMapreduceAppClasspath);
-		builder.setIncludeBaseDirectory(includeBaseDirectory);
+		builder.addClasspathEntries(id, classpathEntries);
+		builder.setUseDefaultYarnClasspath(id, useDefaultYarnClasspath);
+		builder.setUseDefaultMapreduceClasspath(id, useDefaultMapreduceClasspath);
+		builder.setDefaultYarnAppClasspath(id, defaultYarnAppClasspath);
+		builder.setDefaultMapreduceAppClasspath(id, defaultMapreduceAppClasspath);
+		builder.setIncludeBaseDirectory(id, includeBaseDirectory);
 		if (StringUtils.hasText(delimiter)) {
-			builder.setDelimiter(delimiter);
+			builder.setDelimiter(id, delimiter);
 		}
 	}
 

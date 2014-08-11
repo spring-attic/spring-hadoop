@@ -28,6 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ContainerAllocateData {
 
+	private String id;
 	private Integer anyData = 0;
 	private Map<String, Integer> hostData = new ConcurrentHashMap<String, Integer>();
 	private Map<String, Integer> rackData = new ConcurrentHashMap<String, Integer>();
@@ -110,6 +111,14 @@ public class ContainerAllocateData {
 		return anyData;
 	}
 
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String getId() {
+		return id;
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder buf = new StringBuilder();
@@ -121,7 +130,7 @@ public class ContainerAllocateData {
 		for (Entry<String, Integer> entry : hostData.entrySet()) {
 			buf.append(entry.getKey() + "=" + entry.getValue() + " ");
 		}
-		buf.append("}]");
+		buf.append("}], ");
 
 		buf.append("rackData=[size=" + rackData.size() + ", ");
 		buf.append("{");

@@ -77,7 +77,8 @@ public class SpringYarnConfigBuilder
 
 		YarnEnvironmentBuilder yarnEnvironmentBuilder = getSharedObject(YarnEnvironmentBuilder.class);
 		yarnEnvironmentBuilder.configuration(configuration);
-		Map<String, String> env = yarnEnvironmentBuilder.build();
+		Map<String, Map<String, String>> envs = yarnEnvironmentBuilder.build();
+		Map<String, String> env = envs.get(null);
 		config.setEnvironment(env);
 
 		YarnClientBuilder yarnClientBuilder = getSharedObject(YarnClientBuilder.class);
@@ -93,6 +94,7 @@ public class SpringYarnConfigBuilder
 			yarnAppmasterBuilder.configuration(configuration);
 			yarnAppmasterBuilder.setResourceLocalizer(localizer);
 			yarnAppmasterBuilder.setEnvironment(env);
+			yarnAppmasterBuilder.setEnvironments(envs);
 			config.setYarnAppmaster(yarnAppmasterBuilder.build());
 		}
 

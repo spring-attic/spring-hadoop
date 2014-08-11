@@ -15,6 +15,8 @@
  */
 package org.springframework.yarn.boot;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.logging.Log;
@@ -38,12 +40,18 @@ import org.springframework.util.StringUtils;
 import org.springframework.yarn.YarnSystemConstants;
 import org.springframework.yarn.am.AppmasterTrackService;
 import org.springframework.yarn.am.YarnAppmaster;
+import org.springframework.yarn.am.grid.GridProjectionFactory;
+import org.springframework.yarn.am.grid.support.DefaultGridProjectionFactory;
+import org.springframework.yarn.am.grid.support.ProjectionData;
 import org.springframework.yarn.batch.support.YarnJobLauncher;
+import org.springframework.yarn.boot.actuate.endpoint.YarnContainerClusterEndpoint;
+import org.springframework.yarn.boot.actuate.endpoint.mvc.YarnContainerClusterMvcEndpoint;
 import org.springframework.yarn.boot.condition.ConditionalOnYarnAppmaster;
 import org.springframework.yarn.boot.properties.SpringHadoopProperties;
 import org.springframework.yarn.boot.properties.SpringYarnAppmasterLaunchContextProperties;
 import org.springframework.yarn.boot.properties.SpringYarnAppmasterLocalizerProperties;
 import org.springframework.yarn.boot.properties.SpringYarnAppmasterProperties;
+import org.springframework.yarn.boot.properties.SpringYarnAppmasterProperties.ContainerClustersProperties;
 import org.springframework.yarn.boot.properties.SpringYarnAppmasterResourceProperties;
 import org.springframework.yarn.boot.properties.SpringYarnBatchProperties;
 import org.springframework.yarn.boot.properties.SpringYarnEnvProperties;
@@ -52,6 +60,7 @@ import org.springframework.yarn.boot.support.AppmasterLauncherRunner;
 import org.springframework.yarn.boot.support.BootApplicationEventTransformer;
 import org.springframework.yarn.boot.support.BootLocalResourcesSelector;
 import org.springframework.yarn.boot.support.BootLocalResourcesSelector.Mode;
+import org.springframework.yarn.boot.support.BootMultiLocalResourcesSelector;
 import org.springframework.yarn.boot.support.EmbeddedAppmasterTrackService;
 import org.springframework.yarn.boot.support.SpringYarnBootUtils;
 import org.springframework.yarn.config.annotation.EnableYarn;
@@ -62,8 +71,10 @@ import org.springframework.yarn.config.annotation.builders.YarnConfigConfigurer;
 import org.springframework.yarn.config.annotation.builders.YarnEnvironmentConfigurer;
 import org.springframework.yarn.config.annotation.builders.YarnResourceLocalizerConfigurer;
 import org.springframework.yarn.config.annotation.configurers.LocalResourcesHdfsConfigurer;
+import org.springframework.yarn.config.annotation.configurers.MasterContainerAllocatorConfigurer;
 import org.springframework.yarn.fs.LocalResourcesSelector;
 import org.springframework.yarn.fs.LocalResourcesSelector.Entry;
+import org.springframework.yarn.fs.MultiLocalResourcesSelector;
 import org.springframework.yarn.launch.LaunchCommandsFactoryBean;
 import org.springframework.yarn.support.YarnContextUtils;
 
@@ -95,8 +106,11 @@ public class YarnAppmasterAutoConfiguration {
 	}
 
 	@Configuration
-	@EnableConfigurationProperties({ SpringYarnAppmasterLocalizerProperties.class })
+	@EnableConfigurationProperties({ SpringYarnAppmasterProperties.class, SpringYarnAppmasterLocalizerProperties.class })
 	public static class LocalResourcesSelectorConfig {
+
+		@Autowired
+		private SpringYarnAppmasterProperties syap;
 
 		@Autowired
 		private SpringYarnAppmasterLocalizerProperties syalp;
@@ -104,6 +118,29 @@ public class YarnAppmasterAutoConfiguration {
 		@Bean
 		@ConditionalOnMissingBean(LocalResourcesSelector.class)
 		public LocalResourcesSelector localResourcesSelector() {
+
+			Map<String, LocalResourcesSelector> selectors = new HashMap<String, LocalResourcesSelector>();
+			if (syap.getContainercluster() != null && syap.getContainercluster().getClusters() != null) {
+				for (java.util.Map.Entry<String, ContainerClustersProperties> entry : syap.getContainercluster().getClusters().entrySet()) {
+					SpringYarnAppmasterLocalizerProperties props = entry.getValue().getLocalizer();
+					if (props == null) {
+						continue;
+					}
+					BootLocalResourcesSelector selector = new BootLocalResourcesSelector(Mode.CONTAINER);
+					if (StringUtils.hasText(props.getZipPattern())) {
+						selector.setZipArchivePattern(props.getZipPattern());
+					}
+					if (props.getPropertiesNames() != null) {
+						selector.setPropertiesNames(props.getPropertiesNames());
+					}
+					if (props.getPropertiesSuffixes() != null) {
+						selector.setPropertiesSuffixes(props.getPropertiesSuffixes());
+					}
+					selector.addPatterns(props.getPatterns());
+					selectors.put(entry.getKey(), selector);
+				}
+			}
+
 			BootLocalResourcesSelector selector = new BootLocalResourcesSelector(Mode.CONTAINER);
 			if (StringUtils.hasText(syalp.getZipPattern())) {
 				selector.setZipArchivePattern(syalp.getZipPattern());
@@ -115,7 +152,7 @@ public class YarnAppmasterAutoConfiguration {
 				selector.setPropertiesSuffixes(syalp.getPropertiesSuffixes());
 			}
 			selector.addPatterns(syalp.getPatterns());
-			return selector;
+			return new BootMultiLocalResourcesSelector(selector, selectors);
 		}
 	}
 
@@ -177,6 +214,57 @@ public class YarnAppmasterAutoConfiguration {
 
 	}
 
+	@Configuration
+	@EnableConfigurationProperties({ SpringYarnAppmasterProperties.class })
+	@ConditionalOnExpression("${spring.yarn.appmaster.containercluster.enabled:false}")
+	public static class ContainerClusterConfig  {
+
+		@Autowired
+		private SpringYarnAppmasterProperties syap;
+
+		@Bean
+		public GridProjectionFactory gridProjectionFactory() {
+			Map<String, ProjectionData> projections = new HashMap<String, ProjectionData>();
+			Map<String, ContainerClustersProperties> clusterProps = syap.getContainercluster().getClusters();
+			if (clusterProps != null) {
+				for (java.util.Map.Entry<String, ContainerClustersProperties> entry : clusterProps.entrySet()) {
+					ProjectionData data = new ProjectionData(entry.getValue().getProjectionAny(), entry.getValue()
+							.getProjectionHosts(), entry.getValue().getProjectionRacks());
+					data.setType(entry.getValue().getProjectionType());
+					SpringYarnAppmasterResourceProperties resource = entry.getValue().getResource();
+					if (resource != null) {
+						data.setPriority(resource.getPriority());
+					}
+					projections.put(entry.getKey(), data);
+
+				}
+			}
+			return new DefaultGridProjectionFactory(projections);
+		}
+
+	}
+
+	@Configuration
+	@EnableConfigurationProperties({ SpringYarnAppmasterProperties.class })
+	@ConditionalOnExpression("${spring.yarn.endpoints.containercluster.enabled:false}")
+	public static class EndPointConfig {
+
+		@Autowired
+		private SpringYarnAppmasterProperties syap;
+
+		@Bean
+		@ConditionalOnMissingBean
+		public YarnContainerClusterEndpoint yarnContainerClusterEndpoint() {
+			return new YarnContainerClusterEndpoint();
+		}
+
+		@Bean
+		@ConditionalOnBean(YarnContainerClusterEndpoint.class)
+		public YarnContainerClusterMvcEndpoint yarnContainerClusterMvcEndpoint(YarnContainerClusterEndpoint delegate) {
+			return new YarnContainerClusterMvcEndpoint(delegate);
+		}
+
+	}
 
 	@Configuration
 	@EnableConfigurationProperties({ SpringHadoopProperties.class, SpringYarnProperties.class,
@@ -239,6 +327,16 @@ public class YarnAppmasterAutoConfiguration {
 			for (Entry e : localResourcesSelector.select(applicationDir != null ? applicationDir : "/")) {
 				withHdfs.hdfs(e.getPath(), e.getType(), applicationDir == null);
 			}
+
+			if (syap.getContainercluster() != null && localResourcesSelector instanceof MultiLocalResourcesSelector && syap.getContainercluster().getClusters() != null) {
+				MultiLocalResourcesSelector selector = ((MultiLocalResourcesSelector)localResourcesSelector);
+				for (java.util.Map.Entry<String, ContainerClustersProperties> entry : syap.getContainercluster().getClusters().entrySet()) {
+					withHdfs = localizer.withHdfs(entry.getKey());
+					for (Entry e : selector.select(entry.getKey(), applicationDir != null ? applicationDir : "/")) {
+						withHdfs.hdfs(e.getPath(), e.getType(), applicationDir == null);
+					}
+				}
+			}
 		}
 
 		@Override
@@ -254,18 +352,53 @@ public class YarnAppmasterAutoConfiguration {
 					.delimiter(syalcp.getPathSeparator())
 					.entries(syalcp.getContainerAppClasspath())
 					.entry(explodedEntryIfZip(syalcp));
+
+			if (syap.getContainercluster() != null && syap.getContainercluster().getClusters() != null) {
+				for (java.util.Map.Entry<String, ContainerClustersProperties> entry : syap.getContainercluster().getClusters().entrySet()) {
+					SpringYarnAppmasterLaunchContextProperties props = entry.getValue().getLaunchcontext();
+					environment
+						.withClasspath(entry.getKey())
+							.includeBaseDirectory(props.isIncludeBaseDirectory())
+							.useYarnAppClasspath(props.isUseYarnAppClasspath())
+							.useMapreduceAppClasspath(props.isUseMapreduceAppClasspath())
+							.siteYarnAppClasspath(syp.getSiteYarnAppClasspath())
+							.siteMapreduceAppClasspath(syp.getSiteMapreduceAppClasspath())
+							.delimiter(props.getPathSeparator())
+							.entries(props.getContainerAppClasspath())
+							.entry(explodedEntryIfZip(props));
+				}
+			}
 		}
 
 		@Override
 		public void configure(YarnAppmasterConfigurer master) throws Exception {
 			master
 				.appmasterClass(syap.getAppmasterClass() != null ? syap.getAppmasterClass() : appmasterClass)
-				.containerCommands(createContainerCommands(syalcp))
-				.withContainerAllocator()
-					.locality(syalcp.isLocality())
-					.memory(syarp.getMemory())
-					.priority(syarp.getPriority())
-					.virtualCores(syarp.getVirtualCores());
+				.containerCommands(createContainerCommands(syalcp));
+
+			MasterContainerAllocatorConfigurer containerAllocatorConfigurer = master.withContainerAllocator();
+			containerAllocatorConfigurer
+				.locality(syalcp.isLocality())
+				.memory(syarp.getMemory())
+				.priority(syarp.getPriority())
+				.virtualCores(syarp.getVirtualCores());
+
+			if (syap.getContainercluster() != null && syap.getContainercluster().getClusters() != null) {
+				for (java.util.Map.Entry<String, ContainerClustersProperties> entry : syap.getContainercluster().getClusters().entrySet()) {
+					SpringYarnAppmasterResourceProperties resource = entry.getValue().getResource();
+					SpringYarnAppmasterLaunchContextProperties launchcontext = entry.getValue().getLaunchcontext();
+
+					master
+						.containerCommands(entry.getKey(), createContainerCommands(launchcontext));
+
+					containerAllocatorConfigurer
+						.withCollection(entry.getKey())
+							.priority(resource != null ? resource.getPriority() : null)
+							.memory(resource != null ? resource.getMemory() : null)
+							.virtualCores(resource != null ? resource.getVirtualCores() : null)
+							.locality(launchcontext != null ? launchcontext.isLocality() : false);
+				}
+			}
 		}
 
 	}

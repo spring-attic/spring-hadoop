@@ -23,6 +23,8 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.actuate.autoconfigure.EndpointAutoConfiguration;
+import org.springframework.boot.actuate.autoconfigure.EndpointMBeanExportAutoConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.batch.BatchAutoConfiguration;
 import org.springframework.boot.autoconfigure.jmx.JmxAutoConfiguration;
@@ -51,7 +53,8 @@ import org.springframework.yarn.support.console.ApplicationsReport.SubmittedRepo
  */
 @Configuration
 @EnableAutoConfiguration(exclude = { EmbeddedServletContainerAutoConfiguration.class, WebMvcAutoConfiguration.class,
-		JmxAutoConfiguration.class, BatchAutoConfiguration.class })
+		JmxAutoConfiguration.class, BatchAutoConfiguration.class, JmxAutoConfiguration.class,
+		EndpointMBeanExportAutoConfiguration.class, EndpointAutoConfiguration.class })
 public class YarnInfoApplication extends AbstractClientApplication<YarnInfoApplication> {
 
 	/**

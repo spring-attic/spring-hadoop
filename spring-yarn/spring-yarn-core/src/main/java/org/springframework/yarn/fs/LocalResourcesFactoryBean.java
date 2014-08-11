@@ -15,9 +15,11 @@
  */
 package org.springframework.yarn.fs;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
@@ -38,8 +40,11 @@ public class LocalResourcesFactoryBean implements InitializingBean, FactoryBean<
 	/** Localizer returned from this factory */
 	private ResourceLocalizer resources;
 
-	/** Localizer transfer entries*/
+	/** Localizer transfer entries */
 	private Collection<TransferEntry> hdfsEntries;
+
+	/** Localizer additional transfer entries */
+	private final HashMap<String, Collection<TransferEntry>> additionalHdfsEntries = new HashMap<String, Collection<TransferEntry>>();
 
 	/** Localizer copy entries*/
 	private Collection<CopyEntry> copyEntries;
@@ -97,7 +102,24 @@ public class LocalResourcesFactoryBean implements InitializingBean, FactoryBean<
 			defaultResourceLocalizer.setRawFileContents(rawFileContents);
 		}
 
-		resources = defaultResourceLocalizer;
+		if (additionalHdfsEntries.size() == 0) {
+			resources = defaultResourceLocalizer;
+		} else {
+			Map<String, ResourceLocalizer> localizers = new HashMap<String, ResourceLocalizer>();
+			for (Entry<String, Collection<TransferEntry>> entry : additionalHdfsEntries.entrySet()) {
+				for(TransferEntry e : entry.getValue()) {
+					if(e.type == null) {
+						e.type = (defaultType != null ? defaultType : LocalResourceType.FILE);
+					}
+					if(e.visibility == null) {
+						e.visibility = (defaultVisibility != null ? defaultVisibility : LocalResourceVisibility.APPLICATION);
+					}
+				}
+				localizers.put(entry.getKey(), new DefaultResourceLocalizer(configuration, entry.getValue(),
+						new ArrayList<LocalResourcesFactoryBean.CopyEntry>()));
+			}
+			resources = new DefaultMultiResourceLocalizer(defaultResourceLocalizer, localizers);
+		}
 	}
 
 	/**
@@ -125,6 +147,16 @@ public class LocalResourcesFactoryBean implements InitializingBean, FactoryBean<
 	 */
 	public void setHdfsEntries(Collection<TransferEntry> hdfsEntries) {
 		this.hdfsEntries = hdfsEntries;
+	}
+
+	/**
+	 * Sets hdfs entries reference for this factory.
+	 *
+	 * @param id the identifier
+	 * @param hdfsEntries Collection of hdfs entries
+	 */
+	public void setHdfsEntries(String id, Collection<TransferEntry> hdfsEntries) {
+		this.additionalHdfsEntries.put(id, hdfsEntries);
 	}
 
 	/**

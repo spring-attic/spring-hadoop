@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,11 +30,32 @@ public class DefaultLocalResourcesHdfsConfigurer
 		extends AnnotationConfigurerAdapter<ResourceLocalizer, YarnResourceLocalizerConfigurer, YarnResourceLocalizerBuilder>
 		implements LocalResourcesHdfsConfigurer {
 
-	private Collection<TransferEntry> hdfsEntries = new ArrayList<TransferEntry>();
+	private final Collection<TransferEntry> hdfsEntries = new ArrayList<TransferEntry>();
+	private final String id;
+
+	/**
+	 * Instantiates a new default local resources hdfs configurer.
+	 */
+	public DefaultLocalResourcesHdfsConfigurer() {
+		this(null);
+	}
+
+	/**
+	 * Instantiates a new default local resources hdfs configurer.
+	 *
+	 * @param id the identifier
+	 */
+	public DefaultLocalResourcesHdfsConfigurer(String id) {
+		this.id = id;
+	}
 
 	@Override
 	public void configure(YarnResourceLocalizerBuilder builder) throws Exception {
-		builder.setHdfsEntries(hdfsEntries);
+		if (id == null) {
+			builder.setHdfsEntries(hdfsEntries);
+		} else {
+			builder.setHdfsEntries(id, hdfsEntries);
+		}
 	}
 
 	@Override

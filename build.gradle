@@ -321,6 +321,7 @@ configure(javaProjects()) {
 	eclipse.classpath.file {
 		whenMerged { classpath ->
 			classpath.entries.removeAll { entry -> entry.toString().contains(".pom") }
+			classpath.entries.removeAll { entry -> entry.toString().contains("servlet-api") }
 		}
 	}
 
@@ -964,6 +965,7 @@ if (gradle.ext.mr2) {
 		description = 'Spring Yarn Core'
 		dependencies {
 			compile project(":spring-data-hadoop")
+			compile "org.springframework:spring-messaging:$springVersion"
 			compile("org.apache.hadoop:hadoop-yarn-client:$hadoopVersion") { dep ->
 				exclude group: "org.slf4j", module: "slf4j-log4j12"
 			}
@@ -1028,12 +1030,35 @@ if (gradle.ext.mr2) {
 
 	project('spring-yarn:spring-yarn-boot') {
 		description = 'Spring Yarn Boot'
+		configurations.all {
+			exclude group: 'javax.servlet', module: 'servlet-api', version: '2.5'
+		}
 		dependencies {
 			compile project(":spring-yarn:spring-yarn-core")
 			provided project(":spring-yarn:spring-yarn-batch")
 			provided "org.springframework:spring-web:$springVersion"
+			provided "org.springframework:spring-webmvc:$springVersion"
 			compile "org.springframework.boot:spring-boot-autoconfigure:$springBootVersion"
+			compile "org.springframework.boot:spring-boot-actuator:$springBootVersion"
+			compile "org.apache.httpcomponents:httpclient:$httpclientVersion"
 			runtime "org.yaml:snakeyaml:$snakeYamlVersion"
+			testRuntime("org.springframework.boot:spring-boot-starter-web:$springBootVersion") {
+				exclude group:'ch.qos.logback'
+			}
+			testCompile("org.mockito:mockito-core:$mockitoVersion") { dep ->
+				exclude group: "org.hamcrest"
+			}
+			testCompile "com.jayway.jsonpath:json-path:$jsonpathVersion"
+			testCompile "com.jayway.jsonpath:json-path-assert:$jsonpathVersion"
+		}
+	}
+
+	project('spring-yarn:spring-yarn-boot-cli') {
+		description = 'Spring Yarn Boot Cli'
+		dependencies {
+			compile project(":spring-yarn:spring-yarn-boot")
+			compile "org.springframework.boot:spring-boot-cli:$springBootVersion"
+			runtime "org.springframework:spring-web:$springVersion"
 		}
 	}
 

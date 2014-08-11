@@ -16,6 +16,7 @@
 package org.springframework.yarn.config.annotation.builders;
 
 import org.springframework.yarn.config.annotation.SpringYarnConfigurerAdapter;
+import org.springframework.yarn.config.annotation.configurers.DefaultLocalResourcesHdfsConfigurer;
 import org.springframework.yarn.config.annotation.configurers.LocalResourcesCopyConfigurer;
 import org.springframework.yarn.config.annotation.configurers.DefaultLocalResourcesCopyConfigurer;
 import org.springframework.yarn.config.annotation.configurers.LocalResourcesHdfsConfigurer;
@@ -74,7 +75,7 @@ public interface YarnResourceLocalizerConfigurer {
 	LocalResourcesCopyConfigurer withCopy() throws Exception;
 
 	/**
-	 * Specify configuration options as properties with a {@link DefaultLocalResourcesCopyConfigurer}.
+	 * Specify configuration options as properties with a {@link DefaultLocalResourcesHdfsConfigurer}.
 	 *
 	 * <br>JavaConfig:
 	 * <pre>
@@ -92,11 +93,29 @@ public interface YarnResourceLocalizerConfigurer {
 	 * &lt;/yarn:localresources&gt;
 	 * </pre>
 	 *
-	 * @return {@link LocalResourcesCopyConfigurer} for chaining
+	 * @return {@link LocalResourcesHdfsConfigurer} for chaining
 	 * @throws Exception if error occurred
 	 */
 	LocalResourcesHdfsConfigurer withHdfs() throws Exception;
 
+	/**
+	 * Specify configuration options as properties with a {@link DefaultLocalResourcesHdfsConfigurer}
+	 * with an identifier.
+	 *
+	 * @param id the identifier
+	 * @return {@link LocalResourcesHdfsConfigurer} for chaining
+	 * @throws Exception if error occurred
+	 * @see #withHdfs()
+	 */
+	LocalResourcesHdfsConfigurer withHdfs(String id) throws Exception;
+
+	/**
+	 * Specify a staging directory.
+	 *
+	 * @param stagingDirectory the staging directory
+	 * @return {@link YarnResourceLocalizerConfigurer} for chaining
+	 * @throws Exception if error occurred
+	 */
 	YarnResourceLocalizerConfigurer stagingDirectory(String stagingDirectory) throws Exception;
 
 }

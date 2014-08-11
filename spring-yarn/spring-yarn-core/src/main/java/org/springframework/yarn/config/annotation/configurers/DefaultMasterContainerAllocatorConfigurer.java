@@ -15,13 +15,24 @@
  */
 package org.springframework.yarn.config.annotation.configurers;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.data.hadoop.config.common.annotation.AnnotationConfigurer;
 import org.springframework.data.hadoop.config.common.annotation.AnnotationConfigurerAdapter;
+import org.springframework.util.StringUtils;
 import org.springframework.yarn.am.YarnAppmaster;
 import org.springframework.yarn.am.allocate.DefaultContainerAllocator;
 import org.springframework.yarn.config.annotation.builders.YarnAppmasterBuilder;
 import org.springframework.yarn.config.annotation.builders.YarnAppmasterConfigurer;
 import org.springframework.yarn.support.ParsingUtils;
 
+/**
+ * {@link AnnotationConfigurer} for {@link YarnAppmaster} container allocator.
+ *
+ * @author Janne Valkealahti
+ *
+ */
 public class DefaultMasterContainerAllocatorConfigurer
 		extends AnnotationConfigurerAdapter<YarnAppmaster, YarnAppmasterConfigurer, YarnAppmasterBuilder>
 		implements MasterContainerAllocatorConfigurer {
@@ -31,20 +42,30 @@ public class DefaultMasterContainerAllocatorConfigurer
 	private Integer virtualCores;
 	private boolean locality;
 
+	private final List<DefaultMasterContainerAllocatorCollectionConfigurer> collectionConfigurers =
+			new ArrayList<DefaultMasterContainerAllocatorCollectionConfigurer>();
+
 	@Override
 	public void configure(YarnAppmasterBuilder builder) throws Exception {
-		DefaultContainerAllocator containerAllocator = new DefaultContainerAllocator();
+		DefaultContainerAllocator allocator = new DefaultContainerAllocator();
 		if (priority != null) {
-			containerAllocator.setPriority(priority);
+			allocator.setPriority(priority);
 		}
 		if (virtualCores != null) {
-			containerAllocator.setVirtualcores(virtualCores);
+			allocator.setVirtualcores(virtualCores);
 		}
 		if (memory != null) {
-			containerAllocator.setMemory(ParsingUtils.parseBytesAsMegs(memory));
+			allocator.setMemory(ParsingUtils.parseBytesAsMegs(memory));
 		}
-		containerAllocator.setLocality(locality);
-		builder.setContainerAllocator(containerAllocator);
+		allocator.setLocality(locality);
+
+		for (DefaultMasterContainerAllocatorCollectionConfigurer configurer : collectionConfigurers) {
+			allocator.setAllocationValues(configurer.id, configurer.priority, configurer.virtualCores,
+					StringUtils.hasText(configurer.memory) ? ParsingUtils.parseBytesAsMegs(configurer.memory) : null,
+					configurer.locality);
+		}
+
+		builder.setContainerAllocator(allocator);
 	}
 
 	@Override
@@ -71,9 +92,67 @@ public class DefaultMasterContainerAllocatorConfigurer
 		return this;
 	}
 
+	@Override
 	public MasterContainerAllocatorConfigurer locality(boolean locality) {
 		this.locality = locality;
 		return this;
+	}
+
+	@Override
+	public MasterContainerAllocatorCollectionConfigurer withCollection(String id) {
+		DefaultMasterContainerAllocatorCollectionConfigurer configurer =
+				new DefaultMasterContainerAllocatorCollectionConfigurer(id);
+		collectionConfigurers.add(configurer);
+		return configurer;
+	}
+
+	public final class DefaultMasterContainerAllocatorCollectionConfigurer implements MasterContainerAllocatorCollectionConfigurer {
+
+		private final String id;
+		private Integer priority;
+		private String memory;
+		private Integer virtualCores;
+		private boolean locality;
+
+		public DefaultMasterContainerAllocatorCollectionConfigurer(String id) {
+			this.id = id;
+		}
+
+		@Override
+		public MasterContainerAllocatorCollectionConfigurer priority(Integer priority) {
+			this.priority = priority;
+			return this;
+		}
+
+		@Override
+		public MasterContainerAllocatorCollectionConfigurer virtualCores(Integer virtualCores) {
+			this.virtualCores = virtualCores;
+			return this;
+		}
+
+		@Override
+		public MasterContainerAllocatorCollectionConfigurer memory(String memory) {
+			this.memory = memory;
+			return this;
+		}
+
+		@Override
+		public MasterContainerAllocatorCollectionConfigurer memory(int memory) {
+			this.memory = Integer.toString(memory);
+			return this;
+		}
+
+		@Override
+		public MasterContainerAllocatorCollectionConfigurer locality(boolean locality) {
+			this.locality = locality;
+			return this;
+		}
+
+		@Override
+		public MasterContainerAllocatorConfigurer and() {
+			return DefaultMasterContainerAllocatorConfigurer.this;
+		}
+
 	}
 
 }

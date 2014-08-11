@@ -17,6 +17,8 @@ package org.springframework.yarn.boot.app;
 
 import org.apache.hadoop.yarn.api.records.ApplicationId;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.actuate.autoconfigure.EndpointAutoConfiguration;
+import org.springframework.boot.actuate.autoconfigure.EndpointMBeanExportAutoConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.batch.BatchAutoConfiguration;
 import org.springframework.boot.autoconfigure.jmx.JmxAutoConfiguration;
@@ -43,7 +45,8 @@ import org.springframework.yarn.client.YarnClient;
  */
 @Configuration
 @EnableAutoConfiguration(exclude = { EmbeddedServletContainerAutoConfiguration.class, WebMvcAutoConfiguration.class,
-		JmxAutoConfiguration.class, BatchAutoConfiguration.class })
+		JmxAutoConfiguration.class, BatchAutoConfiguration.class, JmxAutoConfiguration.class,
+		EndpointMBeanExportAutoConfiguration.class, EndpointAutoConfiguration.class })
 public class YarnSubmitApplication extends AbstractClientApplication<YarnSubmitApplication> {
 
 	/**

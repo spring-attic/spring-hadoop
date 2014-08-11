@@ -16,6 +16,7 @@
 package org.springframework.yarn.am;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -53,13 +54,14 @@ public abstract class AbstractAppmaster extends LifecycleObjectSupport {
 	private static final Log log = LogFactory.getLog(AbstractAppmaster.class);
 
 	/** Environment variables for the process */
-	private Map<String, String> environment;
+//	private Map<String, String> environment;
+	private final HashMap<String, Map<String, String>> environments = new HashMap<String, Map<String,String>>();
 
 	/** Yarn configuration */
 	private Configuration configuration;
 
-	/** Commands for container start */
-	private List<String> commands;
+	/** Commands for container start where value mapped with null key indicates defaults */
+	private final Map<String, List<String>> commands = new HashMap<String, List<String>>();
 
 	/** Template operations talking to resource manager */
 	private AppmasterRmOperations rmTemplate;
@@ -137,7 +139,12 @@ public abstract class AbstractAppmaster extends LifecycleObjectSupport {
 	 * @return the environment variables
 	 */
 	public Map<String, String> getEnvironment() {
-		return environment;
+//		return environment;
+		return getEnvironment(null);
+	}
+
+	public Map<String, String> getEnvironment(String id) {
+		return environments.get(id);
 	}
 
 	/**
@@ -146,7 +153,12 @@ public abstract class AbstractAppmaster extends LifecycleObjectSupport {
 	 * @param environment the environment variables
 	 */
 	public void setEnvironment(Map<String, String> environment) {
-		this.environment = environment;
+//		this.environment = environment;
+		setEnvironment(null, environment);
+	}
+
+	public void setEnvironment(String id, Map<String, String> environment) {
+		environments.put(id, environment);
 	}
 
 	/**
@@ -191,7 +203,17 @@ public abstract class AbstractAppmaster extends LifecycleObjectSupport {
 	 * @return the commands
 	 */
 	public List<String> getCommands() {
-		return commands;
+		return commands.get(null);
+	}
+
+	/**
+	 * Gets the commands.
+	 *
+	 * @param id the commands identifier
+	 * @return the commands
+	 */
+	public List<String> getCommands(String id) {
+		return commands.get(id);
 	}
 
 	/**
@@ -200,7 +222,17 @@ public abstract class AbstractAppmaster extends LifecycleObjectSupport {
 	 * @param commands the new commands
 	 */
 	public void setCommands(List<String> commands) {
-		this.commands = commands;
+		this.commands.put(null, commands);
+	}
+
+	/**
+	 * Sets the commands with an identifier.
+	 *
+	 * @param id the commands identifier
+	 * @param commands the new commands
+	 */
+	public void setCommands(String id, List<String> commands) {
+		this.commands.put(id, commands);
 	}
 
 	/**
@@ -209,7 +241,17 @@ public abstract class AbstractAppmaster extends LifecycleObjectSupport {
 	 * @param commands the new commands
 	 */
 	public void setCommands(String[] commands) {
-		this.commands = Arrays.asList(commands);
+		setCommands(Arrays.asList(commands));
+	}
+
+	/**
+	 * Sets the commands with an identifier.
+	 *
+	 * @param id the commands identifier
+	 * @param commands the new commands
+	 */
+	public void setCommands(String id, String[] commands) {
+		setCommands(id, Arrays.asList(commands));
 	}
 
 	/**

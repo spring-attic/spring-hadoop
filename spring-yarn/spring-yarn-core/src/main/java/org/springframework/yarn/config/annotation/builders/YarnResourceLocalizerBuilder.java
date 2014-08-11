@@ -17,12 +17,15 @@ package org.springframework.yarn.config.annotation.builders;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map.Entry;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.yarn.api.records.LocalResourceType;
 import org.apache.hadoop.yarn.api.records.LocalResourceVisibility;
 import org.springframework.data.hadoop.config.common.annotation.AbstractConfiguredAnnotationBuilder;
 import org.springframework.data.hadoop.config.common.annotation.AnnotationBuilder;
+import org.springframework.data.hadoop.config.common.annotation.ObjectPostProcessor;
 import org.springframework.yarn.config.annotation.configurers.DefaultLocalResourcesCopyConfigurer;
 import org.springframework.yarn.config.annotation.configurers.DefaultLocalResourcesHdfsConfigurer;
 import org.springframework.yarn.config.annotation.configurers.LocalResourcesCopyConfigurer;
@@ -51,10 +54,13 @@ public final class YarnResourceLocalizerBuilder
 	private Collection<TransferEntry> transferEntries;
 	private Collection<RawCopyEntry> rawEntries;
 
+	private final HashMap<String, Collection<TransferEntry>> transferEntries2 = new HashMap<String, Collection<TransferEntry>>();
+
 	/**
 	 * Instantiates a new yarn resource localizer builder.
 	 */
 	public YarnResourceLocalizerBuilder() {
+		super(ObjectPostProcessor.QUIESCENT_POSTPROCESSOR, true);
 	}
 
 	@Override
@@ -66,6 +72,9 @@ public final class YarnResourceLocalizerBuilder
 		fb.setConfiguration(configuration);
 		fb.setCopyEntries(copyEntries != null ? copyEntries : new ArrayList<LocalResourcesFactoryBean.CopyEntry>());
 		fb.setHdfsEntries(transferEntries != null ? transferEntries : new ArrayList<LocalResourcesFactoryBean.TransferEntry>());
+		for (Entry<String, Collection<TransferEntry>> entry : transferEntries2.entrySet()) {
+			fb.setHdfsEntries(entry.getKey(), entry.getValue());
+		}
 		if (rawEntries != null) {
 			fb.setRawCopyEntries(rawEntries);
 		}
@@ -81,6 +90,11 @@ public final class YarnResourceLocalizerBuilder
 	@Override
 	public LocalResourcesHdfsConfigurer withHdfs() throws Exception {
 		return apply(new DefaultLocalResourcesHdfsConfigurer());
+	}
+
+	@Override
+	public LocalResourcesHdfsConfigurer withHdfs(String id) throws Exception {
+		return apply(new DefaultLocalResourcesHdfsConfigurer(id));
 	}
 
 	@Override
@@ -109,6 +123,10 @@ public final class YarnResourceLocalizerBuilder
 
 	public void setHdfsEntries(Collection<TransferEntry> transferEntries) {
 		this.transferEntries = transferEntries;
+	}
+
+	public void setHdfsEntries(String id, Collection<TransferEntry> transferEntries) {
+		this.transferEntries2.put(id, transferEntries);
 	}
 
 	public void setRawCopyEntries(Collection<RawCopyEntry> rawEntries) {

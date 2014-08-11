@@ -60,6 +60,18 @@ public abstract class TestUtils {
 		return (T) ReflectionUtils.invokeMethod(method, target);
 	}
 
+	@SuppressWarnings("unchecked")
+	public static <T> T callMethod(String name, Object target, Object[] args, Class<?>[] argsTypes) throws Exception {
+		Class<?> clazz = target.getClass();
+		Method method = ReflectionUtils.findMethod(clazz, name, argsTypes);
+
+		if (method == null)
+			throw new IllegalArgumentException("Cannot find method '" + method + "' in the class hierarchy of "
+					+ target.getClass());
+		method.setAccessible(true);
+		return (T) ReflectionUtils.invokeMethod(method, target, args);
+	}
+
 	public static void setField(String name, Object target, Object value) throws Exception {
 		Field field = null;
 		Class<?> clazz = target.getClass();

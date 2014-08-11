@@ -18,6 +18,7 @@ package org.springframework.yarn.config.annotation.configurers;
 import org.springframework.data.hadoop.config.common.annotation.AnnotationConfigurerBuilder;
 import org.springframework.yarn.am.allocate.ContainerAllocator;
 import org.springframework.yarn.config.annotation.builders.YarnAppmasterConfigurer;
+import org.springframework.yarn.config.annotation.configurers.DefaultMasterContainerAllocatorConfigurer.DefaultMasterContainerAllocatorCollectionConfigurer;
 
 /**
  * {@link AnnotationConfigurerBuilder} for configuring {@link ContainerAllocator}.
@@ -198,5 +199,89 @@ public interface MasterContainerAllocatorConfigurer extends AnnotationConfigurer
 	 * @return {@link MasterContainerAllocatorConfigurer} for chaining
 	 */
 	MasterContainerAllocatorConfigurer locality(boolean locality);
+
+	/**
+	 * Specify a collection of container allocator attributes. Applies a new
+	 * {@link DefaultMasterContainerAllocatorCollectionConfigurer} into a current configurer.
+	 *
+	 * <p>
+	 * <p>JavaConfig:
+	 * <p>
+	 * <pre>
+	 *
+	 * public void configure(YarnAppmasterConfigure master) throws Exception {
+	 *   master
+	 *     .withContainerAllocator()
+	 *       .withCollection("id")
+	 *         .priority(0);
+	 * }
+	 * </pre>
+	 *
+	 * @param id
+	 * @return {@link MasterContainerAllocatorCollectionConfigurer} for chaining
+	 */
+	MasterContainerAllocatorCollectionConfigurer withCollection(String id);
+
+	/**
+	 * {@code MasterContainerAllocatorCollectionConfigurer} is an interface
+	 * for {@code DefaultMasterContainerAllocatorCollectionConfigurer} which is
+	 * used to configure {@link MasterContainerAllocatorConfigurer} parameters
+	 * as an identified collection.
+	 */
+	public interface MasterContainerAllocatorCollectionConfigurer {
+
+		/**
+		 * Specify a container priority for {@link ContainerAllocator}.
+		 *
+		 * @param priority the priority
+		 * @return {@link MasterContainerAllocatorCollectionConfigurer} for chaining
+		 * @see MasterContainerAllocatorConfigurer#priority(Integer)
+		 */
+		MasterContainerAllocatorCollectionConfigurer priority(Integer priority);
+
+		/**
+		 * Specify a container virtual cores for {@link ContainerAllocator}.
+		 *
+		 * @param virtualCores the virtual cores
+		 * @return {@link MasterContainerAllocatorCollectionConfigurer} for chaining
+		 * @see MasterContainerAllocatorConfigurer#virtualCores(Integer)
+		 */
+		MasterContainerAllocatorCollectionConfigurer virtualCores(Integer virtualCores);
+
+		/**
+		 * Specify a container memory for {@link ContainerAllocator}.
+		 *
+		 * @param memory the memory
+		 * @return {@link MasterContainerAllocatorCollectionConfigurer} for chaining
+		 * @see MasterContainerAllocatorConfigurer#memory(String)
+		 */
+		MasterContainerAllocatorCollectionConfigurer memory(String memory);
+
+		/**
+		 * Specify a container memory for {@link ContainerAllocator}.
+		 *
+		 * @param memory the memory
+		 * @return {@link MasterContainerAllocatorCollectionConfigurer} for chaining
+		 * @see MasterContainerAllocatorConfigurer#memory(String)
+		 */
+		MasterContainerAllocatorCollectionConfigurer memory(int memory);
+
+		/**
+		 * Specify a locality relaxing for {@link ContainerAllocator}.
+		 *
+		 * @param locality the locality flag for resource relaxing
+		 * @return {@link MasterContainerAllocatorCollectionConfigurer} for chaining
+		 * @see MasterContainerAllocatorConfigurer#locality(boolean)
+		 */
+		MasterContainerAllocatorCollectionConfigurer locality(boolean locality);
+
+		/**
+		 * Returns a parent {@link MasterContainerAllocatorConfigurer} configurer.
+		 *
+		 * @return {@link MasterContainerAllocatorConfigurer} for chaining
+		 */
+		MasterContainerAllocatorConfigurer and();
+
+	}
 
 }

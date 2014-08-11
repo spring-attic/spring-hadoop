@@ -1,0 +1,49 @@
+spring:
+    yarn:
+        appmaster:
+            containercluster:
+                clusters:
+                  ? cluster1
+                  : projectionType: any
+                    projectionAny: 1
+                    projectionHosts:
+                        host1: 1
+                        host2: 2
+                    projectionRacks:
+                        rack1: 1
+                        rack2: 2
+                    ? resource
+                    : priority: 234
+                      memory: memoryFoo
+                      virtualCores: 123
+                    ? launchcontext
+                    : archiveFile: archiveFileFoo
+                      runnerClass: runnerClassFoo
+                      arguments:
+                        ? argumentsKeyFoo1
+                        : argumentsValFoo1
+                        ? argumentsKeyFoo2
+                        : argumentsValFoo2
+                      containerAppClasspath:
+                        - "classpath1Foo"
+                        - "classpath2Foo"
+                      options:
+                        - "options1Foo"
+                        - "options2Foo"
+                      locality: true
+                      includeLocalSystemEnv: true
+                      useYarnAppClasspath: false
+                      includeBaseDirectory: false
+                      pathSeparator: ":"
+                    ? localizer
+                    : patterns:
+                        - "patterns1Foo"
+                        - "patterns2Foo"
+                      zipPattern: zipPatternFoo
+                      propertiesNames: [name1Foo, name2Foo]
+                      propertiesSuffixes: [suffix1Foo, suffix2Foo]
+                  ? cluster2
+                  : ? resource
+                    : priority: 2344
+                      memory: memoryFooo
+                      virtualCores: 1233

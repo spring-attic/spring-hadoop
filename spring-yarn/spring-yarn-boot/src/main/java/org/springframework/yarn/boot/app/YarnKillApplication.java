@@ -19,6 +19,8 @@ import org.apache.hadoop.yarn.api.records.ApplicationId;
 import org.apache.hadoop.yarn.api.records.ApplicationReport;
 import org.apache.hadoop.yarn.api.records.YarnApplicationState;
 import org.apache.hadoop.yarn.util.ConverterUtils;
+import org.springframework.boot.actuate.autoconfigure.EndpointAutoConfiguration;
+import org.springframework.boot.actuate.autoconfigure.EndpointMBeanExportAutoConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.batch.BatchAutoConfiguration;
 import org.springframework.boot.autoconfigure.jmx.JmxAutoConfiguration;
@@ -42,7 +44,8 @@ import org.springframework.yarn.client.YarnClient;
  */
 @Configuration
 @EnableAutoConfiguration(exclude = { EmbeddedServletContainerAutoConfiguration.class, WebMvcAutoConfiguration.class,
-		JmxAutoConfiguration.class, BatchAutoConfiguration.class })
+		JmxAutoConfiguration.class, BatchAutoConfiguration.class, JmxAutoConfiguration.class,
+		EndpointMBeanExportAutoConfiguration.class, EndpointAutoConfiguration.class })
 public class YarnKillApplication extends AbstractClientApplication<YarnKillApplication> {
 
 	public String run() {

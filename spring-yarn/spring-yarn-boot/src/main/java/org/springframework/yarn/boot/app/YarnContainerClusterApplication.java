@@ -1,0 +1,355 @@
+/*
+ * Copyright 2014 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.springframework.yarn.boot.app;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.hadoop.yarn.api.records.ApplicationId;
+import org.apache.hadoop.yarn.api.records.ApplicationReport;
+import org.apache.hadoop.yarn.util.ConverterUtils;
+import org.springframework.boot.actuate.autoconfigure.EndpointAutoConfiguration;
+import org.springframework.boot.actuate.autoconfigure.EndpointMBeanExportAutoConfiguration;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.batch.BatchAutoConfiguration;
+import org.springframework.boot.autoconfigure.jmx.JmxAutoConfiguration;
+import org.springframework.boot.autoconfigure.web.EmbeddedServletContainerAutoConfiguration;
+import org.springframework.boot.autoconfigure.web.WebMvcAutoConfiguration;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.yarn.am.cluster.ContainerCluster;
+import org.springframework.yarn.boot.SpringApplicationCallback;
+import org.springframework.yarn.boot.SpringApplicationTemplate;
+import org.springframework.yarn.boot.actuate.endpoint.YarnContainerClusterEndpoint;
+import org.springframework.yarn.boot.actuate.endpoint.mvc.AbstractContainerClusterRequest.ProjectionDataType;
+import org.springframework.yarn.boot.actuate.endpoint.mvc.ContainerClusterCreateRequest;
+import org.springframework.yarn.boot.actuate.endpoint.mvc.ContainerClusterCreateRequest.ProjectionType;
+import org.springframework.yarn.boot.actuate.endpoint.mvc.ContainerClusterModifyRequest;
+import org.springframework.yarn.boot.actuate.endpoint.mvc.YarnContainerClusterMvcEndpoint;
+import org.springframework.yarn.boot.actuate.endpoint.mvc.domain.ContainerClusterResource;
+import org.springframework.yarn.boot.actuate.endpoint.mvc.domain.YarnContainerClusterEndpointResource;
+import org.springframework.yarn.boot.support.SpringYarnBootUtils;
+import org.springframework.yarn.client.YarnClient;
+import org.springframework.yarn.support.console.ContainerClusterReport;
+import org.springframework.yarn.support.console.ContainerClusterReport.ClusterInfoField;
+import org.springframework.yarn.support.console.ContainerClusterReport.ClustersInfoField;
+import org.springframework.yarn.support.console.ContainerClusterReport.ClustersInfoReportData;
+
+/**
+ * A Boot application which is used to control Spring YARN {@link ContainerCluster}s
+ * via rest API offered by a {@link YarnContainerClusterMvcEndpoint}.
+ *
+ * @author Janne Valkealahti
+ *
+ */
+@Configuration
+@EnableAutoConfiguration(exclude = { EmbeddedServletContainerAutoConfiguration.class, WebMvcAutoConfiguration.class,
+		JmxAutoConfiguration.class, BatchAutoConfiguration.class, JmxAutoConfiguration.class,
+		EndpointMBeanExportAutoConfiguration.class, EndpointAutoConfiguration.class })
+public class YarnContainerClusterApplication extends AbstractClientApplication<YarnContainerClusterApplication> {
+
+	@Override
+	protected YarnContainerClusterApplication getThis() {
+		return this;
+	}
+
+	public String run() {
+		return run(new String[0]);
+	}
+
+	public String run(String... args) {
+		SpringApplicationBuilder builder = new SpringApplicationBuilder();
+		builder.web(false);
+		builder.sources(YarnContainerClusterApplication.class, OperationProperties.class);
+		SpringYarnBootUtils.addSources(builder, sources.toArray(new Object[0]));
+		SpringYarnBootUtils.addProfiles(builder, profiles.toArray(new String[0]));
+		SpringYarnBootUtils.addApplicationListener(builder, appProperties);
+
+		SpringApplicationTemplate template = new SpringApplicationTemplate(builder);
+		return template.execute(new SpringApplicationCallback<String>() {
+
+			@Override
+			public String runWithSpringApplication(ApplicationContext context) throws Exception {
+				OperationProperties operationProperties = context.getBean(OperationProperties.class);
+				YarnClient client = context.getBean(YarnClient.class);
+				ApplicationId applicationId = ConverterUtils.toApplicationId(operationProperties.getApplicationId());
+				String clusterId = operationProperties.getClusterId();
+				String clusterDef = operationProperties.getClusterDef();
+				String projectionType = operationProperties.getProjectionType();
+				Integer projectionDataAny = operationProperties.getProjectionDataAny();
+				Map<String, Integer> projectionDataHosts = operationProperties.getProjectionDataHosts();
+				Map<String, Integer> projectionDataRacks = operationProperties.getProjectionDataRacks();
+				Map<String, Object> extraProperties = operationProperties.getExtraProperties();
+				Operation operation = operationProperties.getOperation();
+				boolean verbose = operationProperties.isVerbose();
+
+				if (Operation.CLUSTERSINFO == operation) {
+					return doClustersInfo(client, applicationId);
+				} else if (Operation.CLUSTERINFO == operation) {
+					return doClusterInfo(client, applicationId, clusterId, verbose);
+				} else if (Operation.CLUSTERCREATE == operation) {
+					return doClusterCreate(client, applicationId, clusterId, clusterDef, projectionType,
+							projectionDataAny, projectionDataHosts, projectionDataRacks, extraProperties);
+				} else if (Operation.CLUSTERDESTROY == operation) {
+					return doClusterDestroy(client, applicationId, clusterId);
+				} else if (Operation.CLUSTERMODIFY == operation) {
+					return doClusterModify(client, applicationId, clusterId, projectionDataAny, projectionDataHosts,
+							projectionDataRacks);
+				} else if (Operation.CLUSTERSTART == operation) {
+					return doClusterStart(client, applicationId, clusterId);
+				} else if (Operation.CLUSTERSTOP == operation) {
+					return doClusterStop(client, applicationId, clusterId);
+				}
+				return null;
+			}
+
+		}, args);
+
+	}
+
+	private String doClustersInfo(YarnClient client, ApplicationId applicationId) {
+		YarnContainerClusterOperations operations = buildClusterOperations(client, applicationId);
+		YarnContainerClusterEndpointResource response = operations.getClusters();
+		return ContainerClusterReport.clustersInfoReportBuilder()
+				.add(ClustersInfoField.ID)
+				.from(new ArrayList<String>(response.getClusters()))
+				.build().toString();
+	}
+
+	private String doClusterInfo(YarnClient client, ApplicationId applicationId, String clusterId, boolean verbose) {
+		YarnContainerClusterOperations operations = buildClusterOperations(client, applicationId);
+		ContainerClusterResource response = operations.clusterInfo(clusterId);
+
+		List<ClustersInfoReportData> data = new ArrayList<ClustersInfoReportData>();
+
+		Integer pany = response.getGridProjection().getProjectionData().getAny();
+		Map<String, Integer> phosts = response.getGridProjection().getProjectionData().getHosts();
+		Map<String, Integer> pracks = response.getGridProjection().getProjectionData().getRacks();
+		Integer sany = response.getGridProjection().getSatisfyState().getAllocateData().getAny();
+		Map<String, Integer> shosts = response.getGridProjection().getSatisfyState().getAllocateData().getHosts();
+		Map<String, Integer> sracks = response.getGridProjection().getSatisfyState().getAllocateData().getRacks();
+
+		data.add(new ClustersInfoReportData(response.getContainerClusterState().getClusterState().toString(), response.getGridProjection().getMembers().size(), pany, phosts, pracks, sany, shosts, sracks));
+		if (verbose) {
+			return ContainerClusterReport.clusterInfoReportBuilder()
+					.add(ClusterInfoField.STATE)
+					.add(ClusterInfoField.MEMBERS)
+					.add(ClusterInfoField.PROJECTIONANY)
+					.add(ClusterInfoField.PROJECTIONHOSTS)
+					.add(ClusterInfoField.PROJECTIONRACKS)
+					.add(ClusterInfoField.SATISFYANY)
+					.add(ClusterInfoField.SATISFYHOSTS)
+					.add(ClusterInfoField.SATISFYRACKS)
+					.from(data)
+					.build().toString();
+		} else {
+			return ContainerClusterReport.clusterInfoReportBuilder()
+					.add(ClusterInfoField.STATE)
+					.add(ClusterInfoField.MEMBERS)
+					.from(data)
+					.build().toString();
+		}
+	}
+
+	private String doClusterCreate(YarnClient client, ApplicationId applicationId, String clusterId, String clusterDef,
+			String projectionType, Integer projectionDataAny, Map<String, Integer> hosts, Map<String, Integer> racks,
+			Map<String, Object> extraProperties) {
+		YarnContainerClusterOperations operations = buildClusterOperations(client, applicationId);
+
+		ContainerClusterCreateRequest request = new ContainerClusterCreateRequest();
+		request.setClusterId(clusterId);
+		request.setClusterDef(clusterDef);
+		request.setProjection(ProjectionType.valueOf(projectionType.toUpperCase()));
+		request.setExtraProperties(extraProperties);
+
+		ProjectionDataType projectionData = new ProjectionDataType();
+		projectionData.setAny(projectionDataAny);
+		projectionData.setHosts(hosts);
+		projectionData.setRacks(racks);
+
+		request.setProjectionData(projectionData);
+		operations.clusterCreate(request);
+		return "Cluster " + clusterId + " created.";
+	}
+
+	private String doClusterDestroy(YarnClient client, ApplicationId applicationId, String clusterId) {
+		YarnContainerClusterOperations operations = buildClusterOperations(client, applicationId);
+		operations.clusterDestroy(clusterId);
+		return "Cluster " + clusterId + " destroyed.";
+	}
+
+	private String doClusterStart(YarnClient client, ApplicationId applicationId, String clusterId) {
+		YarnContainerClusterOperations operations = buildClusterOperations(client, applicationId);
+		ContainerClusterModifyRequest request = new ContainerClusterModifyRequest();
+		request.setAction("start");
+		operations.clusterStart(clusterId, request);
+		return "Cluster " + clusterId + " started.";
+	}
+
+	private String doClusterStop(YarnClient client, ApplicationId applicationId, String clusterId) {
+		YarnContainerClusterOperations operations = buildClusterOperations(client, applicationId);
+		ContainerClusterModifyRequest request = new ContainerClusterModifyRequest();
+		request.setAction("stop");
+		operations.clusterStop(clusterId, request);
+		return "Cluster " + clusterId + " stopped.";
+	}
+
+	private String doClusterModify(YarnClient client, ApplicationId applicationId, String clusterId,
+			Integer projectionDataAny, Map<String, Integer> hosts, Map<String, Integer> racks) {
+		YarnContainerClusterOperations operations = buildClusterOperations(client, applicationId);
+
+		ContainerClusterCreateRequest request = new ContainerClusterCreateRequest();
+		request.setClusterId(clusterId);
+
+		ProjectionDataType projectionData = new ProjectionDataType();
+		projectionData.setAny(projectionDataAny);
+		projectionData.setHosts(hosts);
+		projectionData.setRacks(racks);
+
+		request.setProjectionData(projectionData);
+
+		operations.clusterModify(clusterId, request);
+		return "Cluster " + clusterId + " modified.";
+	}
+
+	private YarnContainerClusterOperations buildClusterOperations(YarnClient client, ApplicationId applicationId) {
+		ApplicationReport report = client.getApplicationReport(applicationId);
+		String trackingUrl = report.getOriginalTrackingUrl();
+		return new YarnContainerClusterTemplate(trackingUrl + "/" + YarnContainerClusterEndpoint.ENDPOINT_ID);
+	}
+
+	@ConfigurationProperties(value = "spring.yarn.internal.ContainerClusterApplication")
+	public static class OperationProperties {
+
+		private Operation operation;
+
+		private String applicationId;
+
+		private String clusterId;
+
+		private String clusterDef;
+
+		private String projectionType;
+
+		private Integer projectionDataAny;
+
+		private Map<String, Integer> projectionDataHosts;
+
+		private Map<String, Integer> projectionDataRacks;
+
+		private Map<String, Object> extraProperties;
+
+		private boolean verbose;
+
+		public void setOperation(Operation operation) {
+			this.operation = operation;
+		}
+
+		public Operation getOperation() {
+			return operation;
+		}
+
+		public void setApplicationId(String applicationId) {
+			this.applicationId = applicationId;
+		}
+
+		public String getApplicationId() {
+			return applicationId;
+		}
+
+		public void setClusterId(String clusterId) {
+			this.clusterId = clusterId;
+		}
+
+		public String getClusterId() {
+			return clusterId;
+		}
+
+		public void setClusterDef(String clusterDef) {
+			this.clusterDef = clusterDef;
+		}
+
+		public String getClusterDef() {
+			return clusterDef;
+		}
+
+		public void setProjectionType(String projectionType) {
+			this.projectionType = projectionType;
+		}
+
+		public String getProjectionType() {
+			return projectionType;
+		}
+
+		public void setProjectionDataAny(Integer projectionDataAny) {
+			this.projectionDataAny = projectionDataAny;
+		}
+
+		public Integer getProjectionDataAny() {
+			return projectionDataAny;
+		}
+
+		public void setProjectionDataHosts(Map<String, Integer> projectionDataHosts) {
+			this.projectionDataHosts = projectionDataHosts;
+		}
+
+		public Map<String, Integer> getProjectionDataHosts() {
+			return projectionDataHosts;
+		}
+
+		public void setProjectionDataRacks(Map<String, Integer> projectionDataRacks) {
+			this.projectionDataRacks = projectionDataRacks;
+		}
+
+		public Map<String, Integer> getProjectionDataRacks() {
+			return projectionDataRacks;
+		}
+
+		public void setExtraProperties(Map<String, Object> extraProperties) {
+			this.extraProperties = extraProperties;
+		}
+
+		public Map<String, Object> getExtraProperties() {
+			return extraProperties;
+		}
+
+		public void setVerbose(boolean verbose) {
+			this.verbose = verbose;
+		}
+
+		public boolean isVerbose() {
+			return verbose;
+		}
+
+	}
+
+	/**
+	 * Operations supported by this application.
+	 */
+	private enum Operation {
+		CLUSTERSINFO,
+		CLUSTERINFO,
+		CLUSTERCREATE,
+		CLUSTERDESTROY,
+		CLUSTERMODIFY,
+		CLUSTERSTART,
+		CLUSTERSTOP
+	}
+
+}
