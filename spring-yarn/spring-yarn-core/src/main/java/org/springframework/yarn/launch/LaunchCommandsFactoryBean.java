@@ -55,6 +55,9 @@ public class LaunchCommandsFactoryBean implements InitializingBean, FactoryBean<
 	/** Possible arguments */
 	private Properties arguments;
 
+	/** Possible arguments as list */
+	private List<String> argumentsList;
+
 	/** Possible jvm options */
 	private List<String> options;
 
@@ -114,6 +117,10 @@ public class LaunchCommandsFactoryBean implements InitializingBean, FactoryBean<
 			}
 		}
 
+		if (argumentsList != null) {
+			commandsList.addAll(argumentsList);
+		}
+
 		// program arguments at the end before stdout/stderr
 		commandsList.addAll(resolveProgramArguments());
 
@@ -125,8 +132,7 @@ public class LaunchCommandsFactoryBean implements InitializingBean, FactoryBean<
 	/**
 	 * Sets the main command.
 	 *
-	 * @param command
-	 *            the new command
+	 * @param command the new command
 	 */
 	public void setCommand(String command) {
 		this.command = command;
@@ -135,8 +141,7 @@ public class LaunchCommandsFactoryBean implements InitializingBean, FactoryBean<
 	/**
 	 * Sets the runner class.
 	 *
-	 * @param runner
-	 *            the new runner class
+	 * @param runner the new runner class
 	 */
 	public void setRunner(Class<?> runner) {
 		this.runner = runner;
@@ -145,8 +150,7 @@ public class LaunchCommandsFactoryBean implements InitializingBean, FactoryBean<
 	/**
 	 * Sets the runner class.
 	 *
-	 * @param runnerClass
-	 *            the new runner class
+	 * @param runnerClass the new runner class
 	 */
 	public void setRunnerClass(String runnerClass) {
 		this.runnerClass = runnerClass;
@@ -156,8 +160,7 @@ public class LaunchCommandsFactoryBean implements InitializingBean, FactoryBean<
 	 * Sets the jar file name. If this is set, the command mode is automatically
 	 * to use executable jar with 'java -jar'.
 	 *
-	 * @param jarFile
-	 *            the new jar file
+	 * @param jarFile the new jar file
 	 */
 	public void setJarFile(String jarFile) {
 		this.jarFile = jarFile;
@@ -166,8 +169,7 @@ public class LaunchCommandsFactoryBean implements InitializingBean, FactoryBean<
 	/**
 	 * Sets the context file.
 	 *
-	 * @param contextFile
-	 *            the new context file
+	 * @param contextFile the new context file
 	 */
 	public void setContextFile(String contextFile) {
 		this.contextFile = contextFile;
@@ -176,8 +178,7 @@ public class LaunchCommandsFactoryBean implements InitializingBean, FactoryBean<
 	/**
 	 * Sets the bean name.
 	 *
-	 * @param beanName
-	 *            the new bean name
+	 * @param beanName the new bean name
 	 */
 	public void setBeanName(String beanName) {
 		this.beanName = beanName;
@@ -186,18 +187,27 @@ public class LaunchCommandsFactoryBean implements InitializingBean, FactoryBean<
 	/**
 	 * Sets the arguments.
 	 *
-	 * @param arguments
-	 *            the new arguments
+	 * @param arguments the new arguments
 	 */
 	public void setArguments(Properties arguments) {
 		this.arguments = arguments;
 	}
 
 	/**
+	 * Sets the arguments as a list. Arguments set using
+	 * this method are handled before arguments set via
+	 * {@link #setArguments(Properties)}.
+	 *
+	 * @param argumentsList the new arguments
+	 */
+	public void setArgumentsList(List<String> argumentsList) {
+		this.argumentsList = argumentsList;
+	}
+
+	/**
 	 * Sets the options.
 	 *
-	 * @param options
-	 *            the new options
+	 * @param options the new options
 	 */
 	public void setOptions(List<String> options) {
 		this.options = options;
@@ -206,8 +216,7 @@ public class LaunchCommandsFactoryBean implements InitializingBean, FactoryBean<
 	/**
 	 * Sets the stdout.
 	 *
-	 * @param stdout
-	 *            the new stdout
+	 * @param stdout the new stdout
 	 */
 	public void setStdout(String stdout) {
 		this.stdout = stdout;
@@ -216,8 +225,7 @@ public class LaunchCommandsFactoryBean implements InitializingBean, FactoryBean<
 	/**
 	 * Sets the stderr.
 	 *
-	 * @param stderr
-	 *            the new stderr
+	 * @param stderr the new stderr
 	 */
 	public void setStderr(String stderr) {
 		this.stderr = stderr;

@@ -24,6 +24,7 @@ public abstract class AbstractLaunchContextProperties {
 	private String runnerClass;
 	private List<String> options;
 	private Map<String, String> arguments;
+	private List<String> argumentsList;
 	private List<String> containerAppClasspath;
 	private String pathSeparator;
 	private boolean includeBaseDirectory = true;
@@ -65,6 +66,14 @@ public abstract class AbstractLaunchContextProperties {
 
 	public List<String> getContainerAppClasspath() {
 		return containerAppClasspath;
+	}
+
+	public List<String> getArgumentsList() {
+		return argumentsList;
+	}
+
+	public void setArgumentsList(List<String> argumentsList) {
+		this.argumentsList = argumentsList;
 	}
 
 	public void setContainerAppClasspath(List<String> containerAppClasspath) {

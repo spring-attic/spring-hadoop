@@ -217,6 +217,8 @@ public class YarnClientAutoConfiguration {
 			factory.setRunnerClass("org.springframework.boot.loader.PropertiesLauncher");
 		}
 
+		factory.setArgumentsList(syclcp.getArgumentsList());
+
 		if (syclcp.getArguments() != null) {
 			Properties arguments = new Properties();
 			arguments.putAll(syclcp.getArguments());

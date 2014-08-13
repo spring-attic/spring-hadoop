@@ -419,6 +419,8 @@ public class YarnAppmasterAutoConfiguration {
 			factory.setRunnerClass("org.springframework.boot.loader.PropertiesLauncher");
 		}
 
+		factory.setArgumentsList(syalcp.getArgumentsList());
+
 		if (syalcp.getArguments() != null) {
 			Properties arguments = new Properties();
 			arguments.putAll(syalcp.getArguments());

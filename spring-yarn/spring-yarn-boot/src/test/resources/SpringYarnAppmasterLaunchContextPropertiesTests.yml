@@ -9,6 +9,9 @@ spring:
                   : argumentsValFoo1
                   ? argumentsKeyFoo2
                   : argumentsValFoo2
+                argumentsList:
+                  - argumentsListFoo1
+                  - argumentsListFoo2
                 containerAppClasspath:
                   - "classpath1Foo"
                   - "classpath2Foo"

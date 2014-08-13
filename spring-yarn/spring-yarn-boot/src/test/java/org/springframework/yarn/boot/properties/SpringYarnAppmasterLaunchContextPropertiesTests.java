@@ -16,6 +16,7 @@
 package org.springframework.yarn.boot.properties;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -45,6 +46,11 @@ public class SpringYarnAppmasterLaunchContextPropertiesTests {
 		assertThat(arguments.size(), is(2));
 		assertThat(arguments.get("argumentsKeyFoo1"), is("argumentsValFoo1"));
 		assertThat(arguments.get("argumentsKeyFoo2"), is("argumentsValFoo2"));
+
+		List<String> argumentsList = properties.getArgumentsList();
+		assertThat(argumentsList, notNullValue());
+		assertThat(argumentsList.size(), is(2));
+		assertThat(argumentsList, contains("argumentsListFoo1", "argumentsListFoo2"));
 
 		List<String> classpath = properties.getContainerAppClasspath();
 		assertThat(classpath, notNullValue());
