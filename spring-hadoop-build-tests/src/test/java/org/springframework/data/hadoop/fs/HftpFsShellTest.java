@@ -20,6 +20,7 @@ import org.junit.runner.RunWith;
 import org.springframework.data.hadoop.HadoopException;
 import org.springframework.data.hadoop.test.context.HadoopDelegatingSmartContextLoader;
 import org.springframework.data.hadoop.test.context.MiniHadoopCluster;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -31,7 +32,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(loader = HadoopDelegatingSmartContextLoader.class)
-@MiniHadoopCluster
+@MiniHadoopCluster(id="HftpFsShellTest")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class HftpFsShellTest extends AbstractROFsShellTest {
 
 	public static final String HFTP_FILESYSTEM_CLASS_NAME_FOR_V1_THRU_V2_2 =

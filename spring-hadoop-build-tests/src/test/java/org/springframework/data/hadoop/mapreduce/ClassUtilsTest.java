@@ -15,6 +15,10 @@
  */
 package org.springframework.data.hadoop.mapreduce;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+
 import org.junit.Test;
 import org.springframework.beans.BeanUtils;
 import org.springframework.core.io.DefaultResourceLoader;
@@ -22,7 +26,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.util.ClassUtils;
 
 import test.SomeClass;
-import static org.junit.Assert.*;
 
 /**
  * @author Costin Leau

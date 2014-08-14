@@ -40,6 +40,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.data.hadoop.TestUtils;
 import org.springframework.data.hadoop.test.context.HadoopDelegatingSmartContextLoader;
 import org.springframework.data.hadoop.test.context.MiniHadoopCluster;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.util.Assert;
 
@@ -49,7 +50,8 @@ import org.springframework.util.Assert;
  * @author Costin Leau
  */
 @ContextConfiguration(loader = HadoopDelegatingSmartContextLoader.class)
-@MiniHadoopCluster
+@MiniHadoopCluster(id="AbstractROFsShellTest")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public abstract class AbstractROFsShellTest {
 	{
 		TestUtils.hackHadoopStagingOnWin();

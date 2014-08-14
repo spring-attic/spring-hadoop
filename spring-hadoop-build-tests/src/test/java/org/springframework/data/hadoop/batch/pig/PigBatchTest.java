@@ -15,6 +15,8 @@
  */
 package org.springframework.data.hadoop.batch.pig;
 
+import static org.junit.Assert.assertTrue;
+
 import java.util.Collection;
 import java.util.List;
 
@@ -26,18 +28,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.hadoop.TestUtils;
 import org.springframework.data.hadoop.batch.JobsTrigger;
-import org.springframework.data.hadoop.batch.pig.PigTasklet;
 import org.springframework.data.hadoop.pig.PigServerFactory;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Costin Leau
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("/org/springframework/data/hadoop/pig/batch.xml")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class PigBatchTest {
 
 	@Autowired

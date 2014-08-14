@@ -48,7 +48,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(loader = HadoopDelegatingSmartContextLoader.class, locations = { "/org/springframework/data/hadoop/batch/in-do-out.xml" })
-@MiniHadoopCluster
+@MiniHadoopCluster(id="ReadWriteHdfsTest")
 @DirtiesContext(classMode=ClassMode.AFTER_CLASS)
 public class ReadWriteHdfsTest extends AbstractHadoopClusterTests {
 

@@ -36,6 +36,7 @@ import org.springframework.data.hadoop.config.common.annotation.complex.ComplexT
 import org.springframework.data.hadoop.config.common.annotation.complex.ComplexTestConfigBuilder;
 import org.springframework.data.hadoop.config.common.annotation.complex.ComplexTestConfigurerAdapter;
 import org.springframework.data.hadoop.config.common.annotation.complex.EnableComplexTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
@@ -48,6 +49,7 @@ import org.springframework.test.context.support.AnnotationConfigContextLoader;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(loader=AnnotationConfigContextLoader.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class ComplexAnnotationConfigurationTests {
 
 	@Autowired

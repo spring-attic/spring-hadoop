@@ -31,6 +31,7 @@ import org.springframework.data.hadoop.config.common.annotation.simple.SimpleTes
 import org.springframework.data.hadoop.config.common.annotation.simple.SimpleTestConfigBeanBConfigurer;
 import org.springframework.data.hadoop.config.common.annotation.simple.SimpleTestConfigBuilder;
 import org.springframework.data.hadoop.config.common.annotation.simple.SimpleTestConfigurerAdapter;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
@@ -44,6 +45,7 @@ import org.springframework.test.context.support.AnnotationConfigContextLoader;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(loader=AnnotationConfigContextLoader.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class XmlImportDependenciesTests {
 
 	@Autowired

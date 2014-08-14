@@ -22,6 +22,7 @@ import java.io.IOException;
 import org.junit.Test;
 import org.springframework.data.hadoop.test.context.HadoopDelegatingSmartContextLoader;
 import org.springframework.data.hadoop.test.context.MiniHadoopCluster;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
@@ -31,7 +32,8 @@ import org.springframework.test.context.ContextConfiguration;
  *
  */
 @ContextConfiguration(loader=HadoopDelegatingSmartContextLoader.class)
-@MiniHadoopCluster
+@MiniHadoopCluster(id="HadoopClusterBaseTestClassTests")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class HadoopClusterBaseTestClassTests extends AbstractHadoopClusterTests {
 
 	@Test

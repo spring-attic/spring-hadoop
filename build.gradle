@@ -22,6 +22,11 @@ allprojects {
 		maven { url 'http://repo.spring.io/libs-release' }
 	}
 }
+tasks.withType(Test) {
+ minHeapSize = "4128m"
+   maxHeapSize = "4512m"
+   jvmArgs '-XX:MaxPermSize=1256m'
+   }
 
 def javaProjects() {
 	subprojects.findAll { project -> project.name != 'docs' }

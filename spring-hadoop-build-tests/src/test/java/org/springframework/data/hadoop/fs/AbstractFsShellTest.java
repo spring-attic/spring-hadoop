@@ -23,8 +23,11 @@ import java.util.UUID;
 
 import org.apache.hadoop.fs.Path;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.core.io.Resource;
 import org.springframework.data.hadoop.TestUtils;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.util.FileSystemUtils;
 
@@ -35,6 +38,8 @@ import static org.junit.Assert.*;
  *
  * @author Costin Leau
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public abstract class AbstractFsShellTest extends AbstractROFsShellTest {
 
 	{

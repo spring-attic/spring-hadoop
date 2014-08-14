@@ -26,6 +26,7 @@ import org.springframework.data.hadoop.HadoopSystemConstants;
 import org.springframework.data.hadoop.TestUtils;
 import org.springframework.data.hadoop.fs.CustomResourceLoaderRegistrar;
 import org.springframework.data.hadoop.fs.HdfsResourceLoader;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -37,6 +38,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class ResourceLoaderRegistrarNamespaceTests {
 
 	@Resource(name = HadoopSystemConstants.DEFAULT_ID_RESOURCE_LOADER)

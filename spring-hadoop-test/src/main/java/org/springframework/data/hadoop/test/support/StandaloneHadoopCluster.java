@@ -143,7 +143,8 @@ public class StandaloneHadoopCluster implements HadoopCluster {
 					nodes, config, fs, this.getClass().getClassLoader());
 
 			configuration = MiniMRClusterCompat.getConfiguration(mrClusterObject);
-
+			configuration.set("dfs.datanode.handler.count", "2");
+			configuration.set("yarn.client.nodemanager-client-async.thread-pool-max-size", "5");
 			// set default uri again in case it wasn't updated
 			FileSystem.setDefaultUri(configuration, fs.getUri());
 

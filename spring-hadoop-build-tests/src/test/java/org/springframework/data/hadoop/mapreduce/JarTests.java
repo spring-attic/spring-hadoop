@@ -46,8 +46,8 @@ import org.springframework.util.ClassUtils;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(loader = HadoopDelegatingSmartContextLoader.class)
-@MiniHadoopCluster
-@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
+@MiniHadoopCluster(id="JarTests")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class JarTests {
 
 	{

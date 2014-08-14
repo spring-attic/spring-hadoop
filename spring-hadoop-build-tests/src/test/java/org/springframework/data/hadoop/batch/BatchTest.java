@@ -42,7 +42,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(loader = HadoopDelegatingSmartContextLoader.class, locations = { "/org/springframework/data/hadoop/batch/multi-thread.xml" })
-@MiniHadoopCluster
+@MiniHadoopCluster(id="BatchTest")
 @DirtiesContext(classMode=ClassMode.AFTER_CLASS)
 public class BatchTest {
 

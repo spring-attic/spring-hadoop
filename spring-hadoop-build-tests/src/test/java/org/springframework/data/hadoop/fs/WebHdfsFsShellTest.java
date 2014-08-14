@@ -18,6 +18,7 @@ package org.springframework.data.hadoop.fs;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.hdfs.web.WebHdfsFileSystem;
 import org.junit.runner.RunWith;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -28,6 +29,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class WebHdfsFsShellTest extends AbstractFsShellTest {
 
 	@Override

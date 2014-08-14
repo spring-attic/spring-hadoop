@@ -47,6 +47,8 @@ import org.springframework.data.hadoop.TestUtils;
 import org.springframework.data.hadoop.configuration.ConfigurationFactoryBean;
 import org.springframework.data.hadoop.test.context.HadoopDelegatingSmartContextLoader;
 import org.springframework.data.hadoop.test.context.MiniHadoopCluster;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -57,7 +59,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(loader = HadoopDelegatingSmartContextLoader.class, locations = { "/org/springframework/data/hadoop/hadoop-ctx.xml" })
-@MiniHadoopCluster
+@MiniHadoopCluster(id="HdfsResourceLoaderLegacyTest")
+@DirtiesContext(classMode=ClassMode.AFTER_CLASS)
 public class HdfsResourceLoaderLegacyTest {
 
 	@Autowired

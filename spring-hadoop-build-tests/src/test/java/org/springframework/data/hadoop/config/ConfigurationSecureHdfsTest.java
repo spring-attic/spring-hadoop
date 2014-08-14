@@ -15,6 +15,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.data.hadoop.TestUtils;
 import org.springframework.data.hadoop.test.tests.Assume;
 import org.springframework.data.hadoop.test.tests.TestGroup;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.util.Assert;
 
 /**
@@ -24,6 +25,7 @@ import org.springframework.util.Assert;
  * @author Janne Valkealahti
  *
  */
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class ConfigurationSecureHdfsTest {
 
 	private static final Log log = LogFactory.getLog(ConfigurationSecureHdfsTest.class);

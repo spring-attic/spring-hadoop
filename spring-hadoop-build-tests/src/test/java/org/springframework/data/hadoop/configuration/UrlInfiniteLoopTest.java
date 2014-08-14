@@ -15,6 +15,8 @@
  */
 package org.springframework.data.hadoop.configuration;
 
+import static org.junit.Assert.assertNotNull;
+
 import java.lang.reflect.Method;
 
 import org.apache.hadoop.conf.Configuration;
@@ -23,8 +25,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.data.hadoop.util.VersionUtils;
 import org.springframework.util.ReflectionUtils;
-
-import static org.junit.Assert.*;
 
 /**
  * See SHDP-92: https://jira.springsource.org/browse/SHDP-92
