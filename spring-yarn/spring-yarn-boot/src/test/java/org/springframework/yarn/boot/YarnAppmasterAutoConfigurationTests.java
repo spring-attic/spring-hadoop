@@ -15,7 +15,14 @@
  */
 package org.springframework.yarn.boot;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.After;
 import org.junit.Rule;
@@ -24,10 +31,15 @@ import org.junit.rules.ExpectedException;
 import org.springframework.boot.autoconfigure.PropertyPlaceholderAutoConfiguration;
 import org.springframework.boot.test.EnvironmentTestUtils;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.yarn.am.YarnAppmaster;
-import org.springframework.yarn.am.cluster.ManagedContainerClusterAppmaster;
 import org.springframework.yarn.am.cluster.ContainerClusterStateMachineConfiguration;
+import org.springframework.yarn.am.cluster.ManagedContainerClusterAppmaster;
+import org.springframework.yarn.am.grid.GridProjection;
+import org.springframework.yarn.am.grid.GridProjectionFactory;
+import org.springframework.yarn.am.grid.GridProjectionFactoryLocator;
+import org.springframework.yarn.am.grid.support.ProjectionData;
 
 /**
  * Tests for {@link YarnAppmasterAutoConfiguration}.
@@ -59,14 +71,91 @@ public class YarnAppmasterAutoConfigurationTests {
 						this.context,
 						"spring.yarn.appmaster.appmasterClass:org.springframework.yarn.boot.YarnAppmasterAutoConfigurationTests$TestManagedContainerClusterAppmaster",
 						"spring.yarn.appmaster.containercluster.enabled:true");
-		context.register(ContainerClusterStateMachineConfiguration.class, TestConfigWithClass.class,
+		context.register(ContainerClusterStateMachineConfiguration.class,
 				YarnAppmasterAutoConfiguration.class, PropertyPlaceholderAutoConfiguration.class);
 		context.refresh();
 		assertNotNull(context.getBean(YarnAppmaster.class));
+		YarnAppmaster appmaster = context.getBean(YarnAppmaster.class);
+		GridProjectionFactoryLocator locator = TestUtils.readField("gridProjectionFactoryLocator", appmaster);
+		Set<GridProjectionFactory> factories = TestUtils.readField("factories", locator);
+		assertThat(factories.size(), is(1));
+		GridProjectionFactory factory = factories.iterator().next();
+		assertThat(factory.getRegisteredProjectionTypes().size(), is(3));
+		assertThat(factory.getRegisteredProjectionTypes(), containsInAnyOrder("hosts", "racks", "any"));
+	}
+
+	@Test
+	public void testOverrideDefaultGridProjectionFactory() throws Exception {
+		System.setProperty("HADOOP_TOKEN_FILE_LOCATION", "xx/xx/xx/00001/container_tokens");
+		context = new AnnotationConfigApplicationContext();
+		EnvironmentTestUtils
+				.addEnvironment(
+						this.context,
+						"spring.yarn.appmaster.appmasterClass:org.springframework.yarn.boot.YarnAppmasterAutoConfigurationTests$TestManagedContainerClusterAppmaster",
+						"spring.yarn.appmaster.containercluster.enabled:true");
+		context.register(ContainerClusterStateMachineConfiguration.class, TestConfig1WithClass.class,
+				YarnAppmasterAutoConfiguration.class, PropertyPlaceholderAutoConfiguration.class);
+		context.refresh();
+		assertNotNull(context.getBean(YarnAppmaster.class));
+		YarnAppmaster appmaster = context.getBean(YarnAppmaster.class);
+		GridProjectionFactoryLocator locator = TestUtils.readField("gridProjectionFactoryLocator", appmaster);
+		Set<GridProjectionFactory> factories = TestUtils.readField("factories", locator);
+		assertThat(factories.size(), is(1));
+		GridProjectionFactory factory = factories.iterator().next();
+		assertThat(factory.getRegisteredProjectionTypes().size(), is(1));
+		assertThat(factory.getRegisteredProjectionTypes(), containsInAnyOrder("foo"));
+	}
+
+	@Test
+	public void testAddCustomGridProjectionFactory() throws Exception {
+		System.setProperty("HADOOP_TOKEN_FILE_LOCATION", "xx/xx/xx/00001/container_tokens");
+		context = new AnnotationConfigApplicationContext();
+		EnvironmentTestUtils
+				.addEnvironment(
+						this.context,
+						"spring.yarn.appmaster.appmasterClass:org.springframework.yarn.boot.YarnAppmasterAutoConfigurationTests$TestManagedContainerClusterAppmaster",
+						"spring.yarn.appmaster.containercluster.enabled:true");
+		context.register(ContainerClusterStateMachineConfiguration.class, TestConfig2WithClass.class,
+				YarnAppmasterAutoConfiguration.class, PropertyPlaceholderAutoConfiguration.class);
+		context.refresh();
+		assertNotNull(context.getBean(YarnAppmaster.class));
+		YarnAppmaster appmaster = context.getBean(YarnAppmaster.class);
+		GridProjectionFactoryLocator locator = TestUtils.readField("gridProjectionFactoryLocator", appmaster);
+		Set<GridProjectionFactory> factories = TestUtils.readField("factories", locator);
+		assertThat(factories.size(), is(2));
 	}
 
 	@Configuration
-	public static class TestConfigWithClass {
+	public static class TestConfig1WithClass {
+
+		@Bean
+		public GridProjectionFactory defaultGridProjectionFactory() {
+			return new TestGridProjectionFactory();
+		}
+
+	}
+
+	@Configuration
+	public static class TestConfig2WithClass {
+
+		@Bean
+		public GridProjectionFactory testGridProjectionFactory() {
+			return new TestGridProjectionFactory();
+		}
+
+	}
+
+	public static class TestGridProjectionFactory implements GridProjectionFactory {
+
+		@Override
+		public GridProjection getGridProjection(ProjectionData projectionData) {
+			return null;
+		}
+
+		@Override
+		public Set<String> getRegisteredProjectionTypes() {
+			return new HashSet<String>(Arrays.asList("foo"));
+		}
 
 	}
 

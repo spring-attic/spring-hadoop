@@ -306,4 +306,14 @@ public class ManagedContainerClusterAppmasterSingleTests extends AbstractManaged
 //		assertDoTask(appmaster, 0, 0, 0, 0, "foo");
 	}
 
+	@Test(expected = IllegalArgumentException.class)
+	public void testCreateUndefinedCluster() throws Exception {
+		TestContainerAllocator allocator = new TestContainerAllocator();
+		TestContainerLauncher launcher = new TestContainerLauncher();
+		TestManagedContainerClusterAppmaster appmaster = createTestAppmaster(allocator, launcher);
+		appmaster.setStateMachineFactory(stateMachineFactory);
+		ProjectionData projectionData = new ProjectionData(1, null, null, "doesnotexist", null);
+		appmaster.createContainerCluster("doesnotexist", projectionData);
+	}
+
 }

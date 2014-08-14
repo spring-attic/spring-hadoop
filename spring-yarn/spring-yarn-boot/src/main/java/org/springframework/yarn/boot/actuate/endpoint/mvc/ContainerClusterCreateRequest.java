@@ -29,7 +29,7 @@ public class ContainerClusterCreateRequest extends AbstractContainerClusterReque
 
 	private String clusterDef;
 
-	private ProjectionType projection;
+	private String projection;
 
 	private ProjectionDataType projectionData;
 
@@ -51,11 +51,11 @@ public class ContainerClusterCreateRequest extends AbstractContainerClusterReque
 		this.clusterDef = clusterDef;
 	}
 
-	public ProjectionType getProjection() {
+	public String getProjection() {
 		return projection;
 	}
 
-	public void setProjection(ProjectionType projection) {
+	public void setProjection(String projection) {
 		this.projection = projection;
 	}
 
@@ -73,12 +73,6 @@ public class ContainerClusterCreateRequest extends AbstractContainerClusterReque
 
 	public void setExtraProperties(Map<String, Object> extraProperties) {
 		this.extraProperties = extraProperties;
-	}
-
-	public enum ProjectionType {
-		ANY,
-		HOSTS,
-		RACKS
 	}
 
 }

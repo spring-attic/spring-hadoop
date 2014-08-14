@@ -15,8 +15,9 @@
  */
 package org.springframework.yarn.am.grid.support;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.springframework.yarn.am.grid.GridProjection;
 import org.springframework.yarn.am.grid.GridProjectionFactory;
@@ -29,17 +30,7 @@ import org.springframework.yarn.am.grid.GridProjectionFactory;
  */
 public class DefaultGridProjectionFactory implements GridProjectionFactory {
 
-	private final Map<String, ProjectionData> defaults = new HashMap<String, ProjectionData>();
-
-	public DefaultGridProjectionFactory(Map<String, ProjectionData> defaults) {
-		if (defaults != null) {
-			this.defaults.putAll(defaults);
-		}
-	}
-
-	@Override
-	public Map<String, ProjectionData> getProjectionDatas() {
-		return defaults;
+	public DefaultGridProjectionFactory() {
 	}
 
 	@Override
@@ -62,6 +53,11 @@ public class DefaultGridProjectionFactory implements GridProjectionFactory {
 			projection.setProjectionData(projectionData);
 		}
 		return projection;
+	}
+
+	@Override
+	public Set<String> getRegisteredProjectionTypes() {
+		return new HashSet<String>(Arrays.asList("hosts", "racks", "any"));
 	}
 
 }

@@ -34,7 +34,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.yarn.boot.actuate.endpoint.YarnContainerClusterEndpoint;
 import org.springframework.yarn.boot.actuate.endpoint.mvc.AbstractContainerClusterRequest.ProjectionDataType;
 import org.springframework.yarn.boot.actuate.endpoint.mvc.ContainerClusterCreateRequest;
-import org.springframework.yarn.boot.actuate.endpoint.mvc.ContainerClusterCreateRequest.ProjectionType;
 import org.springframework.yarn.boot.actuate.endpoint.mvc.ContainerClusterModifyRequest;
 import org.springframework.yarn.boot.actuate.endpoint.mvc.ContainerClusterModifyRequest.ModifyAction;
 import org.springframework.yarn.boot.actuate.endpoint.mvc.domain.ContainerClusterResource;
@@ -119,7 +118,7 @@ public class YarnContainerClusterTemplateTests {
 
 		ContainerClusterCreateRequest request = new ContainerClusterCreateRequest();
 		request.setClusterId("cluster1");
-		request.setProjection(ProjectionType.ANY);
+		request.setProjection("any");
 		ProjectionDataType projectionData = new ProjectionDataType();
 		projectionData.setAny(1);
 		request.setProjectionData(projectionData);

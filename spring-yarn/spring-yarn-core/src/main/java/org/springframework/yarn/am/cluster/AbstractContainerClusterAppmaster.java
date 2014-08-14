@@ -47,6 +47,7 @@ import org.springframework.yarn.am.grid.Grid;
 import org.springframework.yarn.am.grid.GridMember;
 import org.springframework.yarn.am.grid.GridProjection;
 import org.springframework.yarn.am.grid.GridProjectionFactory;
+import org.springframework.yarn.am.grid.GridProjectionFactoryLocator;
 import org.springframework.yarn.am.grid.ProjectedGrid;
 import org.springframework.yarn.am.grid.listener.ProjectedGridListenerAdapter;
 import org.springframework.yarn.am.grid.support.AbstractGridProjection;
@@ -54,6 +55,7 @@ import org.springframework.yarn.am.grid.support.DefaultGrid;
 import org.springframework.yarn.am.grid.support.DefaultGridMember;
 import org.springframework.yarn.am.grid.support.DefaultProjectedGrid;
 import org.springframework.yarn.am.grid.support.ProjectionData;
+import org.springframework.yarn.am.grid.support.ProjectionDataRegistry;
 import org.springframework.yarn.am.grid.support.SatisfyStateData;
 import org.springframework.yarn.am.monitor.ContainerAware;
 import org.springframework.yarn.fs.MultiResourceLocalizer;
@@ -93,8 +95,11 @@ public abstract class AbstractContainerClusterAppmaster extends AbstractEventing
 	/** Factory for building on-demand state machines */
 	private EnumStateMachineFactory<ClusterState, ClusterEvent> stateMachineFactory;
 
-	/** Factory creating projections */
-	private GridProjectionFactory gridProjectionFactory;
+	/** Locator for factories creating projections */
+	private GridProjectionFactoryLocator gridProjectionFactoryLocator;
+
+	/** Projection data registry */
+	private ProjectionDataRegistry projectionDataRegistry;
 
 	@Override
 	protected void onInit() throws Exception {
@@ -113,8 +118,8 @@ public abstract class AbstractContainerClusterAppmaster extends AbstractEventing
 	@Override
 	protected void doStart() {
 		super.doStart();
-		if (gridProjectionFactory != null) {
-			Map<String, ProjectionData> defaults = gridProjectionFactory.getProjectionDatas();
+		if (projectionDataRegistry != null) {
+			Map<String, ProjectionData> defaults = projectionDataRegistry.getProjectionDatas();
 			for (Entry<String, ProjectionData> entry : defaults.entrySet()) {
 				// no type means it's missing projection settings
 				// so assume it's a blueprint and don't try to create
@@ -202,9 +207,18 @@ public abstract class AbstractContainerClusterAppmaster extends AbstractEventing
 			clusterDef = clusterId;
 		}
 
-		GridProjection projection = gridProjectionFactory.getGridProjection(projectionData);
+		GridProjectionFactory gridProjectionFactory = gridProjectionFactoryLocator.getGridProjectionFactory(projectionData.getType());
+		if (gridProjectionFactory == null) {
+			throw new IllegalArgumentException("Projection type " + projectionData.getType()
+					+ " not know to gridProjectionFactoryLocator=[" + gridProjectionFactoryLocator + "]");
+		}
 
-		ProjectionData p = gridProjectionFactory.getProjectionDatas().get(clusterDef);
+		GridProjection projection = gridProjectionFactory.getGridProjection(projectionData);
+		if (projection == null) {
+			throw new IllegalArgumentException("Unable to build projection using type " + projectionData.getType());
+		}
+
+		ProjectionData p = projectionDataRegistry.getProjectionDatas().get(clusterDef);
 
 		if (projection instanceof AbstractGridProjection) {
 			((AbstractGridProjection) projection).setConfiguration(getConfiguration());
@@ -270,15 +284,21 @@ public abstract class AbstractContainerClusterAppmaster extends AbstractEventing
 	}
 
 	/**
-	 * Sets the {@link GridProjectionFactory} used to create an instances
-	 * of {@link GridProjection}s.
+	 * Sets the {@link GridProjectionFactoryLocator} used to find factories
+	 * which are creating an instances of {@link GridProjection}s.
 	 *
-	 * @param gridProjectionFactory the grid projection factory
+	 * @param gridProjectionFactoryLocator the grid projection factory locator
 	 */
 	@Autowired
-	public void setGridProjectionFactory(GridProjectionFactory gridProjectionFactory) {
-		log.info("Setting gridProjectionFactory=" + gridProjectionFactory);
-		this.gridProjectionFactory = gridProjectionFactory;
+	public void setGridProjectionFactoryLocator(GridProjectionFactoryLocator gridProjectionFactoryLocator) {
+		log.info("Setting gridProjectionFactoryLocator=" + gridProjectionFactoryLocator);
+		this.gridProjectionFactoryLocator = gridProjectionFactoryLocator;
+	}
+
+	@Autowired(required = false)
+	public void setProjectionDataRegistry(ProjectionDataRegistry projectionDataRegistry) {
+		log.info("Setting projectionDataRegistry=" + projectionDataRegistry);
+		this.projectionDataRegistry = projectionDataRegistry;
 	}
 
 	protected Grid doCreateGrid() {

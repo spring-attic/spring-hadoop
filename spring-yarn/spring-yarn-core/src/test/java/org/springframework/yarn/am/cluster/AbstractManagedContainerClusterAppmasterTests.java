@@ -45,6 +45,8 @@ import org.springframework.yarn.am.allocate.ContainerAllocateData;
 import org.springframework.yarn.am.allocate.ContainerAllocator;
 import org.springframework.yarn.am.container.ContainerLauncher;
 import org.springframework.yarn.am.grid.support.DefaultGridProjectionFactory;
+import org.springframework.yarn.am.grid.support.GridProjectionFactoryRegistry;
+import org.springframework.yarn.am.grid.support.ProjectionDataRegistry;
 import org.springframework.yarn.am.grid.support.SatisfyStateData;
 import org.springframework.yarn.listener.ContainerAllocatorListener;
 import org.springframework.yarn.support.statemachine.StateMachineSystemConstants;
@@ -126,7 +128,13 @@ public abstract class AbstractManagedContainerClusterAppmasterTests {
 	protected static ManagedContainerClusterAppmaster createManagedAppmaster() throws Exception {
 		ManagedContainerClusterAppmaster appmaster = new ManagedContainerClusterAppmaster();
 		appmaster.setConfiguration(new Configuration());
-		appmaster.setGridProjectionFactory(new DefaultGridProjectionFactory(null));
+
+		GridProjectionFactoryRegistry registry = new GridProjectionFactoryRegistry();
+		registry.addGridProjectionFactory(new DefaultGridProjectionFactory());
+		appmaster.setGridProjectionFactoryLocator(registry);
+		appmaster.setProjectionDataRegistry(new ProjectionDataRegistry(null));
+
+//		appmaster.setGridProjectionFactory(new DefaultGridProjectionFactory());
 		TestUtils.callMethod("onInit", appmaster);
 		return appmaster;
 	}
@@ -163,7 +171,13 @@ public abstract class AbstractManagedContainerClusterAppmasterTests {
 		appmaster.setConfiguration(new Configuration());
 		appmaster.setAllocator(allocator);
 		appmaster.setLauncher(launcher);
-		appmaster.setGridProjectionFactory(new DefaultGridProjectionFactory(null));
+
+		GridProjectionFactoryRegistry registry = new GridProjectionFactoryRegistry();
+		registry.addGridProjectionFactory(new DefaultGridProjectionFactory());
+		appmaster.setGridProjectionFactoryLocator(registry);
+		appmaster.setProjectionDataRegistry(new ProjectionDataRegistry(null));
+
+//		appmaster.setGridProjectionFactory(new DefaultGridProjectionFactory());
 		TestUtils.callMethod("onInit", appmaster);
 		return appmaster;
 	}

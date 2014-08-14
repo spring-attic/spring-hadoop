@@ -16,6 +16,7 @@
 package org.springframework.yarn.boot;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -41,8 +42,11 @@ import org.springframework.yarn.YarnSystemConstants;
 import org.springframework.yarn.am.AppmasterTrackService;
 import org.springframework.yarn.am.YarnAppmaster;
 import org.springframework.yarn.am.grid.GridProjectionFactory;
+import org.springframework.yarn.am.grid.GridProjectionFactoryLocator;
 import org.springframework.yarn.am.grid.support.DefaultGridProjectionFactory;
+import org.springframework.yarn.am.grid.support.GridProjectionFactoryRegistry;
 import org.springframework.yarn.am.grid.support.ProjectionData;
+import org.springframework.yarn.am.grid.support.ProjectionDataRegistry;
 import org.springframework.yarn.batch.support.YarnJobLauncher;
 import org.springframework.yarn.boot.actuate.endpoint.YarnContainerClusterEndpoint;
 import org.springframework.yarn.boot.actuate.endpoint.mvc.YarnContainerClusterMvcEndpoint;
@@ -222,8 +226,28 @@ public class YarnAppmasterAutoConfiguration {
 		@Autowired
 		private SpringYarnAppmasterProperties syap;
 
+		@Autowired(required = false)
+		private List<GridProjectionFactory> gridProjectionFactories;
+
 		@Bean
-		public GridProjectionFactory gridProjectionFactory() {
+		@ConditionalOnMissingBean(name = "defaultGridProjectionFactory")
+		public GridProjectionFactory defaultGridProjectionFactory() {
+			return new DefaultGridProjectionFactory();
+		}
+
+		@Bean
+		public GridProjectionFactoryLocator gridProjectionFactoryLocator() {
+			GridProjectionFactoryRegistry registry = new GridProjectionFactoryRegistry();
+			if (gridProjectionFactories != null) {
+				for (GridProjectionFactory factory : gridProjectionFactories) {
+					registry.addGridProjectionFactory(factory);
+				}
+			}
+			return registry;
+		}
+
+		@Bean
+		public ProjectionDataRegistry projectionDataRegistry() {
 			Map<String, ProjectionData> projections = new HashMap<String, ProjectionData>();
 			Map<String, ContainerClustersProperties> clusterProps = syap.getContainercluster().getClusters();
 			if (clusterProps != null) {
@@ -239,7 +263,7 @@ public class YarnAppmasterAutoConfiguration {
 
 				}
 			}
-			return new DefaultGridProjectionFactory(projections);
+			return new ProjectionDataRegistry(projections);
 		}
 
 	}

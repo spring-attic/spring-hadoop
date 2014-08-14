@@ -15,28 +15,21 @@
  */
 package org.springframework.yarn.boot.actuate.endpoint.mvc;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isEmptyString;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.hadoop.yarn.api.records.Container;
 import org.apache.hadoop.yarn.api.records.ContainerId;
@@ -67,28 +60,29 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.yarn.am.YarnAppmaster;
 import org.springframework.yarn.am.allocate.ContainerAllocateData;
 import org.springframework.yarn.am.allocate.ContainerAllocator;
-import org.springframework.yarn.am.cluster.ClusterState;
 import org.springframework.yarn.am.cluster.ContainerCluster;
 import org.springframework.yarn.am.cluster.ContainerClusterStateMachineConfiguration;
 import org.springframework.yarn.am.cluster.ManagedContainerClusterAppmaster;
 import org.springframework.yarn.am.container.ContainerLauncher;
+import org.springframework.yarn.am.grid.GridProjection;
+import org.springframework.yarn.am.grid.GridProjectionFactory;
 import org.springframework.yarn.am.grid.GridProjectionFactoryLocator;
+import org.springframework.yarn.am.grid.support.AnyGridProjection;
 import org.springframework.yarn.am.grid.support.DefaultGridProjectionFactory;
 import org.springframework.yarn.am.grid.support.GridProjectionFactoryRegistry;
-import org.springframework.yarn.am.grid.support.HostsGridProjection;
 import org.springframework.yarn.am.grid.support.ProjectionData;
 import org.springframework.yarn.am.grid.support.ProjectionDataRegistry;
 import org.springframework.yarn.boot.MockUtils;
 import org.springframework.yarn.boot.TestUtils;
 import org.springframework.yarn.boot.actuate.endpoint.YarnContainerClusterEndpoint;
-import org.springframework.yarn.boot.actuate.endpoint.mvc.YarnContainerClusterMvcEndpointTests.TestConfiguration;
+import org.springframework.yarn.boot.actuate.endpoint.mvc.YarnContainerClusterWithCustomProjectionsMvcEndpointTests.TestConfiguration;
 import org.springframework.yarn.listener.ContainerAllocatorListener;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = { TestConfiguration.class })
 @WebAppConfiguration
 @DirtiesContext(classMode=ClassMode.AFTER_EACH_TEST_METHOD)
-public class YarnContainerClusterMvcEndpointTests {
+public class YarnContainerClusterWithCustomProjectionsMvcEndpointTests {
 
 	private final static String BASE = "/" + YarnContainerClusterEndpoint.ENDPOINT_ID;
 
@@ -106,25 +100,11 @@ public class YarnContainerClusterMvcEndpointTests {
 	}
 
 	/**
-	 * Test home GET when no clusters has been defined.
-	 */
-	@Test
-	public void testHomeEmpty() throws Exception {
-		mvc.
-			perform(get(BASE)).
-			andExpect(status().isOk()).
-//			andExpect(content().string(is("foo"))).
-			andExpect(content().string(not(isEmptyString()))).
-			andExpect(jsonPath("$.*", hasSize(1))).
-			andExpect(jsonPath("$.clusters", hasSize(0)));
-	}
-
-	/**
 	 * Test cluster create using any projection.
 	 */
 	@Test
-	public void testClusterCreateAnyProjection() throws Exception {
-		String content = "{\"clusterId\":\"cluster1\",\"clusterDef\":\"cluster1\",\"projection\":\"ANY\",\"projectionData\":{\"any\":1}},\"extraProperties\":{\"key1\":\"value1\"}}";
+	public void testClusterCreateCustomProjection() throws Exception {
+		String content = "{\"clusterId\":\"cluster1\",\"clusterDef\":\"cluster1\",\"projection\":\"custom\",\"projectionData\":{\"any\":1}},\"extraProperties\":{\"key1\":\"value1\"}}";
 		mvc.
 			perform(post(BASE).content(content).contentType(MediaType.APPLICATION_JSON)).
 			andExpect(status().isCreated()).
@@ -136,153 +116,6 @@ public class YarnContainerClusterMvcEndpointTests {
 		assertThat(clusters.get("cluster1").getGridProjection().getProjectionData().getAny(), is(1));
 	}
 
-	/**
-	 * Test cluster create using hosts projection.
-	 */
-	@Test
-	public void testClusterCreateHostsProjection() throws Exception {
-		String content = "{\"clusterId\":\"cluster1\",\"projection\":\"HOSTS\",\"projectionData\":{\"any\":1,\"hosts\":{\"host1\":11,\"host2\":22}}}";
-		mvc.
-			perform(post(BASE).content(content).contentType(MediaType.APPLICATION_JSON)).
-			andExpect(status().isCreated()).
-			andExpect(content().string(is(""))).
-			andExpect(header().string("Location", endsWith(BASE + "/cluster1")));
-
-		Map<String, ContainerCluster> clusters = TestUtils.readField("clusters", appmaster);
-		assertThat(clusters.size(), is(1));
-		assertThat(clusters.containsKey("cluster1"), is(true));
-		assertThat(clusters.get("cluster1").getGridProjection(), instanceOf(HostsGridProjection.class));
-		assertThat(clusters.get("cluster1").getGridProjection().getSatisfyState().getAllocateData().getAny(), is(0));
-		assertThat(clusters.get("cluster1").getGridProjection().getSatisfyState().getAllocateData().getHosts().size(), is(2));
-		assertThat(clusters.get("cluster1").getGridProjection().getSatisfyState().getAllocateData().getHosts().get("host1"), is(11));
-		assertThat(clusters.get("cluster1").getGridProjection().getSatisfyState().getAllocateData().getHosts().get("host2"), is(22));
-	}
-
-
-	/**
-	 * Test home GET when one any cluster has been created.
-	 */
-	@Test
-	public void testHomeWithAnyCluster() throws Exception {
-		testClusterCreateAnyProjection();
-
-		mvc.
-			perform(get(BASE)).
-			andExpect(status().isOk()).
-			andExpect(content().string(not(isEmptyString()))).
-			andExpect(jsonPath("$.*", hasSize(1))).
-			andExpect(jsonPath("$.clusters", hasSize(1))).
-			andExpect(jsonPath("$.clusters[0]", is("cluster1")));
-	}
-
-	/**
-	 * Test home GET when one hosts cluster has been created.
-	 */
-	@Test
-	public void testHomeWithHostsCluster() throws Exception {
-		testClusterCreateHostsProjection();
-
-		mvc.
-			perform(get(BASE)).
-			andExpect(status().isOk()).
-			andExpect(content().string(not(isEmptyString()))).
-			andExpect(jsonPath("$.*", hasSize(1))).
-			andExpect(jsonPath("$.clusters", hasSize(1))).
-			andExpect(jsonPath("$.clusters[0]", is("cluster1")));
-	}
-
-	@Test
-	public void testClusterWithMember() throws Exception {
-		testHomeWithAnyCluster();
-		TestUtils.callMethod("doTask", appmaster);
-		allocateContainer(appmaster, 1);
-
-		mvc.
-			perform(get(BASE + "/cluster1")).
-			andExpect(status().isOk()).
-			andExpect(content().string(not(isEmptyString()))).
-			andExpect(jsonPath("$.*", hasSize(3))).
-			andExpect(jsonPath("$.id", is("cluster1"))).
-			andExpect(jsonPath("$.gridProjection.*", hasSize(3))).
-			andExpect(jsonPath("$.gridProjection.members", hasSize(1))).
-			andExpect(jsonPath("$.gridProjection.projectionData.*", hasSize(5))).
-			andExpect(jsonPath("$.gridProjection.projectionData.type", is("any"))).
-			andExpect(jsonPath("$.gridProjection.projectionData.priority", nullValue())).
-			andExpect(jsonPath("$.gridProjection.projectionData.any", is(1))).
-			andExpect(jsonPath("$.gridProjection.projectionData.hosts.*", hasSize(0))).
-			andExpect(jsonPath("$.gridProjection.projectionData.racks.*", hasSize(0))).
-			andExpect(jsonPath("$.gridProjection.satisfyState.*", hasSize(2))).
-			andExpect(jsonPath("$.gridProjection.satisfyState.allocateData.*", hasSize(3))).
-			andExpect(jsonPath("$.gridProjection.satisfyState.allocateData.racks.*", hasSize(0))).
-			andExpect(jsonPath("$.gridProjection.satisfyState.allocateData.any", is(0))).
-			andExpect(jsonPath("$.gridProjection.satisfyState.allocateData.hosts.*", hasSize(0))).
-			andExpect(jsonPath("$.gridProjection.satisfyState.removeData", hasSize(0))).
-			andExpect(jsonPath("$.containerClusterState.clusterState", is(ClusterState.INITIAL.toString())));
-	}
-
-	@Test
-	public void testStartCluster() throws Exception {
-		String content = "{\"clusterId\":\"foo\",\"projection\":\"ANY\",\"projectionData\":{\"any\":1}}";
-		mvc.
-			perform(post(BASE).content(content).contentType(MediaType.APPLICATION_JSON));
-
-		content = "{\"action\":\"start\"}";
-		mvc.
-			perform(put(BASE + "/foo").content(content).contentType(MediaType.APPLICATION_JSON)).
-			andExpect(status().isOk()).
-			andExpect(content().string(not(isEmptyString())));
-
-		Map<String, ContainerCluster> clusters = TestUtils.readField("clusters", appmaster);
-		assertThat(clusters.size(), is(1));
-		assertThat(clusters.containsKey("foo"), is(true));
-		assertThat(clusters.get("foo").getStateMachine().getState().getId(), is(ClusterState.RUNNING));
-	}
-
-	@Test
-	public void testStartClusterDoesNotExist() throws Exception {
-		String content = "{\"action\":\"start\"}";
-		mvc.
-			perform(put(BASE + "/foo").content(content).contentType(MediaType.APPLICATION_JSON)).
-			andExpect(status().isNotFound()).
-			andExpect(status().reason("No such cluster"));
-	}
-
-	@Test
-	public void testStopCluster() throws Exception {
-		testStartCluster();
-		String content = "{\"action\":\"stop\"}";
-		mvc.
-		perform(put(BASE + "/foo").content(content).contentType(MediaType.APPLICATION_JSON)).
-		andExpect(status().isOk()).
-		andExpect(content().string(not(isEmptyString())));
-		Map<String, ContainerCluster> clusters = TestUtils.readField("clusters", appmaster);
-		assertThat(clusters.size(), is(1));
-		assertThat(clusters.containsKey("foo"), is(true));
-		assertThat(clusters.get("foo").getStateMachine().getState().getId(), is(ClusterState.STOPPED));
-	}
-
-	@Test
-	public void testClusterStatus() throws Exception {
-		testClusterCreateHostsProjection();
-		mvc.
-			perform(get(BASE + "/cluster1")).
-			andExpect(status().isOk()).
-			andExpect(content().string(containsString("cluster1")));
-
-	}
-
-	@Test
-	public void testClusterModify() throws Exception {
-		testStartCluster();
-		String content = "{\"clusterId\":\"foo\",\"projectionData\":{\"any\":2}}}";
-		mvc.
-			perform(patch(BASE + "/foo").content(content).contentType(MediaType.APPLICATION_JSON)).
-			andExpect(status().isOk());
-		Map<String, ContainerCluster> clusters = TestUtils.readField("clusters", appmaster);
-		assertThat(clusters.size(), is(1));
-		assertThat(clusters.containsKey("foo"), is(true));
-		assertThat(clusters.get("foo").getGridProjection().getProjectionData().getAny(), is(2));
-	}
 
 	@Import({ ContainerClusterStateMachineConfiguration.class, EndpointWebMvcAutoConfiguration.class, ManagementServerPropertiesAutoConfiguration.class,
 			HypermediaAutoConfiguration.class })
@@ -319,6 +152,7 @@ public class YarnContainerClusterMvcEndpointTests {
 		public GridProjectionFactoryLocator gridProjectionFactoryLocator() {
 			GridProjectionFactoryRegistry registry = new GridProjectionFactoryRegistry();
 			registry.addGridProjectionFactory(new DefaultGridProjectionFactory());
+			registry.addGridProjectionFactory(new TestGridProjectionFactory());
 			return registry;
 		}
 
@@ -330,6 +164,33 @@ public class YarnContainerClusterMvcEndpointTests {
 		}
 
 	}
+
+	protected static class TestGridProjectionFactory implements GridProjectionFactory {
+
+		public TestGridProjectionFactory() {
+		}
+
+		@Override
+		public GridProjection getGridProjection(ProjectionData projectionData) {
+			GridProjection projection = null;
+			if ("custom".equalsIgnoreCase(projectionData.getType())) {
+				AnyGridProjection p = new AnyGridProjection();
+				p.setPriority(projectionData.getPriority());
+				projection = p;
+			}
+			if (projection != null) {
+				projection.setProjectionData(projectionData);
+			}
+			return projection;
+		}
+
+		@Override
+		public Set<String> getRegisteredProjectionTypes() {
+			return new HashSet<String>(Arrays.asList("custom"));
+		}
+
+	}
+
 
 	protected static class TestYarnAppmaster extends ManagedContainerClusterAppmaster {
 		@Override

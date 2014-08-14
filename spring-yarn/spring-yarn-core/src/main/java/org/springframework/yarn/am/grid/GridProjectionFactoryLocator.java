@@ -17,29 +17,26 @@ package org.springframework.yarn.am.grid;
 
 import java.util.Set;
 
-import org.springframework.yarn.am.grid.support.ProjectionData;
-
 /**
- * A {@link GridProjectionFactory} is used from an application master
- * responsible handling creation of {@link GridProjection}s.
+ * A locator for {@link GridProjectionFactory} instances.
  *
  * @author Janne Valkealahti
  *
  */
-public interface GridProjectionFactory {
+public interface GridProjectionFactoryLocator {
 
 	/**
-	 * Builds a {@link GridProjection} using a {@link ProjectionData}.
+	 * Locates a {@link GridProjectionFactory}.
 	 *
-	 * @param projectionData the projection data
-	 * @return the grid projection
+	 * @param projectionType the projection type
+	 * @return the grid projection factory
 	 */
-	GridProjection getGridProjection(ProjectionData projectionData);
+	GridProjectionFactory getGridProjectionFactory(String projectionType);
 
 	/**
-	 * Gets a registered projection types handled by this factory.
+	 * Gets a registered projection types known to this locator.
 	 *
-	 * @return the set of projection types
+	 * @return the registered projection types
 	 */
 	Set<String> getRegisteredProjectionTypes();
 
