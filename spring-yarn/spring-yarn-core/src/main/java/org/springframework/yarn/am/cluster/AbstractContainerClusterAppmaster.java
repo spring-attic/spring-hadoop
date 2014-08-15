@@ -183,7 +183,13 @@ public abstract class AbstractContainerClusterAppmaster extends AbstractEventing
 	protected void onContainerCompleted(ContainerStatus status) {
 		super.onContainerCompleted(status);
 
-		grid.removeMember(status.getContainerId());
+		boolean removed = grid.removeMember(status.getContainerId());
+		if (!removed) {
+			// force allocation for all clusters if we got completed
+			// container unknown to a grid. might be an indication
+			// that satisfy states are not met.
+			requestAllocationForAll();
+		}
 
 		if (getMonitor() instanceof ContainerAware) {
 			((ContainerAware)getMonitor()).onContainerStatus(Arrays.asList(status));
@@ -382,14 +388,15 @@ public abstract class AbstractContainerClusterAppmaster extends AbstractEventing
 		return null;
 	}
 
-	/**
-	 * Builds current satisfy state data for all clusters. This data
-	 * contains information what kind of containers clusters will need
-	 * to satisfy its target state. Additionally data may also contain
-	 * containers which it doesn't need which should be killed.
-	 *
-	 * @return the satisfy state data for clusters
-	 */
+	private void requestAllocationForAll() {
+		for (ContainerCluster cluster : clusters.values()) {
+			StateMachine<State<ClusterState, ClusterEvent>, ClusterEvent> stateMachine = cluster.getStateMachine();
+			stateMachine.sendEvent(MessageBuilder.withPayload(ClusterEvent.CONFIGURE)
+					.setHeader("containercluster", cluster)
+					.setHeader("appmaster", AbstractContainerClusterAppmaster.this).build());
+		}
+
+	}
 
 	/**
 	 * Internal poller handling cluster allocation request scheduling.

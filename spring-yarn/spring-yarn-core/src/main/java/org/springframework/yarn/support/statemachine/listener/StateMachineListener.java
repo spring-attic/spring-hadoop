@@ -13,23 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.yarn.support.statemachine;
+package org.springframework.yarn.support.statemachine.listener;
 
-import org.springframework.messaging.Message;
-import org.springframework.yarn.support.statemachine.listener.StateMachineListener;
+public interface StateMachineListener<S,E> {
 
-public interface StateMachine<S, E> {
-
-	S getState();
-
-	S getInitialState();
-
-	void start();
-
-	void sendEvent(Message<E> event);
-
-	void sendEvent(E event);
-
-	void addStateListener(StateMachineListener<S,E> listener);
+	void stateChanged(S from, S to);
 
 }

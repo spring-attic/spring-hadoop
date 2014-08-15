@@ -26,6 +26,8 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.yarn.support.LifecycleObjectSupport;
+import org.springframework.yarn.support.statemachine.listener.CompositeStateMachineListener;
+import org.springframework.yarn.support.statemachine.listener.StateMachineListener;
 import org.springframework.yarn.support.statemachine.state.State;
 import org.springframework.yarn.support.statemachine.transition.Transition;
 import org.springframework.yarn.support.statemachine.transition.TransitionKind;
@@ -48,6 +50,8 @@ public abstract class AbstractStateMachine<S, E> extends LifecycleObjectSupport 
 	private final Queue<Message<E>> eventQueue = new ConcurrentLinkedQueue<Message<E>>();
 
 	private final LinkedList<Message<E>> deferList = new LinkedList<Message<E>>();
+
+	private CompositeStateMachineListener<S, E> stateListener = new CompositeStateMachineListener<S, E>();
 
 	public AbstractStateMachine(Collection<State<S,E>> states, Collection<Transition<S,E>> transitions, State<S,E> initialState) {
 		super();
@@ -91,8 +95,14 @@ public abstract class AbstractStateMachine<S, E> extends LifecycleObjectSupport 
 		switchToState(initialState);
 	}
 
+	@Override
+	public void addStateListener(StateMachineListener<State<S, E>, E> listener) {
+		stateListener.register(listener);
+	}
+
 	private void switchToState(State<S,E> state) {
 		log.info("Moving into state=" + state + " from " + currentState);
+		stateListener.stateChanged(currentState, state);
 		currentState = state;
 
 		for (Transition<S,E> transition : transitions) {

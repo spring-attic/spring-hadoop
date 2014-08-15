@@ -17,9 +17,11 @@ package org.springframework.yarn.am.cluster;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,6 +31,9 @@ import org.springframework.yarn.TestUtils;
 import org.springframework.yarn.am.grid.GridProjection;
 import org.springframework.yarn.am.grid.support.ProjectionData;
 import org.springframework.yarn.am.grid.support.SatisfyStateData;
+import org.springframework.yarn.support.statemachine.StateMachine;
+import org.springframework.yarn.support.statemachine.listener.StateMachineListener;
+import org.springframework.yarn.support.statemachine.state.State;
 
 /**
  * Tests for {@link ManagedContainerClusterAppmaster} using single cluster.
@@ -314,6 +319,57 @@ public class ManagedContainerClusterAppmasterSingleTests extends AbstractManaged
 		appmaster.setStateMachineFactory(stateMachineFactory);
 		ProjectionData projectionData = new ProjectionData(1, null, null, "doesnotexist", null);
 		appmaster.createContainerCluster("doesnotexist", projectionData);
+	}
+
+	@Test
+	public void testReleaseNonAcceptedContainer() throws Exception {
+		TestContainerAllocator allocator = new TestContainerAllocator();
+		TestContainerLauncher launcher = new TestContainerLauncher();
+		TestManagedContainerClusterAppmaster appmaster = createTestAppmaster(allocator, launcher);
+		appmaster.setStateMachineFactory(stateMachineFactory);
+		Map<String, Integer> hosts = new HashMap<String, Integer>();
+		hosts.put("host1", 1);
+		ProjectionData projectionData = new ProjectionData(0, hosts, null, "hosts", 0);
+
+		GridProjection projection = appmaster.createContainerCluster("foo", projectionData).getGridProjection();
+		assertDoTask(appmaster, null, null, null, null, "foo");
+
+		// we hook into statemachine to listen its events
+		TestStateMachineListener sml = new TestStateMachineListener();
+		StateMachine<State<ClusterState, ClusterEvent>, ClusterEvent> stateMachine = appmaster.getContainerClusters().get("foo").getStateMachine();
+		stateMachine.addStateListener(sml);
+
+		appmaster.startContainerCluster("foo");
+		assertDoTask(appmaster, 0, 1, 0, 0, "foo");
+
+		Container container1 = allocateContainer(appmaster, 1, "host2");
+		assertThat(projection.getMembers().size(), is(0));
+		assertThat(sml.states.size(), greaterThan(0));
+		sml.states.clear();
+
+		// when non of a clusters accept container,
+		// check that we get events indicating that
+		// clusters are requested to go into
+		// an allocation mode.
+		releaseContainer(appmaster, container1);
+		assertThat(sml.states.size(), greaterThan(0));
+		assertDoTask(appmaster, 0, 1, 0, 0, "foo");
+		assertThat(appmaster.getContainerClusters().get("foo").getStateMachine().getState().getId(), is(ClusterState.RUNNING));
+
+		allocateContainer(appmaster, 2, "host1");
+		assertThat(projection.getMembers().size(), is(1));
+		assertThat(sml.states.size(), greaterThan(0));
+	}
+
+	private static class TestStateMachineListener implements StateMachineListener<State<ClusterState,ClusterEvent>, ClusterEvent> {
+
+		ArrayList<State<ClusterState, ClusterEvent>> states = new ArrayList<State<ClusterState,ClusterEvent>>();
+
+		@Override
+		public void stateChanged(State<ClusterState, ClusterEvent> from, State<ClusterState, ClusterEvent> to) {
+			states.add(to);
+		}
+
 	}
 
 }
