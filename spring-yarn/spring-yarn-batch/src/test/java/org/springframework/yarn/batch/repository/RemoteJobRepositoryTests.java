@@ -24,7 +24,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration
-@DirtiesContext
+@DirtiesContext(classMode=ClassMode.AFTER_EACH_TEST_METHOD)
 public class RemoteJobRepositoryTests extends AbstractJobRepositoryTests {
 
 	@Override

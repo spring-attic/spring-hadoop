@@ -54,7 +54,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
-@DirtiesContext
+@DirtiesContext(classMode=ClassMode.AFTER_EACH_TEST_METHOD)
 public class MindIntegrationRawTests {
 	private static final Log log = LogFactory.getLog(MindIntegrationRawTests.class);
 
