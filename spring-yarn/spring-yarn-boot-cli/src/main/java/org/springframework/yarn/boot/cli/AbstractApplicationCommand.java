@@ -21,6 +21,7 @@ import joptsimple.OptionSpec;
 import org.springframework.boot.cli.command.OptionParsingCommand;
 import org.springframework.boot.cli.command.options.OptionHandler;
 import org.springframework.boot.cli.command.status.ExitStatus;
+import org.springframework.boot.cli.util.Log;
 
 /**
  * Base class for all commands implemented by
@@ -31,22 +32,64 @@ import org.springframework.boot.cli.command.status.ExitStatus;
  */
 public class AbstractApplicationCommand extends OptionParsingCommand {
 
+	/**
+	 * Instantiates a new abstract application command.
+	 *
+	 * @param name the command name
+	 * @param description the command description
+	 * @param handler the option handler
+	 */
 	protected AbstractApplicationCommand(String name, String description, OptionHandler handler) {
 		super(name, description, handler);
 	}
 
-	protected abstract static class ApplicationOptionHandler extends OptionHandler {
+	public abstract static class ApplicationOptionHandler extends OptionHandler {
 
 		@Override
 		protected final ExitStatus run(OptionSet options) throws Exception {
+			verifyOptionSet(options);
 			runApplication(options);
 			return ExitStatus.OK;
 		}
 
+		/**
+		 * Verify option before application is executed. This method
+		 * is called before {@link #runApplication(OptionSet)}.
+		 *
+		 * @param options the options set
+		 * @throws Exception if error occurred during the processing
+		 */
+		protected void verifyOptionSet(OptionSet options) throws Exception {
+		}
+
+		/**
+		 * Run the application.
+		 *
+		 * @param options the options set
+		 * @throws Exception if error occurred during the processing
+		 */
 		protected abstract void runApplication(OptionSet options) throws Exception;
 
+		/**
+		 * Utility method to check if boolean flag is set.
+		 *
+		 * @param options the options set
+		 * @param option the boolean option spec
+		 * @return true if boolean option is enabled
+		 */
 		protected boolean isFlagOn(OptionSet options, OptionSpec<Boolean> option) {
 			return options.has(option) ? options.valueOf(option) : false;
+		}
+
+		/**
+		 * Utility method to handle output for the command.
+		 * Default implementation simply logs using boot
+		 * cli {@link Log}.
+		 *
+		 * @param output
+		 */
+		protected void handleOutput(String output) {
+			Log.info(output);
 		}
 
 	}

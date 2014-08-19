@@ -20,7 +20,6 @@ import java.util.Properties;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 
-import org.springframework.boot.cli.util.Log;
 import org.springframework.util.StringUtils;
 import org.springframework.yarn.boot.app.YarnInfoApplication;
 
@@ -32,15 +31,40 @@ import org.springframework.yarn.boot.app.YarnInfoApplication;
  */
 public class YarnSubmittedCommand extends AbstractApplicationCommand {
 
+	public final static String DEFAULT_COMMAND = "submitted";
+
+	public final static String DEFAULT_DESC = "List submitted applications";
+
+	/**
+	 * Instantiates a new yarn submitted command using a default
+	 * command name, command description and option handler.
+	 */
 	public YarnSubmittedCommand() {
-		this(null);
+		this(DEFAULT_COMMAND, DEFAULT_DESC, new SubmittedOptionHandler(null));
 	}
 
-	public YarnSubmittedCommand(String defaultAppType) {
-		super("submitted", "List submitted applications", new SubmittedOptionHandler(defaultAppType));
+	/**
+	 * Instantiates a new yarn submitted command  using a default
+	 * command name and command description.
+	 *
+	 * @param handler the handler
+	 */
+	public YarnSubmittedCommand(SubmittedOptionHandler handler) {
+		this(DEFAULT_COMMAND, DEFAULT_DESC, handler);
 	}
 
-	private static final class SubmittedOptionHandler extends ApplicationOptionHandler {
+	/**
+	 * Instantiates a new yarn submitted command.
+	 *
+	 * @param name the command name
+	 * @param description the command description
+	 * @param handler the handler
+	 */
+	public YarnSubmittedCommand(String name, String description, SubmittedOptionHandler handler) {
+		super(name, description, handler);
+	}
+
+	public static class SubmittedOptionHandler extends ApplicationOptionHandler {
 
 		private String defaultAppType = "BOOT";
 
@@ -48,7 +72,11 @@ public class YarnSubmittedCommand extends AbstractApplicationCommand {
 
 		private OptionSpec<Boolean> verboseOption;
 
-		private SubmittedOptionHandler(String defaultAppType) {
+		public SubmittedOptionHandler() {
+			this(null);
+		}
+
+		public SubmittedOptionHandler(String defaultAppType) {
 			if (StringUtils.hasText(defaultAppType)) {
 				this.defaultAppType = defaultAppType;
 			}
@@ -72,7 +100,19 @@ public class YarnSubmittedCommand extends AbstractApplicationCommand {
 			appProperties.setProperty("spring.yarn.internal.YarnInfoApplication.type", options.valueOf(typeOption));
 			app.appProperties(appProperties);
 			String info = app.run(new String[0]);
-			Log.info(info);
+			handleOutput(info);
+		}
+
+		public String getDefaultAppType() {
+			return defaultAppType;
+		}
+
+		public OptionSpec<String> getTypeOption() {
+			return typeOption;
+		}
+
+		public OptionSpec<Boolean> getVerboseOption() {
+			return verboseOption;
 		}
 
 	}

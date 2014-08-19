@@ -19,7 +19,6 @@ import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 
 import org.apache.hadoop.yarn.api.records.ApplicationId;
-import org.springframework.boot.cli.util.Log;
 import org.springframework.util.Assert;
 import org.springframework.yarn.boot.app.YarnSubmitApplication;
 
@@ -31,11 +30,40 @@ import org.springframework.yarn.boot.app.YarnSubmitApplication;
  */
 public class YarnSubmitCommand extends AbstractApplicationCommand {
 
+	public final static String DEFAULT_COMMAND = "submit";
+
+	public final static String DEFAULT_DESC = "Submit application";
+
+	/**
+	 * Instantiates a new yarn submit command using a default
+	 * command name, command description and option handler.
+	 */
 	public YarnSubmitCommand() {
-		super("submit", "Submit application", new SubmitOptionHandler());
+		super(DEFAULT_COMMAND, DEFAULT_DESC, new SubmitOptionHandler());
 	}
 
-	private static final class SubmitOptionHandler extends ApplicationOptionHandler {
+	/**
+	 * Instantiates a new yarn submit command  using a default
+	 * command name and command description.
+	 *
+	 * @param handler the handler
+	 */
+	public YarnSubmitCommand(SubmitOptionHandler handler) {
+		super(DEFAULT_COMMAND, DEFAULT_DESC, handler);
+	}
+
+	/**
+	 * Instantiates a new yarn submit command.
+	 *
+	 * @param name the command name
+	 * @param description the command description
+	 * @param handler the handler
+	 */
+	public YarnSubmitCommand(String name, String description, SubmitOptionHandler handler) {
+		super(name, description, handler);
+	}
+
+	public static class SubmitOptionHandler extends ApplicationOptionHandler {
 
 		private OptionSpec<String> applicationVersionOption;
 
@@ -51,8 +79,12 @@ public class YarnSubmitCommand extends AbstractApplicationCommand {
 			Assert.hasText(appVersion, "Application version must be defined");
 			YarnSubmitApplication app = new YarnSubmitApplication();
 			app.applicationVersion(appVersion);
-			ApplicationId applicationId = app.run(new String[0]);
-			Log.info("New instance submitted with id " + applicationId);
+			ApplicationId applicationId = app.run();
+			handleOutput("New instance submitted with id " + applicationId);
+		}
+
+		public OptionSpec<String> getApplicationVersionOption() {
+			return applicationVersionOption;
 		}
 
 	}

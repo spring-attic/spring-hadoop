@@ -20,7 +20,6 @@ import java.util.Properties;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 
-import org.springframework.boot.cli.util.Log;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.yarn.boot.app.YarnContainerClusterApplication;
@@ -33,11 +32,40 @@ import org.springframework.yarn.boot.app.YarnContainerClusterApplication;
  */
 public class YarnClusterInfoCommand extends AbstractApplicationCommand {
 
+	public final static String DEFAULT_COMMAND = "clusterinfo";
+
+	public final static String DEFAULT_DESC = "List cluster info";
+
+	/**
+	 * Instantiates a new yarn cluster info command using a default
+	 * command name, command description and option handler.
+	 */
 	public YarnClusterInfoCommand() {
-		super("clusterinfo", "List cluster info", new ClusterInfoOptionHandler());
+		super(DEFAULT_COMMAND, DEFAULT_DESC, new ClusterInfoOptionHandler());
 	}
 
-	private static final class ClusterInfoOptionHandler extends ApplicationOptionHandler {
+	/**
+	 * Instantiates a new yarn cluster info command using a default
+	 * command name and command description.
+	 *
+	 * @param handler the handler
+	 */
+	public YarnClusterInfoCommand(ClusterInfoOptionHandler handler) {
+		super(DEFAULT_COMMAND, DEFAULT_DESC, handler);
+	}
+
+	/**
+	 * Instantiates a new yarn cluster info command.
+	 *
+	 * @param name the command name
+	 * @param description the command description
+	 * @param handler the handler
+	 */
+	public YarnClusterInfoCommand(String name, String description, ClusterInfoOptionHandler handler) {
+		super(name, description, handler);
+	}
+
+	public static class ClusterInfoOptionHandler extends ApplicationOptionHandler {
 
 		private OptionSpec<String> applicationIdOption;
 
@@ -54,10 +82,16 @@ public class YarnClusterInfoCommand extends AbstractApplicationCommand {
 		}
 
 		@Override
-		protected void runApplication(OptionSet options) throws Exception {
+		protected void verifyOptionSet(OptionSet options) throws Exception {
 			String appId = options.valueOf(applicationIdOption);
 			String clusterId = options.valueOf(clusterIdOption);
 			Assert.state(StringUtils.hasText(appId) && StringUtils.hasText(clusterId), "Cluster Id and Application Id must be defined");
+		}
+
+		@Override
+		protected void runApplication(OptionSet options) throws Exception {
+			String appId = options.valueOf(applicationIdOption);
+			String clusterId = options.valueOf(clusterIdOption);
 			YarnContainerClusterApplication app = new YarnContainerClusterApplication();
 			Properties appProperties = new Properties();
 			appProperties.setProperty("spring.yarn.internal.ContainerClusterApplication.operation", "CLUSTERINFO");
@@ -70,7 +104,19 @@ public class YarnClusterInfoCommand extends AbstractApplicationCommand {
 			}
 			app.appProperties(appProperties);
 			String info = app.run(new String[0]);
-			Log.info(info);
+			handleOutput(info);
+		}
+
+		public OptionSpec<String> getApplicationIdOption() {
+			return applicationIdOption;
+		}
+
+		public OptionSpec<String> getClusterIdOption() {
+			return clusterIdOption;
+		}
+
+		public OptionSpec<Boolean> getVerboseOption() {
+			return verboseOption;
 		}
 
 	}

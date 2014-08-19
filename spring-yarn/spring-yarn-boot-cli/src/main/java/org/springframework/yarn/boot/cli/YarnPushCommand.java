@@ -20,7 +20,6 @@ import java.util.Properties;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 
-import org.springframework.boot.cli.util.Log;
 import org.springframework.yarn.boot.app.YarnPushApplication;
 
 /**
@@ -31,11 +30,40 @@ import org.springframework.yarn.boot.app.YarnPushApplication;
  */
 public class YarnPushCommand extends AbstractApplicationCommand {
 
+	public final static String DEFAULT_COMMAND = "push";
+
+	public final static String DEFAULT_DESC = "Push new application version";
+
+	/**
+	 * Instantiates a new yarn push command using a default
+	 * command name, command description and option handler.
+	 */
 	public YarnPushCommand() {
-		super("push", "Push new application version", new PushOptionHandler());
+		super(DEFAULT_COMMAND, DEFAULT_DESC, new PushOptionHandler());
 	}
 
-	private static final class PushOptionHandler extends ApplicationOptionHandler {
+	/**
+	 * Instantiates a new yarn push command  using a default
+	 * command name and command description.
+	 *
+	 * @param handler the handler
+	 */
+	public YarnPushCommand(PushOptionHandler handler) {
+		super(DEFAULT_COMMAND, DEFAULT_DESC, handler);
+	}
+
+	/**
+	 * Instantiates a new yarn push command.
+	 *
+	 * @param name the command name
+	 * @param description the command description
+	 * @param handler the handler
+	 */
+	public YarnPushCommand(String name, String description, PushOptionHandler handler) {
+		super(name, description, handler);
+	}
+
+	public static class PushOptionHandler extends ApplicationOptionHandler {
 
 		private OptionSpec<String> applicationVersionOption;
 
@@ -54,7 +82,11 @@ public class YarnPushCommand extends AbstractApplicationCommand {
 			instanceProperties.setProperty("spring.yarn.applicationVersion", appVersion);
 			app.configFile("application.properties", instanceProperties);
 			app.run();
-			Log.info("New instance " + appVersion + " installed");
+			handleOutput("New instance " + appVersion + " installed");
+		}
+
+		public OptionSpec<String> getApplicationVersionOption() {
+			return applicationVersionOption;
 		}
 
 	}

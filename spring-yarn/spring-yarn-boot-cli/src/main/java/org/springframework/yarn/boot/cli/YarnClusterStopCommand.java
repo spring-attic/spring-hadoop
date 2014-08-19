@@ -20,7 +20,6 @@ import java.util.Properties;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 
-import org.springframework.boot.cli.util.Log;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.yarn.boot.app.YarnContainerClusterApplication;
@@ -33,11 +32,40 @@ import org.springframework.yarn.boot.app.YarnContainerClusterApplication;
  */
 public class YarnClusterStopCommand extends AbstractApplicationCommand {
 
+	public final static String DEFAULT_COMMAND = "clusterstop";
+
+	public final static String DEFAULT_DESC = "Stop cluster";
+
+	/**
+	 * Instantiates a new yarn cluster stop command using a default
+	 * command name, command description and option handler.
+	 */
 	public YarnClusterStopCommand() {
-		super("clusterstop", "Stop cluster", new ClusterStopOptionHandler());
+		super(DEFAULT_COMMAND, DEFAULT_DESC, new ClusterStopOptionHandler());
 	}
 
-	private static final class ClusterStopOptionHandler extends ApplicationOptionHandler {
+	/**
+	 * Instantiates a new yarn cluster stop command using a default
+	 * command name and command description.
+	 *
+	 * @param handler the handler
+	 */
+	public YarnClusterStopCommand(ClusterStopOptionHandler handler) {
+		super(DEFAULT_COMMAND, DEFAULT_DESC, handler);
+	}
+
+	/**
+	 * Instantiates a new yarn cluster stop command.
+	 *
+	 * @param name the command name
+	 * @param description the command description
+	 * @param handler the handler
+	 */
+	public YarnClusterStopCommand(String name, String description, ClusterStopOptionHandler handler) {
+		super(name, description, handler);
+	}
+
+	public static class ClusterStopOptionHandler extends ApplicationOptionHandler {
 
 		private OptionSpec<String> applicationIdOption;
 
@@ -45,8 +73,17 @@ public class YarnClusterStopCommand extends AbstractApplicationCommand {
 
 		@Override
 		protected final void options() {
-			this.applicationIdOption = option("application-id", "Specify Yarn Application Id").withRequiredArg();
-			this.clusterIdOption = option("cluster-id", "Specify Cluster Id").withRequiredArg();
+			this.applicationIdOption = option(CliSystemConstants.OPTIONS_APPLICATION_ID,
+					CliSystemConstants.DESC_APPLICATION_ID).withRequiredArg();
+			this.clusterIdOption = option(CliSystemConstants.OPTIONS_CLUSTER_ID, CliSystemConstants.DESC_CLUSTER_ID)
+					.withRequiredArg();
+		}
+
+		@Override
+		protected void verifyOptionSet(OptionSet options) throws Exception {
+			String appId = options.valueOf(applicationIdOption);
+			String clusterId = options.valueOf(clusterIdOption);
+			Assert.state(StringUtils.hasText(appId) && StringUtils.hasText(clusterId), "Cluster Id and Application Id must be defined");
 		}
 
 		@Override
@@ -63,7 +100,15 @@ public class YarnClusterStopCommand extends AbstractApplicationCommand {
 					clusterId);
 			app.appProperties(appProperties);
 			String info = app.run(new String[0]);
-			Log.info(info);
+			handleOutput(info);
+		}
+
+		public OptionSpec<String> getApplicationIdOption() {
+			return applicationIdOption;
+		}
+
+		public OptionSpec<String> getClusterIdOption() {
+			return clusterIdOption;
 		}
 
 	}

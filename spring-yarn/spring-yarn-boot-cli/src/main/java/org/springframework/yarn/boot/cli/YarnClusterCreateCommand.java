@@ -24,8 +24,6 @@ import java.util.Properties;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 
-import org.springframework.boot.cli.command.options.OptionHandler;
-import org.springframework.boot.cli.util.Log;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.yarn.boot.app.YarnContainerClusterApplication;
@@ -38,19 +36,40 @@ import org.springframework.yarn.boot.app.YarnContainerClusterApplication;
  */
 public class YarnClusterCreateCommand extends AbstractApplicationCommand {
 
+	public final static String DEFAULT_COMMAND = "clustercreate";
+
+	public final static String DEFAULT_DESC = "Create cluster";
+
+	/**
+	 * Instantiates a new yarn cluster create command using a default
+	 * command name, command description and option handler.
+	 */
 	public YarnClusterCreateCommand() {
-		super("clustercreate", "Create cluster", new ClusterCreateOptionHandler());
+		super(DEFAULT_COMMAND, DEFAULT_DESC, new ClusterCreateOptionHandler());
 	}
 
-	public YarnClusterCreateCommand(OptionHandler handler) {
-		super("clustercreate", "Create cluster", handler);
+	/**
+	 * Instantiates a new yarn cluster create command using a default
+	 * command name and command description.
+	 *
+	 * @param handler the handler
+	 */
+	public YarnClusterCreateCommand(ClusterCreateOptionHandler handler) {
+		super(DEFAULT_COMMAND, DEFAULT_DESC, handler);
 	}
 
-	public YarnClusterCreateCommand(String name, String description, OptionHandler handler) {
+	/**
+	 * Instantiates a new yarn cluster create command.
+	 *
+	 * @param name the command name
+	 * @param description the command description
+	 * @param handler the handler
+	 */
+	public YarnClusterCreateCommand(String name, String description, ClusterCreateOptionHandler handler) {
 		super(name, description, handler);
 	}
 
-	protected static class ClusterCreateOptionHandler extends ApplicationOptionHandler {
+	public static class ClusterCreateOptionHandler extends ApplicationOptionHandler {
 
 		private OptionSpec<String> applicationIdOption;
 
@@ -85,6 +104,13 @@ public class YarnClusterCreateCommand extends AbstractApplicationCommand {
 		}
 
 		@Override
+		protected void verifyOptionSet(OptionSet options) throws Exception {
+			String appId = options.valueOf(applicationIdOption);
+			String clusterId = options.valueOf(clusterIdOption);
+			Assert.state(StringUtils.hasText(appId) && StringUtils.hasText(clusterId), "Cluster Id and Application Id must be defined");
+		}
+
+		@Override
 		protected void runApplication(OptionSet options) throws Exception {
 			String appId = options.valueOf(applicationIdOption);
 			String clusterId = options.valueOf(clusterIdOption);
@@ -93,7 +119,6 @@ public class YarnClusterCreateCommand extends AbstractApplicationCommand {
 			String projectionAny = options.valueOf(projectionDataAnyOption);
 			List<String> projectionHosts = options.valuesOf(projectionDataHostsOption);
 			List<String> projectionRacks = options.valuesOf(projectionDataRacksOption);
-			Assert.state(StringUtils.hasText(appId) && StringUtils.hasText(clusterId), "Cluster Id and Application Id must be defined");
 
 			YarnContainerClusterApplication app = new YarnContainerClusterApplication();
 			Properties appProperties = new Properties();
@@ -131,8 +156,35 @@ public class YarnClusterCreateCommand extends AbstractApplicationCommand {
 			}
 
 			app.appProperties(appProperties);
-			String info = app.run(new String[0]);
-			Log.info(info);
+			handleOutput(app.run());
+		}
+
+		public OptionSpec<String> getApplicationIdOption() {
+			return applicationIdOption;
+		}
+
+		public OptionSpec<String> getClusterIdOption() {
+			return clusterIdOption;
+		}
+
+		public OptionSpec<String> getClusterDefOption() {
+			return clusterDefOption;
+		}
+
+		public OptionSpec<String> getProjectionTypeOption() {
+			return projectionTypeOption;
+		}
+
+		public OptionSpec<String> getProjectionDataAnyOption() {
+			return projectionDataAnyOption;
+		}
+
+		public OptionSpec<String> getProjectionDataHostsOption() {
+			return projectionDataHostsOption;
+		}
+
+		public OptionSpec<String> getProjectionDataRacksOption() {
+			return projectionDataRacksOption;
 		}
 
 		protected Properties getExtraProperties(OptionSet options) {

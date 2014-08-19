@@ -20,7 +20,6 @@ import java.util.Properties;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 
-import org.springframework.boot.cli.util.Log;
 import org.springframework.util.Assert;
 import org.springframework.yarn.boot.app.YarnKillApplication;
 
@@ -32,17 +31,47 @@ import org.springframework.yarn.boot.app.YarnKillApplication;
  */
 public class YarnKillCommand extends AbstractApplicationCommand {
 
+	public final static String DEFAULT_COMMAND = "kill";
+
+	public final static String DEFAULT_DESC = "Kill application";
+
+	/**
+	 * Instantiates a new yarn kill command using a default command name,
+	 * command description and option handler.
+	 */
 	public YarnKillCommand() {
-		super("kill", "Kill application", new KillOptionHandler());
+		super(DEFAULT_COMMAND, DEFAULT_DESC, new KillOptionHandler());
 	}
 
-	private static final class KillOptionHandler extends ApplicationOptionHandler {
+	/**
+	 * Instantiates a new yarn kill command using a default command name and
+	 * command description.
+	 *
+	 * @param handler the handler
+	 */
+	public YarnKillCommand(KillOptionHandler handler) {
+		super(DEFAULT_COMMAND, DEFAULT_DESC, handler);
+	}
+
+	/**
+	 * Instantiates a new yarn kill command.
+	 *
+	 * @param name the command name
+	 * @param description the command description
+	 * @param handler the handler
+	 */
+	public YarnKillCommand(String name, String description, KillOptionHandler handler) {
+		super(name, description, handler);
+	}
+
+	public static class KillOptionHandler extends ApplicationOptionHandler {
 
 		private OptionSpec<String> applicationIdOption;
 
 		@Override
 		protected final void options() {
-			this.applicationIdOption = option(CliSystemConstants.OPTIONS_APPLICATION_ID, CliSystemConstants.DESC_APPLICATION_ID).withRequiredArg();
+			this.applicationIdOption = option(CliSystemConstants.OPTIONS_APPLICATION_ID,
+					CliSystemConstants.DESC_APPLICATION_ID).withRequiredArg();
 		}
 
 		@Override
@@ -54,7 +83,11 @@ public class YarnKillCommand extends AbstractApplicationCommand {
 			appProperties.setProperty("spring.yarn.internal.YarnKillApplication.applicationId", appId);
 			app.appProperties(appProperties);
 			String info = app.run(new String[0]);
-			Log.info(info);
+			handleOutput(info);
+		}
+
+		public OptionSpec<String> getApplicationIdOption() {
+			return applicationIdOption;
 		}
 
 	}

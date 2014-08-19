@@ -18,13 +18,12 @@ package org.springframework.yarn.boot.cli;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Map.Entry;
+import java.util.Properties;
 
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 
-import org.springframework.boot.cli.util.Log;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.yarn.boot.app.YarnContainerClusterApplication;
@@ -37,11 +36,40 @@ import org.springframework.yarn.boot.app.YarnContainerClusterApplication;
  */
 public class YarnClusterModifyCommand extends AbstractApplicationCommand {
 
+	public final static String DEFAULT_COMMAND = "clustermodify";
+
+	public final static String DEFAULT_DESC = "Modify cluster";
+
+	/**
+	 * Instantiates a new yarn cluster modify command using a default
+	 * command name, command description and option handler.
+	 */
 	public YarnClusterModifyCommand() {
-		super("clustermodify", "Modify cluster", new ClusterModifyOptionHandler());
+		super(DEFAULT_COMMAND, DEFAULT_DESC, new ClusterModifyOptionHandler());
 	}
 
-	private static final class ClusterModifyOptionHandler extends ApplicationOptionHandler {
+	/**
+	 * Instantiates a new yarn cluster modify command using a default
+	 * command name and command description.
+	 *
+	 * @param handler the handler
+	 */
+	public YarnClusterModifyCommand(ClusterModifyOptionHandler handler) {
+		super(DEFAULT_COMMAND, DEFAULT_DESC, handler);
+	}
+
+	/**
+	 * Instantiates a new yarn cluster modify command.
+	 *
+	 * @param name the command name
+	 * @param description the command description
+	 * @param handler the handler
+	 */
+	public YarnClusterModifyCommand(String name, String description, ClusterModifyOptionHandler handler) {
+		super(name, description, handler);
+	}
+
+	public static class ClusterModifyOptionHandler extends ApplicationOptionHandler {
 
 		private OptionSpec<String> applicationIdOption;
 
@@ -68,13 +96,19 @@ public class YarnClusterModifyCommand extends AbstractApplicationCommand {
 		}
 
 		@Override
+		protected void verifyOptionSet(OptionSet options) throws Exception {
+			String appId = options.valueOf(applicationIdOption);
+			String clusterId = options.valueOf(clusterIdOption);
+			Assert.state(StringUtils.hasText(appId) && StringUtils.hasText(clusterId), "Cluster Id and Application Id must be defined");
+		}
+
+		@Override
 		protected void runApplication(OptionSet options) throws Exception {
 			String appId = options.valueOf(applicationIdOption);
 			String clusterId = options.valueOf(clusterIdOption);
 			String projectionAny = options.valueOf(projectionDataAnyOption);
 			List<String> projectionHosts = options.valuesOf(projectionDataHostsOption);
 			List<String> projectionRacks = options.valuesOf(projectionDataRacksOption);
-			Assert.state(StringUtils.hasText(appId) && StringUtils.hasText(clusterId), "Cluster Id and Application Id must be defined");
 			YarnContainerClusterApplication app = new YarnContainerClusterApplication();
 			Properties appProperties = new Properties();
 			appProperties.setProperty("spring.yarn.internal.ContainerClusterApplication.operation", "CLUSTERMODIFY");
@@ -100,7 +134,27 @@ public class YarnClusterModifyCommand extends AbstractApplicationCommand {
 
 			app.appProperties(appProperties);
 			String info = app.run(new String[0]);
-			Log.info(info);
+			handleOutput(info);
+		}
+
+		public OptionSpec<String> getApplicationIdOption() {
+			return applicationIdOption;
+		}
+
+		public OptionSpec<String> getClusterIdOption() {
+			return clusterIdOption;
+		}
+
+		public OptionSpec<String> getProjectionDataAnyOption() {
+			return projectionDataAnyOption;
+		}
+
+		public OptionSpec<String> getProjectionDataHostsOption() {
+			return projectionDataHostsOption;
+		}
+
+		public OptionSpec<String> getProjectionDataRacksOption() {
+			return projectionDataRacksOption;
 		}
 
 		private static Map<String, Integer> getMapFromString(List<String> sources) {

@@ -17,9 +17,8 @@ package org.springframework.yarn.boot.cli;
 
 import java.util.Properties;
 
-import org.springframework.boot.cli.command.AbstractCommand;
-import org.springframework.boot.cli.command.status.ExitStatus;
-import org.springframework.boot.cli.util.Log;
+import joptsimple.OptionSet;
+
 import org.springframework.yarn.boot.app.YarnInfoApplication;
 
 /**
@@ -28,21 +27,53 @@ import org.springframework.yarn.boot.app.YarnInfoApplication;
  * @author Janne Valkealahti
  *
  */
-public class YarnPushedCommand extends AbstractCommand {
+public class YarnPushedCommand extends AbstractApplicationCommand {
 
+	public final static String DEFAULT_COMMAND = "pushed";
+
+	public final static String DEFAULT_DESC = "List pushed applications";
+
+	/**
+	 * Instantiates a new yarn pushed command using a default
+	 * command name, command description and option handler.
+	 */
 	public YarnPushedCommand() {
-		super("pushed", "List pushed applications");
+		super(DEFAULT_COMMAND, DEFAULT_DESC, new PushedOptionHandler());
 	}
 
-	@Override
-	public ExitStatus run(String... args) throws Exception {
-		YarnInfoApplication app = new YarnInfoApplication();
-		Properties appProperties = new Properties();
-		appProperties.setProperty("spring.yarn.internal.YarnInfoApplication.operation", "PUSHED");
-		app.appProperties(appProperties);
-		String info = app.run(args);
-		Log.info(info);
-		return ExitStatus.OK;
+	/**
+	 * Instantiates a new yarn pushed command using a default
+	 * command name and command description.
+	 *
+	 * @param handler the handler
+	 */
+	public YarnPushedCommand(PushedOptionHandler handler) {
+		super(DEFAULT_COMMAND, DEFAULT_DESC, handler);
+	}
+
+	/**
+	 * Instantiates a new yarn pushed command.
+	 *
+	 * @param name the command name
+	 * @param description the command description
+	 * @param handler the handler
+	 */
+	public YarnPushedCommand(String name, String description, PushedOptionHandler handler) {
+		super(name, description, handler);
+	}
+
+	public static class PushedOptionHandler extends ApplicationOptionHandler {
+
+		@Override
+		protected void runApplication(OptionSet options) throws Exception {
+			YarnInfoApplication app = new YarnInfoApplication();
+			Properties appProperties = new Properties();
+			appProperties.setProperty("spring.yarn.internal.YarnInfoApplication.operation", "PUSHED");
+			app.appProperties(appProperties);
+			String info = app.run();
+			handleOutput(info);
+		}
+
 	}
 
 }

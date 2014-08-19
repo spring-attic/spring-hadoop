@@ -70,6 +70,10 @@ public abstract class AbstractCli {
 		runner.setOptionCommands(HelpCommand.class, VersionCommand.class);
 
 		int exitCode = runner.runAndHandleErrors(args);
+		handleRunnerExitCode(runner, exitCode);
+	}
+
+	protected void handleRunnerExitCode(CommandRunner runner, int exitCode) {
 		if (exitCode != 0) {
 			// If successful, leave it to run in case it's a server app
 			System.exit(exitCode);
