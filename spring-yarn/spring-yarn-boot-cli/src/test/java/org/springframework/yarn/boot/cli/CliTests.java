@@ -20,12 +20,18 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.boot.cli.command.Command;
 import org.springframework.boot.cli.command.CommandRunner;
+import org.springframework.boot.cli.command.options.OptionHelp;
+import org.springframework.boot.cli.command.status.ExitStatus;
+import org.springframework.boot.cli.util.Log;
 import org.springframework.yarn.boot.cli.YarnClusterCreateCommand.ClusterCreateOptionHandler;
 import org.springframework.yarn.boot.cli.YarnClusterDestroyCommand.ClusterDestroyOptionHandler;
 import org.springframework.yarn.boot.cli.YarnClusterInfoCommand.ClusterInfoOptionHandler;
@@ -223,6 +229,24 @@ public class CliTests {
 		assertThat(output, containsString(YarnClusterDestroyCommand.DEFAULT_COMMAND + " - " + YarnClusterDestroyCommand.DEFAULT_DESC));
 	}
 
+	@Test
+	public void testHelpCustomNativeCommand() {
+		TestCliCustomNativeCommands cli = new TestCliCustomNativeCommands();
+		tester.run(cli, "help", "custom");
+		String output = tester.getOutput();
+		assertThat(cli.exitCode, is(0));
+		assertThat(output, containsString("custom - Custom Native Command"));
+	}
+
+	@Test
+	public void testRunCustomNativeCommand() {
+		TestCliCustomNativeCommands cli = new TestCliCustomNativeCommands();
+		tester.run(cli, "custom");
+		String output = tester.getOutput();
+		assertThat(cli.exitCode, is(0));
+		assertThat(output, containsString("run custom command"));
+	}
+
 	private static class TestCli extends AbstractCli {
 
 		Integer exitCode;
@@ -289,6 +313,70 @@ public class CliTests {
 		@Override
 		protected void handleRunnerExitCode(CommandRunner runner, int exitCode) {
 			this.exitCode = exitCode;
+		}
+
+	}
+
+	private static class TestCliCustomNativeCommands extends AbstractCli {
+
+		Integer exitCode;
+
+		public TestCliCustomNativeCommands() {
+			List<Command> commands = new ArrayList<Command>();
+			commands.add(new CustomNativeCommand());
+			registerCommands(commands);
+		}
+
+		@Override
+		protected void handleRunnerExitCode(CommandRunner runner, int exitCode) {
+			this.exitCode = exitCode;
+		}
+
+	}
+
+	private static class CustomNativeCommand implements Command {
+
+		@Override
+		public String getName() {
+			return "custom";
+		}
+
+		@Override
+		public String getDescription() {
+			return "Custom Native Command";
+		}
+
+		@Override
+		public String getUsageHelp() {
+			return "getUsageHelp";
+		}
+
+		@Override
+		public String getHelp() {
+			return "getHelp";
+		}
+
+		@Override
+		public Collection<OptionHelp> getOptionsHelp() {
+			OptionHelp optionHelp = new OptionHelp() {
+
+				@Override
+				public String getUsageHelp() {
+					return null;
+				}
+
+				@Override
+				public Set<String> getOptions() {
+					return null;
+				}
+			};
+			return Arrays.asList(optionHelp);
+		}
+
+		@Override
+		public ExitStatus run(String... args) throws Exception {
+			Log.info("run custom command");
+			return ExitStatus.OK;
 		}
 
 	}
