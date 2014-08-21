@@ -26,6 +26,7 @@ import org.apache.hadoop.yarn.api.records.ContainerId;
 import org.apache.hadoop.yarn.api.records.ContainerState;
 import org.apache.hadoop.yarn.api.records.ContainerStatus;
 import org.apache.hadoop.yarn.util.ConverterUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.yarn.listener.ContainerMonitorListener.ContainerMonitorState;
 
 /**
@@ -123,9 +124,9 @@ public class DefaultContainerMonitor extends AbstractMonitor implements Containe
 
 			synchronized (lock) {
 				if (state.equals(ContainerState.COMPLETE)) {
-					if (exitStatus > 0) {
+					if (exitStatus > 0 || exitStatus == -100 || exitStatus == -101 || exitStatus == -1000) {
 						failed.add(cid);
-					} else if (exitStatus != -100){
+					} else if (exitStatus != -100) {
 						// TODO: should do something centrally about exit statuses
 						//       -100 - container released by app
 						completed.add(cid);
@@ -176,10 +177,7 @@ public class DefaultContainerMonitor extends AbstractMonitor implements Containe
 	private String toDebugStringContainerSet(Set<String> set) {
 		StringBuilder buf = new StringBuilder();
 		buf.append('[');
-		for (String containerId : set) {
-			buf.append(containerId);
-			buf.append(',');
-		}
+		buf.append(StringUtils.collectionToCommaDelimitedString(set));
 		buf.append(']');
 		return buf.toString();
 	}
