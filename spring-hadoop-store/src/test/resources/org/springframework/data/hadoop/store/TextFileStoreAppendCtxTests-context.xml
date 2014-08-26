@@ -31,7 +31,8 @@
 		<constructor-arg ref="hadoopConfiguration"/>
 		<constructor-arg ref="testBasePath"/>
 		<constructor-arg><null/></constructor-arg>
-		<property name="idleTimeout" value="1"/>
+		<property name="idleTimeout" value="0"/>
+		<property name="appendable" value="true"/>
 
 	</bean>
 

@@ -47,7 +47,6 @@ public class TextFileWriter extends AbstractDataStreamWriter implements DataStor
 
 	private final byte[] delimiter;
 
-
 	/**
 	 * Instantiates a new text file writer.
 	 *
@@ -73,6 +72,15 @@ public class TextFileWriter extends AbstractDataStreamWriter implements DataStor
 		this.delimiter = delimiter;
 	}
 
+	/**
+	 * Instantiates a new text file writer.
+	 *
+	 * @param configuration the hadoop configuration
+	 * @param basePath the hdfs path
+	 * @param codec the compression codec info
+	 * @param delimiter the delimiter
+	 * @param idleTimeout the idle timeout
+	 */
 	public TextFileWriter(Configuration configuration, Path basePath, CodecInfo codec, byte[] delimiter, long idleTimeout ) {
 		this(configuration, basePath, codec, delimiter);
 		setIdleTimeout(idleTimeout);
@@ -81,15 +89,13 @@ public class TextFileWriter extends AbstractDataStreamWriter implements DataStor
 	@Override
 	public synchronized  void flush() throws IOException {
 		if (streamsHolder != null) {
-			streamsHolder.getStream().flush();
+			OutputStream stream = streamsHolder.getStream();
+			stream.flush();
+			if(isAppendable() && stream instanceof Syncable) {
+				((Syncable)stream).hflush();
+			}
 		}
 	}
-
-    public synchronized  void hflush() throws IOException {
-        if (streamsHolder != null) {
-            ((Syncable)streamsHolder.getStream()).hflush();
-        }
-    }
 
 	@Override
 	public synchronized void close() throws IOException {
@@ -123,20 +129,13 @@ public class TextFileWriter extends AbstractDataStreamWriter implements DataStor
 			close();
 			context.rollStrategies();
 		}
-
-
 	}
 
 	@Override
 	protected void handleIdleTimeout() {
 		try {
-			if (isAppendable()) {
-				log.info("Idle timeout detected for this writer, flushing stream");
-				hflush();
-			} else {
-				log.info("Idle timeout detected for this writer, closing stream");
-				close();
-			}
+			log.info("Idle timeout detected for this writer, closing stream");
+			close();
 		} catch (IOException e) {
 			log.error("error closing", e);
 		}

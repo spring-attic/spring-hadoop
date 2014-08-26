@@ -58,7 +58,7 @@ public abstract class OutputStoreObjectSupport extends StoreObjectSupport {
 	private boolean overwrite = false;
 
 	/** Flag guarding if file is appended or not */
-	private boolean append=false;
+	private boolean append = false;
 
 	/**
 	 * Instantiates a new abstract output store support.
@@ -197,6 +197,24 @@ public abstract class OutputStoreObjectSupport extends StoreObjectSupport {
 	}
 
 	/**
+	 * Checks if file is appendable
+	 *
+	 * @return true, if append enabled
+	 */
+	public boolean isAppendable() {
+		return append;
+	}
+
+	/**
+	 * Set stream as append mode.
+	 *
+	 * @param append the append flag
+	 */
+	public void setAppendable(boolean append) {
+		this.append = append;
+	}
+
+	/**
 	 * Gets the resolved path.
 	 *
 	 * @return the resolved path
@@ -283,14 +301,6 @@ public abstract class OutputStoreObjectSupport extends StoreObjectSupport {
 		} catch (IOException e) {
 		}
 		return false;
-	}
-
-	public boolean isAppendable() {
-		return append;
-	}
-
-	public void setAppendable(boolean append) {
-		this.append = append;
 	}
 
 }

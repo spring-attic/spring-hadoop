@@ -73,6 +73,9 @@ public abstract class AbstractPartitionDataStoreWriter<T, K> extends LifecycleOb
 	/** Idle timeout for writers */
 	private long idleTimeout;
 
+	/** Append flag for writers */
+	private boolean append = false;
+
 	/** Max number of free file path open/find attempts guard against infinite loop */
 	private int maxOpenAttempts = AbstractDataStreamWriter.DEFAULT_MAX_OPEN_ATTEMPTS;
 
@@ -275,8 +278,32 @@ public abstract class AbstractPartitionDataStoreWriter<T, K> extends LifecycleOb
 		log.info("Setting overwrite to " + overwrite);
 	}
 
+	/**
+	 * Checks if overwrite is enabled.
+	 *
+	 * @return true, if overwrite enabled
+	 * @see #setOverwrite(boolean)
+	 */
     public boolean isOverwrite() {
 		return overwrite;
+	}
+
+	/**
+	 * Checks if append is enabled.
+	 *
+	 * @return true, if append enabled
+	 */
+	public boolean isAppendable() {
+		return append;
+	}
+
+	/**
+	 * Set stream as append mode.
+	 *
+	 * @param append the append flag
+	 */
+	public void setAppendable(boolean append) {
+		this.append = append;
 	}
 
 	/**

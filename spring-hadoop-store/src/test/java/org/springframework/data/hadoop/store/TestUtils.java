@@ -55,10 +55,16 @@ public abstract class TestUtils {
 	}
 
 	public static void writeData(DataStoreWriter<String> writer, String[] data, boolean close) throws IOException {
+		writeData(writer, data, close, true);
+	}
+
+	public static void writeData(DataStoreWriter<String> writer, String[] data, boolean close, boolean flush) throws IOException {
 		for (String line : data) {
 			writer.write(line);
 		}
-		writer.flush();
+		if (flush) {
+			writer.flush();
+		}
 		if (close) {
 			writer.close();
 		}

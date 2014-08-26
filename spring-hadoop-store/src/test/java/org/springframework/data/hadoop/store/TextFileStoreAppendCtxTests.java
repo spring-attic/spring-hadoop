@@ -15,12 +15,8 @@
  */
 package org.springframework.data.hadoop.store;
 
-import static org.junit.Assert.assertNotNull;
-
 import java.io.IOException;
-import java.util.List;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -33,6 +29,7 @@ import org.springframework.test.context.ContextConfiguration;
 /**
  * Tests for reading and writing text using context configuration.
  *
+ * @author Janne Valkealahti
  * @author liu jiong
  *
  */
@@ -46,29 +43,14 @@ public class TextFileStoreAppendCtxTests extends AbstractStoreTests {
 	@Test
 	public void testWriteReadManyLines() throws IOException, InterruptedException {
 		TextFileWriter writer = context.getBean("writer", TextFileWriter.class);
-		assertNotNull(writer);
-		writer.setAppendable(true);
 
-		String[] dataArray = new String[] { DATA10, DATA11 };
+		TestUtils.writeData(writer, DATA09ARRAY, false, false);
+		writer.flush();
 
 		TextFileReader reader = new TextFileReader(getConfiguration(), writer.getPath(), null);
-
-		String[] strings = null;
-		if (writer.getPath().getFileSystem(writer.getConfiguration()).exists(writer.getPath())) {
-			List<String> tmpList = TestUtils.readData(reader);
-			strings = new String[tmpList.size()];
-			tmpList.toArray(strings);
-		}
-		for (String data : dataArray) {
-			writer.write(data);
-		}
-
-		// we're on append mode so file is still open and hflush
-		// should have made the data available.
-		writer.resetIdleTimeout();
-		Thread.sleep(5000);
-		reader = new TextFileReader(getConfiguration(), writer.getPath(), null);
-		TestUtils.readDataAndAssert(reader, (String[]) ArrayUtils.addAll(strings, dataArray));
+		TestUtils.readDataAndAssert(reader, DATA09ARRAY);
+		writer.close();
+		reader.close();
 	}
 
 }
