@@ -15,6 +15,8 @@
  */
 package org.springframework.yarn.batch.support;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -41,13 +43,10 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.yarn.batch.support.YarnBatchProperties.JobProperties;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Tests for {@link YarnJobLauncher}.

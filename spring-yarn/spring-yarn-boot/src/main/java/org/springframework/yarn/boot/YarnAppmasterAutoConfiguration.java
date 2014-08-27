@@ -219,6 +219,20 @@ public class YarnAppmasterAutoConfiguration {
 	}
 
 	@Configuration
+	@ConditionalOnExpression("${spring.yarn.appmaster.containercluster.enabled:false}")
+	public static class ContainerClusterFactoryConfig  {
+
+		@Bean
+		@ConditionalOnMissingBean(name = "defaultGridProjectionFactory")
+		public GridProjectionFactory defaultGridProjectionFactory() {
+			// on its own @Configuration class because we
+			// autowire in ContainerClusterConfig
+			return new DefaultGridProjectionFactory();
+		}
+
+	}
+
+	@Configuration
 	@EnableConfigurationProperties({ SpringYarnAppmasterProperties.class })
 	@ConditionalOnExpression("${spring.yarn.appmaster.containercluster.enabled:false}")
 	public static class ContainerClusterConfig  {
@@ -228,12 +242,6 @@ public class YarnAppmasterAutoConfiguration {
 
 		@Autowired(required = false)
 		private List<GridProjectionFactory> gridProjectionFactories;
-
-		@Bean
-		@ConditionalOnMissingBean(name = "defaultGridProjectionFactory")
-		public GridProjectionFactory defaultGridProjectionFactory() {
-			return new DefaultGridProjectionFactory();
-		}
 
 		@Bean
 		public GridProjectionFactoryLocator gridProjectionFactoryLocator() {

@@ -20,12 +20,15 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 import java.util.List;
+import java.util.Properties;
 
 import org.junit.Test;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.yarn.boot.support.SpringYarnBootUtils;
 
 public class SpringYarnClientLocalizerPropertiesTests {
 
@@ -59,6 +62,28 @@ public class SpringYarnClientLocalizerPropertiesTests {
 		assertThat(properties.getZipPattern(), is("zipPatternFoo"));
 
 		context.close();
+	}
+
+	@Test
+	public void testRawFileContents() {
+		SpringApplicationBuilder builder = new SpringApplicationBuilder(TestConfiguration.class);
+
+		Properties p = new Properties();
+		p.put("spring.yarn.client.localizer.rawFileContents." + SpringYarnBootUtils.escapeConfigKey("file1"), new byte[1]);
+		p.put("spring.yarn.client.localizer.rawFileContents." + SpringYarnBootUtils.escapeConfigKey("file2"), new byte[2]);
+		p.put("spring.yarn.client.localizer.rawFileContents." + SpringYarnBootUtils.escapeConfigKey("application.properties"), new byte[3]);
+		builder.properties(p);
+
+		SpringApplication app = builder.application();
+		app.setWebEnvironment(false);
+		ConfigurableApplicationContext context = app.run(new String[0]);
+		SpringYarnClientLocalizerProperties properties = context.getBean(SpringYarnClientLocalizerProperties.class);
+		assertThat(properties, notNullValue());
+		assertThat(properties.getRawFileContents(), notNullValue());
+		assertThat(properties.getRawFileContents().size(), is(3));
+		assertThat(properties.getRawFileContents().get(SpringYarnBootUtils.escapeConfigKey("file1")).length, is(1));
+		assertThat(properties.getRawFileContents().get(SpringYarnBootUtils.escapeConfigKey("file2")).length, is(2));
+		assertThat(properties.getRawFileContents().get(SpringYarnBootUtils.escapeConfigKey("application.properties")).length, is(3));
 	}
 
 	@Configuration

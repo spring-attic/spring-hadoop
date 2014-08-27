@@ -15,6 +15,8 @@
  */
 package org.springframework.yarn.boot;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -160,7 +162,7 @@ public class YarnClientAutoConfiguration {
 				.stagingDirectory(syp.getStagingDir())
 				.withCopy()
 					.copy(StringUtils.toStringArray(sycp.getFiles()), applicationDir, applicationDir == null)
-					.raw(syclp.getRawFileContents(), applicationDir);
+					.raw(unescapeMapKeys(syclp.getRawFileContents()), applicationDir);
 
 			LocalResourcesHdfsConfigurer withHdfs = localizer.withHdfs();
 			for (Entry e : localResourcesSelector.select(applicationDir != null ? applicationDir : "/")) {
@@ -231,6 +233,17 @@ public class YarnClientAutoConfiguration {
 		factory.setStderr("<LOG_DIR>/Appmaster.stderr");
 		factory.afterPropertiesSet();
 		return factory.getObject();
+	}
+
+	private static Map<String, byte[]> unescapeMapKeys(Map<String, byte[]> map) {
+		if (map == null || map.isEmpty()) {
+			return map;
+		}
+		HashMap<String, byte[]> nmap = new HashMap<String, byte[]>();
+		for (String key : map.keySet()) {
+			nmap.put(SpringYarnBootUtils.unescapeConfigKey(key), map.get(key));
+		}
+		return nmap;
 	}
 
 }
