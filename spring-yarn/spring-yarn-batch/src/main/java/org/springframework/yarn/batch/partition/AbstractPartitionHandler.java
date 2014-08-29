@@ -89,7 +89,6 @@ public abstract class AbstractPartitionHandler implements PartitionHandler {
 		waitCompleteState(stepExecution);
 		Collection<StepExecution> result = new ArrayList<StepExecution>(batchAppmaster.getStepExecutions());
 
-		result.addAll(batchAppmaster.getStepExecutions());
 		log.info("Listing statuses of remote executions");
 		for (StepExecution execution : result) {
 			log.info("Remote stepExecution=[" + execution + "]");

@@ -98,6 +98,7 @@ public class JobRepositoryRpcFactory {
 		type.jobExecution = convertJobExecutionType(stepExecution.getJobExecution(), stepExecution);
 
 		type.status = stepExecution.getStatus();
+		type.exitStatus = stepExecution.getExitStatus().getExitCode();
 		type.readCount = stepExecution.getReadCount();
 		type.writeCount = stepExecution.getWriteCount();
 		type.commitCount = stepExecution.getCommitCount();
@@ -178,6 +179,7 @@ public class JobRepositoryRpcFactory {
 				: new StepExecution(type.stepName, jobExecution);
 		stepExecution.setVersion(type.version);
 		stepExecution.setStatus(type.status);
+		stepExecution.setExitStatus(new ExitStatus(type.exitStatus));
 		stepExecution.setReadCount(type.readCount);
 		stepExecution.setWriteCount(type.writeCount);
 		stepExecution.setCommitCount(type.commitCount);

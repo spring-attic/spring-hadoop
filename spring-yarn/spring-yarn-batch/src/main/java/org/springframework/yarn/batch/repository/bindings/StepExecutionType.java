@@ -16,7 +16,6 @@
 package org.springframework.yarn.batch.repository.bindings;
 
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.yarn.integration.ip.mind.binding.BaseObject;
 
@@ -44,7 +43,7 @@ public class StepExecutionType extends BaseObject {
 	public Long endTime;
 	public Long lastUpdated;
 	public ExecutionContextType executionContext;
-	public ExitStatus exitStatus;
+	public String exitStatus;
 	public Boolean terminateOnly;
 	public Integer filterCount;
 

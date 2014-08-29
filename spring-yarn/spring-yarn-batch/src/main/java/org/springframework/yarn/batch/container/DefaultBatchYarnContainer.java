@@ -92,7 +92,7 @@ public class DefaultBatchYarnContainer extends AbstractBatchYarnContainer {
 		}
 
 		if(log.isDebugEnabled()) {
-			log.debug("Finished remote step run, status is " + stepExecution.getStatus());
+			log.info("Finished remote step stepExecution=[" + stepExecution + "]");
 		}
 
 		MindAppmasterServiceClient client = (MindAppmasterServiceClient) getIntegrationServiceClient();
