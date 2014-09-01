@@ -142,21 +142,19 @@ public class YarnContainerClusterMvcEndpoint extends EndpointMvcAdapter {
 	 * @return the container cluster status response
 	 */
 	@RequestMapping(value = "/{clusterId}", method = RequestMethod.PUT)
-	public HttpEntity<ContainerClusterResource> modifyCluster(@PathVariable("clusterId") String clusterId,
+	public HttpEntity<Void> modifyCluster(@PathVariable("clusterId") String clusterId,
 			@RequestBody ContainerClusterModifyRequest request) {
 		ModifyAction action = ContainerClusterModifyRequest.getModifyAction(request.getAction());
 		if (action == null) {
 			throw new NoSuchActionException("Action " + request.getAction() + " not supported");
 		}
-		ContainerCluster cluster = getClusterMayThrow(clusterId);
+		getClusterMayThrow(clusterId);
 		if (ModifyAction.START.equals(action)) {
 			delegate.startCluster(clusterId);
 		} else if (ModifyAction.STOP.equals(action)) {
 			delegate.stopCluster(clusterId);
 		}
-		ContainerClusterResource response = new ContainerClusterResource(cluster);
-		return new ResponseEntity<ContainerClusterResource>(response,
-				HttpStatus.OK);
+		return new ResponseEntity<Void>(HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/{clusterId}", method = RequestMethod.DELETE)
@@ -173,7 +171,7 @@ public class YarnContainerClusterMvcEndpoint extends EndpointMvcAdapter {
 	 * @return the container cluster modify response
 	 */
 	@RequestMapping(value = "/{clusterId}", method = RequestMethod.PATCH)
-	public HttpEntity<ContainerClusterResource> updateCluster(@PathVariable("clusterId") String clusterId, @RequestBody ContainerClusterCreateRequest request) {
+	public HttpEntity<Void> updateCluster(@PathVariable("clusterId") String clusterId, @RequestBody ContainerClusterCreateRequest request) {
 		ContainerCluster cluster = delegate.getClusters().get(clusterId);
 		if (cluster == null) {
 			throw new NoSuchClusterException("No such cluster: " + clusterId);
@@ -190,9 +188,7 @@ public class YarnContainerClusterMvcEndpoint extends EndpointMvcAdapter {
 		}
 		delegate.modifyCluster(clusterId, data);
 
-		ContainerClusterResource response = new ContainerClusterResource(delegate.getClusters().get(clusterId));
-		return new ResponseEntity<ContainerClusterResource>(response,
-				HttpStatus.OK);
+		return new ResponseEntity<Void>(HttpStatus.OK);
 	}
 
 	/**

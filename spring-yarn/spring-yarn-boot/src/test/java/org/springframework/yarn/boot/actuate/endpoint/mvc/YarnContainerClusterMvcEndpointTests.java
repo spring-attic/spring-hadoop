@@ -230,7 +230,7 @@ public class YarnContainerClusterMvcEndpointTests {
 		mvc.
 			perform(put(BASE + "/foo").content(content).contentType(MediaType.APPLICATION_JSON)).
 			andExpect(status().isOk()).
-			andExpect(content().string(not(isEmptyString())));
+			andExpect(content().string(isEmptyString()));
 
 		Map<String, ContainerCluster> clusters = TestUtils.readField("clusters", appmaster);
 		assertThat(clusters.size(), is(1));
@@ -254,7 +254,7 @@ public class YarnContainerClusterMvcEndpointTests {
 		mvc.
 		perform(put(BASE + "/foo").content(content).contentType(MediaType.APPLICATION_JSON)).
 		andExpect(status().isOk()).
-		andExpect(content().string(not(isEmptyString())));
+		andExpect(content().string(isEmptyString()));
 		Map<String, ContainerCluster> clusters = TestUtils.readField("clusters", appmaster);
 		assertThat(clusters.size(), is(1));
 		assertThat(clusters.containsKey("foo"), is(true));
