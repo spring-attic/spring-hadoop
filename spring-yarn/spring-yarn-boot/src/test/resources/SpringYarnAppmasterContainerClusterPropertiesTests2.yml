@@ -2,7 +2,6 @@ spring:
     yarn:
         appmaster:
             containercluster:
-                enabled: true
                 clusters:
                     cluster1:
                         projectionType: any

@@ -133,8 +133,6 @@ public class SpringYarnAppmasterContainerClusterPropertiesTests {
 		SpringYarnAppmasterProperties properties = context.getBean(SpringYarnAppmasterProperties.class);
 		assertThat(properties, notNullValue());
 
-		assertThat(properties.getContainercluster().isEnabled(), is(true));
-
 		assertThat(properties.getContainercluster().getClusters().size(), is(1));
 
 		assertThat(properties.getContainercluster().getClusters().get("cluster1").getProjectionType(), is("any"));
@@ -209,8 +207,6 @@ public class SpringYarnAppmasterContainerClusterPropertiesTests {
 						"--spring.config.location=classpath:/SpringYarnAppmasterContainerClusterPropertiesTests2-2.yml"});
 		SpringYarnAppmasterProperties properties = context.getBean(SpringYarnAppmasterProperties.class);
 		assertThat(properties, notNullValue());
-
-		assertThat(properties.getContainercluster().isEnabled(), is(true));
 
 		assertThat(properties.getContainercluster().getClusters().size(), is(2));
 
