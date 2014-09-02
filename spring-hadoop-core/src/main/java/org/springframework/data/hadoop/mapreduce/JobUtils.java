@@ -1,12 +1,12 @@
 /*
  * Copyright 2011-2014 the original author or authors.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,7 +33,7 @@ import org.springframework.util.ReflectionUtils;
 /**
  * Utilities around Hadoop {@link Job}s.
  * Mainly used for converting a Job instance to different types.
- * 
+ *
  * @author Costin Leau
  * @author Mark Pollack
  * @author Thomas Risberg
@@ -43,13 +43,13 @@ public abstract class JobUtils {
 	/**
 	 * Status of a job. The enum tries to reuse as much as possible
 	 * the internal Hadoop terminology.
-	 * 
+	 *
 	 * @author Costin Leau
 	 */
 	public enum JobStatus {
 		/**
 		 * The status cannot be determined - either because the job might be invalid
-		 * or maybe because of a communication failure.  
+		 * or maybe because of a communication failure.
 		 */
 		UNKNOWN,
 		/**
@@ -190,8 +190,8 @@ public abstract class JobUtils {
 
 	/**
 	 * Returns the status of the given job. May return null indicating accessing the job
-	 * caused exceptions. 
-	 * 
+	 * caused exceptions.
+	 *
 	 * @param job the job
 	 * @return the job status
 	 */
@@ -207,7 +207,7 @@ public abstract class JobUtils {
 					ReflectionUtils.findMethod(Job.class, "getJobState");
 			Object state = getJobState.invoke(job);
 			if (state instanceof Enum) {
-				int value = ((Enum)state).ordinal();
+				int value = ((Enum<?>)state).ordinal();
 				originalStatus = JobStatus.fromRunState(value + 1);
 			}
 		} catch (Exception ignore) {}
