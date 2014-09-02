@@ -2594,6 +2594,12 @@ public void publicVoidParameterArgsMethod(@YarnParameter("key") String value) {
                       <entry>List</entry>
                       <entry>null</entry>
                   </row>
+                  <row>
+                      <entry><literal>spring.hadoop.config</literal></entry>
+                      <entry>No</entry>
+                      <entry>Map</entry>
+                      <entry>null</entry>
+                  </row>
               </tbody>
           </tgroup>
       </table>
@@ -2637,6 +2643,89 @@ public void publicVoidParameterArgsMethod(@YarnParameter("key") String value) {
               format can be anything Spring supports. For example,
               <emphasis>classpath:/myentry.xml</emphasis> from a classpath or
               <emphasis>file:/myentry.xml</emphasis> from a file system.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.hadoop.config</filename></term>
+              <listitem><para>
+              Map of generic hadoop configuration properties.
+              </para></listitem>
+          </varlistentry>
+      </variablelist>
+
+      <table id="yarn:boot:configpropsspringhadoopsecurity" pgwide="1" align="center">
+          <title><literal>spring.hadoop.security</literal> configuration properties</title>
+          <tgroup cols="4">
+              <colspec colname="c1" colwidth="2*" align="left"/>
+              <colspec colname="c2" colwidth="1*"/>
+              <colspec colname="c3" colwidth="1*"/>
+              <colspec colname="c4" colwidth="1*"/>
+              <thead>
+                  <row>
+                      <entry>Property Name</entry>
+                      <entry>Required</entry>
+                      <entry>Type</entry>
+                      <entry>Default Value</entry>
+                  </row>
+              </thead>
+              <tbody>
+                  <row>
+                      <entry><literal>spring.hadoop.security.authMethod</literal></entry>
+                      <entry>No</entry>
+                      <entry>String</entry>
+                      <entry>null</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.hadoop.security.userPrincipal</literal></entry>
+                      <entry>No</entry>
+                      <entry>String</entry>
+                      <entry>null</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.hadoop.security.userKeytab</literal></entry>
+                      <entry>No</entry>
+                      <entry>String</entry>
+                      <entry>null</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.hadoop.security.namenodePrincipal</literal></entry>
+                      <entry>No</entry>
+                      <entry>String</entry>
+                      <entry>null</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.hadoop.security.rmManagerPrincipal</literal></entry>
+                      <entry>No</entry>
+                      <entry>String</entry>
+                      <entry>null</entry>
+                  </row>
+              </tbody>
+          </tgroup>
+      </table>
+
+      <variablelist>
+          <varlistentry><term><filename>spring.hadoop.security.authMethod</filename></term>
+              <listitem><para>
+              Hadoop security method.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.hadoop.security.userPrincipal</filename></term>
+              <listitem><para>
+              Principal for user.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.hadoop.security.userKeytab</filename></term>
+              <listitem><para>
+              Path to user keytab file.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.hadoop.security.namenodePrincipal</filename></term>
+              <listitem><para>
+              Namenode principal
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.hadoop.security.rmManagerPrincipal</filename></term>
+              <listitem><para>
+              Resource manager principal
               </para></listitem>
           </varlistentry>
       </variablelist>
@@ -2759,7 +2848,6 @@ public void publicVoidParameterArgsMethod(@YarnParameter("key") String value) {
               </para></listitem>
           </varlistentry>
       </variablelist>
-
 
       <table id="yarn:boot:configpropsspringyarnappmaster" pgwide="1" align="center">
           <title><literal>spring.yarn.appmaster</literal> configuration properties</title>
@@ -3089,7 +3177,177 @@ public void publicVoidParameterArgsMethod(@YarnParameter("key") String value) {
           </varlistentry>
       </variablelist>
 
+      <table id="yarn:boot:configpropsspringyarnappmastercontainercluster" pgwide="1" align="center">
+          <title><literal>spring.yarn.appmaster.containercluster</literal> configuration properties</title>
+          <tgroup cols="4">
+              <colspec colname="c1" colwidth="2*" align="left"/>
+              <colspec colname="c2" colwidth="1*"/>
+              <colspec colname="c3" colwidth="1*"/>
+              <colspec colname="c4" colwidth="1*"/>
+              <thead>
+                  <row>
+                      <entry>Property Name</entry>
+                      <entry>Required</entry>
+                      <entry>Type</entry>
+                      <entry>Default Value</entry>
+                  </row>
+              </thead>
+              <tbody>
+                  <row>
+                      <entry><literal>spring.yarn.appmaster.containercluster.clusters</literal></entry>
+                      <entry>No</entry>
+                      <entry>Map</entry>
+                      <entry>null</entry>
+                  </row>
+              </tbody>
+          </tgroup>
+      </table>
 
+      <variablelist>
+          <varlistentry><term><filename>spring.yarn.appmaster.containercluster.clusters</filename></term>
+              <listitem><para>
+              Definitions of container clusters.
+              </para></listitem>
+          </varlistentry>
+      </variablelist>
+
+      <table id="yarn:boot:configpropsspringyarnappmastercontainerclusterclusters" pgwide="1" align="center">
+          <title><literal>spring.yarn.appmaster.containercluster.clusters.&lt;name&gt;</literal> configuration properties</title>
+          <tgroup cols="4">
+              <colspec colname="c1" colwidth="2*" align="left"/>
+              <colspec colname="c2" colwidth="1*"/>
+              <colspec colname="c3" colwidth="1*"/>
+              <colspec colname="c4" colwidth="1*"/>
+              <thead>
+                  <row>
+                      <entry>Property Name</entry>
+                      <entry>Required</entry>
+                      <entry>Type</entry>
+                      <entry>Default Value</entry>
+                  </row>
+              </thead>
+              <tbody>
+                  <row>
+                      <entry><literal>spring.yarn.appmaster.containercluster.clusters.&lt;name&gt;.resource</literal></entry>
+                      <entry>No</entry>
+                      <entry>Config</entry>
+                      <entry>null</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.appmaster.containercluster.clusters.&lt;name&gt;.launchcontext</literal></entry>
+                      <entry>No</entry>
+                      <entry>Config</entry>
+                      <entry>null</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.appmaster.containercluster.clusters.&lt;name&gt;.localizer</literal></entry>
+                      <entry>No</entry>
+                      <entry>Config</entry>
+                      <entry>null</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.appmaster.containercluster.clusters.&lt;name&gt;.projectionType</literal></entry>
+                      <entry>No</entry>
+                      <entry>String</entry>
+                      <entry>null</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.appmaster.containercluster.clusters.&lt;name&gt;.projectionAny</literal></entry>
+                      <entry>No</entry>
+                      <entry>Integer</entry>
+                      <entry>null</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.appmaster.containercluster.clusters.&lt;name&gt;.projectionHosts</literal></entry>
+                      <entry>No</entry>
+                      <entry>Map</entry>
+                      <entry>null</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.appmaster.containercluster.clusters.&lt;name&gt;.projectionRacks</literal></entry>
+                      <entry>No</entry>
+                      <entry>Map</entry>
+                      <entry>null</entry>
+                  </row>
+              </tbody>
+          </tgroup>
+      </table>
+
+      <variablelist>
+          <varlistentry><term><filename>spring.yarn.appmaster.containercluster.clusters.&lt;name&gt;.resource</filename></term>
+              <listitem><para>
+              Same as <literal>spring.yarn.appmaster.resource</literal> config property.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.appmaster.containercluster.clusters.&lt;name&gt;.launchcontext</filename></term>
+              <listitem><para>
+              Same as <literal>spring.yarn.appmaster.launchcontext</literal> config property.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.appmaster.containercluster.clusters.&lt;name&gt;.localizer</filename></term>
+              <listitem><para>
+              Same as <literal>spring.yarn.aptpmaster.localizer</literal> config property.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.appmaster.containercluster.clusters.&lt;name&gt;.projectionType</filename></term>
+              <listitem><para>
+              Type of a projection to use. One of <literal>any</literal>, <literal>hosts</literal> or
+              <literal>racks</literal> is supported on default or any other projection added via
+              a custom factory.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.appmaster.containercluster.clusters.&lt;name&gt;.projectionAny</filename></term>
+              <listitem><para>
+              Any data passed to projection.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.appmaster.containercluster.clusters.&lt;name&gt;.projectionHosts</filename></term>
+              <listitem><para>
+              Map of hosts data passed to projection. Key would be a hostname and value denoting number of instances
+              in that particular host.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.appmaster.containercluster.clusters.&lt;name&gt;.projectionRacks</filename></term>
+              <listitem><para>
+              Map of racks data passed to projection. Key would be a hostname and value denoting number of instances
+              in that particular rack.
+              </para></listitem>
+          </varlistentry>
+      </variablelist>
+
+      <table id="yarn:boot:configpropsspringyarnendpointscontainercluster" pgwide="1" align="center">
+          <title><literal>spring.yarn.endpoints.containercluster</literal> configuration properties</title>
+          <tgroup cols="4">
+              <colspec colname="c1" colwidth="2*" align="left"/>
+              <colspec colname="c2" colwidth="1*"/>
+              <colspec colname="c3" colwidth="1*"/>
+              <colspec colname="c4" colwidth="1*"/>
+              <thead>
+                  <row>
+                      <entry>Property Name</entry>
+                      <entry>Required</entry>
+                      <entry>Type</entry>
+                      <entry>Default Value</entry>
+                  </row>
+              </thead>
+              <tbody>
+                  <row>
+                      <entry><literal>spring.yarn.endpoints.containercluster.enabled</literal></entry>
+                      <entry>No</entry>
+                      <entry>Boolean</entry>
+                      <entry>null</entry>
+                  </row>
+              </tbody>
+          </tgroup>
+      </table>
+
+      <variablelist>
+          <varlistentry><term><filename>spring.yarn.endpoints.containercluster.enabled</filename></term>
+              <listitem><para>
+              Enabling endpoint MVC REST API controlling container clusters.
+              </para></listitem>
+          </varlistentry>
+      </variablelist>
 
       <table id="yarn:boot:configpropsspringyarnclient" pgwide="1" align="center">
           <title><literal>spring.yarn.client</literal> configuration properties</title>
@@ -3529,7 +3787,7 @@ public void publicVoidParameterArgsMethod(@YarnParameter("key") String value) {
       </variablelist>
 
       <table id="yarn:boot:configpropsspringyarnbatchjobs" pgwide="1" align="center">
-          <title><literal>spring.yarn</literal> configuration properties</title>
+          <title><literal>spring.yarn.batch.jobs</literal> configuration properties</title>
           <tgroup cols="4">
               <colspec colname="c1" colwidth="2*" align="left"/>
               <colspec colname="c2" colwidth="1*"/>
@@ -3628,6 +3886,642 @@ public void publicVoidParameterArgsMethod(@YarnParameter("key") String value) {
               </para></listitem>
           </varlistentry>
       </variablelist>
+
+    </section>
+
+    <section id="yarn:containergroups">
+      <title>Container Groups</title>
+
+      <para>Hadoop YARN is a simple resource scheduler and thus doesn’t provide any higher
+      level functionality for controlling containers for failures or grouping. Currently
+      these type of features need to be implemented atop of YARN using a third party components
+      such as Spring YARN. Containers controlled by YARN are handled as one big pool of resources
+      and any functionality for grouping containers needs to be implemented within a custom
+      application master. Spring YARN provides components which can be used to control
+      containers as groups.</para>
+
+      <para>Container Group is a logical representation of containers managed by a single YARN
+      application. In a typical YARN application a container which is allocated and launched
+      shares a same configuration for Resource(memory, cpu), Localized Files(application files) and
+      Launch Context(process command). Grouping brings a separate configuration for each group
+      which allows to run different logical applications within a one application master. Logical
+      application simply mean that different containers are meant to do totally different things.
+      A simple use case for such things is an application which needs to run two different types
+      of containers, admin and worker nodes respectively.</para>
+
+      <para>YARN itself is not meant to be a task scheduler meaning you can’t request a container
+      for specific task which would then run on a Hadoop cluster. In layman’s terms this simply mean
+      that you can’t associate a container allocation request for response received from a resource
+      manager. This decision was made to keep a resource manager relatively light and spawn all the
+      task activities into an application master. All the allocated containers are requested and
+      received from YARN asynchronously thus making a one big pool of resources. All the task
+      activities needs to be build using this pool. This brings a new concept of doing a container
+      projection from a single allocated pool of containers.</para>
+
+      <para><emphasis>Application Master</emphasis> which is meant to be used with
+      container groups need to implement interface
+      <interfacename>ContainerClusterAppmaster</interfacename> shown below.
+      Currently one built-in implementation
+      <classname>org.springframework.yarn.am.cluster.ManagedContainerClusterAppmaster</classname>
+      exists.</para>
+
+      <programlisting language="java"><![CDATA[
+public interface ContainerClusterAppmaster extends YarnAppmaster {
+  Map<String, ContainerCluster> getContainerClusters();
+  ContainerCluster createContainerCluster(String clusterId, ProjectionData projection);
+  ContainerCluster createContainerCluster(String clusterId,
+    String clusterDef, ProjectionData projection, Map<String, Object> extraProperties);
+  void startContainerCluster(String id);
+  void stopContainerCluster(String id);
+  void destroyContainerCluster(String id);
+  void modifyContainerCluster(String id, ProjectionData data);
+}
+]]></programlisting>
+
+      <para>Order to use default implementation <classname>ManagedContainerClusterAppmaster</classname>,
+      configure it using a <literal>spring.yarn.appmaster.appmasterClass</literal> configuration
+      key. If you plan to control this container groups externally via internal
+      rest api, set <literal>spring.yarn.endpoints.containercluster.enabled</literal>
+      to <literal>true</literal>.</para>
+
+      <programlisting language="text"><![CDATA[spring:
+  yarn:
+    appmaster:
+      appmasterClass: org.springframework.yarn.am.cluster.ManagedContainerClusterAppmaster
+    endpoints:
+      containercluster:
+        enabled: true]]></programlisting>
+
+      <section>
+        <title>Grid Projection</title>
+
+          <para>Container cluster is always associated with a grid projection. This allows
+          de-coupling of cluster configuration and its grid projection. Cluster or group
+          is not directly aware of how containers are chosen.</para>
+
+          <programlisting language="java"><![CDATA[
+public interface GridProjection {
+  boolean acceptMember(GridMember member);
+  GridMember removeMember(GridMember member);
+  Collection<GridMember> getMembers();
+  SatisfyStateData getSatisfyState();
+  void setProjectionData(ProjectionData data);
+  ProjectionData getProjectionData();
+}
+]]></programlisting>
+
+          <para><interfacename>GridProjection</interfacename> has its projection
+          configuration in <classname>ProjectionData</classname>.
+          <classname>SatisfyStateData</classname> defines a data object to satisfy
+          a grid projection state.</para>
+
+          <para>Projections are created via <interfacename>GridProjectionFactory</interfacename>
+          beans. Default factory named as <literal>gridProjectionFactory</literal> currently
+          handles three different types of projections, <classname>AnyGridProjection</classname>,
+          <classname>HostsGridProjection</classname> and <classname>RacksGridProjection</classname>.
+          You can replace this factory by defining a bean with a same name or introduce
+          more factories just by defining your own factory implementations.</para>
+
+          <programlisting language="java"><![CDATA[
+public interface GridProjectionFactory {
+  GridProjection getGridProjection(ProjectionData projectionData);
+  Set<String> getRegisteredProjectionTypes();
+}
+]]></programlisting>
+
+          <para>Registered types needs to be mapped into projections itself created by
+          a factory. For example default implementation does mapping of types <literal>any</literal>,
+          <literal>hosts</literal> and <literal>racks</literal> respectively.</para>
+
+      </section>
+
+      <section>
+        <title>Group Configuration</title>
+
+          <para>Typical configuration is shown below:</para>
+
+          <programlisting language="text"><![CDATA[
+spring:
+  hadoop:
+    fsUri: hdfs://node1:8020
+    resourceManagerHost: node1
+  yarn:
+    appType: BOOT
+    appName: gs-yarn-uimodel
+    applicationBaseDir: /app/
+    applicationDir: /app/gs-yarn-uimodel/
+    appmaster:
+      appmasterClass: org.springframework.yarn.am.cluster.ManagedContainerClusterAppmaster
+      keepContextAlive: true
+      containercluster:
+        clusters:
+          cluster1:
+            projectionType: hosts
+            projectionHosts:
+              node3: 1
+              node4: 1
+            resource:
+              priority: 1
+              memory: 64
+              virtualCores: 1
+            launchcontext:
+              locality: true
+              archiveFile: gs-yarn-uimodel-cont1-0.1.0.jar
+            localizer:
+              patterns:
+                - "*cont1*jar"
+]]></programlisting>
+
+          <para>These container cluster configurations will also work as a blueprint
+          when creating groups manually on demand. If <literal>projectionType</literal> is
+          defined in a configuration it indicates that a group should be
+          created automatically.</para>
+
+      </section>
+
+      <section>
+        <title>Container Restart</title>
+          <para>Currently a simple support for automatically re-starting a failed container is implemented by a fact that if container goes away group projection is no longer satisfied and Spring YARN will try to allocate and start new containers as long as projection is satisfied again.</para>
+      </section>
+
+      <section>
+        <title>REST API</title>
+          <para>While grouping configuration can be static and solely be what’s defined in a yml file, it would be a nice feature if you could control the runtime behaviour of these groups externally. REST API provides methods to create groups with a specific projects, start group, stop group and modify group projection.</para>
+
+          <para>Boot based REST API endpoint need to be explicitly enabled by using a configuration
+          shown below:</para>
+
+          <programlisting language="text"><![CDATA[
+spring:
+  yarn:
+    endpoints:
+      containercluster:
+        enabled: true
+]]></programlisting>
+
+        <section>
+          <title>GET /yarn_containercluster</title>
+          <para>Returns info about existing clusters</para>
+
+          <para>Response Class</para>
+          <programlisting language="text"><![CDATA[
+ContainerClusters {
+  clusters (array[string])
+}
+]]></programlisting>
+          <para>Response Schema</para>
+          <programlisting language="text"><![CDATA[
+{
+  "clusters":[
+    "<clusterId>"
+  ]
+}
+]]></programlisting>
+
+        </section>
+
+        <section>
+          <title>POST /yarn_containercluster</title>
+          <para>Create a new container cluster</para>
+
+          <table pgwide="1" align="center">
+            <title>Parameters</title>
+            <tgroup cols="4">
+              <colspec colname="c1" colwidth="1*" align="left"/>
+              <colspec colname="c2" colwidth="1*" align="left"/>
+              <colspec colname="c3" colwidth="1*" align="left"/>
+              <colspec colname="c4" colwidth="2*" align="left"/>
+              <thead>
+                <row>
+                  <entry>Parameter</entry>
+                  <entry>Description</entry>
+                  <entry>Parameter Type</entry>
+                  <entry>Data Type</entry>
+                </row>
+              </thead>
+              <tbody>
+                <row>
+                  <entry valign="top">body</entry>
+                  <entry valign="top">Cluster to be created</entry>
+                  <entry valign="top">body</entry>
+                  <entry>
+                    <para>Request Class</para>
+                    <programlisting language="text"><![CDATA[
+Cluster {
+  clusterId (string),
+  clusterDef (string),
+  projection (string),
+  projectionData (ProjectionData),
+  extraProperties (map<string,object>)
+}
+
+ProjectionData {
+  type (string),
+  priority (integer),
+  any (integer, optional),
+  hosts (map, optional),
+  racks (map, optional)
+}
+]]></programlisting>
+                    <para>Request Schema</para>
+                    <programlisting language="text"><![CDATA[
+{
+  "clusterId":"",
+  "clusterDef":"",
+  "projection":"",
+  "projectionData":{
+    "any":0,
+    "hosts":{
+      "<hostname>":0
+    },
+    "racks":{
+      "<rackname>":0
+    },
+    "extraProperties":{
+    }
+  }
+}
+]]></programlisting>
+                  </entry>
+                </row>
+              </tbody>
+            </tgroup>
+          </table>
+          <table pgwide="1" align="center">
+            <title>Response Messages</title>
+            <tgroup cols="3">
+              <colspec colname="c1" colwidth="1*" align="left"/>
+              <colspec colname="c2" colwidth="1*" align="left"/>
+              <colspec colname="c3" colwidth="1*" align="left"/>
+              <thead>
+                <row>
+                  <entry>HTTP Status Code</entry>
+                  <entry>Reason</entry>
+                  <entry>Response Model</entry>
+                </row>
+              </thead>
+              <tbody>
+                <row>
+                  <entry valign="top">405</entry>
+                  <entry valign="top">Invalid input</entry>
+                  <entry valign="top"></entry>
+                </row>
+              </tbody>
+            </tgroup>
+          </table>
+        </section>
+
+        <section>
+          <title>GET /yarn_containercluster/{clusterId}</title>
+          <para>Returns info about a container cluster.</para>
+          <para>Response Class</para>
+          <programlisting language="text"><![CDATA[
+ContainerCluster {
+  id (string): unique identifier for a cluster,
+  gridProjection (GridProjection),
+  containerClusterState (ContainerClusterState)
+}
+
+GridProjection {
+  members (array[Member]),
+  projectionData (ProjectionData),
+  satisfyState (SatisfyState)
+}
+
+Member {
+  id (string): unique identifier for a member,  
+}
+
+ProjectionData {
+  type (string),
+  priority (integer),
+  any (integer, optional),
+  hosts (map, optional),
+  racks (map, optional)
+}
+
+SatisfyState {
+  removeData (array(string)),
+  allocateData (AllocateData)
+}
+
+AllocateData {
+  any (integer, optional),
+  hosts (map, optional),
+  racks (map, optional)
+}
+
+ContainerClusterState {
+  clusterState (string)
+}
+]]></programlisting>
+          <para>Response Schema</para>
+          <programlisting language="text"><![CDATA[
+{
+  "id":"",
+  "gridProjection":{
+    "members":[
+      {
+        "id":""
+      }
+    ],
+    "projectionData":{
+      "type":"",
+      "priority":0,
+      "any":0,
+      "hosts":{
+      },
+      "racks":{
+      }
+    },
+    "satisfyState":{
+      "removeData":[
+      ],
+      "allocateData":{
+        "any":0,
+        "hosts":{
+        },
+        "racks":{
+        }
+      }
+    }
+  },
+  "containerClusterState":{
+    "clusterState":""
+  }
+}
+]]></programlisting>
+          <table pgwide="1" align="center">
+            <title>Parameters</title>
+            <tgroup cols="4">
+              <colspec colname="c1" colwidth="1*" align="left"/>
+              <colspec colname="c2" colwidth="1*" align="left"/>
+              <colspec colname="c3" colwidth="1*" align="left"/>
+              <colspec colname="c4" colwidth="2*" align="left"/>
+              <thead>
+                <row>
+                  <entry>Parameter</entry>
+                  <entry>Description</entry>
+                  <entry>Parameter Type</entry>
+                  <entry>Data Type</entry>
+                </row>
+              </thead>
+              <tbody>
+                <row>
+                  <entry valign="top">clusterId</entry>
+                  <entry valign="top">ID of a cluster needs to be fetched</entry>
+                  <entry valign="top">path</entry>
+                  <entry valign="top">string</entry>
+                </row>
+              </tbody>
+            </tgroup>
+          </table>
+          <table pgwide="1" align="center">
+            <title>Response Messages</title>
+            <tgroup cols="3">
+              <colspec colname="c1" colwidth="1*" align="left"/>
+              <colspec colname="c2" colwidth="1*" align="left"/>
+              <colspec colname="c3" colwidth="1*" align="left"/>
+              <thead>
+                <row>
+                  <entry>HTTP Status Code</entry>
+                  <entry>Reason</entry>
+                  <entry>Response Model</entry>
+                </row>
+              </thead>
+              <tbody>
+                <row>
+                  <entry valign="top">404</entry>
+                  <entry valign="top">No such cluster</entry>
+                  <entry valign="top"></entry>
+                </row>
+              </tbody>
+            </tgroup>
+          </table>
+        </section>
+
+        <section>
+          <title>PUT /yarn_containercluster/{clusterId}</title>
+          <para>Modify a container cluster state.</para>
+          <table pgwide="1" align="center">
+            <title>Parameters</title>
+            <tgroup cols="4">
+              <colspec colname="c1" colwidth="1*" align="left"/>
+              <colspec colname="c2" colwidth="1*" align="left"/>
+              <colspec colname="c3" colwidth="1*" align="left"/>
+              <colspec colname="c4" colwidth="2*" align="left"/>
+              <thead>
+                <row>
+                  <entry>Parameter</entry>
+                  <entry>Description</entry>
+                  <entry>Parameter Type</entry>
+                  <entry>Data Type</entry>
+                </row>
+              </thead>
+              <tbody>
+                <row>
+                  <entry valign="top">clusterId</entry>
+                  <entry valign="top">ID of a cluster needs to be fetched</entry>
+                  <entry valign="top">path</entry>
+                  <entry valign="top">string</entry>
+                </row>
+                <row>
+                  <entry valign="top">body</entry>
+                  <entry valign="top">Cluster state to be modified</entry>
+                  <entry valign="top">body</entry>
+                  <entry>
+                    <para>Request Class</para>
+                    <programlisting language="text"><![CDATA[
+ContainerClusterModifyRequest {
+  action (string)
+}
+]]></programlisting>
+                    <para>Request Schema</para>
+                    <programlisting language="text"><![CDATA[
+{
+  "action":""
+}
+]]></programlisting>
+                  </entry>
+                </row>
+              </tbody>
+            </tgroup>
+          </table>
+          <table pgwide="1" align="center">
+            <title>Response Messages</title>
+            <tgroup cols="3">
+              <colspec colname="c1" colwidth="1*" align="left"/>
+              <colspec colname="c2" colwidth="1*" align="left"/>
+              <colspec colname="c3" colwidth="1*" align="left"/>
+              <thead>
+                <row>
+                  <entry>HTTP Status Code</entry>
+                  <entry>Reason</entry>
+                  <entry>Response Model</entry>
+                </row>
+              </thead>
+              <tbody>
+                <row>
+                  <entry valign="top">404</entry>
+                  <entry valign="top">No such cluster</entry>
+                  <entry valign="top"></entry>
+                </row>
+                <row>
+                  <entry valign="top">404</entry>
+                  <entry valign="top">No such action</entry>
+                  <entry valign="top"></entry>
+                </row>
+              </tbody>
+            </tgroup>
+          </table>
+        </section>
+
+        <section>
+          <title>PATCH /yarn_containercluster/{clusterId}</title>
+          <para>Modify a container cluster projection.</para>
+          <table pgwide="1" align="center">
+            <title>Parameters</title>
+            <tgroup cols="4">
+              <colspec colname="c1" colwidth="1*" align="left"/>
+              <colspec colname="c2" colwidth="1*" align="left"/>
+              <colspec colname="c3" colwidth="1*" align="left"/>
+              <colspec colname="c4" colwidth="2*" align="left"/>
+              <thead>
+                <row>
+                  <entry>Parameter</entry>
+                  <entry>Description</entry>
+                  <entry>Parameter Type</entry>
+                  <entry>Data Type</entry>
+                </row>
+              </thead>
+              <tbody>
+                <row>
+                  <entry valign="top">clusterId</entry>
+                  <entry valign="top">ID of a cluster needs to be fetched</entry>
+                  <entry valign="top">path</entry>
+                  <entry valign="top">string</entry>
+                </row>
+                <row>
+                  <entry valign="top">body</entry>
+                  <entry valign="top">Cluster to be created</entry>
+                  <entry valign="top">body</entry>
+                  <entry>
+                    <para>Request Class</para>
+                    <programlisting language="text"><![CDATA[
+Cluster {
+  clusterId (string),
+  clusterDef (string),
+  projection (string),
+  projectionData (ProjectionData),
+  extraProperties (map<string,object>)
+}
+
+ProjectionData {
+  type (string),
+  priority (integer),
+  any (integer, optional),
+  hosts (map, optional),
+  racks (map, optional)
+}
+]]></programlisting>
+                    <para>Request Schema</para>
+                    <programlisting language="text"><![CDATA[
+{
+  "clusterId":"",
+  "projection":"",
+  "projectionData":{
+    "any":0,
+    "hosts":{
+      "<hostname>":0
+    },
+    "racks":{
+      "<rackname>":0
+    }
+  }
+}
+]]></programlisting>
+                  </entry>
+                </row>
+              </tbody>
+            </tgroup>
+          </table>
+          <table pgwide="1" align="center">
+            <title>Response Messages</title>
+            <tgroup cols="3">
+              <colspec colname="c1" colwidth="1*" align="left"/>
+              <colspec colname="c2" colwidth="1*" align="left"/>
+              <colspec colname="c3" colwidth="1*" align="left"/>
+              <thead>
+                <row>
+                  <entry>HTTP Status Code</entry>
+                  <entry>Reason</entry>
+                  <entry>Response Model</entry>
+                </row>
+              </thead>
+              <tbody>
+                <row>
+                  <entry valign="top">404</entry>
+                  <entry valign="top">No such cluster</entry>
+                  <entry valign="top"></entry>
+                </row>
+              </tbody>
+            </tgroup>
+          </table>
+        </section>
+
+        <section>
+          <title>DELETE /yarn_containercluster/{clusterId}</title>
+          <para>Destroy a container cluster.</para>
+          <table pgwide="1" align="center">
+            <title>Parameters</title>
+            <tgroup cols="4">
+              <colspec colname="c1" colwidth="1*" align="left"/>
+              <colspec colname="c2" colwidth="1*" align="left"/>
+              <colspec colname="c3" colwidth="1*" align="left"/>
+              <colspec colname="c4" colwidth="2*" align="left"/>
+              <thead>
+                <row>
+                  <entry>Parameter</entry>
+                  <entry>Description</entry>
+                  <entry>Parameter Type</entry>
+                  <entry>Data Type</entry>
+                </row>
+              </thead>
+              <tbody>
+                <row>
+                  <entry valign="top">clusterId</entry>
+                  <entry valign="top">ID of a cluster needs to be fetched</entry>
+                  <entry valign="top">path</entry>
+                  <entry valign="top">string</entry>
+                </row>
+              </tbody>
+            </tgroup>
+          </table>
+          <table pgwide="1" align="center">
+            <title>Response Messages</title>
+            <tgroup cols="3">
+              <colspec colname="c1" colwidth="1*" align="left"/>
+              <colspec colname="c2" colwidth="1*" align="left"/>
+              <colspec colname="c3" colwidth="1*" align="left"/>
+              <thead>
+                <row>
+                  <entry>HTTP Status Code</entry>
+                  <entry>Reason</entry>
+                  <entry>Response Model</entry>
+                </row>
+              </thead>
+              <tbody>
+                <row>
+                  <entry valign="top">404</entry>
+                  <entry valign="top">No such cluster</entry>
+                  <entry valign="top"></entry>
+                </row>
+              </tbody>
+            </tgroup>
+          </table>
+        </section>
+
+      </section>
 
     </section>
 
@@ -3795,7 +4689,308 @@ public void doListSubmitted() {
 
       </section>
 
+      <section>
+        <title>Using YarnContainerClusterApplication</title>
+
+          <para>YarnContainerClusterApplication is a simple Boot application which knows
+          how to talk with Container Cluster MVC Endpoint. More information about this
+          see javadocs for commands introduced in below chapter.</para>
+
+      </section>
+
     </section>
+
+    <section id="yarn:commandintegration">
+      <title>Cli Integration</title>
+
+      <para>Due to nature of being a foundational library, Spring YARN doesn’t provide a generic purpose client out of a box for communicating with your application. Reason for this is that Spring YARN is not a product, but an application build on top of Spring YARN would be a product which could have its own client. There is no good way of doing a generic purpose ‘client’ which would suit every needs and anyway user may want to customize how client works and how his own code is packaged.</para>
+
+      <para>We’ve made it as simple as possible to create your own client which can be used to control applications on YARN and if container clustering is enabled a similar utility classes can be used to control it. Only thing what is left for the end user to implement is defining which commands should be enabled.</para>
+
+      <para>Client facing component <emphasis>spring-yarn-boot-cli</emphasis> contains implementation
+      based on <emphasis>spring-boot-cli</emphasis> which can be used to build
+      application cli's. It also container built-in commands which are easy to re-use
+      or extend.</para>
+
+      <para>Example above shows a typical main method to use
+      all built-in commands.</para>
+
+      <programlisting language="java"><![CDATA[
+public class ClientApplication extends AbstractCli {
+
+  public static void main(String... args) {
+    List<Command> commands = new ArrayList<Command>();
+    commands.add(new YarnPushCommand());
+    commands.add(new YarnPushedCommand());
+    commands.add(new YarnSubmitCommand());
+    commands.add(new YarnSubmittedCommand());
+    commands.add(new YarnKillCommand());
+    commands.add(new YarnClustersInfoCommand());
+    commands.add(new YarnClusterInfoCommand());
+    commands.add(new YarnClusterCreateCommand());
+    commands.add(new YarnClusterStartCommand());
+    commands.add(new YarnClusterStopCommand());
+    commands.add(new YarnClusterModifyCommand());
+    commands.add(new YarnClusterDestroyCommand());
+    ClientApplication app = new ClientApplication();
+    app.registerCommands(commands);
+    app.registerCommand(new ShellCommand(commands));
+    app.doMain(args);
+  }
+
+}
+]]></programlisting>
+
+      <section>
+        <title>Build-in Commands</title>
+          <para>Built-in commands can be used to either control YARN applications
+          or container clusters. All commands are under a package
+          <literal>org.springframework.yarn.boot.cli</literal>.</para>
+
+          <section>
+            <title>Push Application</title>
+            <programlisting language="text"><![CDATA[
+java -jar <jar> push - Push new application version
+
+usage: java -jar <jar> push [options]
+
+Option                     Description                       
+------                     -----------                       
+-v, --application-version  Application version (default: app)
+]]></programlisting>
+            <para><classname>YarnPushCommand</classname> can be used to push an
+            application into hdfs.</para>
+          </section>
+
+          <section>
+            <title>List Pushed Applications</title>
+            <programlisting language="text"><![CDATA[
+java -jar <jar> pushed - List pushed applications
+
+usage: java -jar <jar> pushed [options]
+
+No options specified  
+]]></programlisting>
+            <para><classname>YarnPushedCommand</classname> can be used to list
+            information about an pushed applications.</para>
+          </section>
+
+          <section>
+            <title>Submit Application</title>
+            <programlisting language="text"><![CDATA[
+java -jar <jar> submit - Submit application
+
+usage: java -jar <jar> submit [options]
+
+Option                     Description                       
+------                     -----------                       
+-v, --application-version  Application version (default: app)
+]]></programlisting>
+            <para><classname>YarnSubmitCommand</classname> can be used to
+            submit a new application instance.</para>
+          </section>
+
+          <section>
+            <title>List Submitted Applications</title>
+            <programlisting language="text"><![CDATA[
+java -jar <jar> submitted - List submitted applications
+
+usage: java -jar <jar> submitted [options]
+
+Option                   Description                     
+------                   -----------                     
+-t, --application-type   Application type (default: BOOT)
+-v, --verbose [Boolean]  Verbose output (default: true)  
+]]></programlisting>
+            <para><classname>YarnSubmittedCommand</classname> can be used to
+            list info about an submitted applications.</para>
+          </section>
+
+          <section>
+            <title>Kill Application</title>
+            <programlisting language="text"><![CDATA[
+java -jar <jar> kill - Kill application
+
+usage: java -jar <jar> kill [options]
+
+Option                Description                
+------                -----------                
+-a, --application-id  Specify YARN application id
+]]></programlisting>
+            <para><classname>YarnKillCommand</classname> can be used
+            to kill a running application instance.</para>
+          </section>
+
+          <section>
+            <title>List Clusters Info</title>
+            <programlisting language="text"><![CDATA[
+java -jar <jar> clustersinfo - List clusters
+
+usage: java -jar <jar> clustersinfo [options]
+
+Option                Description                
+------                -----------                
+-a, --application-id  Specify YARN application id
+]]></programlisting>
+            <para><classname>YarnClustersInfoCommand</classname> can be used to list
+            info about existing clusters.</para>
+          </section>
+
+          <section>
+            <title>List Cluster Info</title>
+            <programlisting language="text"><![CDATA[
+java -jar <jar> clusterinfo - List cluster info
+
+usage: java -jar <jar> clusterinfo [options]
+
+Option                   Description                   
+------                   -----------                   
+-a, --application-id     Specify YARN application id   
+-c, --cluster-id         Specify cluster id            
+-v, --verbose [Boolean]  Verbose output (default: true)
+]]></programlisting>
+            <para><classname>YarnClusterInfoCommand</classname> can be used to list
+            info about a cluster.</para>
+          </section>
+
+          <section>
+            <title>Create Container Cluster</title>
+            <programlisting language="text"><![CDATA[
+java -jar <jar> clustercreate - Create cluster
+
+usage: java -jar <jar> clustercreate [options]
+
+Option                  Description                
+------                  -----------                
+-a, --application-id    Specify YARN application id
+-c, --cluster-id        Specify cluster id         
+-h, --projection-hosts  Projection hosts counts    
+-i, --cluster-def       Specify cluster def id     
+-p, --projection-type   Projection type            
+-r, --projection-racks  Projection racks counts    
+-w, --projection-any    Projection any count    
+]]></programlisting>
+            <para><classname>YarnClusterCreateCommand</classname> can be used to create
+            a new cluster.</para>
+          </section>
+
+          <section>
+            <title>Start Container Cluster</title>
+            <programlisting language="text"><![CDATA[
+java -jar <jar> clusterstart - Start cluster
+
+usage: java -jar <jar> clusterstart [options]
+
+Option                Description                
+------                -----------                
+-a, --application-id  Specify YARN application id
+-c, --cluster-id      Specify cluster id         
+]]></programlisting>
+            <para><classname>YarnClusterStartCommand</classname> can be used to
+            start an existing cluster.</para>
+          </section>
+
+          <section>
+            <title>Stop Container Cluster</title>
+            <programlisting language="text"><![CDATA[
+java -jar <jar> clusterstop - Stop cluster
+
+usage: java -jar <jar> clusterstop [options]
+
+Option                Description                
+------                -----------                
+-a, --application-id  Specify YARN application id
+-c, --cluster-id      Specify cluster id         
+]]></programlisting>
+            <para><classname>YarnClusterStopCommand</classname> can be used to
+            stop an existing cluster.</para>
+          </section>
+
+          <section>
+            <title>Modify Container Cluster</title>
+            <programlisting language="text"><![CDATA[
+java -jar <jar> clustermodify - Modify cluster
+
+usage: java -jar <jar> clustermodify [options]
+
+Option                  Description                
+------                  -----------                
+-a, --application-id    Specify YARN application id
+-c, --cluster-id        Specify cluster id         
+-h, --projection-hosts  Projection hosts counts    
+-r, --projection-racks  Projection racks counts    
+-w, --projection-any    Projection any count       
+]]></programlisting>
+            <para><classname>YarnClusterModifyCommand</classname> can be used to
+            modify an existing cluster.</para>
+          </section>
+
+          <section>
+            <title>Destroy Container Cluster</title>
+            <programlisting language="text"><![CDATA[
+java -jar <jar> clusterdestroy - Destroy cluster
+
+usage: java -jar <jar> clusterdestroy [options]
+
+Option                Description                
+------                -----------                
+-a, --application-id  Specify YARN application id
+-c, --cluster-id      Specify cluster id         
+]]></programlisting>
+            <para><classname>YarnClusterDestroyCommand</classname> can be used to
+            destroy an existing cluster.</para>
+          </section>
+
+      </section>
+
+      <section>
+        <title>Implementing Command</title>
+          <para>There are few different ways to implement a custom command.
+          At a lowest level <interfacename>org.springframework.boot.cli.command.Command</interfacename>
+          need to be implemented by all commands to be used. Spring boot provides
+          helper classes named <classname>org.springframework.boot.cli.command.AbstractCommand</classname>
+          and <classname>org.springframework.boot.cli.command.OptionParsingCommand</classname>
+          to easy with command implementation. All Spring YARN Boot Cli commands are
+          based on <classname>org.springframework.yarn.boot.cli.AbstractApplicationCommand</classname>
+          which makes it easier to execute a boot based application context.</para>
+      </section>
+
+      <section>
+        <title>Using Shell</title>
+          <para>While all commands can be used as is using an executable jar, there is
+          a little overhead for bootstrapping jvm and Boot application context. To
+          overcome this problem all commands can be used within a shell instance.
+          Shell also brings you a command history and all commands are executed
+          faster because a whole jvm and its libraries are already loaded.</para>
+
+          <para>Special command
+          <classname>org.springframework.yarn.boot.cli.shell.ShellCommand</classname>
+          can be used to register an internal shell instance which is reusing
+          all other registered commands.</para>
+
+          <programlisting language="text"><![CDATA[
+Spring YARN Cli (v2.1.0.BUILD-SNAPSHOT)
+Hit TAB to complete. Type 'help' and hit RETURN for help, and 'exit' to quit.
+$ 
+clear            clustercreate    clusterdestroy   clusterinfo      
+clustermodify    clustersinfo     clusterstart     clusterstop      
+exit             help             kill             prompt           
+push             pushed           submit           submitted        
+$ help submitted
+submitted - List submitted applications
+
+usage: submitted [options]
+
+Option                   Description                     
+------                   -----------                     
+-t, --application-type   Application type (default: BOOT)
+-v, --verbose [Boolean]  Verbose output (default: true)  
+]]></programlisting>
+
+      </section>
+
+    </section>
+
 
   </section>
 
