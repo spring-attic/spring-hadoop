@@ -28,7 +28,6 @@ import org.apache.pig.PigServer;
 import org.apache.pig.backend.BackendException;
 import org.apache.pig.backend.executionengine.ExecException;
 import org.apache.pig.backend.executionengine.ExecJob;
-import org.apache.pig.backend.hadoop.executionengine.JobCreationException;
 import org.apache.pig.impl.logicalLayer.FrontendException;
 import org.apache.pig.impl.logicalLayer.schema.SchemaMergeException;
 import org.apache.pig.impl.plan.PlanException;
@@ -74,7 +73,7 @@ abstract class PigUtils {
 		}
 
 		if (ex instanceof FrontendException) {
-			if (ex instanceof JobCreationException) {
+			if (ex.getClass().getName().contains("JobCreationException")) {
 				return new InvalidDataAccessResourceUsageException("Map Reduce error", ex);
 			}
 
