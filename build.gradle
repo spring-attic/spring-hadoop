@@ -62,7 +62,7 @@ def pigQualifier = ''
 // default is Hadoop 2.2.x
 switch (hadoopDistro) {
 
-	// Cloudera CDH5 YARN 2.2.x base
+	// Cloudera CDH5 YARN 2.3.x base
 	case "cdh5":
 		hadoopVersion = cdh5Version
 		println "Using Cloudera CDH5 [$hadoopVersion]"
