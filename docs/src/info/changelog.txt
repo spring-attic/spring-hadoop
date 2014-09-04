@@ -5,6 +5,13 @@ http://projects.spring.io/spring-hadoop/
 Commit changelog: http://github.com/spring-projects/spring-hadoop/tree/v[version]
 Issues changelog: https://jira.spring.io/secure/ReleaseNote.jspa?projectId=10801
 
+Changes in version 1.1.0 RELEASE (2014-09-04)
+---------------------------------------------
+
+General
+* SHDP-339 Updating docs, logo, copyright
+
+
 Changes in version 1.1.0 RC1 (2014-04-29)
 -----------------------------------------
 
