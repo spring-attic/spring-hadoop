@@ -5,7 +5,7 @@ defaultTasks 'build'
 buildscript {
 	repositories {
 		maven { url "http://repo.spring.io/plugins-release" }
-		maven { url "http://repo.spring.io/plugins-milestone" }
+		maven { url "http://repo.spring.io/plugins-snapshot" }
 	}
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:$springBootVersion")
