@@ -5,6 +5,37 @@ http://projects.spring.io/spring-hadoop/
 Commit changelog: http://github.com/spring-projects/spring-hadoop/tree/v[version]
 Issues changelog: https://jira.spring.io/secure/ReleaseNote.jspa?projectId=10801
 
+Changes in version 2.1.0 M1 (2014-09-05)
+----------------------------------------
+General
+* Remove Hadoop v1 based distros from build [SHDP-354]
+* Update dependencies for distros and other projects [SHDP-359]
+* Update Kite SDK to 0.14.0 [SHDP-360]
+* Update Spring projects versions [SHDP-371]
+* New namespace schema files for 2.1 [SHDP-370]
+* Update the build to support Hadoop 2.5.0 [SHDP-388]
+
+Store
+* Store writer should not fail on lifecycle init [SHDP-365]
+* RollingFileNamingStrategy improved handling of file names [SHDP-375]
+* Support append in store writers [SHDP-342]
+* Append for PartitionTextFileWriter [SHDP-389]
+* Change store tests to use minicluster [SHDP-357]
+* Fix Race condition for overwrite [SHDP-374]
+
+YARN
+* Implement yarn container grouping [SHDP-211]
+* Improve Yarn app install/submit model [SHDP-287]
+* Support allocating mixed resources [SHDP-332]
+* Generic boot config for hadoop configuration [SHDP-376]
+* Support creating custom container projections [SHDP-379]
+* Fix containers not allocated after rejection [SHDP-382]
+* Change all boot cli commands to be modifiable [SHDP-383]
+* Fix StaticEventingAppmaster hangs with*100 container exit status [SHDP-385]
+* Fix remote batch step exit code not updated [SHDP-390]
+* Remove unneeded YarnContainerClusterMvcEndpoint response entities [SHDP-391]
+ 
+
 Changes in version 2.0.0 RELEASE (2014-06-10)
 ---------------------------------------------
 General
