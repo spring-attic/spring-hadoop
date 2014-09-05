@@ -26,14 +26,12 @@ By default Spring for Apache Hadoop compiles against the Apache Hadoop 2.2.x sta
 
 The following distros and versions are also supported:
 
-- Apache Hadoop 1.2.x (hadoop12)
+- Apache Hadoop 2.4.1 (hadoop24)
+- Apache Hadoop 2.5.0 (hadoop25)
 - Pivotal HD 1.1 (phd1)
 - Pivotal HD 2.0 (phd20) *
-- Cloudera CDH4 MR1 (cdh4, cdh4mr1)
-- Cloudera CDH4 YARN (cdh4yarn)
-- Cloudera CDH5 YARN (cdh5, cdh5yarn) *
-- Cloudera CDH5 MR1 (cdh5mr1)
-- Hortonworks HDP 1.3 (hdp13)
+- Cloudera CDH4 YARN (cdh4)
+- Cloudera CDH5 YARN (cdh5) *
 - Hortonworks HDP 2.0 (hdp20) *
 - Hortonworks HDP 2.1 (hdp21) *
 
@@ -43,23 +41,21 @@ The following distros and versions are also supported:
 
 To compile against a specific distro version pass the `-Pdistro=<label>` project property, like so:
 
-    gradlew -Pdistro=hadoop12 build
+    gradlew -Pdistro=hadoop24 build
 
 Note that the chosen distro is displayed on the screen:
 
-    Using Apache Hadoop 1.2.x [1.2.1]
+    Using Apache Hadoop 2.4.x [2.4.1]
 
-In this case, the specified Hadoop distribution (above Apache Hadoop 1.2.x) is used to create the project binaries.
+In this case, the specified Hadoop distribution (above Apache Hadoop 2.4.x) is used to create the project binaries.
 
 # CI Builds
 
 The results for CI builds are available at [Spring Data Hadoop: Project Summary - Spring CI](https://build.spring.io/browse/SPRINGDATAHADOOP)
 
 We are currently running tests against the following distributions:
-* Apache Hadoop 1.2.1
 * Apache Hadoop 2.2.0
 * Cloudera CDH5
-* Hortonworks HDP 1.3
 * Hortonworks HDP 2.1
 * Pivotal HD 2.0
 
