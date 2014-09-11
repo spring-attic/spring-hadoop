@@ -136,7 +136,7 @@ public abstract class JobUtils {
 
 		try {
 			Configuration cfg = job.getConfiguration();
-			cfg.set("mapreduce.framework.name", "yarn");
+			//cfg.set("mapreduce.framework.name", "yarn");
 			JobClient jobClient = null;
 			try {
 				Constructor<JobClient> constr = JobClient.class.getConstructor(Configuration.class);
