@@ -146,7 +146,6 @@ public abstract class JobUtils {
 		if (VersionUtils.isHadoop2X()) {
 			try {
 				Configuration cfg = job.getConfiguration();
-				cfg.set("mapreduce.framework.name", "yarn");
 				JobClient jobClient = null;
 				try {
 					Constructor<JobClient> constr = JobClient.class.getConstructor(Configuration.class);
