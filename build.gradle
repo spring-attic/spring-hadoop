@@ -777,6 +777,7 @@ project('spring-data-hadoop-store') {
 	}
 
 	dependencies {
+        compile project(":spring-data-hadoop-core")
 		compile("org.kitesdk:kite-data-core:$kiteVersion") { dep ->
 			exclude group: "log4j", module: "log4j"
 		}
@@ -794,12 +795,58 @@ project('spring-data-hadoop-store') {
 
 }
 
+project('spring-data-hadoop-hbase') {
+	description = 'Spring for Apache Hadoop HBase Support'
+
+	dependencies {
+		compile project(":spring-data-hadoop-core")
+	}
+
+}
+
+project('spring-data-hadoop-hive') {
+	description = 'Spring for Apache Hadoop Hive Support'
+
+	dependencies {
+		compile project(":spring-data-hadoop-core")
+		compile "org.springframework.batch:spring-batch-core:$springBatchVersion"
+	}
+
+}
+
+project('spring-data-hadoop-pig') {
+	description = 'Spring for Apache Hadoop Pig Support'
+
+	dependencies {
+		compile project(":spring-data-hadoop-core")
+		compile "org.springframework.batch:spring-batch-core:$springBatchVersion"
+	}
+
+}
+
+project('spring-data-hadoop-spark') {
+	description = 'Spring for Apache Hadoop Spark Support'
+
+	dependencies {
+		compile project(":spring-data-hadoop-core")
+		compile "org.springframework.batch:spring-batch-core:$springBatchVersion"
+		compile "org.apache.spark:spark-core_2.10:$sparkVersion"
+		compile "org.apache.hadoop:hadoop-client:$hadoopVersion"
+	}
+
+}
+
 project('spring-data-hadoop') {
 	description = 'Spring for Apache Hadoop Configuration'
 
 	dependencies {
 		compile project(":spring-data-hadoop-core")
+        compile project(":spring-data-hadoop-hive")
+        compile project(":spring-data-hadoop-pig")
+        compile project(":spring-data-hadoop-spark")
         compile project(":spring-data-hadoop-batch")
+        compile project(":spring-data-hadoop-store")
+        compile project(":spring-data-hadoop-hbase")
 	}
 
 }
