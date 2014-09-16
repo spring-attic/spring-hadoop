@@ -14,7 +14,7 @@
 		log="src/test/resources/logs/apache_access.log"
 		if (!fsh.test(log)) {
 			fs.copyFromLocalFile(log, log)
-			println("Copied Pig log files to HDFS")
+			print("Copied Pig log files to HDFS")
  		}
 	</hdp:script>	
  	

@@ -87,7 +87,7 @@
 	
 	
 	<hdp:script id="nop-script" language="javascript">
-	println("Called script")
+	print("Called script")
 	</hdp:script>
 	
  
