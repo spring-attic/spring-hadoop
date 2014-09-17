@@ -1151,11 +1151,12 @@ if (gradle.ext.mr2) {
 
 		apply plugin: 'spring-boot'
 
-		description = 'Spring Yarn Boot'
+		description = 'Spring Yarn Boot Build Tests'
 		dependencies {
 			compile project(":spring-yarn:spring-yarn-boot")
-			testCompile project(":spring-yarn:spring-yarn-boot")
 			testCompile project(":spring-yarn:spring-yarn-test")
+			// we might need webmvc for Boot's MetricFilterAutoConfiguration
+			runtime "org.springframework:spring-webmvc:$springVersion"
 		}
 
 		// create a boot jar which we can use in tests
