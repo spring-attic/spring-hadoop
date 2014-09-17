@@ -35,6 +35,7 @@
 	<!--  -->
 	<hdp:configuration register-url-handler="false" depends-on="cfg-init" file-system-uri="${hadoop.fs}" job-tracker-uri="${hadoop.jt}">
 		mapreduce.framework.name=yarn
+		javax.jdo.option.ConnectionURL=jdbc:derby:;databaseName=build/metastore_db;create=true
 		cfg=main
 		someparam=somevalue
 	</hdp:configuration>
@@ -46,7 +47,7 @@
 	<hdp:script language="javascript" run-at-startup="true">
 		// set System 'path.separator' to ':' - see HADOOP-9123
 		if (java.lang.System.getProperty("os.name").toLowerCase().startsWith("win")) {
-			println("Fudging the 'path.separator' on Win for DistributedCache to work")
+			print("Fudging the 'path.separator' on Win for DistributedCache to work")
 			java.lang.System.setProperty("path.separator", ":")
 		}
 	

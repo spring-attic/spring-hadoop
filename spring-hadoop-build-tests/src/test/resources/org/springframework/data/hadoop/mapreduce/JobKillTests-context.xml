@@ -21,10 +21,6 @@
 	fsh.put("src/test/resources/input/gutenberg", "/ide-test/input/word")			
 	</hdp:script>
 
-	<hdp:script id="nop-script" language="javascript">
-	println("Called script")
-	</hdp:script>
-
 	<job id="mainJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="do-hadoop">
 			<tasklet ref="hdp-tasklet"/>
