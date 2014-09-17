@@ -830,7 +830,11 @@ project('spring-data-hadoop-spark') {
 	dependencies {
 		compile project(":spring-data-hadoop-core")
 		compile "org.springframework.batch:spring-batch-core:$springBatchVersion"
-		compile "org.apache.spark:spark-core_2.10:$sparkVersion"
+		compile("org.apache.spark:spark-core_2.10:$sparkVersion") { dep ->
+            exclude group: "org.eclipse.jetty", module: "jetty-server"
+            exclude group: "org.eclipse.jetty", module: "jetty-plus"
+            exclude group: "org.eclipse.jetty", module: "jetty-security"
+        }
 		compile "org.apache.hadoop:hadoop-client:$hadoopVersion"
 	}
 
@@ -1156,7 +1160,7 @@ if (gradle.ext.mr2) {
 			compile project(":spring-yarn:spring-yarn-boot")
 			testCompile project(":spring-yarn:spring-yarn-test")
 			// we might need webmvc for Boot's MetricFilterAutoConfiguration
-			runtime "org.springframework:spring-webmvc:$springVersion"
+			//runtime "org.springframework:spring-webmvc:$springVersion"
 		}
 
 		// create a boot jar which we can use in tests
