@@ -35,6 +35,7 @@
 	<!--  -->
 	<hdp:configuration register-url-handler="false" depends-on="cfg-init" file-system-uri="${hadoop.fs}" job-tracker-uri="${hadoop.jt}">
 		mapreduce.framework.name=yarn
+		javax.jdo.option.ConnectionURL=jdbc:derby:;databaseName=build/metastore_db;create=true
 		cfg=main
 		someparam=somevalue
 	</hdp:configuration>
