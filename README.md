@@ -18,7 +18,7 @@ Spring for Apache Hadoop uses Gradle as its build system. To build the system si
 
     gradlew
 
-from the project root folder. This will compile the sources, run the tests and create the artifacts.
+from the project root folder. This will compile the sources, run the tests and create the artifacts. Note that the tests by default tries to access a localhost single-node Hadoop cluster. 
 
 ## Supported distros
 
@@ -30,6 +30,7 @@ The following distros and versions are also supported:
 - Apache Hadoop 2.5.0 (hadoop25)
 - Pivotal HD 1.1 (phd1)
 - Pivotal HD 2.0 (phd20) *
+- Pivotal HD 2.1 (phd21) *
 - Cloudera CDH4 YARN (cdh4)
 - Cloudera CDH5 YARN (cdh5) *
 - Hortonworks HDP 2.0 (hdp20) *
