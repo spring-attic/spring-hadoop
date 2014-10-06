@@ -817,6 +817,19 @@ project('spring-data-hadoop-store') {
 		compile("org.kitesdk:kite-data-core:$kiteVersion") { dep ->
 			exclude group: "log4j", module: "log4j"
 		}
+	}
+
+}
+
+project('spring-data-hadoop-store-build-tests') {
+	description = 'Spring for Apache Hadoop Store Features Build Tests'
+
+	configurations {
+		testRuntime.exclude group: 'org.apache.hive'
+	}
+
+	dependencies {
+        compile project(":spring-data-hadoop-store")
 		testCompile "org.springframework:spring-messaging:$springVersion"
 		testCompile project(":spring-data-hadoop")
 		testCompile project(path:":spring-data-hadoop-test", configuration:"testArtifacts")
@@ -876,10 +889,20 @@ project('spring-data-hadoop-spark') {
 
 }
 
+project('spring-data-hadoop-config-common') {
+	description = 'Spring for Apache Hadoop Configuration Common'
+
+	dependencies {
+		compile project(":spring-data-hadoop-core")
+	}
+
+}
+
 project('spring-data-hadoop') {
 	description = 'Spring for Apache Hadoop Configuration'
 
 	dependencies {
+		compile project(":spring-data-hadoop-config-common")
 		compile project(":spring-data-hadoop-core")
         compile project(":spring-data-hadoop-hive")
         compile project(":spring-data-hadoop-pig")
@@ -1089,7 +1112,7 @@ if (gradle.ext.mr2) {
 	project('spring-yarn:spring-yarn-core') {
 		description = 'Spring Yarn Core'
 		dependencies {
-			compile project(":spring-data-hadoop")
+			compile project(":spring-data-hadoop-config-common")
 			compile "org.springframework:spring-messaging:$springVersion"
 			compile("org.apache.hadoop:hadoop-yarn-client:$hadoopVersion") { dep ->
 				exclude group: "org.slf4j", module: "slf4j-log4j12"

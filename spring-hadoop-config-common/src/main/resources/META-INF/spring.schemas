@@ -1,0 +1,5 @@
+http\://www.springframework.org/schema/hadoop/spring-hadoop-0.9.xsd=/org/springframework/data/hadoop/config/spring-hadoop-0.9.xsd
+http\://www.springframework.org/schema/hadoop/spring-hadoop-1.0.xsd=/org/springframework/data/hadoop/config/spring-hadoop-1.0.xsd
+http\://www.springframework.org/schema/hadoop/spring-hadoop-2.0.xsd=/org/springframework/data/hadoop/config/spring-hadoop-2.0.xsd
+http\://www.springframework.org/schema/hadoop/spring-hadoop-2.1.xsd=/org/springframework/data/hadoop/config/spring-hadoop-2.1.xsd
+http\://www.springframework.org/schema/hadoop/spring-hadoop.xsd=/org/springframework/data/hadoop/config/spring-hadoop-2.1.xsd
