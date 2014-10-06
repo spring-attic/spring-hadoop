@@ -869,6 +869,8 @@ project('spring-data-hadoop-spark') {
             exclude group: "org.eclipse.jetty", module: "jetty-server"
             exclude group: "org.eclipse.jetty", module: "jetty-plus"
             exclude group: "org.eclipse.jetty", module: "jetty-security"
+            // jline would mess up yarn boot cli because boot uses newer version
+            exclude group: "jline", module: "jline"
         }
 		compile "org.apache.hadoop:hadoop-client:$hadoopVersion"
 	}
