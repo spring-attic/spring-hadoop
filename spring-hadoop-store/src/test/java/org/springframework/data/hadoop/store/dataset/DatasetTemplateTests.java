@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ import org.springframework.data.hadoop.test.context.MiniHadoopCluster;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.kitesdk.data.DatasetRepository;
+import org.kitesdk.data.spi.DatasetRepository;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
@@ -63,8 +63,8 @@ public class DatasetTemplateTests extends AbstractDatasetTemplateTests {
 		datasetOperations.execute(new DatasetRepositoryCallback() {
 			@Override
 			public void doInRepository(DatasetRepository datasetRepository) {
-				datasetRepository.delete(datasetOperations.getDatasetName(TestPojo.class));
-				datasetRepository.delete(datasetOperations.getDatasetName(AnotherPojo.class));
+				datasetRepository.delete("test", datasetOperations.getDatasetName(TestPojo.class));
+				datasetRepository.delete("test", datasetOperations.getDatasetName(AnotherPojo.class));
 			}
 		});
 	}
@@ -109,13 +109,13 @@ public class DatasetTemplateTests extends AbstractDatasetTemplateTests {
 
 		FileSystem fs = FileSystem.get(getConfiguration());
 		assertTrue("Dataset storage created for AnotherPojo",
-				fs.exists(new Path(path + "/" + datasetOperations.getDatasetName(AnotherPojo.class))));
+				fs.exists(new Path(path + "/test/" + datasetOperations.getDatasetName(AnotherPojo.class))));
 		assertTrue("Dataset metadata created for AnotherPojo",
-				fs.exists(new Path(path + "/" + datasetOperations.getDatasetName(AnotherPojo.class) + "/.metadata")));
+				fs.exists(new Path(path + "/test/" + datasetOperations.getDatasetName(AnotherPojo.class) + "/.metadata")));
 		assertTrue("Dataset storage created for TestPojo",
-				fs.exists(new Path(path + "/" + datasetOperations.getDatasetName(TestPojo.class))));
+				fs.exists(new Path(path + "/test/" + datasetOperations.getDatasetName(TestPojo.class))));
 		assertTrue("Dataset metadata created for TestPojo",
-				fs.exists(new Path(path + "/" + datasetOperations.getDatasetName(TestPojo.class) + "/.metadata")));
+				fs.exists(new Path(path + "/test/" + datasetOperations.getDatasetName(TestPojo.class) + "/.metadata")));
 		Collection<AnotherPojo> otherPojos = datasetOperations.read(AnotherPojo.class);
 		assertEquals(3, otherPojos.size());
 		List<AnotherPojo> sorted = new ArrayList<AnotherPojo>(otherPojos);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ import org.kitesdk.data.DatasetNotFoundException;
 import org.kitesdk.data.DatasetReader;
 import org.kitesdk.data.DatasetWriter;
 import org.kitesdk.data.Formats;
-import org.kitesdk.data.PartitionKey;
+import org.kitesdk.data.RefinableView;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.PropertyAccessorFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -141,40 +141,39 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 	}
 
 	@Override
-	public <T> void read(Class<T> targetClass, RecordCallback<T> callback, PartitionKey partitionKey) {
-		readWithCallback(targetClass, callback, partitionKey);
+	public <T> void read(Class<T> targetClass, RecordCallback<T> callback, ViewCallback viewCallback) {
+		readWithCallback(targetClass, callback, viewCallback);
 	}
 
 	@Override
-	public <T> Collection<T> read(Class<T> targetClass, PartitionKey partitionKey) {
+	public <T> Collection<T> read(Class<T> targetClass, ViewCallback viewCallback) {
 		DatasetDescriptor descriptor = getDatasetDescriptor(targetClass);
 		if (descriptor == null) {
 			throw new StoreException("Unable to locate dataset for target class " + targetClass.getName());
 		}
 		if (Formats.PARQUET.equals(descriptor.getFormat())) {
-			return readGenericRecords(targetClass, partitionKey);
+			return readGenericRecords(targetClass, viewCallback);
 		} else {
-			return readPojo(targetClass, partitionKey);
+			return readPojo(targetClass, viewCallback);
 		}
 	}
 
-	private <T> void readWithCallback(Class<T> targetClass, RecordCallback<T> callback, PartitionKey partitionKey) {
+	private <T> void readWithCallback(Class<T> targetClass, RecordCallback<T> callback, ViewCallback viewCallback) {
 		Dataset<T> dataset = DatasetUtils.getDataset(dsFactory, targetClass);
 		if (dataset == null) {
 			throw new StoreException("Unable to locate dataset for target class " + targetClass.getName());
 		}
 		DatasetReader<T> reader = null;
-		if (partitionKey == null) {
+		if (viewCallback == null) {
 			reader = dataset.newReader();
 		} else {
-			Dataset<T> partition = dataset.getPartition(partitionKey, false);
-			if (partition != null) {
-				reader = partition.newReader();
+			RefinableView<T> view = viewCallback.doInView(dataset, targetClass);
+			if (view != null) {
+				reader = view.newReader();
 			}
 		}
 		if (reader != null) {
 			try {
-				reader.open();
 				for (T t : reader) {
 					callback.doInRecord(t);
 				}
@@ -184,24 +183,23 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 		}
 	}
 
-	private <T> Collection<T> readPojo(Class<T> targetClass, PartitionKey partitionKey) {
+	private <T> Collection<T> readPojo(Class<T> targetClass, ViewCallback viewCallback) {
 		Dataset<T> dataset = DatasetUtils.getDataset(dsFactory, targetClass);
 		if (dataset == null) {
 			throw new StoreException("Unable to locate dataset for target class " + targetClass.getName());
 		}
 		DatasetReader<T> reader = null;
-		if (partitionKey == null) {
+		if (viewCallback == null) {
 			reader = dataset.newReader();
 		} else {
-			Dataset<T> partition = dataset.getPartition(partitionKey, false);
-			if (partition != null) {
-				reader = partition.newReader();
+			RefinableView<T> view = viewCallback.doInView(dataset, targetClass);
+			if (view != null) {
+				reader = view.newReader();
 			}
 		}
 		List<T> results = new ArrayList<T>();
 		if (reader != null) {
 			try {
-				reader.open();
 				for (T r : reader) {
 					results.add(r);
 				}
@@ -213,22 +211,21 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 		return results;
 	}
 
-	private <T> Collection<T> readGenericRecords(Class<T> targetClass, PartitionKey partitionKey) {
+	private <T> Collection<T> readGenericRecords(Class<T> targetClass, ViewCallback viewCallback) {
 		Dataset<GenericRecord> dataset =
 				DatasetUtils.getOrCreateDataset(dsFactory, getDatasetDefinitionToUseFor(targetClass), targetClass, GenericRecord.class);
 		DatasetReader<GenericRecord> reader = null;
-		if (partitionKey == null) {
+		if (viewCallback == null) {
 			reader = dataset.newReader();
 		} else {
-			Dataset<GenericRecord> partition = dataset.getPartition(partitionKey, false);
-			if (partition != null) {
-				reader = partition.newReader();
+			RefinableView<GenericRecord> view = viewCallback.doInView(dataset, GenericRecord.class);
+			if (view != null) {
+				reader = view.newReader();
 			}
 		}
 		List<T> results = new ArrayList<T>();
 		if (reader != null) {
 			try {
-				reader.open();
 				for (GenericRecord r : reader) {
 					T data = targetClass.newInstance();
 					BeanWrapper beanWrapper = PropertyAccessorFactory.forBeanPropertyAccess(data);

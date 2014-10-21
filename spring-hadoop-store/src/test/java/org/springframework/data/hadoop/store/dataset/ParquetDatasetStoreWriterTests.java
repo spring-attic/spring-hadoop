@@ -23,9 +23,6 @@ import java.util.Date;
 public class ParquetDatasetStoreWriterTests  extends AbstractDatasetStoreWriterTests<SimplePojo> {
 
 	@Autowired
-	protected String path;
-
-	@Autowired
 	public void setDatasetRepositoryFactory(DatasetRepositoryFactory datasetRepositoryFactory) {
 		this.datasetStoreWriter = new ParquetDatasetStoreWriter<SimplePojo>(SimplePojo.class, datasetRepositoryFactory);
 		this.datasetOperations = new DatasetTemplate(datasetRepositoryFactory, new DatasetDefinition(false, "parquet"));

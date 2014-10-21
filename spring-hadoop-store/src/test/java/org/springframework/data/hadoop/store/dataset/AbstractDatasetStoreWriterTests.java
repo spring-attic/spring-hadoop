@@ -70,9 +70,9 @@ public abstract class AbstractDatasetStoreWriterTests<T extends Comparable<T>> e
 		FileSystem fs = FileSystem.get(getConfiguration());
 		assertTrue("Dataset path created", fs.exists(new Path(path)));
 		assertTrue("Dataset storage created",
-				fs.exists(new Path(path + "/" + DatasetUtils.getDatasetName(recordClass))));
+				fs.exists(new Path(path + "/test/" + DatasetUtils.getDatasetName(recordClass))));
 		assertTrue("Dataset metadata created",
-				fs.exists(new Path(path + "/" + DatasetUtils.getDatasetName(recordClass) + "/.metadata")));
+				fs.exists(new Path(path + "/test/" + DatasetUtils.getDatasetName(recordClass) + "/.metadata")));
 		Collection<T> results = datasetOperations.read(recordClass);
 		assertEquals(2, results.size());
 		List<T> sorted = new ArrayList<T>(results);

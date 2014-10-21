@@ -71,9 +71,6 @@ public class ParquetDatasetStoreWriter<T> extends AbstractDatasetStoreWriter<T> 
 							" specified, you must use 'parquet' with " + this.getClass().getSimpleName() + ".");
 				}
 			}
-			if (!writer.isOpen()) {
-				writer.open();
-			}
 		}
 		GenericRecordBuilder builder = new GenericRecordBuilder(schema);
 		BeanWrapper beanWrapper = PropertyAccessorFactory.forBeanPropertyAccess(entity);

@@ -48,7 +48,7 @@ public abstract class DatasetUtils {
 		String repoName = getDatasetName(pojoClass);
 		Dataset<T> dataset;
 		try {
-			dataset = dsFactory.getDatasetRepository().load(repoName);
+			dataset = dsFactory.getDatasetRepository().load(dsFactory.getNamespace(), repoName);
 			log.debug("Found dataset for " + repoName);
 		}
 		catch (DatasetNotFoundException ex) {
@@ -84,13 +84,13 @@ public abstract class DatasetUtils {
 						.partitionStrategy(datasetDefinition.getPartitionStrategy())
 						.build();
 			}
-			dataset = dsFactory.getDatasetRepository().create(repoName, descriptor);
+			dataset = dsFactory.getDatasetRepository().create(dsFactory.getNamespace(), repoName, descriptor);
 		}
 		return dataset;
 	}
 
 	public static <T> Dataset<T> getDataset(DatasetRepositoryFactory dsFactory, Class<T> clazz) {
 		String repoName = getDatasetName(clazz);
-		return dsFactory.getDatasetRepository().load(repoName);
+		return dsFactory.getDatasetRepository().load(dsFactory.getNamespace(), repoName);
 	}
 }

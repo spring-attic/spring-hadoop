@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,10 @@ import org.apache.hadoop.fs.Path;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.kitesdk.data.Dataset;
 import org.kitesdk.data.DatasetDescriptor;
-import org.kitesdk.data.DatasetRepository;
-import org.kitesdk.data.PartitionKey;
+import org.kitesdk.data.RefinableView;
+import org.kitesdk.data.spi.DatasetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.hadoop.test.context.HadoopDelegatingSmartContextLoader;
 import org.springframework.data.hadoop.test.context.MiniHadoopCluster;
@@ -34,6 +35,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -70,7 +72,7 @@ public abstract class AbstractDatasetTemplatePartitioningTests extends AbstractH
 		datasetOperations.execute(new DatasetRepositoryCallback() {
 			@Override
 			public void doInRepository(DatasetRepository datasetRepository) {
-				datasetRepository.delete(datasetOperations.getDatasetName(SimplePojo.class));
+				datasetRepository.delete("test", datasetOperations.getDatasetName(SimplePojo.class));
 			}
 		});
 	}
@@ -81,9 +83,9 @@ public abstract class AbstractDatasetTemplatePartitioningTests extends AbstractH
 		FileSystem fs = FileSystem.get(getConfiguration());
 		assertTrue("Dataset path created", fs.exists(new Path(path)));
 		assertTrue("Dataset storage created",
-				fs.exists(new Path(path + "/" + datasetOperations.getDatasetName(SimplePojo.class))));
+				fs.exists(new Path(path + "/test/" + datasetOperations.getDatasetName(SimplePojo.class))));
 		assertTrue("Dataset metadata created",
-				fs.exists(new Path(path + "/" + datasetOperations.getDatasetName(SimplePojo.class) + "/.metadata")));
+				fs.exists(new Path(path + "/test/" + datasetOperations.getDatasetName(SimplePojo.class) + "/.metadata")));
 		Collection<SimplePojo> results = datasetOperations.read(SimplePojo.class);
 		assertEquals(2, results.size());
 		List<SimplePojo> sorted = new ArrayList<SimplePojo>(results);
@@ -109,15 +111,32 @@ public abstract class AbstractDatasetTemplatePartitioningTests extends AbstractH
 		FileSystem fs = FileSystem.get(getConfiguration());
 		assertTrue("Dataset path created", fs.exists(new Path(path)));
 		assertTrue("Dataset storage created",
-				fs.exists(new Path(path + "/" + datasetOperations.getDatasetName(SimplePojo.class))));
+				fs.exists(new Path(path + "/test/" + datasetOperations.getDatasetName(SimplePojo.class))));
 		assertTrue("Dataset metadata created",
-				fs.exists(new Path(path + "/" + datasetOperations.getDatasetName(SimplePojo.class) + "/.metadata")));
+				fs.exists(new Path(path + "/test/" + datasetOperations.getDatasetName(SimplePojo.class) + "/.metadata")));
 		DatasetDescriptor descriptor = datasetOperations.getDatasetDescriptor(SimplePojo.class);
-		PartitionKey key1973 = descriptor.getPartitionStrategy().partitionKey("1973");
-		PartitionKey key1973Nov = descriptor.getPartitionStrategy().partitionKey("1973", "11");
-		Collection<SimplePojo> results1973 = datasetOperations.read(SimplePojo.class, key1973);
+		Calendar cal = Calendar.getInstance();
+		cal.set(1973, 0, 1, 0, 0, 0);
+		final Long from1973 = cal.getTime().getTime();
+		cal.set(1973, 11, 31, cal.getMaximum(Calendar.HOUR_OF_DAY), cal.getMaximum(Calendar.MINUTE), cal.getMaximum(Calendar.SECOND));
+		final Long to1973 = cal.getTime().getTime();
+		cal.set(1973, 10, 1, 0, 0, 0);
+		final Long from1973Nov = cal.getTime().getTime();
+		cal.set(1973, 10, 30, cal.getMaximum(Calendar.HOUR_OF_DAY), cal.getMaximum(Calendar.MINUTE), cal.getMaximum(Calendar.SECOND));
+		final Long to1973Nov = cal.getTime().getTime();
+		Collection<SimplePojo> results1973 = datasetOperations.read(SimplePojo.class, new ViewCallback() {
+			@Override
+			public <T> RefinableView<T> doInView(Dataset<T> dataset, Class<T> targetClass) {
+				return dataset.from("birthDate", from1973).to("birthDate", to1973);
+			}
+		});
 		assertEquals(2, results1973.size());
-		Collection<SimplePojo> results1973Nov = datasetOperations.read(SimplePojo.class, key1973Nov);
+		Collection<SimplePojo> results1973Nov = datasetOperations.read(SimplePojo.class, new ViewCallback() {
+			@Override
+			public <T> RefinableView<T> doInView(Dataset<T> dataset, Class<T> targetClass) {
+				return dataset.from("birthDate", from1973Nov).to("birthDate", to1973Nov);
+			}
+		});
 		assertEquals(1, results1973Nov.size());
 		List<SimplePojo> sorted = new ArrayList<SimplePojo>(results1973);
 		Collections.sort(sorted);

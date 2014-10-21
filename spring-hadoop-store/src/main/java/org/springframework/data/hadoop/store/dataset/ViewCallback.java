@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 the original author or authors.
+ * Copyright 2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,17 @@
 
 package org.springframework.data.hadoop.store.dataset;
 
-import org.kitesdk.data.spi.DatasetRepository;
+import org.kitesdk.data.Dataset;
+import org.kitesdk.data.RefinableView;
 
 /**
- * Callback interface for code that operates on a {@link DatasetRepository}.
+ * Callback interface for code that creates a View from a {@link Dataset}.
  * 
  * @author Thomas Risberg
- * @since 2.0
+ * @since 2.1
  */
-public interface DatasetRepositoryCallback {
+public interface ViewCallback {
 
-	void doInRepository(DatasetRepository datasetRepository);
+	<T> RefinableView<T> doInView(Dataset<T> dataset, Class<T> targetClass);
 
 }

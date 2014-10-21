@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package org.springframework.data.hadoop.store.dataset;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.kitesdk.data.DatasetRepository;
+import org.kitesdk.data.spi.DatasetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.hadoop.test.context.HadoopDelegatingSmartContextLoader;
 import org.springframework.data.hadoop.test.context.MiniHadoopCluster;
@@ -58,7 +58,7 @@ public class DatasetTemplateNoNullsTests extends AbstractDatasetTemplateTests {
 		datasetOperations.execute(new DatasetRepositoryCallback() {
 			@Override
 			public void doInRepository(DatasetRepository datasetRepository) {
-				datasetRepository.delete(datasetOperations.getDatasetName(TestPojo.class));
+				datasetRepository.delete("test", datasetOperations.getDatasetName(TestPojo.class));
 			}
 		});
 	}

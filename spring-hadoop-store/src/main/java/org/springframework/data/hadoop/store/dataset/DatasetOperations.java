@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,12 @@
 package org.springframework.data.hadoop.store.dataset;
 
 import org.kitesdk.data.DatasetDescriptor;
-import org.kitesdk.data.PartitionKey;
 
 import java.util.Collection;
 
 /**
  * Interface specifying a basic set of {@link org.kitesdk.data.Dataset} operations against a specific
- * {@link org.kitesdk.data.DatasetRepository}. Implemented by DatasetTemplate.
+ * {@link org.kitesdk.data.spi.DatasetRepository}. Implemented by DatasetTemplate.
  * 
  * @author Thomas Risberg
  * @since 2.0
@@ -47,22 +46,22 @@ public interface DatasetOperations {
 	<T> Collection<T> read(Class<T> targetClass);
 
 	/**
-	 * Read records in the dataset partition based on the {@link PartitionKey} and call the provided callback for each record.
+	 * Read records in the dataset partition based on a {@link org.kitesdk.data.RefinableView} and call the provided callback for each record.
 	 *
 	 * @param targetClass the class that is stored in the dataset
 	 * @param callback the callback to be called for each record
-	 * @param partitionKey the partition key to use for the read
+	 * @param viewCallback the view callback to create the view
 	 */
-	<T> void read(Class<T> targetClass, RecordCallback<T> callback, PartitionKey partitionKey);
+	<T> void read(Class<T> targetClass, RecordCallback<T> callback, ViewCallback viewCallback);
 
 	/**
-	 * Read records in the dataset  partition based on the {@link PartitionKey} and return as a collection.
+	 * Read records in the dataset  partition based on the {@link org.kitesdk.data.RefinableView} and return as a collection.
 	 *
 	 * @param targetClass the class that is stored in the dataset
-	 * @param partitionKey the partition key to use for the read
+	 * @param viewCallback the view callback to create the view
 	 * @return collection containing the records as the specified target class
 	 */
-	<T> Collection<T> read(Class<T> targetClass, PartitionKey partitionKey);
+	<T> Collection<T> read(Class<T> targetClass, ViewCallback viewCallback);
 
 	/**
 	 * Write all records provided in the record collection
@@ -72,9 +71,9 @@ public interface DatasetOperations {
 	<T> void write(Collection<T> records);
 
 	/**
-	 * Execute a callback for the {@link org.kitesdk.data.DatasetRepository}
+	 * Execute a callback for the {@link org.kitesdk.data.spi.DatasetRepository}
 	 * 
-	 * @param callback
+	 * @param callback the callback
 	 */
 	void execute(DatasetRepositoryCallback callback);
 

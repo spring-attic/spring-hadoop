@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import org.apache.hadoop.fs.Path;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.kitesdk.data.DatasetRepository;
+import org.kitesdk.data.spi.DatasetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.hadoop.test.context.HadoopDelegatingSmartContextLoader;
 import org.springframework.data.hadoop.test.context.MiniHadoopCluster;
@@ -76,7 +76,7 @@ public class DatasetTemplateParquetTests extends AbstractHadoopClusterTests {
 		datasetOperations.execute(new DatasetRepositoryCallback() {
 			@Override
 			public void doInRepository(DatasetRepository datasetRepository) {
-				datasetRepository.delete(datasetOperations.getDatasetName(SimplePojo.class));
+				datasetRepository.delete("test", datasetOperations.getDatasetName(SimplePojo.class));
 			}
 		});
 	}
@@ -88,9 +88,9 @@ public class DatasetTemplateParquetTests extends AbstractHadoopClusterTests {
 		FileSystem fs = FileSystem.get(getConfiguration());
 		assertTrue("Dataset path created", fs.exists(new Path(path)));
 		assertTrue("Dataset storage created",
-				fs.exists(new Path(path + "/" + datasetOperations.getDatasetName(SimplePojo.class))));
+				fs.exists(new Path(path + "/test/" + datasetOperations.getDatasetName(SimplePojo.class))));
 		assertTrue("Dataset metadata created",
-				fs.exists(new Path(path + "/" + datasetOperations.getDatasetName(SimplePojo.class) + "/.metadata")));
+				fs.exists(new Path(path + "/test/" + datasetOperations.getDatasetName(SimplePojo.class) + "/.metadata")));
 		Collection<SimplePojo> results = datasetOperations.read(SimplePojo.class);
 		assertEquals(2, results.size());
 		List<SimplePojo> sorted = new ArrayList<SimplePojo>(results);

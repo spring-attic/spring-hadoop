@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@ import org.apache.hadoop.conf.Configuration;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
-import org.kitesdk.data.DatasetRepository;
-import org.kitesdk.data.filesystem.FileSystemDatasetRepository;
+import org.kitesdk.data.spi.DatasetRepository;
+import org.kitesdk.data.spi.filesystem.FileSystemDatasetRepository;
 
 /**
  * Factory class responsible for creating {@link DatasetRepository} instances. Primarily used in configuration code or
@@ -41,6 +41,8 @@ public class DatasetRepositoryFactory implements InitializingBean {
 
 	private String basePath = "/";
 
+	private String namespace;
+
 	/**
 	 * The Hadoop configuraton to be used
 	 * 
@@ -51,8 +53,8 @@ public class DatasetRepositoryFactory implements InitializingBean {
 	}
 
 	/**
-	 * The base path for the datasets in this repository. This combined with the Hadoop configuration 'fs.defaultNS'
-	 * setting determines the actual full path used.
+	 * The base path for the datasets in this repository. This combined with the namespace and the
+	 * Hadoop configuration 'fs.defaultNS' setting determines the actual full path used.
 	 * 
 	 * @param basePath the base path to use
 	 */
@@ -60,9 +62,29 @@ public class DatasetRepositoryFactory implements InitializingBean {
 		this.basePath = basePath;
 	}
 
+	/**
+	 * Namespace to use. Defaults to no namespace ("default" used for Kite SDK API)
+	 *
+	 * @param namespace the namespace
+	 * @since 2.1
+	 */
+	public void setNamespace(String namespace) {
+		this.namespace = namespace;
+	}
+
+	/**
+	 * Get the namespace to use.
+	 *
+	 * @return namespace
+	 */
+	public String getNamespace() {
+		return namespace;
+	}
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(conf, "The configuration property is required");
+		Assert.notNull(namespace, "The namespace property is required");
 		this.repo = new FileSystemDatasetRepository.Builder()
 				.rootDirectory(new URI(basePath)).configuration(conf).build();
 	}

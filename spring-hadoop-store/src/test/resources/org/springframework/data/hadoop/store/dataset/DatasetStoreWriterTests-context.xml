@@ -19,6 +19,7 @@
 	<bean id="datasetFactory" class="org.springframework.data.hadoop.store.dataset.DatasetRepositoryFactory">
 		<property name="conf" ref="hadoopConfiguration"/>
 		<property name="basePath" value="#{path}"/>
+		<property name="namespace" value="test"/>
 	</bean>
 	<bean id="datasetOperations" class="org.springframework.data.hadoop.store.dataset.DatasetTemplate">
 		<property name="datasetRepositoryFactory" ref="datasetFactory"/>
