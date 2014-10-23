@@ -121,8 +121,49 @@ public class DefaultContainerMonitorTests {
 
 		// container 3
 		monitor.onContainerStatus(Arrays.asList(getMockContainerStatus(containerId3, ContainerState.COMPLETE, -100)));
-		assertMonitorState(monitor, 0, 0, 2, 0);
+		assertMonitorState(monitor, 0, 0, 2, 1);
 
+	}
+
+	@Test
+	public void testFailedWithContainerLoss() throws Exception {
+		// SHDP-385 case when nm is killed and eventually rm receives
+		// Container released on a *lost* node" exit_status: -100
+		DefaultContainerMonitor monitor = new DefaultContainerMonitor();
+		ApplicationAttemptId applicationAttemptId = getMockApplicationAttemptId(1, 1);
+		ContainerId containerId1 = getMockContainerId(applicationAttemptId, 1);
+		Container container1 = getMockContainer(containerId1, null, null, null);
+		monitor.onContainer(Arrays.asList(container1));
+		assertMonitorState(monitor, 1, 0, 0, 0);
+
+		monitor.onContainerStatus(Arrays.asList(getMockContainerStatus(containerId1, ContainerState.COMPLETE, -100)));
+		assertMonitorState(monitor, 0, 0, 0, 1);
+	}
+
+	@Test
+	public void testFailedWithContainerDiskFailed() throws Exception {
+		DefaultContainerMonitor monitor = new DefaultContainerMonitor();
+		ApplicationAttemptId applicationAttemptId = getMockApplicationAttemptId(1, 1);
+		ContainerId containerId1 = getMockContainerId(applicationAttemptId, 1);
+		Container container1 = getMockContainer(containerId1, null, null, null);
+		monitor.onContainer(Arrays.asList(container1));
+		assertMonitorState(monitor, 1, 0, 0, 0);
+
+		monitor.onContainerStatus(Arrays.asList(getMockContainerStatus(containerId1, ContainerState.COMPLETE, -101)));
+		assertMonitorState(monitor, 0, 0, 0, 1);
+	}
+
+	@Test
+	public void testFailedWithContainerInvalid() throws Exception {
+		DefaultContainerMonitor monitor = new DefaultContainerMonitor();
+		ApplicationAttemptId applicationAttemptId = getMockApplicationAttemptId(1, 1);
+		ContainerId containerId1 = getMockContainerId(applicationAttemptId, 1);
+		Container container1 = getMockContainer(containerId1, null, null, null);
+		monitor.onContainer(Arrays.asList(container1));
+		assertMonitorState(monitor, 1, 0, 0, 0);
+
+		monitor.onContainerStatus(Arrays.asList(getMockContainerStatus(containerId1, ContainerState.COMPLETE, -1000)));
+		assertMonitorState(monitor, 0, 0, 0, 1);
 	}
 
 	/**
