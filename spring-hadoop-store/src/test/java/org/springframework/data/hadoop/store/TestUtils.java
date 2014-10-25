@@ -20,6 +20,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertNull;
 import static org.hamcrest.Matchers.lessThan;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -165,6 +166,13 @@ public abstract class TestUtils {
 					+ target.getClass());
 		method.setAccessible(true);
 		return (T) ReflectionUtils.invokeMethod(method, target, args);
+	}
+
+	public static void close(Closeable closeable) {
+		try {
+			closeable.close();
+		} catch (Exception e) {
+		}
 	}
 
 }
