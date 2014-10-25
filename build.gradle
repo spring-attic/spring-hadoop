@@ -37,6 +37,26 @@ def yarnProjects() {
 	subprojects.findAll { project -> project.name.contains('-yarn-') }
 }
 
+def forceDependencyVersions(project, distro) {
+	project.configurations.all { configuration ->
+		if ('versionManagement' != configuration.name) {
+			switch (distro) {
+				case "cdh5":
+					resolutionStrategy {
+						eachDependency { details ->
+							if (details.requested.group == 'com.google.guava') {
+								// simply force guava what cdh bundles
+								// because curator pulls newer guava version
+								details.useVersion '11.0.2'
+							}
+						}
+					}
+				break;
+			}
+		}
+	}
+}
+
 println "Using Spring Framework version: [$springVersion]"
 println "Using Java version: [" + System.getProperty("java.version") + "]"
 
@@ -359,6 +379,8 @@ configure(javaProjects()) {
 			springIoVersions "io.spring.platform:platform-versions:${platformVersion}@properties"
 		}
 	}
+
+	forceDependencyVersions(it, 'cdh5')
 
 	sourceCompatibility=1.6
 	targetCompatibility=1.6
