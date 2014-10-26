@@ -16,22 +16,9 @@
 
 package org.springframework.data.hadoop.store.dataset;
 
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.kitesdk.data.Dataset;
-import org.kitesdk.data.DatasetDescriptor;
-import org.kitesdk.data.RefinableView;
-import org.kitesdk.data.spi.DatasetRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.hadoop.test.context.HadoopDelegatingSmartContextLoader;
-import org.springframework.data.hadoop.test.context.MiniHadoopCluster;
-import org.springframework.data.hadoop.test.junit.AbstractHadoopClusterTests;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -41,9 +28,21 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.kitesdk.data.Dataset;
+import org.kitesdk.data.RefinableView;
+import org.kitesdk.data.spi.DatasetRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.hadoop.test.context.HadoopDelegatingSmartContextLoader;
+import org.springframework.data.hadoop.test.context.MiniHadoopCluster;
+import org.springframework.data.hadoop.test.junit.AbstractHadoopClusterTests;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
@@ -114,7 +113,7 @@ public abstract class AbstractDatasetTemplatePartitioningTests extends AbstractH
 				fs.exists(new Path(path + "/test/" + datasetOperations.getDatasetName(SimplePojo.class))));
 		assertTrue("Dataset metadata created",
 				fs.exists(new Path(path + "/test/" + datasetOperations.getDatasetName(SimplePojo.class) + "/.metadata")));
-		DatasetDescriptor descriptor = datasetOperations.getDatasetDescriptor(SimplePojo.class);
+		datasetOperations.getDatasetDescriptor(SimplePojo.class);
 		Calendar cal = Calendar.getInstance();
 		cal.set(1973, 0, 1, 0, 0, 0);
 		final Long from1973 = cal.getTime().getTime();
