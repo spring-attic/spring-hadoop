@@ -267,9 +267,12 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 				writer.write(rec);
 			}
 			writer.flush();
-			writer.close();
 		} catch (IOException e) {
 			throw new StoreException("Error writing " + pojoClass.getName(), e);
+		} finally {
+			try {
+				writer.close();
+			} catch (IOException ignore) {}
 		}
 
 	}
