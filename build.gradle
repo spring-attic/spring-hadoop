@@ -901,10 +901,6 @@ project('spring-data-hadoop-batch') {
 project('spring-data-hadoop-store') {
 	description = 'Spring for Apache Hadoop Store Features'
 
-	configurations {
-		testRuntime.exclude group: 'org.apache.hive'
-	}
-
 	dependencies {
 		compile("org.kitesdk:kite-data-core:$kiteVersion") { dep ->
 			exclude group: "log4j", module: "log4j"
