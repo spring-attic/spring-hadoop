@@ -5,15 +5,28 @@ http://projects.spring.io/spring-hadoop/
 Commit changelog: http://github.com/spring-projects/spring-hadoop/tree/v[version]
 Issues changelog: https://jira.spring.io/secure/ReleaseNote.jspa?projectId=10801
 
+Changes in version 2.0.3 RELEASE (2014-10-31)
+---------------------------------------------
+General
+* Update to use Spring IO 1.0.3 versions [SHDP-411]
+* Update build to support Cloudera CDH 5.1.3 [SHDP-402, SHDP-388]
+* Update build to support Pivotal HD 2.1 SHDP-400]
+* Update build to support Hadoop 2.5.1 [SHDP-395]
+* Remove use of mapreduce.framework.name property in JobUtils [SHDP-394]
+
+Store
+* Make sure writer is closed if exception is thrown [SHDP-408]
+
+YARN
+* Container exit -100 not processed [SHDP-387, SHDP-385]
+
+
 Changes in version 2.0.2 RELEASE (2014-07-28)
 ---------------------------------------------
 Store
 * Store writer should not fail on lifecycle [SHDP-365]
 * Race condition for overwrite [SHDP-374]
 * RollingFileNamingStrategy gets into trouble with certain filenames [SHDP-375]
-
-
-* Update Spring Framework to 4.0.6 [SHDP-369]
 
 
 Changes in version 2.0.1 RELEASE (2014-07-08)
