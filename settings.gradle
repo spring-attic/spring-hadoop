@@ -2,31 +2,17 @@ rootProject.name = 'spring-data-hadoop'
 
 ext.hadoopDistro = hasProperty("distro") ? getProperty("distro") : "default"
 switch (ext.hadoopDistro) {
-	case "cdh3":
-		ext.mr2 = false
-		break    
-	case "cdh4yarn":
-		ext.mr2 = false
-		break    
 	case "cdh4":
-	case "cdh4mr1":
-		ext.mr2 = false
+		ext.mr2 = true
 		break    
 	case "cdh5":
-	case "cdh5yarn":
 		ext.mr2 = true 
-		break    
-	case "cdh5mr1":
-		ext.mr2 = false
 		break    
 	case "phd1":
 		ext.mr2 = false
 		break
 	case "phd20":
 		ext.mr2 = true
-		break
-	case "hdp13":
-		ext.mr2 = false
 		break
 	case "hdp20":
 		ext.mr2 = true

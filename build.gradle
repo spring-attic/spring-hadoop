@@ -65,9 +65,9 @@ println "Using Java version: [" + System.getProperty("java.version") + "]"
 //
 def List hadoopArtifacts = []
 def List hadoopTestArtifacts = []
-def hadoopDefault = "hadoop22"
+def hadoopDefault = "hadoop25"
 def hadoopDistro = project.hasProperty("distro") ? project.getProperty("distro") : hadoopDefault
-def hadoopVersion = hd22Version
+def hadoopVersion = "default"
 
 // Common Hadoop libraries
 def hiveVersion = defaultHiveVersion
@@ -293,10 +293,21 @@ switch (hadoopDistro) {
 		pigQualifier = ':h2'
 		break;
 
-	// Hadoop 2.5.x
-	case "hadoop25":
+	// Hadoop 2.5.x Stable
+	default:
 		hadoopVersion = hd25Version
-		println "Using Apache Hadoop 2.5 - [$hadoopVersion]"
+		if (!project.hasProperty("distro")) {
+			println "Using default distro: Apache Hadoop [$hadoopVersion]"
+		} else {
+			if (hadoopDistro == hadoopDefault) {
+				println "Using Apache Hadoop 2.5 - [$hadoopVersion]"
+			} else {
+				println "Failing build: $hadoopDistro is not a supported distro"
+				println "Supported distros: hadoop24, hadoop25[*], hdp20, hdp21, cdh4, cdh5, phd1, phd20 and phd21"
+				println "* default"
+				throw new InvalidUserDataException("$hadoopDistro is not a supported distro")
+			}
+		}
 		hadoopArtifacts = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
@@ -317,44 +328,6 @@ switch (hadoopDistro) {
 				  "org.apache.hbase:hbase-client:$hbaseVersion"]
 		hiveVersion = hd25HiveVersion
 		pigVersion = hd25PigVersion
-		pigQualifier = ':h2'
-		break;
-
-	// Hadoop 2.2.x Stable
-	default:
-		if (!project.hasProperty("distro")) {
-			println "Using default distro: Apache Hadoop [$hadoopVersion]"
-		} else {
-			if (hadoopDistro == hadoopDefault) {
-				println "Using Apache Hadoop 2.2 - [$hadoopVersion]"
-			} else {
-				println "Failing build: $hadoopDistro is not a supported distro"
-				println "Supported distros: hadoop22[*], hadoop24, hadoop25, hdp20, hdp21, cdh4, cdh5, phd1, phd20 and phd21"
-				println "* default"
-				throw new InvalidUserDataException("$hadoopDistro is not a supported distro")
-			}
-		}
-		hadoopVersion = hd22Version
-		hadoopArtifacts = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-yarn-common:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-streaming:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-distcp:$hadoopVersion"]
-		hadoopTestArtifacts = ["org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion:tests",
-					"org.apache.hadoop:hadoop-hdfs:$hadoopVersion:tests",
-					"org.apache.hadoop:hadoop-common:$hadoopVersion:tests",
-					"org.apache.hadoop:hadoop-mapreduce-client-app:$hadoopVersion",
-					"org.apache.hadoop:hadoop-mapreduce-client-hs:$hadoopVersion",
-					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion",
-					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion:tests"]
-		hbaseVersion = hd22HbaseVersion
-		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion",
-				  "org.apache.hbase:hbase-common:$hbaseVersion",
-				  "org.apache.hbase:hbase-client:$hbaseVersion"]
-		hiveVersion = hd22HiveVersion
-		pigVersion = hd22PigVersion
 		pigQualifier = ':h2'
 }
 
@@ -600,15 +573,6 @@ configure(hadoopProjects()) {
 			break;
 
 		// Hadoop 2.5.x
-		case "hadoop25":
-			dependencies {
-				testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
-				testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
-				testRuntime "dk.brics.automaton:automaton:1.11-8"
-			}
-			break;
-
-		// Hadoop 2.2.x Stable
 		default:
 			dependencies {
 				testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
