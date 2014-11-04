@@ -134,30 +134,6 @@ switch (hadoopDistro) {
 					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion:tests"]
 		break;	
 
-	// Pivotal HD 1.0
-	case "phd1":
-		hadoopVersion = phd1Version
-		println "Using Pivotal HD 1.0 - [$hadoopVersion]"
-		hbaseVersion = phd1HbaseVersion
-		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion"]
-		hiveVersion = phd1HiveVersion
-		pigVersion = phd1PigVersion
-		hadoopArtifacts = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-yarn-common:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-streaming:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-distcp:$hadoopVersion"]
-		hadoopTestArtifacts = ["org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion:tests",
-					"org.apache.hadoop:hadoop-hdfs:$hadoopVersion:tests",
-					"org.apache.hadoop:hadoop-common:$hadoopVersion:tests",
-					"org.apache.hadoop:hadoop-mapreduce-client-app:$hadoopVersion",
-					"org.apache.hadoop:hadoop-mapreduce-client-hs:$hadoopVersion",
-					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion",
-					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion:tests"]
-		break;
-
 	// Pivotal HD 2.0
 	case "phd20":
 		hadoopVersion = phd20Version
@@ -514,18 +490,6 @@ configure(hadoopProjects()) {
 				testRuntime "dk.brics.automaton:automaton:1.11-8"
 			}
 			break;	
-
-		// Pivotal HD 1.0
-		case "phd1":
-			dependencies {
-				compile "org.apache.hive:hive-common:$hiveVersion"
-				compile "org.apache.hive:hive-metastore:$hiveVersion"
-				compile "org.apache.hive:hive-exec:$hiveVersion"
-				testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
-				testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
-				testRuntime "dk.brics.automaton:automaton:1.11-8"
-			}
-			break;
 
 		// Pivotal HD 2.0
 		case "phd20":

@@ -8,9 +8,6 @@ switch (ext.hadoopDistro) {
 	case "cdh5":
 		ext.mr2 = true 
 		break    
-	case "phd1":
-		ext.mr2 = false
-		break
 	case "phd20":
 		ext.mr2 = true
 		break
