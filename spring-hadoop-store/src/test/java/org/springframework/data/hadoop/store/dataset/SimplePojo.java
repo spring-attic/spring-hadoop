@@ -26,6 +26,15 @@ public class SimplePojo implements Comparable<SimplePojo> {
 
 	private Long birthDate;
 
+	public SimplePojo() {
+	}
+
+	public SimplePojo(Long id, String name, Long birthDate) {
+		this.id = id;
+		this.name = name;
+		this.birthDate = birthDate;
+	}
+
 	public Long getId() {
 		return id;
 	}

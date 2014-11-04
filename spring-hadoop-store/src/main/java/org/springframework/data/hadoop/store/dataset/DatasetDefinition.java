@@ -40,6 +40,8 @@ public class DatasetDefinition{
 
 	private PartitionStrategy partitionStrategy;
 
+	private Integer writerCacheSize;
+
 	public DatasetDefinition() {
 		this(null, true, Formats.AVRO.getName());
 	}
@@ -90,6 +92,10 @@ public class DatasetDefinition{
 		this.partitionStrategy = partitionStrategy;
 	}
 
+	public void setWriterCacheSize(Integer writerCacheSize) {
+		this.writerCacheSize = writerCacheSize;
+	}
+
 	public Class<?> getTargetClass() {
 		return targetClass;
 	}
@@ -104,6 +110,10 @@ public class DatasetDefinition{
 
 	public PartitionStrategy getPartitionStrategy() {
 		return partitionStrategy;
+	}
+
+	public Integer getWriterCacheSize() {
+		return writerCacheSize;
 	}
 
 	public Schema getSchema(Class<?> datasetClass) {

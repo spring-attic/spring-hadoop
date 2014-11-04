@@ -23,6 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.kitesdk.data.Dataset;
 import org.kitesdk.data.DatasetDescriptor;
 import org.kitesdk.data.DatasetNotFoundException;
+import org.kitesdk.data.spi.filesystem.FileSystemProperties;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,11 +79,18 @@ public abstract class DatasetUtils {
 				if (log.isDebugEnabled()) {
 					log.debug("Using partitioning: " + datasetDefinition.getPartitionStrategy());
 				}
-				descriptor = new DatasetDescriptor.Builder()
+				DatasetDescriptor.Builder ddBuilder = new DatasetDescriptor.Builder()
 						.schema(schema)
 						.format(datasetDefinition.getFormat())
-						.partitionStrategy(datasetDefinition.getPartitionStrategy())
-						.build();
+						.partitionStrategy(datasetDefinition.getPartitionStrategy());
+				if (datasetDefinition.getWriterCacheSize() != null) {
+					ddBuilder = ddBuilder.property(FileSystemProperties.WRITER_CACHE_SIZE_PROP,
+							Integer.toString(datasetDefinition.getWriterCacheSize()));
+				}
+				descriptor = ddBuilder.build();
+				if (log.isDebugEnabled()) {
+					log.debug("Using descriptor: " + descriptor);
+				}
 			}
 			dataset = dsFactory.getDatasetRepository().create(dsFactory.getNamespace(), repoName, descriptor);
 		}
