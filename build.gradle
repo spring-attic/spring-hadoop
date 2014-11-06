@@ -81,7 +81,7 @@ def hiveGroup = "org.apache.hive"
 // make it possible to use Pig jars compiled for Hadoop 2.0
 def pigQualifier = ''
 
-// default is Hadoop 2.2.x
+// default is Hadoop 2.5.x
 switch (hadoopDistro) {
 
 	// Cloudera CDH5 YARN 2.3.x base
@@ -109,30 +109,6 @@ switch (hadoopDistro) {
 					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion",
 					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion:tests"]
 		break;
-
-	// Cloudera CDH4 YARN
-	case "cdh4":
-		hadoopVersion = cdh4Version
-		println "Using Cloudera CDH4 [$hadoopVersion]"
-		hbaseVersion = cdh4HbaseVersion
-		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion"]
-		hiveVersion = cdh4HiveVersion
-		pigVersion = cdh4PigVersion
-		hadoopArtifacts = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-yarn-common:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-streaming:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-distcp:$hadoopVersion"]
-		hadoopTestArtifacts = ["org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion:tests",
-					"org.apache.hadoop:hadoop-hdfs:$hadoopVersion:tests",
-					"org.apache.hadoop:hadoop-common:$hadoopVersion:tests",
-					"org.apache.hadoop:hadoop-mapreduce-client-app:$hadoopVersion",
-					"org.apache.hadoop:hadoop-mapreduce-client-hs:$hadoopVersion",
-					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion",
-					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion:tests"]
-		break;	
 
 	// Pivotal HD 2.0
 	case "phd20":
@@ -279,7 +255,7 @@ switch (hadoopDistro) {
 				println "Using Apache Hadoop 2.5 - [$hadoopVersion]"
 			} else {
 				println "Failing build: $hadoopDistro is not a supported distro"
-				println "Supported distros: hadoop24, hadoop25[*], hdp20, hdp21, cdh4, cdh5, phd1, phd20 and phd21"
+				println "Supported distros: hadoop24, hadoop25[*], hdp20, hdp21, cdh5, phd20 and phd21"
 				println "* default"
 				throw new InvalidUserDataException("$hadoopDistro is not a supported distro")
 			}
@@ -459,32 +435,17 @@ configure(javaProjects()) {
 
 configure(hadoopProjects()) {
 
-	// default is Hadoop 2.2.x
+	// default is Hadoop 2.5.x
 	switch (hadoopDistro) {
 
 		// Cloudera CDH5 YARN
 		case "cdh5":
-		case "cdh5yarn":
 			dependencies {
 				compile("org.apache.hadoop:hadoop-common:$cdh5Version")
 				compile("org.apache.hadoop:hadoop-mapreduce-client-core:$cdh5Version")
 				compile("org.apache.hadoop:hadoop-distcp:$cdh5Version")
 				compile("org.apache.hadoop:hadoop-hdfs:$cdh5Version")
 				optional("org.apache.hadoop:hadoop-streaming:$cdh5Version")
-				testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
-				testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
-				testRuntime "dk.brics.automaton:automaton:1.11-8"
-			}
-			break;	
-
-		// Cloudera CDH4 YARN
-		case "cdh4yarn":
-			dependencies {
-				compile("org.apache.hadoop:hadoop-common:$cdh4Version")
-				compile("org.apache.hadoop:hadoop-mapreduce-client-core:$cdh4Version")
-				compile("org.apache.hadoop:hadoop-distcp:$cdh4Version")
-				compile("org.apache.hadoop:hadoop-hdfs:$cdh4Version")
-				optional("org.apache.hadoop:hadoop-streaming:$cdh4Version")
 				testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
 				testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
 				testRuntime "dk.brics.automaton:automaton:1.11-8"
@@ -1011,250 +972,246 @@ project('spring-data-hadoop-build-tests') {
 
 }
 
-if (gradle.ext.mr2) {
-
-	configure(yarnProjects()) {
-		task integrationTest(type: Test) {
-			include '**/*IntegrationTests.*'
-		}
-		tasks.withType(Test).all {
-			exclude '**/*IntegrationTests.*'
-		}
-		dependencies {
-			testCompile "org.springframework:spring-test:$springVersion"
-			testCompile "org.hamcrest:hamcrest-core:$hamcrestVersion"
-			testCompile "org.hamcrest:hamcrest-library:$hamcrestVersion"
-			testCompile "junit:junit:$junitVersion"
-		}
-		clean.doLast {ant.delete(dir: "target")}
+configure(yarnProjects()) {
+	task integrationTest(type: Test) {
+		include '**/*IntegrationTests.*'
 	}
-
-	project('spring-yarn') {
-		description = 'Spring for Apache Hadoop YARN'
-		dependencies {
-			compile project("spring-yarn-batch")
-		}
+	tasks.withType(Test).all {
+		exclude '**/*IntegrationTests.*'
 	}
+	dependencies {
+		testCompile "org.springframework:spring-test:$springVersion"
+		testCompile "org.hamcrest:hamcrest-core:$hamcrestVersion"
+		testCompile "org.hamcrest:hamcrest-library:$hamcrestVersion"
+		testCompile "junit:junit:$junitVersion"
+	}
+	clean.doLast {ant.delete(dir: "target")}
+}
 
-	project('spring-yarn:spring-yarn-core') {
-		description = 'Spring Yarn Core'
-		dependencies {
-			compile project(":spring-data-hadoop")
-			compile "org.springframework:spring-messaging:$springVersion"
-			compile("org.apache.hadoop:hadoop-yarn-client:$hadoopVersion") { dep ->
-				exclude group: "org.slf4j", module: "slf4j-log4j12"
-			}
-			compile("org.apache.hadoop:hadoop-common:$hadoopVersion") { dep ->
-				exclude group: "junit", module: "junit"
-			}
-			testCompile("org.mockito:mockito-core:$mockitoVersion") { dep ->
-				exclude group: "org.hamcrest"
-			}
+project('spring-yarn') {
+	description = 'Spring for Apache Hadoop YARN'
+	dependencies {
+		compile project("spring-yarn-batch")
+	}
+}
+
+project('spring-yarn:spring-yarn-core') {
+	description = 'Spring Yarn Core'
+	dependencies {
+		compile project(":spring-data-hadoop")
+		compile "org.springframework:spring-messaging:$springVersion"
+		compile("org.apache.hadoop:hadoop-yarn-client:$hadoopVersion") { dep ->
+			exclude group: "org.slf4j", module: "slf4j-log4j12"
 		}
-
-		tasks.withType(Test).all {
-
-			doFirst() {
-				// check prefix for hd.fs
-				// first copy the properties since we can't change them
-				ext.projProps = project.properties
-	
-				if (projProps.containsKey("hd.fs")) {
-						String hdfs = projProps["hd.fs"].toString()
-						if (!hdfs.contains("://")) {
-							projProps.put("hd.fs", "hdfs://" + hdfs)
-						}
-				}
-			
-				// due to GRADLE-2475, set the system properties manually
-				projProps.each { k,v ->
-						if (k.toString().startsWith("hd.")) {
-							systemProperties[k] = projProps[k]
-						}
-						if (k.toString().equals("profiles")) {
-							systemProperties['spring.profiles.active'] = projProps[k]
-						}
-				}
-			}
-
+		compile("org.apache.hadoop:hadoop-common:$hadoopVersion") { dep ->
+			exclude group: "junit", module: "junit"
+		}
+		testCompile("org.mockito:mockito-core:$mockitoVersion") { dep ->
+			exclude group: "org.hamcrest"
 		}
 	}
 
-	project('spring-yarn:spring-yarn-integration') {
-		description = 'Spring Yarn Integration'
-		dependencies {
-			compile project(":spring-yarn:spring-yarn-core")
-			compile "org.springframework.integration:spring-integration-ip:$springIntVersion"
-			compile "com.fasterxml.jackson.core:jackson-core:$jackson2Version"
-			compile "com.fasterxml.jackson.core:jackson-databind:$jackson2Version"
-			testCompile "org.springframework.integration:spring-integration-test:$springIntVersion"
+	tasks.withType(Test).all {
+
+		doFirst() {
+			// check prefix for hd.fs
+			// first copy the properties since we can't change them
+			ext.projProps = project.properties
+
+			if (projProps.containsKey("hd.fs")) {
+					String hdfs = projProps["hd.fs"].toString()
+					if (!hdfs.contains("://")) {
+						projProps.put("hd.fs", "hdfs://" + hdfs)
+					}
+			}
+		
+			// due to GRADLE-2475, set the system properties manually
+			projProps.each { k,v ->
+					if (k.toString().startsWith("hd.")) {
+						systemProperties[k] = projProps[k]
+					}
+					if (k.toString().equals("profiles")) {
+						systemProperties['spring.profiles.active'] = projProps[k]
+					}
+			}
 		}
+
+	}
+}
+
+project('spring-yarn:spring-yarn-integration') {
+	description = 'Spring Yarn Integration'
+	dependencies {
+		compile project(":spring-yarn:spring-yarn-core")
+		compile "org.springframework.integration:spring-integration-ip:$springIntVersion"
+		compile "com.fasterxml.jackson.core:jackson-core:$jackson2Version"
+		compile "com.fasterxml.jackson.core:jackson-databind:$jackson2Version"
+		testCompile "org.springframework.integration:spring-integration-test:$springIntVersion"
+	}
+}
+
+project('spring-yarn:spring-yarn-batch') {
+	description = 'Spring Yarn Batch'
+	dependencies {
+		compile project(":spring-yarn:spring-yarn-integration")
+		compile project(":spring-data-hadoop-store")
+		compile "org.springframework.batch:spring-batch-core:$springBatchVersion"
+		compile "org.springframework.batch:spring-batch-infrastructure:$springBatchVersion"
+		testCompile project(":spring-data-hadoop-core")
+		testCompile project(":spring-yarn:spring-yarn-test")
+	}
+}
+
+project('spring-yarn:spring-yarn-boot') {
+	description = 'Spring Yarn Boot'
+	configurations.all {
+		exclude group: 'javax.servlet', module: 'servlet-api', version: '2.5'
+	}
+	dependencies {
+		compile project(":spring-yarn:spring-yarn-core")
+		provided project(":spring-yarn:spring-yarn-batch")
+		provided "org.springframework:spring-web:$springVersion"
+		provided "org.springframework:spring-webmvc:$springVersion"
+		compile "org.springframework.boot:spring-boot-autoconfigure:$springBootVersion"
+		compile "org.springframework.boot:spring-boot-actuator:$springBootVersion"
+		compile "org.apache.httpcomponents:httpclient:$httpclientVersion"
+		runtime "org.yaml:snakeyaml:$snakeYamlVersion"
+		testRuntime("org.springframework.boot:spring-boot-starter-web:$springBootVersion") {
+			exclude group:'ch.qos.logback'
+		}
+		testCompile("org.mockito:mockito-core:$mockitoVersion") { dep ->
+			exclude group: "org.hamcrest"
+		}
+		testCompile "com.jayway.jsonpath:json-path:$jsonpathVersion"
+		testCompile "com.jayway.jsonpath:json-path-assert:$jsonpathVersion"
+	}
+}
+
+project('spring-yarn:spring-yarn-boot-cli') {
+	description = 'Spring Yarn Boot Cli'
+	dependencies {
+		compile project(":spring-yarn:spring-yarn-boot")
+		compile "org.springframework.boot:spring-boot-cli:$springBootVersion"
+		runtime "org.springframework:spring-web:$springVersion"
+	}
+}
+
+project('spring-yarn:spring-yarn-boot-build-tests') {
+
+	apply plugin: 'spring-boot'
+
+	description = 'Spring Yarn Boot Build Tests'
+	dependencies {
+		compile project(":spring-yarn:spring-yarn-boot")
+		testCompile project(":spring-yarn:spring-yarn-test")
 	}
 
-	project('spring-yarn:spring-yarn-batch') {
-		description = 'Spring Yarn Batch'
-		dependencies {
-			compile project(":spring-yarn:spring-yarn-integration")
-			compile project(":spring-data-hadoop-store")
-			compile "org.springframework.batch:spring-batch-core:$springBatchVersion"
-			compile "org.springframework.batch:spring-batch-infrastructure:$springBatchVersion"
-			testCompile project(":spring-data-hadoop-core")
-			testCompile project(":spring-yarn:spring-yarn-test")
-		}
+	// create a boot jar which we can use in tests
+	// disable main bootRepackage task so that it
+	// doesn't mess with main artifact
+	// test needs to depend on these tasks
+	task appmasterJar(type: Jar) {
+		archiveName = 'test-archive-appmaster.jar'
+		from sourceSets.test.output
 	}
-
-	project('spring-yarn:spring-yarn-boot') {
-		description = 'Spring Yarn Boot'
-		configurations.all {
-			exclude group: 'javax.servlet', module: 'servlet-api', version: '2.5'
-		}
-		dependencies {
-			compile project(":spring-yarn:spring-yarn-core")
-			provided project(":spring-yarn:spring-yarn-batch")
-			provided "org.springframework:spring-web:$springVersion"
-			provided "org.springframework:spring-webmvc:$springVersion"
-			compile "org.springframework.boot:spring-boot-autoconfigure:$springBootVersion"
-			compile "org.springframework.boot:spring-boot-actuator:$springBootVersion"
-			compile "org.apache.httpcomponents:httpclient:$httpclientVersion"
-			runtime "org.yaml:snakeyaml:$snakeYamlVersion"
-			testRuntime("org.springframework.boot:spring-boot-starter-web:$springBootVersion") {
-				exclude group:'ch.qos.logback'
-			}
-			testCompile("org.mockito:mockito-core:$mockitoVersion") { dep ->
-				exclude group: "org.hamcrest"
-			}
-			testCompile "com.jayway.jsonpath:json-path:$jsonpathVersion"
-			testCompile "com.jayway.jsonpath:json-path-assert:$jsonpathVersion"
-		}
+	task appmasterBootJar(type: BootRepackage, dependsOn: appmasterJar) {
+		withJarTask = appmasterJar
+		mainClass = 'org.springframework.yarn.boot.app.SpringYarnBootApplication'
 	}
+	bootRepackage.enabled = false
+	tasks.withType(Test).all { dependsOn(appmasterBootJar) }
 
-	project('spring-yarn:spring-yarn-boot-cli') {
-		description = 'Spring Yarn Boot Cli'
-		dependencies {
-			compile project(":spring-yarn:spring-yarn-boot")
-			compile "org.springframework.boot:spring-boot-cli:$springBootVersion"
-			runtime "org.springframework:spring-web:$springVersion"
-		}
+	// boot plugin imports gradle application plugin
+	// which creates distZip task which fails
+	// because we don't need mainClassname, so
+	// disabling startScripts and distZip tasks
+	startScripts.enabled = false
+	distZip.enabled = false
+}
+
+project('spring-yarn:spring-yarn-test') {
+	description = 'Spring Yarn Test Core'
+	configurations {
+		hadoopruntime.exclude group: 'log4j'
+		hadoopruntime.exclude group: 'org.slf4j'
+		hadoopruntime.exclude group: 'org.apache.hadoop'
+		hadoopruntime.exclude group: 'commons-logging'
+		hadoopruntime.exclude group: 'org.codehaus.jettison'
+		hadoopruntime.exclude group: 'com.thoughtworks.xstream'
+		hadoopruntimenotest.exclude group: 'org.apache.hadoop', module: 'hadoop-yarn-server-tests'
 	}
-
-	project('spring-yarn:spring-yarn-boot-build-tests') {
-
-		apply plugin: 'spring-boot'
-
-		description = 'Spring Yarn Boot Build Tests'
-		dependencies {
-			compile project(":spring-yarn:spring-yarn-boot")
-			testCompile project(":spring-yarn:spring-yarn-test")
+	dependencies {
+        compile project(":spring-yarn:spring-yarn-core")
+		compile "org.springframework:spring-test:$springVersion"
+		compile "junit:junit:$junitVersion"
+		compile("org.apache.hadoop:hadoop-yarn-client:$hadoopVersion") { dep ->
+			exclude group: "org.slf4j", module: "slf4j-log4j12"
 		}
-
-		// create a boot jar which we can use in tests
-		// disable main bootRepackage task so that it
-		// doesn't mess with main artifact
-		// test needs to depend on these tasks
-		task appmasterJar(type: Jar) {
-			archiveName = 'test-archive-appmaster.jar'
-			from sourceSets.test.output
+		compile("org.apache.hadoop:hadoop-common:$hadoopVersion") { dep ->
+			exclude group: "junit", module: "junit"
 		}
-		task appmasterBootJar(type: BootRepackage, dependsOn: appmasterJar) {
-			withJarTask = appmasterJar
-			mainClass = 'org.springframework.yarn.boot.app.SpringYarnBootApplication'
+		compile("org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion") { dep ->
+			exclude group: "org.slf4j", module: "slf4j-log4j12"
 		}
-		bootRepackage.enabled = false
-		tasks.withType(Test).all { dependsOn(appmasterBootJar) }
-
-		// boot plugin imports gradle application plugin
-		// which creates distZip task which fails
-		// because we don't need mainClassname, so
-		// disabling startScripts and distZip tasks
-		startScripts.enabled = false
-		distZip.enabled = false
+		compile("org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion:tests") { dep ->
+			exclude group: "org.slf4j", module: "slf4j-log4j12"
+		}
+		compile "org.apache.hadoop:hadoop-hdfs:$hadoopVersion"
+		compile("org.apache.hadoop:hadoop-hdfs:$hadoopVersion:tests") { dep ->
+			exclude group: "log4j", module: "log4j"
+		}
+		compile("org.apache.hadoop:hadoop-common:$hadoopVersion:tests") { dep ->
+			exclude group: "log4j", module: "log4j"
+			exclude group: "org.slf4j", module: "slf4j-log4j12"
+		}
+		hadoopruntime configurations.runtime
+		hadoopruntimenotest configurations.runtime
 	}
-
-	project('spring-yarn:spring-yarn-test') {
-		description = 'Spring Yarn Test Core'
-		configurations {
-			hadoopruntime.exclude group: 'log4j'
-			hadoopruntime.exclude group: 'org.slf4j'
-			hadoopruntime.exclude group: 'org.apache.hadoop'
-			hadoopruntime.exclude group: 'commons-logging'
-			hadoopruntime.exclude group: 'org.codehaus.jettison'
-			hadoopruntime.exclude group: 'com.thoughtworks.xstream'
-			hadoopruntimenotest.exclude group: 'org.apache.hadoop', module: 'hadoop-yarn-server-tests'
-		}
-		dependencies {
-            compile project(":spring-yarn:spring-yarn-core")
-			compile "org.springframework:spring-test:$springVersion"
-			compile "junit:junit:$junitVersion"
-			compile("org.apache.hadoop:hadoop-yarn-client:$hadoopVersion") { dep ->
-				exclude group: "org.slf4j", module: "slf4j-log4j12"
-			}
-			compile("org.apache.hadoop:hadoop-common:$hadoopVersion") { dep ->
-				exclude group: "junit", module: "junit"
-			}
-			compile("org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion") { dep ->
-				exclude group: "org.slf4j", module: "slf4j-log4j12"
-			}
-			compile("org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion:tests") { dep ->
-				exclude group: "org.slf4j", module: "slf4j-log4j12"
-			}
-			compile "org.apache.hadoop:hadoop-hdfs:$hadoopVersion"
-			compile("org.apache.hadoop:hadoop-hdfs:$hadoopVersion:tests") { dep ->
-				exclude group: "log4j", module: "log4j"
-			}
-			compile("org.apache.hadoop:hadoop-common:$hadoopVersion:tests") { dep ->
-				exclude group: "log4j", module: "log4j"
-				exclude group: "org.slf4j", module: "slf4j-log4j12"
-			}
-			hadoopruntime configurations.runtime
-			hadoopruntimenotest configurations.runtime
-		}
-		task copyHadoopRuntimeDeps(type: Copy) {
-			into "$buildDir/dependency-libs"
-			from configurations.hadoopruntime
-		}
-		task copyHadoopRuntimeDepsAll(type: Copy) {
-			into "$buildDir/dependency-all-libs"
-			from configurations.hadoopruntimenotest
-		}
-		tasks.withType(Test).all { dependsOn([copyHadoopRuntimeDeps,copyHadoopRuntimeDepsAll]) }
+	task copyHadoopRuntimeDeps(type: Copy) {
+		into "$buildDir/dependency-libs"
+		from configurations.hadoopruntime
 	}
-
-	project('spring-yarn:spring-yarn-build-tests') {
-		description = 'Spring Yarn Integration Test'
-		configurations {
-			hadoopruntime.exclude group: 'log4j'
-			hadoopruntime.exclude group: 'org.slf4j'
-			hadoopruntime.exclude group: 'org.apache.hadoop'
-			hadoopruntime.exclude group: 'commons-logging'
-			hadoopruntime.exclude group: 'org.codehaus.jettison'
-			hadoopruntime.exclude group: 'com.thoughtworks.xstream'
-			hadoopruntimenotest.exclude group: 'org.apache.hadoop', module: 'hadoop-yarn-server-tests'
-		}
-		dependencies {
-			compile project(":spring-yarn:spring-yarn-core")
-			compile project(":spring-yarn:spring-yarn-test")
-			hadoopruntime configurations.runtime
-			hadoopruntimenotest configurations.runtime
-		}
-		task copyHadoopRuntimeDeps(type: Copy) {
-			into "$buildDir/dependency-libs"
-			from configurations.hadoopruntime
-		}
-		task copyHadoopRuntimeDepsAll(type: Copy) {
-			into "$buildDir/dependency-all-libs"
-			from configurations.hadoopruntimenotest
-		}
-		tasks.withType(Test).all { dependsOn([copyHadoopRuntimeDeps,copyHadoopRuntimeDepsAll]) }
+	task copyHadoopRuntimeDepsAll(type: Copy) {
+		into "$buildDir/dependency-all-libs"
+		from configurations.hadoopruntimenotest
 	}
+	tasks.withType(Test).all { dependsOn([copyHadoopRuntimeDeps,copyHadoopRuntimeDepsAll]) }
+}
 
-	project('spring-yarn:spring-yarn-boot-test') {
-		description = 'Spring Yarn Boot Test'
-		dependencies {
-			compile project(":spring-yarn:spring-yarn-boot")
-			compile project(":spring-yarn:spring-yarn-test")
-		}
+project('spring-yarn:spring-yarn-build-tests') {
+	description = 'Spring Yarn Integration Test'
+	configurations {
+		hadoopruntime.exclude group: 'log4j'
+		hadoopruntime.exclude group: 'org.slf4j'
+		hadoopruntime.exclude group: 'org.apache.hadoop'
+		hadoopruntime.exclude group: 'commons-logging'
+		hadoopruntime.exclude group: 'org.codehaus.jettison'
+		hadoopruntime.exclude group: 'com.thoughtworks.xstream'
+		hadoopruntimenotest.exclude group: 'org.apache.hadoop', module: 'hadoop-yarn-server-tests'
 	}
+	dependencies {
+		compile project(":spring-yarn:spring-yarn-core")
+		compile project(":spring-yarn:spring-yarn-test")
+		hadoopruntime configurations.runtime
+		hadoopruntimenotest configurations.runtime
+	}
+	task copyHadoopRuntimeDeps(type: Copy) {
+		into "$buildDir/dependency-libs"
+		from configurations.hadoopruntime
+	}
+	task copyHadoopRuntimeDepsAll(type: Copy) {
+		into "$buildDir/dependency-all-libs"
+		from configurations.hadoopruntimenotest
+	}
+	tasks.withType(Test).all { dependsOn([copyHadoopRuntimeDeps,copyHadoopRuntimeDepsAll]) }
+}
 
+project('spring-yarn:spring-yarn-boot-test') {
+	description = 'Spring Yarn Boot Test'
+	dependencies {
+		compile project(":spring-yarn:spring-yarn-boot")
+		compile project(":spring-yarn:spring-yarn-test")
+	}
 }
 
 task wrapper(type: Wrapper) {
