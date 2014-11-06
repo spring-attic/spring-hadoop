@@ -36,7 +36,7 @@ public class CodecFileNamingStrategyTests {
 		CodecFileNamingStrategy strategy = new CodecFileNamingStrategy();
 		assertThat(strategy.resolve(null), nullValue());
 		strategy.setCodecInfo(Codecs.GZIP.getCodecInfo());
-		assertThat(strategy.resolve(null).toString(), is(".gzip"));
+		assertThat(strategy.resolve(null).toString(), is(".gz"));
 	}
 
 	@Test
@@ -44,7 +44,7 @@ public class CodecFileNamingStrategyTests {
 		CodecFileNamingStrategy strategy = new CodecFileNamingStrategy();
 		strategy.setCodecInfo(Codecs.GZIP.getCodecInfo());
 		assertThat(strategy.isEnabled(), is(true));
-		assertThat(strategy.resolve(new Path("/foo/jee")).toString(), is("/foo/jee.gzip"));
+		assertThat(strategy.resolve(new Path("/foo/jee")).toString(), is("/foo/jee.gz"));
 		strategy.setEnabled(false);
 		assertThat(strategy.isEnabled(), is(false));
 		assertThat(strategy.resolve(new Path("/foo/jee")).toString(), is("/foo/jee"));

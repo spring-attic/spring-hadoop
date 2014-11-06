@@ -94,7 +94,7 @@ public class TextFileStoreTests extends AbstractStoreTests {
 		writer.setFileNamingStrategy(fileNamingStrategy);
 		TestUtils.writeData(writer, DATA09ARRAY);
 
-		TextFileReader reader = new TextFileReader(testConfig, new Path(testDefaultPath, "data.gzip"),
+		TextFileReader reader = new TextFileReader(testConfig, new Path(testDefaultPath, "data.gz"),
 				Codecs.GZIP.getCodecInfo());
 		TestUtils.readDataAndAssert(reader, DATA09ARRAY);
 	}
@@ -232,13 +232,13 @@ public class TextFileStoreTests extends AbstractStoreTests {
 		writer.afterPropertiesSet();
 		TestUtils.writeData(writer, dataArray);
 
-		TextFileReader reader1 = new TextFileReader(testConfig, new Path(testDefaultPath, "data-0.gzip"), Codecs.GZIP.getCodecInfo());
+		TextFileReader reader1 = new TextFileReader(testConfig, new Path(testDefaultPath, "data-0.gz"), Codecs.GZIP.getCodecInfo());
 		List<String> splitData1 = TestUtils.readData(reader1);
 
-		TextFileReader reader2 = new TextFileReader(testConfig, new Path(testDefaultPath, "data-1.gzip"), Codecs.GZIP.getCodecInfo());
+		TextFileReader reader2 = new TextFileReader(testConfig, new Path(testDefaultPath, "data-1.gz"), Codecs.GZIP.getCodecInfo());
 		List<String> splitData2 = TestUtils.readData(reader2);
 
-		TextFileReader reader3 = new TextFileReader(testConfig, new Path(testDefaultPath, "data-2.gzip"), Codecs.GZIP.getCodecInfo());
+		TextFileReader reader3 = new TextFileReader(testConfig, new Path(testDefaultPath, "data-2.gz"), Codecs.GZIP.getCodecInfo());
 		List<String> splitData3 = TestUtils.readData(reader3);
 
 		assertThat(splitData1.size() + splitData2.size() + splitData3.size(), is(3));
