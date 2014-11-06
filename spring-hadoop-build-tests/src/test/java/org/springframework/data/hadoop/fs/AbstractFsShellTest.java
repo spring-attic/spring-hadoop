@@ -37,10 +37,6 @@ import static org.junit.Assert.*;
  */
 public abstract class AbstractFsShellTest extends AbstractROFsShellTest {
 
-	{
-		TestUtils.hackHadoopStagingOnWin();
-	}
-
 	@Test
 	public void testCopyFromLocalAndText() throws Exception {
 		String name1 = UUID.randomUUID() + ".txt";

@@ -25,7 +25,7 @@
 		train=last
 	</hdp:configuration>
 
-	<hdp:configuration id="shortcutBased" file-system-uri="hdfs://fakefs:1234" job-tracker-uri="fakejt:1234" rm-manager-uri="fakerm:1234"/>
+	<hdp:configuration id="shortcutBased" file-system-uri="hdfs://fakefs:1234" job-history-uri="fakejh:1234" rm-manager-uri="fakerm:1234"/>
 
 	<util:properties id="props" location="props.properties"/>
 

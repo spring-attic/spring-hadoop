@@ -40,11 +40,6 @@ import static org.junit.Assume.assumeThat;
 @ContextConfiguration
 public class DistCpTest {
 
-	{
-		TestUtils.hackHadoopStagingOnWin();
-	}
-
-
 	@Autowired
 	Configuration cfg;
 

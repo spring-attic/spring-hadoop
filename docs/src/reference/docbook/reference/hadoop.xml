@@ -169,7 +169,7 @@
         http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd"&gt;
         
      &lt;hdp:configuration&gt;
-        fs.default.name=hdfs://localhost:9000
+        fs.defaultFS=hdfs://localhost:8020
         hadoop.tmp.dir=/tmp/hadoop
         electric=sea
      &lt;/hdp:configuration&gt;
@@ -180,7 +180,7 @@
     be replaced at runtime, based on the existing environment without touching
     the configuration:</para>
 
-    <note><para>Usual configuration parameters for <literal>fs.default.name</literal>,
+    <note><para>Usual configuration parameters for
     <literal>fs.defaultFS</literal>, <literal>mapred.job.tracker</literal> and
     <literal>yarn.resourcemanager.address</literal> can be configured using tag attributes
     <emphasis>file-system-uri</emphasis>, <emphasis>job-tracker-uri</emphasis> and
@@ -197,7 +197,7 @@
         http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd"&gt;
         
      &lt;hdp:configuration&gt;
-        fs.default.name=${hd.fs}
+        fs.defaultFS=${hd.fs}
         hadoop.tmp.dir=file://${java.io.tmpdir}
         hangar=${number:18}
      &lt;/hdp:configuration&gt;
@@ -275,12 +275,12 @@
 
     <programlisting language="xml">&lt;!-- default name is 'hadoopConfiguration' --&gt;
 &lt;hdp:configuration&gt;
-    fs.default.name=${hd.fs}
+    fs.defaultFS=${hd.fs}
     hadoop.tmp.dir=file://${java.io.tmpdir}
 &lt;/hdp:configuration&gt;
      
 &lt;hdp:configuration id="custom" configuration-ref="hadoopConfiguration"&gt;
-    fs.default.name=${custom.hd.fs}
+    fs.defaultFS=${custom.hd.fs}
 &lt;/hdp:configuration&gt;     
 
 ...
@@ -353,7 +353,7 @@
                     <entry><literal>file-system-uri</literal></entry>
                     <entry>String</entry>
                     <entry>The HDFS filesystem address. Equivalent to
-                    <emphasis>fs.default.name</emphasis> and <emphasis>fs.defaultFS</emphasis> propertys.</entry>
+                    <emphasis>fs.defaultFS</emphasis> propertys.</entry>
                 </row>
                 <row>
                     <entry><literal>job-tracker-uri</literal></entry>

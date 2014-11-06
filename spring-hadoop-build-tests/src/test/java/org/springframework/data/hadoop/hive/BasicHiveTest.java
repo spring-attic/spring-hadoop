@@ -52,10 +52,6 @@ public class BasicHiveTest {
 	@Autowired
 	private HiveOperations hiveTemplate;
 
-	{
-		TestUtils.hackHadoopStagingOnWin();
-	}
-
 	@Test
 	public void testHiveConnection() throws Exception {
 		JdbcTemplate jdbc = ctx.getBean("template", JdbcTemplate.class);

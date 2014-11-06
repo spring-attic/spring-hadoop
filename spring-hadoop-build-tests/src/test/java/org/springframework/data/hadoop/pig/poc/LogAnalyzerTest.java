@@ -29,11 +29,6 @@ import org.springframework.data.hadoop.TestUtils;
  */
 public class LogAnalyzerTest {
 
-	{
-		TestUtils.hackHadoopStagingOnWin();
-	}
-
-
 	@Test
 	public void executePOC() throws Exception {
 		GenericXmlApplicationContext ctx = new GenericXmlApplicationContext(

@@ -197,7 +197,7 @@ hadoop.socks.server=localhost:6666
 <context:property-placeholder location="hadoop.properties"/>
 
 <!-- Hadoop FileSystem using a placeholder and emr.properties -->
-<hdp:configuration properties-location="emr.properties" file-system-uri="${hd.fs}" job-tracker-uri="${hd.jt}/>
+<hdp:configuration properties-location="emr.properties" file-system-uri="${hd.fs}" job-history-uri="${hd.jh}/>
 ]]></programlisting>
 			
 			<para>hadoop.properties</para>
@@ -205,7 +205,7 @@ hadoop.socks.server=localhost:6666
 # S3 bucket backing the HDFS S3 fs
 hd.fs=s3n://my-working-bucket/
 # job tracker pointing to the EMR internal IP
-hd.jt=10.123.123.123:9000
+hd.jh=10.123.123.123:10020
 ]]></programlisting>
 
 			<para>emr.properties</para>

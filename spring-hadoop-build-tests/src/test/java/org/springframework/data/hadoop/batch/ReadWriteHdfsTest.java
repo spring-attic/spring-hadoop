@@ -37,10 +37,6 @@ import static org.junit.Assert.assertTrue;
  */
 public class ReadWriteHdfsTest {
 
-	{
-		TestUtils.hackHadoopStagingOnWin();
-	}
-
 	@Before
 	public void before() {
 		StepSynchronizationManager.release();

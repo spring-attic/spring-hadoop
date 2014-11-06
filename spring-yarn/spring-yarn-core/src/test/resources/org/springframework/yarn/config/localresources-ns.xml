@@ -12,12 +12,12 @@
 	<context:property-placeholder location="hadoop.properties"/>
 
 	<yarn:configuration>
-		fs.default.name=${hd.fs}
+		fs.defaultFS=${hd.fs}
 		yarn.resourcemanager.address=${hd.rm}
 	</yarn:configuration>
 
 	<yarn:configuration id="customConfiguration">
-		fs.default.name=${hd.fs}
+		fs.defaultFS=${hd.fs}
 		yarn.resourcemanager.address=${hd.rm}
 	</yarn:configuration>
 

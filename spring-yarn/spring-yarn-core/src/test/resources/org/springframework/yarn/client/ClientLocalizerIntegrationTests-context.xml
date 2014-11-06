@@ -13,7 +13,7 @@
 	<yarn:environment/>
 
 	<yarn:configuration>
-	fs.default.name=${hd.fs}
+	fs.defaultFS=${hd.fs}
 	yarn.resourcemanager.address=${hd.rm}
 	</yarn:configuration>
 

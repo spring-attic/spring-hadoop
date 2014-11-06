@@ -14,7 +14,7 @@
 	<!-- 
 			mapred.job.tracker=${mapred.job.tracker}
 			# this is a comment
-			fs.default.name=${hd.fs}
+			fs.defaultFS=${hd.fs}
 			# put the db inside the build so it can be ignored and cleaned between runs
 			hive.metastore.metadb.dir=.${file.separator}build
 			hive.metastore.warehouse.dir=.${file.separator}build

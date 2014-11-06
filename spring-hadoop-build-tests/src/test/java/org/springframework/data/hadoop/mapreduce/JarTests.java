@@ -43,10 +43,6 @@ import static org.junit.Assert.*;
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 public class JarTests {
 
-	{
-		TestUtils.hackHadoopStagingOnWin();
-	}
-
 	@Autowired
 	private ApplicationContext ctx;
 	@Autowired

@@ -57,10 +57,6 @@ public class HiveBatchTest {
 	@Autowired
 	private HiveOperations template;
 
-	{
-		TestUtils.hackHadoopStagingOnWin();
-	}
-
 	@Test
 	public void testHiveClient() throws Exception {
 		ctx.getBean("hiveClientFactory", HiveClientFactory.class);

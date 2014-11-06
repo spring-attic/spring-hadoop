@@ -11,7 +11,7 @@
 	<context:property-placeholder location="hadoop-local.properties"/>
 
 	<yarn:configuration>
-		fs.default.name=${hd.fs}
+		fs.defaultFS=${hd.fs}
 		yarn.resourcemanager.address=${hd.rm}
 		fs.hdfs.impl=org.apache.hadoop.hdfs.DistributedFileSystem
 	</yarn:configuration>

@@ -57,8 +57,8 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 	private boolean registerJvmUrl = false;
 
 	private String fsUri;
-	private String jtUri;
 	private String rmUri;
+	private String jhUri;
 
 	private String userKeytab;
 	private String userPrincipal;
@@ -84,16 +84,15 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 		// compile for different versions.
 		// set hdfs / fs URI last to override all other properties
 		if (StringUtils.hasText(fsUri)) {
-			internalConfig.set("fs.default.name", fsUri.trim());
 			internalConfig.set("fs.defaultFS", fsUri.trim());
-		}
-
-		if (StringUtils.hasText(jtUri)) {
-			internalConfig.set("mapred.job.tracker", jtUri.trim());
 		}
 
 		if (StringUtils.hasText(rmUri)) {
 			internalConfig.set("yarn.resourcemanager.address", rmUri.trim());
+		}
+
+		if (StringUtils.hasText(jhUri)) {
+			internalConfig.set("mapreduce.jobhistory.address", jhUri.trim());
 		}
 
 		if (StringUtils.hasText(userKeytab)) {
@@ -276,8 +275,7 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 	}
 
 	/**
-	 * Sets the File System ('fs.default.name') and ('fs.defaultFS') URI
-	 * for HadoopV1 and HadoopV2 respectively.
+	 * Sets the File System ('fs.defaultFS') URI
 	 *
 	 * @param fsUri the default file system uri
 	 */
@@ -286,21 +284,21 @@ public class ConfigurationFactoryBean implements BeanClassLoaderAware, Initializ
 	}
 
 	/**
-	 * Sets the Job Tracker ('mapred.jobtracker') URI for HadoopV1.
-	 *
-	 * @param jtUri the job tracker uri
-	 */
-	public void setJobTrackerUri(String jtUri) {
-		this.jtUri = jtUri;
-	}
-
-	/**
-	 * Sets the Yarn resource manager ('yarn.resourcemanager.address') URI for HadoopV2.
+	 * Sets the Yarn resource manager ('yarn.resourcemanager.address') URI.
 	 *
 	 * @param rmUri the resource manager uri
 	 */
 	public void setRmManagerUri(String rmUri) {
 		this.rmUri = rmUri;
+	}
+
+	/**
+	 * Sets the Job Tracker ('mapreduce.jobhistory.address') URI.
+	 *
+	 * @param jhUri the job tracker uri
+	 */
+	public void setJobHistoryUri(String jhUri) {
+		this.jhUri = jhUri;
 	}
 
 }

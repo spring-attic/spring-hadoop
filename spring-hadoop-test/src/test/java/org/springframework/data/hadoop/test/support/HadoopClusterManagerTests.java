@@ -133,8 +133,6 @@ public class HadoopClusterManagerTests {
 	private static String getHdfsUrl(Configuration configuration) {
 		if (configuration.get("fs.defaultFS") != null) {
 			return configuration.get("fs.defaultFS");
-		} else if (configuration.get("fs.default.name") != null) {
-			return configuration.get("fs.default.name");
 		} else {
 			return null;
 		}

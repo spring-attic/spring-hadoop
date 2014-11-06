@@ -78,7 +78,7 @@ public class SpringYarnConfigurationMasterTests {
 		assertThat(config.get("resource.property"), is("test-site-1.xml"));
 		assertThat(config.get("resource.property.2"), is("test-site-2.xml"));
 		assertThat(config.get("foo"), is("jee"));
-		assertThat(config.get("fs.default.name"), is("hdfs://foo.uri"));
+		assertThat(config.get("fs.defaultFS"), is("hdfs://foo.uri"));
 
 		Collection<CopyEntry> copyEntries = TestUtils.readField("copyEntries", localizer);
 		assertNotNull(copyEntries);

@@ -46,10 +46,6 @@ import static org.junit.Assert.*;
  */
 @ContextConfiguration
 public abstract class AbstractROFsShellTest {
-	{
-		TestUtils.hackHadoopStagingOnWin();
-	}
-
 
 	@Before
 	public void init() throws Exception {

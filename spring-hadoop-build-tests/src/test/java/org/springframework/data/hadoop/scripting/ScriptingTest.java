@@ -45,10 +45,6 @@ import static org.junit.Assert.*;
 @ContextConfiguration
 public class ScriptingTest {
 
-	{
-		TestUtils.hackHadoopStagingOnWin();
-	}
-
 	@Resource
 	private ApplicationContext ctx;
 	@Resource

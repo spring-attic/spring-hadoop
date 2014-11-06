@@ -50,10 +50,6 @@ public class PigTest {
 	@Autowired
 	private ApplicationContext ctx;
 
-	{
-		TestUtils.hackHadoopStagingOnWin();
-	}
-
 	@Test
 	public void testPig() throws Exception {
 		pigTemplate.executeScript("A = LOAD 'foo.txt' AS (key, value);");

@@ -74,10 +74,6 @@ public class JobTests {
 
 	private JobInfo jobInfo;
 
-	{
-		TestUtils.hackHadoopStagingOnWin();
-	}
-
 	@Before
 	public void before() {
 		TestTool.conf = null;

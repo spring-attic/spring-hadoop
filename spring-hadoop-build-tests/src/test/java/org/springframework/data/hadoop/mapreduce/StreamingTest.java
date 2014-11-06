@@ -55,10 +55,6 @@ public class StreamingTest {
 	@Resource(name = "ns-stream-job")
 	private Job job;
 
-	{
-		TestUtils.hackHadoopStagingOnWin();
-	}
-
 	@Test
 	public void testStreaming() throws Exception {
 		cleanOutput(ctx);

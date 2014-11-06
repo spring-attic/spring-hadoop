@@ -88,7 +88,7 @@
  		<para>Once the scheme has been decided upon, one can specify it through the standard Hadoop <link linkend="hadoop:config">configuration</link>, either through the Hadoop configuration files or its properties:</para>
  		
  		<programlisting language="xml"><![CDATA[<hdp:configuration>
-  fs.default.name=webhdfs://localhost
+  fs.defaultFS=webhdfs://localhost
   ...
 </hdp:configuration>]]></programlisting>
  		

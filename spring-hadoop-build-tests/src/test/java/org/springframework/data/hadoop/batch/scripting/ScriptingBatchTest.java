@@ -38,11 +38,6 @@ public class ScriptingBatchTest {
 	@Autowired
 	private ApplicationContext ctx;
 
-
-	{
-		TestUtils.hackHadoopStagingOnWin();
-	}
-
 	@SuppressWarnings("static-access")
 	@Test
 	public void testNamespace() throws Exception {

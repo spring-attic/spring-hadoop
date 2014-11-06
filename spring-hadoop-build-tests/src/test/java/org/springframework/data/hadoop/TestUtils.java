@@ -19,16 +19,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
-import java.util.Properties;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.data.hadoop.fs.HdfsResourceLoader;
-import org.springframework.data.hadoop.util.PermissionUtils;
 
 /**
  * Testing utilities.
@@ -38,36 +34,6 @@ import org.springframework.data.hadoop.util.PermissionUtils;
  *
  */
 public abstract class TestUtils {
-
-	/**
-	 * Hack to allow Hadoop client to run on windows.
-	 * Since Hadoop 1.0.x this fails since Hadoop expects certain permissions to be set, which it cannot on Windows/NTFS.
-	 * To overcome this, the hack changes the permissions required by the staging process.
-	 * However this causes the job to fail when interacting with a remote cluster since the statging permission set between the client
-	 * and the server are different.
-	 * The error message however doesn't properly shows that (it actually points to the permissions available on the server though it uses
-	 * the client ones). The solution is to _not_ use the hacked permissions but rather the original set.
-	 *
-	 * Note that if the client has created a folder already with the hacked set, Hadoop will complain - the solution is to remove the folder.
-	 *
-	 *
-	 * This method tries to address this by enabling the permissions only if the 'hadoop.jt' property is non-local. Additionally the boostrapping hadoop-context
-	 * features a script which removes the staging folder to avoid permissions mismatches.
-	 */
-	public static void hackHadoopStagingOnWin() {
-		// check test properties
-		try {
-			Properties testProperties = PropertiesLoaderUtils.loadProperties(new ClassPathResource("/test.properties"));
-			if (testProperties != null && "local".equals(testProperties.get("hadoop.jt"))) {
-				if (System.getProperty("os.name").toLowerCase().startsWith("win")) {
-					System.out.println("[TestUtils] Running a local Hadoop JT on !Windows! - hacking Hadoop Permissions...");
-					PermissionUtils.hackHadoopStagingOnWin();
-				}
-			}
-		} catch (IOException ex) {
-			// ignore
-		}
-	}
 
 	public static Resource mkdir(Configuration cfg, String dir) {
 		HdfsResourceLoader loader = new HdfsResourceLoader(cfg);

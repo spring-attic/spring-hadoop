@@ -40,10 +40,6 @@ import static org.junit.Assert.*;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class ToolTests {
 
-	{
-		TestUtils.hackHadoopStagingOnWin();
-	}
-
 	public static class TestTool implements Tool {
 
 		public static Configuration conf;

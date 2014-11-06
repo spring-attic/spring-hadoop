@@ -14,7 +14,7 @@
 	
 	alternative configuration
 	<hdp:configuration register-url-handler="false">
-		fs.default.name=hftp://localhost
+		fs.defaultFS=hftp://localhost
 	</hdp:configuration>
 	 -->
 </beans>

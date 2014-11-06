@@ -41,11 +41,6 @@ public class HBaseCfgTest {
 	@Autowired
 	Job job;
 
-	{
-		TestUtils.hackHadoopStagingOnWin();
-	}
-
-
 	@Test
 	public void testConfigProperties() throws Exception {
 		Assert.notNull(hbaseConfiguration);

@@ -45,10 +45,6 @@ public class PigBatchTest {
 	@Autowired
 	private ApplicationContext ctx;
 
-	{
-		TestUtils.hackHadoopStagingOnWin();
-	}
-
 	@Test
 	public void testServerNamespace() throws Exception {
 		assertTrue(ctx.isPrototype("pig-script"));

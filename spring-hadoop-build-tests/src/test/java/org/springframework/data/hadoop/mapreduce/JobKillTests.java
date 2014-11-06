@@ -40,11 +40,6 @@ public class JobKillTests {
 	@Autowired
 	private ApplicationContext ctx;
 
-
-	{
-		TestUtils.hackHadoopStagingOnWin();
-	}
-
 	private static long WAIT_FOR_JOB_TO_START = 1 * 1000;
 
 	@Test

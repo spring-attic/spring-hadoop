@@ -247,20 +247,20 @@ The security method for hadoop
 				<xsd:attribute name="file-system-uri" type="xsd:string">
 				<xsd:annotation>
 					<xsd:documentation><![CDATA[
-The default file-system address (host:port). Equivalent to 'fs.default.name' and 'fs.defaultFS' propertys for HadoopV1 and HadoopV2 respectively.]]></xsd:documentation>
-			 	</xsd:annotation>
-				</xsd:attribute>
-				<xsd:attribute name="job-tracker-uri" type="xsd:string">
-				<xsd:annotation>
-					<xsd:documentation><![CDATA[
-The MapReduce job tracker address (host:port) for HadoopV1. Equivalent to 'mapred.job.tracker' property.]]></xsd:documentation>
+The default file-system address (host:port). Equivalent to 'fs.defaultFS' property.]]></xsd:documentation>
 			 	</xsd:annotation>
 				</xsd:attribute>
 				<xsd:attribute name="rm-manager-uri" type="xsd:string">
 				<xsd:annotation>
 					<xsd:documentation><![CDATA[
-The Hadoop Yarn resource manager address (host:port) for HadoopV2. Equivalent to 'yarn.resourcemanager.address' property.]]></xsd:documentation>
+The Hadoop Yarn resource manager address (host:port). Equivalent to 'yarn.resourcemanager.address' property.]]></xsd:documentation>
 			 	</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="job-history-uri" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+The MapReduce job history address (host:port). Equivalent to 'mapreduce.jobhistory.address' property.]]></xsd:documentation>
+				</xsd:annotation>
 				</xsd:attribute>
 		</xsd:extension>
 		</xsd:complexContent>

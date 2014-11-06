@@ -83,10 +83,9 @@ public class ConfigurationNamespaceTests {
 	@Test
 	public void testShortcutConfiguration() throws Exception {
 		assertThat(shortcutBased, notNullValue());
-		assertThat(shortcutBased.get("fs.default.name"), is("hdfs://fakefs:1234"));
 		assertThat(shortcutBased.get("fs.defaultFS"), is("hdfs://fakefs:1234"));
-		assertThat(shortcutBased.get("mapred.job.tracker"), is("fakejt:1234"));
 		assertThat(shortcutBased.get("yarn.resourcemanager.address"), is("fakerm:1234"));
+		assertThat(shortcutBased.get("mapreduce.jobhistory.address"), is("fakejh:1234"));
 	}
 
 }

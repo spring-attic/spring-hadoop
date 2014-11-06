@@ -49,10 +49,6 @@ import static org.junit.Assert.assertTrue;
 @ContextConfiguration
 public class JobParamsTest {
 
-	{
-		TestUtils.hackHadoopStagingOnWin();
-	}
-
 	@Autowired
 	ApplicationContext ctx;
 
