@@ -24,7 +24,6 @@ import org.junit.Test;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.context.support.GenericXmlApplicationContext;
 import org.springframework.core.io.Resource;
-import org.springframework.data.hadoop.TestUtils;
 import org.springframework.data.hadoop.fs.HdfsResourceLoader;
 
 import static org.junit.Assert.assertTrue;

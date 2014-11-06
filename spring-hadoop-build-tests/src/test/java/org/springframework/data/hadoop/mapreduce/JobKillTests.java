@@ -21,7 +21,6 @@ import org.junit.runner.RunWith;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.data.hadoop.TestUtils;
 import org.springframework.data.hadoop.batch.JobsTrigger;
 import org.springframework.data.hadoop.mapreduce.JobUtils.JobStatus;
 import org.springframework.test.context.ContextConfiguration;

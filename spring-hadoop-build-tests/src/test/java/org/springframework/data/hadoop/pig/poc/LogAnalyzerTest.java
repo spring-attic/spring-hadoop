@@ -20,7 +20,6 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.junit.Test;
 import org.springframework.context.support.GenericXmlApplicationContext;
-import org.springframework.data.hadoop.TestUtils;
 
 /**
  * This test acts as a tiny sample that builds a small data pipeline for doing log analysis.
