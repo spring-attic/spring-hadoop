@@ -723,7 +723,7 @@ hadoop jar job10.jar ...</programlisting>
 
     <para>SHDP also provides support for executing vanilla Hadoop jars. Thus
     the famous <ulink
-    url="http://hadoop.apache.org/common/docs/r1.0.3/mapred_tutorial.html#Example%3A+WordCount+v1.0">WordCount</ulink>
+    url="http://hadoop.apache.org/docs/r2.5.1/hadoop-mapreduce-client/hadoop-mapreduce-client-core/MapReduceTutorial.html#Example:_WordCount_v1.0">WordCount</ulink>
     example:</para>
 
     <programlisting>bin/hadoop jar hadoop-examples.jar wordcount /wordcount/input /wordcount/output</programlisting>
