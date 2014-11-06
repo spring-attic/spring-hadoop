@@ -131,7 +131,7 @@ public class RawStreamStoreTests extends AbstractStoreTests {
 
 		doWithInputStream(stream, writer);
 
-		TextFileReader reader = new TextFileReader(getConfiguration(), new Path(testDefaultPath, "data.gzip"), Codecs.GZIP.getCodecInfo());
+		TextFileReader reader = new TextFileReader(getConfiguration(), new Path(testDefaultPath, "data.gz"), Codecs.GZIP.getCodecInfo());
 		List<String> data = TestUtils.readData(reader);
 		assertThat(data.size(), is(1000));
 	}
