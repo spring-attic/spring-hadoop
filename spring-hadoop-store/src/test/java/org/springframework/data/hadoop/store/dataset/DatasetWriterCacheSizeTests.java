@@ -103,11 +103,12 @@ public class DatasetWriterCacheSizeTests  extends AbstractHadoopClusterTests {
 		writer.flush();
 		writer.close();
 
+		// closing shell would close minicluster fs and break tests
+		@SuppressWarnings("resource")
 		FsShell fsShell = new FsShell(getConfiguration());
 		assertTrue(fsShell.ls(true, path + "/test/" + datasetTemplete.getDatasetName(SimplePojo.class) + "/year=1997/month=05/*.avro").size() >= 2);
 		assertTrue(fsShell.ls(true, path + "/test/" + datasetTemplete.getDatasetName(SimplePojo.class) + "/year=1997/month=11/*.avro").size() >= 2);
 		assertTrue(fsShell.ls(true, path + "/test/" + datasetTemplete.getDatasetName(SimplePojo.class) + "/year=1997/month=12/*.avro").size() >= 2);
-		fsShell.close();
 	}
 
 	@Test
@@ -134,10 +135,11 @@ public class DatasetWriterCacheSizeTests  extends AbstractHadoopClusterTests {
 		writer.flush();
 		writer.close();
 
+		// closing shell would close minicluster fs and break tests
+		@SuppressWarnings("resource")
 		FsShell fsShell = new FsShell(getConfiguration());
 		assertEquals(1, fsShell.ls(true, path + "/test/" + datasetTemplete.getDatasetName(SimplePojo.class) + "/year=1997/month=05/*.avro").size());
 		assertEquals(1, fsShell.ls(true, path + "/test/" + datasetTemplete.getDatasetName(SimplePojo.class) + "/year=1997/month=11/*.avro").size());
 		assertEquals(1, fsShell.ls(true, path + "/test/" + datasetTemplete.getDatasetName(SimplePojo.class) + "/year=1997/month=12/*.avro").size());
-		fsShell.close();
 	}
 }
