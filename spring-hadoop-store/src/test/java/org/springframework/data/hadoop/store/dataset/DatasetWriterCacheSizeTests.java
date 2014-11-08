@@ -16,7 +16,15 @@
 
 package org.springframework.data.hadoop.store.dataset;
 
-import org.apache.hadoop.fs.FileStatus;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,15 +38,6 @@ import org.springframework.data.hadoop.test.junit.AbstractHadoopClusterTests;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
@@ -108,6 +107,7 @@ public class DatasetWriterCacheSizeTests  extends AbstractHadoopClusterTests {
 		assertTrue(fsShell.ls(true, path + "/test/" + datasetTemplete.getDatasetName(SimplePojo.class) + "/year=1997/month=05/*.avro").size() >= 2);
 		assertTrue(fsShell.ls(true, path + "/test/" + datasetTemplete.getDatasetName(SimplePojo.class) + "/year=1997/month=11/*.avro").size() >= 2);
 		assertTrue(fsShell.ls(true, path + "/test/" + datasetTemplete.getDatasetName(SimplePojo.class) + "/year=1997/month=12/*.avro").size() >= 2);
+		fsShell.close();
 	}
 
 	@Test
@@ -138,5 +138,6 @@ public class DatasetWriterCacheSizeTests  extends AbstractHadoopClusterTests {
 		assertEquals(1, fsShell.ls(true, path + "/test/" + datasetTemplete.getDatasetName(SimplePojo.class) + "/year=1997/month=05/*.avro").size());
 		assertEquals(1, fsShell.ls(true, path + "/test/" + datasetTemplete.getDatasetName(SimplePojo.class) + "/year=1997/month=11/*.avro").size());
 		assertEquals(1, fsShell.ls(true, path + "/test/" + datasetTemplete.getDatasetName(SimplePojo.class) + "/year=1997/month=12/*.avro").size());
+		fsShell.close();
 	}
 }
