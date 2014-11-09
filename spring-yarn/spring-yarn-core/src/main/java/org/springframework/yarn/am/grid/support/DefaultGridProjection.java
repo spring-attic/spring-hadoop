@@ -25,6 +25,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.yarn.util.RackResolver;
 import org.springframework.yarn.am.grid.GridMember;
+import org.springframework.yarn.am.grid.GridProjection;
 
 /**
  * Default implementation of {@link GridProjection}.

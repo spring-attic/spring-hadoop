@@ -16,6 +16,7 @@
 package org.springframework.yarn.am.grid.support;
 
 import org.apache.hadoop.yarn.api.records.Container;
+import org.springframework.yarn.am.grid.GridMember;
 
 /**
  * Default implementation of {@link GridMember}.

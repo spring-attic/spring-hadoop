@@ -16,6 +16,7 @@
 package org.springframework.yarn.am.grid.support;
 
 import org.springframework.yarn.am.grid.Grid;
+import org.springframework.yarn.am.grid.ProjectedGrid;
 
 /**
  * Default implementation of {@link ProjectedGrid}.
