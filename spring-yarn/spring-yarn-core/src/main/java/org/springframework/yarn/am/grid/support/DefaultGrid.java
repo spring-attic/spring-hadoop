@@ -15,6 +15,12 @@
  */
 package org.springframework.yarn.am.grid.support;
 
+/**
+ * Default implementation of {@link Grid}.
+ *
+ * @author Janne Valkealahti
+ *
+ */
 public class DefaultGrid extends AbstractGrid {
 
 }

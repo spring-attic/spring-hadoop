@@ -44,11 +44,27 @@ public class DefaultContainerAllocatorTests {
 
 		List<ResourceRequest> createRequests = TestUtils.callMethod("createRequests", allocator);
 		assertThat(createRequests, notNullValue());
+		assertThat(createRequests.size(), is(0));
+	}
+
+	@Test
+	public void testLegacyAnyCount() throws Exception {
+		DefaultContainerAllocator allocator = new DefaultContainerAllocator();
+		allocator.setConfiguration(new Configuration());
+		allocator.setLocality(false);
+		TestUtils.callMethod("internalInit", allocator);
+
+		allocator.allocateContainers(2);
+
+		List<ResourceRequest> createRequests = TestUtils.callMethod("createRequests", allocator);
+		assertThat(createRequests, notNullValue());
 		assertThat(createRequests.size(), is(1));
-		ResourceRequest req = createRequests.get(0);
-		assertThat(req.getPriority().getPriority(), is(0));
-		assertThat(req.getNumContainers(), is(0));
-		assertThat(req.getRelaxLocality(), is(true));
+
+		ResourceRequest req0 = createRequests.get(0);
+		assertThat(req0.getResourceName(), is("*"));
+		assertThat(req0.getPriority().getPriority(), is(0));
+		assertThat(req0.getNumContainers(), is(2));
+		assertThat(req0.getRelaxLocality(), is(true));
 	}
 
 	@Test
@@ -190,7 +206,7 @@ public class DefaultContainerAllocatorTests {
 		List<ResourceRequest> createRequests = TestUtils.callMethod("createRequests", allocator);
 		Collections.sort(createRequests, new ResourceRequestComparator());
 		assertThat(createRequests, notNullValue());
-		assertThat(createRequests.size(), is(7));
+		assertThat(createRequests.size(), is(6));
 
 		assertResourceRequest(createRequests.get(0), "*", 2, 2, false, 128, 2);
 		assertResourceRequest(createRequests.get(1), "/default-rack", 2, 1, false, 128, 2);
@@ -198,7 +214,6 @@ public class DefaultContainerAllocatorTests {
 		assertResourceRequest(createRequests.get(3), "*", 1, 2, true, 64, 1);
 		assertResourceRequest(createRequests.get(4), "/default-rack", 1, 1, true, 64, 1);
 		assertResourceRequest(createRequests.get(5), "host10", 1, 1, true, 64, 1);
-		assertResourceRequest(createRequests.get(6), "*", 0, 0, true, 64, 1);
 	}
 
 	@Test
@@ -222,13 +237,12 @@ public class DefaultContainerAllocatorTests {
 		List<ResourceRequest> createRequests = TestUtils.callMethod("createRequests", allocator);
 		Collections.sort(createRequests, new ResourceRequestComparator());
 		assertThat(createRequests, notNullValue());
-		assertThat(createRequests.size(), is(5));
+		assertThat(createRequests.size(), is(4));
 
 		assertResourceRequest(createRequests.get(0), "*", 2, 2, false, 128, 2);
 		assertResourceRequest(createRequests.get(1), "/default-rack", 2, 1, false, 128, 2);
 		assertResourceRequest(createRequests.get(2), "host20", 2, 1, true, 128, 2);
 		assertResourceRequest(createRequests.get(3), "*", 1, 1, true, 64, 1);
-		assertResourceRequest(createRequests.get(4), "*", 0, 0, true, 64, 1);
 	}
 
 	@Test
@@ -237,6 +251,7 @@ public class DefaultContainerAllocatorTests {
 		allocator.setConfiguration(new Configuration());
 		TestUtils.callMethod("internalInit", allocator);
 
+		// we don't set allocation values thus 'cluster1' is unknown
 		ContainerAllocateData data1 = new ContainerAllocateData();
 		data1.setId("cluster1");
 		data1.addAny(1);
@@ -248,6 +263,97 @@ public class DefaultContainerAllocatorTests {
 		assertThat(createRequests.size(), is(1));
 
 		assertResourceRequest(createRequests.get(0), "*", 0, 1, true, 64, 1);
+	}
+
+	@Test
+	public void testOneRackAndHostLocalityRequests() throws Exception {
+		DefaultContainerAllocator allocator = new DefaultContainerAllocator();
+		allocator.setConfiguration(new Configuration());
+		allocator.setLocality(true);
+		TestUtils.callMethod("internalInit", allocator);
+
+		ContainerAllocateData data = new ContainerAllocateData();
+		data.addRacks("/default-rack", 2);
+		data.addHosts("host1", 1);
+		allocator.allocateContainers(data);
+
+		List<ResourceRequest> createRequests = TestUtils.callMethod("createRequests", allocator);
+		assertThat(createRequests, notNullValue());
+		assertThat(createRequests.size(), is(5));
+
+		ResourceRequest req;
+		req = createRequests.get(0);
+		assertThat(req.getResourceName(), is("host1"));
+		assertThat(req.getPriority().getPriority(), is(0));
+		assertThat(req.getNumContainers(), is(1));
+		assertThat(req.getRelaxLocality(), is(true));
+
+		req = createRequests.get(1);
+		assertThat(req.getResourceName(), is("/default-rack"));
+		assertThat(req.getPriority().getPriority(), is(0));
+		assertThat(req.getNumContainers(), is(1));
+		assertThat(req.getRelaxLocality(), is(false));
+
+		req = createRequests.get(2);
+		assertThat(req.getResourceName(), is("*"));
+		assertThat(req.getPriority().getPriority(), is(0));
+		assertThat(req.getNumContainers(), is(2));
+		assertThat(req.getRelaxLocality(), is(false));
+
+		req = createRequests.get(3);
+		assertThat(req.getResourceName(), is("/default-rack"));
+		assertThat(req.getPriority().getPriority(), is(1));
+		assertThat(req.getNumContainers(), is(2));
+		assertThat(req.getRelaxLocality(), is(true));
+
+		req = createRequests.get(4);
+		assertThat(req.getResourceName(), is("*"));
+		assertThat(req.getPriority().getPriority(), is(1));
+		assertThat(req.getNumContainers(), is(2));
+		assertThat(req.getRelaxLocality(), is(false));
+
+	}
+
+	@Test
+	public void testAnyAndHostLocalityRequests() throws Exception {
+		DefaultContainerAllocator allocator = new DefaultContainerAllocator();
+		allocator.setConfiguration(new Configuration());
+		allocator.setLocality(true);
+		TestUtils.callMethod("internalInit", allocator);
+
+		ContainerAllocateData data = new ContainerAllocateData();
+		data.addAny(1);
+		data.addHosts("host1", 1);
+		allocator.allocateContainers(data);
+
+		List<ResourceRequest> createRequests = TestUtils.callMethod("createRequests", allocator);
+		assertThat(createRequests, notNullValue());
+		assertThat(createRequests.size(), is(4));
+
+		ResourceRequest req;
+		req = createRequests.get(0);
+		assertThat(req.getResourceName(), is("host1"));
+		assertThat(req.getPriority().getPriority(), is(1));
+		assertThat(req.getNumContainers(), is(1));
+		assertThat(req.getRelaxLocality(), is(true));
+
+		req = createRequests.get(1);
+		assertThat(req.getResourceName(), is("/default-rack"));
+		assertThat(req.getPriority().getPriority(), is(1));
+		assertThat(req.getNumContainers(), is(1));
+		assertThat(req.getRelaxLocality(), is(false));
+
+		req = createRequests.get(2);
+		assertThat(req.getResourceName(), is("*"));
+		assertThat(req.getPriority().getPriority(), is(1));
+		assertThat(req.getNumContainers(), is(2));
+		assertThat(req.getRelaxLocality(), is(false));
+
+		req = createRequests.get(3);
+		assertThat(req.getResourceName(), is("*"));
+		assertThat(req.getPriority().getPriority(), is(0));
+		assertThat(req.getNumContainers(), is(1));
+		assertThat(req.getRelaxLocality(), is(true));
 	}
 
 	private static void assertResourceRequest(ResourceRequest req, String resourceName, Integer priority, Integer numContainers, Boolean relaxLocality, Integer capMemory, Integer capCores) {

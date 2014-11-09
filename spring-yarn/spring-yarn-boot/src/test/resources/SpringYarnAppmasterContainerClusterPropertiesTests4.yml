@@ -3,8 +3,7 @@ spring:
         appmaster:
             containercluster:
                 clusters:
-                    cluster2:
+                    cluster1:
                         projection:
                             type: default
-                            data:
-                                any: 2
+                            data: {any: 1, hosts: {host1: 1, host2: 2}, racks: {rack1: 1, rack2: 2}, properties: {foo: bar}}

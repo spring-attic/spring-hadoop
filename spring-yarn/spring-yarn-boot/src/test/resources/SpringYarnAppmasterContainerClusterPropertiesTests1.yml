@@ -4,14 +4,18 @@ spring:
             containercluster:
                 clusters:
                   ? cluster1
-                  : projectionType: any
-                    projectionAny: 1
-                    projectionHosts:
-                        host1: 1
-                        host2: 2
-                    projectionRacks:
-                        rack1: 1
-                        rack2: 2
+                  : ? projection
+                    : type: default
+                      data:
+                          any: 1
+                          hosts:
+                              host1: 1
+                              host2: 2
+                          racks:
+                              rack1: 1
+                              rack2: 2
+                          properties:
+                              foo: bar
                     ? resource
                     : priority: 234
                       memory: memoryFoo

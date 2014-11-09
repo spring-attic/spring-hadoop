@@ -80,8 +80,8 @@ public class YarnAppmasterAutoConfigurationTests {
 		Set<GridProjectionFactory> factories = TestUtils.readField("factories", locator);
 		assertThat(factories.size(), is(1));
 		GridProjectionFactory factory = factories.iterator().next();
-		assertThat(factory.getRegisteredProjectionTypes().size(), is(3));
-		assertThat(factory.getRegisteredProjectionTypes(), containsInAnyOrder("hosts", "racks", "any"));
+		assertThat(factory.getRegisteredProjectionTypes().size(), is(1));
+		assertThat(factory.getRegisteredProjectionTypes(), containsInAnyOrder("default"));
 	}
 
 	@Test
@@ -148,7 +148,7 @@ public class YarnAppmasterAutoConfigurationTests {
 	public static class TestGridProjectionFactory implements GridProjectionFactory {
 
 		@Override
-		public GridProjection getGridProjection(ProjectionData projectionData) {
+		public GridProjection getGridProjection(ProjectionData projectionData, org.apache.hadoop.conf.Configuration configuration) {
 			return null;
 		}
 

@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.hadoop.conf.Configuration;
 import org.springframework.yarn.am.grid.GridProjection;
 import org.springframework.yarn.am.grid.GridProjectionFactory;
 
@@ -30,26 +31,26 @@ import org.springframework.yarn.am.grid.GridProjectionFactory;
  */
 public class DefaultGridProjectionFactory implements GridProjectionFactory {
 
+	private final static Set<String> REG_NAMES = new HashSet<String>(Arrays.asList(DefaultGridProjection.REGISTERED_NAME));
+
+	/**
+	 * Instantiates a new default grid projection factory.
+	 */
 	public DefaultGridProjectionFactory() {
 	}
 
 	@Override
-	public GridProjection getGridProjection(ProjectionData projectionData) {
-		GridProjection projection = null;
-		if ("hosts".equalsIgnoreCase(projectionData.getType())) {
-			HostsGridProjection p = new HostsGridProjection();
-			p.setPriority(projectionData.getPriority());
-			projection = p;
-		} else if ("racks".equalsIgnoreCase(projectionData.getType())) {
-			RacksGridProjection p = new RacksGridProjection();
-			p.setPriority(projectionData.getPriority());
-			projection = p;
-		} else if ("any".equalsIgnoreCase(projectionData.getType())) {
-			AnyGridProjection p = new AnyGridProjection();
-			p.setPriority(projectionData.getPriority());
-			projection = p;
-		}
-		if (projection != null) {
+	public GridProjection getGridProjection(ProjectionData projectionData, Configuration configuration) {
+		DefaultGridProjection projection = null;
+		if (DefaultGridProjection.REGISTERED_NAME.equalsIgnoreCase(projectionData.getType())) {
+			projection = new DefaultGridProjection();
+			projection.setConfiguration(configuration);
+			projection.setPriority(projectionData.getPriority());
+			projection.setMemory(projectionData.getMemory());
+			projection.setVirtualCores(projectionData.getVirtualCores());
+			if (projectionData.getLocality() != null) {
+				projection.setLocality(projectionData.getLocality());
+			}
 			projection.setProjectionData(projectionData);
 		}
 		return projection;
@@ -57,7 +58,7 @@ public class DefaultGridProjectionFactory implements GridProjectionFactory {
 
 	@Override
 	public Set<String> getRegisteredProjectionTypes() {
-		return new HashSet<String>(Arrays.asList("hosts", "racks", "any"));
+		return REG_NAMES;
 	}
 
 }

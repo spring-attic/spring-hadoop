@@ -50,7 +50,6 @@ import org.springframework.yarn.am.grid.GridProjectionFactory;
 import org.springframework.yarn.am.grid.GridProjectionFactoryLocator;
 import org.springframework.yarn.am.grid.ProjectedGrid;
 import org.springframework.yarn.am.grid.listener.ProjectedGridListenerAdapter;
-import org.springframework.yarn.am.grid.support.AbstractGridProjection;
 import org.springframework.yarn.am.grid.support.DefaultGrid;
 import org.springframework.yarn.am.grid.support.DefaultGridMember;
 import org.springframework.yarn.am.grid.support.DefaultProjectedGrid;
@@ -209,28 +208,32 @@ public abstract class AbstractContainerClusterAppmaster extends AbstractEventing
 	@Override
 	public ContainerCluster createContainerCluster(String clusterId, String clusterDef, ProjectionData projectionData, Map<String, Object> extraProperties) {
 
+		// cluster def not given, assume it is gonna be same as cluster id
 		if (clusterDef == null) {
 			clusterDef = clusterId;
 		}
 
-		GridProjectionFactory gridProjectionFactory = gridProjectionFactoryLocator.getGridProjectionFactory(projectionData.getType());
+		GridProjectionFactory gridProjectionFactory = gridProjectionFactoryLocator
+				.getGridProjectionFactory(projectionData.getType());
 		if (gridProjectionFactory == null) {
 			throw new IllegalArgumentException("Projection type " + projectionData.getType()
 					+ " not know to gridProjectionFactoryLocator=[" + gridProjectionFactoryLocator + "]");
 		}
 
-		GridProjection projection = gridProjectionFactory.getGridProjection(projectionData);
-		if (projection == null) {
-			throw new IllegalArgumentException("Unable to build projection using type " + projectionData.getType());
+		// need to merge incoming data with data in registry. this is because data may
+		// work as a blueprint thus having some setting but incoming always overrides
+		// what already exists.
+		ProjectionData p = projectionDataRegistry.getProjectionDatas().get(clusterDef);
+		ProjectionData merged = p != null ? p.merge(projectionData) : projectionData;
+		if (log.isDebugEnabled()) {
+			log.debug("Incoming projection data: " + projectionData);
+			log.debug("Blueprint projection data: " + p);
+			log.debug("Merged projection data: " + merged);
 		}
 
-		ProjectionData p = projectionDataRegistry.getProjectionDatas().get(clusterDef);
-
-		if (projection instanceof AbstractGridProjection) {
-			((AbstractGridProjection) projection).setConfiguration(getConfiguration());
-			if (p != null && ((AbstractGridProjection) projection).getPriority() == null) {
-				((AbstractGridProjection) projection).setPriority(p.getPriority());
-			}
+		GridProjection projection = gridProjectionFactory.getGridProjection(merged, getConfiguration());
+		if (projection == null) {
+			throw new IllegalArgumentException("Unable to build projection using type " + projectionData.getType());
 		}
 
 		StateMachine<State<ClusterState, ClusterEvent>, ClusterEvent> stateMachine = stateMachineFactory

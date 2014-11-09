@@ -18,6 +18,7 @@ package org.springframework.yarn.boot.properties;
 import java.util.Map;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.yarn.am.grid.support.DefaultGridProjection;
 
 /**
  * Spring Boot {@link ConfigurationProperties} for
@@ -68,6 +69,8 @@ public class SpringYarnAppmasterProperties {
 
 	public static class ContainerClusterProperties {
 
+		private boolean enabled;
+
 		private Map<String, ContainerClustersProperties> clusters;
 
 		public Map<String, ContainerClustersProperties> getClusters() {
@@ -76,6 +79,14 @@ public class SpringYarnAppmasterProperties {
 
 		public void setClusters(Map<String, ContainerClustersProperties> clusters) {
 			this.clusters = clusters;
+		}
+
+		public boolean isEnabled() {
+			return enabled;
+		}
+
+		public void setEnabled(boolean enabled) {
+			this.enabled = enabled;
 		}
 
 	}
@@ -88,13 +99,7 @@ public class SpringYarnAppmasterProperties {
 
 		private SpringYarnAppmasterLocalizerProperties localizer;
 
-		private String projectionType;
-
-		private Integer projectionAny;
-
-		private Map<String, Integer> projectionHosts;
-
-		private Map<String, Integer> projectionRacks;
+		private ContainerClustersProjectionProperties projection;
 
 		public SpringYarnAppmasterResourceProperties getResource() {
 			return resource;
@@ -120,36 +125,80 @@ public class SpringYarnAppmasterProperties {
 			this.localizer = localizer;
 		}
 
-		public String getProjectionType() {
-			return projectionType;
+		public ContainerClustersProjectionProperties getProjection() {
+			return projection;
 		}
 
-		public void setProjectionType(String projectionType) {
-			this.projectionType = projectionType;
+		public void setProjection(ContainerClustersProjectionProperties projection) {
+			this.projection = projection;
 		}
 
-		public Integer getProjectionAny() {
-			return projectionAny;
+	}
+
+	public static class ContainerClustersProjectionProperties {
+
+		private String type = DefaultGridProjection.REGISTERED_NAME;
+
+		private ContainerClustersProjectionDataProperties data;
+
+		public void setType(String type) {
+			this.type = type;
 		}
 
-		public void setProjectionAny(Integer projectionAny) {
-			this.projectionAny = projectionAny;
+		public String getType() {
+			return type;
 		}
 
-		public Map<String, Integer> getProjectionHosts() {
-			return projectionHosts;
+		public void setData(ContainerClustersProjectionDataProperties data) {
+			this.data = data;
 		}
 
-		public void setProjectionHosts(Map<String, Integer> projectionHosts) {
-			this.projectionHosts = projectionHosts;
+		public ContainerClustersProjectionDataProperties getData() {
+			return data;
 		}
 
-		public Map<String, Integer> getProjectionRacks() {
-			return projectionRacks;
+	}
+
+	public static class ContainerClustersProjectionDataProperties {
+
+		private Integer any;
+
+		private Map<String, Integer> hosts;
+
+		private Map<String, Integer> racks;
+
+		private Map<String, Object> properties;
+
+		public Integer getAny() {
+			return any;
 		}
 
-		public void setProjectionRacks(Map<String, Integer> projectionRacks) {
-			this.projectionRacks = projectionRacks;
+		public void setAny(Integer any) {
+			this.any = any;
+		}
+
+		public Map<String, Integer> getHosts() {
+			return hosts;
+		}
+
+		public void setHosts(Map<String, Integer> hosts) {
+			this.hosts = hosts;
+		}
+
+		public Map<String, Integer> getRacks() {
+			return racks;
+		}
+
+		public void setRacks(Map<String, Integer> racks) {
+			this.racks = racks;
+		}
+
+		public Map<String, Object> getProperties() {
+			return properties;
+		}
+
+		public void setProperties(Map<String, Object> properties) {
+			this.properties = properties;
 		}
 
 	}

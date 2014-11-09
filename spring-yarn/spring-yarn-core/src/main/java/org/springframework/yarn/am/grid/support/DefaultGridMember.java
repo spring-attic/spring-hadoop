@@ -17,11 +17,21 @@ package org.springframework.yarn.am.grid.support;
 
 import org.apache.hadoop.yarn.api.records.Container;
 
+/**
+ * Default implementation of {@link GridMember}.
+ *
+ * @author Janne Valkealahti
+ *
+ */
 public class DefaultGridMember extends AbstractGridMember {
 
+	/**
+	 * Instantiates a new default grid member.
+	 *
+	 * @param container the container
+	 */
 	public DefaultGridMember(Container container) {
 		super(container);
 	}
-
 
 }

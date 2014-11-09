@@ -31,6 +31,11 @@ public class ProjectionDataRegistry {
 
 	private final Map<String, ProjectionData> defaults = new HashMap<String, ProjectionData>();
 
+	/**
+	 * Instantiates a new projection data registry.
+	 *
+	 * @param defaults the defaults for name to projection data mappings
+	 */
 	public ProjectionDataRegistry(Map<String, ProjectionData> defaults) {
 		if (defaults != null) {
 			this.defaults.putAll(defaults);

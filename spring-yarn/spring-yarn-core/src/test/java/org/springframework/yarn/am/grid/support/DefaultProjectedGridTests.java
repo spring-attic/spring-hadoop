@@ -21,36 +21,45 @@ import static org.junit.Assert.assertThat;
 
 import org.apache.hadoop.yarn.api.records.Container;
 import org.apache.hadoop.yarn.api.records.ContainerId;
+import org.apache.hadoop.yarn.api.records.NodeId;
 import org.apache.hadoop.yarn.api.records.Priority;
+import org.apache.hadoop.yarn.api.records.Resource;
 import org.junit.Test;
 import org.springframework.yarn.MockUtils;
 
+/**
+ * Tests for {@link DefaultProjectedGrid}.
+ *
+ * @author Janne Valkealahti
+ *
+ */
 public class DefaultProjectedGridTests {
 
 	@Test
 	public void testSimpleOperations() {
 		DefaultGrid grid = new DefaultGrid();
 		DefaultProjectedGrid projectedGrid = new DefaultProjectedGrid(grid);
-		AnyGridProjection projection = new AnyGridProjection(2);
+		DefaultGridProjection projection = new DefaultGridProjection();
+		projection.setProjectionData(new ProjectionData(2));
 		projection.setPriority(0);
+		projection.setMemory(0);
+		projection.setVirtualCores(0);
 
 		projectedGrid.addProjection(projection);
 
 		ContainerId id = MockUtils.getMockContainerId(MockUtils.getMockApplicationAttemptId(0, 0), 0);
 		Priority priority = MockUtils.getMockPriority(0);
-		Container container = MockUtils.getMockContainer(id, null, null, priority);
+		NodeId nodeId = MockUtils.getMockNodeId("host", 0);
+		Resource resource = MockUtils.getMockResource(0, 0);
+		Container container = MockUtils.getMockContainer(id, nodeId, resource, priority);
 		DefaultGridMember member = new DefaultGridMember(container);
 		grid.addMember(member);
 
-//		GridProjection projection2 = projectedGrid.getProjection("test1");
 		assertThat(projection, notNullValue());
-
 		assertThat(projection.getMembers().size(), is(1));
 
 		SatisfyStateData satisfyState = projection.getSatisfyState();
 		assertThat(satisfyState.getAllocateData().getAny(), is(1));
 	}
-
-
 
 }

@@ -17,8 +17,19 @@ package org.springframework.yarn.am.grid.support;
 
 import org.springframework.yarn.am.grid.Grid;
 
+/**
+ * Default implementation of {@link ProjectedGrid}.
+ *
+ * @author Janne Valkealahti
+ *
+ */
 public class DefaultProjectedGrid extends AbstractProjectedGrid {
 
+	/**
+	 * Instantiates a new default projected grid.
+	 *
+	 * @param grid the grid
+	 */
 	public DefaultProjectedGrid(Grid grid) {
 		super(grid);
 	}

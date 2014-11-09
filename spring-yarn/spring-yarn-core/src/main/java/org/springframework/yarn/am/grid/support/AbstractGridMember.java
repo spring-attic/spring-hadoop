@@ -19,10 +19,21 @@ import org.apache.hadoop.yarn.api.records.Container;
 import org.apache.hadoop.yarn.api.records.ContainerId;
 import org.springframework.yarn.am.grid.GridMember;
 
+/**
+ * Base implementation of {@link GridMember}.
+ *
+ * @author Janne Valkealahti
+ *
+ */
 public abstract class AbstractGridMember implements GridMember {
 
 	private Container container;
 
+	/**
+	 * Instantiates a new abstract grid member.
+	 *
+	 * @param container the container
+	 */
 	public AbstractGridMember(Container container) {
 		this.container = container;
 	}

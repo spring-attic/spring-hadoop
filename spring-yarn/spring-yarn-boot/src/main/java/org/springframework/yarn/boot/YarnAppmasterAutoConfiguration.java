@@ -15,6 +15,7 @@
  */
 package org.springframework.yarn.boot;
 
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +56,8 @@ import org.springframework.yarn.boot.properties.SpringHadoopProperties;
 import org.springframework.yarn.boot.properties.SpringYarnAppmasterLaunchContextProperties;
 import org.springframework.yarn.boot.properties.SpringYarnAppmasterLocalizerProperties;
 import org.springframework.yarn.boot.properties.SpringYarnAppmasterProperties;
+import org.springframework.yarn.boot.properties.SpringYarnAppmasterProperties.ContainerClustersProjectionDataProperties;
+import org.springframework.yarn.boot.properties.SpringYarnAppmasterProperties.ContainerClustersProjectionProperties;
 import org.springframework.yarn.boot.properties.SpringYarnAppmasterProperties.ContainerClustersProperties;
 import org.springframework.yarn.boot.properties.SpringYarnAppmasterResourceProperties;
 import org.springframework.yarn.boot.properties.SpringYarnBatchProperties;
@@ -80,6 +83,7 @@ import org.springframework.yarn.fs.LocalResourcesSelector;
 import org.springframework.yarn.fs.LocalResourcesSelector.Entry;
 import org.springframework.yarn.fs.MultiLocalResourcesSelector;
 import org.springframework.yarn.launch.LaunchCommandsFactoryBean;
+import org.springframework.yarn.support.ParsingUtils;
 import org.springframework.yarn.support.YarnContextUtils;
 
 /**
@@ -260,12 +264,31 @@ public class YarnAppmasterAutoConfiguration {
 			Map<String, ContainerClustersProperties> clusterProps = syap.getContainercluster().getClusters();
 			if (clusterProps != null) {
 				for (java.util.Map.Entry<String, ContainerClustersProperties> entry : clusterProps.entrySet()) {
-					ProjectionData data = new ProjectionData(entry.getValue().getProjectionAny(), entry.getValue()
-							.getProjectionHosts(), entry.getValue().getProjectionRacks());
-					data.setType(entry.getValue().getProjectionType());
+					ProjectionData data = new ProjectionData();
+					ContainerClustersProjectionProperties ccpProperties = entry.getValue().getProjection();
+					if (ccpProperties != null) {
+						ContainerClustersProjectionDataProperties ccpdProperties = ccpProperties.getData();
+						if (ccpdProperties != null) {
+							data.setAny(ccpdProperties.getAny());
+							data.setHosts(ccpdProperties.getHosts());
+							data.setRacks(ccpdProperties.getRacks());
+							data.setProperties(ccpdProperties.getProperties());
+						}
+						data.setType(ccpProperties.getType());
+					}
+
 					SpringYarnAppmasterResourceProperties resource = entry.getValue().getResource();
 					if (resource != null) {
 						data.setPriority(resource.getPriority());
+						data.setVirtualCores(resource.getVirtualCores());
+						try {
+							data.setMemory(ParsingUtils.parseBytesAsMegs(resource.getMemory()));
+						} catch (ParseException e) {
+						}
+					}
+					SpringYarnAppmasterLaunchContextProperties launchcontext = entry.getValue().getLaunchcontext();
+					if (launchcontext != null) {
+						data.setLocality(launchcontext.isLocality());
 					}
 					projections.put(entry.getKey(), data);
 

@@ -58,7 +58,7 @@ public class ManagedContainerClusterAppmasterSingleTests extends AbstractManaged
 		TestContainerLauncher launcher = new TestContainerLauncher();
 		TestManagedContainerClusterAppmaster appmaster = createTestAppmaster(allocator, launcher);
 		appmaster.setStateMachineFactory(stateMachineFactory);
-		ProjectionData projectionData = new ProjectionData(1, null, null, "any", null);
+		ProjectionData projectionData = new ProjectionData(1, null, null, "default", null);
 		appmaster.createContainerCluster("cluster", projectionData);
 		assertDoTask(appmaster, 0, 0, 0, 0, "foo", true);
 	}
@@ -69,7 +69,7 @@ public class ManagedContainerClusterAppmasterSingleTests extends AbstractManaged
 		TestContainerLauncher launcher = new TestContainerLauncher();
 		TestManagedContainerClusterAppmaster appmaster = createTestAppmaster(allocator, launcher);
 		appmaster.setStateMachineFactory(stateMachineFactory);
-		ProjectionData projectionData = new ProjectionData(1, null, null, "any", null);
+		ProjectionData projectionData = new ProjectionData(1, null, null, "default", null);
 		appmaster.createContainerCluster("foo", projectionData);
 		appmaster.startContainerCluster("foo");
 		assertDoTask(appmaster, 1, 0, 0, 0, "foo");
@@ -82,7 +82,9 @@ public class ManagedContainerClusterAppmasterSingleTests extends AbstractManaged
 		TestManagedContainerClusterAppmaster appmaster = createTestAppmaster(allocator, launcher);
 		appmaster.setStateMachineFactory(stateMachineFactory);
 
-		ProjectionData projectionData = new ProjectionData(1, null, null, "any", 0);
+		ProjectionData projectionData = new ProjectionData(1, null, null, "default", 0);
+		projectionData.setMemory(0);
+		projectionData.setVirtualCores(0);
 
 		appmaster.createContainerCluster("foo", projectionData);
 		appmaster.startContainerCluster("foo");
@@ -101,9 +103,6 @@ public class ManagedContainerClusterAppmasterSingleTests extends AbstractManaged
 
 		allocateContainer(appmaster, 1);
 
-		// should get 0 any alloc and no container kills
-//		assertSatisfyStateData(appmaster, 1, null, null, null);
-
 		assertThat(launcher.container, notNullValue());
 		assertThat(allocator.containerAllocateData, nullValue());
 		assertThat(allocator.releaseContainers, nullValue());
@@ -115,7 +114,9 @@ public class ManagedContainerClusterAppmasterSingleTests extends AbstractManaged
 		TestContainerLauncher launcher = new TestContainerLauncher();
 		TestManagedContainerClusterAppmaster appmaster = createTestAppmaster(allocator, launcher);
 		appmaster.setStateMachineFactory(stateMachineFactory);
-		ProjectionData projectionData = new ProjectionData(1, null, null, "any", 0);
+		ProjectionData projectionData = new ProjectionData(1, null, null, "default", 0);
+		projectionData.setMemory(0);
+		projectionData.setVirtualCores(0);
 
 		// create
 		GridProjection projection = appmaster.createContainerCluster("foo", projectionData).getGridProjection();
@@ -142,7 +143,9 @@ public class ManagedContainerClusterAppmasterSingleTests extends AbstractManaged
 		TestContainerLauncher launcher = new TestContainerLauncher();
 		TestManagedContainerClusterAppmaster appmaster = createTestAppmaster(allocator, launcher);
 		appmaster.setStateMachineFactory(stateMachineFactory);
-		ProjectionData projectionData = new ProjectionData(1, null, null, "any", 0);
+		ProjectionData projectionData = new ProjectionData(1, null, null, "default", 0);
+		projectionData.setMemory(0);
+		projectionData.setVirtualCores(0);
 
 		// create
 		GridProjection projection = appmaster.createContainerCluster("foo", projectionData).getGridProjection();
@@ -187,7 +190,9 @@ public class ManagedContainerClusterAppmasterSingleTests extends AbstractManaged
 		TestContainerLauncher launcher = new TestContainerLauncher();
 		TestManagedContainerClusterAppmaster appmaster = createTestAppmaster(allocator, launcher);
 		appmaster.setStateMachineFactory(stateMachineFactory);
-		ProjectionData projectionData = new ProjectionData(1, null, null, "any", 0);
+		ProjectionData projectionData = new ProjectionData(1, null, null, "default", 0);
+		projectionData.setMemory(0);
+		projectionData.setVirtualCores(0);
 
 		// create and start
 		GridProjection projection = appmaster.createContainerCluster("foo", projectionData).getGridProjection();
@@ -212,7 +217,7 @@ public class ManagedContainerClusterAppmasterSingleTests extends AbstractManaged
 		TestContainerLauncher launcher = new TestContainerLauncher();
 		TestManagedContainerClusterAppmaster appmaster = createTestAppmaster(allocator, launcher);
 		appmaster.setStateMachineFactory(stateMachineFactory);
-		ProjectionData projectionData = new ProjectionData(1, null, null, "any", 0);
+		ProjectionData projectionData = new ProjectionData(1, null, null, "default", 0);
 		appmaster.createContainerCluster("foo", projectionData);
 		appmaster.startContainerCluster("foo");
 		appmaster.stopContainerCluster("foo");
@@ -227,7 +232,7 @@ public class ManagedContainerClusterAppmasterSingleTests extends AbstractManaged
 		TestContainerLauncher launcher = new TestContainerLauncher();
 		TestManagedContainerClusterAppmaster appmaster = createTestAppmaster(allocator, launcher);
 		appmaster.setStateMachineFactory(stateMachineFactory);
-		ProjectionData projectionData = new ProjectionData(1, null, null, "any", 0);
+		ProjectionData projectionData = new ProjectionData(1, null, null, "default", 0);
 		appmaster.createContainerCluster("foo", projectionData);
 		appmaster.startContainerCluster("foo");
 		assertThat(appmaster.getContainerClusters().get("foo").getStateMachine().getState().getId(), is(ClusterState.RUNNING));
@@ -248,7 +253,7 @@ public class ManagedContainerClusterAppmasterSingleTests extends AbstractManaged
 		TestContainerLauncher launcher = new TestContainerLauncher();
 		TestManagedContainerClusterAppmaster appmaster = createTestAppmaster(allocator, launcher);
 		appmaster.setStateMachineFactory(stateMachineFactory);
-		ProjectionData projectionData = new ProjectionData(1, null, null, "any", 0);
+		ProjectionData projectionData = new ProjectionData(1, null, null, "default", 0);
 		appmaster.createContainerCluster("foo", projectionData);
 		assertThat(appmaster.getContainerClusters().size(), is(1));
 		appmaster.destroyContainerCluster("foo");
@@ -264,7 +269,9 @@ public class ManagedContainerClusterAppmasterSingleTests extends AbstractManaged
 		Map<String, Integer> hosts = new HashMap<String, Integer>();
 		hosts.put("host1", 2);
 		hosts.put("host2", 2);
-		ProjectionData projectionData = new ProjectionData(0, hosts, null, "hosts", 0);
+		ProjectionData projectionData = new ProjectionData(0, hosts, null, "default", 0);
+		projectionData.setMemory(0);
+		projectionData.setVirtualCores(0);
 
 		// create
 		GridProjection projection = appmaster.createContainerCluster("foo", projectionData).getGridProjection();
@@ -299,16 +306,6 @@ public class ManagedContainerClusterAppmasterSingleTests extends AbstractManaged
 
 		SatisfyStateData satisfyState = appmaster.getContainerClusters().get("foo").getGridProjection().getSatisfyState();
 		assertThat(satisfyState.getRemoveData().size(), is(3));
-
-//		Map<String, Integer> hostsfromprojection = appmaster.getContainerClusters().get("foo").getGridProjection().getProjectionData().getHosts();
-//		assertThat(hostsfromprojection.get("host1"), is(1));
-//		assertThat(hostsfromprojection.get("host2"), is(1));
-//
-//		assertDoTask(appmaster, 0, 2, 0, 0, "foo");
-//
-//		releaseContainer(appmaster, container1);
-//		assertThat(projection.getMembers().size(), is(1));
-//		assertDoTask(appmaster, 0, 0, 0, 0, "foo");
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -329,7 +326,9 @@ public class ManagedContainerClusterAppmasterSingleTests extends AbstractManaged
 		appmaster.setStateMachineFactory(stateMachineFactory);
 		Map<String, Integer> hosts = new HashMap<String, Integer>();
 		hosts.put("host1", 1);
-		ProjectionData projectionData = new ProjectionData(0, hosts, null, "hosts", 0);
+		ProjectionData projectionData = new ProjectionData(0, hosts, null, "default", 0);
+		projectionData.setMemory(0);
+		projectionData.setVirtualCores(0);
 
 		GridProjection projection = appmaster.createContainerCluster("foo", projectionData).getGridProjection();
 		assertDoTask(appmaster, null, null, null, null, "foo");

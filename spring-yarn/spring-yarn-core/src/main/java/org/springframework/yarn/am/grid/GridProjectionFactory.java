@@ -17,6 +17,7 @@ package org.springframework.yarn.am.grid;
 
 import java.util.Set;
 
+import org.apache.hadoop.conf.Configuration;
 import org.springframework.yarn.am.grid.support.ProjectionData;
 
 /**
@@ -32,9 +33,10 @@ public interface GridProjectionFactory {
 	 * Builds a {@link GridProjection} using a {@link ProjectionData}.
 	 *
 	 * @param projectionData the projection data
+	 * @param configuration the hadoop configuration
 	 * @return the grid projection
 	 */
-	GridProjection getGridProjection(ProjectionData projectionData);
+	GridProjection getGridProjection(ProjectionData projectionData, Configuration configuration);
 
 	/**
 	 * Gets a registered projection types handled by this factory.

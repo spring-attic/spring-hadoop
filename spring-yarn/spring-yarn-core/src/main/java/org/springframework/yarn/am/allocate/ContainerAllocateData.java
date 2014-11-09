@@ -119,6 +119,28 @@ public class ContainerAllocateData {
 		return id;
 	}
 
+	public boolean hasData() {
+		return anyData > 0 || !hostData.isEmpty() || !rackData.isEmpty();
+	}
+
+	public ContainerAllocateData byAny() {
+		ContainerAllocateData cad = new ContainerAllocateData();
+		cad.anyData = getAny();
+		return cad;
+	}
+
+	public ContainerAllocateData byHosts() {
+		ContainerAllocateData cad = new ContainerAllocateData();
+		cad.hostData = getHosts();
+		return cad;
+	}
+
+	public ContainerAllocateData byRacks() {
+		ContainerAllocateData cad = new ContainerAllocateData();
+		cad.rackData = getRacks();
+		return cad;
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder buf = new StringBuilder();

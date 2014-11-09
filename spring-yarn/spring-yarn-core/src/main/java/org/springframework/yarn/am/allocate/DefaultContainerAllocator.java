@@ -18,11 +18,9 @@ package org.springframework.yarn.am.allocate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -39,6 +37,7 @@ import org.apache.hadoop.yarn.api.records.Resource;
 import org.apache.hadoop.yarn.api.records.ResourceRequest;
 import org.apache.hadoop.yarn.util.Records;
 import org.springframework.util.StringUtils;
+import org.springframework.yarn.am.allocate.AllocationGroup.ContainerAllocationValues;
 import org.springframework.yarn.am.allocate.DefaultAllocateCountTracker.AllocateCountInfo;
 import org.springframework.yarn.listener.CompositeContainerAllocatorListener;
 import org.springframework.yarn.listener.ContainerAllocatorListener;
@@ -70,12 +69,6 @@ public class DefaultContainerAllocator extends AbstractPollingAllocator implemen
     /** Locality relaxing */
     private boolean locality = false;
 
-    private Map<Integer, ContainerAllocationValues> allocationParams = new ConcurrentHashMap<Integer, ContainerAllocationValues>();
-
-    private Map<Integer, DefaultAllocateCountTracker> allocateCountTrackers = new ConcurrentHashMap<Integer, DefaultAllocateCountTracker>();
-
-    private Map<String, Integer> idToPriority = new ConcurrentHashMap<String, Integer>();
-
     /** Increasing counter for rpc request id*/
     private AtomicInteger requestId = new AtomicInteger();
 
@@ -94,6 +87,9 @@ public class DefaultContainerAllocator extends AbstractPollingAllocator implemen
     /** Empty list for requests without container asks */
     private final List<ResourceRequest> EMPTY = new ArrayList<ResourceRequest>();
 
+    /** Groups for allocation tracking */
+	private final AllocationGroups allocationGroups = new AllocationGroups();
+
     @Override
     protected void onInit() throws Exception {
         super.onInit();
@@ -105,9 +101,9 @@ public class DefaultContainerAllocator extends AbstractPollingAllocator implemen
         if (log.isDebugEnabled()) {
             log.debug("Incoming count: " + count);
         }
-        DefaultAllocateCountTracker tracker = allocateCountTrackers.get(priority);
-        tracker.addContainers(count);
-        allocationDirty.set(true);
+        ContainerAllocateData cad = new ContainerAllocateData();
+        cad.addAny(count);
+        allocateContainers(cad);
     }
 
     @Override
@@ -117,12 +113,61 @@ public class DefaultContainerAllocator extends AbstractPollingAllocator implemen
 
     @Override
     public void allocateContainers(ContainerAllocateData containerAllocateData) {
-        log.info("Incoming containerAllocateData: " + containerAllocateData);
-        DefaultAllocateCountTracker tracker = getAllocateCountTracker(containerAllocateData.getId());
-        log.info("State allocateCountTracker before adding allocation data: " + tracker);
-        tracker.addContainers(containerAllocateData);
-        allocationDirty.set(true);
-        log.info("State allocateCountTracker after adding allocation data: " + tracker);
+    	log.info("Incoming containerAllocateData: " + containerAllocateData);
+    	String id = StringUtils.hasText(containerAllocateData.getId()) ? containerAllocateData.getId() : "";
+    	AllocationGroup group = allocationGroups.get(id);
+
+    	if (group == null) {
+    		group = allocationGroups.get("");
+    	}
+
+    	boolean dirty = false;
+    	ContainerAllocateData cad = containerAllocateData.byAny();
+    	if (cad.hasData()) {
+    		dirty = true;
+            DefaultAllocateCountTracker tracker = group.getAllocateCountTracker(AllocationGroup.GROUP_ANY);
+        	if (tracker == null) {
+        		allocationGroups.reserve(id, AllocationGroup.GROUP_ANY);
+        		tracker = new DefaultAllocateCountTracker(AllocationGroup.GROUP_ANY, getConfiguration());
+            	group.setAllocateCountTracker(AllocationGroup.GROUP_ANY, tracker);
+        	}
+        	log.info("State allocateCountTracker before adding allocation data: " + tracker);
+        	tracker.addContainers(cad);
+        	log.info("State allocateCountTracker after adding allocation data: " + tracker);
+    	}
+
+    	cad = containerAllocateData.byHosts();
+    	if (cad.hasData()) {
+    		dirty = true;
+            DefaultAllocateCountTracker tracker = group.getAllocateCountTracker(AllocationGroup.GROUP_HOST);
+        	if (tracker == null) {
+        		allocationGroups.reserve(id, AllocationGroup.GROUP_HOST);
+        		tracker = new DefaultAllocateCountTracker(AllocationGroup.GROUP_HOST, getConfiguration());
+            	group.setAllocateCountTracker(AllocationGroup.GROUP_HOST, tracker);
+        	}
+        	log.info("State allocateCountTracker before adding allocation data: " + tracker);
+        	tracker.addContainers(cad);
+        	log.info("State allocateCountTracker after adding allocation data: " + tracker);
+    	}
+
+
+    	cad = containerAllocateData.byRacks();
+    	if (cad.hasData()) {
+    		dirty = true;
+            DefaultAllocateCountTracker tracker = group.getAllocateCountTracker(AllocationGroup.GROUP_RACK);
+        	if (tracker == null) {
+        		allocationGroups.reserve(id, AllocationGroup.GROUP_RACK);
+        		tracker = new DefaultAllocateCountTracker(AllocationGroup.GROUP_RACK, getConfiguration());
+            	group.setAllocateCountTracker(AllocationGroup.GROUP_RACK, tracker);
+        	}
+        	log.info("State allocateCountTracker before adding allocation data: " + tracker);
+        	tracker.addContainers(cad);
+        	log.info("State allocateCountTracker after adding allocation data: " + tracker);
+    	}
+
+    	if (dirty) {
+        	allocationDirty.set(true);
+    	}
     }
 
     @Override
@@ -136,67 +181,6 @@ public class DefaultContainerAllocator extends AbstractPollingAllocator implemen
     public void releaseContainer(ContainerId containerId) {
         log.info("Adding new container to be released containerId=" + containerId);
         releaseContainers.add(containerId);
-    }
-
-    public void setAllocationValues(String id, Integer priority, Integer virtualcores, Integer memory, Boolean locality) {
-
-    	if (log.isTraceEnabled()) {
-        	log.trace("setAllocationValues 1: id=" + id + " priority=" + priority + " cores=" + virtualcores + " memory=" + memory + " locality=" + locality);
-    	}
-
-    	id = StringUtils.hasText(id) ? id : "";
-    	if (!idToPriority.containsKey(id) && idToPriority.containsValue(priority)) {
-    		throw new IllegalArgumentException("Key " + id + " is already mapped to priority " + priority);
-    	} else {
-    		idToPriority.put(id, priority);
-    	}
-    	allocationParams.put(priority, new ContainerAllocationValues(priority, virtualcores, memory, locality));
-    	allocateCountTrackers.put(priority, new DefaultAllocateCountTracker(id, getConfiguration()));
-    }
-
-    private ContainerAllocationValues getAllocationValues(String id) {
-    	return allocationParams.get(idToPriority.get(id));
-    }
-
-    private DefaultAllocateCountTracker getAllocateCountTracker(String id) {
-    	id = StringUtils.hasText(id) ? id : "";
-    	return allocateCountTrackers.get(idToPriority.containsKey(id) ? idToPriority.get(id) : idToPriority.get(""));
-    }
-
-    private List<ResourceRequest> createRequests() {
-        List<ResourceRequest> requestedContainers = new ArrayList<ResourceRequest>();
-
-        for (DefaultAllocateCountTracker tracker : allocateCountTrackers.values()) {
-        	AllocateCountInfo allocateCounts = tracker.getAllocateCounts();
-        	ContainerAllocationValues allocationValues = getAllocationValues(tracker.getId());
-        	if (log.isTraceEnabled()) {
-    			log.trace("trace 1 " + allocationValues.locality);
-    			log.trace("trace 2 tracker id:" + tracker.getId());
-        	}
-        	boolean hostsAdded = false;
-        	for (Entry<String, Integer> entry : allocateCounts.hostsInfo.entrySet()) {
-            	if (log.isTraceEnabled()) {
-        			log.trace("trace 3 entry key=" + entry.getKey() + " value=" + entry.getValue());
-            	}
-        		requestedContainers.add(getContainerResourceRequest(tracker.getId(), entry.getValue(), entry.getKey(), true));
-        		hostsAdded = true;
-        	}
-        	for (Entry<String, Integer> entry : allocateCounts.racksInfo.entrySet()) {
-            	if (log.isTraceEnabled()) {
-        			log.trace("trace 4 entry key=" + entry.getKey() + " value=" + entry.getValue());
-            	}
-        		requestedContainers.add(getContainerResourceRequest(tracker.getId(), entry.getValue(), entry.getKey(), (hostsAdded && allocationValues.locality) ? false : true));
-        	}
-        	for (Entry<String, Integer> entry : allocateCounts.anysInfo.entrySet()) {
-            	if (log.isTraceEnabled()) {
-        			log.trace("trace 5 entry key=" + entry.getKey() + " value=" + entry.getValue());
-            	}
-        		requestedContainers.add(getContainerResourceRequest(tracker.getId(), entry.getValue(), entry.getKey(), !allocationValues.locality));
-        	}
-
-        }
-
-        return requestedContainers;
     }
 
     @Override
@@ -253,13 +237,14 @@ public class DefaultContainerAllocator extends AbstractPollingAllocator implemen
 		List<Container> preProcessed = new ArrayList<Container>();
 		for (Container container : containers) {
 
-			DefaultAllocateCountTracker tracker = allocateCountTrackers.get(container.getPriority().getPriority());
+
+			DefaultAllocateCountTracker tracker = allocationGroups.get(container.getPriority().getPriority())
+					.getAllocateCountTracker(container.getPriority().getPriority());
 
 			if (log.isDebugEnabled()) {
 				log.debug("State allocateCountTracker before handling allocated container: " + tracker);
 			}
-			Container processed = allocateCountTrackers.get(container.getPriority().getPriority())
-					.processAllocatedContainer(container);
+			Container processed = tracker.processAllocatedContainer(container);
 			if (processed != null) {
 				preProcessed.add(processed);
 			} else {
@@ -298,6 +283,26 @@ public class DefaultContainerAllocator extends AbstractPollingAllocator implemen
     @Override
     public void setProgress(float progress) {
         applicationProgress = progress;
+    }
+
+    /**
+     * Sets the allocation values for given identifier.
+     *
+     * @param id the allocation identifier
+     * @param priority the base priority
+     * @param virtualcores the cpu count
+     * @param memory the memory
+     * @param locality the locality flag
+     */
+    public void setAllocationValues(String id, Integer priority, Integer virtualcores, Integer memory, Boolean locality) {
+    	if (log.isTraceEnabled()) {
+			log.trace("setAllocationValues 1: id=" + id + " priority=" + priority + " cores=" + virtualcores
+					+ " memory=" + memory + " locality=" + locality);
+    	}
+
+    	id = StringUtils.hasText(id) ? id : "";
+    	AllocationGroup group = allocationGroups.add(id, priority);
+    	group.setContainerAllocationValues(new ContainerAllocationValues(priority, virtualcores, memory, locality));
     }
 
     /**
@@ -377,13 +382,64 @@ public class DefaultContainerAllocator extends AbstractPollingAllocator implemen
         this.locality = locality;
     }
 
+    private List<ResourceRequest> createRequests() {
+        List<ResourceRequest> requestedContainers = new ArrayList<ResourceRequest>();
+
+        for (AllocationGroup group : allocationGroups.getGroups()) {
+        	for (DefaultAllocateCountTracker tracker : group.getAllocateCountTrackers()) {
+
+        		AllocateCountInfo allocateCounts = tracker.getAllocateCounts();
+        		Integer pri = group.getPriority(tracker.getId());
+            	ContainerAllocationValues allocationValues = group.getContainerAllocationValues();
+        		if (pri == null) {
+        			pri = allocationValues.priority;
+        		}
+
+            	if (log.isTraceEnabled()) {
+        			log.trace("trace 1 " + allocationValues.locality);
+        			log.trace("trace 2 tracker id:" + tracker.getId());
+            	}
+            	boolean hostsAdded = false;
+            	for (Entry<String, Integer> entry : allocateCounts.hostsInfo.entrySet()) {
+                	if (log.isTraceEnabled()) {
+            			log.trace("trace 3 entry key=" + entry.getKey() + " value=" + entry.getValue());
+                	}
+    				requestedContainers.add(getContainerResourceRequest(allocationValues, pri, entry.getValue(), entry.getKey(),
+    						true));
+            		hostsAdded = true;
+            	}
+            	for (Entry<String, Integer> entry : allocateCounts.racksInfo.entrySet()) {
+                	if (log.isTraceEnabled()) {
+            			log.trace("trace 4 entry key=" + entry.getKey() + " value=" + entry.getValue());
+                	}
+    				requestedContainers.add(getContainerResourceRequest(allocationValues, pri, entry.getValue(), entry.getKey(),
+    						(hostsAdded && allocationValues.locality) ? false : true));
+            	}
+            	for (Entry<String, Integer> entry : allocateCounts.anysInfo.entrySet()) {
+                	if (log.isTraceEnabled()) {
+            			log.trace("trace 5 entry key=" + entry.getKey() + " value=" + entry.getValue());
+                	}
+                	// need to force locality flag for any in case of
+                	// any group
+                	boolean localityForAny = tracker.getId().equals(AllocationGroup.GROUP_ANY) ? true : !allocationValues.locality;
+       				requestedContainers.add(getContainerResourceRequest(allocationValues, pri, entry.getValue(), entry.getKey(),
+       						localityForAny));
+            	}
+
+
+        	}
+        }
+
+        return requestedContainers;
+    }
+
     /**
      * Internal init which should only configure this class and
      * should not touch parent classes.
      */
     private void internalInit() {
     	setAllocationValues(null, priority, virtualcores, memory, locality);
-    	for (DefaultAllocateCountTracker tracker : allocateCountTrackers.values()) {
+    	for (DefaultAllocateCountTracker tracker : allocationGroups.getAllocateCountTrackers()) {
     		tracker.setConfiguration(getConfiguration());
     	}
     }
@@ -391,52 +447,27 @@ public class DefaultContainerAllocator extends AbstractPollingAllocator implemen
     /**
      * Utility method creating a {@link ResourceRequest}.
      *
-     * @param numContainers number of containers to request
+     * @param allocationValues
+     * @param priority
+     * @param numContainers
+     * @param hostName
+     * @param relaxLocality
      * @return request to be sent to resource manager
      */
-    private ResourceRequest getContainerResourceRequest(String id, int numContainers, String hostName, boolean relaxLocality) {
-
-    	ContainerAllocationValues allocationValues = getAllocationValues(id);
-
+	private ResourceRequest getContainerResourceRequest(ContainerAllocationValues allocationValues, int priority,
+			int numContainers, String hostName, boolean relaxLocality) {
         ResourceRequest request = Records.newRecord(ResourceRequest.class);
         request.setRelaxLocality(relaxLocality);
         request.setResourceName(hostName);
         request.setNumContainers(numContainers);
         Priority pri = Records.newRecord(Priority.class);
-        pri.setPriority(allocationValues.priority);
+        pri.setPriority(priority);
         request.setPriority(pri);
         Resource capability = Records.newRecord(Resource.class);
         capability.setMemory(allocationValues.memory);
         ResourceCompat.setVirtualCores(capability, allocationValues.virtualcores);
         request.setCapability(capability);
         return request;
-    }
-
-    private static class ContainerAllocationValues {
-        int priority = 0;
-        int virtualcores = 1;
-        int memory = 64;
-        boolean locality = false;
-		public ContainerAllocationValues(Integer priority, Integer virtualcores, Integer memory, Boolean locality) {
-			if (priority != null) {
-				this.priority = priority;
-			}
-			if (virtualcores != null) {
-				this.virtualcores = virtualcores;
-			}
-			if (memory != null) {
-				this.memory = memory;
-			}
-			if (locality != null) {
-				this.locality = locality;
-			}
-		}
-		@Override
-		public String toString() {
-			return "ContainerAllocationValues [priority=" + priority + ", virtualcores=" + virtualcores + ", memory="
-					+ memory + ", locality=" + locality + "]";
-		}
-
     }
 
 }

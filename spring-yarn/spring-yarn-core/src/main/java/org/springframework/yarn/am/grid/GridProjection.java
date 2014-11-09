@@ -16,6 +16,7 @@
 package org.springframework.yarn.am.grid;
 
 import java.util.Collection;
+import java.util.Comparator;
 
 import org.springframework.yarn.am.grid.support.ProjectionData;
 import org.springframework.yarn.am.grid.support.SatisfyStateData;
@@ -28,6 +29,12 @@ import org.springframework.yarn.am.grid.support.SatisfyStateData;
  */
 public interface GridProjection {
 
+	/**
+	 * Asks a projection if it accepted a member.
+	 *
+	 * @param member the grid member
+	 * @return true, if member accepted by projection
+	 */
 	boolean acceptMember(GridMember member);
 
 	/**
@@ -65,5 +72,23 @@ public interface GridProjection {
 	 * @return the projection data
 	 */
 	ProjectionData getProjectionData();
+
+	/**
+	 * Gets the projection priority.
+	 *
+	 * @return the projection priority
+	 */
+	Integer getPriority();
+
+	/**
+	 * {@link Comparator} sorting {@link GridProjection}s for priority.
+	 */
+	public static final Comparator<GridProjection> PRIORITY_COMPARATOR = new Comparator<GridProjection>() {
+        public int compare(GridProjection left, GridProjection right) {
+        	Integer l = left.getPriority() != null ? left.getPriority() : 0;
+        	Integer r = right.getPriority() != null ? right.getPriority() : 0;
+            return l - r;
+        }
+    };
 
 }

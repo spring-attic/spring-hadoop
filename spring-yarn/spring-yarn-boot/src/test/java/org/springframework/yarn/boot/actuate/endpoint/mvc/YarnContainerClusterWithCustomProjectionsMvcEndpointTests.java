@@ -67,7 +67,7 @@ import org.springframework.yarn.am.container.ContainerLauncher;
 import org.springframework.yarn.am.grid.GridProjection;
 import org.springframework.yarn.am.grid.GridProjectionFactory;
 import org.springframework.yarn.am.grid.GridProjectionFactoryLocator;
-import org.springframework.yarn.am.grid.support.AnyGridProjection;
+import org.springframework.yarn.am.grid.support.DefaultGridProjection;
 import org.springframework.yarn.am.grid.support.DefaultGridProjectionFactory;
 import org.springframework.yarn.am.grid.support.GridProjectionFactoryRegistry;
 import org.springframework.yarn.am.grid.support.ProjectionData;
@@ -171,10 +171,10 @@ public class YarnContainerClusterWithCustomProjectionsMvcEndpointTests {
 		}
 
 		@Override
-		public GridProjection getGridProjection(ProjectionData projectionData) {
+		public GridProjection getGridProjection(ProjectionData projectionData, org.apache.hadoop.conf.Configuration configuration) {
 			GridProjection projection = null;
 			if ("custom".equalsIgnoreCase(projectionData.getType())) {
-				AnyGridProjection p = new AnyGridProjection();
+				DefaultGridProjection p = new DefaultGridProjection();
 				p.setPriority(projectionData.getPriority());
 				projection = p;
 			}
@@ -190,7 +190,6 @@ public class YarnContainerClusterWithCustomProjectionsMvcEndpointTests {
 		}
 
 	}
-
 
 	protected static class TestYarnAppmaster extends ManagedContainerClusterAppmaster {
 		@Override

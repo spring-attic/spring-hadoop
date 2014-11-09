@@ -56,6 +56,13 @@ public abstract class MockUtils {
 		return container;
 	}
 
+	public static Resource getMockResource(int mem, int cores) {
+		Resource resource = mock(Resource.class);
+		when(resource.getMemory()).thenReturn(mem);
+		when(resource.getVirtualCores()).thenReturn(cores);
+		return resource;
+	}
+
 	public static ContainerId getMockContainerId(ApplicationAttemptId applicationAttemptId, int id) {
 		ContainerId containerId = mock(ContainerId.class);
 		doReturn(applicationAttemptId).when(containerId).getApplicationAttemptId();

@@ -42,14 +42,12 @@ public class ManagedContainerClusterAppmasterMultiTests extends AbstractManagedC
 		appmaster.setStateMachineFactory(stateMachineFactory);
 
 		// cluster1
-		ProjectionData projectionData1 = new ProjectionData(1, null, null, "any", 0);
+		ProjectionData projectionData1 = new ProjectionData(1, null, null, "default", 0);
 		appmaster.createContainerCluster("cluster1", projectionData1);
 
 		// cluster2
-		ProjectionData projectionData2 = new ProjectionData(1, null, null, "any", 0);
+		ProjectionData projectionData2 = new ProjectionData(1, null, null, "default", 0);
 		appmaster.createContainerCluster("cluster2", projectionData2);
-
-//		assertSatisfyStateData(appmaster, 2, null, null, null);
 	}
 
 	@Test
@@ -59,11 +57,15 @@ public class ManagedContainerClusterAppmasterMultiTests extends AbstractManagedC
 		TestManagedContainerClusterAppmaster appmaster = createTestAppmaster(allocator, launcher);
 		appmaster.setStateMachineFactory(stateMachineFactory);
 
-		ProjectionData projectionData1 = new ProjectionData(1, null, null, "any", 0);
+		ProjectionData projectionData1 = new ProjectionData(1, null, null, "default", 0);
+		projectionData1.setMemory(0);
+		projectionData1.setVirtualCores(0);
 		appmaster.createContainerCluster("cluster1", projectionData1);
 		appmaster.startContainerCluster("cluster1");
 
-		ProjectionData projectionData2 = new ProjectionData(1, null, null, "any", 0);
+		ProjectionData projectionData2 = new ProjectionData(1, null, null, "default", 0);
+		projectionData2.setMemory(0);
+		projectionData2.setVirtualCores(0);
 		appmaster.createContainerCluster("cluster2", projectionData2);
 		appmaster.startContainerCluster("cluster2");
 
@@ -86,9 +88,6 @@ public class ManagedContainerClusterAppmasterMultiTests extends AbstractManagedC
 		assertThat(allocator.releaseContainers, nullValue());
 		launcher.resetTestData();
 		allocator.resetTestData();
-//		assertThat(appmaster.satisfyStateData.size(), is(2));
-//		assertThat(appmaster.satisfyStateData.get(0), nullValue());
-//		assertThat(appmaster.satisfyStateData.get(1), nullValue());
 
 		// allocate 2
 		appmaster.resetTestData();
@@ -99,9 +98,6 @@ public class ManagedContainerClusterAppmasterMultiTests extends AbstractManagedC
 		assertThat(allocator.releaseContainers, nullValue());
 		launcher.resetTestData();
 		allocator.resetTestData();
-//		assertThat(appmaster.satisfyStateData.size(), is(2));
-//		assertThat(appmaster.satisfyStateData.get(0), nullValue());
-//		assertThat(appmaster.satisfyStateData.get(1), nullValue());
 	}
 
 	@Test
@@ -112,11 +108,15 @@ public class ManagedContainerClusterAppmasterMultiTests extends AbstractManagedC
 		appmaster.setStateMachineFactory(stateMachineFactory);
 
 		// cluster1
-		ProjectionData projectionData1 = new ProjectionData(1, null, null, "any", 0);
+		ProjectionData projectionData1 = new ProjectionData(1, null, null, "default", 0);
+		projectionData1.setMemory(0);
+		projectionData1.setVirtualCores(0);
 		GridProjection projection1 = appmaster.createContainerCluster("cluster1", projectionData1).getGridProjection();
 
 		// cluster2
-		ProjectionData projectionData2 = new ProjectionData(1, null, null, "any", 0);
+		ProjectionData projectionData2 = new ProjectionData(1, null, null, "default", 0);
+		projectionData2.setMemory(0);
+		projectionData2.setVirtualCores(0);
 		GridProjection projection2 = appmaster.createContainerCluster("cluster2", projectionData2).getGridProjection();
 
 		appmaster.startContainerCluster("cluster1");
@@ -130,11 +130,9 @@ public class ManagedContainerClusterAppmasterMultiTests extends AbstractManagedC
 		// allocate container 1
 		allocateContainer(appmaster, 1);
 		assertThat(projection1.getMembers().size() + projection2.getMembers().size(), is(1));
-//		assertDoTask(appmaster, null, null, null, null, "cluster1");
 
 		allocateContainer(appmaster, 2);
 		assertThat(projection1.getMembers().size() + projection2.getMembers().size(), is(2));
-//		assertDoTask(appmaster, null, null, null, null, "cluster1");
 
 		allocateContainer(appmaster, 3);
 		assertThat(projection1.getMembers().size(), is(1));
@@ -158,23 +156,18 @@ public class ManagedContainerClusterAppmasterMultiTests extends AbstractManagedC
 		Map<String, Integer> hosts1 = new HashMap<String, Integer>();
 		hosts1.put("host10", 1);
 
-//		ProjectionData projectionData1 = new ProjectionData(0, hosts1, null);
-//		HostsGridProjection projection1 = new HostsGridProjection();
-//		projection1.setProjectionData(projectionData1);
-		ProjectionData projectionData1 = new ProjectionData(0, hosts1, null, "hosts", 0);
+		ProjectionData projectionData1 = new ProjectionData(0, hosts1, null, "default", 0);
+		projectionData1.setMemory(0);
+		projectionData1.setVirtualCores(0);
 
-
-//		HostsGridProjection projection1 = new HostsGridProjection(hosts1);
 		GridProjection projection1 = appmaster.createContainerCluster("cluster1", projectionData1).getGridProjection();
 
 		// cluster2
 		Map<String, Integer> hosts2 = new HashMap<String, Integer>();
 		hosts2.put("host20", 1);
-//		ProjectionData projectionData2 = new ProjectionData(0, hosts2, null);
-//		HostsGridProjection projection2 = new HostsGridProjection();
-//		projection2.setProjectionData(projectionData2);
-//		HostsGridProjection projection2 = new HostsGridProjection(hosts2);
-		ProjectionData projectionData2 = new ProjectionData(0, hosts2, null, "hosts", 0);
+		ProjectionData projectionData2 = new ProjectionData(0, hosts2, null, "default", 0);
+		projectionData2.setMemory(0);
+		projectionData2.setVirtualCores(0);
 		GridProjection projection2 = appmaster.createContainerCluster("cluster2", projectionData2).getGridProjection();
 
 		appmaster.startContainerCluster("cluster1");
@@ -188,21 +181,13 @@ public class ManagedContainerClusterAppmasterMultiTests extends AbstractManagedC
 		// allocate container 1
 		allocateContainer(appmaster, 1, "host10");
 		assertThat(projection1.getMembers().size() + projection2.getMembers().size(), is(1));
-//		assertDoTask(appmaster, null, null, null, null, "cluster1");
 
 		allocateContainer(appmaster, 2, "host20");
 		assertThat(projection1.getMembers().size() + projection2.getMembers().size(), is(2));
-//		assertDoTask(appmaster, null, null, null, null, "cluster1");
 
 		allocateContainer(appmaster, 3, "hostX1");
 		assertThat(projection1.getMembers().size(), is(1));
 		assertThat(projection2.getMembers().size(), is(1));
-
-		// modify - ramp up to 2
-//		appmaster.modifyContainerCluster("cluster1", new ProjectionData(2));
-//		assertDoTask(appmaster, 1, 0, 0, 0, "cluster1");
-
-
 	}
 
 

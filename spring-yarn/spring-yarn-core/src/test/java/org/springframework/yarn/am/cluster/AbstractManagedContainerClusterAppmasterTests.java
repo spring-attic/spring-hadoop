@@ -33,6 +33,7 @@ import org.apache.hadoop.yarn.api.records.ContainerState;
 import org.apache.hadoop.yarn.api.records.ContainerStatus;
 import org.apache.hadoop.yarn.api.records.NodeId;
 import org.apache.hadoop.yarn.api.records.Priority;
+import org.apache.hadoop.yarn.api.records.Resource;
 import org.junit.After;
 import org.junit.Before;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -52,20 +53,29 @@ import org.springframework.yarn.listener.ContainerAllocatorListener;
 import org.springframework.yarn.support.statemachine.StateMachineSystemConstants;
 import org.springframework.yarn.support.statemachine.config.EnumStateMachineFactory;
 
+/**
+ * Base class for tests for {@link ManagedContainerClusterAppmaster}.
+ *
+ * @author Janne Valkealahti
+ *
+ */
 public abstract class AbstractManagedContainerClusterAppmasterTests {
 
 	private AnnotationConfigApplicationContext ctx;
+
 	protected EnumStateMachineFactory<ClusterState, ClusterEvent> stateMachineFactory;
 
 	protected Container allocateContainer(Object appmaster, int id) throws Exception {
-		return allocateContainer(appmaster, id, null);
+		// force host as "host"
+		return allocateContainer(appmaster, id, "host");
 	}
 
 	protected Container allocateContainer(Object appmaster, int id, String host) throws Exception {
 		ContainerId containerId = MockUtils.getMockContainerId(MockUtils.getMockApplicationAttemptId(0, 0), 0);
 		NodeId nodeId = MockUtils.getMockNodeId(host, 0);
 		Priority priority = MockUtils.getMockPriority(0);
-		Container container = MockUtils.getMockContainer(containerId, nodeId, null, priority);
+		Resource resource = MockUtils.getMockResource(0, 0);
+		Container container = MockUtils.getMockContainer(containerId, nodeId, resource, priority);
 		TestUtils.callMethod("onContainerAllocated", appmaster, new Object[]{container}, new Class<?>[]{Container.class});
 		return container;
 	}
@@ -101,29 +111,8 @@ public abstract class AbstractManagedContainerClusterAppmasterTests {
 		if (killSize != null) {
 			assertThat(appmaster.getSatisfyStateDataByCluster(cluster).getRemoveData(), notNullValue());
 			assertThat(appmaster.getSatisfyStateDataByCluster(cluster).getRemoveData().size(), is(killSize));
-		} else {
-//			assertThat(appmaster.getSatisfyStateDataByCluster(cluster), nullValue());
-//			assertThat(appmaster.getSatisfyStateDataByCluster(cluster), notNullValue());
 		}
 	}
-
-//	protected static void assertSatisfyStateData(Object appmaster, Integer mapSize, Integer anySize, Integer hostsSize, Integer racksSize) throws Exception {
-//		Map<ContainerCluster, SatisfyStateData> map = TestUtils.callMethod("getSatisfyStateData", appmaster);
-//		assertThat(map.size(), is(mapSize));
-//		SatisfyStateData data = null;
-//		if (mapSize != null && mapSize > 0) {
-//			data = map.entrySet().iterator().next().getValue();
-//		}
-//		if (anySize != null) {
-//			assertThat(data.getAllocateData().getAny(), is(anySize));
-//		}
-//		if (hostsSize != null) {
-//			assertThat(data.getAllocateData().getHosts().size(), is(hostsSize));
-//		}
-//		if (racksSize != null) {
-//			assertThat(data.getAllocateData().getRacks().size(), is(racksSize));
-//		}
-//	}
 
 	protected static ManagedContainerClusterAppmaster createManagedAppmaster() throws Exception {
 		ManagedContainerClusterAppmaster appmaster = new ManagedContainerClusterAppmaster();
@@ -134,7 +123,6 @@ public abstract class AbstractManagedContainerClusterAppmasterTests {
 		appmaster.setGridProjectionFactoryLocator(registry);
 		appmaster.setProjectionDataRegistry(new ProjectionDataRegistry(null));
 
-//		appmaster.setGridProjectionFactory(new DefaultGridProjectionFactory());
 		TestUtils.callMethod("onInit", appmaster);
 		return appmaster;
 	}
@@ -177,7 +165,6 @@ public abstract class AbstractManagedContainerClusterAppmasterTests {
 		appmaster.setGridProjectionFactoryLocator(registry);
 		appmaster.setProjectionDataRegistry(new ProjectionDataRegistry(null));
 
-//		appmaster.setGridProjectionFactory(new DefaultGridProjectionFactory());
 		TestUtils.callMethod("onInit", appmaster);
 		return appmaster;
 	}
@@ -199,14 +186,8 @@ public abstract class AbstractManagedContainerClusterAppmasterTests {
 		}
 
 		public void resetTestData() {
-//			satisfyStateData = null;
 			satisfyStateData.clear();;
 		}
-
-//		@Override
-//		protected void handleSatisfyStateData(Map<ContainerCluster, SatisfyStateData> satisfyData) {
-//			satisfyStateData = satisfyData;
-//		}
 
 		@Override
 		protected void handleSatisfyStateData(ContainerCluster cluster, SatisfyStateData satisfyData) {

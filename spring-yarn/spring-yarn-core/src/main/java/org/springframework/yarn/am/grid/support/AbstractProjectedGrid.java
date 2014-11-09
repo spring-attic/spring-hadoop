@@ -15,8 +15,11 @@
  */
 package org.springframework.yarn.am.grid.support;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 
 import org.springframework.util.Assert;
 import org.springframework.yarn.am.grid.Grid;
@@ -126,9 +129,12 @@ public abstract class AbstractProjectedGrid implements ProjectedGrid {
 
 		@Override
 		public GridMember preAdd(GridMember member, Grid grid) {
-			// intercept and check if any projection
-			// accepts this member
-			for (GridProjection projection : getProjections()) {
+			// intercept and check if any projection accepts this member
+			// using a priority sorted list to offer members to
+			// lowest priorities
+			List<GridProjection> projections = new ArrayList<GridProjection>(getProjections());
+			Collections.sort(projections, GridProjection.PRIORITY_COMPARATOR);
+			for (GridProjection projection : projections) {
 				if (projection.acceptMember(member)) {
 					notifyMemberAdded(projection, member);
 					return member;
