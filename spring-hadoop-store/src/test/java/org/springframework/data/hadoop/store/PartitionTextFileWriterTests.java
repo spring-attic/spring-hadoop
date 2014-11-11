@@ -233,6 +233,48 @@ public class PartitionTextFileWriterTests extends AbstractStoreTests {
 		TestUtils.readDataAndAssert(reader3, dataArray3);
 	}
 
+	@Test
+	public void testWritersCleaned() throws Exception {
+		String expression = "path(region)";
+		String[] dataArray = new String[] { DATA10 };
+		DefaultPartitionStrategy<String> strategy = new DefaultPartitionStrategy<String>(expression);
+
+		Map<String, Object> headers = new HashMap<String, Object>();
+		headers.put("region", "reg1");
+
+		PartitionTextFileWriter<Map<String, Object>> writer =
+				new PartitionTextFileWriter<Map<String, Object>>(getConfiguration(), testDefaultPath, null, strategy);
+		writer.setFileNamingStrategyFactory(new StaticFileNamingStrategy("bar"));
+
+		writer.write(dataArray[0], headers);
+		writer.flush();
+
+		Map<Path, DataStoreWriter<String>> writers = TestUtils.readField("writers", writer);
+		assertThat(writers.size(), is(1));
+
+		headers.put("region", "reg2");
+		writer.write(dataArray[0], headers);
+		writer.flush();
+
+		writers = TestUtils.readField("writers", writer);
+		assertThat(writers.size(), is(2));
+
+		DataStoreWriter<String> toclose = writers.values().iterator().next();
+		toclose.close();
+		writer.flush();
+		writers = TestUtils.readField("writers", writer);
+		assertThat(writers.size(), is(1));
+
+		writer.close();
+
+		TextFileReader reader = new TextFileReader(getConfiguration(), new Path(testDefaultPath, "reg1/bar"), null);
+		TestUtils.readDataAndAssert(reader, dataArray);
+
+		writers = TestUtils.readField("writers", writer);
+		assertThat(writers.size(), is(0));
+
+	}
+
 	private static class CustomerPartitionStrategy implements PartitionStrategy<String, String> {
 
 		CustomerPartitionResolver partitionResolver = new CustomerPartitionResolver();

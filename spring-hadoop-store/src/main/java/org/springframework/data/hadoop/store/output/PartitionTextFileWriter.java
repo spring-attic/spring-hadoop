@@ -15,6 +15,8 @@
  */
 package org.springframework.data.hadoop.store.output;
 
+import java.io.IOException;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.springframework.data.hadoop.store.DataStoreWriter;
@@ -47,8 +49,15 @@ public class PartitionTextFileWriter<K> extends AbstractPartitionDataStoreWriter
 	}
 
 	@Override
-	protected DataStoreWriter<String> createWriter(Configuration configuration, Path path, CodecInfo codec) {
-		TextFileWriter writer = new TextFileWriter(getConfiguration(), path != null ? new Path(getBasePath(), path) : getBasePath(), codec);
+	protected DataStoreWriter<String> createWriter(Configuration configuration, final Path path, CodecInfo codec) {
+		TextFileWriter writer = new TextFileWriter(getConfiguration(), path != null ? new Path(getBasePath(), path) : getBasePath(), codec) {
+			@Override
+			public synchronized void close() throws IOException {
+				super.close();
+				// catch close() and destroy from parent
+				destroyWriter(path);
+			}
+		};
 		if (getBeanFactory() != null) {
 			writer.setBeanFactory(getBeanFactory());
 		}

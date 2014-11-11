@@ -370,4 +370,22 @@ public abstract class AbstractPartitionDataStoreWriter<T, K> extends LifecycleOb
 	 */
 	protected abstract DataStoreWriter<T> createWriter(Configuration configuration, Path basePath, CodecInfo codec);
 
+	/**
+	 * Destroys a writer with a given {@link Path} if exist.
+	 *
+	 * @param path the path
+	 */
+	protected void destroyWriter(Path path) {
+		if (path == null) {
+			return;
+		}
+		DataStoreWriter<T> writer = writers.remove(path);
+		if (writer != null) {
+			try {
+				writer.close();
+			} catch (IOException e) {
+			}
+		}
+	}
+
 }
