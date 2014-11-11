@@ -40,14 +40,13 @@ public class DateFormatMethodExecutorTests extends AbstractExpressionTests {
 	public void testCompilables() throws Exception {
 		Message<String> rootObject = MessageBuilder.withPayload("foo-bar").setHeader("foo", "bar").build();
 		Long timestamp = rootObject.getHeaders().getTimestamp();
-//		String nowYYYYMMdd = new SimpleDateFormat("yyyy/MM/dd").format(new Date(timestamp));
-//		String nowYYYYMM = new SimpleDateFormat("yyyy/MM").format(new Date(timestamp));
+		String nowYYYYMMzero = new SimpleDateFormat("yyyy/MM").format(new Date(0));
 		String nowYYYY = new SimpleDateFormat("yyyy").format(new Date(timestamp));
 
 		Message<Object> wrappedRootObject = new MessageExpressionMethods.MessageWrappedMessage(rootObject);
 
 		assertExpression(new TestMethodResolver(), wrappedRootObject, "dateFormat('yyyy')", nowYYYY, true);
-		assertExpression(new TestMethodResolver(), rootObject, "dateFormat('yyyy/MM', 0)", "1970/01", true);
+		assertExpression(new TestMethodResolver(), rootObject, "dateFormat('yyyy/MM', 0)", nowYYYYMMzero, true);
 		assertExpression(new TestMethodResolver(), rootObject, "dateFormat('yyyyMMdd','2000-10-20')", "20001020", true);
 		assertExpression(new TestMethodResolver(), rootObject, "dateFormat('yyyyMMdd','20001020','yyyyMMdd')", "20001020", true);
 	}
