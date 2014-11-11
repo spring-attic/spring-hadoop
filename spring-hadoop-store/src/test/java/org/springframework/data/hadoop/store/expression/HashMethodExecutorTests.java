@@ -15,12 +15,18 @@
  */
 package org.springframework.data.hadoop.store.expression;
 
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import java.util.List;
+
 import org.junit.Test;
+import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.expression.AccessException;
+import org.springframework.expression.EvaluationContext;
+import org.springframework.expression.MethodExecutor;
 import org.springframework.expression.TypedValue;
+import org.springframework.expression.spel.support.ReflectiveMethodResolver;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 /**
@@ -29,7 +35,7 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
  * @author Janne Valkealahti
  *
  */
-public class HashMethodExecutorTests {
+public class HashMethodExecutorTests extends AbstractExpressionTests {
 
 	@Test
 	public void testPositiveValues() throws Exception {
@@ -104,6 +110,26 @@ public class HashMethodExecutorTests {
 		assertThat((String) value.getValue(), is("9_hash"));
 		value = executor.execute(context, new Object(), -9, 27);
 		assertThat((String) value.getValue(), is("9_hash"));
+	}
+
+	@Test
+	public void testCompilables() throws Exception {
+		assertExpression(new TestMethodResolver(), "hash(3,2)", "1_hash", true);
+	}
+
+//	@Test
+//	public void testNonCompilables() throws Exception {
+//		assertExpression(new TestMethodResolver(), "path(new String[]{'foo1'})", "foo1", false);
+//	}
+
+	private static class TestMethodResolver extends ReflectiveMethodResolver {
+
+		@Override
+		public MethodExecutor resolve(EvaluationContext context, Object targetObject, String name,
+				List<TypeDescriptor> argumentTypes) throws AccessException {
+			return super.resolve(context, HashMethodExecutor.class, name, argumentTypes);
+		}
+
 	}
 
 }

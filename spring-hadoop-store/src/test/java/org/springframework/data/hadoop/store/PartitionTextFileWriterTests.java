@@ -39,6 +39,10 @@ import org.springframework.data.hadoop.store.strategy.naming.StaticFileNamingStr
 import org.springframework.data.hadoop.store.strategy.rollover.SizeRolloverStrategy;
 import org.springframework.data.hadoop.test.context.HadoopDelegatingSmartContextLoader;
 import org.springframework.data.hadoop.test.context.MiniHadoopCluster;
+import org.springframework.expression.spel.SpelCompilerMode;
+import org.springframework.expression.spel.SpelParserConfiguration;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.test.context.ContextConfiguration;
@@ -80,7 +84,9 @@ public class PartitionTextFileWriterTests extends AbstractStoreTests {
 	public void testMessageWriteReadTextOneLine() throws IOException {
 		String expression = "headers[region] + '/' + dateFormat('yyyy/MM', headers[timestamp])";
 		String[] dataArray = new String[] { DATA10 };
-		MessagePartitionStrategy<String> strategy = new MessagePartitionStrategy<String>(expression);
+		MessagePartitionStrategy<String> strategy = new MessagePartitionStrategy<String>(expression,
+				new StandardEvaluationContext(), new SpelExpressionParser(new SpelParserConfiguration(
+						SpelCompilerMode.IMMEDIATE, null)));
 
 		Map<String, Object> headers = new HashMap<String, Object>();
 		headers.put("region", "foo");
@@ -103,7 +109,9 @@ public class PartitionTextFileWriterTests extends AbstractStoreTests {
 	public void testFallbackWriter() throws IOException {
 		String expression = "headers[region] + '/' + dateFormat('yyyy/MM', headers[timestamp])";
 		String[] dataArray = new String[] { DATA10 };
-		MessagePartitionStrategy<String> strategy = new MessagePartitionStrategy<String>(expression);
+		MessagePartitionStrategy<String> strategy = new MessagePartitionStrategy<String>(expression,
+				new StandardEvaluationContext(), new SpelExpressionParser(new SpelParserConfiguration(
+						SpelCompilerMode.IMMEDIATE, null)));
 
 		Map<String, Object> headers = new HashMap<String, Object>();
 		headers.put("region", "foo");
@@ -123,8 +131,10 @@ public class PartitionTextFileWriterTests extends AbstractStoreTests {
 	@Test
 	public void testWriteReadManyLinesWithNamingAndRollover() throws IOException {
 
-		String expression = "headers[region] + '/' + dateFormat('yyyy/MM', headers[timestamp])";
-		MessagePartitionStrategy<String> strategy = new MessagePartitionStrategy<String>(expression);
+		String expression = "headers[region].toString() + '/' + dateFormat('yyyy/MM', headers[timestamp])";
+		MessagePartitionStrategy<String> strategy = new MessagePartitionStrategy<String>(expression,
+				new StandardEvaluationContext(), new SpelExpressionParser(new SpelParserConfiguration(
+						SpelCompilerMode.IMMEDIATE, null)));
 
 		PartitionTextFileWriter<Message<?>> writer =
 				new PartitionTextFileWriter<Message<?>>(getConfiguration(), testDefaultPath, null, strategy);

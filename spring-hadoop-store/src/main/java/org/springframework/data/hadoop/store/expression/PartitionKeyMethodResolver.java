@@ -22,6 +22,7 @@ import org.springframework.expression.AccessException;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.MethodExecutor;
 import org.springframework.expression.MethodResolver;
+import org.springframework.expression.spel.support.ReflectiveMethodResolver;
 
 /**
  * A {@link MethodResolver} handling custom methods internally without
@@ -30,9 +31,9 @@ import org.springframework.expression.MethodResolver;
  * @author Janne Valkealahti
  * @author Rodrigo Meneses
  */
-public class PartitionKeyMethodResolver implements MethodResolver {
+public class PartitionKeyMethodResolver extends ReflectiveMethodResolver {
 
-	public final static String METHOD_DATEFORMAT = "dateformat";
+	public final static String METHOD_DATEFORMAT = "dateFormat";
 
 	public final static String METHOD_PATH = "path";
 
@@ -42,114 +43,38 @@ public class PartitionKeyMethodResolver implements MethodResolver {
 
 	public final static String METHOD_HASHRANGE = "range";
 
+	public PartitionKeyMethodResolver() {
+		super();
+	}
+
+	public PartitionKeyMethodResolver(boolean useDistance) {
+		super(useDistance);
+	}
+
 	@Override
-	public final MethodExecutor resolve(EvaluationContext context, Object targetObject, String name,
+	public MethodExecutor resolve(EvaluationContext context, Object targetObject, String name,
 			List<TypeDescriptor> argumentTypes) throws AccessException {
-		return dispatch(context, targetObject, name, argumentTypes);
-	}
-
-	/**
-	 * Dispatch handling to an appropriate method supported by
-	 * this {@link PartitionKeyMethodResolver}.
-	 *
-	 * @param context the current evaluation context
-	 * @param targetObject the object upon which the method is being called
-	 * @param argumentTypes the arguments that the constructor must be able to handle
-	 * @return a MethodExecutor that can invoke the method, or null if the method cannot be found
-	 * @throws AccessException the access exception
-	 */
-	protected MethodExecutor dispatch(EvaluationContext context, Object targetObject, String name,
-			List<TypeDescriptor> argumentTypes) throws AccessException {
-		String methodName = name != null ? name.toLowerCase() : null;
-		if (METHOD_DATEFORMAT.equals(methodName)) {
-			return doDateFormat(context, targetObject, methodName, argumentTypes);
-		} else if (METHOD_PATH.equals(methodName)) {
-			return doPath(context, targetObject, methodName, argumentTypes);
-		} else if (METHOD_HASH.equals(methodName)) {
-			return doHash(context, targetObject, methodName, argumentTypes);
-		} else if (METHOD_HASHLIST.equals(methodName)) {
-			return doHashList(context, targetObject, methodName, argumentTypes);
-		} else if (METHOD_HASHRANGE.equals(methodName)) {
-			return doHashRange(context, targetObject, methodName, argumentTypes);
+		// first check against given targetObject
+		MethodExecutor executor = super.resolve(context, targetObject, name, argumentTypes);
+		if (executor != null) {
+			return executor;
 		}
-		// return null as method not found
-		return null;
-	}
 
-	/**
-	 * Create a {@link MethodExecutor} using {@link DateFormatMethodExecutor}.
-	 *
-	 * @param context the current evaluation context
-	 * @param targetObject the object upon which the method is being called
-	 * @param argumentTypes the arguments that the constructor must be able to handle
-	 * @return a MessageDateFormatMethodExecutor
-	 * @throws AccessException the access exception
-	 */
-	protected MethodExecutor doDateFormat(EvaluationContext context, Object targetObject, String name,
-			List<TypeDescriptor> argumentTypes) throws AccessException {
-		if (argumentTypes.size() == 1) {
-			return new DateFormatMethodExecutor("timestamp");
-		} else if (argumentTypes.size() == 2 || argumentTypes.size()==3) {
-			return new DateFormatMethodExecutor(null);
-		} else {
-			throw new AccessException("Too many or missing arguments");
+		// intercept our own function names and replace target so
+		// that we can match a correct partition functions.
+		if (METHOD_PATH.equals(name)) {
+			targetObject = PathCombiningMethodExecutor.class;
+		} else if (METHOD_DATEFORMAT.equals(name)) {
+			targetObject = DateFormatMethodExecutor.class;
+		} else if (METHOD_HASH.equals(name)) {
+			targetObject = HashMethodExecutor.class;
+		} else if (METHOD_HASHLIST.equals(name)) {
+			targetObject = HashListMethodExecutor.class;
+		} else if (METHOD_HASHRANGE.equals(name)) {
+			targetObject = HashRangeMethodExecutor.class;
 		}
-	}
-
-	/**
-	 * Create a {@link MethodExecutor} using {@link HashMethodExecutor}.
-	 *
-	 * @param context the current evaluation context
-	 * @param targetObject the object upon which the method is being called
-	 * @param argumentTypes the arguments that the constructor must be able to handle
-	 * @return a MessageDateFormatMethodExecutor
-	 * @throws AccessException the access exception
-	 */
-	protected MethodExecutor doHash(EvaluationContext context, Object targetObject, String name,
-			List<TypeDescriptor> argumentTypes) throws AccessException {
-		return new HashMethodExecutor();
-	}
-
-	/**
-	 * Create a {@link MethodExecutor} using {@link PathCombiningMethodExecutor}.
-	 *
-	 * @param context the current evaluation context
-	 * @param targetObject the object upon which the method is being called
-	 * @param argumentTypes the arguments that the constructor must be able to handle
-	 * @return a MessageDateFormatMethodExecutor
-	 * @throws AccessException the access exception
-	 */
-	protected MethodExecutor doPath(EvaluationContext context, Object targetObject, String name,
-			List<TypeDescriptor> argumentTypes) throws AccessException {
-		return new PathCombiningMethodExecutor();
-	}
-
-	/**
-	 * Create a {@link MethodExecutor} using {@link HashListMethodExecutor}.
-	 *
-	 * @param context the current evaluation context
-	 * @param targetObject the object upon which the method is being called
-	 * @param argumentTypes the arguments that the constructor must be able to handle
-	 * @return a MessageDateFormatMethodExecutor
-	 * @throws AccessException the access exception
-	 */
-	protected MethodExecutor doHashList(EvaluationContext context, Object targetObject, String name,
-			List<TypeDescriptor> argumentTypes) throws AccessException {
-		return new HashListMethodExecutor();
-	}
-
-	/**
-	 * Create a {@link MethodExecutor} using {@link HashRangeMethodExecutor}.
-	 *
-	 * @param context the current evaluation context
-	 * @param targetObject the object upon which the method is being called
-	 * @param argumentTypes the arguments that the constructor must be able to handle
-	 * @return a MessageDateFormatMethodExecutor
-	 * @throws AccessException the access exception
-	 */
-	protected MethodExecutor doHashRange(EvaluationContext context, Object targetObject, String name,
-			List<TypeDescriptor> argumentTypes) throws AccessException {
-		return new HashRangeMethodExecutor();
+		// need to go back to super method for whole spel to work
+		return super.resolve(context, targetObject, name, argumentTypes);
 	}
 
 }

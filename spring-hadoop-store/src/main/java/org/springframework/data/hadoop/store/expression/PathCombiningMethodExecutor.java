@@ -29,37 +29,49 @@ import org.springframework.expression.TypedValue;
  */
 public class PathCombiningMethodExecutor implements MethodExecutor {
 
-	private final static String DEFAULT_PATH_DELIMITER = "/";
+	private final static String PATH_DELIMITER = "/";
 
-	private final String delimiter;
-
-	/**
-	 * Instantiates a new path combine method executor with
-	 * default delimiter '/'.
-	 */
 	public PathCombiningMethodExecutor() {
-		this(DEFAULT_PATH_DELIMITER);
-	}
-
-	/**
-	 * Instantiates a new path combine method executor.
-	 *
-	 * @param delimiter the delimiter for paths
-	 */
-	public PathCombiningMethodExecutor(String delimiter) {
-		this.delimiter = delimiter;
 	}
 
 	@Override
 	public TypedValue execute(EvaluationContext context, Object target, Object... arguments) throws AccessException {
+		return new TypedValue(pathWithObjectArray(arguments));
+	}
+
+	public static String path(String arg) throws AccessException {
+		return pathWithObjectArray(new String[]{arg});
+	}
+
+	public static String path(String... arguments) throws AccessException {
+		return pathWithObjectArray(arguments);
+	}
+
+	public static String path(Long arg) throws AccessException {
+		return pathWithObjectArray(new Long[]{arg});
+	}
+
+	public static String path(Long... arguments) throws AccessException {
+		return pathWithObjectArray(arguments);
+	}
+
+	public static String path(Object arg) throws AccessException {
+		return pathWithObjectArray(new Object[]{arg});
+	}
+
+	public static String path(Object... arguments) throws AccessException {
+		return pathWithObjectArray(arguments);
+	}
+
+	private static String pathWithObjectArray(Object[] arguments) throws AccessException {
 		StringBuilder buf = new StringBuilder();
 		for (int i = 0; i < arguments.length; i++) {
 			buf.append(arguments[i]);
 			if (i+1 < arguments.length) {
-				buf.append(delimiter);
+				buf.append(PATH_DELIMITER);
 			}
 		}
-		return new TypedValue(buf.toString());
+		return buf.toString();
 	}
 
 }

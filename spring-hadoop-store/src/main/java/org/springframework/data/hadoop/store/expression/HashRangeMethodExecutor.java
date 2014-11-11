@@ -40,16 +40,23 @@ public class HashRangeMethodExecutor implements MethodExecutor {
 	@Override
 	public TypedValue execute(EvaluationContext context, Object target, Object... arguments) throws AccessException {
 		if (arguments[1] instanceof List) {
-			try {
-				Object[] ranges = ((List<?>) arguments[1]).toArray(new Object[0]);
-				int searchIndex = Arrays.binarySearch(ranges, arguments[0]);
-				return new TypedValue(ranges[Math.min(searchIndex < 0 ? -searchIndex - 1 : searchIndex, ranges.length - 1)]
-						+ "_range");
-			} catch (Exception e) {
-				throw new AccessException("Error finding range", e);
-			}
+			return new TypedValue(rangeWithObjectAndList(arguments[0], (List<?>) arguments[1]));
 		}
 		throw new AccessException("Argument " + arguments[1] + " not a List");
+	}
+
+	public static String range(Object arg1, List<?> arg2) throws AccessException {
+		return rangeWithObjectAndList(arg1, arg2);
+	}
+
+	private static String rangeWithObjectAndList(Object arg1, List<?> arg2) throws AccessException {
+		try {
+			Object[] ranges = ((List<?>) arg2).toArray(new Object[0]);
+			int searchIndex = Arrays.binarySearch(ranges, arg1);
+			return ranges[Math.min(searchIndex < 0 ? -searchIndex - 1 : searchIndex, ranges.length - 1)] + "_range";
+		} catch (Exception e) {
+			throw new AccessException("Error finding range", e);
+		}
 	}
 
 }

@@ -13,18 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.springframework.data.hadoop.store.expression;
 
-import org.springframework.expression.MethodResolver;
-import org.springframework.messaging.Message;
-
-/**
- * A {@link Message} specific {@link MethodResolver}.
- *
- * @author Janne Valkealahti
- *
- */
-public class MessagePartitionKeyMethodResolver extends PartitionKeyMethodResolver {
+public class PartitionKeyMethodResolverTests {
 
 }

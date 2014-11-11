@@ -25,6 +25,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
+import org.springframework.data.hadoop.test.tests.Assume;
+import org.springframework.data.hadoop.test.tests.TestGroup;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
@@ -39,6 +41,7 @@ public class MessageExpressionMethodsTests {
 		Map<String, Object> headers = new HashMap<String, Object>();
 		headers.put("headerkey", "headervalue");
 		Message<String> message = MessageBuilder.withPayload("jee").copyHeaders(headers).build();
+		Message<Object> wrappedRootObject = new MessageExpressionMethods.MessageWrappedMessage(message);
 		String nowYYYYMM = new SimpleDateFormat("yyyy/MM").format(new Date());
 		String nowYYYY = new SimpleDateFormat("yyyy").format(new Date());
 
@@ -49,16 +52,16 @@ public class MessageExpressionMethodsTests {
 		context.addMethodResolver(resolver);
 		context.addPropertyAccessor(accessor);
 
-		assertThat(parser.parseExpression("dateFormat('yyyy/MM')").getValue(context, message, String.class), is(nowYYYYMM));
+		assertThat(parser.parseExpression("dateFormat('yyyy/MM')").getValue(context, wrappedRootObject, String.class), is(nowYYYYMM));
 		assertThat(parser.parseExpression("dateFormat('yyyy/MM', headers[timestamp])").getValue(context, message, String.class), is(nowYYYYMM));
 		assertThat(parser.parseExpression("dateFormat('yyyy/MM', timestamp)").getValue(context, message, String.class), is(nowYYYYMM));
 		assertThat(parser.parseExpression("dateFormat('yyyy/MM', T(java.lang.System).currentTimeMillis())").getValue(context, message, String.class), is(nowYYYYMM));
-		assertThat(parser.parseExpression("path(dateFormat('yyyy'),dateFormat('MM'))").getValue(context, message, String.class), is(nowYYYYMM));
+		assertThat(parser.parseExpression("path(dateFormat('yyyy'),dateFormat('MM'))").getValue(context, wrappedRootObject, String.class), is(nowYYYYMM));
 		assertThat(parser.parseExpression("path('yyyy', 'MM')").getValue(context, message, String.class), is("yyyy/MM"));
 		assertThat(parser.parseExpression("path('yyyy', 'MM', payload.substring(0,3))").getValue(context, message, String.class), is("yyyy/MM/jee"));
-		assertThat(parser.parseExpression("dateFormat('yyyy') + '/' + dateFormat('MM')").getValue(context, message, String.class), is(nowYYYYMM));
+		assertThat(parser.parseExpression("dateFormat('yyyy') + '/' + dateFormat('MM')").getValue(context, wrappedRootObject, String.class), is(nowYYYYMM));
 		assertThat(parser.parseExpression("headerkey").getValue(context, message, String.class), is("headervalue"));
-		assertThat(parser.parseExpression("path(dateFormat('yyyy'), headerkey)").getValue(context, message, String.class), is(nowYYYY + "/headervalue"));
+		assertThat(parser.parseExpression("path(dateFormat('yyyy'), headerkey)").getValue(context, wrappedRootObject, String.class), is(nowYYYY + "/headervalue"));
 		assertThat(parser.parseExpression("headers.timestamp").getValue(context, message, Long.class), greaterThan(0l));
 		assertThat(parser.parseExpression("headers[timestamp]").getValue(context, message, Long.class), greaterThan(0l));
 		assertThat(parser.parseExpression("payload").getValue(context, message, String.class), is("jee"));
@@ -81,7 +84,7 @@ public class MessageExpressionMethodsTests {
 
 		ExpressionParser parser = new SpelExpressionParser();
 
-		MessageExpressionMethods methods = new MessageExpressionMethods();
+		MessageExpressionMethods methods = new MessageExpressionMethods(new StandardEvaluationContext(), true, true);
 		assertThat(methods.getValue(parser.parseExpression("dateFormat('yyyy/MM')"), message, String.class), is(nowYYYYMM));
 		assertThat(methods.getValue(parser.parseExpression("dateFormat('yyyy/MM', headers[timestamp])"), message, String.class), is(nowYYYYMM));
 		assertThat(methods.getValue(parser.parseExpression("dateFormat('yyyy/MM', timestamp)"), message, String.class), is(nowYYYYMM));
@@ -102,6 +105,7 @@ public class MessageExpressionMethodsTests {
 
 	@Test
 	public void testPerfWithResolverAndAccessor() {
+		Assume.group(TestGroup.PERFORMANCE);
 		Message<String> message = MessageBuilder.withPayload("jee").build();
 
 		ExpressionParser parser = new SpelExpressionParser();
@@ -121,6 +125,7 @@ public class MessageExpressionMethodsTests {
 
 	@Test
 	public void testPerfWithNativeSpel() {
+		Assume.group(TestGroup.PERFORMANCE);
 		Message<String> message = MessageBuilder.withPayload("jee").build();
 
 		ExpressionParser parser = new SpelExpressionParser();

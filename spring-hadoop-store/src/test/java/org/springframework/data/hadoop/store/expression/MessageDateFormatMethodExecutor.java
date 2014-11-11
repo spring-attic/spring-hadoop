@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.data.hadoop.store.expression;
 
 import java.text.SimpleDateFormat;
 import java.util.Map;
 
+import org.springframework.data.hadoop.store.expression.DateFormatMethodExecutor;
 import org.springframework.expression.AccessException;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.MethodExecutor;
@@ -55,8 +57,8 @@ public class MessageDateFormatMethodExecutor extends DateFormatMethodExecutor {
 			return super.execute(context, target, arguments);
 		}
 		if (target instanceof Message<?>) {
-			Map<?, ?> map = ((Message<?>)target).getHeaders();
-			SimpleDateFormat format = new SimpleDateFormat((String)arguments[0]);
+			Map<?, ?> map = ((Message<?>) target).getHeaders();
+			SimpleDateFormat format = new SimpleDateFormat((String) arguments[0]);
 			return new TypedValue(format.format(map.get(getKey())));
 		}
 		throw new AccessException("Unable to format");

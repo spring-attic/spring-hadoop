@@ -42,19 +42,26 @@ public class HashListMethodExecutor implements MethodExecutor {
 	public TypedValue execute(EvaluationContext context, Object target, Object... arguments) throws AccessException {
 		if (arguments[1] instanceof List) {
 			List<?> list = (List<?>)arguments[1];
-			for (Object object : list) {
-				if (object instanceof List) {
-					List<?> sublist = ((List<?>)object);
-					if (sublist.contains(arguments[0])) {
-						return new TypedValue(sublist.get(0) + "_list");
-					}
-				}
-			}
+			return new TypedValue(listWithObjects(arguments[0], list));
 		} else {
 			throw new AccessException("Argument " + arguments[1] + " not a List");
 		}
-		// we didn't match anything, return default partition as 'list'
-		return new TypedValue("list");
+	}
+
+	public static String list(String arg1, List<Object> arg2) {
+		return listWithObjects(arg1, arg2);
+	}
+
+	private static String listWithObjects(Object arg1, List<?> arg2) {
+		for (Object object : arg2) {
+			if (object instanceof List) {
+				List<?> sublist = ((List<?>)object);
+				if (sublist.contains(arg1)) {
+					return sublist.get(0) + "_list";
+				}
+			}
+		}
+		return "list";
 	}
 
 }

@@ -13,18 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.data.hadoop.store.expression;
 
-import org.springframework.expression.EvaluationContext;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.expression.EvaluationException;
 import org.springframework.expression.Expression;
+import org.springframework.expression.MethodResolver;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageHeaders;
 import org.springframework.util.Assert;
 
 /**
  * Helper class to work with a spel expressions resolving values
- * from a {@link Message}.
+ * from a {@link Message}. A {@link StandardEvaluationContext} is expected and
+ * {@link MessagePartitionKeyMethodResolver} and {@link MessagePartitionKeyPropertyAccessor}
+ * registered with it.
  *
  * @author Janne Valkealahti
  *
@@ -34,26 +42,39 @@ public class MessageExpressionMethods {
 	private final StandardEvaluationContext context;
 
 	/**
-	 * Instantiates a new message expression methods.
+	 * Instantiates a new message expression methods with
+	 * a {@link StandardEvaluationContext}.
+	 *
+	 * @param evaluationContext the spel evaluation context
 	 */
-	public MessageExpressionMethods() {
-		this(null);
+	public MessageExpressionMethods(StandardEvaluationContext evaluationContext) {
+		this(evaluationContext, false, false);
 	}
 
 	/**
 	 * Instantiates a new message expression methods with
-	 * a {@link EvaluationContext} which is expected to be
 	 * a {@link StandardEvaluationContext}.
+	 *
+	 * @param evaluationContext the spel evaluation context
+	 * @param autoCustomize auto customize method resolver and property accessor
+	 * @param replaceMethodResolver replace context method resolver
 	 */
-	public MessageExpressionMethods(EvaluationContext evaluationContext) {
-		if (evaluationContext instanceof StandardEvaluationContext) {
-			// we were given a context, so don't register anything
-			context = (StandardEvaluationContext) evaluationContext;
-		} else {
-			context = new StandardEvaluationContext();
-			context.addMethodResolver(new MessagePartitionKeyMethodResolver());
-			context.addPropertyAccessor(new MessagePartitionKeyPropertyAccessor());
+	public MessageExpressionMethods(StandardEvaluationContext evaluationContext, boolean autoCustomize, boolean replaceMethodResolver) {
+		Assert.notNull(evaluationContext, "Evaluation context cannot be null");
+		if (autoCustomize) {
+			MethodResolver methodResolver = new MessagePartitionKeyMethodResolver();
+			if (replaceMethodResolver) {
+				List<MethodResolver> methodResolvers = new ArrayList<MethodResolver>();
+				methodResolvers.add(methodResolver);
+				evaluationContext.setMethodResolvers(methodResolvers);
+			} else {
+				evaluationContext.addMethodResolver(methodResolver);
+			}
 		}
+		if (autoCustomize) {
+			evaluationContext.addPropertyAccessor(new MessagePartitionKeyPropertyAccessor());
+		}
+		this.context = evaluationContext;
 	}
 
 	/**
@@ -65,9 +86,35 @@ public class MessageExpressionMethods {
 	 * @return the value
 	 * @throws EvaluationException the evaluation exception
 	 */
-	public <T> T getValue(Expression expression, Message<?> message, Class<T> desiredResultType) throws EvaluationException {
+	public <T> T getValue(Expression expression, Message<?> message, Class<T> desiredResultType)
+			throws EvaluationException {
 		Assert.notNull(expression, "Expression cannot be null");
-		return expression.getValue(context, message, desiredResultType);
+		return expression.getValue(context, new MessageWrappedMessage(message), desiredResultType);
+	}
+
+	public static class MessageWrappedMessage implements Message<Object> {
+
+		private final Message<?> delegate;
+
+		public MessageWrappedMessage(Message<?> delegate) {
+			this.delegate = delegate;
+		}
+
+		@Override
+		public Object getPayload() {
+			return delegate.getPayload();
+		}
+
+		@Override
+		public MessageHeaders getHeaders() {
+			return delegate.getHeaders();
+		}
+
+		public String dateFormat(String pattern) {
+			SimpleDateFormat format = new SimpleDateFormat(pattern);
+			return format.format(getHeaders().getTimestamp());
+		}
+
 	}
 
 }

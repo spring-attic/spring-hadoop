@@ -92,4 +92,41 @@ public class DateFormatMethodExecutor implements MethodExecutor {
 		return key;
 	}
 
+	public static String dateFormat(String pattern, Integer epoch) throws AccessException {
+		SimpleDateFormat format = new SimpleDateFormat(pattern);
+		return format.format(epoch);
+	}
+
+	public static String dateFormat(String pattern, Long epoch) throws AccessException {
+		SimpleDateFormat format = new SimpleDateFormat(pattern);
+		return format.format(epoch);
+	}
+
+	public static String dateFormat(String pattern, Date date) throws AccessException {
+		SimpleDateFormat format = new SimpleDateFormat(pattern);
+		return format.format(date);
+	}
+
+	public static String dateFormat(String pattern, String datestring) throws AccessException {
+		try {
+			SimpleDateFormat format = new SimpleDateFormat(pattern);
+			SimpleDateFormat fromFormat = new SimpleDateFormat(DEFAULT_FORMAT);
+			Date parsedDate = fromFormat.parse(datestring);
+			return format.format(parsedDate);
+		} catch (ParseException e) {
+			throw new AccessException("Unable to format", e);
+		}
+	}
+
+	public static String dateFormat(String pattern, String datestring, String dateformat) throws AccessException {
+		try {
+			SimpleDateFormat format = new SimpleDateFormat(pattern);
+			SimpleDateFormat fromFormat = new SimpleDateFormat(dateformat);
+			Date parsedDate = fromFormat.parse(datestring);
+			return format.format(parsedDate);
+		} catch (ParseException e) {
+			throw new AccessException("Unable to format", e);
+		}
+	}
+
 }
