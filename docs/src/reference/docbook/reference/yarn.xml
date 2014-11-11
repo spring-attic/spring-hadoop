@@ -3246,27 +3246,9 @@ public void publicVoidParameterArgsMethod(@YarnParameter("key") String value) {
                       <entry>null</entry>
                   </row>
                   <row>
-                      <entry><literal>spring.yarn.appmaster.containercluster.clusters.&lt;name&gt;.projectionType</literal></entry>
+                      <entry><literal>spring.yarn.appmaster.containercluster.clusters.&lt;name&gt;.projection</literal></entry>
                       <entry>No</entry>
-                      <entry>String</entry>
-                      <entry>null</entry>
-                  </row>
-                  <row>
-                      <entry><literal>spring.yarn.appmaster.containercluster.clusters.&lt;name&gt;.projectionAny</literal></entry>
-                      <entry>No</entry>
-                      <entry>Integer</entry>
-                      <entry>null</entry>
-                  </row>
-                  <row>
-                      <entry><literal>spring.yarn.appmaster.containercluster.clusters.&lt;name&gt;.projectionHosts</literal></entry>
-                      <entry>No</entry>
-                      <entry>Map</entry>
-                      <entry>null</entry>
-                  </row>
-                  <row>
-                      <entry><literal>spring.yarn.appmaster.containercluster.clusters.&lt;name&gt;.projectionRacks</literal></entry>
-                      <entry>No</entry>
-                      <entry>Map</entry>
+                      <entry>Config</entry>
                       <entry>null</entry>
                   </row>
               </tbody>
@@ -3289,31 +3271,61 @@ public void publicVoidParameterArgsMethod(@YarnParameter("key") String value) {
               Same as <literal>spring.yarn.aptpmaster.localizer</literal> config property.
               </para></listitem>
           </varlistentry>
-          <varlistentry><term><filename>spring.yarn.appmaster.containercluster.clusters.&lt;name&gt;.projectionType</filename></term>
+          <varlistentry><term><filename>spring.yarn.appmaster.containercluster.clusters.&lt;name&gt;.projection</filename></term>
               <listitem><para>
-              Type of a projection to use. One of <literal>any</literal>, <literal>hosts</literal> or
-              <literal>racks</literal> is supported on default or any other projection added via
-              a custom factory.
-              </para></listitem>
-          </varlistentry>
-          <varlistentry><term><filename>spring.yarn.appmaster.containercluster.clusters.&lt;name&gt;.projectionAny</filename></term>
-              <listitem><para>
-              Any data passed to projection.
-              </para></listitem>
-          </varlistentry>
-          <varlistentry><term><filename>spring.yarn.appmaster.containercluster.clusters.&lt;name&gt;.projectionHosts</filename></term>
-              <listitem><para>
-              Map of hosts data passed to projection. Key would be a hostname and value denoting number of instances
-              in that particular host.
-              </para></listitem>
-          </varlistentry>
-          <varlistentry><term><filename>spring.yarn.appmaster.containercluster.clusters.&lt;name&gt;.projectionRacks</filename></term>
-              <listitem><para>
-              Map of racks data passed to projection. Key would be a hostname and value denoting number of instances
-              in that particular rack.
+              Config collection for a projection settings.
               </para></listitem>
           </varlistentry>
       </variablelist>
+
+      <table id="yarn:boot:configpropsspringyarnappmastercontainerclusterclustersprojection" pgwide="1" align="center">
+          <title><literal>spring.yarn.appmaster.containercluster.clusters.&lt;name&gt;.projection</literal> configuration properties</title>
+          <tgroup cols="4">
+              <colspec colname="c1" colwidth="2*" align="left"/>
+              <colspec colname="c2" colwidth="1*"/>
+              <colspec colname="c3" colwidth="1*"/>
+              <colspec colname="c4" colwidth="1*"/>
+              <thead>
+                  <row>
+                      <entry>Property Name</entry>
+                      <entry>Required</entry>
+                      <entry>Type</entry>
+                      <entry>Default Value</entry>
+                  </row>
+              </thead>
+              <tbody>
+                  <row>
+                      <entry><literal>spring.yarn.appmaster.containercluster.clusters.&lt;name&gt;.projection.type</literal></entry>
+                      <entry>No</entry>
+                      <entry>String</entry>
+                      <entry>null</entry>
+                  </row>
+                  <row>
+                      <entry><literal>spring.yarn.appmaster.containercluster.clusters.&lt;name&gt;.projection.data</literal></entry>
+                      <entry>No</entry>
+                      <entry>Map</entry>
+                      <entry>null</entry>
+                  </row>
+              </tbody>
+          </tgroup>
+      </table>
+
+      <variablelist>
+          <varlistentry><term><filename>spring.yarn.appmaster.containercluster.clusters.&lt;name&gt;.projection.type</filename></term>
+              <listitem><para>
+              Type of a projection to use. <literal>default</literal> is supported on default or any other projection added via
+              a custom factory.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry><term><filename>spring.yarn.appmaster.containercluster.clusters.&lt;name&gt;.projection.data</filename></term>
+              <listitem><para>
+              Map of config keys and values. <literal>any</literal> takes an integer, <literal>hosts</literal>
+              as name to integer map, <literal>racks</literal> as name to integer map, <literal>properties</literal>
+              as a generic map values.
+              </para></listitem>
+          </varlistentry>
+      </variablelist>
+
 
       <table id="yarn:boot:configpropsspringyarnendpointscontainercluster" pgwide="1" align="center">
           <title><literal>spring.yarn.endpoints.containercluster</literal> configuration properties</title>
@@ -3977,8 +3989,8 @@ public interface GridProjection {
 
           <para>Projections are created via <interfacename>GridProjectionFactory</interfacename>
           beans. Default factory named as <literal>gridProjectionFactory</literal> currently
-          handles three different types of projections, <classname>AnyGridProjection</classname>,
-          <classname>HostsGridProjection</classname> and <classname>RacksGridProjection</classname>.
+          handles one different type of projection named <classname>DefaultGridProjection</classname>
+          which is registered with name <literal>default</literal>.
           You can replace this factory by defining a bean with a same name or introduce
           more factories just by defining your own factory implementations.</para>
 
@@ -3990,8 +4002,8 @@ public interface GridProjectionFactory {
 ]]></programlisting>
 
           <para>Registered types needs to be mapped into projections itself created by
-          a factory. For example default implementation does mapping of types <literal>any</literal>,
-          <literal>hosts</literal> and <literal>racks</literal> respectively.</para>
+          a factory. For example default implementation does mapping of
+          type <literal>default</literal>.</para>
 
       </section>
 
@@ -4016,10 +4028,16 @@ spring:
       containercluster:
         clusters:
           cluster1:
-            projectionType: hosts
-            projectionHosts:
-              node3: 1
-              node4: 1
+            projection:
+              type: default
+              data:
+                any: 1
+                hosts:
+                  node3: 1
+                  node4: 1
+                racks:
+                  rack1: 1
+                  rack2: 1 
             resource:
               priority: 1
               memory: 64
