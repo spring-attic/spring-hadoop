@@ -1076,9 +1076,7 @@ project('spring-yarn:spring-yarn-boot') {
 		compile "org.springframework.boot:spring-boot-actuator:$springBootVersion"
 		compile "org.apache.httpcomponents:httpclient:$httpclientVersion"
 		runtime "org.yaml:snakeyaml:$snakeYamlVersion"
-		testRuntime("org.springframework.boot:spring-boot-starter-web:$springBootVersion") {
-			exclude group:'ch.qos.logback'
-		}
+		testRuntime "org.apache.tomcat.embed:tomcat-embed-jasper:$tomcatEmbedVersion"
 		testCompile("org.mockito:mockito-core:$mockitoVersion") { dep ->
 			exclude group: "org.hamcrest"
 		}
