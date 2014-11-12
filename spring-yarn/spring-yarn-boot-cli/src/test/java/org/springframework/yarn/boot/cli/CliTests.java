@@ -29,6 +29,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.boot.cli.command.Command;
 import org.springframework.boot.cli.command.CommandRunner;
+import org.springframework.boot.cli.command.HelpExample;
 import org.springframework.boot.cli.command.options.OptionHelp;
 import org.springframework.boot.cli.command.status.ExitStatus;
 import org.springframework.boot.cli.util.Log;
@@ -377,6 +378,11 @@ public class CliTests {
 		public ExitStatus run(String... args) throws Exception {
 			Log.info("run custom command");
 			return ExitStatus.OK;
+		}
+
+		@Override
+		public Collection<HelpExample> getExamples() {
+			return null;
 		}
 
 	}
