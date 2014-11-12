@@ -53,9 +53,11 @@ public class PartitionTextFileWriter<K> extends AbstractPartitionDataStoreWriter
 		TextFileWriter writer = new TextFileWriter(getConfiguration(), path != null ? new Path(getBasePath(), path) : getBasePath(), codec) {
 			@Override
 			public synchronized void close() throws IOException {
-				super.close();
 				// catch close() and destroy from parent
+				// this needs to happen before we pass
+				// close() to writer
 				destroyWriter(path);
+				super.close();
 			}
 		};
 		if (getBeanFactory() != null) {

@@ -87,7 +87,7 @@ public class TextFileWriter extends AbstractDataStreamWriter implements DataStor
 	}
 
 	@Override
-	public synchronized  void flush() throws IOException {
+	public synchronized void flush() throws IOException {
 		if (streamsHolder != null) {
 			OutputStream stream = streamsHolder.getStream();
 			stream.flush();
@@ -135,6 +135,7 @@ public class TextFileWriter extends AbstractDataStreamWriter implements DataStor
 	protected void handleIdleTimeout() {
 		try {
 			log.info("Idle timeout detected for this writer, closing stream");
+			flush();
 			close();
 		} catch (IOException e) {
 			log.error("error closing", e);

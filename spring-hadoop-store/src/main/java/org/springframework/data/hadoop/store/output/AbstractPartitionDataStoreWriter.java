@@ -150,18 +150,22 @@ public abstract class AbstractPartitionDataStoreWriter<T, K> extends LifecycleOb
 	}
 
 	@Override
-	public void write(T entity, K partitionKey) throws IOException {
+	public synchronized void write(T entity, K partitionKey) throws IOException {
 		DataStoreWriter<T> writer = null;
 		Path path = null;
-		if (partitionKey != null) {
-			path = partitionStrategy.getPartitionResolver().resolvePath(partitionKey);
-			writer = writers.get(path);
-		} else if (fallbackWriter == null){
-			fallbackWriter = writer = createWriter(getConfiguration(), null, getCodec());
-		}
-		if (writer == null) {
-			writer = createWriter(getConfiguration(), path, getCodec());
-			writers.put(path, writer);
+
+		// double sync for destroyWriter
+		synchronized (writers) {
+			if (partitionKey != null) {
+				path = partitionStrategy.getPartitionResolver().resolvePath(partitionKey);
+				writer = writers.get(path);
+			} else if (fallbackWriter == null) {
+				fallbackWriter = writer = createWriter(getConfiguration(), null, getCodec());
+			}
+			if (writer == null) {
+				writer = createWriter(getConfiguration(), path, getCodec());
+				writers.put(path, writer);
+			}
 		}
 		writer.write(entity);
 	}
@@ -372,19 +376,20 @@ public abstract class AbstractPartitionDataStoreWriter<T, K> extends LifecycleOb
 
 	/**
 	 * Destroys a writer with a given {@link Path} if exist.
+	 * This method expects subclass to close and flush writer
+	 * before call of this.
 	 *
 	 * @param path the path
 	 */
 	protected void destroyWriter(Path path) {
+		log.info("Trying to destoy writer with path=[" + path + "]");
 		if (path == null) {
 			return;
 		}
-		DataStoreWriter<T> writer = writers.remove(path);
-		if (writer != null) {
-			try {
-				writer.close();
-			} catch (IOException e) {
-			}
+		// sync with writer create in write()
+		synchronized (writers) {
+			DataStoreWriter<T> writer = writers.remove(path);
+			log.info("Removing writer=[" + writer + "]");
 		}
 	}
 
