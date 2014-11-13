@@ -5,6 +5,35 @@ http://projects.spring.io/spring-hadoop/
 Commit changelog: http://github.com/spring-projects/spring-hadoop/tree/v[version]
 Issues changelog: https://jira.spring.io/secure/ReleaseNote.jspa?projectId=10801
 
+Changes in version 2.1.0 M2 (2014-11-13)
+----------------------------------------
+General
+* Update the build to support Hadoop 2.5.1 [SHDP-395]
+* Update build to support Pivotal HD 2.1 [SHDP-400]
+* Update build to support Cloudera CDH 5.2.0 [SHDP-405]
+* Change default version to be Hadoop 2.5.x [SHDP-412]
+* Remove build support for Pivotal HD 1.x and CDH 4 [SHDP-413]
+* Align with upcoming IO platform versions [SHDP-420]
+  - Spring Framework 4.1.2.RELEASE
+  - Spring Batch 3.0.2.RELEASE
+  - Spring Integration 4.0.4.RELEASE.
+* Update to Boot 1.2.0.RC1 [SHDP-424]
+* Update Kite SDK to 0.17.0 [SHDP-367]
+* Remove use of mapreduce.framework.name property [SHDP-394]
+* Reorganize build, add hbase, hive, pig and spark sub-projects [SHDP-396]
+* Fix test suite issues for Hive, Pig and JavaScript [SHDP-399]
+
+Store
+* Add writerCacheSize property to DatasetDefinition for Kite SDK [SHDP-407]
+* DatasetTemplate doesn't close writer if exception is thrown [SHDP-408]
+* Change extension used for bzip2 and gzip [SHDP-416]
+* Partition writer doesn't clean resources [SHDP-423]
+* Enhance spel in store partitioning [SHDP-377]
+
+YARN
+* Enhance container groups for easier allocation model [SHDP-418]
+
+
 Changes in version 2.1.0 M1 (2014-09-05)
 ----------------------------------------
 General
