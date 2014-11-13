@@ -77,13 +77,13 @@ public class YarnClusterTests {
 	}
 
 	@Test
-	@Timed(millis = 120000)
+	@Timed(millis = 240000)
 	public void testAppSubmission1() throws Exception {
 		doSubmitAndAssert();
 	}
 
 	@Test
-	@Timed(millis = 120000)
+	@Timed(millis = 240000)
 	public void testAppSubmission2() throws Exception {
 		doSubmitAndAssert();
 	}
@@ -96,7 +96,7 @@ public class YarnClusterTests {
 		assertThat(applicationId, notNullValue());
 
 		YarnApplicationState state = null;
-		for (int i = 0; i<120; i++) {
+		for (int i = 0; i<240; i++) {
 			state = findState(client, applicationId);
 			if (state == null) {
 				break;

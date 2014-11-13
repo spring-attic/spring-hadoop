@@ -51,19 +51,19 @@ import org.springframework.yarn.test.support.ContainerLogUtils;
 public class ClusterBaseTestClassSubmitTests extends AbstractYarnClusterTests {
 
 	@Test
-	@Timed(millis = 130000)
+	@Timed(millis = 240000)
 	public void testAppSubmission1() throws Exception {
 		doSubmitAndAssert();
 	}
 
 	@Test
-	@Timed(millis = 130000)
+	@Timed(millis = 240000)
 	public void testAppSubmission2() throws Exception {
 		doSubmitAndAssert();
 	}
 
 	private void doSubmitAndAssert() throws Exception {
-		ApplicationInfo info = submitApplicationAndWait(120, TimeUnit.SECONDS);
+		ApplicationInfo info = submitApplicationAndWait(240, TimeUnit.SECONDS);
 		assertThat(info, notNullValue());
 		assertThat(info.getYarnApplicationState(), notNullValue());
 		assertThat(info.getApplicationId(), notNullValue());
