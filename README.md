@@ -91,6 +91,6 @@ Github is for social coding: if you want to write code, we encourage contributio
 
 # Staying in touch
 
-Follow the project team ([Mark](http://twitter.com/markpollack), [Thomas](http://twitter.com/trisberg)) or [Janne](https://twitter.com/tunebluez)) on Twitter.
+Follow the project team ([Mark](http://twitter.com/markpollack), [Thomas](http://twitter.com/trisberg) or [Janne](https://twitter.com/tunebluez)) on Twitter.
 
 In-depth articles can be found at the Spring [blog](http://spring.io/blog), and releases are announced via our [news feed](http://spring.io/blog/category/news).
