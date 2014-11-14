@@ -99,6 +99,9 @@ public class YarnContainerClusterMvcEndpoint extends EndpointMvcAdapter {
 		if (request.getProjectionData().getRacks() != null) {
 			projectionData.setRacks(request.getProjectionData().getRacks());
 		}
+		if (request.getProjectionData().getProperties() != null) {
+			projectionData.setProperties(request.getProjectionData().getProperties());
+		}
 
 		if (request.getProjection() == null) {
 			throw new InvalidInputException("Projection not defined");

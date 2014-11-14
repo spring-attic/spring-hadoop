@@ -15,15 +15,15 @@
  */
 package org.springframework.yarn.boot.cli;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 
+import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.yarn.boot.app.YarnContainerClusterApplication;
@@ -71,6 +71,8 @@ public class YarnClusterModifyCommand extends AbstractApplicationCommand {
 
 	public static class ClusterModifyOptionHandler extends ApplicationOptionHandler {
 
+		private static final String PREFIX = "spring.yarn.internal.ContainerClusterApplication";
+
 		private OptionSpec<String> applicationIdOption;
 
 		private OptionSpec<String> clusterIdOption;
@@ -81,6 +83,8 @@ public class YarnClusterModifyCommand extends AbstractApplicationCommand {
 
 		private OptionSpec<String> projectionDataRacksOption;
 
+		private OptionSpec<String> projectionDataRawOption;
+
 		@Override
 		protected final void options() {
 			this.applicationIdOption = option(CliSystemConstants.OPTIONS_APPLICATION_ID,
@@ -90,9 +94,11 @@ public class YarnClusterModifyCommand extends AbstractApplicationCommand {
 			this.projectionDataAnyOption = option(CliSystemConstants.OPTIONS_PROJECTION_ANY,
 					CliSystemConstants.DESC_PROJECTION_ANY).withRequiredArg();
 			this.projectionDataHostsOption = option(CliSystemConstants.OPTIONS_PROJECTION_HOSTS,
-					CliSystemConstants.DESC_PROJECTION_HOSTS).withOptionalArg().withValuesSeparatedBy(",");
+					CliSystemConstants.DESC_PROJECTION_HOSTS).withOptionalArg();
 			this.projectionDataRacksOption = option(CliSystemConstants.OPTIONS_PROJECTION_RACKS,
-					CliSystemConstants.DESC_PROJECTION_RACKS).withOptionalArg().withValuesSeparatedBy(",");
+					CliSystemConstants.DESC_PROJECTION_RACKS).withOptionalArg();
+			this.projectionDataRawOption = option(CliSystemConstants.OPTIONS_PROJECTION_DATA,
+					CliSystemConstants.DESC_PROJECTION_DATA).withOptionalArg();
 		}
 
 		@Override
@@ -107,8 +113,10 @@ public class YarnClusterModifyCommand extends AbstractApplicationCommand {
 			String appId = options.valueOf(applicationIdOption);
 			String clusterId = options.valueOf(clusterIdOption);
 			String projectionAny = options.valueOf(projectionDataAnyOption);
-			List<String> projectionHosts = options.valuesOf(projectionDataHostsOption);
-			List<String> projectionRacks = options.valuesOf(projectionDataRacksOption);
+			String projectionHosts = options.valueOf(projectionDataHostsOption);
+			String projectionRacks = options.valueOf(projectionDataRacksOption);
+			String projectionRaw = options.valueOf(projectionDataRawOption);
+
 			YarnContainerClusterApplication app = new YarnContainerClusterApplication();
 			Properties appProperties = new Properties();
 			appProperties.setProperty("spring.yarn.internal.ContainerClusterApplication.operation", "CLUSTERMODIFY");
@@ -118,18 +126,25 @@ public class YarnClusterModifyCommand extends AbstractApplicationCommand {
 					clusterId);
 
 			if (StringUtils.hasText(projectionAny)) {
-				appProperties
-						.setProperty("spring.yarn.internal.ContainerClusterApplication.projectionDataAny", projectionAny);
+				appProperties.setProperty(PREFIX + ".projectionData.any", projectionAny);
 			}
 
-			for (Entry<String, Integer> entry : getMapFromString(projectionHosts).entrySet()) {
-				appProperties.setProperty("spring.yarn.internal.ContainerClusterApplication.projectionDataHosts."
-						+ entry.getKey(), entry.getValue().toString());
+			if (StringUtils.hasText(projectionHosts)) {
+				for (Entry<Object, Object> entry : getPropertiesFromRawYaml(projectionHosts).entrySet()) {
+					appProperties.setProperty(PREFIX + ".projectionData.hosts." + entry.getKey(), entry.getValue().toString());
+				}
 			}
 
-			for (Entry<String, Integer> entry : getMapFromString(projectionRacks).entrySet()) {
-				appProperties.setProperty("spring.yarn.internal.ContainerClusterApplication.projectionDataRacks."
-						+ entry.getKey(), entry.getValue().toString());
+			if (StringUtils.hasText(projectionRacks)) {
+				for (Entry<Object, Object> entry : getPropertiesFromRawYaml(projectionRacks).entrySet()) {
+					appProperties.setProperty(PREFIX + ".projectionData.racks." + entry.getKey(), entry.getValue().toString());
+				}
+			}
+
+			if (StringUtils.hasText(projectionRaw)) {
+				for (Entry<Object, Object> entry : getPropertiesFromRawYaml(projectionRaw).entrySet()) {
+					appProperties.setProperty(PREFIX + ".projectionData." + entry.getKey(), entry.getValue().toString());
+				}
 			}
 
 			app.appProperties(appProperties);
@@ -157,32 +172,15 @@ public class YarnClusterModifyCommand extends AbstractApplicationCommand {
 			return projectionDataRacksOption;
 		}
 
-		private static Map<String, Integer> getMapFromString(List<String> sources) {
-			HashMap<String, Integer> map = new HashMap<String, Integer>();
-			if (sources != null) {
-				String currentHost = null;
-				for (String source : sources) {
-					if (isNumber(source)) {
-						map.put(currentHost, Integer.parseInt(source));
-					} else {
-						currentHost = source;
-					}
-					if (!map.containsKey(currentHost)) {
-						map.put(currentHost, 1);
-					} else {
-					}
-				}
+		private static Properties getPropertiesFromRawYaml(String raw) {
+			if (StringUtils.isEmpty(raw)) {
+				return new Properties();
 			}
-			return map;
-		}
-
-		private static boolean isNumber(String source) {
-			try {
-				Integer.parseInt(source);
-				return true;
-			} catch (NumberFormatException e) {
-			}
-			return false;
+			Resource resource = new ByteArrayResource(raw.getBytes());
+			YamlPropertiesFactoryBean ypfb = new YamlPropertiesFactoryBean();
+			ypfb.setResources(resource);
+			ypfb.afterPropertiesSet();
+			return ypfb.getObject();
 		}
 
 	}

@@ -39,6 +39,7 @@ public abstract class AbstractContainerClusterRequest {
 		Integer any;
 		Map<String, Integer> hosts;
 		Map<String, Integer> racks;
+		Map<String, Object> properties;
 		public Integer getAny() {
 			return any;
 		}
@@ -56,6 +57,12 @@ public abstract class AbstractContainerClusterRequest {
 		}
 		public void setRacks(Map<String, Integer> racks) {
 			this.racks = racks;
+		}
+		public Map<String, Object> getProperties() {
+			return properties;
+		}
+		public void setProperties(Map<String, Object> properties) {
+			this.properties = properties;
 		}
 	}
 

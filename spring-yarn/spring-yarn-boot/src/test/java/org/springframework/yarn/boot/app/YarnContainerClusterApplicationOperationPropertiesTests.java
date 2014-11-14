@@ -33,18 +33,18 @@ public class YarnContainerClusterApplicationOperationPropertiesTests {
 		SpringApplication app = new SpringApplication(TestConfiguration.class);
 		app.setWebEnvironment(false);
 		ConfigurableApplicationContext context = app.run(new String[] {
-				"--spring.yarn.internal.ContainerClusterApplication.projectionDataAny=1",
-				"--spring.yarn.internal.ContainerClusterApplication.projectionDataHosts.host1=1",
-				"--spring.yarn.internal.ContainerClusterApplication.projectionDataRacks.rack1=1",
-				"--spring.yarn.internal.ContainerClusterApplication.projectionDataHosts.host2=2",
-				"--spring.yarn.internal.ContainerClusterApplication.projectionDataRacks.rack2=2" });
+				"--spring.yarn.internal.ContainerClusterApplication.projectionData.any=1",
+				"--spring.yarn.internal.ContainerClusterApplication.projectionData.hosts.host1=1",
+				"--spring.yarn.internal.ContainerClusterApplication.projectionData.racks.rack1=1",
+				"--spring.yarn.internal.ContainerClusterApplication.projectionData.hosts.host2=2",
+				"--spring.yarn.internal.ContainerClusterApplication.projectionData.racks.rack2=2" });
 		OperationProperties properties = context.getBean(OperationProperties.class);
 		assertThat(properties, notNullValue());
-		assertThat(properties.getProjectionDataAny(), is(1));
-		assertThat(properties.getProjectionDataHosts().get("host1"), is(1));
-		assertThat(properties.getProjectionDataHosts().get("host2"), is(2));
-		assertThat(properties.getProjectionDataRacks().get("rack1"), is(1));
-		assertThat(properties.getProjectionDataRacks().get("rack2"), is(2));
+		assertThat(properties.getProjectionData().getAny(), is(1));
+		assertThat(properties.getProjectionData().getHosts().get("host1"), is(1));
+		assertThat(properties.getProjectionData().getHosts().get("host2"), is(2));
+		assertThat(properties.getProjectionData().getRacks().get("rack1"), is(1));
+		assertThat(properties.getProjectionData().getRacks().get("rack2"), is(2));
 		context.close();
 	}
 

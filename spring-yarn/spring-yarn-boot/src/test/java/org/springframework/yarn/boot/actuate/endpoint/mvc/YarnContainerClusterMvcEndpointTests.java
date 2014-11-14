@@ -158,6 +158,29 @@ public class YarnContainerClusterMvcEndpointTests {
 		assertThat(clusters.get("cluster1").getGridProjection().getSatisfyState().getAllocateData().getHosts().get("host2"), is(22));
 	}
 
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testClusterCreateComplexProjectionData() throws Exception {
+		String content = "{\"clusterId\":\"cluster1\",\"clusterDef\":\"cluster1\",\"projection\":\"DEFAULT\",\"projectionData\":{\"any\":1,\"hosts\":{\"host1\":11,\"host2\":22},\"racks\":{\"rack1\":1,\"rack2\":2},\"properties\":{\"key1\":123,\"key2\":\"value2\",\"key3\":{\"subkey\":\"subvalue\"}}}},\"extraProperties\":{\"key1\":\"value1\"}}";
+		mvc.
+			perform(post(BASE).content(content).contentType(MediaType.APPLICATION_JSON)).
+			andExpect(status().isCreated()).
+			andExpect(content().string(is(""))).
+			andExpect(header().string("Location", endsWith(BASE + "/cluster1")));
+		Map<String, ContainerCluster> clusters = TestUtils.readField("clusters", appmaster);
+		assertThat(clusters.size(), is(1));
+		assertThat(clusters.containsKey("cluster1"), is(true));
+		assertThat(clusters.get("cluster1").getGridProjection(), instanceOf(DefaultGridProjection.class));
+		DefaultGridProjection projection = (DefaultGridProjection) clusters.get("cluster1").getGridProjection();
+		assertThat(projection.getProjectionData().getAny(), is(1));
+		assertThat(projection.getProjectionData().getHosts().get("host1"), is(11));
+		assertThat(projection.getProjectionData().getHosts().get("host2"), is(22));
+		assertThat(projection.getProjectionData().getRacks().get("rack1"), is(1));
+		assertThat(projection.getProjectionData().getRacks().get("rack2"), is(2));
+		assertThat((Integer)projection.getProjectionData().getProperties().get("key1"), is(123));
+		assertThat((String)projection.getProjectionData().getProperties().get("key2"), is("value2"));
+		assertThat((String)((Map<String,Object>)projection.getProjectionData().getProperties().get("key3")).get("subkey"), is("subvalue"));
+	}
 
 	/**
 	 * Test home GET when one any cluster has been created.

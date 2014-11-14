@@ -47,6 +47,8 @@ public abstract class CliSystemConstants {
 
 	public final static List<String> OPTIONS_PROJECTION_RACKS  = asList("projection-racks", "r");
 
+	public final static List<String> OPTIONS_PROJECTION_DATA  = asList("projection-data", "y");
+
 	public final static String DESC_APPLICATION_ID = "Specify YARN application id";
 
 	public final static String DESC_CLUSTER_ID = "Specify cluster id";
@@ -66,5 +68,7 @@ public abstract class CliSystemConstants {
 	public final static String DESC_PROJECTION_HOSTS = "Projection hosts counts";
 
 	public final static String DESC_PROJECTION_RACKS = "Projection racks counts";
+
+	public final static String DESC_PROJECTION_DATA = "Raw projection data";
 
 }

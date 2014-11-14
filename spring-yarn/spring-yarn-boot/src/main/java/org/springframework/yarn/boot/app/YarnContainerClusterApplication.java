@@ -91,9 +91,11 @@ public class YarnContainerClusterApplication extends AbstractClientApplication<Y
 				String clusterId = operationProperties.getClusterId();
 				String clusterDef = operationProperties.getClusterDef();
 				String projectionType = operationProperties.getProjectionType();
-				Integer projectionDataAny = operationProperties.getProjectionDataAny();
-				Map<String, Integer> projectionDataHosts = operationProperties.getProjectionDataHosts();
-				Map<String, Integer> projectionDataRacks = operationProperties.getProjectionDataRacks();
+				ProjectionDataProperties projectionData = operationProperties.getProjectionData();
+				Integer projectionDataAny = projectionData != null ? projectionData.getAny() : null;
+				Map<String, Integer> projectionDataHosts = projectionData != null ? projectionData.getHosts() : null;
+				Map<String, Integer> projectionDataRacks = projectionData != null ? projectionData.getRacks() : null;
+				Map<String, Object> projectionDataProperties = projectionData != null ? projectionData.getProperties() : null;
 				Map<String, Object> extraProperties = operationProperties.getExtraProperties();
 				Operation operation = operationProperties.getOperation();
 				boolean verbose = operationProperties.isVerbose();
@@ -104,12 +106,13 @@ public class YarnContainerClusterApplication extends AbstractClientApplication<Y
 					return doClusterInfo(client, applicationId, clusterId, verbose);
 				} else if (Operation.CLUSTERCREATE == operation) {
 					return doClusterCreate(client, applicationId, clusterId, clusterDef, projectionType,
-							projectionDataAny, projectionDataHosts, projectionDataRacks, extraProperties);
+							projectionDataAny, projectionDataHosts, projectionDataRacks, projectionDataProperties,
+							extraProperties);
 				} else if (Operation.CLUSTERDESTROY == operation) {
 					return doClusterDestroy(client, applicationId, clusterId);
 				} else if (Operation.CLUSTERMODIFY == operation) {
 					return doClusterModify(client, applicationId, clusterId, projectionDataAny, projectionDataHosts,
-							projectionDataRacks);
+							projectionDataRacks, projectionDataProperties);
 				} else if (Operation.CLUSTERSTART == operation) {
 					return doClusterStart(client, applicationId, clusterId);
 				} else if (Operation.CLUSTERSTOP == operation) {
@@ -144,7 +147,8 @@ public class YarnContainerClusterApplication extends AbstractClientApplication<Y
 		Map<String, Integer> shosts = response.getGridProjection().getSatisfyState().getAllocateData().getHosts();
 		Map<String, Integer> sracks = response.getGridProjection().getSatisfyState().getAllocateData().getRacks();
 
-		data.add(new ClustersInfoReportData(response.getContainerClusterState().getClusterState().toString(), response.getGridProjection().getMembers().size(), pany, phosts, pracks, sany, shosts, sracks));
+		data.add(new ClustersInfoReportData(response.getContainerClusterState().getClusterState().toString(), response
+				.getGridProjection().getMembers().size(), pany, phosts, pracks, sany, shosts, sracks));
 		if (verbose) {
 			return ContainerClusterReport.clusterInfoReportBuilder()
 					.add(ClusterInfoField.STATE)
@@ -168,7 +172,7 @@ public class YarnContainerClusterApplication extends AbstractClientApplication<Y
 
 	private String doClusterCreate(YarnClient client, ApplicationId applicationId, String clusterId, String clusterDef,
 			String projectionType, Integer projectionDataAny, Map<String, Integer> hosts, Map<String, Integer> racks,
-			Map<String, Object> extraProperties) {
+			Map<String, Object> projectionDataProperties, Map<String, Object> extraProperties) {
 		YarnContainerClusterOperations operations = buildClusterOperations(client, applicationId);
 
 		ContainerClusterCreateRequest request = new ContainerClusterCreateRequest();
@@ -181,6 +185,7 @@ public class YarnContainerClusterApplication extends AbstractClientApplication<Y
 		projectionData.setAny(projectionDataAny);
 		projectionData.setHosts(hosts);
 		projectionData.setRacks(racks);
+		projectionData.setProperties(projectionDataProperties);
 
 		request.setProjectionData(projectionData);
 		operations.clusterCreate(request);
@@ -210,7 +215,8 @@ public class YarnContainerClusterApplication extends AbstractClientApplication<Y
 	}
 
 	private String doClusterModify(YarnClient client, ApplicationId applicationId, String clusterId,
-			Integer projectionDataAny, Map<String, Integer> hosts, Map<String, Integer> racks) {
+			Integer projectionDataAny, Map<String, Integer> hosts, Map<String, Integer> racks,
+			Map<String, Object> properties) {
 		YarnContainerClusterOperations operations = buildClusterOperations(client, applicationId);
 
 		ContainerClusterCreateRequest request = new ContainerClusterCreateRequest();
@@ -220,6 +226,7 @@ public class YarnContainerClusterApplication extends AbstractClientApplication<Y
 		projectionData.setAny(projectionDataAny);
 		projectionData.setHosts(hosts);
 		projectionData.setRacks(racks);
+		projectionData.setProperties(properties);
 
 		request.setProjectionData(projectionData);
 
@@ -246,11 +253,7 @@ public class YarnContainerClusterApplication extends AbstractClientApplication<Y
 
 		private String projectionType;
 
-		private Integer projectionDataAny;
-
-		private Map<String, Integer> projectionDataHosts;
-
-		private Map<String, Integer> projectionDataRacks;
+		private ProjectionDataProperties projectionData;
 
 		private Map<String, Object> extraProperties;
 
@@ -296,28 +299,12 @@ public class YarnContainerClusterApplication extends AbstractClientApplication<Y
 			return projectionType;
 		}
 
-		public void setProjectionDataAny(Integer projectionDataAny) {
-			this.projectionDataAny = projectionDataAny;
+		public ProjectionDataProperties getProjectionData() {
+			return projectionData;
 		}
 
-		public Integer getProjectionDataAny() {
-			return projectionDataAny;
-		}
-
-		public void setProjectionDataHosts(Map<String, Integer> projectionDataHosts) {
-			this.projectionDataHosts = projectionDataHosts;
-		}
-
-		public Map<String, Integer> getProjectionDataHosts() {
-			return projectionDataHosts;
-		}
-
-		public void setProjectionDataRacks(Map<String, Integer> projectionDataRacks) {
-			this.projectionDataRacks = projectionDataRacks;
-		}
-
-		public Map<String, Integer> getProjectionDataRacks() {
-			return projectionDataRacks;
+		public void setProjectionData(ProjectionDataProperties projectionData) {
+			this.projectionData = projectionData;
 		}
 
 		public void setExtraProperties(Map<String, Object> extraProperties) {
@@ -334,6 +321,50 @@ public class YarnContainerClusterApplication extends AbstractClientApplication<Y
 
 		public boolean isVerbose() {
 			return verbose;
+		}
+
+	}
+
+	public static class ProjectionDataProperties {
+
+		private Integer any;
+
+		private Map<String, Integer> hosts;
+
+		private Map<String, Integer> racks;
+
+		private Map<String, Object> properties;
+
+		public Integer getAny() {
+			return any;
+		}
+
+		public void setAny(Integer any) {
+			this.any = any;
+		}
+
+		public Map<String, Integer> getHosts() {
+			return hosts;
+		}
+
+		public void setHosts(Map<String, Integer> hosts) {
+			this.hosts = hosts;
+		}
+
+		public Map<String, Integer> getRacks() {
+			return racks;
+		}
+
+		public void setRacks(Map<String, Integer> racks) {
+			this.racks = racks;
+		}
+
+		public Map<String, Object> getProperties() {
+			return properties;
+		}
+
+		public void setProperties(Map<String, Object> properties) {
+			this.properties = properties;
 		}
 
 	}
