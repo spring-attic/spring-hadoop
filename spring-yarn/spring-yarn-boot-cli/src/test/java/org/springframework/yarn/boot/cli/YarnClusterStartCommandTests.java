@@ -23,6 +23,7 @@ import joptsimple.OptionSet;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.springframework.yarn.boot.app.ClientApplicationRunner;
 import org.springframework.yarn.boot.cli.YarnClusterStartCommand.ClusterStartOptionHandler;
 
 /**
@@ -68,6 +69,14 @@ public class YarnClusterStartCommandTests {
 		command.run("-a", "foo");
 	}
 
+	@Test
+	public void testRequiredArgs() throws Exception {
+		NoHandleApplicationOptionHandler handler = new NoHandleApplicationOptionHandler();
+		YarnClusterStartCommand command = new YarnClusterStartCommand(handler);
+		command.run("-a", "aaa", "-c", "ccc");
+		assertThat(handler.output, is("output"));
+	}
+
 	private static class CustomClusterStartOptionHandler extends ClusterStartOptionHandler {
 
 		@Override
@@ -84,6 +93,17 @@ public class YarnClusterStartCommandTests {
 
 		@Override
 		protected void runApplication(OptionSet options) throws Exception {
+		}
+
+	}
+
+	private static class NoHandleApplicationOptionHandler extends ClusterStartOptionHandler {
+
+		String output;
+
+		@Override
+		protected void handleApplicationRun(ClientApplicationRunner<String> app) {
+			this.output = "output";
 		}
 
 	}

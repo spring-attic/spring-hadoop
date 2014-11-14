@@ -65,7 +65,7 @@ public class YarnClusterInfoCommand extends AbstractApplicationCommand {
 		super(name, description, handler);
 	}
 
-	public static class ClusterInfoOptionHandler extends ApplicationOptionHandler {
+	public static class ClusterInfoOptionHandler extends ApplicationOptionHandler<String> {
 
 		private OptionSpec<String> applicationIdOption;
 
@@ -103,8 +103,7 @@ public class YarnClusterInfoCommand extends AbstractApplicationCommand {
 				appProperties.setProperty("spring.yarn.internal.ContainerClusterApplication.verbose", "true");
 			}
 			app.appProperties(appProperties);
-			String info = app.run(new String[0]);
-			handleOutput(info);
+			handleApplicationRun(app);
 		}
 
 		public OptionSpec<String> getApplicationIdOption() {

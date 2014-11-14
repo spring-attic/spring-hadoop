@@ -32,13 +32,21 @@ import org.springframework.util.StringUtils;
  *
  * @param <T> the type of a sub-class
  */
-public abstract class AbstractClientApplication<T extends AbstractClientApplication<T>> {
+public abstract class AbstractClientApplication<R, T extends AbstractClientApplication<R, T>> implements ClientApplicationRunner<R> {
 
 	protected String applicationVersion;
 	protected String applicationBaseDir;
 	protected List<Object> sources = new ArrayList<Object>();
 	protected List<String> profiles = new ArrayList<String>();
 	protected Properties appProperties = new Properties();
+
+	@Override
+	public R run() {
+		return run(new String[0]);
+	}
+
+	@Override
+	public abstract R run(String... args);
 
 	/**
 	 * Sets an application version to be used by a builder.

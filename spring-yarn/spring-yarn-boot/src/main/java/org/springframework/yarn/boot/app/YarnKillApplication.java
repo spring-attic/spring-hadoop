@@ -46,7 +46,7 @@ import org.springframework.yarn.client.YarnClient;
 @EnableAutoConfiguration(exclude = { EmbeddedServletContainerAutoConfiguration.class, WebMvcAutoConfiguration.class,
 		JmxAutoConfiguration.class, BatchAutoConfiguration.class, JmxAutoConfiguration.class,
 		EndpointMBeanExportAutoConfiguration.class, EndpointAutoConfiguration.class })
-public class YarnKillApplication extends AbstractClientApplication<YarnKillApplication> {
+public class YarnKillApplication extends AbstractClientApplication<String, YarnKillApplication> {
 
 	public String run() {
 		return run(new String[0]);

@@ -69,7 +69,7 @@ public class YarnClusterCreateCommand extends AbstractApplicationCommand {
 		super(name, description, handler);
 	}
 
-	public static class ClusterCreateOptionHandler extends ApplicationOptionHandler {
+	public static class ClusterCreateOptionHandler extends ApplicationOptionHandler<String> {
 
 		private static final String PREFIX = "spring.yarn.internal.ContainerClusterApplication";
 
@@ -134,10 +134,13 @@ public class YarnClusterCreateCommand extends AbstractApplicationCommand {
 					appId);
 			appProperties.setProperty("spring.yarn.internal.ContainerClusterApplication.clusterId",
 					clusterId);
-			appProperties.setProperty("spring.yarn.internal.ContainerClusterApplication.clusterDef",
-					clusterDef);
-			appProperties.setProperty("spring.yarn.internal.ContainerClusterApplication.projectionType",
-					projectionType);
+			if (clusterDef != null) {
+				appProperties.setProperty("spring.yarn.internal.ContainerClusterApplication.clusterDef", clusterDef);
+			}
+			if (projectionType != null) {
+				appProperties.setProperty("spring.yarn.internal.ContainerClusterApplication.projectionType",
+						projectionType);
+			}
 
 			if (StringUtils.hasText(projectionAny)) {
 				appProperties.setProperty(PREFIX + ".projectionData.any", projectionAny);
@@ -170,7 +173,7 @@ public class YarnClusterCreateCommand extends AbstractApplicationCommand {
 			}
 
 			app.appProperties(appProperties);
-			handleOutput(app.run());
+			handleApplicationRun(app);
 		}
 
 		public OptionSpec<String> getApplicationIdOption() {

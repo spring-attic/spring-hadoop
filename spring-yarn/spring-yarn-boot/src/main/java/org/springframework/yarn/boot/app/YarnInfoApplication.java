@@ -55,7 +55,7 @@ import org.springframework.yarn.support.console.ApplicationsReport.SubmittedRepo
 @EnableAutoConfiguration(exclude = { EmbeddedServletContainerAutoConfiguration.class, WebMvcAutoConfiguration.class,
 		JmxAutoConfiguration.class, BatchAutoConfiguration.class, JmxAutoConfiguration.class,
 		EndpointMBeanExportAutoConfiguration.class, EndpointAutoConfiguration.class })
-public class YarnInfoApplication extends AbstractClientApplication<YarnInfoApplication> {
+public class YarnInfoApplication extends AbstractClientApplication<String, YarnInfoApplication> {
 
 	/**
 	 * Run a {@link SpringApplication} build by a

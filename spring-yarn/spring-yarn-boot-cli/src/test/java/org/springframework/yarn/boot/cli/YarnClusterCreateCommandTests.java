@@ -23,6 +23,7 @@ import joptsimple.OptionSet;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.springframework.yarn.boot.app.ClientApplicationRunner;
 import org.springframework.yarn.boot.cli.YarnClusterCreateCommand.ClusterCreateOptionHandler;
 
 /**
@@ -46,20 +47,21 @@ public class YarnClusterCreateCommandTests {
 		assertThat(command.getHelp(), containsString("-p, --projection-type"));
 		assertThat(command.getHelp(), containsString("-r, --projection-racks"));
 		assertThat(command.getHelp(), containsString("-w, --projection-any"));
+		assertThat(command.getHelp(), containsString("-y, --projection-data"));
 	}
 
 	@Test
 	public void testFailureNoArgs() throws Exception {
 		thrown.expect(IllegalStateException.class);
 		thrown.expectMessage(containsString("Cluster Id and Application Id must be defined"));
-		NoRunClusterCreateOptionHandler handler = new NoRunClusterCreateOptionHandler();
+		NoRunApplicationClusterCreateOptionHandler handler = new NoRunApplicationClusterCreateOptionHandler();
 		YarnClusterCreateCommand command = new YarnClusterCreateCommand(handler);
 		command.run(new String[0]);
 	}
 
 	@Test
 	public void testShouldNotFail() throws Exception {
-		NoRunClusterCreateOptionHandler handler = new NoRunClusterCreateOptionHandler();
+		NoRunApplicationClusterCreateOptionHandler handler = new NoRunApplicationClusterCreateOptionHandler();
 		YarnClusterCreateCommand command = new YarnClusterCreateCommand(handler);
 		command.run("-a", "xxx", "-c", "xxx");
 	}
@@ -71,6 +73,14 @@ public class YarnClusterCreateCommandTests {
 		CustomClusterCreateOptionHandler handler = new CustomClusterCreateOptionHandler();
 		YarnClusterCreateCommand command = new YarnClusterCreateCommand(handler);
 		command.run("-a", "foo");
+	}
+
+	@Test
+	public void testMissingClusterDef() throws Exception {
+		NoHandleApplicationOptionHandler handler = new NoHandleApplicationOptionHandler();
+		YarnClusterCreateCommand command = new YarnClusterCreateCommand(handler);
+		command.run("-a", "aaa", "-c", "ccc");
+		assertThat(handler.output, is("output"));
 	}
 
 	private static class CustomClusterCreateOptionHandler extends ClusterCreateOptionHandler {
@@ -85,10 +95,21 @@ public class YarnClusterCreateCommandTests {
 
 	}
 
-	private static class NoRunClusterCreateOptionHandler extends ClusterCreateOptionHandler {
+	private static class NoRunApplicationClusterCreateOptionHandler extends ClusterCreateOptionHandler {
 
 		@Override
 		protected void runApplication(OptionSet options) throws Exception {
+		}
+
+	}
+
+	private static class NoHandleApplicationOptionHandler extends ClusterCreateOptionHandler {
+
+		String output;
+
+		@Override
+		protected void handleApplicationRun(ClientApplicationRunner<String> app) {
+			this.output = "output";
 		}
 
 	}

@@ -20,6 +20,7 @@ import joptsimple.OptionSpec;
 
 import org.apache.hadoop.yarn.api.records.ApplicationId;
 import org.springframework.util.Assert;
+import org.springframework.yarn.boot.app.ClientApplicationRunner;
 import org.springframework.yarn.boot.app.YarnSubmitApplication;
 
 /**
@@ -63,7 +64,7 @@ public class YarnSubmitCommand extends AbstractApplicationCommand {
 		super(name, description, handler);
 	}
 
-	public static class SubmitOptionHandler extends ApplicationOptionHandler {
+	public static class SubmitOptionHandler extends ApplicationOptionHandler<ApplicationId> {
 
 		private OptionSpec<String> applicationVersionOption;
 
@@ -79,6 +80,11 @@ public class YarnSubmitCommand extends AbstractApplicationCommand {
 			Assert.hasText(appVersion, "Application version must be defined");
 			YarnSubmitApplication app = new YarnSubmitApplication();
 			app.applicationVersion(appVersion);
+			handleApplicationRun(app);
+		}
+
+		@Override
+		protected void handleApplicationRun(ClientApplicationRunner<ApplicationId> app) {
 			ApplicationId applicationId = app.run();
 			handleOutput("New instance submitted with id " + applicationId);
 		}

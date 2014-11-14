@@ -23,6 +23,7 @@ import joptsimple.OptionSet;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.springframework.yarn.boot.app.ClientApplicationRunner;
 import org.springframework.yarn.boot.cli.YarnPushedCommand.PushedOptionHandler;
 
 /**
@@ -58,6 +59,14 @@ public class YarnPushedCommandTests {
 		command.run();
 	}
 
+	@Test
+	public void testRequiredArgs() throws Exception {
+		NoHandleApplicationOptionHandler handler = new NoHandleApplicationOptionHandler();
+		YarnPushedCommand command = new YarnPushedCommand(handler);
+		command.run();
+		assertThat(handler.output, is("output"));
+	}
+
 	private static class CustomPushedOptionHandler extends PushedOptionHandler {
 
 		@Override
@@ -71,6 +80,17 @@ public class YarnPushedCommandTests {
 
 		@Override
 		protected void runApplication(OptionSet options) throws Exception {
+		}
+
+	}
+
+	private static class NoHandleApplicationOptionHandler extends PushedOptionHandler {
+
+		String output;
+
+		@Override
+		protected void handleApplicationRun(ClientApplicationRunner<String> app) {
+			this.output = "output";
 		}
 
 	}

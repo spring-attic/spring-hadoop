@@ -64,7 +64,7 @@ public class YarnSubmittedCommand extends AbstractApplicationCommand {
 		super(name, description, handler);
 	}
 
-	public static class SubmittedOptionHandler extends ApplicationOptionHandler {
+	public static class SubmittedOptionHandler extends ApplicationOptionHandler<String> {
 
 		private String defaultAppType = "BOOT";
 
@@ -99,8 +99,7 @@ public class YarnSubmittedCommand extends AbstractApplicationCommand {
 			}
 			appProperties.setProperty("spring.yarn.internal.YarnInfoApplication.type", options.valueOf(typeOption));
 			app.appProperties(appProperties);
-			String info = app.run(new String[0]);
-			handleOutput(info);
+			handleApplicationRun(app);
 		}
 
 		public String getDefaultAppType() {

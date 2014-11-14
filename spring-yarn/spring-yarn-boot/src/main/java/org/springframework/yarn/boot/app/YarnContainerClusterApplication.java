@@ -61,7 +61,7 @@ import org.springframework.yarn.support.console.ContainerClusterReport.ClustersI
 @EnableAutoConfiguration(exclude = { EmbeddedServletContainerAutoConfiguration.class, WebMvcAutoConfiguration.class,
 		JmxAutoConfiguration.class, BatchAutoConfiguration.class, JmxAutoConfiguration.class,
 		EndpointMBeanExportAutoConfiguration.class, EndpointAutoConfiguration.class })
-public class YarnContainerClusterApplication extends AbstractClientApplication<YarnContainerClusterApplication> {
+public class YarnContainerClusterApplication extends AbstractClientApplication<String, YarnContainerClusterApplication> {
 
 	@Override
 	protected YarnContainerClusterApplication getThis() {

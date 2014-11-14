@@ -23,6 +23,7 @@ import joptsimple.OptionSet;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.springframework.yarn.boot.app.ClientApplicationRunner;
 import org.springframework.yarn.boot.cli.YarnClusterDestroyCommand.ClusterDestroyOptionHandler;
 
 /**
@@ -68,6 +69,14 @@ public class YarnClusterDestroyCommandTests {
 		command.run("-a", "foo");
 	}
 
+	@Test
+	public void testRequiredArgs() throws Exception {
+		NoHandleApplicationOptionHandler handler = new NoHandleApplicationOptionHandler();
+		YarnClusterDestroyCommand command = new YarnClusterDestroyCommand(handler);
+		command.run("-a", "aaa", "-c", "ccc");
+		assertThat(handler.output, is("output"));
+	}
+
 	private static class CustomClusterDestroyOptionHandler extends ClusterDestroyOptionHandler {
 
 		@Override
@@ -84,6 +93,17 @@ public class YarnClusterDestroyCommandTests {
 
 		@Override
 		protected void runApplication(OptionSet options) throws Exception {
+		}
+
+	}
+
+	private static class NoHandleApplicationOptionHandler extends ClusterDestroyOptionHandler {
+
+		String output;
+
+		@Override
+		protected void handleApplicationRun(ClientApplicationRunner<String> app) {
+			this.output = "output";
 		}
 
 	}

@@ -23,6 +23,7 @@ import joptsimple.OptionSet;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.springframework.yarn.boot.app.ClientApplicationRunner;
 import org.springframework.yarn.boot.cli.YarnClusterModifyCommand.ClusterModifyOptionHandler;
 
 /**
@@ -71,6 +72,14 @@ public class YarnClusterModifyCommandTests {
 		command.run("-a", "foo");
 	}
 
+	@Test
+	public void testMissingOptionalArgs() throws Exception {
+		NoHandleApplicationOptionHandler handler = new NoHandleApplicationOptionHandler();
+		YarnClusterModifyCommand command = new YarnClusterModifyCommand(handler);
+		command.run("-a", "aaa", "-c", "ccc");
+		assertThat(handler.output, is("output"));
+	}
+
 	private static class CustomClusterModifyOptionHandler extends ClusterModifyOptionHandler {
 
 		@Override
@@ -87,6 +96,17 @@ public class YarnClusterModifyCommandTests {
 
 		@Override
 		protected void runApplication(OptionSet options) throws Exception {
+		}
+
+	}
+
+	private static class NoHandleApplicationOptionHandler extends ClusterModifyOptionHandler {
+
+		String output;
+
+		@Override
+		protected void handleApplicationRun(ClientApplicationRunner<String> app) {
+			this.output = "output";
 		}
 
 	}

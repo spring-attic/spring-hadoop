@@ -20,6 +20,7 @@ import java.util.Properties;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 
+import org.springframework.yarn.boot.app.ClientApplicationRunner;
 import org.springframework.yarn.boot.app.YarnPushApplication;
 
 /**
@@ -63,7 +64,7 @@ public class YarnPushCommand extends AbstractApplicationCommand {
 		super(name, description, handler);
 	}
 
-	public static class PushOptionHandler extends ApplicationOptionHandler {
+	public static class PushOptionHandler extends ApplicationOptionHandler<String> {
 
 		private OptionSpec<String> applicationVersionOption;
 
@@ -81,8 +82,13 @@ public class YarnPushCommand extends AbstractApplicationCommand {
 			Properties instanceProperties = new Properties();
 			instanceProperties.setProperty("spring.yarn.applicationVersion", appVersion);
 			app.configFile("application.properties", instanceProperties);
+			handleApplicationRun(app);
+		}
+
+		@Override
+		protected void handleApplicationRun(ClientApplicationRunner<String> app) {
 			app.run();
-			handleOutput("New instance " + appVersion + " installed");
+			handleOutput("New instance submitted");
 		}
 
 		public OptionSpec<String> getApplicationVersionOption() {

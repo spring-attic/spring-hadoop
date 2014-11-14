@@ -69,7 +69,7 @@ public class YarnClusterModifyCommand extends AbstractApplicationCommand {
 		super(name, description, handler);
 	}
 
-	public static class ClusterModifyOptionHandler extends ApplicationOptionHandler {
+	public static class ClusterModifyOptionHandler extends ApplicationOptionHandler<String> {
 
 		private static final String PREFIX = "spring.yarn.internal.ContainerClusterApplication";
 
@@ -148,8 +148,7 @@ public class YarnClusterModifyCommand extends AbstractApplicationCommand {
 			}
 
 			app.appProperties(appProperties);
-			String info = app.run(new String[0]);
-			handleOutput(info);
+			handleApplicationRun(app);
 		}
 
 		public OptionSpec<String> getApplicationIdOption() {

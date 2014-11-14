@@ -23,6 +23,7 @@ import joptsimple.OptionSet;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.springframework.yarn.boot.app.ClientApplicationRunner;
 import org.springframework.yarn.boot.cli.YarnSubmittedCommand.SubmittedOptionHandler;
 
 /**
@@ -80,6 +81,14 @@ public class YarnSubmittedCommandTests {
 		command.run();
 	}
 
+	@Test
+	public void testRequiredArgs() throws Exception {
+		NoHandleApplicationOptionHandler handler = new NoHandleApplicationOptionHandler();
+		YarnSubmittedCommand command = new YarnSubmittedCommand(handler);
+		command.run();
+		assertThat(handler.output, is("output"));
+	}
+
 	private static class CustomSubmittedOptionHandler extends SubmittedOptionHandler {
 
 		public CustomSubmittedOptionHandler(String defaultAppType) {
@@ -110,6 +119,17 @@ public class YarnSubmittedCommandTests {
 
 		@Override
 		protected void runApplication(OptionSet options) throws Exception {
+		}
+
+	}
+
+	private static class NoHandleApplicationOptionHandler extends SubmittedOptionHandler {
+
+		String output;
+
+		@Override
+		protected void handleApplicationRun(ClientApplicationRunner<String> app) {
+			this.output = "output";
 		}
 
 	}

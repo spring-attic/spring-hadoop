@@ -22,6 +22,7 @@ import org.springframework.boot.cli.command.OptionParsingCommand;
 import org.springframework.boot.cli.command.options.OptionHandler;
 import org.springframework.boot.cli.command.status.ExitStatus;
 import org.springframework.boot.cli.util.Log;
+import org.springframework.yarn.boot.app.ClientApplicationRunner;
 
 /**
  * Base class for all commands implemented by
@@ -43,7 +44,7 @@ public class AbstractApplicationCommand extends OptionParsingCommand {
 		super(name, description, handler);
 	}
 
-	public abstract static class ApplicationOptionHandler extends OptionHandler {
+	public abstract static class ApplicationOptionHandler<R> extends OptionHandler {
 
 		@Override
 		protected final ExitStatus run(OptionSet options) throws Exception {
@@ -90,6 +91,28 @@ public class AbstractApplicationCommand extends OptionParsingCommand {
 		 */
 		protected void handleOutput(String output) {
 			Log.info(output);
+		}
+
+		/**
+		 * Handles run of {@link ClientApplicationRunner}.
+		 *
+		 * @param app the app
+		 */
+		protected void handleApplicationRun(ClientApplicationRunner<R> app) {
+			handleApplicationRun(app, new String[0]);
+		}
+
+		/**
+		 * Handles run of {@link ClientApplicationRunner}.
+		 *
+		 * @param app the app
+		 * @param args the args
+		 */
+		protected void handleApplicationRun(ClientApplicationRunner<R> app, String... args) {
+			R run = app.run(args);
+			if (run != null) {
+				handleOutput(run.toString());
+			}
 		}
 
 	}

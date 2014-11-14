@@ -23,6 +23,7 @@ import joptsimple.OptionSet;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.springframework.yarn.boot.app.ClientApplicationRunner;
 import org.springframework.yarn.boot.cli.YarnClustersInfoCommand.ClustersInfoOptionHandler;
 
 /**
@@ -67,6 +68,14 @@ public class YarnClustersInfoCommandTests {
 		command.run("-a", "foo");
 	}
 
+	@Test
+	public void testRequiredArgs() throws Exception {
+		NoHandleApplicationOptionHandler handler = new NoHandleApplicationOptionHandler();
+		YarnClustersInfoCommand command = new YarnClustersInfoCommand(handler);
+		command.run("-a", "aaa");
+		assertThat(handler.output, is("output"));
+	}
+
 	private static class CustomClustersInfoOptionHandler extends ClustersInfoOptionHandler {
 
 		@Override
@@ -83,6 +92,17 @@ public class YarnClustersInfoCommandTests {
 
 		@Override
 		protected void runApplication(OptionSet options) throws Exception {
+		}
+
+	}
+
+	private static class NoHandleApplicationOptionHandler extends ClustersInfoOptionHandler {
+
+		String output;
+
+		@Override
+		protected void handleApplicationRun(ClientApplicationRunner<String> app) {
+			this.output = "output";
 		}
 
 	}

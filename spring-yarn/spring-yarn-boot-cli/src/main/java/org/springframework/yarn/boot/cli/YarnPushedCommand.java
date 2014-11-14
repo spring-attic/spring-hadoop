@@ -62,7 +62,7 @@ public class YarnPushedCommand extends AbstractApplicationCommand {
 		super(name, description, handler);
 	}
 
-	public static class PushedOptionHandler extends ApplicationOptionHandler {
+	public static class PushedOptionHandler extends ApplicationOptionHandler<String> {
 
 		@Override
 		protected void runApplication(OptionSet options) throws Exception {
@@ -70,8 +70,7 @@ public class YarnPushedCommand extends AbstractApplicationCommand {
 			Properties appProperties = new Properties();
 			appProperties.setProperty("spring.yarn.internal.YarnInfoApplication.operation", "PUSHED");
 			app.appProperties(appProperties);
-			String info = app.run();
-			handleOutput(info);
+			handleApplicationRun(app);
 		}
 
 	}

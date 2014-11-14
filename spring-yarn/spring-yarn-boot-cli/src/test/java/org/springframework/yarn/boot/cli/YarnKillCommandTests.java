@@ -23,6 +23,7 @@ import joptsimple.OptionSet;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.springframework.yarn.boot.app.ClientApplicationRunner;
 import org.springframework.yarn.boot.cli.YarnKillCommand.KillOptionHandler;
 
 /**
@@ -59,6 +60,14 @@ public class YarnKillCommandTests {
 		command.run("-a", "foo");
 	}
 
+	@Test
+	public void testRequiredArgs() throws Exception {
+		NoHandleApplicationOptionHandler handler = new NoHandleApplicationOptionHandler();
+		YarnKillCommand command = new YarnKillCommand(handler);
+		command.run("-a", "aaa");
+		assertThat(handler.output, is("output"));
+	}
+
 	private static class CustomKillOptionHandler extends KillOptionHandler {
 
 		@Override
@@ -78,6 +87,17 @@ public class YarnKillCommandTests {
 		@Override
 		protected void runApplication(OptionSet options) throws Exception {
 			appId = options.valueOf(getApplicationIdOption());
+		}
+
+	}
+
+	private static class NoHandleApplicationOptionHandler extends KillOptionHandler {
+
+		String output;
+
+		@Override
+		protected void handleApplicationRun(ClientApplicationRunner<String> app) {
+			this.output = "output";
 		}
 
 	}

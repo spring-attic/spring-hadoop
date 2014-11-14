@@ -54,7 +54,7 @@ import org.springframework.yarn.client.YarnClient;
 @EnableAutoConfiguration(exclude = { EmbeddedServletContainerAutoConfiguration.class, WebMvcAutoConfiguration.class,
 		JmxAutoConfiguration.class, BatchAutoConfiguration.class, JmxAutoConfiguration.class,
 		EndpointMBeanExportAutoConfiguration.class, EndpointAutoConfiguration.class })
-public class YarnPushApplication extends AbstractClientApplication<YarnPushApplication> {
+public class YarnPushApplication extends AbstractClientApplication<String, YarnPushApplication> {
 
 	private Map<String, Properties> configFilesContents = new HashMap<String, Properties>();
 
@@ -78,8 +78,8 @@ public class YarnPushApplication extends AbstractClientApplication<YarnPushAppli
 	 *
 	 * @see #run(String...)
 	 */
-	public void run() {
-		run(new String[0]);
+	public String run() {
+		return run(new String[0]);
 	}
 
 	/**
@@ -87,7 +87,7 @@ public class YarnPushApplication extends AbstractClientApplication<YarnPushAppli
 	 *
 	 * @param args the Spring Application args
 	 */
-	public void run(String... args) {
+	public String run(String... args) {
 		if (!StringUtils.hasText(applicationVersion)) {
 			throw new SpringApplicationException("Error executing a spring application", new IllegalArgumentException(
 					"Instance id must be set"));
@@ -107,10 +107,10 @@ public class YarnPushApplication extends AbstractClientApplication<YarnPushAppli
 		SpringYarnBootUtils.addApplicationListener(builder, appProperties);
 
 		SpringApplicationTemplate template = new SpringApplicationTemplate(builder);
-		template.execute(new SpringApplicationCallback<Void>() {
+		return template.execute(new SpringApplicationCallback<String>() {
 
 			@Override
-			public Void runWithSpringApplication(ApplicationContext context) throws Exception {
+			public String runWithSpringApplication(ApplicationContext context) throws Exception {
 				YarnClient client = context.getBean(YarnClient.class);
 				SpringYarnProperties syp = context.getBean(SpringYarnProperties.class);
 				String applicationdir = SpringYarnBootUtils.resolveApplicationdir(syp);

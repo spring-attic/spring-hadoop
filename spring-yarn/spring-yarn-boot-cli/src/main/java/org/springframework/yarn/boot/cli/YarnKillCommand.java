@@ -64,7 +64,7 @@ public class YarnKillCommand extends AbstractApplicationCommand {
 		super(name, description, handler);
 	}
 
-	public static class KillOptionHandler extends ApplicationOptionHandler {
+	public static class KillOptionHandler extends ApplicationOptionHandler<String> {
 
 		private OptionSpec<String> applicationIdOption;
 
@@ -82,8 +82,7 @@ public class YarnKillCommand extends AbstractApplicationCommand {
 			Properties appProperties = new Properties();
 			appProperties.setProperty("spring.yarn.internal.YarnKillApplication.applicationId", appId);
 			app.appProperties(appProperties);
-			String info = app.run(new String[0]);
-			handleOutput(info);
+			handleApplicationRun(app);
 		}
 
 		public OptionSpec<String> getApplicationIdOption() {

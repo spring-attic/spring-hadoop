@@ -65,7 +65,7 @@ public class YarnClusterDestroyCommand extends AbstractApplicationCommand {
 		super(name, description, handler);
 	}
 
-	public static class ClusterDestroyOptionHandler extends ApplicationOptionHandler {
+	public static class ClusterDestroyOptionHandler extends ApplicationOptionHandler<String> {
 
 		private OptionSpec<String> applicationIdOption;
 
@@ -98,8 +98,7 @@ public class YarnClusterDestroyCommand extends AbstractApplicationCommand {
 			appProperties.setProperty("spring.yarn.internal.ContainerClusterApplication.clusterId",
 					versionId);
 			app.appProperties(appProperties);
-			String info = app.run(new String[0]);
-			handleOutput(info);
+			handleApplicationRun(app);
 		}
 
 		public OptionSpec<String> getApplicationIdOption() {
