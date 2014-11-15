@@ -49,7 +49,6 @@ import org.springframework.yarn.boot.actuate.endpoint.mvc.domain.YarnContainerCl
  * @author Janne Valkealahti
  *
  */
-@RequestMapping("/" + YarnContainerClusterEndpoint.ENDPOINT_ID)
 public class YarnContainerClusterMvcEndpoint extends EndpointMvcAdapter {
 
 	private final YarnContainerClusterEndpoint delegate;

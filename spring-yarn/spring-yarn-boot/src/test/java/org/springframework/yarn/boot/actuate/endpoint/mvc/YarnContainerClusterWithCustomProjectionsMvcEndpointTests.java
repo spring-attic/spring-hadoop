@@ -109,7 +109,7 @@ public class YarnContainerClusterWithCustomProjectionsMvcEndpointTests {
 			perform(post(BASE).content(content).contentType(MediaType.APPLICATION_JSON)).
 			andExpect(status().isCreated()).
 			andExpect(content().string(is(""))).
-			andExpect(header().string("Location", endsWith(BASE + "/cluster1")));
+			andExpect(header().string("Location", endsWith("/cluster1")));
 		Map<String, ContainerCluster> clusters = TestUtils.readField("clusters", appmaster);
 		assertThat(clusters.size(), is(1));
 		assertThat(clusters.containsKey("cluster1"), is(true));
