@@ -15,7 +15,12 @@
  */
 package org.springframework.yarn.config.annotation;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+
+import java.util.Map;
 
 import org.junit.Test;
 import org.springframework.context.support.GenericApplicationContext;
@@ -25,6 +30,7 @@ import org.springframework.yarn.container.ContainerHandler;
 
 /**
  * Tests for post processing pojos to create ContainerHandlers.
+ * Mostly verifying usage of {@link SpringYarnAnnotationPostProcessor}.
  *
  * @author Janne Valkealahti
  *
@@ -38,20 +44,60 @@ public class SpringYarnAnnotationPostProcessorTests {
 		SpringYarnAnnotationPostProcessor postProcessor = new SpringYarnAnnotationPostProcessor();
 		postProcessor.setBeanFactory(context.getBeanFactory());
 		postProcessor.afterPropertiesSet();
-		TestBean testBean = new TestBean();
-		postProcessor.postProcessAfterInitialization(testBean, "testBean");
+
+		TestBean1 testBean1 = new TestBean1();
+		postProcessor.postProcessAfterInitialization(testBean1, "testBean1");
 		context.refresh();
-		assertTrue(context.containsBean("testBean.test.onContainerStart"));
-		Object endpoint = context.getBean("testBean.test.onContainerStart");
+
+		assertTrue(context.containsBean("testBean1.test1.onContainerStart"));
+		Object endpoint = context.getBean("testBean1.test1.onContainerStart");
 		assertTrue(endpoint instanceof ContainerHandler);
+
+		assertNotNull(context.getBean(ContainerHandler.class));
+
+		context.stop();
+	}
+
+	@Test
+	public void testComplexOnContainerStart() {
+		@SuppressWarnings("resource")
+		GenericApplicationContext context = new GenericApplicationContext();
+		SpringYarnAnnotationPostProcessor postProcessor = new SpringYarnAnnotationPostProcessor();
+		postProcessor.setBeanFactory(context.getBeanFactory());
+		postProcessor.afterPropertiesSet();
+
+		TestBean1 testBean1 = new TestBean1();
+		postProcessor.postProcessAfterInitialization(testBean1, "testBean1");
+		TestBean2 testBean2 = new TestBean2();
+		postProcessor.postProcessAfterInitialization(testBean2, "testBean2");
+		context.refresh();
+
+		assertTrue(context.containsBean("testBean1.test1.onContainerStart"));
+		Object endpoint = context.getBean("testBean1.test1.onContainerStart");
+		assertTrue(endpoint instanceof ContainerHandler);
+		assertTrue(context.containsBean("testBean2.test2.onContainerStart"));
+		endpoint = context.getBean("testBean2.test2.onContainerStart");
+		assertTrue(endpoint instanceof ContainerHandler);
+
+		Map<String, ContainerHandler> beans = context.getBeansOfType(ContainerHandler.class);
+		assertThat(beans.size(), is(2));
+
 		context.stop();
 	}
 
 	@YarnComponent
-	private static class TestBean {
+	private static class TestBean1 {
 
 		@OnContainerStart
-		public void test() {
+		public void test1() {
+		}
+	}
+
+	@YarnComponent
+	private static class TestBean2 {
+
+		@OnContainerStart
+		public void test2() {
 		}
 	}
 

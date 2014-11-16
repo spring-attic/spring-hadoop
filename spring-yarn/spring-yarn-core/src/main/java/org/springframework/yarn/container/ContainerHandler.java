@@ -17,6 +17,7 @@ package org.springframework.yarn.container;
 
 import java.lang.reflect.Method;
 
+import org.springframework.core.Ordered;
 import org.springframework.yarn.annotation.OnContainerStart;
 import org.springframework.yarn.annotation.YarnComponent;
 
@@ -28,9 +29,11 @@ import org.springframework.yarn.annotation.YarnComponent;
  * @author Janne Valkealahti
  *
  */
-public class ContainerHandler {
+public class ContainerHandler implements Ordered {
 
 	private final YarnContainerRuntimeProcessor<?> processor;
+
+	private int order = Ordered.LOWEST_PRECEDENCE;
 
 	/**
 	 * Instantiates a new container handler.
@@ -69,6 +72,21 @@ public class ContainerHandler {
 	 */
 	public <T> ContainerHandler(MethodInvokingYarnContainerRuntimeProcessor<T> processor) {
 		this.processor = processor;
+	}
+
+	@Override
+	public int getOrder() {
+		return order;
+	}
+
+	/**
+	 * Sets the order used get value from {@link #getOrder()}.
+	 * Default value is {@link Ordered#LOWEST_PRECEDENCE}.
+	 *
+	 * @param order the new order
+	 */
+	public void setOrder(int order) {
+		this.order = order;
 	}
 
 	/**
