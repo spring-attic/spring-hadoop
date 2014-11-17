@@ -18,7 +18,10 @@ package org.springframework.yarn.container;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -45,6 +48,7 @@ public class DefaultYarnContainer extends AbstractYarnContainer implements BeanF
 
 	@Override
 	protected void runInternal() {
+		log.info("runInternal");
 		Exception runtimeException = null;
 		List<Object> results = new ArrayList<Object>();
 
@@ -57,6 +61,13 @@ public class DefaultYarnContainer extends AbstractYarnContainer implements BeanF
 		} catch (Exception e) {
 			runtimeException = e;
 			log.error("Error handling container", e);
+		}
+
+		try {
+			results = waitFutures(results);
+		} catch (Exception e) {
+			runtimeException = e;
+			log.error("Error handling futures", e);
 		}
 
 		log.info("Container state based on method results=[" + StringUtils.arrayToCommaDelimitedString(results.toArray())
@@ -99,6 +110,26 @@ public class DefaultYarnContainer extends AbstractYarnContainer implements BeanF
 		OrderComparator comparator = new OrderComparator();
 		Collections.sort(handlersList, comparator);
 		return handlersList;
+	}
+
+	/**
+	 * Iterates list and replaces Future values with
+	 * a real ones.
+	 *
+	 * @param results the results to iterate
+	 * @return the modified list
+     * @throws ExecutionException if the computation threw an exception
+     * @throws InterruptedException if the current thread was interrupted while waiting
+	 */
+	private List<Object> waitFutures(List<Object> results) throws InterruptedException, ExecutionException {
+		ListIterator<Object> iterator = results.listIterator();
+		while (iterator.hasNext()) {
+			Object result = (Object) iterator.next();
+			if (result instanceof Future<?>) {
+				iterator.set(((Future<?>) result).get());
+			}
+		}
+		return results;
 	}
 
 	/**

@@ -16,11 +16,13 @@
 package org.springframework.yarn.container;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isOneOf;
 import static org.junit.Assert.assertThat;
 
 import java.util.List;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Test;
@@ -28,6 +30,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.yarn.annotation.OnContainerStart;
 import org.springframework.yarn.annotation.YarnComponent;
 import org.springframework.yarn.config.annotation.SpringYarnAnnotationPostProcessor;
@@ -366,6 +369,40 @@ public class DefaultYarnContainerTests {
 		context.stop();
 	}
 
+	@Test
+	public void testFutureValues() {
+		@SuppressWarnings("resource")
+		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(BaseConfig.class, FutureValuesConfig.class);
+		DefaultYarnContainer container = context.getBean(DefaultYarnContainer.class);
+		final StateWrapper stateWrapper = new StateWrapper();
+
+		container.addContainerStateListener(new ContainerStateListener() {
+			@Override
+			public void state(ContainerState state, Object exit) {
+				stateWrapper.state = state;
+				stateWrapper.exit = exit;
+			}
+		});
+
+		container.run();
+		assertThat(stateWrapper.state, is(ContainerState.COMPLETED));
+		assertThat(stateWrapper.exit, instanceOf(List.class));
+		assertThat((Integer)((List<?>)stateWrapper.exit).get(0), is(1));
+		assertThat((Integer)((List<?>)stateWrapper.exit).get(1), nullValue());
+		assertThat((Integer)((List<?>)stateWrapper.exit).get(2), is(2));
+
+		TestBean12 testBean12 = context.getBean(TestBean12.class);
+		assertThat(testBean12.called1, is(true));
+		assertThat(testBean12.called2, is(true));
+		assertThat(testBean12.called3, is(true));
+
+		assertThat(testBean12.order1, is(1));
+		assertThat(testBean12.order2, is(0));
+		assertThat(testBean12.order3, is(2));
+
+		context.stop();
+	}
+
 	@Configuration
 	static class BaseConfig {
 
@@ -507,6 +544,15 @@ public class DefaultYarnContainerTests {
 		@Bean
 		TestBean11 testBean11() {
 			return new TestBean11(executionOrder);
+		}
+	}
+
+	@Configuration
+	static class FutureValuesConfig {
+		private AtomicInteger executionOrder = new AtomicInteger();
+		@Bean
+		TestBean12 testBean12() {
+			return new TestBean12(executionOrder);
 		}
 	}
 
@@ -729,6 +775,45 @@ public class DefaultYarnContainerTests {
 			called3 = true;
 			order3 = executionOrder.getAndIncrement();
 			return 2;
+		}
+	}
+
+	@YarnComponent
+	private static class TestBean12 {
+
+		AtomicInteger executionOrder;
+		boolean called1 = false;
+		boolean called2 = false;
+		boolean called3 = false;
+		int order1 = -1;
+		int order2 = -1;
+		int order3 = -1;
+
+		TestBean12(AtomicInteger executionOrder) {
+			this.executionOrder = executionOrder;
+		}
+
+		@OnContainerStart
+		@Order(52)
+		public void test1() {
+			called1 = true;
+			order1 = executionOrder.getAndIncrement();
+		}
+
+		@OnContainerStart
+		@Order(51)
+		public Future<Integer> test2() {
+			called2 = true;
+			order2 = executionOrder.getAndIncrement();
+			return new AsyncResult<Integer>(1);
+		}
+
+		@OnContainerStart
+		@Order(53)
+		public Future<Integer> test3() {
+			called3 = true;
+			order3 = executionOrder.getAndIncrement();
+			return new AsyncResult<Integer>(2);
 		}
 	}
 
