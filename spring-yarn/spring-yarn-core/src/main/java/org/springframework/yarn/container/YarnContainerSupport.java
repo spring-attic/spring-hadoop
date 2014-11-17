@@ -15,6 +15,9 @@
  */
 package org.springframework.yarn.container;
 
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.yarn.event.YarnEventPublisher;
 import org.springframework.yarn.support.LifecycleObjectSupport;
 
 /**
