@@ -1,0 +1,8 @@
+spring:
+    hadoop:
+        resources:
+          - "file:/fake-resource-1.xml"
+          - "classpath:/fake-resource-2.xml"
+        fsUri: fsUriFoo
+        resourceManagerAddress: resourceManagerAddressFoo:321
+        resourceManagerSchedulerAddress: resourceManagerSchedulerAddressFoo:123

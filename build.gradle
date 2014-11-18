@@ -802,6 +802,20 @@ project('spring-data-hadoop') {
 
 }
 
+project('spring-data-hadoop-boot') {
+	description = 'Spring for Apache Hadoop Boot'
+
+	dependencies {
+		compile project(":spring-data-hadoop")
+		compile "org.springframework.boot:spring-boot-autoconfigure:$springBootVersion"
+		runtime "org.yaml:snakeyaml:$snakeYamlVersion"
+		testCompile "org.springframework:spring-test:$springVersion"
+		testCompile "org.hamcrest:hamcrest-core:$hamcrestVersion"
+		testCompile "org.hamcrest:hamcrest-library:$hamcrestVersion"
+		testCompile "junit:junit:$junitVersion"
+	}
+}
+
 project('spring-data-hadoop-test') {
 	description = 'Spring for Apache Hadoop Tests Core'
 

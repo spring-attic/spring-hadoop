@@ -1,0 +1,6 @@
+spring:
+    hadoop:
+        fsUri: hdfs://host:1234
+        config:
+            key1: value1
+            key2: value2
