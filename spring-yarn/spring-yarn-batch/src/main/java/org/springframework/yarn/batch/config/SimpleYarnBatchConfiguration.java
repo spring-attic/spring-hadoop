@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,6 @@
  */
 package org.springframework.yarn.batch.config;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import javax.sql.DataSource;
 
 import org.springframework.batch.core.explore.JobExplorer;
@@ -26,11 +23,8 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.support.ConversionServiceFactoryBean;
-import org.springframework.core.convert.ConversionService;
-import org.springframework.core.convert.converter.Converter;
-import org.springframework.core.convert.support.GenericConversionService;
 import org.springframework.integration.channel.DirectChannel;
+import org.springframework.integration.config.IntegrationConverter;
 import org.springframework.integration.ip.tcp.TcpInboundGateway;
 import org.springframework.integration.ip.tcp.connection.TcpNetServerConnectionFactory;
 import org.springframework.yarn.YarnSystemConstants;
@@ -39,16 +33,20 @@ import org.springframework.yarn.batch.repository.BatchAppmasterService;
 import org.springframework.yarn.batch.repository.JobRepositoryService;
 import org.springframework.yarn.event.DefaultYarnEventPublisher;
 import org.springframework.yarn.event.YarnEventPublisher;
-import org.springframework.yarn.integration.convert.ConverterRegistrar;
 import org.springframework.yarn.integration.convert.MindHolderToObjectConverter;
 import org.springframework.yarn.integration.convert.MindObjectToHolderConverter;
 import org.springframework.yarn.integration.ip.mind.MindRpcSerializer;
 import org.springframework.yarn.integration.support.DefaultPortExposingTcpSocketSupport;
-import org.springframework.yarn.integration.support.IntegrationContextUtils;
 import org.springframework.yarn.integration.support.Jackson2ObjectMapperFactoryBean;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * Annotation based batch configuration for Yarn Appmaster.
+ *
+ * @author Janne Valkealahti
+ *
+ */
 @Configuration
 public class SimpleYarnBatchConfiguration {
 
@@ -86,23 +84,20 @@ public class SimpleYarnBatchConfiguration {
 		return factory.getObject();
 	}
 
-	@Bean(name=IntegrationContextUtils.YARN_INTEGRATION_CONVERSION_SERVICE_BEAN_NAME)
-	public ConversionService conversionService() {
-		CustomConversionServiceFactoryBean factory = new CustomConversionServiceFactoryBean();
-		factory.afterPropertiesSet();
-		return factory.getObject();
+	@Bean
+	@IntegrationConverter
+	public MindObjectToHolderConverter mindObjectToHolderConverter() {
+		return new MindObjectToHolderConverter(objectMapper());
 	}
 
 	@Bean
-	public ConverterRegistrar converterRegistrar() {
-		Set<Converter<?, ?>> converters = new HashSet<Converter<?,?>>();
-		converters.add(new MindObjectToHolderConverter(objectMapper()));
+	@IntegrationConverter
+	public MindHolderToObjectConverter mindHolderToObjectConverter() {
 		String[] packages = new String[]{
 				"org.springframework.yarn.batch.repository.bindings",
 				"org.springframework.yarn.batch.repository.bindings.exp",
 				"org.springframework.yarn.batch.repository.bindings.repo"};
-		converters.add(new MindHolderToObjectConverter(objectMapper(), packages));
-		return new ConverterRegistrar(converters);
+		return new MindHolderToObjectConverter(objectMapper(), packages);
 	}
 
 	@Bean
@@ -144,18 +139,6 @@ public class SimpleYarnBatchConfiguration {
 		service.setMessageChannel(directChannel());
 		service.setSocketSupport(defaultPortExposingTcpSocketSupport());
 		return service;
-	}
-
-	static class CustomConversionServiceFactoryBean extends ConversionServiceFactoryBean {
-
-		@Override
-		public ConversionService getObject() {
-			ConversionService service = super.getObject();
-			if (service instanceof GenericConversionService) {
-				((GenericConversionService) service).removeConvertible(Object.class, Object.class);
-			}
-			return service;
-		}
 	}
 
 }

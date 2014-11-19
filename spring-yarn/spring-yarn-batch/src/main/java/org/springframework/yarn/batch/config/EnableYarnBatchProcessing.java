@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import java.lang.annotation.Target;
 
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.context.annotation.Import;
+import org.springframework.integration.config.EnableIntegration;
 
 /**
  * Enabled Spring Batch processing used with Yarn Appmaster.
@@ -34,6 +35,7 @@ import org.springframework.context.annotation.Import;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @EnableBatchProcessing
+@EnableIntegration
 @Import(SimpleYarnBatchConfiguration.class)
 public @interface EnableYarnBatchProcessing {
 

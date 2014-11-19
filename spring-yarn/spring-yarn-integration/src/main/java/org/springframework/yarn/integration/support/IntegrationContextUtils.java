@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,9 @@ import org.springframework.util.Assert;
 public class IntegrationContextUtils {
 
 	public static final String TASK_SCHEDULER_BEAN_NAME = "taskScheduler";
-	public static final String YARN_INTEGRATION_CONVERSION_SERVICE_BEAN_NAME = "yarnIntegrationConversionService";
+
+	// we match this name with the one from SI
+	public static final String YARN_INTEGRATION_CONVERSION_SERVICE_BEAN_NAME = "integrationConversionService";
 
 	/**
 	 * Return the {@link TaskScheduler} bean whose name is "taskScheduler" if
