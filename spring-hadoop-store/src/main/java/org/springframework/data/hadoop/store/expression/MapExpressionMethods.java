@@ -15,12 +15,14 @@
  */
 package org.springframework.data.hadoop.store.expression;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
-import org.springframework.context.expression.MapAccessor;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.EvaluationException;
 import org.springframework.expression.Expression;
+import org.springframework.expression.MethodResolver;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.util.Assert;
 
@@ -56,8 +58,26 @@ public class MapExpressionMethods {
 		} else {
 			context = new StandardEvaluationContext();
 			context.addMethodResolver(new PartitionKeyMethodResolver());
-			context.addPropertyAccessor(new MapAccessor());
+			context.addPropertyAccessor(new MapPartitionKeyPropertyAccessor());
 		}
+	}
+
+	public MapExpressionMethods(StandardEvaluationContext evaluationContext, boolean autoCustomize, boolean replaceMethodResolver) {
+		Assert.notNull(evaluationContext, "Evaluation context cannot be null");
+		if (autoCustomize) {
+			MethodResolver methodResolver = new PartitionKeyMethodResolver();
+			if (replaceMethodResolver) {
+				List<MethodResolver> methodResolvers = new ArrayList<MethodResolver>();
+				methodResolvers.add(methodResolver);
+				evaluationContext.setMethodResolvers(methodResolvers);
+			} else {
+				evaluationContext.addMethodResolver(methodResolver);
+			}
+		}
+		if (autoCustomize) {
+			evaluationContext.addPropertyAccessor(new MapPartitionKeyPropertyAccessor());
+		}
+		this.context = evaluationContext;
 	}
 
 	/**

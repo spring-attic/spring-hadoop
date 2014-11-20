@@ -24,7 +24,10 @@ import org.springframework.data.hadoop.store.expression.MapExpressionMethods;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.spel.SpelCompilerMode;
+import org.springframework.expression.spel.SpelParserConfiguration;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 /**
  * A {@link PartitionStrategy} which is used to provide a generic partitioning support using Spring SpEL.
@@ -52,7 +55,7 @@ public class DefaultPartitionStrategy<T extends Object> extends AbstractPartitio
 	 * @param expression the expression
 	 * @param evaluationContext the evaluation context
 	 */
-	public DefaultPartitionStrategy(Expression expression, EvaluationContext evaluationContext) {
+	public DefaultPartitionStrategy(Expression expression, StandardEvaluationContext evaluationContext) {
 		super(new MapPartitionResolver(expression, evaluationContext), new MapPartitionKeyResolver<T>());
 	}
 
@@ -72,8 +75,20 @@ public class DefaultPartitionStrategy<T extends Object> extends AbstractPartitio
 	 * @param expression the expression
 	 * @param evaluationContext the evaluation context
 	 */
-	public DefaultPartitionStrategy(String expression, EvaluationContext evaluationContext) {
-		super(new MapPartitionResolver(expression, evaluationContext), new MapPartitionKeyResolver<T>());
+	public DefaultPartitionStrategy(String expression, StandardEvaluationContext evaluationContext) {
+		this(expression, evaluationContext, null);
+	}
+
+	/**
+	 * Instantiates a new default partition strategy with
+	 * {@link EvaluationContext} and {@link ExpressionParser}.
+	 *
+	 * @param expression the expression
+	 * @param evaluationContext the evaluation context
+	 * @param expressionParser the expression parser
+	 */
+	public DefaultPartitionStrategy(String expression, StandardEvaluationContext evaluationContext, ExpressionParser expressionParser) {
+		super(new MapPartitionResolver(expression, evaluationContext, expressionParser), new MapPartitionKeyResolver<T>());
 	}
 
 	/**
@@ -85,11 +100,16 @@ public class DefaultPartitionStrategy<T extends Object> extends AbstractPartitio
 		private final Expression expression;
 		private final MapExpressionMethods methods;
 
-		public MapPartitionResolver(String expression, EvaluationContext evaluationContext) {
-			ExpressionParser parser = new SpelExpressionParser();
-			this.expression = parser.parseExpression(expression);
-			this.methods = new MapExpressionMethods(evaluationContext);
-			log.info("Using expression=[" + this.expression.getExpressionString() + "]");
+		public MapPartitionResolver(String expression, StandardEvaluationContext evaluationContext, ExpressionParser expressionParser) {
+			if (expressionParser == null) {
+				// default to mixed mode
+				expressionParser = new SpelExpressionParser(new SpelParserConfiguration(SpelCompilerMode.MIXED, null));
+			}
+			if (evaluationContext == null) {
+				evaluationContext = new StandardEvaluationContext();
+			}
+			this.expression = expressionParser.parseExpression(expression);
+			this.methods = new MapExpressionMethods(evaluationContext, true, false);
 		}
 
 		public MapPartitionResolver(Expression expression, EvaluationContext evaluationContext) {

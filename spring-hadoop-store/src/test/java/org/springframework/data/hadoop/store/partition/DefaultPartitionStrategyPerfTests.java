@@ -16,6 +16,10 @@
 package org.springframework.data.hadoop.store.partition;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.hadoop.fs.Path;
 import org.junit.Test;
@@ -30,8 +34,6 @@ import org.springframework.expression.spel.SpelCompilerMode;
 import org.springframework.expression.spel.SpelParserConfiguration;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
-import org.springframework.messaging.Message;
-import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.util.StopWatch;
 
@@ -43,7 +45,7 @@ import org.springframework.util.StopWatch;
  */
 @ContextConfiguration(loader=HadoopDelegatingSmartContextLoader.class)
 @MiniHadoopCluster
-public class PartitionPerfTests extends AbstractStoreTests {
+public class DefaultPartitionStrategyPerfTests extends AbstractStoreTests {
 
 	private final int COUNT = 50000;
 //	private final int COUNT = 1000000;
@@ -109,12 +111,12 @@ public class PartitionPerfTests extends AbstractStoreTests {
 		Assume.group(TestGroup.PERFORMANCE);
 		String expression = "list(payload.split('\u0001')[0],{{'1TO5','APP1','APP2','APP3','APP4','APP5'},{'6TO10','APP6','APP7','APP8','APP9','APP10'}})";
 
-		@SuppressWarnings("unchecked")
-		Message<String>[] messages = new Message[10];
+		ArrayList<Map<String, Object>> messages = new ArrayList<Map<String,Object>>();
 		for (int i = 0; i<10; i++) {
 			String payload = "APP" + (i+1) + "\u0001" + "somedata";
-			Message<String> message = MessageBuilder.withPayload(payload).build();
-			messages[i] = message;
+			Map<String, Object> message = new HashMap<String, Object>();
+			message.put("payload", payload);
+			messages.add(message);
 		}
 
 		testPerformance("testLargeList", expression, messages);
@@ -139,12 +141,12 @@ public class PartitionPerfTests extends AbstractStoreTests {
 		Assume.group(TestGroup.PERFORMANCE);
 		String expression = "payload.split('\u0001')[0]";
 
-		@SuppressWarnings("unchecked")
-		Message<String>[] messages = new Message[1];
+		ArrayList<Map<String, Object>> messages = new ArrayList<Map<String,Object>>();
 		for (int i = 0; i<1; i++) {
 			String payload = "APP" + (i+1) + "\u0001" + "somedata";
-			Message<String> message = MessageBuilder.withPayload(payload).build();
-			messages[i] = message;
+			Map<String, Object> message = new HashMap<String, Object>();
+			message.put("payload", payload);
+			messages.add(message);
 		}
 
 		testPerformance("testWithPayloadSplit", expression, messages);
@@ -155,12 +157,12 @@ public class PartitionPerfTests extends AbstractStoreTests {
 		Assume.group(TestGroup.PERFORMANCE);
 		String expression = "list(payload.split('\u0001')[0],{{'1TO5','APP1'}})";
 
-		@SuppressWarnings("unchecked")
-		Message<String>[] messages = new Message[1];
+		ArrayList<Map<String, Object>> messages = new ArrayList<Map<String,Object>>();
 		for (int i = 0; i<1; i++) {
 			String payload = "APP" + (i+1) + "\u0001" + "somedata";
-			Message<String> message = MessageBuilder.withPayload(payload).build();
-			messages[i] = message;
+			Map<String, Object> message = new HashMap<String, Object>();
+			message.put("payload", payload);
+			messages.add(message);
 		}
 
 		testPerformance("testListWithPayloadSplit", expression, messages);
@@ -171,12 +173,12 @@ public class PartitionPerfTests extends AbstractStoreTests {
 		Assume.group(TestGroup.PERFORMANCE);
 		String expression = "list(payload,{{'1TO5','APP1'}})";
 
-		@SuppressWarnings("unchecked")
-		Message<String>[] messages = new Message[1];
+		ArrayList<Map<String, Object>> messages = new ArrayList<Map<String,Object>>();
 		for (int i = 0; i<1; i++) {
-			String payload = "APP" + (i+1);
-			Message<String> message = MessageBuilder.withPayload(payload).build();
-			messages[i] = message;
+			String payload = "APP" + (i+1) + "\u0001" + "somedata";
+			Map<String, Object> message = new HashMap<String, Object>();
+			message.put("payload", payload);
+			messages.add(message);
 		}
 
 		testPerformance("testListWithPayload", expression, messages);
@@ -196,7 +198,7 @@ public class PartitionPerfTests extends AbstractStoreTests {
 	@Test
 	public void testPartitioningWithDateFormat() throws IOException {
 		Assume.group(TestGroup.PERFORMANCE);
-		String expression = "dateFormat('yyyy/MM')";
+		String expression = "dateFormat('yyyy/MM',timestamp)";
 		testPerformance("testPartitioningWithDateFormat", expression);
 	}
 
@@ -206,14 +208,15 @@ public class PartitionPerfTests extends AbstractStoreTests {
 	@Test
 	public void testDateFormatAndListAndPayloadSplit() throws IOException {
 		Assume.group(TestGroup.PERFORMANCE);
-		String expression = "path(dateFormat('yyyy/MM/dd'),list(payload.split('\u0001')[0],{{'1TO5','APP1','APP2','APP3','APP4','APP5'},{'6TO10','APP6','APP7','APP8','APP9','APP10'}}))";
+		String expression = "path(dateFormat('yyyy/MM/dd',timestamp),list(payload.split('\u0001')[0],{{'1TO5','APP1','APP2','APP3','APP4','APP5'},{'6TO10','APP6','APP7','APP8','APP9','APP10'}}))";
 
-		@SuppressWarnings("unchecked")
-		Message<String>[] messages = new Message[10];
+		ArrayList<Map<String, Object>> messages = new ArrayList<Map<String,Object>>();
 		for (int i = 0; i<10; i++) {
 			String payload = "APP" + (i+1) + "\u0001" + "somedata";
-			Message<String> message = MessageBuilder.withPayload(payload).build();
-			messages[i] = message;
+			Map<String, Object> message = new HashMap<String, Object>();
+			message.put("payload", payload);
+			message.put("timestamp", 0);
+			messages.add(message);
 		}
 
 		testPerformance("testDateFormatAndListAndPayloadSplit", expression, messages);
@@ -224,12 +227,12 @@ public class PartitionPerfTests extends AbstractStoreTests {
 		Assume.group(TestGroup.PERFORMANCE);
 		String expression = "path(payload.split('\u0001')[0])";
 
-		@SuppressWarnings("unchecked")
-		Message<String>[] messages = new Message[10];
+		ArrayList<Map<String, Object>> messages = new ArrayList<Map<String,Object>>();
 		for (int i = 0; i<10; i++) {
 			String payload = "APP" + (i+1) + "\u0001" + "somedata";
-			Message<String> message = MessageBuilder.withPayload(payload).build();
-			messages[i] = message;
+			Map<String, Object> message = new HashMap<String, Object>();
+			message.put("payload", payload);
+			messages.add(message);
 		}
 
 		testPerformance("testUsePayload1", expression, messages);
@@ -240,12 +243,12 @@ public class PartitionPerfTests extends AbstractStoreTests {
 		Assume.group(TestGroup.PERFORMANCE);
 		String expression = "path(payload.split('-')[0])";
 
-		@SuppressWarnings("unchecked")
-		Message<String>[] messages = new Message[10];
+		ArrayList<Map<String, Object>> messages = new ArrayList<Map<String,Object>>();
 		for (int i = 0; i<10; i++) {
-			String payload = "APP" + (i+1) + "-somedata";
-			Message<String> message = MessageBuilder.withPayload(payload).build();
-			messages[i] = message;
+			String payload = "APP" + (i+1) + "\u0001" + "somedata";
+			Map<String, Object> message = new HashMap<String, Object>();
+			message.put("payload", payload);
+			messages.add(message);
 		}
 
 		testPerformance("testUsePayload2", expression, messages);
@@ -256,12 +259,12 @@ public class PartitionPerfTests extends AbstractStoreTests {
 		Assume.group(TestGroup.PERFORMANCE);
 		String expression = "path(payload)";
 
-		@SuppressWarnings("unchecked")
-		Message<String>[] messages = new Message[10];
+		ArrayList<Map<String, Object>> messages = new ArrayList<Map<String,Object>>();
 		for (int i = 0; i<10; i++) {
-			String payload = "APP" + (i+1);
-			Message<String> message = MessageBuilder.withPayload(payload).build();
-			messages[i] = message;
+			String payload = "APP" + (i+1) + "\u0001" + "somedata";
+			Map<String, Object> message = new HashMap<String, Object>();
+			message.put("payload", payload);
+			messages.add(message);
 		}
 
 		testPerformance("testUsePayload3", expression, messages);
@@ -272,65 +275,64 @@ public class PartitionPerfTests extends AbstractStoreTests {
 		Assume.group(TestGroup.PERFORMANCE);
 		String expression = "path(T(org.springframework.util.StringUtils).split(payload,'-')[0])";
 
-		@SuppressWarnings("unchecked")
-		Message<String>[] messages = new Message[10];
+		ArrayList<Map<String, Object>> messages = new ArrayList<Map<String,Object>>();
 		for (int i = 0; i<10; i++) {
 			String payload = "APP" + (i+1) + "-somedata";
-			Message<String> message = MessageBuilder.withPayload(payload).build();
-			messages[i] = message;
+			Map<String, Object> message = new HashMap<String, Object>();
+			message.put("payload", payload);
+			messages.add(message);
 		}
 
 		testPerformance("testUsePayload4", expression, messages);
 	}
 
 	private void testPerformance(String name, String expression) throws IOException {
-		Message<String> message = MessageBuilder.withPayload("dummy").build();
-
-		@SuppressWarnings("unchecked")
-		Message<String>[] messages = new Message[1];
-		messages[0] = message;
-
+		ArrayList<Map<String, Object>> messages = new ArrayList<Map<String,Object>>(1);
+		Map<String, Object> message = new HashMap<String, Object>();
+		message.put("payload", "dummy");
+		message.put("timestamp", 0);
+		messages.add(message);
 		testPerformance(name, expression, messages);
 	}
 
-	private void testPerformance(String name, String expression, Message<String>[] messages) throws IOException {
+	private void testPerformance(String name, String expression, List<Map<String, Object>> messages) throws IOException {
 		// customexecutor
-		MessagePartitionStrategy<String> strategy1 = new MessagePartitionStrategy<String>(expression,
+		DefaultPartitionStrategy<String> strategy1 = new DefaultPartitionStrategy<String>(expression,
 				new StandardEvaluationContext());
-		PartitionTextFileWriter<Message<?>> writer1 = new PartitionTextFileWriter<Message<?>>(getConfiguration(),
+		PartitionTextFileWriter<Map<String, Object>> writer1 = new PartitionTextFileWriter<Map<String, Object>>(getConfiguration(),
 				new Path(testDefaultPath, "1"), null, strategy1);
 
 		// reflection
-		MessagePartitionStrategy<String> strategy2 = new MessagePartitionStrategy<String>(expression,
+		DefaultPartitionStrategy<String> strategy2 = new DefaultPartitionStrategy<String>(expression,
 				new StandardEvaluationContext(), new SpelExpressionParser(new SpelParserConfiguration(SpelCompilerMode.OFF, null)));
-		PartitionTextFileWriter<Message<?>> writer2 = new PartitionTextFileWriter<Message<?>>(getConfiguration(),
+		PartitionTextFileWriter<Map<String, Object>> writer2 = new PartitionTextFileWriter<Map<String, Object>>(getConfiguration(),
 				new Path(testDefaultPath, "2"), null, strategy2);
 
 		// compile
-		MessagePartitionStrategy<String> strategy3 = new MessagePartitionStrategy<String>(expression,
+		DefaultPartitionStrategy<String> strategy3 = new DefaultPartitionStrategy<String>(expression,
 				new StandardEvaluationContext(), new SpelExpressionParser(new SpelParserConfiguration(SpelCompilerMode.IMMEDIATE, null)));
-		PartitionTextFileWriter<Message<?>> writer3 = new PartitionTextFileWriter<Message<?>>(getConfiguration(),
+		PartitionTextFileWriter<Map<String, Object>> writer3 = new PartitionTextFileWriter<Map<String, Object>>(getConfiguration(),
 				new Path(testDefaultPath, "3"), null, strategy3);
 
 		StopWatch sw = new StopWatch(name);
 
 		sw.start("customexecutor");
 		for (int i = 0; i<COUNT; i++) {
-			writer1.write(DATA10, messages[i%messages.length]);
+			writer1.write(DATA10, messages.get(i%messages.size()));
 		}
 		sw.stop();
 		writer1.close();
 
 		sw.start("reflection");
 		for (int i = 0; i<COUNT; i++) {
-			writer2.write(DATA10, messages[i%messages.length]);
+			writer2.write(DATA10, messages.get(i%messages.size()));
 		}
 		sw.stop();
 		writer2.close();
 
 		sw.start("compile");
 		for (int i = 0; i<COUNT; i++) {
-			writer3.write(DATA10, messages[i%messages.length]);
+			writer3.write(DATA10, messages.get(i%messages.size()));
 		}
 		sw.stop();
 		writer3.close();
