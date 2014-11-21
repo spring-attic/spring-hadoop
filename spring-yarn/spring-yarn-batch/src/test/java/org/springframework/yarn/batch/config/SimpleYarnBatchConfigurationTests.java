@@ -53,45 +53,40 @@ public class SimpleYarnBatchConfigurationTests {
 			// SimpleYarnBatchConfiguration to work
 			return new DataSource() {
 
-				@Override
+				// lets not use @Override so that methods
+				// between jdk6/jdk7 doesn't cause compile trouble
+				// this is just a dummy anonymous class
+
 				public <T> T unwrap(Class<T> iface) throws SQLException {
 					return null;
 				}
 
-				@Override
 				public boolean isWrapperFor(Class<?> iface) throws SQLException {
 					return false;
 				}
 
-				@Override
 				public void setLoginTimeout(int seconds) throws SQLException {
 				}
 
-				@Override
 				public void setLogWriter(PrintWriter out) throws SQLException {
 				}
 
-				@Override
 				public Logger getParentLogger() throws SQLFeatureNotSupportedException {
 					return null;
 				}
 
-				@Override
 				public int getLoginTimeout() throws SQLException {
 					return 0;
 				}
 
-				@Override
 				public PrintWriter getLogWriter() throws SQLException {
 					return null;
 				}
 
-				@Override
 				public Connection getConnection(String username, String password) throws SQLException {
 					return null;
 				}
 
-				@Override
 				public Connection getConnection() throws SQLException {
 					return null;
 				}
