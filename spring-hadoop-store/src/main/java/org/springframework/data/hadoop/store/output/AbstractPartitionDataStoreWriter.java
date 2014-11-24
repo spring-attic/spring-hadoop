@@ -399,7 +399,11 @@ public abstract class AbstractPartitionDataStoreWriter<T, K> extends LifecycleOb
 		// sync with writer create in write()
 		synchronized (writers) {
 			DataStoreWriter<T> writer = writers.remove(path);
-			log.info("Removing writer=[" + writer + "]");
+			if (writer != null) {
+				log.info("Removed writer=[" + writer + "]");
+			} else {
+				log.info("Writer with path=[" + path + "] didn't exist anymore");
+			}
 		}
 	}
 

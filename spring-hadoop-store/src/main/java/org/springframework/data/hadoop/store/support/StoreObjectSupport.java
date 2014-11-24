@@ -78,6 +78,7 @@ public abstract class StoreObjectSupport extends LifecycleObjectSupport {
 		if (idleTimeout > 0) {
 			idleTrigger = new IdleTimeoutTrigger(idleTimeout);
 			idlePoller = new IdleTimeoutPoller(getTaskScheduler(), getTaskExecutor(), idleTrigger);
+			idlePoller.setStopWaitResultsTimeout(10000);
 			idlePoller.init();
 		}
 	}

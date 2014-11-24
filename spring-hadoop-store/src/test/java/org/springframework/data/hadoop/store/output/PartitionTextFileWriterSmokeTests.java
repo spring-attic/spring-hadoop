@@ -15,11 +15,15 @@
  */
 package org.springframework.data.hadoop.store.output;
 
+import static org.hamcrest.CoreMatchers.everyItem;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.endsWith;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
@@ -86,6 +90,7 @@ public class PartitionTextFileWriterSmokeTests extends AbstractStoreTests {
 		Thread.sleep(3000);
 
 		Map<Path, DataStoreWriter<String>> writers = TestUtils.readField("writers", writer);
+		TestUtils.printLsR(PATH, getConfiguration());
 		assertThat(writers.size(), is(0));
 
 		writer.flush();
@@ -94,6 +99,12 @@ public class PartitionTextFileWriterSmokeTests extends AbstractStoreTests {
 		// assuming items in DATA09ARRAY have same length
 		assertThat(getTotalWritten(), is((long) count * (DATA10.length() + 1) * threads * iterations));
 
+		@SuppressWarnings("resource")
+		FsShell shell = new FsShell(getConfiguration());
+		Collection<FileStatus> files = shell.ls(true, PATH);
+		Collection<String> names = statusesToNames(files);
+		assertThat(names, everyItem(not(endsWith("tmp"))));
+
 	}
 
 	private long getTotalWritten() {
@@ -101,12 +112,21 @@ public class PartitionTextFileWriterSmokeTests extends AbstractStoreTests {
 		FsShell shell = new FsShell(hadoopConfiguration);
 		long total = 0;
 		for (FileStatus s : shell.ls(true, PATH)) {
-			System.out.println(s);
 			if (s.isFile()) {
 				total += s.getLen();
 			}
 		}
 		return total;
+	}
+
+	private static Collection<String> statusesToNames(Collection<FileStatus> statuses) {
+		Collection<String> names = new ArrayList<String>();
+		for (FileStatus s : statuses) {
+			String p = s.getPath().toString();
+			int index = p.indexOf('/', 8);
+			names.add(p.substring(index));
+		}
+		return names;
 	}
 
 	private void doConcurrentWrites(final PartitionTextFileWriter<String> writer, int threadCount, final int writeCount) {
