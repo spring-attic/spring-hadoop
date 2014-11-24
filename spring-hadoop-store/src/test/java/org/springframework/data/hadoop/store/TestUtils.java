@@ -17,8 +17,8 @@ package org.springframework.data.hadoop.store;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertNull;
 import static org.hamcrest.Matchers.lessThan;
+import static org.junit.Assert.assertNull;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -27,6 +27,8 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.hadoop.fs.FileStatus;
+import org.springframework.data.hadoop.fs.FsShell;
 import org.springframework.util.ReflectionUtils;
 
 /**
@@ -178,6 +180,14 @@ public abstract class TestUtils {
 		try {
 			closeable.close();
 		} catch (Exception e) {
+		}
+	}
+
+	@SuppressWarnings("resource")
+	public static void printLsR(String path, org.apache.hadoop.conf.Configuration configuration) {
+		FsShell shell = new FsShell(configuration);
+		for (FileStatus s : shell.ls(true, path)) {
+			System.out.println(">>> " + s);
 		}
 	}
 

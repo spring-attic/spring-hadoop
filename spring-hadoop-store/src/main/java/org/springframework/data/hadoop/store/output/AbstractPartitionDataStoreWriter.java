@@ -23,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
+import org.springframework.context.Lifecycle;
 import org.springframework.data.hadoop.store.DataStoreWriter;
 import org.springframework.data.hadoop.store.PartitionDataStoreWriter;
 import org.springframework.data.hadoop.store.codec.CodecInfo;
@@ -182,6 +183,15 @@ public abstract class AbstractPartitionDataStoreWriter<T, K> extends LifecycleOb
 
 	@Override
 	protected void doStop() {
+		for (DataStoreWriter<T> w : writers.values()) {
+			if (w instanceof Lifecycle) {
+				try {
+					((Lifecycle)w).stop();
+				} catch (Exception e) {
+					log.warn("Error closing DataStoreWriter " + w, e);
+				}
+			}
+		}
 		try {
 			flush();
 			close();
