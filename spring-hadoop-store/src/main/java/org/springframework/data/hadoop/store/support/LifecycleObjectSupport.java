@@ -185,7 +185,7 @@ public abstract class LifecycleObjectSupport implements InitializingBean, SmartL
 	 *
 	 * @return the bean factory.
 	 */
-	protected final BeanFactory getBeanFactory() {
+	public final BeanFactory getBeanFactory() {
 		return beanFactory;
 	}
 
@@ -204,7 +204,7 @@ public abstract class LifecycleObjectSupport implements InitializingBean, SmartL
 	 *
 	 * @return the defined task scheduler
 	 */
-	protected TaskScheduler getTaskScheduler() {
+	public TaskScheduler getTaskScheduler() {
 		if (taskScheduler == null && getBeanFactory() != null) {
 			if (log.isDebugEnabled()) {
 				log.debug("getting taskScheduler service from bean factory " + getBeanFactory());
@@ -254,7 +254,7 @@ public abstract class LifecycleObjectSupport implements InitializingBean, SmartL
 	 *
 	 * @return the defined task executor
 	 */
-	protected TaskExecutor getTaskExecutor() {
+	public TaskExecutor getTaskExecutor() {
 		if (taskExecutor == null && getBeanFactory() != null) {
 			if (log.isDebugEnabled()) {
 				log.debug("getting taskExecutor service from bean factory " + getBeanFactory());

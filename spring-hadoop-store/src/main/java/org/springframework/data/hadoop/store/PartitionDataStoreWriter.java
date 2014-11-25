@@ -17,6 +17,8 @@ package org.springframework.data.hadoop.store;
 
 import java.io.IOException;
 
+import org.springframework.data.hadoop.store.partition.PartitionKeyResolver;
+import org.springframework.data.hadoop.store.partition.PartitionResolver;
 import org.springframework.data.hadoop.store.partition.PartitionStrategy;
 
 /**
@@ -31,15 +33,13 @@ import org.springframework.data.hadoop.store.partition.PartitionStrategy;
  * @param <T> the type of an entity to write
  * @param <K> the type of a partition key
  */
-public interface PartitionDataStoreWriter<T,K> extends DataStoreWriter<T> {
-
-	/**
-	 * Write an entity with an explicit partitioning key.
-	 *
-	 * @param entity the entity to write
-	 * @param partitionKey the partition key
-	 * @throws IOException if an I/O error occurs
-	 */
+public interface PartitionDataStoreWriter<T, K, S> extends DataStoreWriter<T> {
+	
+	PartitionStrategy<T, K> getPartitionStrategy();
+	
+	Serializer<T, S> getSerializer();
+	
+	void write(T entity) throws IOException;
 	void write(T entity, K partitionKey) throws IOException;
 
 }

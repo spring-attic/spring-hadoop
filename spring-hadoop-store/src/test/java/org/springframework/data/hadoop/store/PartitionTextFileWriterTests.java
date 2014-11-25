@@ -27,13 +27,18 @@ import java.util.Map;
 
 import org.apache.hadoop.fs.Path;
 import org.junit.Test;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.hadoop.store.input.TextFileReader;
-import org.springframework.data.hadoop.store.output.PartitionTextFileWriter;
+import org.springframework.data.hadoop.store.output.DataStoreWriterFactory;
+import org.springframework.data.hadoop.store.output.PartitioningDataStoreWriter;
+import org.springframework.data.hadoop.store.output.ShardedDataStoreWriter;
+import org.springframework.data.hadoop.store.output.TextFileWriterFactory;
 import org.springframework.data.hadoop.store.partition.DefaultPartitionStrategy;
 import org.springframework.data.hadoop.store.partition.MessagePartitionStrategy;
 import org.springframework.data.hadoop.store.partition.PartitionKeyResolver;
 import org.springframework.data.hadoop.store.partition.PartitionResolver;
 import org.springframework.data.hadoop.store.partition.PartitionStrategy;
+import org.springframework.data.hadoop.store.strategy.naming.FileNamingStrategy;
 import org.springframework.data.hadoop.store.strategy.naming.RollingFileNamingStrategy;
 import org.springframework.data.hadoop.store.strategy.naming.StaticFileNamingStrategy;
 import org.springframework.data.hadoop.store.strategy.rollover.SizeRolloverStrategy;
@@ -68,9 +73,8 @@ public class PartitionTextFileWriterTests extends AbstractStoreTests {
 		headers.put("timestamp", System.currentTimeMillis());
 		String nowYYYYMM = new SimpleDateFormat("yyyy/MM").format(new Date());
 
-		PartitionTextFileWriter<Map<String, Object>> writer =
-				new PartitionTextFileWriter<Map<String, Object>>(getConfiguration(), testDefaultPath, null, strategy);
-		writer.setFileNamingStrategyFactory(new StaticFileNamingStrategy("bar"));
+		PartitioningDataStoreWriter<String, Map<String, Object>, String> writer =
+				createMapWriter(testDefaultPath, new StaticFileNamingStrategy("bar"), strategy);
 
 		writer.write(dataArray[0], headers);
 		writer.flush();
@@ -82,20 +86,16 @@ public class PartitionTextFileWriterTests extends AbstractStoreTests {
 
 	@Test
 	public void testMessageWriteReadTextOneLine() throws IOException {
-		String expression = "headers[region] + '/' + dateFormat('yyyy/MM', headers[timestamp])";
 		String[] dataArray = new String[] { DATA10 };
-		MessagePartitionStrategy<String> strategy = new MessagePartitionStrategy<String>(expression,
-				new StandardEvaluationContext(), new SpelExpressionParser(new SpelParserConfiguration(
-						SpelCompilerMode.IMMEDIATE, null)));
 
 		Map<String, Object> headers = new HashMap<String, Object>();
 		headers.put("region", "foo");
+
 		Message<String> message = MessageBuilder.withPayload("jee").copyHeaders(headers).build();
 		String nowYYYYMM = new SimpleDateFormat("yyyy/MM").format(new Date());
 
-		PartitionTextFileWriter<Message<?>> writer =
-				new PartitionTextFileWriter<Message<?>>(getConfiguration(), testDefaultPath, null, strategy);
-		writer.setFileNamingStrategyFactory(new StaticFileNamingStrategy("bar"));
+		PartitioningDataStoreWriter<String, Message<?>, String> writer =
+				createMessageWriter(testDefaultPath, new StaticFileNamingStrategy("bar"));
 
 		writer.write(dataArray[0], message);
 		writer.flush();
@@ -107,18 +107,13 @@ public class PartitionTextFileWriterTests extends AbstractStoreTests {
 
 	@Test
 	public void testFallbackWriter() throws IOException {
-		String expression = "headers[region] + '/' + dateFormat('yyyy/MM', headers[timestamp])";
 		String[] dataArray = new String[] { DATA10 };
-		MessagePartitionStrategy<String> strategy = new MessagePartitionStrategy<String>(expression,
-				new StandardEvaluationContext(), new SpelExpressionParser(new SpelParserConfiguration(
-						SpelCompilerMode.IMMEDIATE, null)));
 
 		Map<String, Object> headers = new HashMap<String, Object>();
 		headers.put("region", "foo");
 
-		PartitionTextFileWriter<Message<?>> writer =
-				new PartitionTextFileWriter<Message<?>>(getConfiguration(), testDefaultPath, null, strategy);
-		writer.setFileNamingStrategyFactory(new StaticFileNamingStrategy("bar"));
+		PartitioningDataStoreWriter<String, Message<?>, String> writer =
+				createMessageWriter(testDefaultPath, new StaticFileNamingStrategy("bar"));
 
 		writer.write(dataArray[0], null);
 		writer.flush();
@@ -131,16 +126,11 @@ public class PartitionTextFileWriterTests extends AbstractStoreTests {
 	@Test
 	public void testWriteReadManyLinesWithNamingAndRollover() throws IOException {
 
-		String expression = "headers[region].toString() + '/' + dateFormat('yyyy/MM', headers[timestamp])";
-		MessagePartitionStrategy<String> strategy = new MessagePartitionStrategy<String>(expression,
-				new StandardEvaluationContext(), new SpelExpressionParser(new SpelParserConfiguration(
-						SpelCompilerMode.IMMEDIATE, null)));
+		PartitioningDataStoreWriter<String, Message<?>, String> writer =
+				createMessageWriter(testDefaultPath, new RollingFileNamingStrategy());
 
-		PartitionTextFileWriter<Message<?>> writer =
-				new PartitionTextFileWriter<Message<?>>(getConfiguration(), testDefaultPath, null, strategy);
 
-		writer.setFileNamingStrategyFactory(new RollingFileNamingStrategy());
-		writer.setRolloverStrategyFactory(new SizeRolloverStrategy(40));
+		writer.getShardWriter().setRolloverStrategyFactory(new SizeRolloverStrategy(40));
 
 		for (String data : DATA09ARRAY) {
 			Map<String, Object> headers = new HashMap<String, Object>();
@@ -171,8 +161,11 @@ public class PartitionTextFileWriterTests extends AbstractStoreTests {
 		String[] dataArray2 = new String[] { "customer2-1", "customer2-2", "customer2-3" };
 		String[] dataArray3 = new String[] { "customer3-1", "customer3-2", "customer3-3" };
 		CustomerPartitionStrategy strategy = new CustomerPartitionStrategy();
-		PartitionTextFileWriter<String> writer =
-				new PartitionTextFileWriter<String>(getConfiguration(), testDefaultPath, null, strategy);
+
+		PartitioningDataStoreWriter<String, String, String> writer =
+				createStringWriter(testDefaultPath, new StaticFileNamingStrategy("bar"), 
+						strategy);
+
 
 		writer.write(dataArray1[0], "customer1");
 		writer.write(dataArray1[1], "customer1");
@@ -187,15 +180,15 @@ public class PartitionTextFileWriterTests extends AbstractStoreTests {
 		writer.close();
 
 		// /tmp/TextFilePartitionedWriterTests/default/customer1
-		TextFileReader reader1 = new TextFileReader(getConfiguration(), new Path(testDefaultPath, "customer1"), null);
+		TextFileReader reader1 = new TextFileReader(getConfiguration(), new Path(testDefaultPath, "customer1/bar"), null);
 		TestUtils.readDataAndAssert(reader1, dataArray1);
 
 		// /tmp/TextFilePartitionedWriterTests/default/customer2
-		TextFileReader reader2 = new TextFileReader(getConfiguration(), new Path(testDefaultPath, "customer2"), null);
+		TextFileReader reader2 = new TextFileReader(getConfiguration(), new Path(testDefaultPath, "customer2/bar"), null);
 		TestUtils.readDataAndAssert(reader2, dataArray2);
 
 		// /tmp/TextFilePartitionedWriterTests/default/customer3
-		TextFileReader reader3 = new TextFileReader(getConfiguration(), new Path(testDefaultPath, "customer3"), null);
+		TextFileReader reader3 = new TextFileReader(getConfiguration(), new Path(testDefaultPath, "customer3/bar"), null);
 		TestUtils.readDataAndAssert(reader3, dataArray3);
 	}
 
@@ -205,8 +198,9 @@ public class PartitionTextFileWriterTests extends AbstractStoreTests {
 		String[] dataArray2 = new String[] { "customer2-1", "customer2-2", "customer2-3" };
 		String[] dataArray3 = new String[] { "customer3-1", "customer3-2", "customer3-3" };
 		CustomerPartitionStrategy strategy = new CustomerPartitionStrategy();
-		PartitionTextFileWriter<String> writer =
-				new PartitionTextFileWriter<String>(getConfiguration(), testDefaultPath, null, strategy);
+		PartitioningDataStoreWriter<String, String, String> writer =
+				createStringWriter(testDefaultPath, new StaticFileNamingStrategy("bar"), 
+						strategy);
 
 		writer.write(dataArray1[0]);
 		writer.write(dataArray1[1]);
@@ -220,16 +214,16 @@ public class PartitionTextFileWriterTests extends AbstractStoreTests {
 		writer.flush();
 		writer.close();
 
-		// /tmp/TextFilePartitionedWriterTests/default/customer1
-		TextFileReader reader1 = new TextFileReader(getConfiguration(), new Path(testDefaultPath, "customer1"), null);
+		// /tmp/PartitionTextFileWriterTests/default/customer1
+		TextFileReader reader1 = new TextFileReader(getConfiguration(), new Path(testDefaultPath, "customer1/bar"), null);
 		TestUtils.readDataAndAssert(reader1, dataArray1);
 
-		// /tmp/TextFilePartitionedWriterTests/default/customer2
-		TextFileReader reader2 = new TextFileReader(getConfiguration(), new Path(testDefaultPath, "customer2"), null);
+		// /tmp/PartitionTextFileWriterTests/default/customer2
+		TextFileReader reader2 = new TextFileReader(getConfiguration(), new Path(testDefaultPath, "customer2/bar"), null);
 		TestUtils.readDataAndAssert(reader2, dataArray2);
 
-		// /tmp/TextFilePartitionedWriterTests/default/customer3
-		TextFileReader reader3 = new TextFileReader(getConfiguration(), new Path(testDefaultPath, "customer3"), null);
+		// /tmp/PartitionTextFileWriterTests/default/customer3
+		TextFileReader reader3 = new TextFileReader(getConfiguration(), new Path(testDefaultPath, "customer3/bar"), null);
 		TestUtils.readDataAndAssert(reader3, dataArray3);
 	}
 
@@ -242,27 +236,28 @@ public class PartitionTextFileWriterTests extends AbstractStoreTests {
 		Map<String, Object> headers = new HashMap<String, Object>();
 		headers.put("region", "reg1");
 
-		PartitionTextFileWriter<Map<String, Object>> writer =
-				new PartitionTextFileWriter<Map<String, Object>>(getConfiguration(), testDefaultPath, null, strategy);
-		writer.setFileNamingStrategyFactory(new StaticFileNamingStrategy("bar"));
+		PartitioningDataStoreWriter<String, Map<String, Object>, String> writer =
+				createMapWriter(testDefaultPath, new StaticFileNamingStrategy("bar"), 
+						strategy);
+
 
 		writer.write(dataArray[0], headers);
 		writer.flush();
 
-		Map<Path, DataStoreWriter<String>> writers = TestUtils.readField("writers", writer);
+		Map<Path, DataStoreWriter<String>> writers = TestUtils.readField("writers", writer.getShardWriter());
 		assertThat(writers.size(), is(1));
 
 		headers.put("region", "reg2");
 		writer.write(dataArray[0], headers);
 		writer.flush();
 
-		writers = TestUtils.readField("writers", writer);
+		writers = TestUtils.readField("writers", writer.getShardWriter());
 		assertThat(writers.size(), is(2));
 
 		DataStoreWriter<String> toclose = writers.values().iterator().next();
 		toclose.close();
 		writer.flush();
-		writers = TestUtils.readField("writers", writer);
+		writers = TestUtils.readField("writers", writer.getShardWriter());
 		assertThat(writers.size(), is(1));
 
 		writer.close();
@@ -270,7 +265,7 @@ public class PartitionTextFileWriterTests extends AbstractStoreTests {
 		TextFileReader reader = new TextFileReader(getConfiguration(), new Path(testDefaultPath, "reg1/bar"), null);
 		TestUtils.readDataAndAssert(reader, dataArray);
 
-		writers = TestUtils.readField("writers", writer);
+		writers = TestUtils.readField("writers", writer.getShardWriter());
 		assertThat(writers.size(), is(0));
 
 	}
@@ -312,6 +307,107 @@ public class PartitionTextFileWriterTests extends AbstractStoreTests {
 			}
 			return null;
 		}
+	}
+	
+	public PartitioningDataStoreWriter<String, String, String> createStringWriter(
+			Path basePath, FileNamingStrategy fileNamingStrategy,
+			PartitionStrategy<String, String> partitionStrategy) {
+		
+		DataStoreWriterFactory<DataStoreWriter<String>> factory = new TextFileWriterFactory();
+		
+		ShardedDataStoreWriter<String> shardedWriter = new ShardedDataStoreWriter<String>(getConfiguration(),
+				basePath, null, factory);
+		
+		shardedWriter.setFileNamingStrategyFactory(fileNamingStrategy);
+		shardedWriter.setInWritingSuffix(".tmp");
+		
+		Serializer<String, String> serializer = new Serializer<String, String>() {
+
+			@Override
+			public String serialize(String entity) {
+				return entity;
+			}
+			
+		};
+		
+		PartitioningDataStoreWriter<String, String, String> writer = new PartitioningDataStoreWriter<String, String, String>(
+				shardedWriter,
+				partitionStrategy,
+				serializer);
+		
+
+		return writer;
+	}
+	
+	public PartitioningDataStoreWriter<String, Map<String, Object>, String> createMapWriter(
+			Path basePath, FileNamingStrategy fileNamingStrategy,
+			PartitionStrategy<String, Map<String, Object>> partitionStrategy) {
+		
+		DataStoreWriterFactory<DataStoreWriter<String>> factory = new TextFileWriterFactory();
+		
+		ShardedDataStoreWriter<String> shardedWriter = new ShardedDataStoreWriter<String>(getConfiguration(),
+				basePath, null, factory);
+		
+		shardedWriter.setFileNamingStrategyFactory(fileNamingStrategy);
+		shardedWriter.setInWritingSuffix(".tmp");
+		
+		Serializer<String, String> serializer = new Serializer<String, String>() {
+
+			@Override
+			public String serialize(String entity) {
+				return entity;
+			}
+			
+		};
+		
+		PartitioningDataStoreWriter<String, Map<String, Object>, String> writer = new PartitioningDataStoreWriter<String, Map<String, Object>, String>(
+				shardedWriter,
+				partitionStrategy,
+				serializer);
+		
+
+		return writer;
+	}
+	
+	
+	public PartitioningDataStoreWriter<String, Message<?>, String> createMessageWriter(
+			Path basePath, 
+			FileNamingStrategy fileNamingStrategy) {
+		
+		String expression = "headers[region].toString() + '/' + dateFormat('yyyy/MM', headers[timestamp])";
+		
+		MessagePartitionStrategy<String> partitionStrategy = new MessagePartitionStrategy<String>(
+				expression,
+				new StandardEvaluationContext(), 
+				new SpelExpressionParser(
+						new SpelParserConfiguration(SpelCompilerMode.IMMEDIATE, null)
+				)
+		);
+		
+		DataStoreWriterFactory<DataStoreWriter<String>> factory = new TextFileWriterFactory();
+		
+		ShardedDataStoreWriter<String> shardedWriter = new ShardedDataStoreWriter<String>(getConfiguration(),
+				basePath, null, factory);
+		
+		shardedWriter.setFileNamingStrategyFactory(fileNamingStrategy);
+		shardedWriter.setInWritingSuffix(".tmp");
+		
+		Serializer<String, String> serializer = new Serializer<String, String>() {
+
+			@Override
+			public String serialize(String entity) {
+				return entity;
+			}
+			
+		};
+		
+		PartitioningDataStoreWriter<String, Message<?>, String> writer = new PartitioningDataStoreWriter<String, Message<?>, String>(
+				shardedWriter,
+				(PartitionStrategy)partitionStrategy,
+				serializer);
+		
+
+		return writer;
 	}
 
 }

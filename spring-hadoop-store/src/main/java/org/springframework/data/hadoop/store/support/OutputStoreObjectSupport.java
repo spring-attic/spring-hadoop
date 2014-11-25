@@ -174,6 +174,14 @@ public abstract class OutputStoreObjectSupport extends StoreObjectSupport {
 		this.prefix = prefix;
 	}
 
+	public String getInWritingSuffix() {
+		return suffix;
+	}
+
+	public String getInWritingPrefix() {
+		return prefix;
+	}
+
 	/**
 	 * Sets the flag indicating if written files may be overwritten.
 	 * Default value is <code>FALSE</code> meaning {@code StoreException}

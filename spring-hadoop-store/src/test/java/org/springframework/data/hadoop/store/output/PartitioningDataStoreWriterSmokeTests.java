@@ -34,6 +34,7 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.hadoop.fs.FsShell;
 import org.springframework.data.hadoop.store.AbstractStoreTests;
 import org.springframework.data.hadoop.store.DataStoreWriter;
+import org.springframework.data.hadoop.store.Serializer;
 import org.springframework.data.hadoop.store.TestUtils;
 import org.springframework.data.hadoop.store.event.DefaultStoreEventPublisher;
 import org.springframework.data.hadoop.store.event.LoggingListener;
@@ -56,7 +57,7 @@ import org.springframework.test.context.ContextConfiguration;
 @ContextConfiguration(loader=HadoopDelegatingSmartContextLoader.class)
 @MiniHadoopCluster
 @DirtiesContext(classMode=ClassMode.AFTER_EACH_TEST_METHOD)
-public class PartitionTextFileWriterSmokeTests extends AbstractStoreTests {
+public class PartitioningDataStoreWriterSmokeTests extends AbstractStoreTests {
 
 	@Autowired
 	private ApplicationContext context;
@@ -74,7 +75,7 @@ public class PartitionTextFileWriterSmokeTests extends AbstractStoreTests {
 		int iterations = 10;
 
 		@SuppressWarnings("unchecked")
-		PartitionTextFileWriter<String> writer = context.getBean("writer1", PartitionTextFileWriter.class);
+		PartitioningDataStoreWriter<String, String, String> writer = context.getBean("writer1", PartitioningDataStoreWriter.class);
 		assertNotNull(writer);
 
 		for (int i = 0; i < iterations; i++) {
@@ -109,7 +110,7 @@ public class PartitionTextFileWriterSmokeTests extends AbstractStoreTests {
 		return total;
 	}
 
-	private void doConcurrentWrites(final PartitionTextFileWriter<String> writer, int threadCount, final int writeCount) {
+	private void doConcurrentWrites(final PartitioningDataStoreWriter<String, String, String> writer, int threadCount, final int writeCount) {
 		final CountDownLatch latch = new CountDownLatch(1);
 		final ArrayList<Thread> joins = new ArrayList<Thread>();
 		for (int i = 0; i < threadCount; ++i) {
@@ -211,12 +212,32 @@ public class PartitionTextFileWriterSmokeTests extends AbstractStoreTests {
 		}
 
 		@Bean
-		public PartitionTextFileWriter<String> writer1() {
-			PartitionTextFileWriter<String> writer = new PartitionTextFileWriter<String>(hadoopConfiguration,
-					testBasePath(), null, partitionStrategy());
-			writer.setIdleTimeout(1000);
-			writer.setFileNamingStrategyFactory(fileNamingStrategy());
-			writer.setInWritingSuffix(".tmp");
+		public PartitioningDataStoreWriter<String, String, String> writer1() {
+			
+			DataStoreWriterFactory<DataStoreWriter<String>> factory = new TextFileWriterFactory();
+			
+			ShardedDataStoreWriter<String> shardedWriter = new ShardedDataStoreWriter<String>(hadoopConfiguration,
+					testBasePath(), null, factory);
+			
+			shardedWriter.setIdleTimeout(1000);
+			shardedWriter.setFileNamingStrategyFactory(fileNamingStrategy());
+			shardedWriter.setInWritingSuffix(".tmp");
+			
+			Serializer<String, String> serializer = new Serializer<String, String>() {
+
+				@Override
+				public String serialize(String entity) {
+					return entity;
+				}
+				
+			};
+			
+			PartitioningDataStoreWriter<String, String, String> writer = new PartitioningDataStoreWriter<String, String, String>(
+					shardedWriter,
+					partitionStrategy(),
+					serializer);
+			
+
 			return writer;
 		}
 

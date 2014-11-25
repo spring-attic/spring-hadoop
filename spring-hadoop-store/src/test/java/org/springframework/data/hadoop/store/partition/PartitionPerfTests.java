@@ -20,8 +20,14 @@ import java.io.IOException;
 import org.apache.hadoop.fs.Path;
 import org.junit.Test;
 import org.springframework.data.hadoop.store.AbstractStoreTests;
-import org.springframework.data.hadoop.store.output.PartitionTextFileWriter;
+import org.springframework.data.hadoop.store.DataStoreWriter;
+import org.springframework.data.hadoop.store.Serializer;
+import org.springframework.data.hadoop.store.output.DataStoreWriterFactory;
+import org.springframework.data.hadoop.store.output.PartitioningDataStoreWriter;
+import org.springframework.data.hadoop.store.output.ShardedDataStoreWriter;
 import org.springframework.data.hadoop.store.output.TextFileWriter;
+import org.springframework.data.hadoop.store.output.TextFileWriterFactory;
+import org.springframework.data.hadoop.store.strategy.naming.RollingFileNamingStrategy;
 import org.springframework.data.hadoop.test.context.HadoopDelegatingSmartContextLoader;
 import org.springframework.data.hadoop.test.context.MiniHadoopCluster;
 import org.springframework.data.hadoop.test.tests.Assume;
@@ -295,22 +301,22 @@ public class PartitionPerfTests extends AbstractStoreTests {
 
 	private void testPerformance(String name, String expression, Message<String>[] messages) throws IOException {
 		// customexecutor
-		MessagePartitionStrategy<String> strategy1 = new MessagePartitionStrategy<String>(expression,
-				new StandardEvaluationContext());
-		PartitionTextFileWriter<Message<?>> writer1 = new PartitionTextFileWriter<Message<?>>(getConfiguration(),
-				new Path(testDefaultPath, "1"), null, strategy1);
+		PartitionStrategy<String, Message> strategy1 = (PartitionStrategy)(new MessagePartitionStrategy<String>(expression,
+				new StandardEvaluationContext()));
+		
+		PartitioningDataStoreWriter<String, Message, String> writer1 = createWriter(new Path(testDefaultPath, "1"), strategy1);
 
 		// reflection
-		MessagePartitionStrategy<String> strategy2 = new MessagePartitionStrategy<String>(expression,
-				new StandardEvaluationContext(), new SpelExpressionParser(new SpelParserConfiguration(SpelCompilerMode.OFF, null)));
-		PartitionTextFileWriter<Message<?>> writer2 = new PartitionTextFileWriter<Message<?>>(getConfiguration(),
-				new Path(testDefaultPath, "2"), null, strategy2);
+		PartitionStrategy<String, Message> strategy2 = (PartitionStrategy)(new MessagePartitionStrategy<String>(expression,
+				new StandardEvaluationContext(), new SpelExpressionParser(new SpelParserConfiguration(SpelCompilerMode.OFF, null))));
+		
+		PartitioningDataStoreWriter<String, Message, String> writer2 = createWriter(new Path(testDefaultPath, "2"), strategy2);
 
 		// compile
-		MessagePartitionStrategy<String> strategy3 = new MessagePartitionStrategy<String>(expression,
-				new StandardEvaluationContext(), new SpelExpressionParser(new SpelParserConfiguration(SpelCompilerMode.IMMEDIATE, null)));
-		PartitionTextFileWriter<Message<?>> writer3 = new PartitionTextFileWriter<Message<?>>(getConfiguration(),
-				new Path(testDefaultPath, "3"), null, strategy3);
+		PartitionStrategy<String, Message> strategy3 = (PartitionStrategy)(new MessagePartitionStrategy<String>(expression,
+				new StandardEvaluationContext(), new SpelExpressionParser(new SpelParserConfiguration(SpelCompilerMode.IMMEDIATE, null))));
+
+		PartitioningDataStoreWriter<String, Message, String> writer3 = createWriter(new Path(testDefaultPath, "3"), strategy3);
 
 		StopWatch sw = new StopWatch(name);
 
@@ -342,6 +348,40 @@ public class PartitionPerfTests extends AbstractStoreTests {
 	@org.springframework.context.annotation.Configuration
 	static class Config {
 		// just empty to survive without xml configs
+	}
+	
+	public PartitioningDataStoreWriter<String, Message, String> createWriter(Path basePath, 
+			PartitionStrategy<String, Message> partitionStrategy) {
+		
+		DataStoreWriterFactory<DataStoreWriter<String>> factory = new TextFileWriterFactory();
+		
+		ShardedDataStoreWriter<String> shardedWriter = new ShardedDataStoreWriter<String>(getConfiguration(),
+				basePath, null, factory);
+		
+		shardedWriter.setIdleTimeout(1000);
+		shardedWriter.setFileNamingStrategyFactory(fileNamingStrategy());
+		shardedWriter.setInWritingSuffix(".tmp");
+		
+		Serializer<String, String> serializer = new Serializer<String, String>() {
+
+			@Override
+			public String serialize(String entity) {
+				return entity;
+			}
+			
+		};
+		
+		PartitioningDataStoreWriter<String, Message, String> writer = new PartitioningDataStoreWriter<String, Message, String>(
+				shardedWriter,
+				partitionStrategy,
+				serializer);
+		
+
+		return writer;
+	}
+	
+	public RollingFileNamingStrategy fileNamingStrategy() {
+		return new RollingFileNamingStrategy();
 	}
 
 }

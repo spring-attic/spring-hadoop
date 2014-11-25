@@ -148,6 +148,10 @@ public abstract class StoreObjectSupport extends LifecycleObjectSupport {
 	public void resetIdleTimeout() {
 		lastIdle = System.currentTimeMillis();
 	}
+	
+	public long getIdleTimeout() {
+		return idleTimeout;
+	}
 
 	/**
 	 * Handle idle timeout. This method should be overriden
