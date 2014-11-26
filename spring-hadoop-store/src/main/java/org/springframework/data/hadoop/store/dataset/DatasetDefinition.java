@@ -18,6 +18,7 @@ package org.springframework.data.hadoop.store.dataset;
 
 import org.apache.avro.Schema;
 import org.apache.avro.reflect.ReflectData;
+import org.kitesdk.data.CompressionType;
 import org.kitesdk.data.Format;
 import org.kitesdk.data.Formats;
 import org.kitesdk.data.PartitionStrategy;
@@ -28,9 +29,10 @@ import org.springframework.util.Assert;
  * Class to define the options for a {@link org.kitesdk.data.Dataset}
  *
  * @author Thomas Risberg
+ * @author Janne Valkealahti
  * @since 2.0
  */
-public class DatasetDefinition{
+public class DatasetDefinition {
 
 	private Class<?> targetClass;
 
@@ -41,6 +43,8 @@ public class DatasetDefinition{
 	private PartitionStrategy partitionStrategy;
 
 	private Integer writerCacheSize;
+
+	private CompressionType compressionType;
 
 	public DatasetDefinition() {
 		this(null, true, Formats.AVRO.getName());
@@ -96,6 +100,15 @@ public class DatasetDefinition{
 		this.writerCacheSize = writerCacheSize;
 	}
 
+	public void setCompressionType(String compressionType) {
+		Assert.notNull(compressionType, "The compression type can't be null");
+		try {
+			this.compressionType = CompressionType.forName(compressionType);
+		} catch (IllegalArgumentException e) {
+			throw new StoreException("Invalid compression type '" + compressionType + "' specified", e);
+		}
+	}
+
 	public Class<?> getTargetClass() {
 		return targetClass;
 	}
@@ -114,6 +127,10 @@ public class DatasetDefinition{
 
 	public Integer getWriterCacheSize() {
 		return writerCacheSize;
+	}
+
+	public CompressionType getCompressionType() {
+		return compressionType;
 	}
 
 	public Schema getSchema(Class<?> datasetClass) {

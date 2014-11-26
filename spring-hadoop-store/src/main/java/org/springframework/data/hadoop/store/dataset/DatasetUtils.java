@@ -34,16 +34,37 @@ import java.util.List;
  * {@link org.kitesdk.data.DatasetWriter}s
  *
  * @author Thomas Risberg
+ * @author Janne Valkealahti
  * @since 2.0
  */
 public abstract class DatasetUtils {
 
 	private final static Log log = LogFactory.getLog(DatasetUtils.class);
 
+	/**
+	 * Gets the dataset name. This method simply delegates to
+	 * {@link Class#getSimpleName()} and gets a lower case name.
+	 *
+	 * @param <T> the generic class type
+	 * @param clazz the clazz
+	 * @return the dataset name
+	 */
 	public static <T> String getDatasetName(Class<T> clazz) {
 		return clazz.getSimpleName().toLowerCase();
 	}
 
+	/**
+	 * Gets a {@link Dataset} using a {@link DatasetRepositoryFactory},
+	 * {@link DatasetDefinition}, pojo class and a record class. {@link Dataset}
+	 * is created if it doesn't exist.
+	 *
+	 * @param <T> the generic record class type
+	 * @param dsFactory the dataset repository factory
+	 * @param datasetDefinition the dataset definition
+	 * @param pojoClass the pojo class
+	 * @param recordClass the record class
+	 * @return the dataset
+	 */
 	public static <T> Dataset<T> getOrCreateDataset(DatasetRepositoryFactory dsFactory, DatasetDefinition datasetDefinition,
 													Class<?> pojoClass, Class<T> recordClass) {
 		String repoName = getDatasetName(pojoClass);
@@ -73,6 +94,7 @@ public abstract class DatasetUtils {
 				descriptor = new DatasetDescriptor.Builder()
 						.schema(schema)
 						.format(datasetDefinition.getFormat())
+						.compressionType(datasetDefinition.getCompressionType())
 						.build();
 			}
 			else {
@@ -82,6 +104,7 @@ public abstract class DatasetUtils {
 				DatasetDescriptor.Builder ddBuilder = new DatasetDescriptor.Builder()
 						.schema(schema)
 						.format(datasetDefinition.getFormat())
+						.compressionType(datasetDefinition.getCompressionType())
 						.partitionStrategy(datasetDefinition.getPartitionStrategy());
 				if (datasetDefinition.getWriterCacheSize() != null) {
 					ddBuilder = ddBuilder.property(FileSystemProperties.WRITER_CACHE_SIZE_PROP,
@@ -97,8 +120,17 @@ public abstract class DatasetUtils {
 		return dataset;
 	}
 
-	public static <T> Dataset<T> getDataset(DatasetRepositoryFactory dsFactory, Class<T> clazz) {
-		String repoName = getDatasetName(clazz);
+	/**
+	 * Gets the dataset using a {@link DatasetRepositoryFactory} and
+	 * a pojo class. Passed class is a same used in {@link #getOrCreateDataset "pojoClass"}
+	 *
+	 * @param <T> the generic type
+	 * @param dsFactory the ds factory
+	 * @param pojoClass the pojo class
+	 * @return the dataset
+	 */
+	public static <T> Dataset<T> getDataset(DatasetRepositoryFactory dsFactory, Class<T> pojoClass) {
+		String repoName = getDatasetName(pojoClass);
 		return dsFactory.getDatasetRepository().load(dsFactory.getNamespace(), repoName);
 	}
 }
