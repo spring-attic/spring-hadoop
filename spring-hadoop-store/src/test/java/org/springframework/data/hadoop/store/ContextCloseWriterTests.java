@@ -151,7 +151,7 @@ public class ContextCloseWriterTests extends AbstractStoreTests {
 		// in-use-postfix happend in a separate thread and context/jvm close
 		// may kill that thread. I was able to reproduce this trouble with
 		// 2sec sleep here with 1 sec idleTimeout. Thought tests didn't fail
-		// every time. So this is better than nothing fot catching this problem.
+		// every time. So this is better than nothing for catching this problem.
 		AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext();
 		ctx.setParent(context);
 		ctx.register(Config5.class);
@@ -165,12 +165,14 @@ public class ContextCloseWriterTests extends AbstractStoreTests {
 		partitionKey.put("timestamp", 1000);
 		writer5.write("foo", partitionKey);
 
-		Thread.sleep(2000);
 		FsShell shell = new FsShell(getConfiguration());
 		Collection<FileStatus> files = shell.ls(true, Config5.DIR);
 		Collection<String> names = statusesToNames(files);
 		assertThat(files.size(), is(5));
+
+		// context close should rename the files
 		ctx.close();
+
 		files = shell.ls(true, Config5.DIR);
 		names = statusesToNames(files);
 		assertThat(files.size(), is(5));
@@ -178,6 +180,40 @@ public class ContextCloseWriterTests extends AbstractStoreTests {
 				names,
 				containsInAnyOrder(Config5.DIR, Config5.DIR + "/0", Config5.DIR + "/0/data-0.txt", Config5.DIR + "/1000",
 						Config5.DIR + "/1000/data-0.txt"));
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked", "resource" })
+	@Test
+	public void testSinglePartitionTextFileWriterComplexNamingCloseByTimeout() throws Exception {
+		AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext();
+		ctx.setParent(context);
+		ctx.register(Config6.class);
+		ctx.refresh();
+		PartitionDataStoreWriter writer6 = ctx.getBean("writer6", PartitionDataStoreWriter.class);
+
+		Map<String, Object> partitionKey = new HashMap<String, Object>();
+		partitionKey.put("timestamp", 0);
+		writer6.write("foo", partitionKey);
+
+		partitionKey.put("timestamp", 1000);
+		writer6.write("foo", partitionKey);
+
+		Thread.sleep(3000);
+
+		FsShell shell = new FsShell(getConfiguration());
+		Collection<FileStatus> files = shell.ls(true, Config6.DIR);
+		Collection<String> names = statusesToNames(files);
+		assertThat(files.size(), is(5));
+
+		files = shell.ls(true, Config6.DIR);
+		names = statusesToNames(files);
+		assertThat(files.size(), is(5));
+		assertThat(
+				names,
+				containsInAnyOrder(Config6.DIR, Config6.DIR + "/0", Config6.DIR + "/0/data-0.txt", Config6.DIR + "/1000",
+						Config6.DIR + "/1000/data-0.txt"));
+		// rename should have happened before context close
+		ctx.close();
 	}
 
 	@Configuration
@@ -268,6 +304,43 @@ public class ContextCloseWriterTests extends AbstractStoreTests {
 	static class Config5 extends SpringDataStoreTextWriterConfigurerAdapter {
 
 		final static String DIR = "/tmp/ContextCloseWriterTests/testSinglePartitionTextFileWriterComplexNamingCloseByContext";
+
+		@Autowired
+		org.apache.hadoop.conf.Configuration configuration;
+
+		@Override
+		public void configure(DataStoreTextWriterConfigurer config) throws Exception {
+			config
+				.configuration(configuration)
+				.basePath(DIR)
+				.idleTimeout(1000)
+				.inWritingSuffix(".tmp")
+				.withNamingStrategy()
+					.name("data")
+					.rolling()
+					.name("txt", ".")
+					.and()
+				.withPartitionStrategy()
+					.map("timestamp");
+		}
+
+		@Bean
+		public TaskScheduler taskScheduler() {
+			return new ConcurrentTaskScheduler();
+		}
+
+		@Bean
+		public TaskExecutor taskExecutor() {
+			return new ConcurrentTaskExecutor();
+		}
+
+	}
+
+	@Configuration
+	@EnableDataStoreTextWriter(name="writer6")
+	static class Config6 extends SpringDataStoreTextWriterConfigurerAdapter {
+
+		final static String DIR = "/tmp/ContextCloseWriterTests/testSinglePartitionTextFileWriterComplexNamingCloseByTimeout";
 
 		@Autowired
 		org.apache.hadoop.conf.Configuration configuration;
