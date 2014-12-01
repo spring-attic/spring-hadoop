@@ -164,4 +164,13 @@ public class BatchAppmaster extends AbstractBatchAppmaster implements YarnAppmas
 
 	}
 
+	@Override
+	protected void doStop() {
+		// TODO we override stop here for AbstractAppmaster not
+		//      to call notifyCompleted() because we currently need to call
+		//      it at the end of submitApplication(). should do a little
+		//      refactoring to play nice with lifecycle.
+		finishAppmaster();
+	}
+
 }

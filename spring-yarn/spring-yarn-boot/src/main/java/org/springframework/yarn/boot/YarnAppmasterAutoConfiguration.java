@@ -50,7 +50,9 @@ import org.springframework.yarn.am.grid.support.ProjectionData;
 import org.springframework.yarn.am.grid.support.ProjectionDataRegistry;
 import org.springframework.yarn.batch.support.YarnJobLauncher;
 import org.springframework.yarn.boot.actuate.endpoint.YarnContainerClusterEndpoint;
+import org.springframework.yarn.boot.actuate.endpoint.YarnContainerRegisterEndpoint;
 import org.springframework.yarn.boot.actuate.endpoint.mvc.YarnContainerClusterMvcEndpoint;
+import org.springframework.yarn.boot.actuate.endpoint.mvc.YarnContainerRegisterMvcEndpoint;
 import org.springframework.yarn.boot.condition.ConditionalOnYarnAppmaster;
 import org.springframework.yarn.boot.properties.SpringHadoopProperties;
 import org.springframework.yarn.boot.properties.SpringYarnAppmasterLaunchContextProperties;
@@ -302,7 +304,7 @@ public class YarnAppmasterAutoConfiguration {
 	@Configuration
 	@EnableConfigurationProperties({ SpringYarnAppmasterProperties.class })
 	@ConditionalOnExpression("${spring.yarn.endpoints.containercluster.enabled:false}")
-	public static class EndPointConfig {
+	public static class ContainerClusterEndPointConfig {
 
 		@Autowired
 		private SpringYarnAppmasterProperties syap;
@@ -317,6 +319,24 @@ public class YarnAppmasterAutoConfiguration {
 		@ConditionalOnBean(YarnContainerClusterEndpoint.class)
 		public YarnContainerClusterMvcEndpoint yarnContainerClusterMvcEndpoint(YarnContainerClusterEndpoint delegate) {
 			return new YarnContainerClusterMvcEndpoint(delegate);
+		}
+
+	}
+
+	@Configuration
+	@ConditionalOnExpression("${spring.yarn.endpoints.containerregister.enabled:false}")
+	public static class ContainerRegisterEndPointConfig {
+
+		@Bean
+		@ConditionalOnMissingBean
+		public YarnContainerRegisterEndpoint yarnContainerRegisterEndpoint() {
+			return new YarnContainerRegisterEndpoint();
+		}
+
+		@Bean
+		@ConditionalOnBean(YarnContainerRegisterEndpoint.class)
+		public YarnContainerRegisterMvcEndpoint yarnContainerRegisterMvcEndpoint(YarnContainerRegisterEndpoint delegate) {
+			return new YarnContainerRegisterMvcEndpoint(delegate);
 		}
 
 	}

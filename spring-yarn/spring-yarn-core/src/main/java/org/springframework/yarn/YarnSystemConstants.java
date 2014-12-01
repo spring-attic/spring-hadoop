@@ -56,6 +56,9 @@ public class YarnSystemConstants {
 	/** Default bean id for Yarn event publisher. */
 	public static final String DEFAULT_ID_EVENT_PUBLISHER = "yarnEventPublisher";
 
+	/** Default bean id for Yarn container shutdown. */
+	public static final String DEFAULT_CONTAINER_SHUTDOWN = "yarnContainerShutdown";
+
 	/** Default bean id for appmaster service client. */
 	public static final String DEFAULT_ID_AMSERVICE_CLIENT = "yarnAmserviceClient";
 
@@ -70,6 +73,9 @@ public class YarnSystemConstants {
 
 	/** Default name of container context file. */
 	public static final String DEFAULT_CONTEXT_FILE_CONTAINER = "container-context.xml";
+
+	/** Default env variable for track url. */
+	public static final String AMSERVICE_TRACKURL = "SHDP_AMSERVICE_TRACKURL";
 
 	/** Default env variable for amservice port. */
 	public static final String AMSERVICE_PORT = "SHDP_AMSERVICE_PORT";

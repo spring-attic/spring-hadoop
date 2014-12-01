@@ -35,10 +35,7 @@ import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
-import org.springframework.yarn.YarnSystemException;
 import org.springframework.yarn.am.AbstractEventingAppmaster;
-import org.springframework.yarn.am.AppmasterCmOperations;
-import org.springframework.yarn.am.AppmasterCmTemplate;
 import org.springframework.yarn.am.ContainerLauncherInterceptor;
 import org.springframework.yarn.am.allocate.AbstractAllocator;
 import org.springframework.yarn.am.allocate.ContainerAllocateData;
@@ -335,16 +332,6 @@ public abstract class AbstractContainerClusterAppmaster extends AbstractEventing
 
 	protected void killContainer(Container container) {
 		killQueue.add(container);
-	}
-
-	protected AppmasterCmOperations getCmTemplate(Container container) {
-		try {
-			AppmasterCmTemplate template = new AppmasterCmTemplate(getConfiguration(), container);
-			template.afterPropertiesSet();
-			return template;
-		} catch (Exception e) {
-			throw new YarnSystemException("Unable to create AppmasterCmTemplate", e);
-		}
 	}
 
 	/**

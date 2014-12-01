@@ -24,6 +24,7 @@ import org.springframework.util.Assert;
 import org.springframework.yarn.YarnSystemConstants;
 import org.springframework.yarn.am.AppmasterService;
 import org.springframework.yarn.am.AppmasterTrackService;
+import org.springframework.yarn.am.container.ContainerShutdown;
 import org.springframework.yarn.event.YarnEventPublisher;
 
 /**
@@ -139,6 +140,17 @@ public class YarnContextUtils {
 	 */
 	public static YarnEventPublisher getEventPublisher(BeanFactory beanFactory) {
 		return getBeanOfType(beanFactory, YarnSystemConstants.DEFAULT_ID_EVENT_PUBLISHER, YarnEventPublisher.class);
+	}
+
+	/**
+	 * Return the {@link ContainerShutdown} bean whose name is "yarnContainerShutdown" if
+	 * available.
+	 *
+	 * @param beanFactory BeanFactory for lookup, must not be null.
+	 * @return yarn container shutdown
+	 */
+	public static ContainerShutdown getContainerShutdown(BeanFactory beanFactory) {
+		return getBeanOfType(beanFactory, YarnSystemConstants.DEFAULT_CONTAINER_SHUTDOWN, ContainerShutdown.class);
 	}
 
 	/**
