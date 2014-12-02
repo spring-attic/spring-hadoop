@@ -725,10 +725,10 @@ project('spring-data-hadoop-store') {
 
 	dependencies {
 		compile project(":spring-data-hadoop")
+		compile "org.springframework:spring-messaging:$springVersion"
 		compile("org.kitesdk:kite-data-core:$kiteVersion") { dep ->
 			exclude group: "log4j", module: "log4j"
 		}
-		testCompile "org.springframework:spring-messaging:$springVersion"
 		testCompile project(path:":spring-data-hadoop-test", configuration:"testArtifacts")
 		testCompile "org.springframework:spring-test:$springVersion"
 		testCompile("org.mockito:mockito-core:$mockitoVersion") { dep ->
