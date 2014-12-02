@@ -32,6 +32,7 @@ import org.apache.hadoop.fs.Path;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
@@ -57,7 +58,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ContextConfiguration;
 
-@ContextConfiguration(loader=HadoopDelegatingSmartContextLoader.class)
+@ContextConfiguration(loader=HadoopDelegatingSmartContextLoader.class, classes = PartitionTextFileWriterSmokeTests.EmptyConfig.class)
 @MiniHadoopCluster
 @DirtiesContext(classMode=ClassMode.AFTER_EACH_TEST_METHOD)
 public class PartitionTextFileWriterSmokeTests extends AbstractStoreTests {
@@ -68,17 +69,25 @@ public class PartitionTextFileWriterSmokeTests extends AbstractStoreTests {
 	@Autowired
 	private org.apache.hadoop.conf.Configuration hadoopConfiguration;
 
-	private final static String PATH = "/tmp/PartitionTextFileWriterSmokeTests/default";
+	private final static String PATH1 = "/tmp/PartitionTextFileWriterSmokeTests/testWritePartitions/default";
+
+	private final static String PATH2 = "/tmp/PartitionTextFileWriterSmokeTests/testWritePartitionsWithContextClose/default";
 
 	@Test
 	public void testWritePartitions() throws Exception {
 		Assume.group(TestGroup.PERFORMANCE);
+
+		AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext();
+		ctx.setParent(context);
+		ctx.register(BaseConfig.class, Config1.class);
+		ctx.refresh();
+
 		int threads = 30;
 		int count = 20000;
 		int iterations = 10;
 
 		@SuppressWarnings("unchecked")
-		PartitionTextFileWriter<String> writer = context.getBean("writer1", PartitionTextFileWriter.class);
+		PartitionTextFileWriter<String> writer = ctx.getBean("writer1", PartitionTextFileWriter.class);
 		assertNotNull(writer);
 
 		for (int i = 0; i < iterations; i++) {
@@ -90,28 +99,66 @@ public class PartitionTextFileWriterSmokeTests extends AbstractStoreTests {
 		Thread.sleep(3000);
 
 		Map<Path, DataStoreWriter<String>> writers = TestUtils.readField("writers", writer);
-		TestUtils.printLsR(PATH, getConfiguration());
+		TestUtils.printLsR(PATH1, getConfiguration());
 		assertThat(writers.size(), is(0));
 
 		writer.flush();
 		writer.close();
 
 		// assuming items in DATA09ARRAY have same length
-		assertThat(getTotalWritten(), is((long) count * (DATA10.length() + 1) * threads * iterations));
+		assertThat(getTotalWritten(PATH1), is((long) count * (DATA10.length() + 1) * threads * iterations));
 
 		@SuppressWarnings("resource")
 		FsShell shell = new FsShell(getConfiguration());
-		Collection<FileStatus> files = shell.ls(true, PATH);
+		Collection<FileStatus> files = shell.ls(true, PATH1);
+		Collection<String> names = statusesToNames(files);
+		assertThat(names, everyItem(not(endsWith("tmp"))));
+
+		ctx.close();
+	}
+
+	@Test
+	public void testWritePartitionsWithContextClose() throws Exception {
+		Assume.group(TestGroup.PERFORMANCE);
+
+		AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext();
+		ctx.setParent(context);
+		ctx.register(BaseConfig.class, Config2.class);
+		ctx.refresh();
+
+		int threads = 30;
+		int count = 20000;
+		int iterations = 10;
+
+		@SuppressWarnings("unchecked")
+		PartitionTextFileWriter<String> writer = ctx.getBean("writer1", PartitionTextFileWriter.class);
+		assertNotNull(writer);
+
+		for (int i = 0; i < iterations; i++) {
+			doConcurrentWrites(writer, threads, count);
+		}
+
+		ctx.close();
+		Map<Path, DataStoreWriter<String>> writers = TestUtils.readField("writers", writer);
+		TestUtils.printLsR(PATH2, getConfiguration());
+		assertThat(writers.size(), is(0));
+
+		// assuming items in DATA09ARRAY have same length
+		assertThat(getTotalWritten(PATH2), is((long) count * (DATA10.length() + 1) * threads * iterations));
+
+		@SuppressWarnings("resource")
+		FsShell shell = new FsShell(getConfiguration());
+		Collection<FileStatus> files = shell.ls(true, PATH2);
 		Collection<String> names = statusesToNames(files);
 		assertThat(names, everyItem(not(endsWith("tmp"))));
 
 	}
 
-	private long getTotalWritten() {
+	private long getTotalWritten(String path) {
 		@SuppressWarnings("resource")
 		FsShell shell = new FsShell(hadoopConfiguration);
 		long total = 0;
-		for (FileStatus s : shell.ls(true, PATH)) {
+		for (FileStatus s : shell.ls(true, path)) {
 			if (s.isFile()) {
 				total += s.getLen();
 			}
@@ -190,10 +237,73 @@ public class PartitionTextFileWriterSmokeTests extends AbstractStoreTests {
 	}
 
 	@Configuration
-	public static class Config {
+	public static class Config1 {
 
 		@Autowired
 		private org.apache.hadoop.conf.Configuration hadoopConfiguration;
+
+		@Bean
+		public Path testBasePath() {
+			return new Path(PATH1);
+		}
+
+		@Bean
+		public RollingFileNamingStrategy fileNamingStrategy() {
+			return new RollingFileNamingStrategy();
+		}
+
+		@Bean
+		public PartitionStrategy<String, String> partitionStrategy() {
+			return new TestPartitionStrategy();
+		}
+
+		@Bean
+		public PartitionTextFileWriter<String> writer1() {
+			PartitionTextFileWriter<String> writer = new PartitionTextFileWriter<String>(hadoopConfiguration,
+					testBasePath(), null, partitionStrategy());
+			writer.setIdleTimeout(1000);
+			writer.setFileNamingStrategyFactory(fileNamingStrategy());
+			writer.setInWritingSuffix(".tmp");
+			return writer;
+		}
+
+	}
+
+	@Configuration
+	public static class Config2 {
+
+		@Autowired
+		private org.apache.hadoop.conf.Configuration hadoopConfiguration;
+
+		@Bean
+		public Path testBasePath() {
+			return new Path(PATH2);
+		}
+
+		@Bean
+		public RollingFileNamingStrategy fileNamingStrategy() {
+			return new RollingFileNamingStrategy();
+		}
+
+		@Bean
+		public PartitionStrategy<String, String> partitionStrategy() {
+			return new TestPartitionStrategy();
+		}
+
+		@Bean
+		public PartitionTextFileWriter<String> writer1() {
+			PartitionTextFileWriter<String> writer = new PartitionTextFileWriter<String>(hadoopConfiguration,
+					testBasePath(), null, partitionStrategy());
+			writer.setIdleTimeout(60000);
+			writer.setFileNamingStrategyFactory(fileNamingStrategy());
+			writer.setInWritingSuffix(".tmp");
+			return writer;
+		}
+
+	}
+
+	@Configuration
+	public static class BaseConfig {
 
 		@Bean
 		public TaskExecutor taskExecutor() {
@@ -215,31 +325,10 @@ public class PartitionTextFileWriterSmokeTests extends AbstractStoreTests {
 			return new LoggingListener("INFO");
 		}
 
-		@Bean
-		public RollingFileNamingStrategy fileNamingStrategy() {
-			return new RollingFileNamingStrategy();
-		}
+	}
 
-		@Bean
-		public Path testBasePath() {
-			return new Path(PATH);
-		}
-
-		@Bean
-		public PartitionStrategy<String, String> partitionStrategy() {
-			return new TestPartitionStrategy();
-		}
-
-		@Bean
-		public PartitionTextFileWriter<String> writer1() {
-			PartitionTextFileWriter<String> writer = new PartitionTextFileWriter<String>(hadoopConfiguration,
-					testBasePath(), null, partitionStrategy());
-			writer.setIdleTimeout(1000);
-			writer.setFileNamingStrategyFactory(fileNamingStrategy());
-			writer.setInWritingSuffix(".tmp");
-			return writer;
-		}
-
+	@Configuration
+	static class EmptyConfig {
 	}
 
 }

@@ -26,6 +26,7 @@ import org.apache.hadoop.fs.Path;
 import org.springframework.context.Lifecycle;
 import org.springframework.data.hadoop.store.DataStoreWriter;
 import org.springframework.data.hadoop.store.PartitionDataStoreWriter;
+import org.springframework.data.hadoop.store.StoreException;
 import org.springframework.data.hadoop.store.codec.CodecInfo;
 import org.springframework.data.hadoop.store.partition.PartitionStrategy;
 import org.springframework.data.hadoop.store.strategy.naming.FileNamingStrategy;
@@ -89,6 +90,9 @@ public abstract class AbstractPartitionDataStoreWriter<T, K> extends LifecycleOb
 	/** Flag guarding if files can be overwritten */
 	private boolean overwrite = false;
 
+	/** In-house flag indicating if this partition writer is closed */
+	private volatile boolean closed = false;
+
 	/**
 	 * Instantiates a new abstract data store partition writer.
 	 *
@@ -132,6 +136,10 @@ public abstract class AbstractPartitionDataStoreWriter<T, K> extends LifecycleOb
 
 	@Override
 	public void close() throws IOException {
+		// we flag this writer closed so that user
+		// gets exception immediately before we've
+		// managed to close underlying writers.
+		closed = true;
 		for (DataStoreWriter<?> writer : writers.values()) {
 			try {
 				writer.close();
@@ -152,6 +160,9 @@ public abstract class AbstractPartitionDataStoreWriter<T, K> extends LifecycleOb
 
 	@Override
 	public synchronized void write(T entity, K partitionKey) throws IOException {
+		if (isClosed()) {
+			throw new StoreException("This writer is already closed");
+		}
 		DataStoreWriter<T> writer = null;
 		Path path = null;
 
@@ -183,9 +194,14 @@ public abstract class AbstractPartitionDataStoreWriter<T, K> extends LifecycleOb
 
 	@Override
 	protected void doStop() {
+		// close flag is also set in close() method
+		// but we want to do it also here if stopping
+		// is initiated from a lifecycle
+		closed = true;
 		for (DataStoreWriter<T> w : writers.values()) {
 			if (w instanceof Lifecycle) {
 				try {
+					log.info("Stopping writer=[" + w + "]");
 					((Lifecycle)w).stop();
 				} catch (Exception e) {
 					log.warn("Error closing DataStoreWriter " + w, e);
@@ -372,6 +388,15 @@ public abstract class AbstractPartitionDataStoreWriter<T, K> extends LifecycleOb
 	 */
 	public int getMaxOpenAttempts() {
 		return maxOpenAttempts;
+	}
+
+	/**
+	 * Checks if this writer is closed.
+	 *
+	 * @return true, if is closed
+	 */
+	public boolean isClosed() {
+		return closed;
 	}
 
 	/**

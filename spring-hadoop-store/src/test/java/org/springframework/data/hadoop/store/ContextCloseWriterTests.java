@@ -15,6 +15,7 @@
  */
 package org.springframework.data.hadoop.store;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertThat;
@@ -216,6 +217,75 @@ public class ContextCloseWriterTests extends AbstractStoreTests {
 		ctx.close();
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked", "resource" })
+	@Test
+	public void testPartitionTextFileWriterPrefixRemoved() throws Exception {
+		AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext();
+		ctx.setParent(context);
+		ctx.register(Config7.class);
+		ctx.refresh();
+		PartitionDataStoreWriter writer7 = ctx.getBean("writer7", PartitionDataStoreWriter.class);
+
+		Map<String, Object> partitionKey = new HashMap<String, Object>();
+		partitionKey.put("timestamp", 0);
+		writer7.write("foo", partitionKey);
+
+		partitionKey.put("timestamp", 1000);
+		writer7.write("foo", partitionKey);
+
+		ctx.close();
+		// rename should happen with context close
+
+		FsShell shell = new FsShell(getConfiguration());
+		Collection<FileStatus> files = shell.ls(true, Config7.DIR);
+		Collection<String> names = statusesToNames(files);
+		assertThat(files.size(), is(5));
+		assertThat(
+				names,
+				containsInAnyOrder(Config7.DIR, Config7.DIR + "/0", Config7.DIR + "/0/data-0.txt", Config7.DIR + "/1000",
+						Config7.DIR + "/1000/data-0.txt"));
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked", "resource" })
+	@Test
+	public void testPartitionTextFileWriterWriterAfterContextClose() throws Exception {
+		AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext();
+		ctx.setParent(context);
+		ctx.register(Config8.class);
+		ctx.refresh();
+		PartitionDataStoreWriter writer8 = ctx.getBean("writer8", PartitionDataStoreWriter.class);
+
+		Map<String, Object> partitionKey = new HashMap<String, Object>();
+		partitionKey.put("timestamp", 0);
+		writer8.write("foo", partitionKey);
+
+		partitionKey.put("timestamp", 1000);
+		writer8.write("foo", partitionKey);
+
+		ctx.close();
+
+		Exception expected = null;
+		try {
+			partitionKey.put("timestamp", 2000);
+			writer8.write("foo", partitionKey);
+		} catch (Exception e) {
+			expected = e;
+		}
+		assertThat(expected, instanceOf(StoreException.class));
+
+		// rename should happen with context close
+
+		FsShell shell = new FsShell(getConfiguration());
+		Collection<FileStatus> files = shell.ls(true, Config8.DIR);
+		Collection<String> names = statusesToNames(files);
+		TestUtils.printLsR(Config8.DIR, getConfiguration());
+		assertThat(files.size(), is(5));
+		assertThat(
+				names,
+				containsInAnyOrder(Config8.DIR, Config8.DIR + "/0", Config8.DIR + "/0/data-0.txt", Config8.DIR + "/1000",
+						Config8.DIR + "/1000/data-0.txt"));
+	}
+
 	@Configuration
 	@EnableDataStoreTextWriter(name="writer1")
 	static class Config1 extends SpringDataStoreTextWriterConfigurerAdapter {
@@ -351,6 +421,80 @@ public class ContextCloseWriterTests extends AbstractStoreTests {
 				.configuration(configuration)
 				.basePath(DIR)
 				.idleTimeout(1000)
+				.inWritingSuffix(".tmp")
+				.withNamingStrategy()
+					.name("data")
+					.rolling()
+					.name("txt", ".")
+					.and()
+				.withPartitionStrategy()
+					.map("timestamp");
+		}
+
+		@Bean
+		public TaskScheduler taskScheduler() {
+			return new ConcurrentTaskScheduler();
+		}
+
+		@Bean
+		public TaskExecutor taskExecutor() {
+			return new ConcurrentTaskExecutor();
+		}
+
+	}
+
+	@Configuration
+	@EnableDataStoreTextWriter(name="writer7")
+	static class Config7 extends SpringDataStoreTextWriterConfigurerAdapter {
+
+		final static String DIR = "/tmp/ContextCloseWriterTests/testPartitionTextFileWriterPrefixRemoved";
+
+		@Autowired
+		org.apache.hadoop.conf.Configuration configuration;
+
+		@Override
+		public void configure(DataStoreTextWriterConfigurer config) throws Exception {
+			config
+				.configuration(configuration)
+				.basePath(DIR)
+				.idleTimeout(60000)
+				.inWritingSuffix(".tmp")
+				.withNamingStrategy()
+					.name("data")
+					.rolling()
+					.name("txt", ".")
+					.and()
+				.withPartitionStrategy()
+					.map("timestamp");
+		}
+
+		@Bean
+		public TaskScheduler taskScheduler() {
+			return new ConcurrentTaskScheduler();
+		}
+
+		@Bean
+		public TaskExecutor taskExecutor() {
+			return new ConcurrentTaskExecutor();
+		}
+
+	}
+
+	@Configuration
+	@EnableDataStoreTextWriter(name="writer8")
+	static class Config8 extends SpringDataStoreTextWriterConfigurerAdapter {
+
+		final static String DIR = "/tmp/ContextCloseWriterTests/testPartitionTextFileWriterWriterAfterContextClose";
+
+		@Autowired
+		org.apache.hadoop.conf.Configuration configuration;
+
+		@Override
+		public void configure(DataStoreTextWriterConfigurer config) throws Exception {
+			config
+				.configuration(configuration)
+				.basePath(DIR)
+				.idleTimeout(60000)
 				.inWritingSuffix(".tmp")
 				.withNamingStrategy()
 					.name("data")
