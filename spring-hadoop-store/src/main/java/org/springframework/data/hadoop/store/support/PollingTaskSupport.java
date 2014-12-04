@@ -1,11 +1,11 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,9 +16,13 @@
 package org.springframework.data.hadoop.store.support;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.Trigger;
@@ -35,6 +39,8 @@ import org.springframework.util.Assert;
  */
 public abstract class PollingTaskSupport<T> {
 
+	private static final Log log = LogFactory.getLog(PollingTaskSupport.class);
+
 	/** Trigger for polling task */
 	private volatile Trigger trigger;
 
@@ -49,6 +55,9 @@ public abstract class PollingTaskSupport<T> {
 
 	/** Spring task executor */
 	private TaskExecutor taskExecutor;
+
+	/** Timeout to wait results when stopping*/
+	private long stopWaitResultsTimeout = 0;
 
 	/**
 	 * Instantiates a new polling task support. On default a simple {@code PeriodicTrigger} is used.
@@ -109,6 +118,19 @@ public abstract class PollingTaskSupport<T> {
 	 */
 	public void stop() {
 		if (runningTask != null) {
+			if (stopWaitResultsTimeout > 0) {
+				try {
+					log.info("Waiting result for " + stopWaitResultsTimeout + " millis.");
+					Object result = runningTask.get(stopWaitResultsTimeout, TimeUnit.MILLISECONDS);
+					log.info("Result is " + result);
+				} catch (InterruptedException e) {
+					log.warn("Got interrupted waiting result", e);
+				} catch (ExecutionException e) {
+					log.error("Got error waiting result", e);
+				} catch (TimeoutException e) {
+					log.error("Got timeout waiting result", e);
+				}
+			}
 			runningTask.cancel(true);
 		}
 		runningTask = null;
@@ -121,6 +143,17 @@ public abstract class PollingTaskSupport<T> {
 	 */
 	public void setTrigger(Trigger trigger) {
 		this.trigger = trigger;
+	}
+
+	/**
+	 * Sets the stop wait results timeout. Value is set as millis
+	 * and if it is more than zero, stopping is done with call
+	 * to running task get with a timeout.
+	 *
+	 * @param stopWaitResultsTimeout the new stop wait results timeout
+	 */
+	public void setStopWaitResultsTimeout(long stopWaitResultsTimeout) {
+		this.stopWaitResultsTimeout = stopWaitResultsTimeout;
 	}
 
 	/**

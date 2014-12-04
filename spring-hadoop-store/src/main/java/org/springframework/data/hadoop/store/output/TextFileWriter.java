@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,6 @@ public class TextFileWriter extends AbstractDataStreamWriter implements DataStor
 
 	private final byte[] delimiter;
 
-
 	/**
 	 * Instantiates a new text file writer.
 	 *
@@ -72,15 +71,25 @@ public class TextFileWriter extends AbstractDataStreamWriter implements DataStor
 		this.delimiter = delimiter;
 	}
 
+	/**
+	 * Instantiates a new text file writer.
+	 *
+	 * @param configuration the hadoop configuration
+	 * @param basePath the hdfs path
+	 * @param codec the compression codec info
+	 * @param delimiter the delimiter
+	 * @param idleTimeout the idle timeout
+	 */
 	public TextFileWriter(Configuration configuration, Path basePath, CodecInfo codec, byte[] delimiter, long idleTimeout ) {
 		this(configuration, basePath, codec, delimiter);
 		setIdleTimeout(idleTimeout);
 	}
 
 	@Override
-	public synchronized  void flush() throws IOException {
+	public synchronized void flush() throws IOException {
 		if (streamsHolder != null) {
-			streamsHolder.getStream().flush();
+			OutputStream stream = streamsHolder.getStream();
+			stream.flush();
 		}
 	}
 
@@ -116,14 +125,13 @@ public class TextFileWriter extends AbstractDataStreamWriter implements DataStor
 			close();
 			context.rollStrategies();
 		}
-
-
 	}
 
 	@Override
 	protected void handleIdleTimeout() {
-		log.info("Idle timeout detected for this writer, closing stream");
 		try {
+			log.info("Idle timeout detected for this writer, closing stream");
+			flush();
 			close();
 		} catch (IOException e) {
 			log.error("error closing", e);

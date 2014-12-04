@@ -23,8 +23,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
+import org.springframework.context.Lifecycle;
 import org.springframework.data.hadoop.store.DataStoreWriter;
 import org.springframework.data.hadoop.store.PartitionDataStoreWriter;
+import org.springframework.data.hadoop.store.StoreException;
 import org.springframework.data.hadoop.store.codec.CodecInfo;
 import org.springframework.data.hadoop.store.partition.PartitionStrategy;
 import org.springframework.data.hadoop.store.strategy.naming.FileNamingStrategy;
@@ -85,6 +87,9 @@ public abstract class AbstractPartitionDataStoreWriter<T, K> extends LifecycleOb
 	/** Flag guarding if files can be overwritten */
 	private boolean overwrite = false;
 
+	/** In-house flag indicating if this partition writer is closed */
+	private volatile boolean closed = false;
+
 	/**
 	 * Instantiates a new abstract data store partition writer.
 	 *
@@ -128,6 +133,10 @@ public abstract class AbstractPartitionDataStoreWriter<T, K> extends LifecycleOb
 
 	@Override
 	public void close() throws IOException {
+		// we flag this writer closed so that user
+		// gets exception immediately before we've
+		// managed to close underlying writers.
+		closed = true;
 		for (DataStoreWriter<?> writer : writers.values()) {
 			try {
 				writer.close();
@@ -147,18 +156,25 @@ public abstract class AbstractPartitionDataStoreWriter<T, K> extends LifecycleOb
 	}
 
 	@Override
-	public void write(T entity, K partitionKey) throws IOException {
+	public synchronized void write(T entity, K partitionKey) throws IOException {
+		if (isClosed()) {
+			throw new StoreException("This writer is already closed");
+		}
 		DataStoreWriter<T> writer = null;
 		Path path = null;
-		if (partitionKey != null) {
-			path = partitionStrategy.getPartitionResolver().resolvePath(partitionKey);
-			writer = writers.get(path);
-		} else if (fallbackWriter == null){
-			fallbackWriter = writer = createWriter(getConfiguration(), null, getCodec());
-		}
-		if (writer == null) {
-			writer = createWriter(getConfiguration(), path, getCodec());
-			writers.put(path, writer);
+
+		// double sync for destroyWriter
+		synchronized (writers) {
+			if (partitionKey != null) {
+				path = partitionStrategy.getPartitionResolver().resolvePath(partitionKey);
+				writer = writers.get(path);
+			} else if (fallbackWriter == null) {
+				fallbackWriter = writer = createWriter(getConfiguration(), null, getCodec());
+			}
+			if (writer == null) {
+				writer = createWriter(getConfiguration(), path, getCodec());
+				writers.put(path, writer);
+			}
 		}
 		writer.write(entity);
 	}
@@ -175,6 +191,20 @@ public abstract class AbstractPartitionDataStoreWriter<T, K> extends LifecycleOb
 
 	@Override
 	protected void doStop() {
+		// close flag is also set in close() method
+		// but we want to do it also here if stopping
+		// is initiated from a lifecycle
+		closed = true;
+		for (DataStoreWriter<T> w : writers.values()) {
+			if (w instanceof Lifecycle) {
+				try {
+					log.info("Stopping writer=[" + w + "]");
+					((Lifecycle)w).stop();
+				} catch (Exception e) {
+					log.warn("Error closing DataStoreWriter " + w, e);
+				}
+			}
+		}
 		try {
 			flush();
 			close();
@@ -275,6 +305,12 @@ public abstract class AbstractPartitionDataStoreWriter<T, K> extends LifecycleOb
 		log.info("Setting overwrite to " + overwrite);
 	}
 
+	/**
+	 * Checks if overwrite is enabled.
+	 *
+	 * @return true, if overwrite enabled
+	 * @see #setOverwrite(boolean)
+	 */
     public boolean isOverwrite() {
 		return overwrite;
 	}
@@ -334,6 +370,15 @@ public abstract class AbstractPartitionDataStoreWriter<T, K> extends LifecycleOb
 	}
 
 	/**
+	 * Checks if this writer is closed.
+	 *
+	 * @return true, if is closed
+	 */
+	public boolean isClosed() {
+		return closed;
+	}
+
+	/**
 	 * Need to be implemented by a subclass for an actual writer.
 	 *
 	 * @param configuration the configuration
@@ -342,5 +387,28 @@ public abstract class AbstractPartitionDataStoreWriter<T, K> extends LifecycleOb
 	 * @return the data store writer
 	 */
 	protected abstract DataStoreWriter<T> createWriter(Configuration configuration, Path basePath, CodecInfo codec);
+
+	/**
+	 * Destroys a writer with a given {@link Path} if exist.
+	 * This method expects subclass to close and flush writer
+	 * before call of this.
+	 *
+	 * @param path the path
+	 */
+	protected void destroyWriter(Path path) {
+		log.info("Trying to destoy writer with path=[" + path + "]");
+		if (path == null) {
+			return;
+		}
+		// sync with writer create in write()
+		synchronized (writers) {
+			DataStoreWriter<T> writer = writers.remove(path);
+			if (writer != null) {
+				log.info("Removed writer=[" + writer + "]");
+			} else {
+				log.info("Writer with path=[" + path + "] didn't exist anymore");
+			}
+		}
+	}
 
 }
