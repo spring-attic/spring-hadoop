@@ -263,6 +263,7 @@ public abstract class OutputStoreObjectSupport extends StoreObjectSupport {
 	 * @param path the path to rename
 	 */
 	protected void renameFile(Path path) {
+		log.debug("renameFile called with path=[" + path + "]");
 		// bail out if there's no in-writing settings
 		if (!StringUtils.hasText(prefix) && !StringUtils.hasText(suffix)) {
 			return;
@@ -281,6 +282,7 @@ public abstract class OutputStoreObjectSupport extends StoreObjectSupport {
 			boolean succeed;
 			try {
 				fs.delete(toPath, false);
+				log.info("Renaming path=[" + path + "] toPath=[" + toPath + "]");
 				succeed = fs.rename(path, toPath);
 			} catch (Exception e) {
 				throw new StoreException("Failed renaming from " + path + " to " + toPath, e);

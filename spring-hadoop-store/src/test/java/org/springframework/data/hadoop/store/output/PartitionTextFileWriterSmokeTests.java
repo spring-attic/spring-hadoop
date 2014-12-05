@@ -46,7 +46,10 @@ import org.springframework.data.hadoop.store.event.StoreEventPublisher;
 import org.springframework.data.hadoop.store.partition.PartitionKeyResolver;
 import org.springframework.data.hadoop.store.partition.PartitionResolver;
 import org.springframework.data.hadoop.store.partition.PartitionStrategy;
+import org.springframework.data.hadoop.store.strategy.naming.FileNamingStrategy;
 import org.springframework.data.hadoop.store.strategy.naming.RollingFileNamingStrategy;
+import org.springframework.data.hadoop.store.strategy.rollover.RolloverStrategy;
+import org.springframework.data.hadoop.store.strategy.rollover.SizeRolloverStrategy;
 import org.springframework.data.hadoop.test.context.HadoopDelegatingSmartContextLoader;
 import org.springframework.data.hadoop.test.context.MiniHadoopCluster;
 import org.springframework.data.hadoop.test.tests.Assume;
@@ -72,6 +75,8 @@ public class PartitionTextFileWriterSmokeTests extends AbstractStoreTests {
 	private final static String PATH1 = "/tmp/PartitionTextFileWriterSmokeTests/testWritePartitions/default";
 
 	private final static String PATH2 = "/tmp/PartitionTextFileWriterSmokeTests/testWritePartitionsWithContextClose/default";
+
+	private final static String PATH3 = "/tmp/PartitionTextFileWriterSmokeTests/testWritePartitionsWithRolloverAndContextClose/default";
 
 	@Test
 	public void testWritePartitions() throws Exception {
@@ -149,6 +154,44 @@ public class PartitionTextFileWriterSmokeTests extends AbstractStoreTests {
 		@SuppressWarnings("resource")
 		FsShell shell = new FsShell(getConfiguration());
 		Collection<FileStatus> files = shell.ls(true, PATH2);
+		Collection<String> names = statusesToNames(files);
+		assertThat(names, everyItem(not(endsWith("tmp"))));
+
+	}
+
+	@Test
+	public void testWritePartitionsWithRolloverAndContextClose() throws Exception {
+		Assume.group(TestGroup.PERFORMANCE);
+
+		AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext();
+		ctx.setParent(context);
+		ctx.register(BaseConfig.class, Config3.class);
+		ctx.refresh();
+
+		int threads = 30;
+		int count = 20000;
+		int iterations = 10;
+
+		@SuppressWarnings("unchecked")
+		PartitionTextFileWriter<String> writer = ctx.getBean("writer1", PartitionTextFileWriter.class);
+		assertNotNull(writer);
+
+		for (int i = 0; i < iterations; i++) {
+			doConcurrentWrites(writer, threads, count);
+		}
+		Thread.sleep(3000);
+
+		ctx.close();
+		Map<Path, DataStoreWriter<String>> writers = TestUtils.readField("writers", writer);
+		TestUtils.printLsR(PATH3, getConfiguration());
+		assertThat(writers.size(), is(0));
+
+		// assuming items in DATA09ARRAY have same length
+		assertThat(getTotalWritten(PATH3), is((long) count * (DATA10.length() + 1) * threads * iterations));
+
+		@SuppressWarnings("resource")
+		FsShell shell = new FsShell(getConfiguration());
+		Collection<FileStatus> files = shell.ls(true, PATH3);
 		Collection<String> names = statusesToNames(files);
 		assertThat(names, everyItem(not(endsWith("tmp"))));
 
@@ -296,6 +339,45 @@ public class PartitionTextFileWriterSmokeTests extends AbstractStoreTests {
 					testBasePath(), null, partitionStrategy());
 			writer.setIdleTimeout(60000);
 			writer.setFileNamingStrategyFactory(fileNamingStrategy());
+			writer.setInWritingSuffix(".tmp");
+			return writer;
+		}
+
+	}
+
+	@Configuration
+	public static class Config3 {
+
+		@Autowired
+		private org.apache.hadoop.conf.Configuration hadoopConfiguration;
+
+		@Bean
+		public Path testBasePath() {
+			return new Path(PATH3);
+		}
+
+		@Bean
+		public FileNamingStrategy fileNamingStrategy() {
+			return new RollingFileNamingStrategy();
+		}
+
+		@Bean
+		public RolloverStrategy rolloverStrategy() {
+			return new SizeRolloverStrategy("1M");
+		}
+
+		@Bean
+		public PartitionStrategy<String, String> partitionStrategy() {
+			return new TestPartitionStrategy();
+		}
+
+		@Bean
+		public PartitionTextFileWriter<String> writer1() {
+			PartitionTextFileWriter<String> writer = new PartitionTextFileWriter<String>(hadoopConfiguration,
+					testBasePath(), null, partitionStrategy());
+			writer.setIdleTimeout(1000);
+			writer.setFileNamingStrategyFactory(fileNamingStrategy());
+			writer.setRolloverStrategyFactory(rolloverStrategy());
 			writer.setInWritingSuffix(".tmp");
 			return writer;
 		}

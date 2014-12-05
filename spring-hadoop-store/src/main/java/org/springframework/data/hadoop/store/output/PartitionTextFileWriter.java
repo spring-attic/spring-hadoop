@@ -58,6 +58,7 @@ public class PartitionTextFileWriter<K> extends AbstractPartitionDataStoreWriter
 				// close() to writer
 				destroyWriter(path);
 				super.close();
+				stop();
 			}
 		};
 		if (getBeanFactory() != null) {
