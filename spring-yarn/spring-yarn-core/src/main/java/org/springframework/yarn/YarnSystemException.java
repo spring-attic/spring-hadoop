@@ -71,4 +71,14 @@ public class YarnSystemException extends UncategorizedDataAccessException {
 		super(message, e);
 	}
 
+	/**
+	 * Constructs a general YarnSystemException.
+	 *
+	 * @param message the message
+	 * @param cause the throwable cause
+	 */
+	public YarnSystemException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
 }

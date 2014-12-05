@@ -24,6 +24,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.springframework.yarn.listener.CompositeContainerStateListener;
 import org.springframework.yarn.listener.ContainerStateListener;
 import org.springframework.yarn.listener.ContainerStateListener.ContainerState;
+import org.springframework.yarn.support.LifecycleObjectSupport;
 
 /**
  * Base implementation of {@link YarnContainer} providing
@@ -33,7 +34,7 @@ import org.springframework.yarn.listener.ContainerStateListener.ContainerState;
  * @author Janne Valkealahti
  *
  */
-public abstract class AbstractYarnContainer implements LongRunningYarnContainer, YarnContainerRuntime {
+public abstract class AbstractYarnContainer extends LifecycleObjectSupport implements LongRunningYarnContainer, YarnContainerRuntime {
 
 	private final static Log log = LogFactory.getLog(AbstractYarnContainer.class);
 
@@ -62,6 +63,16 @@ public abstract class AbstractYarnContainer implements LongRunningYarnContainer,
 	@Override
 	public void setParameters(Properties parameters) {
 		this.parameters = parameters;
+	}
+
+	@Override
+	public void addContainerStateListener(ContainerStateListener listener) {
+		stateListener.register(listener);
+	}
+
+	@Override
+	public boolean isWaitCompleteState() {
+		return false;
 	}
 
 	/**
@@ -108,16 +119,6 @@ public abstract class AbstractYarnContainer implements LongRunningYarnContainer,
 	 */
 	public Properties getParameters() {
 		return parameters;
-	}
-
-	@Override
-	public void addContainerStateListener(ContainerStateListener listener) {
-		stateListener.register(listener);
-	}
-
-	@Override
-	public boolean isWaitCompleteState() {
-		return false;
 	}
 
 	/**

@@ -15,6 +15,7 @@
  */
 package org.springframework.yarn.container;
 
+import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.is;
@@ -31,6 +32,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.annotation.AsyncResult;
+import org.springframework.util.concurrent.ListenableFuture;
+import org.springframework.util.concurrent.SettableListenableFuture;
 import org.springframework.yarn.annotation.OnContainerStart;
 import org.springframework.yarn.annotation.YarnComponent;
 import org.springframework.yarn.config.annotation.SpringYarnAnnotationPostProcessor;
@@ -56,6 +59,7 @@ public class DefaultYarnContainerTests {
 		container.addContainerStateListener(new ContainerStateListener() {
 			@Override
 			public void state(ContainerState state, Object exit) {
+				stateWrapper.count.incrementAndGet();
 				stateWrapper.state = state;
 				stateWrapper.exit = exit;
 			}
@@ -65,6 +69,7 @@ public class DefaultYarnContainerTests {
 		assertThat(stateWrapper.state, is(ContainerState.COMPLETED));
 		assertThat(stateWrapper.exit, instanceOf(Integer.class));
 		assertThat((Integer)stateWrapper.exit, is(0));
+		assertThat(stateWrapper.count.get(), is(1));
 
 		context.stop();
 	}
@@ -79,6 +84,7 @@ public class DefaultYarnContainerTests {
 		container.addContainerStateListener(new ContainerStateListener() {
 			@Override
 			public void state(ContainerState state, Object exit) {
+				stateWrapper.count.incrementAndGet();
 				stateWrapper.state = state;
 				stateWrapper.exit = exit;
 			}
@@ -88,6 +94,7 @@ public class DefaultYarnContainerTests {
 		assertThat(stateWrapper.state, is(ContainerState.COMPLETED));
 		assertThat(stateWrapper.exit, instanceOf(Boolean.class));
 		assertThat((Boolean)stateWrapper.exit, is(true));
+		assertThat(stateWrapper.count.get(), is(1));
 
 		context.stop();
 	}
@@ -102,6 +109,7 @@ public class DefaultYarnContainerTests {
 		container.addContainerStateListener(new ContainerStateListener() {
 			@Override
 			public void state(ContainerState state, Object exit) {
+				stateWrapper.count.incrementAndGet();
 				stateWrapper.state = state;
 				stateWrapper.exit = exit;
 			}
@@ -111,6 +119,7 @@ public class DefaultYarnContainerTests {
 		assertThat(stateWrapper.state, is(ContainerState.COMPLETED));
 		assertThat(stateWrapper.exit, instanceOf(Integer.class));
 		assertThat((Integer)stateWrapper.exit, is(10));
+		assertThat(stateWrapper.count.get(), is(1));
 
 		context.stop();
 	}
@@ -125,6 +134,7 @@ public class DefaultYarnContainerTests {
 		container.addContainerStateListener(new ContainerStateListener() {
 			@Override
 			public void state(ContainerState state, Object exit) {
+				stateWrapper.count.incrementAndGet();
 				stateWrapper.state = state;
 				stateWrapper.exit = exit;
 			}
@@ -133,6 +143,7 @@ public class DefaultYarnContainerTests {
 		container.run();
 		assertThat(stateWrapper.state, is(ContainerState.FAILED));
 		assertThat(stateWrapper.exit, instanceOf(Exception.class));
+		assertThat(stateWrapper.count.get(), is(1));
 
 		context.stop();
 	}
@@ -147,6 +158,7 @@ public class DefaultYarnContainerTests {
 		container.addContainerStateListener(new ContainerStateListener() {
 			@Override
 			public void state(ContainerState state, Object exit) {
+				stateWrapper.count.incrementAndGet();
 				stateWrapper.state = state;
 				stateWrapper.exit = exit;
 			}
@@ -156,6 +168,7 @@ public class DefaultYarnContainerTests {
 		assertThat(stateWrapper.state, is(ContainerState.COMPLETED));
 		assertThat(stateWrapper.exit, instanceOf(String.class));
 		assertThat((String)stateWrapper.exit, is("UNKNOWN"));
+		assertThat(stateWrapper.count.get(), is(1));
 
 		context.stop();
 	}
@@ -170,6 +183,7 @@ public class DefaultYarnContainerTests {
 		container.addContainerStateListener(new ContainerStateListener() {
 			@Override
 			public void state(ContainerState state, Object exit) {
+				stateWrapper.count.incrementAndGet();
 				stateWrapper.state = state;
 				stateWrapper.exit = exit;
 			}
@@ -179,6 +193,7 @@ public class DefaultYarnContainerTests {
 		assertThat(stateWrapper.state, is(ContainerState.COMPLETED));
 		assertThat(stateWrapper.exit, instanceOf(Integer.class));
 		assertThat((Integer)stateWrapper.exit, is(0));
+		assertThat(stateWrapper.count.get(), is(1));
 
 		TestBean1 testBean1 = context.getBean(TestBean1.class);
 		TestBean7 testBean7 = context.getBean(TestBean7.class);
@@ -198,6 +213,7 @@ public class DefaultYarnContainerTests {
 		container.addContainerStateListener(new ContainerStateListener() {
 			@Override
 			public void state(ContainerState state, Object exit) {
+				stateWrapper.count.incrementAndGet();
 				stateWrapper.state = state;
 				stateWrapper.exit = exit;
 			}
@@ -207,6 +223,7 @@ public class DefaultYarnContainerTests {
 		assertThat(stateWrapper.state, is(ContainerState.COMPLETED));
 		assertThat(stateWrapper.exit, instanceOf(Integer.class));
 		assertThat((Integer)stateWrapper.exit, is(0));
+		assertThat(stateWrapper.count.get(), is(1));
 
 		TestBean5 testBean5 = context.getBean(TestBean5.class);
 		assertThat(testBean5.called1, is(true));
@@ -225,6 +242,7 @@ public class DefaultYarnContainerTests {
 		container.addContainerStateListener(new ContainerStateListener() {
 			@Override
 			public void state(ContainerState state, Object exit) {
+				stateWrapper.count.incrementAndGet();
 				stateWrapper.state = state;
 				stateWrapper.exit = exit;
 			}
@@ -234,6 +252,7 @@ public class DefaultYarnContainerTests {
 		assertThat(stateWrapper.state, is(ContainerState.COMPLETED));
 		assertThat(stateWrapper.exit, instanceOf(Integer.class));
 		assertThat((Integer)stateWrapper.exit, is(0));
+		assertThat(stateWrapper.count.get(), is(1));
 
 		TestBean1 testBean1 = context.getBean(TestBean1.class);
 		TestBean7 testBean7 = context.getBean(TestBean7.class);
@@ -256,6 +275,7 @@ public class DefaultYarnContainerTests {
 		container.addContainerStateListener(new ContainerStateListener() {
 			@Override
 			public void state(ContainerState state, Object exit) {
+				stateWrapper.count.incrementAndGet();
 				stateWrapper.state = state;
 				stateWrapper.exit = exit;
 			}
@@ -265,6 +285,7 @@ public class DefaultYarnContainerTests {
 		assertThat(stateWrapper.state, is(ContainerState.COMPLETED));
 		assertThat(stateWrapper.exit, instanceOf(Integer.class));
 		assertThat((Integer)stateWrapper.exit, is(0));
+		assertThat(stateWrapper.count.get(), is(1));
 
 		TestBean8 testBean8 = context.getBean(TestBean8.class);
 		TestBean9 testBean9 = context.getBean(TestBean9.class);
@@ -294,6 +315,7 @@ public class DefaultYarnContainerTests {
 		container.addContainerStateListener(new ContainerStateListener() {
 			@Override
 			public void state(ContainerState state, Object exit) {
+				stateWrapper.count.incrementAndGet();
 				stateWrapper.state = state;
 				stateWrapper.exit = exit;
 			}
@@ -303,6 +325,7 @@ public class DefaultYarnContainerTests {
 		assertThat(stateWrapper.state, is(ContainerState.COMPLETED));
 		assertThat(stateWrapper.exit, instanceOf(Integer.class));
 		assertThat((Integer)stateWrapper.exit, is(0));
+		assertThat(stateWrapper.count.get(), is(1));
 
 		TestBean10 testBean10 = context.getBean(TestBean10.class);
 		assertThat(testBean10.called1, is(true));
@@ -325,6 +348,7 @@ public class DefaultYarnContainerTests {
 		container.addContainerStateListener(new ContainerStateListener() {
 			@Override
 			public void state(ContainerState state, Object exit) {
+				stateWrapper.count.incrementAndGet();
 				stateWrapper.state = state;
 				stateWrapper.exit = exit;
 			}
@@ -335,6 +359,7 @@ public class DefaultYarnContainerTests {
 		assertThat(stateWrapper.exit, instanceOf(List.class));
 		assertThat((Integer)((List<?>)stateWrapper.exit).get(9), is(1));
 		assertThat((Integer)((List<?>)stateWrapper.exit).get(11), is(2));
+		assertThat(stateWrapper.count.get(), is(1));
 
 		TestBean8 testBean8 = context.getBean(TestBean8.class);
 		TestBean9 testBean9 = context.getBean(TestBean9.class);
@@ -379,6 +404,7 @@ public class DefaultYarnContainerTests {
 		container.addContainerStateListener(new ContainerStateListener() {
 			@Override
 			public void state(ContainerState state, Object exit) {
+				stateWrapper.count.incrementAndGet();
 				stateWrapper.state = state;
 				stateWrapper.exit = exit;
 			}
@@ -387,6 +413,7 @@ public class DefaultYarnContainerTests {
 		container.run();
 		assertThat(stateWrapper.state, is(ContainerState.COMPLETED));
 		assertThat(stateWrapper.exit, instanceOf(List.class));
+		assertThat(stateWrapper.count.get(), is(1));
 		assertThat((Integer)((List<?>)stateWrapper.exit).get(0), is(1));
 		assertThat((Integer)((List<?>)stateWrapper.exit).get(1), nullValue());
 		assertThat((Integer)((List<?>)stateWrapper.exit).get(2), is(2));
@@ -401,6 +428,72 @@ public class DefaultYarnContainerTests {
 		assertThat(testBean12.order3, is(2));
 
 		context.stop();
+	}
+
+	@Test
+	public void testListenableFutureValues() {
+		@SuppressWarnings("resource")
+		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(BaseConfig.class, ListenableFutureValuesConfig.class);
+		DefaultYarnContainer container = context.getBean(DefaultYarnContainer.class);
+		final StateWrapper stateWrapper = new StateWrapper();
+
+		container.addContainerStateListener(new ContainerStateListener() {
+			@Override
+			public void state(ContainerState state, Object exit) {
+				stateWrapper.count.incrementAndGet();
+				stateWrapper.state = state;
+				stateWrapper.exit = exit;
+			}
+		});
+
+		container.run();
+		assertThat(stateWrapper.state, is(ContainerState.COMPLETED));
+		assertThat(stateWrapper.exit, instanceOf(List.class));
+		assertThat(stateWrapper.count.get(), is(1));
+		assertThat((Integer)((List<?>)stateWrapper.exit).size(), is(3));
+		assertThat((Integer)((List<?>)stateWrapper.exit).get(0), anyOf(is(1), nullValue()));
+		assertThat((Integer)((List<?>)stateWrapper.exit).get(1), anyOf(is(1), nullValue()));
+		assertThat((Integer)((List<?>)stateWrapper.exit).get(2), anyOf(is(1), nullValue()));
+
+		TestBean13 testBean13 = context.getBean(TestBean13.class);
+		assertThat(testBean13.called1, is(true));
+		assertThat(testBean13.called2, is(true));
+		assertThat(testBean13.called3, is(true));
+
+		context.stop();
+	}
+
+	@Test
+	public void testCatchInterruptTaskFuture() {
+		@SuppressWarnings("resource")
+		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(BaseConfig.class, CatchInterruptTaskFutureConfig.class);
+		DefaultYarnContainer container = context.getBean(DefaultYarnContainer.class);
+		final StateWrapper stateWrapper = new StateWrapper();
+
+		container.addContainerStateListener(new ContainerStateListener() {
+			@Override
+			public void state(ContainerState state, Object exit) {
+				stateWrapper.count.incrementAndGet();
+				stateWrapper.state = state;
+				stateWrapper.exit = exit;
+			}
+		});
+
+		container.run();
+		// we've not got any results yet
+		assertThat(stateWrapper.state, nullValue());
+		assertThat(stateWrapper.exit, nullValue());
+		assertThat(stateWrapper.count.get(), is(0));
+
+		TestBean14 testBean14 = context.getBean(TestBean14.class);
+		assertThat(testBean14.called1, is(true));
+		assertThat(testBean14.called2, is(true));
+		assertThat(testBean14.future1.interrupted, is(false));
+		assertThat(testBean14.future2.interrupted, is(false));
+
+		context.stop();
+		assertThat(testBean14.future1.interrupted, is(true));
+		assertThat(testBean14.future2.interrupted, is(true));
 	}
 
 	@Configuration
@@ -553,6 +646,22 @@ public class DefaultYarnContainerTests {
 		@Bean
 		TestBean12 testBean12() {
 			return new TestBean12(executionOrder);
+		}
+	}
+
+	@Configuration
+	static class ListenableFutureValuesConfig {
+		@Bean
+		TestBean13 testBean13() {
+			return new TestBean13();
+		}
+	}
+
+	@Configuration
+	static class CatchInterruptTaskFutureConfig {
+		@Bean
+		TestBean14 testBean14() {
+			return new TestBean14();
 		}
 	}
 
@@ -817,9 +926,66 @@ public class DefaultYarnContainerTests {
 		}
 	}
 
+	@YarnComponent
+	private static class TestBean13 {
+
+		boolean called1 = false;
+		boolean called2 = false;
+		boolean called3 = false;
+
+		@OnContainerStart
+		public void test1() {
+			called1 = true;
+		}
+
+		@OnContainerStart
+		public ListenableFuture<Integer> test2() {
+			called2 = true;
+			return new AsyncResult<Integer>(1);
+		}
+
+		@OnContainerStart
+		public ListenableFuture<Integer> test3() {
+			called3 = true;
+			return new AsyncResult<Integer>(1);
+		}
+	}
+
+	@YarnComponent
+	private static class TestBean14 {
+
+		boolean called1 = false;
+		boolean called2 = false;
+		CatchInterruptTaskFuture future1 = new CatchInterruptTaskFuture();
+		CatchInterruptTaskFuture future2 = new CatchInterruptTaskFuture();
+
+		@OnContainerStart
+		public ListenableFuture<Integer> test1() {
+			called1 = true;
+			return future1;
+		}
+
+		@OnContainerStart
+		public ListenableFuture<Integer> test2() {
+			called2 = true;
+			return future2;
+		}
+	}
+
 	private static class StateWrapper {
 		ContainerState state;
 		Object exit;
+		AtomicInteger count = new AtomicInteger();
+	}
+
+	private static class CatchInterruptTaskFuture extends SettableListenableFuture<Integer> {
+
+		boolean interrupted = false;
+
+		@Override
+		protected void interruptTask() {
+			interrupted = true;
+		}
 	}
 
 }
