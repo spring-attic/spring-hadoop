@@ -31,6 +31,8 @@ public class SpringYarnEnvProperties {
 	private String fs;
 	private String rm;
 	private String scheduler;
+	private String trackUrl;
+	private String containerId;
 
 	/**
 	 * Gets the value of environment variable <code>SHDP_HD_FS</code>.
@@ -85,6 +87,44 @@ public class SpringYarnEnvProperties {
 	 */
 	public void setSHDP_HD_SCHEDULER(String scheduler) {
 		this.scheduler = scheduler;
+	}
+
+	/**
+	 * Gets the value of environment variable <code>SHDP_AMSERVICE_TRACKURL</code>.
+	 *
+	 * @return the value of <code>SHDP_AMSERVICE_TRACKURL</code> or <code>null</code>
+	 */
+	public String getTrackUrl() {
+		return trackUrl;
+	}
+
+	/**
+	 * Sets the value from an environment variable
+	 * <code>SHDP_AMSERVICE_TRACKURL</code>.
+	 *
+	 * @param trackUrl track url
+	 */
+	public void setSHDP_AMSERVICE_TRACKURL(String trackUrl) {
+		this.trackUrl = trackUrl;
+	}
+
+	/**
+	 * Gets the value of environment variable <code>SHDP_CONTAINERID</code>.
+	 *
+	 * @return the value of <code>SHDP_CONTAINERID</code> or <code>null</code>
+	 */
+	public String getContainerId() {
+		return containerId;
+	}
+
+	/**
+	 * Sets the value from an environment variable
+	 * <code>SHDP_CONTAINERID</code>.
+	 *
+	 * @param containerId container id
+	 */
+	public void setSHDP_CONTAINERID(String containerId) {
+		this.containerId = containerId;
 	}
 
 }

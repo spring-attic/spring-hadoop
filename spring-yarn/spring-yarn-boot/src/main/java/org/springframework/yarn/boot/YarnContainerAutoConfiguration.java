@@ -34,6 +34,7 @@ import org.springframework.yarn.boot.properties.SpringYarnContainerProperties;
 import org.springframework.yarn.boot.properties.SpringYarnEnvProperties;
 import org.springframework.yarn.boot.properties.SpringYarnProperties;
 import org.springframework.yarn.boot.support.ContainerLauncherRunner;
+import org.springframework.yarn.boot.support.ContainerRegistrar;
 import org.springframework.yarn.config.annotation.EnableYarn;
 import org.springframework.yarn.config.annotation.EnableYarn.Enable;
 import org.springframework.yarn.config.annotation.SpringYarnConfigurerAdapter;
@@ -79,6 +80,22 @@ public class YarnContainerAutoConfiguration {
 		public String customContainerClass() {
 			// class reference would fail if not in classpath
 			return "org.springframework.yarn.batch.container.DefaultBatchYarnContainer";
+		}
+
+	}
+
+	@Configuration
+	@ConditionalOnExpression("${endpoints.shutdown.enabled:false}")
+	@EnableConfigurationProperties({ SpringYarnEnvProperties.class })
+	public static class ContainerRegistrarConfig {
+
+		@Autowired
+		private SpringYarnEnvProperties syep;
+
+		@Bean
+		public ContainerRegistrar containerRegistrar() {
+			// only enable if boot shutdown is functional
+			return new ContainerRegistrar(syep.getTrackUrl(), syep.getContainerId());
 		}
 
 	}

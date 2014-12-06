@@ -42,6 +42,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.yarn.YarnSystemConstants;
 import org.springframework.yarn.am.AppmasterTrackService;
 import org.springframework.yarn.am.YarnAppmaster;
+import org.springframework.yarn.am.container.ContainerShutdown;
 import org.springframework.yarn.am.grid.GridProjectionFactory;
 import org.springframework.yarn.am.grid.GridProjectionFactoryLocator;
 import org.springframework.yarn.am.grid.support.DefaultGridProjectionFactory;
@@ -71,6 +72,7 @@ import org.springframework.yarn.boot.support.BootLocalResourcesSelector;
 import org.springframework.yarn.boot.support.BootLocalResourcesSelector.Mode;
 import org.springframework.yarn.boot.support.BootMultiLocalResourcesSelector;
 import org.springframework.yarn.boot.support.EmbeddedAppmasterTrackService;
+import org.springframework.yarn.boot.support.EndpointContainerShutdown;
 import org.springframework.yarn.boot.support.SpringYarnBootUtils;
 import org.springframework.yarn.config.annotation.EnableYarn;
 import org.springframework.yarn.config.annotation.EnableYarn.Enable;
@@ -337,6 +339,13 @@ public class YarnAppmasterAutoConfiguration {
 		@ConditionalOnBean(YarnContainerRegisterEndpoint.class)
 		public YarnContainerRegisterMvcEndpoint yarnContainerRegisterMvcEndpoint(YarnContainerRegisterEndpoint delegate) {
 			return new YarnContainerRegisterMvcEndpoint(delegate);
+		}
+
+		@ConditionalOnExpression("${endpoints.shutdown.enabled:false}")
+		@Bean(name=YarnSystemConstants.DEFAULT_CONTAINER_SHUTDOWN)
+		public ContainerShutdown containerShutdown() {
+			// only enable if boot shutdown is functional
+			return new EndpointContainerShutdown();
 		}
 
 	}
