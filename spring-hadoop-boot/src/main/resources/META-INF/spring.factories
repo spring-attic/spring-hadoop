@@ -1,3 +1,4 @@
 # Auto Configure
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-org.springframework.data.hadoop.boot.HadoopAutoConfiguration
+org.springframework.data.hadoop.boot.HadoopAutoConfiguration,\
+org.springframework.data.hadoop.boot.HadoopFsShellAutoConfiguration

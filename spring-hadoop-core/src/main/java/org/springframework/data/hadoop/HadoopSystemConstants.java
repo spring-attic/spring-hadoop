@@ -32,4 +32,7 @@ public abstract class HadoopSystemConstants {
 	/** Default bean id for hadoop configuration. */
 	public static final String DEFAULT_ID_CONFIGURATION = "hadoopConfiguration";
 
+	/** Default bean id for hadoop fsshell. */
+	public static final String DEFAULT_ID_FSSHELL = "hadoopFsShell";
+
 }
