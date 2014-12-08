@@ -558,12 +558,19 @@ public class CustomerPartitionKeyResolver implements PartitionKeyResolver<String
           <para><emphasis>BZIP2</emphasis> - <classname>org.apache.hadoop.io.compress.BZip2Codec</classname></para>
         </listitem>
         <listitem>
-          <para><emphasis>LZO</emphasis> - <classname>com.hadoop.compression.lzo.LzoCodec</classname> (non-splittable)</para>
+          <para><emphasis>LZO</emphasis> - <classname>com.hadoop.compression.lzo.LzoCodec</classname></para>
         </listitem>
         <listitem>
-          <para><emphasis>SLZO</emphasis> - <classname>com.hadoop.compression.lzo.LzoCodec</classname> (splittable)</para>
+          <para><emphasis>LZOP</emphasis> - <classname>com.hadoop.compression.lzo.LzopCodec</classname></para>
         </listitem>
       </itemizedlist>
+
+      <note>
+        <para>Lzo based compression codecs doesn't exist in maven dependencies due to licensing
+        restrictions and need for native libraries. Order to use it add codec classes to classpath
+        and its native libs using <emphasis>java.library.path</emphasis>.
+        </para>
+      </note>
 
     </section>
 

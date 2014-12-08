@@ -35,6 +35,7 @@ import org.springframework.data.hadoop.store.strategy.naming.StaticFileNamingStr
 import org.springframework.data.hadoop.store.strategy.rollover.SizeRolloverStrategy;
 import org.springframework.data.hadoop.test.context.HadoopDelegatingSmartContextLoader;
 import org.springframework.data.hadoop.test.context.MiniHadoopCluster;
+import org.springframework.data.hadoop.test.tests.Assume;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
@@ -91,6 +92,22 @@ public class TextFileStoreTests extends AbstractStoreTests {
 
 		TextFileReader reader = new TextFileReader(getConfiguration(), testDefaultPath,
 				Codecs.BZIP2.getCodecInfo());
+		TestUtils.readDataAndAssert(reader, DATA09ARRAY);
+	}
+
+	@Test
+	public void testWriteReadManyLinesWithLzo() throws IOException {
+		// Add lzo and native libs with project properties to run this test
+		// because we can't include anything automatically
+		// -PtestJavaLibraryPath=/tmp/lzo/native
+		// -PtestJavaClasspath=/tmp/lzo/lib/hadoop-lzo-0.4.17.jar
+		Assume.codecExists(Codecs.LZO.getCodecInfo().getCodecClass());
+		TextFileWriter writer = new TextFileWriter(getConfiguration(), testDefaultPath,
+				Codecs.LZO.getCodecInfo());
+		TestUtils.writeData(writer, DATA09ARRAY);
+
+		TextFileReader reader = new TextFileReader(getConfiguration(), testDefaultPath,
+				Codecs.LZO.getCodecInfo());
 		TestUtils.readDataAndAssert(reader, DATA09ARRAY);
 	}
 

@@ -55,32 +55,15 @@ public enum Codecs {
 	 */
 	BZIP2(new DefaultCodecInfo(BZip2Codec.class.getName(), true, "bz2"), "BZIP2"),
 
-	// TODO: should we do like DelegatingLzoCodecInfo for resolving
-	// these at runtime. Anyway only one can be present
-	// at any given time!
 	/**
-	 * Non-splittable {@code LzoCodec}. This codec should be based on implementation from
-	 * http://code.google.com/p/hadoop-gpl-compression.
+	 * Non-splittable {@code LzoCodec}.
 	 */
 	LZO(new DefaultCodecInfo("com.hadoop.compression.lzo.LzoCodec", false, "lzo"), "LZO"),
 
 	/**
-	 * Splittable {@code LzoCodec}. This codec should be based on implementation from
-	 * http://github.com/kevinweil/hadoop-lzo.
+	 * Non-splittable {@code LzopCodec}.
 	 */
-	SLZO(new DefaultCodecInfo("com.hadoop.compression.lzo.LzoCodec", true, "slzo"), "SLZO"),
-
-	/**
-	 * Non-splittable {@code LzopCodec}. This codec should be based on implementation from
-	 * http://code.google.com/p/hadoop-gpl-compression.
-	 */
-	LZOP(new DefaultCodecInfo("com.hadoop.compression.lzo.LzopCodec", false, "lzop"), "LZOP"),
-
-	/**
-	 * Splittable {@code LzoCodec}. This codec should be based on implementation from
-	 * http://github.com/kevinweil/hadoop-lzo.
-	 */
-	SLZOP(new DefaultCodecInfo("com.hadoop.compression.lzo.LzopCodec", true, "slzop"), "SLZOP");
+	LZOP(new DefaultCodecInfo("com.hadoop.compression.lzo.LzopCodec", false, "lzop"), "LZOP");
 
 	private final CodecInfo codec;
 

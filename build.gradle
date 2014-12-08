@@ -359,6 +359,18 @@ configure(javaProjects()) {
 		}
 	}
 
+	if (project.hasProperty('testJavaLibraryPath')) {
+		test {
+			systemProperty "java.library.path", "${testJavaLibraryPath}"
+		}
+	}
+
+	if (project.hasProperty('testJavaClasspath')) {
+		dependencies {
+			testRuntime files("${testJavaClasspath}")
+		}
+	}
+
 	forceDependencyVersions(it, 'cdh5')
 
 	sourceCompatibility=1.6
