@@ -46,6 +46,8 @@ public class DatasetDefinition {
 
 	private CompressionType compressionType;
 
+	private Schema schema;
+
 	public DatasetDefinition() {
 		this(null, true, Formats.AVRO.getName());
 	}
@@ -109,6 +111,10 @@ public class DatasetDefinition {
 		}
 	}
 
+	public void setSchema(Schema schema) {
+		this.schema = schema;
+	}
+
 	public Class<?> getTargetClass() {
 		return targetClass;
 	}
@@ -134,12 +140,15 @@ public class DatasetDefinition {
 	}
 
 	public Schema getSchema(Class<?> datasetClass) {
-		Schema schema;
-		if (allowNullValues) {
-			schema = ReflectData.AllowNull.get().getSchema(datasetClass);
-		} else {
-			schema = ReflectData.get().getSchema(datasetClass);
+		if (schema != null) {
+			return schema;
 		}
-		return schema;
+		Schema s;
+		if (allowNullValues) {
+			s = ReflectData.AllowNull.get().getSchema(datasetClass);
+		} else {
+			s = ReflectData.get().getSchema(datasetClass);
+		}
+		return s;
 	}
 }

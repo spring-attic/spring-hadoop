@@ -1,0 +1,12 @@
+{
+  "type" : "record",
+  "name" : "DogPojo",
+  "namespace" : "org.springframework.data.hadoop.store.dataset.DatasetExtAvroSchemaTests$",
+  "fields" : [ {
+    "name" : "name",
+    "type" : "string"
+  }, {
+    "name" : "age",
+    "type" : "int"
+  } ]
+}
