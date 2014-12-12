@@ -361,6 +361,33 @@ switch (hadoopDistro) {
 		pigQualifier = ':h2'
 		break;
 
+	// Hadoop 2.6.x
+	case "hadoop26":
+		hadoopVersion = hd26Version
+		println "Using Apache Hadoop 2.6 - [$hadoopVersion]"
+		hadoopArtifacts = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-yarn-common:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-streaming:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-distcp:$hadoopVersion"]
+		hadoopTestArtifacts = ["org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion:tests",
+					"org.apache.hadoop:hadoop-hdfs:$hadoopVersion:tests",
+					"org.apache.hadoop:hadoop-common:$hadoopVersion:tests",
+					"org.apache.hadoop:hadoop-mapreduce-client-app:$hadoopVersion",
+					"org.apache.hadoop:hadoop-mapreduce-client-hs:$hadoopVersion",
+					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion",
+					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion:tests"]
+		hbaseVersion = hd26HbaseVersion
+		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion",
+				  "org.apache.hbase:hbase-common:$hbaseVersion",
+				  "org.apache.hbase:hbase-client:$hbaseVersion"]
+		hiveVersion = hd26HiveVersion
+		pigVersion = hd26PigVersion
+		pigQualifier = ':h2'
+		break;
+
 	// Hadoop 1.2.x Stable
 	case "hadoop12":
 		hadoopVersion = hd12Version
@@ -685,6 +712,15 @@ configure(hadoopProjects()) {
 
 		// Hadoop 2.5.x
 		case "hadoop25":
+			dependencies {
+				testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
+				testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
+				testRuntime "dk.brics.automaton:automaton:1.11-8"
+			}
+			break;
+
+		// Hadoop 2.6.x
+		case "hadoop26":
 			dependencies {
 				testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
 				testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"

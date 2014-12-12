@@ -15,36 +15,28 @@
  */
 package org.springframework.data.hadoop.pig;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.pig.PigException;
 import org.apache.pig.PigServer;
 import org.apache.pig.backend.BackendException;
 import org.apache.pig.backend.executionengine.ExecException;
 import org.apache.pig.backend.executionengine.ExecJob;
-import org.apache.pig.backend.hadoop.executionengine.mapReduceLayer.JobCreationException;
 import org.apache.pig.impl.logicalLayer.FrontendException;
 import org.apache.pig.impl.logicalLayer.schema.SchemaMergeException;
 import org.apache.pig.impl.plan.PlanException;
 import org.apache.pig.impl.plan.VisitorException;
-import org.apache.pig.tools.grunt.GruntParser;
-import org.apache.pig.tools.parameters.ParameterSubstitutionPreprocessor;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.dao.NonTransientDataAccessResourceException;
+import org.springframework.data.hadoop.HadoopException;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
@@ -81,7 +73,7 @@ abstract class PigUtils {
 		}
 
 		if (ex instanceof FrontendException) {
-			if (ex instanceof JobCreationException) {
+			if (ex.getClass().getName().contains("JobCreationException")) {
 				return new InvalidDataAccessResourceUsageException("Map Reduce error", ex);
 			}
 
@@ -161,40 +153,9 @@ abstract class PigUtils {
 			ReflectionUtils.invokeMethod(registerScript, pig, in, arguments);
 		}
 		else {
-			registerScriptForPig07X(pig, in, arguments);
+			throw new HadoopException("Pig versions older than 0.8.0 are not supported.");
 		}
 
-	}
-
-	private static void registerScriptForPig07X(PigServer pig, InputStream in, Map<String, String> params) throws IOException {
-		try {
-			// transform the map type to list type which can been accepted by ParameterSubstitutionPreprocessor
-			List<String> paramList = new ArrayList<String>();
-			if (params != null) {
-				for (Map.Entry<String, String> entry : params.entrySet()) {
-					paramList.add(entry.getKey() + "=" + entry.getValue());
-				}
-			}
-
-			// do parameter substitution
-			ParameterSubstitutionPreprocessor psp = new ParameterSubstitutionPreprocessor(50);
-			StringWriter writer = new StringWriter();
-			psp.genSubstitutedFile(new BufferedReader(new InputStreamReader(in)), writer, null, null);
-
-			GruntParser grunt = new GruntParser(new StringReader(writer.toString()));
-			grunt.setInteractive(false);
-			grunt.setParams(pig);
-			grunt.parseStopOnError(true);
-		} catch (FileNotFoundException e) {
-			LogFactory.getLog(PigServer.class).error(e.getLocalizedMessage());
-			throw new IOException(e.getCause());
-		} catch (org.apache.pig.tools.pigscript.parser.ParseException e) {
-			LogFactory.getLog(PigServer.class).error(e.getLocalizedMessage());
-			throw new IOException(e.getCause());
-		} catch (org.apache.pig.tools.parameters.ParseException e) {
-			LogFactory.getLog(PigServer.class).error(e.getLocalizedMessage());
-			throw new IOException(e.getCause());
-		}
 	}
 
 	static void validateEachStatement(PigServer pig, boolean validate) {
