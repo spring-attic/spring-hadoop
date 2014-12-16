@@ -5,6 +5,17 @@ http://projects.spring.io/spring-hadoop/
 Commit changelog: http://github.com/spring-projects/spring-hadoop/tree/v[version]
 Issues changelog: https://jira.spring.io/secure/ReleaseNote.jspa?projectId=10801
 
+Changes in version 2.0.4 RELEASE (2014-12-16)
+---------------------------------------------
+General
+* Update build to support Cloudera CDH 5.2.0 [SHDP-422]
+* Update build to support Hadoop 2.6.0 [SHDP-455]
+
+Store
+* Backport partition writer enhancements from SHDP-447 SHDP-436 SHDP-427 [SHDP-444] 	
+* Backport SHDP-416 Change extension used for bzip2 and gzip [SHDP-417]
+
+
 Changes in version 2.0.3 RELEASE (2014-10-31)
 ---------------------------------------------
 General
