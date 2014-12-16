@@ -1,0 +1,112 @@
+= Developing Spring for Apache Hadoop Applications
+
+This section provides some guidance on how one can use the Spring for
+Apache Hadoop project in conjunction with other Spring projects,
+starting with the Spring Framework itself, then Spring Batch, and then
+Spring Integration.
+
+== Guidance and Examples
+
+Spring for Apache Hadoop provides integration with the Spring Framework
+to create and run Hadoop MapReduce, Hive, and Pig jobs as well as work
+with HDFS and HBase. If you have simple needs to work with Hadoop,
+including basic scheduling, you can add the Spring for Apache Hadoop
+namespace to your Spring based project and get going quickly using
+Hadoop.
+
+As the complexity of your Hadoop application increases, you may want to
+use Spring Batch to regain on the complexity of developing a large
+Hadoop application. Spring Batch provides an extension to the Spring
+programming model to support common batch job scenarios characterized by
+the processing of large amounts of data from flat files, databases and
+messaging systems. It also provides a workflow style processing model,
+persistent tracking of steps within the workflow, event notification, as
+well as administrative functionality to start/stop/restart a workflow.
+As Spring Batch was designed to be extended, Spring for Apache Hadoop
+plugs into those extensibilty points, allowing for Hadoop related
+processing to be a first class citizen in the Spring Batch processing
+model.
+
+Another project of interest to Hadoop developers is Spring Integration.
+Spring Integration provides an extension of the Spring programming model
+to support the well-known http://www.eaipatterns.com[Enterprise
+Integration Patterns]. It enables lightweight messaging _within_
+Spring-based applications and supports integration with external systems
+via declarative adapters. These adapters are of particular interest to
+Hadoop developers, as they directly support common Hadoop use-cases such
+as polling a directory or FTP folder for the presence of a file or group
+of files. Then once the files are present, a message is sent internally
+to the application to do additional processing. This additional
+processing can be calling a Hadoop MapReduce job directly or starting a
+more complex Spring Batch based workflow. Similarly, a step in a Spring
+Batch workflow can invoke functionality in Spring Integration, for
+example to send a message though an email adapter.
+
+No matter if you use the Spring Batch project with the Spring Framework
+by itself or with additional extentions such as Spring Batch and Spring
+Integration that focus on a particular domain, you will benefit from the
+core values that Spring projects bring to the table, namely enabling
+modularity, reuse and extensive support for unit and integration
+testing.
+
+=== Scheduling
+
+Spring Batch integrates with a variety of job schedulers and is not a
+scheduling framework. There are many good enterprise schedulers
+available in both the commercial and open source spaces such as Quartz,
+Tivoli, Control-M, etc. It is intended to work in conjunction with a
+scheduler, not replace a scheduler. As a lightweight solution, you can
+use Spring's built in scheduling support that will give you cron-like
+and other basic scheduling trigger functionality. See the
+http://docs.spring.io/spring-batch/faq.html#schedulers[Task Execution
+and Scheduling] documention for more info. A middle ground it to use
+Spring's Quartz integration, see
+http://docs.spring.io/spring/docs/4.0.x/spring-framework-reference/html/scheduling.html#scheduling-quartz[Using
+the OpenSymphony Quartz Scheduler] for more information. The Spring
+Batch distribution contains an example, but this documentation will be
+updated to provide some more directed examples with Hadoop, check for
+updates on the http://projects.spring.io/spring-hadoop/[main web site of
+Spring for Apache Hadoop].
+
+=== Batch Job Listeners
+
+Spring Batch lets you attach listeners at the job and step levels to
+perform additional processing. For example, at the end of a job you can
+perform some notification or perhaps even start another Spring Batch
+job. As a brief example, implement the interface
+http://docs.spring.io/spring-batch/apidocs/org/springframework/batch/core/JobExecutionListener.html[JobExecutionListener]
+and configure it into the Spring Batch job as shown below.
+
+[source,xml]
+----
+<batch:job id="job1">
+  <batch:step id="import" next="wordcount">
+    <batch:tasklet ref="script-tasklet"/>
+  </batch:step>
+            
+  <batch:step id="wordcount">
+    <batch:tasklet ref="wordcount-tasklet" />
+  </batch:step>
+
+  <batch:listeners>
+   <batch:listener ref="simpleNotificatonListener"/>
+  </batch:listeners>
+
+</batch:job>
+
+<bean id="simpleNotificatonListener" class="com.mycompany.myapp.SimpleNotificationListener"/>
+----
+
+== Other Samples
+
+The sample applications have been moved into their own repository so
+they can be developed independently of the Spring for Apache Hadoop
+release cycle. They can be found on GitHub
+https://github.com/spring-projects/spring-hadoop-samples/.
+
+The
+https://github.com/spring-projects/spring-hadoop/wiki/Sample-Projects[wiki
+page] for the Spring for Apache Hadoop project has more documentation
+for building and running the examples and there is also some
+instructions in the _README_ file of each example.
+

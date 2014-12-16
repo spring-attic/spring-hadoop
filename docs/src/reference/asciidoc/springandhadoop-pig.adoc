@@ -1,0 +1,145 @@
+== Pig support
+
+For http://pig.apache.org[Pig] users, SHDP provides easy creation and
+configuration of PigServer instances for registering and executing
+scripts either locally or remotely. In its simplest form, the
+declaration looks as follows:
+
+[source,xml]
+----
+<hdp:pig />
+----
+
+This will create a org.springframework.data.hadoop.pig.PigServerFactory
+instance, named `pigFactory`, a factory that creates `PigServer`
+instances on demand configured with a default PigContext, executing
+scripts in `MapReduce` mode. The factory is needed since `PigServer` is
+not thread-safe and thus cannot be used by multiple objects at the same
+time. In typical scenarios however, one might want to connect to a
+remote Hadoop tracker and register some scripts automatically so let us
+take a look of how the configuration might look like:
+
+[source,xml]
+----
+<pig-factory exec-type="LOCAL" job-name="pig-script" configuration-ref="hadoopConfiguration" properties-location="pig-dev.properties" 
+   xmlns="http://www.springframework.org/schema/hadoop">
+     source=${pig.script.src}
+   <script location="org/company/pig/script.pig">
+     <arguments>electric=sea</arguments>
+   </script>
+   <script>
+     A = LOAD 'src/test/resources/logs/apache_access.log' USING PigStorage() AS (name:chararray, age:int);
+     B = FOREACH A GENERATE name;
+     DUMP B;
+   </script>
+</pig-factory> />
+----
+
+The example exposes quite a few options so let us review them one by
+one. First the top-level pig definition configures the pig instance: the
+execution type, the Hadoop configuration used and the job name. Notice
+that additional properties can be specified (either by declaring them
+inlined or/and loading them from an external file) - in fact,
+`<hdp:pig-factory/>` just like the rest of the libraries configuration
+elements, supports common properties attributes as described in the
+#hadoop:config:properties[hadoop configuration] section.
+
+The definition contains also two scripts: `script.pig` (read from the
+classpath) to which one pair of arguments, relevant to the script, is
+passed (notice the use of property placeholder) but also an inlined
+script, declared as part of the definition, without any arguments.
+
+As you can tell, the `pig-factory` namespace offers several options
+pertaining to Pig configuration.
+
+=== Running a Pig script
+
+Like the rest of the Spring Hadoop components, a runner is provided out
+of the box for executing Pig scripts, either inlined or from various
+locations through `pig-runner` element:
+
+[source,xml]
+----
+<hdp:pig-runner id="pigRunner" run-at-startup="true">
+   <hdp:script>
+        A = LOAD 'src/test/resources/logs/apache_access.log' USING PigStorage() AS (name:chararray, age:int);
+        ...
+   </hdp:script>
+   <hdp:script location="pig-scripts/script.pig"/>
+</hdp:pig-runner>
+----
+
+The runner will trigger the execution during the application start-up
+(notice the `run-at-startup` flag which is by default `false`). Do note
+that the runner will not run unless triggered manually or if
+`run-at-startup` is set to `true`. Additionally the runner (as in fact
+do all link:#runners[runners] in SHDP) allows one or multiple `pre` and
+`post` actions to be specified to be executed before and after each run.
+Typically other runners (such as other jobs or scripts) can be specified
+but any JDK `Callable` can be passed in. For more information on
+runners, see the link:#runners[dedicated] chapter.
+
+==== Using the Pig tasklet
+
+For Spring Batch environments, SHDP provides a dedicated tasklet to
+execute Pig queries, on demand, as part of a batch or workflow. The
+declaration is pretty straightforward:
+
+[source,xml]
+----
+<hdp:pig-tasklet id="pig-script">
+   <hdp:script location="org/company/pig/handsome.pig" />
+</hdp:pig-tasklet>
+----
+
+The syntax of the scripts declaration is similar to that of the `pig`
+namespace.
+
+=== Interacting with the Pig API
+
+For those that need to programmatically interact directly with Pig ,
+Spring for Apache Hadoop provides a dedicated
+http://en.wikipedia.org/wiki/Template_method_pattern[template], similar
+to the aforementioned `HiveTemplate`. The template handles the
+redundant, boiler-plate code, required for interacting with Pig such as
+creating a new `PigServer`, executing the scripts, catching any
+exceptions and performing clean-up. One can programmatically execute
+scripts but also interact with the Hive API through the
+`PigServerCallback`. For example:
+
+[source,xml]
+----
+<hdp:pig-factory ... />
+<!-- Pig template wires automatically to 'pigFactory'-->
+<hdp:pig-template />
+    
+<!-- use component scanning-->
+<context:component-scan base-package="some.pkg" /> 
+----
+
+[source,java]
+----
+public class SomeClass {
+  @Inject
+  private PigTemplate template;
+
+  public Set<String> getDbs() {
+      return pigTemplate.execute(new PigCallback<Set<String>() {
+         @Override
+         public Set<String> doInPig(PigServer pig) throws ExecException, IOException {
+            return pig.getAliasKeySet();
+         }
+      });
+  }
+}
+----
+
+The example above shows a basic container configuration wiring a
+`PigTemplate` into a user class which uses it to interact with the
+`PigServer` API. Notice that the user does not have to handle the
+lifecycle of the `PigServer` instance or catch any exception - these are
+handled automatically by the template which converts them, like the rest
+of the Spring templates, into `DataAccessException`s. Thus the
+application only has to track only one exception hierarchy across all
+data technologies instead of one per technology.
+

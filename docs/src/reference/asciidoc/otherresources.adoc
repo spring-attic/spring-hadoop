@@ -1,0 +1,17 @@
+= Other Resources
+
+In addition to this reference documentation, there are a number of other
+resources that may help you learn how to use Hadoop and Spring
+framework. These additional, third-party resources are enumerated in
+this section.
+
+== Useful Links
+
+* Spring for Apache Hadoop
+  http://www.springframework.org/spring-data/hadoop[Home Page]
+* Spring Data http://projects.spring.io/spring-data[Home Page]
+* Spring Data Book http://shop.oreilly.com/product/0636920024767.do[Home Page]
+* Spring http://blog.spring.io/[Blog]
+* Apache Hadoop http://hadoop.apache.org[Home Page]
+* Pivotal HD http://www.pivotal.io/big-data/pivotal-hd[Home Page]
+

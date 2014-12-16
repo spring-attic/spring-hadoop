@@ -1,0 +1,30 @@
+[preface]
+== Preface
+
+Spring for Apache Hadoop provides extensions to Spring, Spring Batch,
+and Spring Integration to build manageable and robust pipeline solutions
+around Hadoop.
+
+Spring for Apache Hadoop supports reading from and writing to HDFS,
+running various types of Hadoop jobs (Java MapReduce, Streaming),
+scripting and HBase, Hive and Pig interactions. An important goal is to
+provide excellent support for non-Java based developers to be productive
+using Spring for Apache Hadoop and not have to write any Java code to
+use the core feature set.
+
+Spring for Apache Hadoop also applies the familiar Spring programming
+model to Java MapReduce jobs by providing support for dependency
+injection of simple jobs as well as a POJO based MapReduce programming
+model that decouples your MapReduce classes from Hadoop specific details
+such as base classes and data types.
+
+This document assumes the reader already has a basic familiarity with
+the Spring Framework and Hadoop concepts and APIs.
+
+While every effort has been made to ensure that this documentation is
+comprehensive and there are no errors, nevertheless some topics might
+require more explanation and some typos might have crept in. If you do
+spot any mistakes or even more serious errors and you can spare a few
+cycles during lunch, please do bring the error to the attention of the
+Spring for Apache Hadoop team by raising an issue. Thank you.
+

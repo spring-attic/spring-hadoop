@@ -1,0 +1,115 @@
+[[introduction]]
+= Introduction
+
+Spring for Apache Hadoop provides integration with the Spring Framework
+to create and run Hadoop MapReduce, Hive, and Pig jobs as well as work
+with HDFS and HBase. If you have simple needs to work with Hadoop,
+including basic scheduling, you can add the Spring for Apache Hadoop
+namespace to your Spring based project and get going quickly using
+Hadoop. As the complexity of your Hadoop application increases, you may
+want to use Spring Batch and Spring Integration to regain on the
+complexity of developing a large Hadoop application.
+
+This document is the reference guide for Spring for Apache Hadoop
+project (SHDP). It explains the relationship between the Spring
+framework and Hadoop as well as related projects such as Spring Batch
+and Spring Integration. The first part describes the integration with
+the Spring framework to define the base concepts and semantics of the
+integration and how they can be used effectively. The second part
+describes how you can build upon these base concepts and create workflow
+based solutions provided by the integration with Spring Batch.
+
+== Requirements
+
+Spring for Apache Hadoop 2.1 is built and tested with JDK 7.0 (generated
+jars are usable in JDK 6.0 and above),
+http://projects.spring.io/spring-framework/[Spring Framework] 4.0 and is
+by default built against http://hadoop.apache.org/[Apache Hadoop] 2.5.1.
+
+Spring for Apache Hadoop 2.1 supports the following versions and
+distributions:
+
+* http://hadoop.apache.org/[Apache Hadoop] 2.4.1 *
+* http://hadoop.apache.org/[Apache Hadoop] 2.5.1 *
+* http://www.gopivotal.com/[Pivotal] HD 2.1 *
+* http://www.cloudera.com/[Cloudera] CDH5 (2.5.0-cdh5.2.0) *
+* http://www.hortonworks.com/[Hortonworks] Data Platform 2.1 *
+
+* The distributions noted with and asterisk will include spring-yarn
+support in the build.
+
+Any distribution compatible with Apache Hadoop 2.2.x or later should be
+usable.
+
+Spring for Apache Hadoop 2.1 is tested daily against a number of Hadoop
+distributions. See the
+https://build.spring.io/browse/SPRINGDATAHADOOP[test plan page] for
+current status.
+
+Instructions for setting up project builds using various supported
+distributions are provided on the Spring for Apache Hadoop wiki -
+https://github.com/spring-projects/spring-hadoop/wiki
+
+Regarding Hadoop-related projects, SDHP supports
+http://hbase.apache.org/[HBase] 0.94.11, http://hive.apache.org/[Hive]
+0.11.0 and http://pig.apache.org/[Pig] 0.11.0 and above. As a rule of
+thumb, when using Hadoop-related projects, such as Hive or Pig, use the
+required Hadoop version as a basis for discovering the supported
+versions.
+
+To take full advantage of Spring for Apache Hadoop you need a running
+Hadoop cluster. If you don't already have one in your environment, a
+good first step is to create a single-node cluster. To install the most
+recent stable verision of Hadoop, the
+"http://hadoop.apache.org/common/docs/stable/#Getting+Started[Getting
+Started"] page from the official Apache documentation is a good general
+guide. There should be a link for "Single Node Setup".
+
+It is also convenient to download a Virtual Machine where Hadoop is
+setup and ready to go. Cloudera, Hortonworks and Pivotal all provide
+virtual machines and provide VM downloads on their product pages.
+Additionally, the link:#appendices[appendix] provides information on how
+to use Spring for Apache Hadoop and setup Hadoop with cloud providers,
+such as Amazon Web Services.
+
+== Additional Resources
+
+While this documentation acts as a reference for Spring for Hadoop
+project, there are number of resources that, while optional, complement
+this document by providing additional background and code samples for
+the reader to try and experiment with:
+
+* _Spring for Apache Hadoop
+https://github.com/spring-projects/spring-hadoop-samples/[samples]_. +
+Official repository full of SHDP samples demonstrating the various
+project features.
+* _Spring Data
+http://shop.oreilly.com/product/0636920024767.do[Book]_. +
+Guide to Spring Data projects, written by the committers behind them.
+Covers Spring Data Hadoop stand-alone but in tandem with its _siblings_
+projects. All author royalties from book sales are donated to
+http://creativecommons.org/about[Creative Commons] organization.
+* _Spring Data Book
+https://github.com/spring-projects/spring-data-book/tree/master/hadoop[examples]_. +
+Complete running samples for the Spring Data book. Note that some of
+them are available inside Spring for Apache Hadoop samples as well.
+
+This part of the reference documentation explains the core functionality
+that Spring for Apache Hadoop (SHDP) provides to any Spring based
+application.
+
+? describes the Spring support for bootstrapping, initializing and
+working with core Hadoop.
+
+? describes the Spring support for interacting with the Hadoop file
+system.
+
+? describes the Spring support for HBase.
+
+? describes the Hive integration in SHDP.
+
+? describes the Pig support in Spring for Apache Hadoop.
+
+? describes how to configure and interact with Hadoop in a secure
+environment.
+

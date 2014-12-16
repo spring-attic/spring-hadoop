@@ -1,0 +1,73 @@
+== Security Support
+
+Spring for Apache Hadoop is aware of the security constraints of the
+running Hadoop environment and allows its components to be configured as
+such. For clarity, this document breaks down _security_ into HDFS
+permissions and user impersonation (also known as _secure_ Hadoop). The
+rest of this document discusses each component and the impact (and
+usage) it has on the various SHDP features.
+
+=== HDFS permissions
+
+HDFS layer provides file permissions designed to be similar to those
+present in *nix OS. The official
+http://hadoop.apache.org/common/docs/r1.0.3/hdfs_permissions_guide.html[guide]
+explains the major components but in short, the access for each file
+(whether it's for reading, writing or in case of directories accessing)
+can be restricted to certain users or groups. Depending on the user
+identity (which is typically based on the host operating system), code
+executing against the Hadoop cluster can see or/and interact with the
+file-system based on these permissions. Do note that each HDFS or
+`FileSystem` implementation can have slightly different semantics or
+implementation.
+
+SHDP obeys the HDFS permissions, using the identity of the current user
+(by default) for interacting with the file system. In particular, the
+`HdfsResourceLoader` considers when doing pattern matching, only the
+files that it's supposed to _see_ and does not perform any privileged
+action. It is possible however to specify a different user, meaning the
+`ResourceLoader` interacts with HDFS using that user's rights - however
+this obeys the #security:kerberos[user impersonation] rules. When using
+different users, it is recommended to create separate `ResourceLoader`
+instances (one per user) instead of assigning additional permissions or
+groups to one user - this makes it easier to manage and wire the
+different HDFS _views_ without having to modify the ACLs. Note however
+that when using impersonation, the `ResourceLoader` might (and will
+typically) return _restricted_ files that might not be consumed or seen
+by the callee.
+
+=== User impersonation (Kerberos)
+
+Securing a Hadoop cluster can be a difficult task - each machine can
+have a different set of users and groups, each with different passwords.
+Hadoop relies on
+http://en.wikipedia.org/wiki/Kerberos_%28protocol%29[Kerberos], a
+ticket-based protocol for allowing nodes to communicate over a
+non-secure network to prove their identity to one another in a secure
+manner. Unfortunately there is not a lot of documentation on this topic
+out there. However there are
+http://hortonworks.com/blog/fine-tune-your-apache-hadoop-security-settings/[some]
+https://ccp.cloudera.com/display/CDHDOC/Configuring+Hadoop+Security+in+CDH3[resources]
+to get you started.
+
+SHDP does not require any extra configuration - it simply obeys the
+security system in place. By default, when running inside a _secure_
+Hadoop, SHDP uses the current user (as expected). It also supports _user
+impersonation_, that is, interacting with the Hadoop cluster with a
+different identity (this allows a superuser to submit job or access hdfs
+on behalf of another user in a secure way, without _leaking_
+permissions). The major MapReduce components, such as `job`, `streaming`
+and `tool` as well as `pig` support user impersonation through the
+`user` attribute. By default, this property is empty, meaning the
+current user is used - however one can specify the different identity
+(also known as _ugi_) to be used by the target component:
+
+[source,xml]
+----
+<hdp:job id="jobFromJoe" user="joe" .../>
+----
+
+Note that the user running the application (or the current user) must
+have the proper kerberos credentials to be able to impersonate the
+target user (in this case _joe_).
+

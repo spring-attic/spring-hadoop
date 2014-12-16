@@ -1,0 +1,234 @@
+== Hive integration
+
+When working with http://hive.apache.org[] from a Java environment, one
+can choose between the http://thrift.apache.org/[Thrift] client or using
+the Hive JDBC-like
+http://hive.apache.org/docs/r0.7.1/api/org/apache/hadoop/hive/jdbc/package-summary.html[driver].
+Both have their pros and cons but no matter the choice, Spring and SHDP
+support both of them.
+
+=== Starting a Hive Server
+
+SHDP provides a dedicated namespace element for starting a Hive server
+as a Thrift service (only when using Hive 0.8 or higher). Simply specify
+the host, the port (the defaults are `localhost` and `10000`
+respectively) and you're good to go:
+
+[source,xml]
+----
+<!-- by default, the definition name is 'hive-server' -->
+<hdp:hive-server host="some-other-host" port="10001" />
+----
+
+If needed the Hadoop configuration can be passed in or additional
+properties specified. In fact `hiver-server` provides the same
+properties configuration `knobs` as #hadoop:config:properties[hadoop
+configuration]:
+
+[source,xml]
+----
+<hdp:hive-server host="some-other-host" port="10001" properties-location="classpath:hive-dev.properties" configuration-ref="hadoopConfiguration">
+  someproperty=somevalue
+  hive.exec.scratchdir=/tmp/mydir
+</hdp:hive-server>
+----
+
+The Hive server is bound to the enclosing application context
+life-cycle, that is it will automatically startup and shutdown
+along-side the application context.
+
+=== Using the Hive Thrift Client
+
+Similar to the server, SHDP provides a dedicated namespace element for
+configuring a Hive client (that is Hive accessing a server node through
+the Thrift). Likewise, simply specify the host, the port (the defaults
+are `localhost` and `10000` respectively) and you're done:
+
+[source,xml]
+----
+<!-- by default, the definition name is 'hiveClientFactory' -->
+<hdp:hive-client-factory host="some-other-host" port="10001" />
+----
+
+Note that since Thrift clients are not thread-safe,
+`hive-client-factory` returns a factory (named
+`org.springframework.data.hadoop.hive.HiveClientFactory`) for creating
+`HiveClient` new instances for each invocation. Furthermore, the client
+definition also allows Hive scripts (either declared inlined or
+externally) to be executed during initialization, once the client
+connects; this is quite useful for doing Hive specific initialization:
+
+[source,xml]
+----
+<hive-client-factory host="some-host" port="some-port" xmlns="http://www.springframework.org/schema/hadoop">
+   <hdp:script>
+     DROP TABLE IF EXITS testHiveBatchTable; 
+     CREATE TABLE testHiveBatchTable (key int, value string);
+   </hdp:script>
+   <hdp:script location="classpath:org/company/hive/script.q">
+       <arguments>ignore-case=true</arguments>
+   </hdp:script>
+</hive-client-factory>
+----
+
+In the example above, two scripts are executed each time a new Hive
+client is created (if the scripts need to be executed only once consider
+using a tasklet) by the factory. The first script is defined inline
+while the second is read from the classpath and passed one parameter.
+For more information on using parameters (or variables) in Hive scripts,
+see
+http://hive.apache.org/docs/r0.9.0/language_manual/var_substitution.html[this]
+section in the Hive manual.
+
+=== Using the Hive JDBC Client
+
+Another attractive option for accessing Hive is through its JDBC driver.
+This exposes Hive through the
+http://docs.oracle.com/javase/6/docs/technotes/guides/jdbc/[JDBC API]
+meaning one can use the standard API or its derived utilities to
+interact with Hive, such as the rich
+http://docs.spring.io/spring/docs/4.0.x/spring-framework-reference/html/jdbc.html[JDBC
+support] in Spring Framework.
+
+[WARNING]
+====
+Note that the JDBC driver is a work-in-progress and not all the JDBC
+features are available (and probably never will since Hive cannot
+support all of them as it is not the typical relational database). Do
+read the official documentation and examples.
+====
+
+SHDP does not offer any dedicated support for the JDBC integration -
+Spring Framework itself provides the needed tools; simply configure Hive
+as you would with any other JDBC Driver:
+
+[source,xml]
+----
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:c="http://www.springframework.org/schema/c"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+    
+    <!-- basic Hive driver bean -->
+    <bean id="hive-driver" class="org.apache.hadoop.hive.jdbc.HiveDriver"/>
+
+    <!-- wrapping a basic datasource around the driver -->
+    <!-- notice the 'c:' namespace (available in Spring 3.1+) for inlining constructor arguments, 
+         in this case the url (default is 'jdbc:hive://localhost:10000/default') -->
+    <bean id="hive-ds" class="org.springframework.jdbc.datasource.SimpleDriverDataSource"
+       c:driver-ref="hive-driver" c:url="${hive.url}"/>
+
+    <!-- standard JdbcTemplate declaration -->
+    <bean id="template" class="org.springframework.jdbc.core.JdbcTemplate" c:data-source-ref="hive-ds"/>
+    
+    <context:property-placeholder location="hive.properties"/>
+</beans>
+----
+
+And that is it! Following the example above, one can use the `hive-ds`
+DataSource bean to manually get a hold of Connections or better yet, use
+Spring's
+http://docs.spring.io/spring/docs/4.0.x/spring-framework-reference/html/jdbc.html#jdbc-JdbcTemplate[JdbcTemplate]
+as in the example above.
+
+=== Running a Hive script or query
+
+Like the rest of the Spring Hadoop components, a runner is provided out
+of the box for executing Hive scripts, either inlined or from various
+locations through `hive-runner` element:
+
+[source,xml]
+----
+<hdp:hive-runner id="hiveRunner" run-at-startup="true">
+   <hdp:script>
+     DROP TABLE IF EXITS testHiveBatchTable; 
+     CREATE TABLE testHiveBatchTable (key int, value string);
+   </hdp:script>
+   <hdp:script location="hive-scripts/script.q"/>
+</hdp:hive-runner>
+----
+
+The runner will trigger the execution during the application start-up
+(notice the `run-at-startup` flag which is by default `false`). Do note
+that the runner will not run unless triggered manually or if
+`run-at-startup` is set to `true`. Additionally the runner (as in fact
+do all link:#runners[runners] in SHDP) allows one or multiple `pre` and
+`post` actions to be specified to be executed before and after each run.
+Typically other runners (such as other jobs or scripts) can be specified
+but any JDK `Callable` can be passed in. For more information on
+runners, see the link:#runners[dedicated] chapter.
+
+==== Using the Hive tasklet
+
+For Spring Batch environments, SHDP provides a dedicated tasklet to
+execute Hive queries, on demand, as part of a batch or workflow. The
+declaration is pretty straightforward:
+
+[source,xml]
+----
+<hdp:hive-tasklet id="hive-script">
+   <hdp:script>
+     DROP TABLE IF EXITS testHiveBatchTable; 
+     CREATE TABLE testHiveBatchTable (key int, value string);
+   </hdp:script>
+   <hdp:script location="classpath:org/company/hive/script.q" />
+</hdp:hive-tasklet>
+----
+
+The tasklet above executes two scripts - one declared as part of the
+bean definition followed by another located on the classpath.
+
+=== Interacting with the Hive API
+
+For those that need to programmatically interact with the Hive API,
+Spring for Apache Hadoop provides a dedicated
+http://en.wikipedia.org/wiki/Template_method_pattern[template], similar
+to the aforementioned `JdbcTemplate`. The template handles the
+redundant, boiler-plate code, required for interacting with Hive such as
+creating a new `HiveClient`, executing the queries, catching any
+exceptions and performing clean-up. One can programmatically execute
+queries (and get the raw results or convert them to longs or ints) or
+scripts but also interact with the Hive API through the
+`HiveClientCallback`. For example:
+
+[source,xml]
+----
+<hdp:hive-client-factory ... />
+<!-- Hive template wires automatically to 'hiveClientFactory'-->
+<hdp:hive-template />
+    
+<!-- wire hive template into a bean -->
+<bean id="someBean" class="org.SomeClass" p:hive-template-ref="hiveTemplate"/>
+----
+
+[source,java]
+----
+public class SomeClass {
+
+  private HiveTemplate template;
+
+  public void setHiveTemplate(HiveTemplate template) { this.template = template; }
+
+  public List<String> getDbs() {
+      return hiveTemplate.execute(new HiveClientCallback<List<String>>() {
+         @Override
+         public List<String> doInHive(HiveClient hiveClient) throws Exception {
+            return hiveClient.get_all_databases();
+         }
+      }));
+  }
+}
+----
+
+The example above shows a basic container configuration wiring a
+`HiveTemplate` into a user class which uses it to interact with the
+`HiveClient` Thrift API. Notice that the user does not have to handle
+the lifecycle of the `HiveClient` instance or catch any exception (out
+of the many thrown by Hive itself and the Thrift fabric) - these are
+handled automatically by the template which converts them, like the rest
+of the Spring templates, into `DataAccessException`s. Thus the
+application only has to track only one exception hierarchy across all
+data technologies instead of one per technology.
+
