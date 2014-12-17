@@ -9,8 +9,11 @@
       	http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
 
 	<import resource="../batch-common.xml"/>
-	<import resource="../hadoop-ctx.xml"/>
-	
+	<hdp:configuration register-url-handler="false">
+		fs.default.name=file:///
+		mapreduce.framework.name=local
+	</hdp:configuration>
+
 	<hdp:script language="javascript" run-at-startup="true">
 		log="src/test/resources/logs/apache_access.log"
 		if (!fsh.test(log)) {
