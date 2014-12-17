@@ -9,8 +9,11 @@
       	http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
 
 	<import resource="../batch-common.xml"/>
-	<import resource="../hadoop-ctx.xml"/>
-	
+	<hdp:configuration register-url-handler="false">
+		fs.defaultFS=file:///
+		mapreduce.framework.name=local
+	</hdp:configuration>
+
 	<hdp:script language="javascript" run-at-startup="true">
 		log="src/test/resources/logs/apache_access.log"
 		if (!fsh.test(log)) {
@@ -39,7 +42,7 @@
 		</property>
 	</bean>
 
-	<hdp:pig-factory configuration-ref="hadoopConfiguration" exec-type="LOCAL" job-name="pig-script"/> 
+	<hdp:pig-factory configuration-ref="hadoopConfiguration" exec-type="LOCAL" job-name="pig-script"/>
 	
 	<hdp:pig-tasklet id="pig-script" scope="prototype">
 		<hdp:script location="org/springframework/data/hadoop/pig/script.pig" />
