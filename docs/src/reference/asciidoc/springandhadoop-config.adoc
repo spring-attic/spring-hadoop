@@ -606,7 +606,7 @@ constructors. Note that by default the `tool-runner` does not execute
 the `Tool` until its definition is actually called - this behavior can
 be changed through the `run-at-startup` attribute above.
 
-==== Replacing Hadoop shell invocations with `tool-runner`
+==== Replacing Hadoop shell invocations with tool-runner
 
 `tool-runner` is a nice way for migrating series or shell invocations or
 scripts into fully wired, managed Java objects. Consider the following
@@ -783,7 +783,7 @@ configuration options as #hadoop:jar-runner[jar-runner] except for
 <hdp:jar-tasklet id="jar-tasklet" jar="some-jar.jar" />
 ----
 
-=== Configuring the Hadoop `DistributedCache`
+=== Configuring the Hadoop DistributedCache
 
 http://hadoop.apache.org/common/docs/stable/mapred_tutorial.html#DistributedCache[DistributedCache]
 is a Hadoop facility for distributing application-specific, large,

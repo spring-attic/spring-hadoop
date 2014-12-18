@@ -31,8 +31,11 @@ distributions:
 
 * http://hadoop.apache.org/[Apache Hadoop] 2.4.1
 * http://hadoop.apache.org/[Apache Hadoop] 2.5.1
-* http://www.gopivotal.com/[Pivotal] HD 2.1
+* http://hadoop.apache.org/[Apache Hadoop] 2.6.0
+* http://www.pivotal.io/[Pivotal] HD 2.0
+* http://www.pivotal.io/[Pivotal] HD 2.1
 * http://www.cloudera.com/[Cloudera] CDH5 (2.5.0-cdh5.2.0)
+* http://www.hortonworks.com/[Hortonworks] Data Platform 2.0
 * http://www.hortonworks.com/[Hortonworks] Data Platform 2.1
 
 Any distribution compatible with Apache Hadoop 2.2.x or later should be
@@ -58,8 +61,8 @@ To take full advantage of Spring for Apache Hadoop you need a running
 Hadoop cluster. If you don't already have one in your environment, a
 good first step is to create a single-node cluster. To install the most
 recent stable verision of Hadoop, the
-"http://hadoop.apache.org/common/docs/stable/#Getting+Started[Getting
-Started"] page from the official Apache documentation is a good general
+http://hadoop.apache.org/common/docs/stable/#Getting+Started[Getting
+Started] page from the official Apache project is a good general
 guide. There should be a link for "Single Node Setup".
 
 It is also convenient to download a Virtual Machine where Hadoop is
