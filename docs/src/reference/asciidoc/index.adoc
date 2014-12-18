@@ -3,6 +3,7 @@
 :java-ClassLoader: http://docs.oracle.com/javase/7/docs/api/java/lang/ClassLoader.html
 :core-ApplicationContext: http://docs.spring.io/spring/docs/{spring-version}/javadoc-api/org/springframework/context/ApplicationContext.html
 :core-ResourcePatternResolver: http://docs.spring.io/spring/docs/{spring-version}/javadoc-api/org/springframework/core/io/support/ResourcePatternResolver.html
+:core-ref-util: http://docs.spring.io/spring/docs/{spring-version}/spring-framework-reference/html/xsd-config.html#xsd-config-body-schemas-util-properties
 :shdp-FsShell: http://docs.spring.io/spring-hadoop/docs/{spring-hadoop-version}/api/org/springframework/data/hadoop/fs/FsShell.html
 :shdp-DistCp: http://docs.spring.io/spring-hadoop/docs/{spring-hadoop-version}/api/org/springframework/data/hadoop/fs/DistCp.html
 :shdp-HdfsResourceLoader: http://docs.spring.io/spring-hadoop/docs/{spring-hadoop-version}/api/org/springframework/data/hadoop/fs/HdfsResourceLoader.html
@@ -14,8 +15,7 @@ include::preface.adoc[]
 include::introduction.adoc[]
 
 [[springandhadoop]]
-= Spring and Hadoop
-
+include::springandhadoop.adoc[]
 include::springandhadoop-config.adoc[]
 include::springandhadoop-fs.adoc[]
 include::springandhadoop-store.adoc[]

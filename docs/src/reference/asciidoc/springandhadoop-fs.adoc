@@ -1,3 +1,4 @@
+[[springandhadoop-fs]]
 == Working with the Hadoop File System
 
 A common task in Hadoop is interacting with its file system, whether for

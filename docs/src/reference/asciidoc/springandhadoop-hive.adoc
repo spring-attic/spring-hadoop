@@ -1,3 +1,4 @@
+[[springandhadoop-hive]]
 == Hive integration
 
 When working with http://hive.apache.org[] from a Java environment, one

@@ -1,3 +1,4 @@
+[[springandhadoop-testing]]
 == Testing Support
 
 Hadoop testing has always been a cumbersome process especially if you

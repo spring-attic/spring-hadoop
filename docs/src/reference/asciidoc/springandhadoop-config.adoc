@@ -1,3 +1,4 @@
+[[springandhadoop-config]]
 == Hadoop Configuration, MapReduce, and Distributed Cache
 
 One of the common tasks when using Hadoop is interacting with its
@@ -200,9 +201,7 @@ test suite to cope with the differences between the different
 development boxes and the CI server.
 
 Additionally, external `Properties` files can be loaded, `Properties`
-beans (typically declared through Spring's `
-        
-      ` namespace). Along with the nested properties declaration, this
+beans (typically declared through Spring's {core-ref-util}[util] namespace). Along with the nested properties declaration, this
 allows customized configurations to be easily declared:
 
 [source,xml]

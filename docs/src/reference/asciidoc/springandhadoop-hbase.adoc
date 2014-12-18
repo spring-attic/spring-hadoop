@@ -1,3 +1,4 @@
+[[springandhadoop-hbase]]
 == Working with HBase
 
 SHDP provides basic configuration for http://hbase.apache.org[HBase]

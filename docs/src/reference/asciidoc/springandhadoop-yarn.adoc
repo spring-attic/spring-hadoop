@@ -1,3 +1,4 @@
+[[springandhadoop-yarn]]
 == Yarn Support
 
 You've propbably seen a lot of topics around Yarn and next version of

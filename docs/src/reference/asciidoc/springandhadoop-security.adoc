@@ -1,3 +1,4 @@
+[[springandhadoop-security]]
 == Security Support
 
 Spring for Apache Hadoop is aware of the security constraints of the

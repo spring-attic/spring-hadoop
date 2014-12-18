@@ -1,3 +1,4 @@
+[[springandhadoop-store]]
 == Writing and reading data using the Hadoop File System
 
 The Store sub-project of Spring for Apache Hadoop provides abstractions

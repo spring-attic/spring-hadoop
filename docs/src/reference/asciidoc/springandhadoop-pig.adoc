@@ -1,3 +1,4 @@
+[[springandhadoop-pig]]
 == Pig support
 
 For http://pig.apache.org[Pig] users, SHDP provides easy creation and

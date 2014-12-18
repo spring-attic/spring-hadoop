@@ -68,7 +68,7 @@ guide. There should be a link for "Single Node Setup".
 It is also convenient to download a Virtual Machine where Hadoop is
 setup and ready to go. Cloudera, Hortonworks and Pivotal all provide
 virtual machines and provide VM downloads on their product pages.
-Additionally, the link:#appendices[appendix] provides information on how
+Additionally, the <<appendices>> link:#appendices[appendix] provides information on how
 to use Spring for Apache Hadoop and setup Hadoop with cloud providers,
 such as Amazon Web Services.
 
@@ -93,23 +93,4 @@ http://creativecommons.org/about[Creative Commons] organization.
 https://github.com/spring-projects/spring-data-book/tree/master/hadoop[examples]_. +
 Complete running samples for the Spring Data book. Note that some of
 them are available inside Spring for Apache Hadoop samples as well.
-
-This part of the reference documentation explains the core functionality
-that Spring for Apache Hadoop (SHDP) provides to any Spring based
-application.
-
-? describes the Spring support for bootstrapping, initializing and
-working with core Hadoop.
-
-? describes the Spring support for interacting with the Hadoop file
-system.
-
-? describes the Spring support for HBase.
-
-? describes the Hive integration in SHDP.
-
-? describes the Pig support in Spring for Apache Hadoop.
-
-? describes how to configure and interact with Hadoop in a secure
-environment.
 
