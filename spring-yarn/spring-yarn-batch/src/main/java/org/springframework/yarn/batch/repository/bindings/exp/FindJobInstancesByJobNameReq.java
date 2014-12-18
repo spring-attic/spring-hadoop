@@ -19,7 +19,7 @@ import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.yarn.integration.ip.mind.binding.BaseObject;
 
 /**
- * Request binding for {@link JobExplorer#getJobInstancesByJobName(String, int, int)}.
+ * Request binding for {@link JobExplorer#getJobInstances(String, int, int)}.
  *
  * @author Janne Valkealahti
  *

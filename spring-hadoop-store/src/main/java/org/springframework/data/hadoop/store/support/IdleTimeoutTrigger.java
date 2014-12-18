@@ -80,7 +80,7 @@ public class IdleTimeoutTrigger implements Trigger {
 	 * Specify the delay for the initial execution. It will be evaluated in terms of this trigger's {@link TimeUnit}. If
 	 * no time unit was explicitly provided upon instantiation, the default is milliseconds.
 	 *
-	 * @param initialDelay
+	 * @param initialDelay initial delay
 	 */
 	public void setInitialDelay(long initialDelay) {
 		this.initialDelay = timeUnit.toMillis(initialDelay);

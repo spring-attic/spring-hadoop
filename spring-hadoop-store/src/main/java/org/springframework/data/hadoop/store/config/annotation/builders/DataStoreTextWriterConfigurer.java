@@ -148,6 +148,8 @@ public interface DataStoreTextWriterConfigurer {
 	 * <br>
 	 * No equivalent
 	 *
+	 * @param configuration the hadoop configuration
+	 *
 	 * @return {@link DataStoreTextWriterConfigurer} for chaining
 	 */
 	DataStoreTextWriterConfigurer configuration(Configuration configuration);
@@ -169,6 +171,8 @@ public interface DataStoreTextWriterConfigurer {
 	 * <br>XML:
 	 * <br>
 	 * No equivalent
+	 *
+	 * @param path the path
 	 *
 	 * @return {@link DataStoreTextWriterConfigurer} for chaining
 	 */
@@ -192,6 +196,8 @@ public interface DataStoreTextWriterConfigurer {
 	 * <br>
 	 * No equivalent
 	 *
+	 * @param path the path
+	 *
 	 * @return {@link DataStoreTextWriterConfigurer} for chaining
 	 */
 	DataStoreTextWriterConfigurer basePath(String path);
@@ -213,6 +219,8 @@ public interface DataStoreTextWriterConfigurer {
 	 * <br>XML:
 	 * <br>
 	 * No equivalent
+	 *
+	 * @param codec the codec
 	 *
 	 * @return {@link DataStoreTextWriterConfigurer} for chaining
 	 */
@@ -236,6 +244,8 @@ public interface DataStoreTextWriterConfigurer {
 	 * <br>
 	 * No equivalent
 	 *
+	 * @param codec the codec
+	 *
 	 * @return {@link DataStoreTextWriterConfigurer} for chaining
 	 */
 	DataStoreTextWriterConfigurer codec(String codec);
@@ -257,6 +267,8 @@ public interface DataStoreTextWriterConfigurer {
 	 * <br>XML:
 	 * <br>
 	 * No equivalent
+	 *
+	 * @param codec the codec
 	 *
 	 * @return {@link DataStoreTextWriterConfigurer} for chaining
 	 */
@@ -280,6 +292,8 @@ public interface DataStoreTextWriterConfigurer {
 	 * <br>
 	 * No equivalent
 	 *
+	 * @param overwrite enable overwrite
+	 *
 	 * @return {@link DataStoreTextWriterConfigurer} for chaining
 	 */
 	DataStoreTextWriterConfigurer overwrite(boolean overwrite);
@@ -301,6 +315,8 @@ public interface DataStoreTextWriterConfigurer {
 	 * <br>XML:
 	 * <br>
 	 * No equivalent
+	 *
+	 * @param append enable append support
 	 *
 	 * @return {@link DataStoreTextWriterConfigurer} for chaining
 	 */
@@ -324,6 +340,8 @@ public interface DataStoreTextWriterConfigurer {
 	 * <br>
 	 * No equivalent
 	 *
+	 * @param prefix the in-writing prefix
+	 *
 	 * @return {@link DataStoreTextWriterConfigurer} for chaining
 	 */
 	DataStoreTextWriterConfigurer inWritingPrefix(String prefix);
@@ -345,6 +363,8 @@ public interface DataStoreTextWriterConfigurer {
 	 * <br>XML:
 	 * <br>
 	 * No equivalent
+	 *
+	 * @param suffix the in-writing suffix
 	 *
 	 * @return {@link DataStoreTextWriterConfigurer} for chaining
 	 */
@@ -368,6 +388,8 @@ public interface DataStoreTextWriterConfigurer {
 	 * <br>
 	 * No equivalent
 	 *
+	 * @param timeout the idle timeout
+	 *
 	 * @return {@link DataStoreTextWriterConfigurer} for chaining
 	 */
 	DataStoreTextWriterConfigurer idleTimeout(long timeout);
@@ -389,6 +411,8 @@ public interface DataStoreTextWriterConfigurer {
 	 * <br>XML:
 	 * <br>
 	 * No equivalent
+	 *
+	 * @param attempts the attemps count
 	 *
 	 * @return {@link DataStoreTextWriterConfigurer} for chaining
 	 */

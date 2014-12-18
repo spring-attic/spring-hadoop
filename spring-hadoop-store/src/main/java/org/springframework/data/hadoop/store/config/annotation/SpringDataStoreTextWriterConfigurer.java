@@ -18,6 +18,7 @@ package org.springframework.data.hadoop.store.config.annotation;
 import org.apache.hadoop.conf.Configuration;
 import org.springframework.data.hadoop.config.common.annotation.AnnotationBuilder;
 import org.springframework.data.hadoop.config.common.annotation.AnnotationConfigurer;
+import org.springframework.data.hadoop.store.config.annotation.builders.DataStoreTextWriterBuilder;
 import org.springframework.data.hadoop.store.config.annotation.builders.DataStoreTextWriterConfigurer;
 import org.springframework.data.hadoop.store.config.annotation.builders.SpringDataStoreTextWriterBuilder;
 

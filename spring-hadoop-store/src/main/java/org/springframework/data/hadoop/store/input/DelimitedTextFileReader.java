@@ -77,6 +77,7 @@ public class DelimitedTextFileReader implements DataStoreReader<List<String>> {
 	 * @param configuration the configuration
 	 * @param basePath the base path
 	 * @param codec the codec
+	 * @param inputSplit the input split
 	 * @param fieldDelimiter the field delimiter
 	 * @param textDelimiter the text delimiter
 	 */

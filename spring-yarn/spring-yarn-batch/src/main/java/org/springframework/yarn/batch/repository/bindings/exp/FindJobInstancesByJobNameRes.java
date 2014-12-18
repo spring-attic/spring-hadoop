@@ -22,7 +22,7 @@ import org.springframework.yarn.batch.repository.bindings.JobInstanceType;
 import org.springframework.yarn.integration.ip.mind.binding.BaseResponseObject;
 
 /**
- * Response binding for {@link JobExplorer#getJobInstancesByJobName(String, int, int)}.
+ * Response binding for {@link JobExplorer#getJobInstances(String, int, int)}.
  *
  * @author Janne Valkealahti
  *

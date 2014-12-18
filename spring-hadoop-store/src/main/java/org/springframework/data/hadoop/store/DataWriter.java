@@ -30,6 +30,7 @@ public interface DataWriter<T> {
 	/**
 	 * Write an entity.
 	 *
+	 * @param entity the entity to write
 	 * @throws IOException if an I/O error occurs
 	 */
 	void write(T entity) throws IOException;

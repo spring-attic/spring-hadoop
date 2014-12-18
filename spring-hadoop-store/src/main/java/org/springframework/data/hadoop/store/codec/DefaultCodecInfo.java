@@ -35,6 +35,7 @@ public class DefaultCodecInfo implements CodecInfo {
 	 *
 	 * @param clazz the clazz of a codec
 	 * @param splittable the info if codec is splittable
+	 * @param suffix the suffix
 	 */
 	public DefaultCodecInfo(String clazz, boolean splittable, String suffix) {
 		super();

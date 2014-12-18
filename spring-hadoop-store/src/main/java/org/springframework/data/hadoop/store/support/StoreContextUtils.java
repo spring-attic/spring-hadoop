@@ -40,6 +40,7 @@ public class StoreContextUtils {
 	 * Return the {@link TaskScheduler} bean whose name is "taskScheduler" if available.
 	 *
 	 * @param beanFactory BeanFactory for lookup, must not be null.
+	 * @return the task scheduler
 	 */
 	public static TaskScheduler getTaskScheduler(BeanFactory beanFactory) {
 		return getBeanOfType(beanFactory, TASK_SCHEDULER_BEAN_NAME, TaskScheduler.class);
@@ -49,6 +50,7 @@ public class StoreContextUtils {
 	 * Return the {@link TaskScheduler} bean whose name is "taskExecutor" if available.
 	 *
 	 * @param beanFactory BeanFactory for lookup, must not be null.
+	 * @return the task executor
 	 */
 	public static TaskExecutor getTaskExecutor(BeanFactory beanFactory) {
 		return getBeanOfType(beanFactory, TASK_EXECUTOR_BEAN_NAME, TaskExecutor.class);
@@ -58,6 +60,7 @@ public class StoreContextUtils {
 	 * Return the {@link StoreEventPublisher} bean whose name is "storeEventPublisher" if available.
 	 *
 	 * @param beanFactory BeanFactory for lookup, must not be null.
+	 * @return the store event publisher
 	 */
 	public static StoreEventPublisher getEventPublisher(BeanFactory beanFactory) {
 		return getBeanOfType(beanFactory, StoreSystemConstants.DEFAULT_ID_EVENT_PUBLISHER,

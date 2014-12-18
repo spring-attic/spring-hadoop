@@ -29,6 +29,7 @@ public interface FileNamingStrategy extends FileNamingStrategyFactory<FileNaming
 	/**
 	 * Resolve a current file path denoted by this strategy.
 	 *
+	 * @param path the path
 	 * @return the path
 	 */
 	Path resolve(Path path);

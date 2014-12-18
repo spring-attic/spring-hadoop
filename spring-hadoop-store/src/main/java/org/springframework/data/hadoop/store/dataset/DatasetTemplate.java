@@ -66,7 +66,7 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 
 	/**
 	 * The {@link DatasetRepositoryFactory} to use for this template.
-	 * 
+	 *
 	 * @param datasetRepositoryFactory the DatasetRepositoryFactory to use
 	 */
 	public void setDatasetRepositoryFactory(DatasetRepositoryFactory datasetRepositoryFactory) {
@@ -75,6 +75,8 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 
 	/**
 	 * The default {@link DatasetDefinition} used for this template.
+	 *
+	 * @return the default dataset definition
 	 */
 	public DatasetDefinition getDefaultDatasetDefinition() {
 		return defaultDatasetDefinition;
@@ -94,6 +96,8 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 
 	/**
 	 * The {@link DatasetDefinition}s used for this template.
+	 *
+	 * @return the dataset definitions
 	 */
 	public Collection<DatasetDefinition> getDatasetDefinitions() {
 		return datasetDefinitions.values();

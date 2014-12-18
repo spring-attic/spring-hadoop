@@ -66,6 +66,9 @@ public interface NamingStrategyConfigurer extends AnnotationConfigurerBuilder<Da
 	 * <br>
 	 * No equivalent
 	 *
+	 * @param name the base name
+	 * @param prefix the naming prefix
+	 *
 	 * @return {@link NamingStrategyConfigurer} for chaining
 	 */
 	NamingStrategyConfigurer name(String name, String prefix);
@@ -88,6 +91,8 @@ public interface NamingStrategyConfigurer extends AnnotationConfigurerBuilder<Da
 	 * <br>XML:
 	 * <br>
 	 * No equivalent
+	 *
+	 * @param name the base name
 	 *
 	 * @return {@link NamingStrategyConfigurer} for chaining
 	 */

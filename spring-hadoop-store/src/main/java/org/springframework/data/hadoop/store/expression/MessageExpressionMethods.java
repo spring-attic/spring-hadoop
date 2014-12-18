@@ -82,6 +82,7 @@ public class MessageExpressionMethods {
 	 *
 	 * @param <T> the generic type
 	 * @param expression the expression
+	 * @param message the message
 	 * @param desiredResultType the desired result type
 	 * @return the value
 	 * @throws EvaluationException the evaluation exception

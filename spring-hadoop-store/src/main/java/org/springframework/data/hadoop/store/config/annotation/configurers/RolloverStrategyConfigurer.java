@@ -63,6 +63,8 @@ public interface RolloverStrategyConfigurer extends AnnotationConfigurerBuilder<
 	 * <br>
 	 * No equivalent
 	 *
+	 * @param size the size
+	 *
 	 * @return {@link RolloverStrategyConfigurer} for chaining
 	 */
 	RolloverStrategyConfigurer size(long size);
@@ -86,6 +88,8 @@ public interface RolloverStrategyConfigurer extends AnnotationConfigurerBuilder<
 	 * <br>XML:
 	 * <br>
 	 * No equivalent
+	 *
+	 * @param size the size
 	 *
 	 * @return {@link RolloverStrategyConfigurer} for chaining
 	 */

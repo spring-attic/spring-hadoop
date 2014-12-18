@@ -65,6 +65,8 @@ public interface PartitionStrategyConfigurer extends AnnotationConfigurerBuilder
 	 * <br>
 	 * No equivalent
 	 *
+	 * @param partitionStrategy the partition strategy
+	 *
 	 * @return {@link PartitionStrategyConfigurer} for chaining
 	 */
 	PartitionStrategyConfigurer custom(PartitionStrategy<?, ?> partitionStrategy);
@@ -88,6 +90,8 @@ public interface PartitionStrategyConfigurer extends AnnotationConfigurerBuilder
 	 * <br>XML:
 	 * <br>
 	 * No equivalent
+	 *
+	 * @param expression the partition expression
 	 *
 	 * @return {@link PartitionStrategyConfigurer} for chaining
 	 */

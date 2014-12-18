@@ -23,7 +23,7 @@ import java.util.Collection;
 /**
  * Interface specifying a basic set of {@link org.kitesdk.data.Dataset} operations against a specific
  * {@link org.kitesdk.data.spi.DatasetRepository}. Implemented by DatasetTemplate.
- * 
+ *
  * @author Thomas Risberg
  * @since 2.0
  */
@@ -31,16 +31,18 @@ public interface DatasetOperations {
 
 	/**
 	 * Read all records in the dataset and call the provided callback for each record.
-	 * 
+	 *
 	 * @param targetClass the class that is stored in the dataset
 	 * @param callback the callback to be called for each record
+	 * @param <T> the class type
 	 */
 	<T> void read(Class<T> targetClass, RecordCallback<T> callback);
 
 	/**
 	 * Read all records in the dataset and return as a collection.
-	 * 
+	 *
 	 * @param targetClass the class that is stored in the dataset
+	 * @param <T> the class type
 	 * @return collection containing the records as the specified target class
 	 */
 	<T> Collection<T> read(Class<T> targetClass);
@@ -51,6 +53,7 @@ public interface DatasetOperations {
 	 * @param targetClass the class that is stored in the dataset
 	 * @param callback the callback to be called for each record
 	 * @param viewCallback the view callback to create the view
+	 * @param <T> the class type
 	 */
 	<T> void read(Class<T> targetClass, RecordCallback<T> callback, ViewCallback viewCallback);
 
@@ -59,28 +62,31 @@ public interface DatasetOperations {
 	 *
 	 * @param targetClass the class that is stored in the dataset
 	 * @param viewCallback the view callback to create the view
+	 * @param <T> the class type
 	 * @return collection containing the records as the specified target class
 	 */
 	<T> Collection<T> read(Class<T> targetClass, ViewCallback viewCallback);
 
 	/**
 	 * Write all records provided in the record collection
-	 * 
+	 *
 	 * @param records the records to write
+	 * @param <T> the class type
 	 */
 	<T> void write(Collection<T> records);
 
 	/**
 	 * Execute a callback for the {@link org.kitesdk.data.spi.DatasetRepository}
-	 * 
+	 *
 	 * @param callback the callback
 	 */
 	void execute(DatasetRepositoryCallback callback);
 
 	/**
 	 * Get the {@link org.kitesdk.data.DatasetDescriptor} for the given class
-	 * 
+	 *
 	 * @param targetClass the class stored in the dataset
+	 * @param <T> the class type
 	 * @return the DatasetDescriptor
 	 */
 	<T> DatasetDescriptor getDatasetDescriptor(Class<T> targetClass);
@@ -89,6 +95,7 @@ public interface DatasetOperations {
 	 * Get the dataset name to be used for the given class
 	 *
 	 * @param targetClass the class stored in the dataset
+	 * @param <T> the class type
 	 * @return the dataset name
 	 */
 	<T> String getDatasetName(Class<T> targetClass);
