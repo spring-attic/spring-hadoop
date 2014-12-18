@@ -5,6 +5,38 @@ http://projects.spring.io/spring-hadoop/
 Commit changelog: http://github.com/spring-projects/spring-hadoop/tree/v[version]
 Issues changelog: https://jira.spring.io/secure/ReleaseNote.jspa?projectId=10801
 
+Changes in version 2.1.0 M3 (2014-12-18)
+----------------------------------------
+General
+* Update to Spring Boot 1.2.0 and Spring Core 4.1.3 [SHDP-453]
+* Upgrade to SI 4.1.0 [SHDP-433]
+* Update the build to support Hortonworks HDP 2.2 [SHDP-442]
+* Update the build to support Hadoop 2.6.0 [SHDP-445]
+* Update Kite SDK to 0.17.1 [SHDP-448]
+* Update docs for 2.1.0.M3 [SHDP-450]
+* Fix test failures with Pig 0.14.0 [SHDP-454]
+* Add boot autoconfiguration for shdp core config [SHDP-410]
+* Add FsShell boot auto-configuration [SHDP-449]
+
+Store
+* Remove unsupported lzo codecs [SHDP-356]
+* DefaultPartitionStrategy now uses SpEL compiler [SHDP-427]
+* PartitionTextFileWriter may leave in-use prefix/suffix behind [SHDP-436]
+* PartitionTextFileWriter doesn't stop TextFileWriter [SHDP-447]
+* Allow to define CompressionType in datasets [SHDP-437]
+* Move MessagePartitionStrategy and related classes to main jar [SHDP-428]
+* Add support for using externally defined Avro schema [SHDP-329]
+
+YARN
+* Fix YarnContainerClusterMvcEndpoint registered twice [SHDP-430]
+* Support multiple @YarnComponents [SHDP-431]
+* Make @YarnComponent easier for long running container [SHDP-432]
+* Abstract boot app run in AbstractApplicationCommand [SHDP-429]
+* Support ListenableFuture in YarnComponent [SHDP-443] 
+* Support graceful yarn app shutdown [SHDP-439]
+* Change container cluster create/modify options [SHDP-426]    
+    
+
 Changes in version 2.1.0 M2 (2014-11-13)
 ----------------------------------------
 General
