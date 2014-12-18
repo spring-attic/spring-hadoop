@@ -29,14 +29,11 @@ by default built against http://hadoop.apache.org/[Apache Hadoop] 2.5.1.
 Spring for Apache Hadoop 2.1 supports the following versions and
 distributions:
 
-* http://hadoop.apache.org/[Apache Hadoop] 2.4.1 *
-* http://hadoop.apache.org/[Apache Hadoop] 2.5.1 *
-* http://www.gopivotal.com/[Pivotal] HD 2.1 *
-* http://www.cloudera.com/[Cloudera] CDH5 (2.5.0-cdh5.2.0) *
-* http://www.hortonworks.com/[Hortonworks] Data Platform 2.1 *
-
-* The distributions noted with and asterisk will include spring-yarn
-support in the build.
+* http://hadoop.apache.org/[Apache Hadoop] 2.4.1
+* http://hadoop.apache.org/[Apache Hadoop] 2.5.1
+* http://www.gopivotal.com/[Pivotal] HD 2.1
+* http://www.cloudera.com/[Cloudera] CDH5 (2.5.0-cdh5.2.0)
+* http://www.hortonworks.com/[Hortonworks] Data Platform 2.1
 
 Any distribution compatible with Apache Hadoop 2.2.x or later should be
 usable.
