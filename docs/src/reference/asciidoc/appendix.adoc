@@ -1,0 +1,406 @@
+[[appendices]]
+= Appendices
+
+:numbered!:
+
+[appendix]
+== Using Spring for Apache Hadoop with Amazon EMR
+A popular option for creating on-demand Hadoop cluster is Amazon Elastic
+Map Reduce or http://aws.amazon.com/elasticmapreduce/[Amazon EMR
+service]. The user can through the command-line, API or a web UI
+configure, start, stop and manage a Hadoop cluster in the _cloud_
+without having to worry about the actual set-up or hardware resources
+used by the cluster. However, as the setup is different then a _locally_
+available cluster, so does the interaction between the application that
+want to use it and the target cluster. This section provides information
+on how to setup Amazon EMR with Spring for Apache Hadoop so the changes
+between a using a local, pseudo-distributed or owned cluster and EMR are
+minimal.
+
+[IMPORTANT]
+====
+This chapter assumes the user is familiar with Amazon EMR and the cost
+associated with it and its related services - we strongly recommend
+getting familiar with the official EMR documentation.
+====
+
+One of the big differences when using Amazon EMR versus a local cluster
+is the lack of access of the file system server and the job tracker.
+This means submitting jobs or reading and writing to the file-system
+isn't available out of the box - which is understandable for security
+reasons. If the cluster would be open, if could be easily abused while
+charging its rightful owner. However, it is fairly straight-forward to
+get access to both the file system and the job tracker so the deployment
+flow does not have to change.
+
+Amazon EMR allows clusters to be created through the management console,
+through the API or the command-line. This documentation will focus on
+the
+http://docs.amazonwebservices.com/ElasticMapReduce/latest/GettingStartedGuide/SignUp.html#emr-gsg-install-cli[command-line]
+but the setup is not limited to it - feel free to adjust it according to
+your needs or preference. Make sure to properly setup the
+http://docs.amazonwebservices.com/ElasticMapReduce/latest/GettingStartedGuide/SignUp.html#ConfigCredentials[credentials]
+so that the S3 file-system can be properly accessed.
+
+=== Start up the cluster
+
+[IMPORTANT]
+====
+Make sure you read the whole chapter before starting up the EMR cluster
+====
+
+A nice feature of Amazon EMR is starting a cluster for an indefinite
+period. That is rather then submitting a job and creating the cluster
+until it finished, one can create a cluster (along side a job) but
+request to be kept _alive_ even if there is no work for it. This is
+http://docs.amazonwebservices.com/ElasticMapReduce/latest/GettingStartedGuide/Essentials.html#emr-gsg-creating-a-job-flow[easily
+done] through the `--create --alive` parameters:
+
+------------------------------------
+./elastic-mapreduce --create --alive
+------------------------------------
+
+The output will be similar to this:
+----------------
+Created job flow
+----------------
+
+One can verify the results in the console through the `list` command or
+through the web management console. Depending on the cluster setup and
+the user account, the Hadoop cluster initialization should be complete
+anywhere between 1 to 5 minutes. The cluster is ready once its state
+changes from `STARTING/PROVISIONING` to `WAITING`.
+
+[NOTE]
+====
+By default, each newly created cluster has a new public IP that is not
+typically reused. To simplify the setup, one can use
+Amazon Elastic IP, that is a static, predefined IP, so that she knows before-hand the
+cluster address. Refer to this
+section inside the EMR documentation for more information. As an
+alternative, one can use the EC2 API in combinatioon with the EMR API
+to retrieve the private IP of address of the master node of her cluster
+or even programatically configure and start the EMR cluster on demand
+without having to hard-code the private IPs.
+====
+
+However, to remotely access the cluster from outside (as oppose to just
+running a jar within the cluster), one needs to tweak the cluster
+settings just a tiny bit - as mentioned below.
+
+=== Open an SSH Tunnel as a SOCKS proxy
+
+Due to security reasons, the EMR cluster is not exposed to the outside
+world and is bound only to the machine internal IP. While you can open
+up the firewall to allow access (note that you also have to do some port
+forwarding since again, Hadoop is bound to the cluster internal IP
+rather then all available network cards), it is recommended to use a SSH
+tunnel instead. The SSH tunnel provides a secure connection between your
+machine on the cluster preventing any snooping or man-in-the-middle
+attacks. Further more it is quite easy to automate and be executed along
+side the cluster creation, programmatically or through some script. The
+Amazon EMR docs have dedicated sections on
+http://docs.amazonwebservices.com/ElasticMapReduce/latest/GettingStartedGuide/SignUp.html#emr-gsg-ssh-setup-config[SSH
+Setup and Configuration] and on opening a
+http://docs.amazonwebservices.com/ElasticMapReduce/latest/DeveloperGuide/emr-ssh-tunnel.html[SSH
+Tunnel to the master node] so please refer to them. Make sure to setup
+the SSH tunnel as a SOCKS proxy, that is to redirect all calls to remote
+ports - this is crucial when working with Hadoop (or other applications)
+that use a range of ports for communication.
+
+=== Configuring Hadoop to use a SOCKS proxy
+
+Once the tunnel or the SOCKS proxy is in place, one needs to configure
+Hadoop to use it. By default, Hadoop makes connections directly to its
+target which is fine for regular use, but in this case, we need to use
+the SOCKS proxy to pass through the firewall. One can do so through the
+`hadoop.rpc.socket.factory.class.default` and `hadoop.socks.server`
+properties:
+
+--------------------------------------------------------------------------------
+hadoop.rpc.socket.factory.class.default=org.apache.hadoop.net.SocksSocketFactory
+# this configure assumes the SOCKS proxy is opened on local port 6666
+hadoop.socks.server=localhost:6666
+--------------------------------------------------------------------------------
+
+At this point, all Hadoop communication will go through the SOCKS proxy
+at localhost on port 6666. The main advantage is that all the IPs,
+domain names, ports are resolved on the 'remote' side of the proxy so
+one can just start using the remote cluster IPs. However, only the
+Hadoop client needs to use the proxy - to avoid having the client
+configuration be read by the cluster nodes (which would mean the nodes
+would try to use a SOCKS proxy on the remote side as well), make sure
+the master node (and thus all its nodes) `hadoop-site.xml` marks the
+default network setting as final (see this
+http://blog.cloudera.com/blog/2008/12/securing-a-hadoop-cluster-through-a-gateway/[blog
+post] for a detailed explanation):
+
+[source,xml]
+----
+<property>
+    <name>hadoop.rpc.socket.factory.class.default</name>
+    <value>org.apache.hadoop.net.StandardSocketFactory</value>
+    <final>true</final>
+</property>
+----
+
+Simply pass this configuration (and other options that you might have)
+to the master node using a
+http://docs.aws.amazon.com/ElasticMapReduce/latest/DeveloperGuide/Bootstrap.html[bootstrap]
+action. One can find this file ready for usage, already deployed to
+Amazon S3 at
+http://dist.springframework.org.s3.amazonaws.com/release/SHDP/emr-settings.xml[s3://dist.springframework.org/release/SHDP/emr-settings.xml].
+Simply pass the file to command-line used for firing up the EMR cluster:
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+./elastic-mapreduce --create --alive --bootstrap-action s3://elasticmapreduce/bootstrap-actions/configure-hadoop --args "--site-config-file,s3://dist.springframework.org/release/SHDP/emr-settings.xml"
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+[NOTE]
+====
+For security reasons, we recommend copying the 'emr-settings.xml' file
+to one of your S3 buckets and use that location instead.
+====
+
+=== Accessing the file-system
+
+Amazon EMR offers Simple Storage Service, also known as
+http://aws.amazon.com/s3/[S3] service, as means for durable read-write
+storage for EMR. While the cluster is active, one can write additional
+data to HDFS but unless S3 is used, the data will be lost once the
+cluster shuts down. Note that when using an S3 location for the first
+time, the proper
+http://docs.amazonwebservices.com/ElasticMapReduce/latest/DeveloperGuide/emr-s3-acls.html[access
+permissions] needs to be setup. Accessing S3 is easier then the job
+tracker - in fact the Hadoop distribution provides not one but two
+file-system
+http://docs.amazonwebservices.com/ElasticMapReduce/latest/DeveloperGuide/FileSystemConfig.html[implementations
+for S3]:
+
+.Hadoop S3 File Systems
+[width="100%",cols="20%,20%,20%,40%",options="header",]
+|=======================================================================
+|Name |URI Prefix |Access Method |Description
+|S3 Native FS |`s3n://` |S3 Native |Native access to S3. The recommended
+file-system as the data is read/written in its native format and can be
+used not just by Hadoop but also other systems without any translation.
+The down-side is that it does not support large files (5GB) out of the
+box (though there is a work-around through the
+http://docs.amazonwebservices.com/ElasticMapReduce/latest/DeveloperGuide/Config_Multipart.html#Config_Multipart.title[multipart]
+upload feature).
+
+|S3 Block FS |`s3://` |Block Based |The files are stored as blocks
+(similar to the underlying structure in HDFS). This is somewhat more
+efficient in terms of renames and file sizes but requires a dedicated
+bucket and is not inter-operable with other S3 tools.
+|=======================================================================
+
+To access the data in S3 one can either use an HDFS file-system on top
+of it, which requires no extra setup, or copy the data from S3 to the
+HDFS cluster using manual tools,
+http://wiki.apache.org/hadoop/AmazonS3#Running_bulk_copies_in_and_out_of_S3[distcp
+with S3], its dedicated version
+http://docs.amazonwebservices.com/ElasticMapReduce/latest/DeveloperGuide/UsingEMR_s3distcp.html[s3distcp],
+Hadoop
+http://docs.amazonwebservices.com/ElasticMapReduce/latest/DeveloperGuide/DistributedCache.html[DistributedCache]
+(which SHDP #hadoop:distributed-cache[supports] as well) or third-party
+tools such as http://s3tools.org/s3cmd[s3cmd].
+
+For newbies and development we recommend accessing the S3 directly
+through the File-System abstraction as in most cases, its performance is
+close to that of the data inside the native HDFS. When dealing with data
+that is read multiple times, copying the data from S3 locally inside the
+cluster might improve performance but we advice running some performance
+tests first.
+
+=== Shutting down the cluster
+
+Once the cluster is no longer needed for a longer period of time, one
+can shut it down fairly
+http://docs.amazonwebservices.com/ElasticMapReduce/latest/GettingStartedGuide/CleanUp.html[straight
+forward]:
+
+--------------------------------
+./elastic-mapreduce --terminate 
+--------------------------------
+
+Note that the EMR cluster is billed by the hour and since the time is
+rounded upwards, starting and shutting down the cluster repeateadly
+might end up being more expensive then just keeping it alive. Consult
+the
+http://aws.amazon.com/elasticmapreduce/faqs/#billing-2[documentation]
+for more information.
+
+=== Example configuration
+
+To put it all together, to use Amazon EMR one can use the following
+work-flow with SHDP:
+
+* Start an _alive_ cluster using the bootstrap action to guarantees the
+cluster does NOT use a socks proxy. Open a SSH tunnel, in SOCKS mode, to
+the EMR cluster.
++
+Start the cluster for an indefinite period. Once the server is up,
+create an SSH tunnel,in SOCKS mode, to the remote cluster. This allows
+the client to communicate directly with the remote nodes as if they are
+part of the same network.This step does not have to be repeated unless
+the cluster is terminated - one can (and should) submit multiple jobs to
+it.
+* Configure SHDP
+* Once the cluster is up and the SSH tunnel/SOCKS proxy is in place,
+point SHDP to the new configuration. The example below shows how the
+configuration can look like:
++
+hadoop-context.xml
++
+
+[source,xml]
+----
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:hdp="http://www.springframework.org/schema/hadoop"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
+
+<!-- property placeholder backed by hadoop.properties -->     
+<context:property-placeholder location="hadoop.properties"/>
+
+<!-- Hadoop FileSystem using a placeholder and emr.properties -->
+<hdp:configuration properties-location="emr.properties" file-system-uri="${hd.fs}" job-history-uri="${hd.jh}/>
+----
+
++
+hadoop.properties
++
+---------------------------------------------
+# Amazon EMR
+# S3 bucket backing the HDFS S3 fs
+hd.fs=s3n://my-working-bucket/
+# job tracker pointing to the EMR internal IP
+hd.jh=10.123.123.123:10020
+---------------------------------------------
++
+emr.properties
++
+--------------------------------------------------------------------------------
+# Amazon EMR
+# Use a SOCKS proxy 
+hadoop.rpc.socket.factory.class.default=org.apache.hadoop.net.SocksSocketFactory
+hadoop.socks.server=localhost:6666
+
+# S3 credentials
+# for s3:// uri
+fs.s3.awsAccessKeyId=XXXXXXXXXXXXXXXXXXXX
+fs.s3.awsSecretAccessKey=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+# for s3n:// uri
+fs.s3n.awsAccessKeyId=XXXXXXXXXXXXXXXXXXXX
+fs.s3n.awsSecretAccessKey=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+--------------------------------------------------------------------------------
++
+Spring Hadoop is now ready to talk to your Amazon EMR cluster. Try it
+out!
++
+
+[NOTE]
+====
+The inquisitive reader might wonder why the example above uses two
+properties file, hadoop.properties and emr.properties
+instead of just one. While one file is enough, the example tries to
+isolate the EMR configuration into a separate configuration (especially
+as it contains security credentials).
+====
+
+* Shutdown the tunnel and the cluster
++
+Once the jobs submitted are completed, unless new jobs are shortly
+scheduled, one can shutdown the cluster. Just like the first step, this
+is optional. Again, make sure you understand the billing process first.
+
+[appendix]
+== Using Spring for Apache Hadoop with EC2/Apache Whirr
+
+As mentioned above, those interested in using on-demand Hadoop clusters
+can use Amazon Elastic Map Reduce (or Amazon EMR) service. An
+alternative to that, for those that want maximum control over the
+cluster, is to use Amazon Elastic Compute Cloud or
+http://aws.amazon.com/ec2/[EC2]. EC2 is in fact the service on top of
+which Amazon EMR runs and that is, a resizable, configurable compute
+capacity in the cloud.
+
+[IMPORTANT]
+====
+This chapter assumes the user is familiar with Amazon EC2 and the
+cost associated with it and its related services - we strongly recommend
+getting familiar with the official EC2 documentation .
+====
+
+Just like Amazon EMR, using EC2 means the Hadoop cluster (or whatever
+service you run on it) runs in the cloud and thus 'development' access
+to it, is different then when running the service in local network.
+There are various tips and tools out there that can handle the initial
+provisioning and configure the access to the cluster. Such a solution is
+http://whirr.apache.org/[Apache Whirr] which is a set of libraries for
+running cloud services. Though it provides a Java API as well, one can
+easily configure, start and stop services from the command-line.
+
+=== Setting up the Hadoop cluster on EC2 with Apache Whirr
+
+The Whirr
+http://whirr.apache.org/docs/0.8.1/quick-start-guide.html[documentation]
+provides more detail on how to interact with the various cloud providers
+out-there through Whirr. In case of EC2, one needs Java 6 (which is
+required by Apache Hadoop), an account on EC2 and an SSH client
+(available out of the box on *nix platforms and freely downloadable
+(such as PuTTY) on Windows). Since Whirr does most of the heavy lifting,
+one needs to tell Whirr what Cloud provider and account is used, either
+by setting some environment properties or through the
+`~/.whirr/credentials file`:
+
+--------------------------------
+whirr.provider=aws-ec2
+whirr.identity=your-aws-key
+whirr.credential=your-aws-secret
+--------------------------------
+
+Now instruct Whirr to configure a Hadoop cluster on EC2 - just add the
+following properties to a configuration file (say `hadoop.properties`):
+
+--------------------------------------------------------------------------------------------------
+whirr.cluster-name=myhadoopcluster 
+whirr.instance-templates=1 hadoop-jobtracker+hadoop-namenode,1 hadoop-datanode+hadoop-tasktracker 
+whirr.provider=aws-ec2
+whirr.private-key-file=${sys:user.home}/.ssh/id_rsa
+whirr.public-key-file=${sys:user.home}/.ssh/id_rsa.pub
+--------------------------------------------------------------------------------------------------
+
+The configuration above assumes the SSH keys for your user have been
+already generated. Now start your Hadoop cluster:
+
+---------------------------------------------------
+bin/whirr launch-cluster --config hadoop.properties
+---------------------------------------------------
+
+As with Amazon EMR, one cannot correct to the Hadoop cluster from
+outside - however Whirr provides out of the box the feature to create an
+SSH tunnel to create a SOCKS proxy (on port 6666). When a cluster is
+created, Whirr creates a script to launch the cluster which may be found
+in `~/.whirr/cluster-name`. Run it as a follows (in a new terminal
+window):
+
+----------------------------------------
+~/.whirr/myhadoopcluster/hadoop-proxy.sh
+----------------------------------------
+
+At this point, one can just the #emr:socks[SOCKS proxy] configuration
+from the Amazon EMR section to configure the Hadoop client.
+
+To destroy the cluster, one can use the Amazon EMR console or Whirr
+itself:
+
+----------------------------------------------------
+bin/whirr destroy-cluster --config hadoop.properties
+----------------------------------------------------
+

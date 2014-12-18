@@ -1,0 +1,3348 @@
+[[springandhadoop-yarn]]
+== Yarn Support
+
+You've propbably seen a lot of topics around Yarn and next version of
+Hadoop's Map Reduce called _MapReduce Version 2_. Originally Yarn was a
+component of MapReduce itself created to overcome some performance
+issues in Hadoop's original design. The fundamental idea of MapReduce v2
+is to split up the two major functionalities of the JobTracker, resource
+management and job scheduling/monitoring, into separate daemons. The
+idea is to have a global _Resource Manager_ (RM) and per-application
+_Application Master_ (AM). An application is either a single job in the
+classical sense of Map-Reduce jobs or a group of jobs.
+
+Let's take a step back and see how original _MapReduce Version 1_ works.
+_Job Tracker_ is a global singleton entity responsible for managing
+resources like per node _Task Trackers_ and job life-cycle. _Task
+Tracker_ is responsible for executing tasks from a _Job Tracker_ and
+periodically reporting back the status of the tasks. Naturally there is
+a much more going on behind the scenes but the main point of this is
+that the _Job Tracker_ has always been a bottleneck in terms of
+scalability. This is where Yarn steps in by splitting the load away from
+a global resource management and job tracking into per application
+masters. Global resource manager can then concentrate in its main task
+of handling the management of resources.
+
+[NOTE]
+====
+Yarn is usually referred as a synonym for MapReduce Version 2.
+This is not exactly true and it's easier to understand the
+relationship between those two by saying that MapReduce Version 2
+is an application running on top of Yarn.
+====
+
+As we just mentioned _MapReduce Version 2_ is an application running of
+top of _Yarn_. It is possible to make similar custom _Yarn_ based
+application which have nothing to do with _MapReduce_. _Yarn_ itself
+doesn't know that it is running _MapReduce Version 2_. While there's
+nothing wrong to do everything from scratch one will soon realise that
+steps to learn how to work with _Yarn_ are rather deep. This is where
+Spring Hadoop support for Yarn steps in by trying to make things easier
+so that user could concentrate on his own code and not having to worry
+about framework internals.
+
+=== Using the Spring for Apache Yarn Namespace
+
+To simplify configuration, SHDP provides a dedicated namespace for
+_Yarn_ components. However, one can opt to configure the beans directly
+through the usual `<bean>` definition. For more information about XML
+Schema-based configuration in Spring, see
+http://docs.spring.io/spring/docs/4.0.x/spring-framework-reference/html/xsd-config.html[this]
+appendix in the Spring Framework reference documentation.
+
+To use the SHDP namespace, one just needs to import it inside the
+configuration:
+
+[source,xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:yarn="http://www.springframework.org/schema/yarn"<!--1--><!--2-->
+  xmlns:yarn-int="http://www.springframework.org/schema/yarn/integration"<!--3--><!--4-->
+  xmlns:yarn-batch="http://www.springframework.org/schema/yarn/batch"<!--5--><!--6-->
+  xsi:schemaLocation="
+    http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/yarn
+    http://www.springframework.org/schema/yarn/spring-yarn.xsd<!--7-->
+    http://www.springframework.org/schema/yarn/integration
+    http://www.springframework.org/schema/yarn/integration/spring-yarn-integration.xsd<!--8-->
+    http://www.springframework.org/schema/yarn/batch
+    http://www.springframework.org/schema/yarn/batch/spring-yarn-batch.xsd"><!--9-->
+
+  <bean id ... >
+
+  <yarn:configuration ...><!--10-->
+</beans>
+----
+
+<1> Spring for Apache Hadoop Yarn namespace prefix for core package. Any
+name can do but through out the reference documentation, the `yarn` will
+be used.
+
+<2> The namespace URI.
+
+<3> Spring for Apache Hadoop Yarn namespace prefix for integration package.
+Any name can do but through out the reference documentation, the
+`yarn-int` will be used.
+
+<4> The namespace URI.
+
+<5> Spring for Apache Hadoop Yarn namespace prefix for batch package. Any
+name can do but through out the reference documentation, the
+`yarn-batch` will be used.
+
+<6> The namespace URI.
+
+<7> The namespace URI location. Note that even though the location points to
+an external address (which exists and is valid), Spring will resolve the
+schema locally as it is included in the Spring for Apache Hadoop Yarn
+library.
+
+<8> The namespace URI location.
+
+<9> The namespace URI location.
+
+<10> Declaration example for the Yarn namespace. Notice the prefix usage.
+
+Once declared, the namespace elements can be declared simply by
+appending the aforementioned prefix. Note that is possible to change the
+default namespace, for example from `<beans>` to `<yarn>`. This is
+useful for configuration composed mainly of Hadoop components as it
+avoids declaring the prefix. To achieve this, simply swap the namespace
+prefix declaration above:
+
+[source,xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans
+xmlns="http://www.springframework.org/schema/yarn"<!--1-->
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:beans="http://www.springframework.org/schema/beans"<!--2-->
+  xsi:schemaLocation="
+    http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/yarn
+    http://www.springframework.org/schema/yarn/spring-yarn.xsd">
+
+    <beans:bean id ... ><!--3-->
+
+    <configuration ...><!--4-->
+
+</beans:beans>
+----
+
+<1> The default namespace declaration for this XML file points to the Spring
+for Apache Yarn namespace.
+
+<2> The beans namespace prefix declaration.
+
+<3> Bean declaration using the `<beans>` namespace. Notice the prefix.
+
+<4> Bean declaration using the `<yarn>` namespace. Notice the _lack_ of
+prefix (as `yarn` is the default namespace).
+
+=== Using the Spring for Apache Yarn JavaConfig
+
+It is also possible to work without XML configuration and rely on
+Annotation based configuration model. XML and JavaConfig for _Spring
+YARN_ are not full replacement for each others but we try to mimic the
+behaviour as much as we can.
+
+We basically rely on two concepts when working with JavaConfig. Firstly
+an annotation @EnableYarn is used to activate different parts of a
+Spring Configuration depending on _enable_ attribute. We can enable
+configuration for _CONTAINER_, _APPMASTER_ or _CLIENT_. Secondly when
+configuration is enabled one can use SpringYarnConfigurerAdapter whose
+callback methods can be used to do further configuration for components
+familiar from XML.
+
+[source,java]
+----
+@Configuration
+@EnableYarn(enable=Enable.CONTAINER)
+public class ContainerConfiguration extends SpringYarnConfigurerAdapter {
+
+  @Override
+  public void configure(YarnContainerConfigurer container) throws Exception {
+    container
+      .containerClass(MultiContextContainer.class);
+  }
+
+}
+----
+
+In above example we enabled configuration for _CONTAINER_ and used
+SpringYarnConfigurerAdapter and its `configure` callback method for
+YarnContainerConfigurer. In this method we instructed container class to
+be a MultiContextContainer.
+
+[source,java]
+----
+@Configuration
+@EnableYarn(enable=Enable.APPMASTER)
+public class AppmasterConfiguration extends SpringYarnConfigurerAdapter {
+
+  @Override
+  public void configure(YarnAppmasterConfigurer master) throws Exception {
+    master
+      .withContainerRunner();
+  }
+
+}
+----
+
+In above example we enabled configuration for _APPMASTER_ and because of
+this a callback method for YarnAppmasterConfigurer is called
+automatically.
+
+[source,java]
+----
+@Configuration
+@EnableYarn(enable=Enable.CLIENT)
+@PropertySource("classpath:hadoop.properties")
+public class ClientConfiguration extends SpringYarnConfigurerAdapter {
+
+  @Autowired
+  private Environment env;
+
+  @Override
+  public void configure(YarnConfigConfigurer config) throws Exception {
+    config
+      .fileSystemUri(env.getProperty("hd.fs"))
+      .resourceManagerAddress(env.getProperty("hd.rm"));
+  }
+
+  @Override
+  public void configure(YarnClientConfigurer client) throws Exception {
+    Properties arguments = new Properties();
+    arguments.put("container-count", "4");
+    client
+      .appName("multi-context-jc")
+      .withMasterRunner()
+        .contextClass(AppmasterConfiguration.class)
+        .arguments(arguments);
+}
+----
+
+In above example we enabled configuration for _CLIENT_. Here one will
+get yet another callback for YarnClientConfigurer. Additionally this
+shows how a Hadoop configuration can be customized using a callback for
+YarnConfigConfigurer.
+
+=== Configuring Yarn
+
+In order to use Hadoop and Yarn, one needs to first configure it namely
+by creating a `YarnConfiguration` object. The configuration holds
+information about the various parameters of the Yarn system.
+
+[NOTE]
+====
+Configuration for `<yarn:configuration>` looks very similar than
+`<hdp:configuration>`. Reason for this is a simple separation for
+Hadoop's YarnConfiguration and JobConf classes.
+====
+
+In its simplest form, the configuration definition is a one liner:
+
+[source,xml]
+----
+<yarn:configuration />
+----
+
+The declaration above defines a YarnConfiguration bean (to be precise a
+factory bean of type ConfigurationFactoryBean) named, by default,
+`yarnConfiguration`. The default name is used, by conventions, by the
+other elements that require a configuration - this leads to simple and
+very concise configurations as the main components can automatically
+wire themselves up without requiring any specific configuration.
+
+For scenarios where the defaults need to be tweaked, one can pass in
+additional configuration files:
+
+[source,xml]
+----
+<yarn:configuration resources="classpath:/custom-site.xml, classpath:/hq-site.xml">
+----
+
+In this example, two additional Hadoop configuration resources are added
+to the configuration.
+
+[NOTE]
+====
+Note that the configuration makes use of Spring's
+http://docs.spring.io/spring/docs/4.0.x/spring-framework-reference/html/resources.html[Resource]
+abstraction to locate the file. This allows various search patterns to
+be used, depending on the running environment or the prefix specified(if
+any) by the value - in this example the classpath is used.
+====
+
+In addition to referencing configuration resources, one can tweak Hadoop
+settings directly through Java Properties. This can be quite handy when
+just a few options need to be changed:
+
+[source,xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:yarn="http://www.springframework.org/schema/yarn"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/yarn http://www.springframework.org/schema/yarn/spring-yarn.xsd">
+        
+  <yarn:configuration>
+    fs.defaultFS=hdfs://localhost:9000
+    hadoop.tmp.dir=/tmp/hadoop
+    electric=sea
+  </yarn:configuration>
+</beans>
+----
+
+One can further customize the settings by avoiding the so called
+_hard-coded_ values by externalizing them so they can be replaced at
+runtime, based on the existing environment without touching the
+configuration:
+
+[source,xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:yarn="http://www.springframework.org/schema/yarn"
+  xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+    http://www.springframework.org/schema/yarn http://www.springframework.org/schema/yarn/spring-yarn.xsd">
+        
+  <yarn:configuration>
+    fs.defaultFS=${hd.fs}
+    hadoop.tmp.dir=file://${java.io.tmpdir}
+    hangar=${number:18}
+  </yarn:configuration>
+     
+  <context:property-placeholder location="classpath:hadoop.properties" />     
+</beans>
+----
+
+Through Spring's property placeholder
+http://docs.spring.io/spring/docs/4.0.x/spring-framework-reference/html/beans.html#beans-factory-placeholderconfigurer[support],
+link:docs.spring.io/spring/docs/4.0.x/spring-framework-reference/html/expressions.html[SpEL]
+and the
+http://spring.io/blog/2011/06/09/spring-framework-3-1-m2-released/[environment
+abstraction] (available in Spring 3.1). one can externalize environment
+specific properties from the main code base easing the deployment across
+multiple machines. In the example above, the default file system is
+replaced based on the properties available in `hadoop.properties` while
+the temp dir is determined dynamically through `SpEL`. Both approaches
+offer a lot of flexbility in adapting to the running environment - in
+fact we use this approach extensivly in the Spring for Apache Hadoop
+test suite to cope with the differences between the different
+development boxes and the CI server.
+
+Additionally, external `Properties` files can be loaded, `Properties`
+beans (typically declared through Spring's `
+      ` namespace). Along with the nested properties declaration, this
+allows customized configurations to be easily declared:
+
+[source,xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:yarn="http://www.springframework.org/schema/yarn"
+  xmlns:context="http://www.springframework.org/schema/context"
+  xmlns:util="http://www.springframework.org/schema/util"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+    http://www.springframework.org/schema/yarn http://www.springframework.org/schema/yarn/spring-yarn.xsd">
+
+  <!-- merge the local properties, the props bean and the two properties files -->        
+  <yarn:configuration properties-ref="props" properties-location="cfg-1.properties, cfg-2.properties">
+    star=chasing
+    captain=eo
+  </yarn:configuration>
+     
+  <util:properties id="props" location="props.properties"/>     
+</beans>
+----
+
+When merging several properties, ones defined locally win. In the
+example above the configuration properties are the primary source,
+followed by the `props` bean followed by the external properties file
+based on their defined order. While it's not typical for a configuration
+to refer to use so many properties, the example showcases the various
+options available.
+
+[NOTE]
+====
+For more properties utilities, including using the System as a source or
+fallback, or control over the merging order, consider using Spring's
+PropertiesFactoryBean (which is what Spring for Apache Hadoop Yarn and
+util:properties use underneath).
+====
+
+It is possible to create configuration based on existing ones - this
+allows one to create dedicated configurations, slightly different from
+the main ones, usable for certain jobs (such as streaming - more on that
+#yarn:job:streaming[below]). Simply use the `configuration-ref`
+attribute to refer to the _parent_ configuration - all its properties
+will be inherited and overridden as specified by the child:
+
+[source,xml]
+----
+<!-- default name is 'yarnConfiguration' -->
+<yarn:configuration>
+  fs.defaultFS=${hd.fs}
+  hadoop.tmp.dir=file://${java.io.tmpdir}
+</yarn:configuration>
+     
+<yarn:configuration id="custom" configuration-ref="yarnConfiguration">
+  fs.defaultFS=${custom.hd.fs}
+</yarn:configuration>     
+
+...
+----
+
+Make sure though you specify a different name since otherwise, since
+both definitions will have the same name, the Spring container will
+interpret this as being the same definition (and will usually consider
+the last one found).
+
+Last but not least a reminder that one can mix and match all these
+options to her preference. In general, consider externalizing
+configuration since it allows easier updates without interfering with
+the application configuration. When dealing with multiple, similar
+configuration use configuration _composition_ as it tends to keep the
+definitions concise, in sync and easy to update.
+
+.`yarn:configuration` attributes
+[width="100%",cols="18%,16%,66%",options="header",]
+|=======================================================================
+|Name |Values |Description
+|`configuration-ref` |Bean Reference |Reference to existing
+_Configuration_ bean
+
+|`properties-ref` |Bean Reference |Reference to existing _Properties_
+bean
+
+|`properties-location` |Comma delimited list |List or Spring _Resource_
+paths
+
+|`resources` |Comma delimited list |List or Spring _Resource_ paths
+
+|`fs-uri` |String |The HDFS filesystem address. Equivalent to
+_fs.defaultFS_ property.
+
+|`rm-address` |String |The Yarn Resource manager address. Equivalent to
+_yarn.resourcemanager.address_ property.
+
+|`scheduler-address` |String |The Yarn Resource manager scheduler
+address. Equivalent to _yarn.resourcemanager.scheduler.address_
+property.
+|=======================================================================
+
+=== Local Resources
+
+When _Application Master_ or any other _Container_ is run in a hadoop
+cluster, there are usually dependencies to various application and
+configuration files. These files needs to be localized into a running
+_Container_ by making a physical copy. Localization is a process where
+dependent files are copied into node's directory structure and thus can
+be used within the _Container_ itself. Yarn itself tries to provide
+isolation in a way that multiple containers and applications would not
+clash.
+
+In order to use local resources, one needs to create an implementation
+of ResourceLocalizer interface. In its simplest form, resource localizer
+can be defined as:
+
+[source,xml]
+----
+<yarn:localresources>
+  <yarn:hdfs path="/path/in/hdfs/my.jar"/>
+</yarn:localresources>
+----
+
+The declaration above defines a ResourceLocalizer bean (to be precise a
+factory bean of type LocalResourcesFactoryBean) named, by default,
+_yarnLocalresources_. The default name is used, by conventions, by the
+other elements that require a reference to a resource localizer. It's
+explained later how this reference is used when container launch context
+is defined.
+
+It is also possible to define path as pattern. This makes it easier to
+pick up all or subset of files from a directory.
+
+[source,xml]
+----
+<yarn:localresources>
+  <yarn:hdfs path="/path/in/hdfs/*.jar"/>
+</yarn:localresources>
+----
+
+Behind the scenes it's not enough to simple have a reference to file in
+a hdfs file system. Yarn itself when localizing resources into container
+needs to do a consistency check for copied files. This is done by
+checking file size and timestamp. This information needs to passed to
+yarn together with a file path. Order to do this the one who defines
+these beans needs to ask this information from hdfs prior to sending out
+resouce localizer request. This kind of behaviour exists to make sure
+that once localization is defined, _Container_ will fail fast if
+dependant files were replaced during the process.
+
+On default the hdfs base address is coming from a Yarn configuration and
+ResourceLocalizer bean will use configuration named
+_yarnLocalresources_. If there is a need to use something else than the
+default bean, _configuration_ parameter can be used to make a reference
+to other defined configurations.
+
+[source,xml]
+----
+<yarn:localresources configuration="yarnConfiguration">
+  <yarn:hdfs path="/path/in/hdfs/my.jar"/>
+</yarn:localresources>
+----
+
+For example, client defining a launch context for _Application Master_
+needs to access dependent hdfs entries. Effectively hdfs entry given to
+resource localizer needs to be accessed from a _Node Manager_.
+
+Yarn resource localizer is using additional parameters to define entry
+type and visibility. Usage is described below:
+
+[source,xml]
+----
+<yarn:localresources>
+  <yarn:hdfs path="/path/in/hdfs/my.jar" type="FILE" visibility="APPLICATION"/>
+</yarn:localresources>
+----
+
+For convenience it is possible to copy files into hdfs during the
+localization process using a _yarn:copy_ tag. Currently base staging
+directory is _/syarn/staging/xx_ where _xx_ is a unique identifier per
+application instance.
+
+[source,xml]
+----
+<yarn:localresources>
+  <yarn:copy src="file:/local/path/to/files/*jar" staging="true"/>
+  <yarn:hdfs path="/*" staging="true"/>
+</yarn:localresources>
+----
+
+.`yarn:localresources` attributes
+[width="100%",cols="18%,16%,66%",options="header",]
+|=======================================================================
+|Name |Values |Description
+|`configuration` |Bean Reference |A reference to configuration bean
+name, default is _yarnConfiguration_
+
+|`type` |`ARCHIVE`, `FILE`, `PATTERN` |Global default if not defined in
+entry level
+
+|`visibility` |`PUBLIC`, `PRIVATE`, `APPLICATION` |Global default if not
+defined in entry level
+|=======================================================================
+
+.`yarn:hdfs` attributes
+[width="100%",cols="18%,16%,66%",options="header",]
+|=======================================================================
+|Name |Values |Description
+|`path` |HDFS Path |Path in hdfs
+
+|`type` |`ARCHIVE`, `FILE`(default), `PATTERN` |`ARCHIVE` -
+automatically unarchived by the Node Manager, `FILE` - regular file,
+`PATTERN` - hybrid between archive and file.
+
+|`visibility` |`PUBLIC`, `PRIVATE`, `APPLICATION`(default) |`PUBLIC` -
+Shared by all users on the node, `PRIVATE` - Shared among all
+applications of the _same user_ on the node, `APPLICATION` - Shared only
+among containers of the _same application_ on the node
+
+|`staging` |`true`, `false`(default) |Internal temporary stagind
+directory.
+|=======================================================================
+
+.`yarn:copy` attributes
+[width="100%",cols="18%,16%,66%",options="header",]
+|=======================================================================
+|Name |Values |Description
+|`src` |Copy sources |Comma delimited list of resource patterns
+
+|`staging` |`true`, `false`(default) |Internal temporary stagind
+directory.
+|=======================================================================
+
+=== Container Environment
+
+One central concept in Yarn is to use environment variables which then
+can be read from a container. While it's possible to read those variable
+at any time it is considered bad design if one chooce to do so. Spring
+Yarn will pass variable into application before any business methods are
+executed, which makes things more clearly and testing becomes much more
+easier.
+
+[source,xml]
+----
+<yarn:environment/>
+----
+
+The declaration above defines a Map bean (to be precise a factory bean
+of type EnvironmentFactoryBean) named, by default, _yarnEnvironment_.
+The default name is used, by conventions, by the other elements that
+require a reference to a environment variables.
+
+For conveniance it is possible to define a classpath entry directly into
+an environment. Most likely one is about to run some java code with
+libraries so classpath needs to be defined anyway.
+
+[source,xml]
+----
+<yarn:environment include-local-system-env="false">
+  <yarn:classpath use-yarn-app-classpath="true" delimiter=":">
+    ./*
+  </yarn:classpath>
+</yarn:environment>
+----
+
+If _use-yarn-app-classpath_ parameter is set to _true_(default value) a
+default yarn entries will be added to classpath automatically. These
+entries are on default resolved from a normal
+`Hadoop Yarn Configuration` using its _yarn.application.classpath_
+property or if _site-yarn-app-classpath_ has a any content entries are
+resolved from there.
+
+[NOTE]
+====
+Be carefull if passing environment variables between different systems.
+For example if running a client on Windows and passing variables to
+Application Master running on Linux, execution wrapper in Yarn may
+silently fail.
+====
+
+.`yarn:environment` attributes
+[width="100%",cols="18%,16%,66%",options="header",]
+|=======================================================================
+|Name |Values |Description
+|`include-local-system-env` |`true`, `false`(default) |Defines whether
+system environment variables are actually added to this bean.
+|=======================================================================
+
+.`classpath` attributes
+[width="100%",cols="18%,16%,66%",options="header",]
+|=======================================================================
+|Name |Values |Description
+|`use-yarn-app-classpath` |`false`(default), `true` |Defines whether
+default yarn entries are added to classpath.
+
+|`use-mapreduce-app-classpath` |`false`(default), `true` |Defines
+whether default mr entries are added to classpath.
+
+|`site-yarn-app-classpath` |Classpath entries |Defines a comma delimited
+list of default yarn application classpath entries.
+
+|`site-mapreduce-app-classpath` |Classpath entries |Defines a comma
+delimited list of default mr application classpath entries.
+
+|`delimiter` |Delimiter string, default is ":" |Defines delimiter used
+in a classpath string
+|=======================================================================
+
+=== Application Client
+
+Client is always your entry point when interacting with a Yarn system
+whether one is about to submit a new application instance or just
+querying _Resource Manager_ for running application(s) status. Currently
+support for client is very limited and a simple command to start
+_Application Master_ can be defined. If there is just a need to query
+_Resource Manager_, command definition is not needed.
+
+[source,xml]
+----
+<yarn:client app-name="customAppName">
+  <yarn:master-command>
+    <![CDATA[
+      /usr/local/java/bin/java
+      org.springframework.yarn.am.CommandLineAppmasterRunner
+      appmaster-context.xml
+      yarnAppmaster
+      container-count=2
+      1><LOG_DIR>/AppMaster.stdout
+      2><LOG_DIR>/AppMaster.stderr
+    ]]>
+  </yarn:master-command>
+</yarn:client>
+----
+
+The declaration above defines a YarnClient bean (to be precise a factory
+bean of type YarnClientFactoryBean) named, by default, _yarnClient_. It
+also defines a command launching an _Application Master_ using
+`<master-command>` entry which is also a way to define the raw commands.
+If this _yarnClient_ instance is used to submit an application, its name
+would come from a _app-name_ attribute.
+
+[source,xml]
+----
+<yarn:client app-name="customAppName">
+  <yarn:master-runner/>
+</yarn:client>
+----
+
+For a convinience entry `<master-runner>` can be used to define same
+command entries.
+
+[source,xml]
+----
+<yarn:client app-name="customAppName">
+  <util:properties id="customArguments">
+    container-count=2
+  </util:properties>
+  <yarn:master-runner
+    command="java"
+    context-file="appmaster-context.xml"
+    bean-name="yarnAppmaster"
+    arguments="customArguments"
+    stdout="<LOG_DIR>/AppMaster.stdout"
+    stderr="<LOG_DIR>/AppMaster.stderr" />
+</yarn:client>
+----
+
+All previous three examples are effectively identical from Spring Yarn
+point of view.
+
+[NOTE]
+====
+The <LOG_DIR> refers to Hadoop's dedicated log directory for the running
+container.
+====
+
+[source,xml]
+----
+<yarn:client app-name="customAppName"
+  configuration="customConfiguration"
+  resource-localizer="customResources"
+  environment="customEnv"
+  priority="1"
+  virtualcores="2"
+  memory="11"
+  queue="customqueue">
+  <yarn:master-runner/>
+</yarn:client>
+----
+
+If there is a need to change some of the parameters for the _Application
+Master_ submission, `memory` and `virtualcores` defines the container
+settings. For submission, `queue` and `priority` defines how submission
+is actually done.
+
+.`yarn:client` attributes
+[width="100%",cols="18%,16%,66%",options="header",]
+|=======================================================================
+|Name |Values |Description
+|`app-name` |Name as string, default is empty |Yarn submitted
+application name
+
+|`configuration` |Bean Reference |A reference to configuration bean
+name, default is _yarnConfiguration_
+
+|`resource-localizer` |Bean Reference |A reference to resource localizer
+bean name, default is _yarnLocalresources_
+
+|`environment` |Bean Reference |A reference to environment bean name,
+default is _yarnEnvironment_
+
+|`template` |Bean Reference |A reference to a bean implementing
+ClientRmOperations
+
+|`memory` |Memory as integer, default is "64" |Amount of memory for
+appmaster resource
+
+|`virtualcores` |Cores as integer, default is "1" |Number of appmaster
+resource virtual cores
+
+|`priority` |Priority as integer, default is "0" |Submission priority
+
+|`queue` |Queue string, default is "default" |Submission queue
+|=======================================================================
+
+.`yarn:master-command`
+[width="100%",cols="18%,16%,66%",options="header",]
+|=======================================================================
+|Name |Values |Description
+|Entry content |List of commands |Commands defined in this entry are
+aggregated into a single command line
+|=======================================================================
+
+.`yarn:master-runner` attributes
+[width="100%",cols="18%,16%,66%",options="header",]
+|=======================================================================
+|Name |Values |Description
+|`command` |Main command as string, default is "java" |Command line
+first entry
+
+|`context-file` |Name of the Spring context file, default is
+"appmaster-context.xml" |Command line second entry
+
+|`bean-name` |Name of the Spring bean, default is "yarnAppmaster"
+|Command line third entry
+
+|`arguments` |Reference to Java's Properties |Added to command line
+parameters as key/value pairs separated by '='
+
+|`stdout` |Stdout, default is "<LOG_DIR>/AppMaster.stdout" |Appended
+with 1>
+
+|`stderr` |Stderr, default is "<LOG_DIR>/AppMaster.stderr" |Appended
+with 2>
+|=======================================================================
+
+=== Application Master
+
+Application master is responsible for container allocation, launching
+and monitoring.
+
+[source,xml]
+----
+<yarn:master>
+  <yarn:container-allocator virtualcores="1" memory="64" priority="0"/>    
+  <yarn:container-launcher username="whoami"/>    
+  <yarn:container-command>
+    <![CDATA[
+      /usr/local/java/bin/java
+      org.springframework.yarn.container.CommandLineContainerRunner
+      container-context.xml
+      1><LOG_DIR>/Container.stdout
+      2><LOG_DIR>/Container.stderr
+    ]]>
+  </yarn:container-command>
+</yarn:master>
+----
+
+The declaration above defines a YarnAppmaster bean (to be precise a bean
+of type StaticAppmaster) named, by default, _yarnAppmaster_. It also
+defines a command launching a _Container(s)_ using `<container-command>`
+entry, parameters for allocation using `<container-allocator>` entry and
+finally a launcher parameter using `<container-launcher>` entry.
+
+Currently there is a simple implementation of StaticAppmaster which is
+able to allocate and launch a number of containers. These containers are
+monitored by querying resource manager for container execution
+completion.
+
+[source,xml]
+----
+<yarn:master>
+  <yarn:container-runner/>
+</yarn:master>
+----
+
+For a convinience entry `<container-runner>` can be used to define same
+command entries.
+
+[source,xml]
+----
+<yarn:master>
+  <util:properties id="customArguments">
+    some-argument=myvalue
+  </util:properties>
+  <yarn:container-runner
+    command="java"
+    context-file="container-context.xml"
+    bean-name="yarnContainer"
+    arguments="customArguments"
+    stdout="<LOG_DIR>/Container.stdout"
+    stderr="<LOG_DIR>/Container.stderr" />
+</yarn:master>
+----
+
+.`yarn:master` attributes
+[width="100%",cols="18%,16%,66%",options="header",]
+|=======================================================================
+|Name |Values |Description
+|`configuration` |Bean Reference |A reference to configuration bean
+name, default is _yarnConfiguration_
+
+|`resource-localizer` |Bean Reference |A reference to resource localizer
+bean name, default is _yarnLocalresources_
+
+|`environment` |Bean Reference |A reference to environment bean name,
+default is _yarnEnvironment_
+|=======================================================================
+
+.`yarn:container-allocator` attributes
+[width="100%",cols="18%,16%,66%",options="header",]
+|=======================================================================
+|Name |Values |Description
+|`virtualcores` |Integer |_number of virtual cpu cores_ of the resource.
+
+|`memory` |Integer, as of MBs. |_memory_ of the resource.
+
+|`priority` |Integer |Assigned priority of a request.
+
+|`locality` |Boolean |If set to true indicates that resources are not
+relaxed. Default is _FALSE_.
+|=======================================================================
+
+.`yarn:container-launcher` attributes
+[width="100%",cols="18%,16%,66%",options="header",]
+|=======================================================================
+|Name |Values |Description
+|`username` |String |Set the _user_ to whom the container has been
+allocated.
+|=======================================================================
+
+.`yarn:container-runner` attributes
+[width="100%",cols="18%,16%,66%",options="header",]
+|=======================================================================
+|Name |Values |Description
+|`command` |Main command as string, default is "java" |Command line
+first entry
+
+|`context-file` |Name of the Spring context file, default is
+"container-context.xml" |Command line second entry
+
+|`bean-name` |Name of the Spring bean, default is "yarnContainer"
+|Command line third entry
+
+|`arguments` |Reference to Java's Properties |Added to command line
+parameters as key/value pairs separated by '='
+
+|`stdout` |Stdout, default is "<LOG_DIR>/Container.stdout" |Appended
+with 1>
+
+|`stderr` |Stderr, default is "<LOG_DIR>/Container.stderr" |Appended
+with 2>
+|=======================================================================
+
+=== Application Container
+
+There is very little what Spring Yarn needs to know about the Container
+in terms of its configuration. There is a simple contract between
+org.springframework.yarn.container.CommandLineContainerRunner and a bean
+it's trying to run on default. Default bean name is _yarnContainer_.
+
+There is a simple interface
+org.springframework.yarn.container.YarnContainer which container needs
+to implement.
+
+[source,java]
+----
+public interface YarnContainer {
+  void run();
+  void setEnvironment(Map<String, String> environment);
+  void setParameters(Properties parameters);
+}
+----
+
+There are few different ways how Container can be defined in Spring xml
+configuration. Natively without using namespaces bean can be defined
+with a correct name:
+
+[source,xml]
+----
+<bean id="yarnContainer" class="org.springframework.yarn.container.TestContainer"> 
+----
+
+Spring Yarn namespace will make it even more simpler. Below example just
+defines class which implements needed interface.
+
+[source,xml]
+----
+<yarn:container container-class="org.springframework.yarn.container.TestContainer"/>
+----
+
+It's possible to make a reference to existing bean. This is usefull if
+bean cannot be instantiated with default constructor.
+
+[source,xml]
+----
+<bean id="testContainer" class="org.springframework.yarn.container.TestContainer"/>
+<yarn:container container-ref="testContainer"/>
+----
+
+It's also possible to inline the bean definition.
+
+[source,xml]
+----
+<yarn:container>
+  <bean class="org.springframework.yarn.container.TestContainer"/>
+</yarn:container>
+----
+
+=== Application Master Services
+
+It is fairly easy to create an application which launches a few
+containers and then leave those to do their tasks. This is pretty much
+what _Distributed Shell_ example application in Yarn is doing. In that
+example a container is configured to run a simple shell command and
+_Application Master_ only tracks when containers have finished. If only
+need from a framework is to be able to fire and forget then that's all
+you need, but most likely a real-world Yarn application will need some
+sort of collaboration with _Application Master_. This communication is
+initiated either from _Application Client_ or _Application Container_.
+
+Yarn framework itself doesn't define any kind of general communication
+API for _Application Master_. There are APIs for communicating with
+_Container Manager_ and _Resource Manager_ which are used on within a
+layer not necessarily exposed to a user. Spring Yarn defines a general
+framework to talk to _Application Master_ through an abstraction and
+currently a JSON based rpc system exists.
+
+This chapter concentrates on developer concepts to create a custom
+services for _Application Master_, configuration options for built-in
+services can be found from sections below -
+#yarn:masterservice[Appmaster Service] and
+#yarn:masterserviceclient[Appmaster Service Client].
+
+==== Basic Concepts
+
+Having a communication framework between _Application Master_ and
+_Container/Client_ involves few moving parts. Firstly there has to be
+some sort of service running on an _Application Master_. Secondly user
+of this service needs to know where it is and how to connect to it.
+Thirtly, if not creating these services from scratch, it'd be nice if
+some sort of abstraction already exist.
+
+Contract for appmaster service is very simple, _Application Master
+Service_ needs to implement AppmasterService interface be registered
+with Spring application context. Actual appmaster instance will then
+pick it up from a bean factory.
+
+[source,java]
+----
+public interface AppmasterService {
+  int getPort();
+  boolean hasPort();
+  String getHost();
+}
+----
+
+_Application Master Service_ framework currently provides integration
+for services acting as service for a _Client_ or a _Container_. Only
+difference between these two roles is how the _Service Client_ gets
+notified about the address of the service. For the _Client_ this
+information is stored within the Hadoop Yarn resource manager. For the
+_Container_ this information is passed via environment within the launch
+context.
+
+[source,xml]
+----
+<bean id="yarnAmservice" class="AppmasterServiceImpl" />
+<bean id="yarnClientAmservice" class="AppmasterClientServiceImpl" />
+----
+
+Example above shows a default bean names, _yarnAmservice_ and
+_yarnClientAmservice_ respectively recognised by Spring Yarn.
+
+Interface AppmasterServiceClient is currently an empty interface just
+marking class to be a appmaster service client.
+
+[source,java]
+----
+public interface AppmasterServiceClient {
+}
+----
+
+==== Using JSON
+
+Default implementations can be used to exchange messages using a simple
+domain classes and actual messages are converted into json and send over
+the transport.
+
+[source,xml]
+----
+<yarn-int:amservice
+  service-impl="org.springframework.yarn.integration.ip.mind.TestService"
+  default-port="1234"/>
+<yarn-int:amservice-client
+  service-impl="org.springframework.yarn.integration.ip.mind.DefaultMindAppmasterServiceClient"
+  host="localhost"
+  port="1234"/>
+----
+
+[source,java]
+----
+@Autowired
+AppmasterServiceClient appmasterServiceClient;
+
+@Test
+public void testServiceInterfaces() throws Exception {
+  SimpleTestRequest request = new SimpleTestRequest();
+  SimpleTestResponse response =
+  (SimpleTestResponse) ((MindAppmasterServiceClient)appmasterServiceClient).
+    doMindRequest(request);
+  assertThat(response.stringField, is("echo:stringFieldValue"));
+}
+----
+
+==== Converters
+
+When default implementations for Application master services are
+exchanging messages, converters are net registered automatically. There
+is a namespace tag _converters_ to ease this configuration.
+
+[source,xml]
+----
+<bean id="mapper" 
+  class="org.springframework.yarn.integration.support.Jackson2ObjectMapperFactoryBean" />    
+
+<yarn-int:converter>
+  <bean class="org.springframework.yarn.integration.convert.MindObjectToHolderConverter">
+    <constructor-arg ref="mapper"/>
+  </bean>
+</yarn-int:converter>
+
+<yarn-int:converter>
+  <bean class="org.springframework.yarn.integration.convert.MindHolderToObjectConverter">
+    <constructor-arg ref="mapper"/>
+    <constructor-arg value="org.springframework.yarn.batch.repository.bindings"/>
+  </bean>
+</yarn-int:converter>
+----
+
+=== Application Master Service
+
+This section of this document is about configuration, more about general
+concepts for see a ?.
+
+Currently Spring Yarn have support for services using Spring Integration
+tcp channels as a transport.
+
+[source,xml]
+----
+<bean id="mapper" 
+  class="org.springframework.yarn.integration.support.Jackson2ObjectMapperFactoryBean" />
+
+<yarn-int:converter>
+  <bean class="org.springframework.yarn.integration.convert.MindObjectToHolderConverter">
+    <constructor-arg ref="mapper"/>
+  </bean>
+</yarn-int:converter>
+
+<yarn-int:converter>
+  <bean class="org.springframework.yarn.integration.convert.MindHolderToObjectConverter">
+    <constructor-arg ref="mapper"/>
+    <constructor-arg value="org.springframework.yarn.integration.ip.mind"/>
+  </bean>
+</yarn-int:converter>
+
+<yarn-int:amservice
+  service-impl="org.springframework.yarn.integration.ip.mind.TestService"/>
+----
+
+If there is a need to manually configure the server side dispatch
+channel, a little bit more configuration is needed.
+
+[source,xml]
+----
+<bean id="serializer"
+  class="org.springframework.yarn.integration.ip.mind.MindRpcSerializer" />
+<bean id="deserializer"
+  class="org.springframework.yarn.integration.ip.mind.MindRpcSerializer" />
+<bean id="socketSupport"
+  class="org.springframework.yarn.integration.support.DefaultPortExposingTcpSocketSupport" />
+
+<ip:tcp-connection-factory id="serverConnectionFactory"
+  type="server"
+  port="0"
+  socket-support="socketSupport"
+  serializer="serializer"
+  deserializer="deserializer"/>
+
+<ip:tcp-inbound-gateway id="inboundGateway"
+  connection-factory="serverConnectionFactory"
+  request-channel="serverChannel" />
+
+<int:channel id="serverChannel" />
+
+<yarn-int:amservice
+  service-impl="org.springframework.yarn.integration.ip.mind.TestService"
+  channel="serverChannel"
+  socket-support="socketSupport"/>
+----
+
+.`yarn-int:amservice` attributes
+[width="100%",cols="18%,16%,66%",options="header",]
+|=======================================================================
+|Name |Values |Description
+|`service-impl` |Class Name |Full name of the class implementing a
+service
+
+|`service-ref` |Bean Reference |Reference to a bean name implementing a
+service
+
+|`channel` |Spring Int channel |Custom message dispatching channel
+
+|`socket-support` |Socket support reference |Custom socket support class
+|=======================================================================
+
+=== Application Master Service Client
+
+This section of this document is about configuration, more about general
+concepts for see a ?.
+
+Currently Spring Yarn have support for services using Spring Integration
+tcp channels as a transport.
+
+[source,xml]
+----
+<bean id="mapper" 
+  class="org.springframework.yarn.integration.support.Jackson2ObjectMapperFactoryBean" />
+
+<yarn-int:converter>
+  <bean class="org.springframework.yarn.integration.convert.MindObjectToHolderConverter">
+    <constructor-arg ref="mapper"/>
+  </bean>
+</yarn-int:converter>
+
+<yarn-int:converter>
+  <bean class="org.springframework.yarn.integration.convert.MindHolderToObjectConverter">
+    <constructor-arg ref="mapper"/>
+    <constructor-arg value="org.springframework.yarn.integration.ip.mind"/>
+  </bean>
+</yarn-int:converter>
+
+<yarn-int:amservice-client
+  service-impl="org.springframework.yarn.integration.ip.mind.DefaultMindAppmasterServiceClient"
+  host="${SHDP_AMSERVICE_HOST}"
+  port="${SHDP_AMSERVICE_PORT}"/>
+----
+
+If there is a need to manually configure the server side dispatch
+channel, a little bit more configuration is needed.
+
+[source,xml]
+----
+<bean id="serializer"
+  class="org.springframework.yarn.integration.ip.mind.MindRpcSerializer" />
+<bean id="deserializer"
+  class="org.springframework.yarn.integration.ip.mind.MindRpcSerializer" />
+
+<ip:tcp-connection-factory id="clientConnectionFactory"
+  type="client"
+  host="localhost"
+  port="${SHDP_AMSERVICE_PORT}"
+  serializer="serializer"
+  deserializer="deserializer"/>
+
+<ip:tcp-outbound-gateway id="outboundGateway"
+  connection-factory="clientConnectionFactory"
+  request-channel="clientRequestChannel"
+  reply-channel="clientResponseChannel" />
+
+<int:channel id="clientRequestChannel" />
+<int:channel id="clientResponseChannel" >
+  <int:queue />
+</int:channel>
+        
+<yarn-int:amservice-client
+  service-impl="org.springframework.yarn.integration.ip.mind.DefaultMindAppmasterServiceClient"
+  request-channel="clientRequestChannel"
+  response-channel="clientResponseChannel"/>
+----
+
+.`yarn-int:amservice-client` attributes
+[width="100%",cols="18%,16%,66%",options="header",]
+|=======================================================================
+|Name |Values |Description
+|`service-impl` |Class Name |Full name of the class implementing a
+service client
+
+|`host` |Hostname |Host of the running appmaster service
+
+|`port` |Port |Port of the running appmaster service
+
+|`request-channel` |Reference to Spring Int request channel |Custom
+channel
+
+|`response-channel` |Reference to Spring Int response channel |Custom
+channel
+|=======================================================================
+
+=== Using Spring Batch
+
+In this chapter we assume you are fairly familiar with concepts using
+_Spring Batch_. Many batch processing problems can be solved with single
+threaded, single process jobs, so it is always a good idea to properly
+check if that meets your needs before thinking about more complex
+implementations. When you are ready to start implementing a job with
+some parallel processing, Spring Batch offers a range of options. At a
+high level there are two modes of parallel processing: single process,
+multi-threaded; and multi-process.
+
+Spring Hadoop contains a support for running Spring Batch jobs on a
+Hadoop cluster. For better parallel processing Spring Batch partitioned
+steps can be executed on a Hadoop cluster as remote steps.
+
+==== Batch Jobs
+
+Starting point running a _Spring Batch Job_ is always the _Application
+Master_ whether a job is just simple job with or without partitioning.
+In case partitioning is not used the whole job would be run within the
+_Application Master_ and no _Containers_ would be launched. This may
+seem a bit odd to run something on Hadoop without using _Containers_ but
+one should remember that _Application Master_ is also just a resource
+allocated from a Hadoop cluster.
+
+Order to run Spring Batch jobs on a Hadoop cluster, few constraints
+exists:
+
+* _Job Context_ - Application Master is the main entry point of running
+the job.
+* _Job Repository_ - Application Master needs to have access to a
+repository which is located either in-memory or in a database. These are
+the two type natively supported by Spring Batch.
+* _Remote Steps_ - Due to nature how Spring Batch partitioning works,
+remote step needs an access to a job repository.
+
+Configuration for Spring Batch Jobs is very similar what is needed for
+normal batch configuration because effectively that's what we are doing.
+Only difference is a way a job is launched which in this case is
+automatically handled by _Application Master_. Implementation of a job
+launching logic is very similar compared to CommandLineJobRunner found
+from a Spring Batch.
+
+[source,xml]
+----
+<bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager"/>
+
+<bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">
+  <property name="transactionManager" ref="transactionManager"/>
+</bean>
+
+<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+  <property name="jobRepository" ref="jobRepository"/>
+</bean>
+----
+
+The declaration above define beans for JobRepository and JobLauncher.
+For simplisity we used in-memory repository while it would be possible
+to switch into repository working with a database if persistence is
+needed. A bean named `jobLauncher` is later used within the _Application
+Master_ to launch jobs.
+
+[source,xml]
+----
+<bean id="yarnEventPublisher" class="org.springframework.yarn.event.DefaultYarnEventPublisher"/>
+      
+<yarn-batch:master/>
+----
+
+The declaration above defines BatchAppmaster bean named, by default,
+`yarnAppmaster` and YarnEventPublisher bean named `yarnEventPublisher`
+which is not created automatically.
+
+Final step to finalize our very simple batch configuration is to define
+the actual batch job.
+
+[source,xml]
+----
+<bean id="hello" class="org.springframework.yarn.examples.PrintTasklet">
+  <property name="message" value="Hello"/>
+</bean>
+
+<batch:job id="job">
+  <batch:step id="master">
+    <batch:tasklet transaction-manager="transactionManager" ref="hello"/>
+  </batch:step>
+</batch:job>
+----
+
+The declaration above defines a simple job and tasklet. Job is named as
+`job` which is the default job name searched by _Application Master_. It
+is possible to use different name by changing the launch configuration.
+
+.`yarn-batch:master` attributes
+[width="100%",cols="18%,16%,66%",options="header",]
+|=======================================================================
+|Name |Values |Description
+|`configuration` |Bean Reference |A reference to configuration bean
+name, default is _yarnConfiguration_
+
+|`resource-localizer` |Bean Reference |A reference to resource localizer
+bean name, default is _yarnLocalresources_
+
+|`environment` |Bean Reference |A reference to environment bean name,
+default is _yarnEnvironment_
+
+|`job-name` |Bean Name Reference |A name reference to Spring Batch job,
+default is _job_
+
+|`job-launcher` |Bean Reference |A reference to job launcher bean name,
+default is _jobLauncher_. Target is a normal Spring Batch bean
+implementing JobLauncher.
+|=======================================================================
+
+==== Partitioning
+
+Let's take a quick look how Spring Batch partitioning is handled.
+Concept of running a partitioned job involves three things, _Remote
+steps_, _Partition Handler_ and a _Partitioner_. If we do a little bit
+of oversimplification a remote step is like any other step from a user
+point of view. Spring Batch itself does not contain implementations for
+any proprietary grid or remoting fabrics. Spring Batch does however
+provide a useful implementation of PartitionHandler that executes Steps
+locally in separate threads of execution, using the TaskExecutor
+strategy from Spring. Spring Hadoop provides implementation to execute
+Steps remotely on a Hadoop cluster.
+
+[NOTE]
+====
+For more background information about the Spring Batch Partitioning,
+read the Spring Batch reference documentation.
+====
+
+===== Configuring Master
+
+As we previously mentioned a step executed on a remote host also need to
+access a job repository. If job repository would be based on a database
+instance, configuration could be similar on a container compared to
+application master. In our configuration example the job repository is
+in-memory based and remote steps needs access for it. Spring Yarn Batch
+contains implementation of a job repository which is able to proxy
+request via json requests. Order to use that we need to enable
+application client service which is exposing this service.
+
+[source,xml]
+----
+<bean id="jobRepositoryRemoteService" class="org.springframework.yarn.batch.repository.JobRepositoryRemoteService" >
+  <property name="mapJobRepositoryFactoryBean" ref="&amp;jobRepository"/>
+</bean>
+
+<bean id="batchService" class="org.springframework.yarn.batch.repository.BatchAppmasterService" >
+  <property name="jobRepositoryRemoteService" ref="jobRepositoryRemoteService"/>
+</bean>
+
+<yarn-int:amservice service-ref="batchService"/>
+----
+
+he declaration above defines JobRepositoryRemoteService bean named
+`jobRepositoryRemoteService` which is then connected into _Application
+Master Service_ exposing job repository via Spring Integration Tcp
+channels.
+
+As job repository communication messages are exchanged via custom json
+messages, converters needs to be defined.
+
+[source,xml]
+----
+<bean id="mapper" class="org.springframework.yarn.integration.support.Jackson2ObjectMapperFactoryBean" />
+
+<yarn-int:converter>
+  <bean class="org.springframework.yarn.integration.convert.MindObjectToHolderConverter">
+    <constructor-arg ref="mapper"/>
+  </bean>
+</yarn-int:converter>
+
+<yarn-int:converter>
+  <bean class="org.springframework.yarn.integration.convert.MindHolderToObjectConverter">
+    <constructor-arg ref="mapper"/>
+    <constructor-arg value="org.springframework.yarn.batch.repository.bindings"/>
+  </bean>
+</yarn-int:converter>
+----
+
+===== Configuring Container
+
+Previously we made a choice to use in-memore job repository running
+inside the application master. Now we need to talk to this repository
+via client service. We start by adding same converters as in application
+master.
+
+[source,xml]
+----
+<bean id="mapper" class="org.springframework.yarn.integration.support.Jackson2ObjectMapperFactoryBean" />
+
+<yarn-int:converter>
+  <bean class="org.springframework.yarn.integration.convert.MindObjectToHolderConverter">
+    <constructor-arg ref="mapper"/>
+  </bean>
+</yarn-int:converter>
+
+<yarn-int:converter>
+  <bean class="org.springframework.yarn.integration.convert.MindHolderToObjectConverter">
+    <constructor-arg ref="mapper"/>
+    <constructor-arg value="org.springframework.yarn.batch.repository.bindings"/>
+  </bean>
+</yarn-int:converter>
+----
+
+We use general client implementation able to communicate with a service
+running on _Application Master_.
+
+[source,xml]
+----
+<yarn-int:amservice-client
+  service-impl="org.springframework.yarn.integration.ip.mind.DefaultMindAppmasterServiceClient"
+  host="${SHDP_AMSERVICE_HOST}"
+  port="${SHDP_AMSERVICE_PORT}" />
+----
+
+Remote step is just like any other step.
+
+[source,xml]
+----
+<bean id="hello" class="org.springframework.yarn.examples.PrintTasklet">
+  <property name="message" value="Hello"/>
+</bean>
+
+<batch:step id="remoteStep">
+  <batch:tasklet transaction-manager="transactionManager" start-limit="100" ref="hello"/>
+</batch:step>
+----
+
+We need to have a way to locate the step from an application context.
+For this we can define a step locator which is later configured into
+running container.
+
+[source,xml]
+----
+<bean id="stepLocator" class="org.springframework.yarn.batch.partition.BeanFactoryStepLocator"/>
+----
+
+Spring Hadoop contains a custom job repository implementation which is
+able to talk back to a remote instance via custom json protocol.
+
+[source,xml]
+----
+<bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager"/>
+
+<bean id="jobRepository" class="org.springframework.yarn.batch.repository.RemoteJobRepositoryFactoryBean">
+  <property name="transactionManager" ref="transactionManager"/>
+  <property name="appmasterScOperations" ref="yarnAmserviceClient"/>
+</bean>
+
+<bean id="jobExplorer" class="org.springframework.yarn.batch.repository.RemoteJobExplorerFactoryBean">
+  <property name="repositoryFactory" ref="&amp;jobRepository" />
+</bean>
+----
+
+Finally we define a _Container_ understanding how to work with a remote
+steps.
+
+[source,xml]
+----
+<bean id="yarnContainer" class="org.springframework.yarn.batch.container.DefaultBatchYarnContainer">
+  <property name="stepLocator" ref="stepLocator"/>
+  <property name="jobExplorer" ref="jobExplorer"/>
+  <property name="integrationServiceClient" ref="yarnAmserviceClient"/>
+</bean>
+----
+
+=== Using Spring Boot Application Model
+
+We have additional support for leveraging _Spring Boot_ when creating
+applications using _Spring YARN_. All dependencies for this exists in a
+sub-module named `spring-yarn-boot` which itself depends on _Spring
+Boot_.
+
+_Spring Boot_ extensions in _Spring YARN_ are used to ease following
+issues:
+
+* Create a clear model how application is built, packaged and run on
+_Hadoop YARN_.
+* Automatically configure components depending whether we are on
+_Client_, _Appmaster_ or _Container_.
+* Create an easy to use externalized configuration model based on Boot's
+ConfigurationProperties.
+
+Before we get into details let's go through how simple it is to create
+and deploy a custom application to a Hadoop cluster. Notice that there
+are no need to use XML.
+
+[source,java]
+----
+@Configuration
+@EnableAutoConfiguration
+public class ContainerApplication {
+
+  public static void main(String[] args) {
+    SpringApplication.run(ContainerApplication.class, args);
+  }
+
+  @Bean
+  public HelloPojo helloPojo() {
+    return new HelloPojo();
+  }
+
+}
+----
+
+In above ContainerApplication, notice how we added @Configuration in a
+class level itself and @Bean for a `helloPojo()` method.
+
+[source,java]
+----
+@YarnComponent
+public class HelloPojo {
+
+  private static final Log log = LogFactory.getLog(HelloPojo.class);
+
+  @Autowired
+  private Configuration configuration;
+
+  @OnContainerStart
+  public void publicVoidNoArgsMethod() {
+    log.info("Hello from HelloPojo");
+    log.info("About to list from hdfs root content");
+    FsShell shell = new FsShell(configuration);
+    for (FileStatus s : shell.ls(false, "/")) {
+      log.info(s);
+    }
+  }
+
+}
+----
+
+HelloPojo class is a simple POJO in a sense that it doesn't extend any
+_Spring YARN_ base classes. What we did in this class:
+
+* We've added a class level@YarnComponent annotation.
+* We've added a method level @OnContainerStart annotation.
+* We've @Autowired a Hadoop's Configuration class.
+
+To demonstrate that we actually have some real functionality in this
+class, we simply use Spring Hadoop's FsShell to list entries from a root
+of a HDFS file system. For this we need to have access to Hadoop's
+Configuration which is prepared for you so that you can just autowire
+it.
+
+[source,java]
+----
+@EnableAutoConfiguration
+public class ClientApplication {
+
+  public static void main(String[] args) {
+    SpringApplication.run(ClientApplication.class, args)
+      .getBean(YarnClient.class)
+      .submitApplication();
+  }
+
+}
+----
+
+* @EnableAutoConfiguration tells Spring Boot to start adding beans based
+on classpath setting, other beans, and various property settings.
+* Specific auto-configuration for Spring YARN components takes place
+since Spring YARN is on the classpath.
+
+The `main()` method uses Spring Boot's `SpringApplication.run()` method
+to launch an application. From there we simply request a bean of type
+YarnClient and execute its `submitApplication()` method. What happens
+next depends on application configuration, which we go through later in
+this document.
+
+[source,java]
+----
+@EnableAutoConfiguration
+public class AppmasterApplication {
+
+  public static void main(String[] args) {
+    SpringApplication.run(AppmasterApplication.class, args);
+  }
+
+}
+----
+
+Application class for YarnAppmaster looks even simpler than what we just
+did for ClientApplication. Again the `main()` method uses Spring Boot's
+`SpringApplication.run()` method to launch an application.
+
+In real life, you most likely need to start adding more custom
+functionality to your application component and you'd do that by start
+adding more beans. To do that you need to define a Spring @Configuration
+or @ComponentScan. AppmasterApplication would then act as your main
+starting point to define more custom functionality.
+
+[source,yaml]
+----
+spring:
+  hadoop:
+    fsUri: hdfs://localhost:8020
+    resourceManagerHost: localhost
+  yarn:
+    appName: yarn-boot-simple
+    applicationDir: /app/yarn-boot-simple/
+    client:
+      files:
+       - "file:build/libs/yarn-boot-simple-container-0.1.0.jar"
+       - "file:build/libs/yarn-boot-simple-appmaster-0.1.0.jar"
+      launchcontext:
+        archiveFile: yarn-boot-simple-appmaster-0.1.0.jar
+    appmaster:
+      containerCount: 1
+      launchcontext:
+        archiveFile: yarn-boot-simple-container-0.1.0.jar
+----
+
+Final part for your application is its runtime configuration which glues
+all the components together which then can be called as a Spring YARN
+application. This configuration act as source for Spring Boot's
+@ConfigurationProperties and contains relevant configuration properties
+which cannot be auto-discovered or otherwise needs to have an option to
+be overwritten by an end user.
+
+You can then write your own defaults for your own environment. Because
+these @ConfigurationProperties are resolved at runtime by Spring Boot,
+you even have an easy option to overwrite these properties either by
+using command-line options or provide additional configuration property
+files.
+
+==== Auto Configuration
+
+_Spring Boot_ is heavily influenced by auto-configuration trying to
+predict what user wants to do. These decisions are based on
+configuration properties, what's currently available from a classpath
+and generally everything what auto-configurers are able to see.
+
+Auto-configuration is able to see if it's currently running on a YARN
+cluster and can also differentiate between _YarnContainer_ and
+_YarnAppmaster_. Parts of the auto-configuration which cannot be
+automatically detected are guarded by a flags in configuration
+properties which then allows end-user to either enable or disable these
+functionalities.
+
+==== Application Files
+
+As we already mentioned _Spring Boot_ creates a clear model how you
+would work with your application files. Most likely what you need in
+your application is jar or zip file(s) having needed application code
+and optional configuration properties to customize the application
+logic. Customization via an external properties files makes it easier to
+change application functionality and reduce a need to hard-code
+application logic.
+
+Running an application on YARN needs an instance of _YarnAppmaster_ and
+instances of _YarnContainer_s. Both of these containers will need a set
+of files and instructions how to execute a container. Based on
+auto-configuration and configuration properties we will make few
+assumptions how a container is executed.
+
+We are fundamentally supporting three different type of combinations:
+
+* If a container main archive file is a jar file we expect it to be
+packaged with Boot and be self container executable jar archive.
+* If a container main archive is a zip file we expect it to be packages
+with Boot. In this case we use a special runner which knows how to run
+this exploded archive.
+* User defines a main class to be run and everything this class will
+need is already setup.
+
+More detailed functionality can be found from a below sections;
+<<applicationclasspath>>, <<containerrunners>> and
+<<configurationproperties>>.
+
+[[applicationclasspath]]
+==== Application Classpath
+
+Let's go through as an examples how a classpath is configured on
+different use cases.
+
+===== Simple Executable Jar
+
+Running a container using an executable jar archive is the most simple
+scenario due to classpath limitation imposed by a JVM. Everything needed
+for the classpath needs to be inside the archive itself. Boot plugins
+for maven and gradle will greatly help to package all library
+dependencies into this archive.
+
+[source,yaml]
+----
+spring:
+  yarn:
+    client:
+      launchcontext:
+        archiveFile: yarn-boot-appmaster-0.1.0.jar
+    appmaster:
+      launchcontext:
+        archiveFile: yarn-boot-container-0.1.0.jar
+----
+
+===== Simple Zip Archive
+
+Using a zip archive is basically needed in two use cases. In first case
+you want to re-use existing libraries in YARN cluster for your
+classpath. In second case you want to add custom classpath entries from
+an exploded zip archive.
+
+[source,yaml]
+----
+spring:
+  yarn:
+    siteYarnAppClasspath: "/path/to/hadoop/libs/*"
+    appmaster:
+      launchcontext:
+        useYarnAppClasspath: true
+        archiveFile: yarn-boot-container-0.1.0.zip
+----
+
+In above example you can have a zip archive which doesn't bundle all
+dependant Hadoop YARN libraries. Default classpath entries are then
+resolved from `siteYarnAppClasspath` property.
+
+[source,yaml]
+----
+spring:
+  yarn:
+    appmaster:
+      launchcontext:
+        archiveFile: yarn-boot-container-0.1.0.zip
+        containerAppClasspath:
+         - "./yarn-boot-container-0.1.0.zip/config"
+         - "./yarn-boot-container-0.1.0.zip/lib"
+----
+
+In above example you needed to use custom classpath entries from an
+exploded zip archive.
+
+[[containerrunners]]
+==== Container Runners
+
+Using a propertys `spring.yarn.client.launchcontext.archiveFile` and
+`spring.yarn.appmaster.launchcontext.archiveFile` respectively, will
+indicate that container is run based on an archive file and Boot runners
+are used. These runner classes are either used manually when
+constructing an actual raw command for container or internally within an
+executable jar archive.
+
+However there are times when you may need to work on much lower level.
+Maybe you are having trouble using an executable jar archive or Boot
+runner is not enough what you want to do. For this use case you would
+use propertys `spring.yarn.client.launchcontext.runnerClass` and
+`spring.yarn.appmaster.launchcontext.runnerClass`.
+
+===== Custom Runner
+
+[source,yaml]
+----
+spring:
+  yarn:
+    appmaster:
+      launchcontext:
+        runnerClass: com.example.MyMainClazz
+----
+
+==== Resource Localizing
+
+Order for containers to use application files, a YARN resource
+localization process needs to do its tasks. We have a few configuration
+properties which are used to determine which files are actually
+localized into container's working directory.
+
+[source,yaml]
+----
+spring:
+  yarn:
+    client:
+      localizer:
+        patterns:
+         - "*appmaster*jar"
+         - "*appmaster*zip"
+        zipPattern: "*zip"
+        propertiesNames: [application]
+        propertiesSuffixes: [properties, yml]
+    appmaster:
+      localizer:
+        patterns:
+         - "*container*jar"
+         - "*container*zip"
+        zipPattern: "*zip"
+        propertiesNames: [application]
+        propertiesSuffixes: [properties, yml]
+----
+
+Above is an example which equals a default functionality when localized
+resources are chosen. For example for a container we automatically
+choose all files matching a simple patterns `*container*jar` and
+`*container*zip`. Additionally we choose configuration properties files
+matching names `application.properties` and `application.yml`. Property
+_zipPattern_ is used as an pattern to instruct YARN resource localizer
+to triet file as an archive to be automatically exploded.
+
+If for some reason the default functionality and how it can be
+configured via configuration properties is not suiteable, one can define
+a custom bean to change how things work. Interface
+LocalResourcesSelector is used to find localized resources.
+
+[source,java]
+----
+public interface LocalResourcesSelector {
+  List<Entry> select(String dir);
+}
+----
+
+Below you see a logic how a default BootLocalResourcesSelector is
+created during the auto-configuration. You would then create a custom
+implementation and create it as a bean in your Configuration class. You
+would not need to use any Conditionals but not how in auto-configuration
+we use @ConditionalOnMissingBean to check if user have already created
+his own implementation.
+
+[source,java]
+----
+@Configuration
+@EnableConfigurationProperties({ SpringYarnAppmasterLocalizerProperties.class })
+public static class LocalResourcesSelectorConfig {
+
+  @Autowired
+  private SpringYarnAppmasterLocalizerProperties syalp;
+
+  @Bean
+  @ConditionalOnMissingBean(LocalResourcesSelector.class)
+  public LocalResourcesSelector localResourcesSelector() {
+    BootLocalResourcesSelector selector = new BootLocalResourcesSelector(Mode.CONTAINER);
+    if (StringUtils.hasText(syalp.getZipPattern())) {
+      selector.setZipArchivePattern(syalp.getZipPattern());
+    }
+    if (syalp.getPropertiesNames() != null) {
+      selector.setPropertiesNames(syalp.getPropertiesNames());
+    }
+    if (syalp.getPropertiesSuffixes() != null) {
+      selector.setPropertiesSuffixes(syalp.getPropertiesSuffixes());
+    }
+    selector.addPatterns(syalp.getPatterns());
+    return selector;
+  }
+}
+----
+
+Your configuration could then look like:
+
+[source,java]
+----
+@EnableAutoConfiguration
+public class AppmasterApplication {
+
+  @Bean
+  public LocalResourcesSelector localResourcesSelector() {
+    return MyLocalResourcesSelector();
+  }
+
+  public static void main(String[] args) {
+    SpringApplication.run(AppmasterApplication.class, args);
+  }
+
+}
+----
+
+==== Container as POJO
+
+In Boot application model if _YarnContainer_ is not explicitly defined
+it defaults to DefaultYarnContainer which expects to find a `POJO`
+created as a bean having a specific annotations instructing the actual
+functionality.
+
+@YarnComponent is a stereotype annotation itself having a Spring's
+@Component defined in it. This is automatically marking a class to be a
+candidate having a @YarnComponent functionality.
+
+Within a `POJO` class we can use @OnContainerStart annotation to mark a
+public method to act as an activator for a method endpoint.
+
+[source,java]
+----
+@OnContainerStart
+public void publicVoidNoArgsMethod() {
+}
+----
+
+Returning type of `int` participates in a _YarnContainer_ exit value.
+
+[source,java]
+----
+@OnContainerStart
+public int publicIntNoArgsMethod() {
+  return 0;
+}
+----
+
+Returning type of `boolean` participates in a _YarnContainer_ exit value
+where _true_ would mean complete and _false_ failed container.
+
+[source,java]
+----
+@OnContainerStart
+public boolean publicBooleanNoArgsMethod() {
+  return true;
+}
+----
+
+Returning type of `String` participates in a _YarnContainer_ exit value
+by matching ExitStatus and getting exit value from ExitCodeMapper.
+
+[source,java]
+----
+@OnContainerStart
+public String publicStringNoArgsMethod() {
+  return "COMPLETE";
+}
+----
+
+If method throws any Exception _YarnContainer_ is marked as failed.
+
+[source,java]
+----
+@OnContainerStart
+public void publicThrowsException() {
+  throw new RuntimeExection("My Error");
+}
+----
+
+Method parameter can be bound with @YarnEnvironments to get access to
+current _YarnContainer_ environment variables.
+
+[source,java]
+----
+@OnContainerStart
+public void publicVoidEnvironmentsArgsMethod(@YarnEnvironments Map<String,String> env) {
+}
+----
+
+Method parameter can be bound with @YarnEnvironment to get access to
+specific _YarnContainer_ environment variable.
+
+[source,java]
+----
+@OnContainerStart
+public void publicVoidEnvironmentArgsMethod(@YarnEnvironment("key") String value) {
+}
+----
+
+Method parameter can be bound with @YarnParameters to get access to
+current _YarnContainer_ arguments.
+
+[source,java]
+----
+@OnContainerStart
+public void publicVoidParametersArgsMethod(@YarnParameters Properties properties) {
+}
+----
+
+Method parameter can be bound with @YarnParameter to get access to a
+specific _YarnContainer_ arguments.
+
+[source,java]
+----
+@OnContainerStart
+public void publicVoidParameterArgsMethod(@YarnParameter("key") String value) {
+}
+----
+
+[[configurationproperties]]
+==== Configuration Properties
+
+Configuration properties can be defined using various methods. See a
+Spring Boot dodumentation for details.
+
+.`spring.hadoop` configuration properties
+[width="100%",cols="<40%,20%,20%,20%",options="header",]
+|=================================================================
+|Property Name |Required |Type |Default Value
+|`spring.hadoop.fsUri` |Yes |String |null
+|`spring.hadoop.resourceManagerAddress` |No |String |null
+|`spring.hadoop.resourceManagerSchedulerAddress` |No |String |null
+|`spring.hadoop.resourceManagerHost` |No |String |null
+|`spring.hadoop.resourceManagerPort` |No |Integer |8032
+|`spring.hadoop.resourceManagerSchedulerPort` |No |Integer |8030
+|`spring.hadoop.resources` |No |List |null
+|`spring.hadoop.config` |No |Map |null
+|=================================================================
+
+`spring.hadoop.fsUri`::
+  A hdfs file system uri for a namenode.
+`spring.hadoop.resourceManagerAddress`::
+  Address of a YARN resource manager.
+`spring.hadoop.resourceManagerSchedulerAddress`::
+  Address of a YARN resource manager scheduler.
+`spring.hadoop.resourceManagerHost`::
+  Hostname of a YARN resource manager.
+`spring.hadoop.resourceManagerPort`::
+  Port of a YARN resource manager.
+`spring.hadoop.resourceManagerSchedulerPort`::
+  Port of a YARN resource manager scheduler. This property is only
+  needed for an application master.
+`spring.hadoop.resources`::
+  List of Spring resource locations to be initialized in Hadoop
+  configuration. These resources should be in Hadoop's own site xml
+  format and location format can be anything Spring supports. For
+  example, _classpath:/myentry.xml_ from a classpath or
+  _file:/myentry.xml_ from a file system.
+`spring.hadoop.config`::
+  Map of generic hadoop configuration properties.
+
+.`spring.hadoop.security` configuration properties
+[width="100%",cols="<40%,20%,20%,20%",options="header",]
+|=============================================================
+|Property Name |Required |Type |Default Value
+|`spring.hadoop.security.authMethod` |No |String |null
+|`spring.hadoop.security.userPrincipal` |No |String |null
+|`spring.hadoop.security.userKeytab` |No |String |null
+|`spring.hadoop.security.namenodePrincipal` |No |String |null
+|`spring.hadoop.security.rmManagerPrincipal` |No |String |null
+|=============================================================
+
+`spring.hadoop.security.authMethod`::
+  Hadoop security method.
+`spring.hadoop.security.userPrincipal`::
+  Principal for user.
+`spring.hadoop.security.userKeytab`::
+  Path to user keytab file.
+`spring.hadoop.security.namenodePrincipal`::
+  Namenode principal
+`spring.hadoop.security.rmManagerPrincipal`::
+  Resource manager principal
+
+.`spring.yarn` configuration properties
+[width="100%",cols="<40%,20%,20%,20%",options="header",]
+|=========================================================
+|Property Name |Required |Type |Default Value
+|`spring.yarn.applicationDir` |No |String |null
+|`spring.yarn.applicationBaseDir` |No |String |null
+|`spring.yarn.applicationVersion` |No |String |null
+|`spring.yarn.stagingDir` |No |String |/spring/staging
+|`spring.yarn.appName` |No |String |null
+|`spring.yarn.appType` |No |String |YARN
+|`spring.yarn.siteYarnAppClasspath` |No |String |null
+|`spring.yarn.siteMapreduceAppClasspath` |No |String |null
+|=========================================================
+
+`spring.yarn.applicationDir`::
+  An application home directory in hdfs. If client copies files into a
+  hdfs during an application submission, files will end up in this
+  directory. If this property is omitted, a staging directory will be
+  used instead.
+`spring.yarn.applicationBaseDir`::
+  An applications base directory where build-in application deployment
+  functionality would create a new application instance. For a normal
+  application submit operation, this is not needed.
+`spring.yarn.applicationVersion`::
+  An application version identifier used together with
+  `applicationBaseDir` in deployment scenarios where `applicationDir`
+  cannot be hard coded.
+`spring.yarn.stagingDir`::
+  A global staging base directory in hdfs.
+`spring.yarn.appName`::
+  Defines a registered application name visible from a YARN resource
+  manager.
+`spring.yarn.appType`::
+  Defines a registered application type used in YARN resource manager.
+`spring.yarn.siteYarnAppClasspath`::
+  Defines a default base YARN application classpath entries.
+`spring.yarn.siteMapreduceAppClasspath`::
+  Defines a default base MR application classpath entries.
+
+.`spring.yarn.appmaster` configuration properties
+[width="100%",cols="<40%,20%,20%,20%",options="header",]
+|===========================================================
+|Property Name |Required |Type |Default Value
+|`spring.yarn.appmaster.appmasterClass` |No |Class |null
+|`spring.yarn.appmaster.containerCount` |No |Integer |1
+|`spring.yarn.appmaster.keepContextAlive` |No |Boolean |true
+|===========================================================
+
+`spring.yarn.appmaster.appmasterClass`::
+  Fully qualified classname which auto-configuration can automatically
+  instantiate as a custom application master.
+`spring.yarn.appmaster.containerCount`::
+  Property which is automatically kept in configuration as a hint which
+  an application master can choose to use when determing how many
+  containers should be launched.
+`spring.yarn.appmaster.keepContextAlive`::
+  Setting for an application master runner to stop main thread to wait a
+  latch before continuing. This is needed in cases where main thread
+  needs to wait event from other threads to be able to exit.
+
+.`spring.yarn.appmaster.launchcontext` configuration properties
+[width="100%",cols="<40%,20%,20%,20%",options="header",]
+|=======================================================================
+|Property Name |Required |Type |Default Value
+|`spring.yarn.appmaster.launchcontext.archiveFile` |No |String |null
+
+|`spring.yarn.appmaster.launchcontext.runnerClass` |No |Class |null
+
+|`spring.yarn.appmaster.launchcontext.options` |No |List |null
+
+|`spring.yarn.appmaster.launchcontext.arguments` |No |Map |null
+
+|`spring.yarn.appmaster.launchcontext.containerAppClasspath` |No |List
+|null
+
+|`spring.yarn.appmaster.launchcontext.pathSeparator` |No |String |:
+
+|`spring.yarn.appmaster.launchcontext.includeBaseDirectory` |No |Boolean
+|true
+
+|`spring.yarn.appmaster.launchcontext.useYarnAppClasspath` |No |Boolean
+|true
+
+|`spring.yarn.appmaster.launchcontext.useMapreduceAppClasspath` |No
+|Boolean |true
+
+|`spring.yarn.appmaster.launchcontext.includeSystemEnv` |No |Boolean
+|true
+
+|`spring.yarn.appmaster.launchcontext.locality` |No |Boolean |false
+|=======================================================================
+
+`spring.yarn.appmaster.launchcontext.archiveFile`::
+  Indicates that a container main file is treated as executable jar or
+  exploded zip.
+`spring.yarn.appmaster.launchcontext.runnerClass`::
+  Indicates a fully qualified class name for a container runner.
+`spring.yarn.appmaster.launchcontext.options`::
+  JVM system options.
+`spring.yarn.appmaster.launchcontext.arguments`::
+  Application arguments.
+`spring.yarn.appmaster.launchcontext.containerAppClasspath`::
+  Additional classpath entries.
+`spring.yarn.appmaster.launchcontext.pathSeparator`::
+  Separator in a classpath.
+`spring.yarn.appmaster.launchcontext.includeBaseDirectory`::
+  If base directory should be added in a classpath.
+`spring.yarn.appmaster.launchcontext.useYarnAppClasspath`::
+  If default yarn application classpath should be added.
+`spring.yarn.appmaster.launchcontext.useMapreduceAppClasspath`::
+  If default mr application classpath should be added.
+`spring.yarn.appmaster.launchcontext.includeSystemEnv`::
+  If system environment variables are added to a container environment.
+`spring.yarn.appmaster.launchcontext.locality`::
+  If set to true indicates that resources are not relaxed.
+
+.`spring.yarn.appmaster.localizer` configuration properties
+[width="100%",cols="<40%,20%,20%,20%",options="header",]
+|====================================================================
+|Property Name |Required |Type |Default Value
+|`spring.yarn.appmaster.localizer.patterns` |No |List |null
+|`spring.yarn.appmaster.localizer.zipPattern` |No |String |null
+|`spring.yarn.appmaster.localizer.propertiesNames` |No |List |null
+|`spring.yarn.appmaster.localizer.propertiesSuffixes` |No |List |null
+|====================================================================
+
+`spring.yarn.appmaster.localizer.patterns`::
+  A simple patterns to choose localized files.
+`spring.yarn.appmaster.localizer.zipPattern`::
+  A simple pattern to mark a file as archive to be exploded.
+`spring.yarn.appmaster.localizer.propertiesNames`::
+  Base name of a configuration files.
+`spring.yarn.appmaster.localizer.propertiesSuffixes`::
+  Suffixes for a configuration files.
+
+.`spring.yarn.appmaster.resource` configuration properties
+[width="100%",cols="<40%,20%,20%,20%",options="header",]
+|===============================================================
+|Property Name |Required |Type |Default Value
+|`spring.yarn.appmaster.resource.priority` |No |String |null
+|`spring.yarn.appmaster.resource.memory` |No |String |null
+|`spring.yarn.appmaster.resource.virtualCores` |No |String |null
+|===============================================================
+
+`spring.yarn.appmaster.resource.priority`::
+  Container priority.
+`spring.yarn.appmaster.resource.memory`::
+  Container memory allocation.
+`spring.yarn.appmaster.resource.virtualCores`::
+  Container cpu allocation.
+
+.`spring.yarn.appmaster.containercluster` configuration properties
+[width="100%",cols="<40%,20%,20%,20%",options="header",]
+|================================================================
+|Property Name |Required |Type |Default Value
+|`spring.yarn.appmaster.containercluster.clusters` |No |Map |null
+|================================================================
+
+`spring.yarn.appmaster.containercluster.clusters`::
+  Definitions of container clusters.
+
+.`spring.yarn.appmaster.containercluster.clusters.<name>` configuration
+properties
+[width="100%",cols="<40%,20%,20%,20%",options="header",]
+|=======================================================================
+|Property Name |Required |Type |Default Value
+|`spring.yarn.appmaster.containercluster.clusters.<name>.resource` |No
+|Config |null
+
+|`spring.yarn.appmaster.containercluster.clusters.<name>.launchcontext`
+|No |Config |null
+
+|`spring.yarn.appmaster.containercluster.clusters.<name>.localizer` |No
+|Config |null
+
+|`spring.yarn.appmaster.containercluster.clusters.<name>.projection` |No
+|Config |null
+|=======================================================================
+
+`spring.yarn.appmaster.containercluster.clusters.<name>.resource`::
+  Same as `spring.yarn.appmaster.resource` config property.
+`spring.yarn.appmaster.containercluster.clusters.<name>.launchcontext`::
+  Same as `spring.yarn.appmaster.launchcontext` config property.
+`spring.yarn.appmaster.containercluster.clusters.<name>.localizer`::
+  Same as `spring.yarn.aptpmaster.localizer` config property.
+`spring.yarn.appmaster.containercluster.clusters.<name>.projection`::
+  Config collection for a projection settings.
+
+.`spring.yarn.appmaster.containercluster.clusters.<name>.projection`
+configuration properties
+[width="100%",cols="<40%,20%,20%,20%",options="header",]
+|=======================================================================
+|Property Name |Required |Type |Default Value
+|`spring.yarn.appmaster.containercluster.clusters.<name>.projection.type`
+|No |String |null
+
+|`spring.yarn.appmaster.containercluster.clusters.<name>.projection.data`
+|No |Map |null
+|=======================================================================
+
+`spring.yarn.appmaster.containercluster.clusters.<name>.projection.type`::
+  Type of a projection to use. `default` is supported on default or any
+  other projection added via a custom factory.
+`spring.yarn.appmaster.containercluster.clusters.<name>.projection.data`::
+  Map of config keys and values. `any` takes an integer, `hosts` as name
+  to integer map, `racks` as name to integer map, `properties` as a
+  generic map values.
+
+.`spring.yarn.endpoints.containercluster` configuration properties
+[width="100%",cols="<40%,20%,20%,20%",options="header",]
+|===================================================================
+|Property Name |Required |Type |Default Value
+|`spring.yarn.endpoints.containercluster.enabled` |No |Boolean |null
+|===================================================================
+
+`spring.yarn.endpoints.containercluster.enabled`::
+  Enabling endpoint MVC REST API controlling container clusters.
+
+.`spring.yarn.client` configuration properties
+[width="100%",cols="<40%,20%,20%,20%",options="header",]
+|=====================================================
+|Property Name |Required |Type |Default Value
+|`spring.yarn.client.files` |No |List |null
+|`spring.yarn.client.priority` |No |Integer |null
+|`spring.yarn.client.queue` |No |String |null
+|`spring.yarn.client.clientClass` |No |Class |null
+|`spring.yarn.client.startup.action` |No |String |null
+|=====================================================
+
+`spring.yarn.client.files`::
+  Files to copy into hdfs during application submission.
+`spring.yarn.client.priority`::
+  Application priority.
+`spring.yarn.client.queue`::
+  Application submission queue.
+`spring.yarn.client.clientClass`::
+  Fully qualified classname which auto-configuration can automatically
+  instantiate as a custom client.
+`spring.yarn.client.startup.action`::
+  Default action to perform on YarnClient. Currently only one action
+  named _submit_ is supported. This action is simply calling
+  `submitApplication` method on YarnClient.
+
+.`spring.yarn.client.launchcontext` configuration properties
+[width="100%",cols="<40%,20%,20%,20%",options="header",]
+|=======================================================================
+|Property Name |Required |Type |Default Value
+|`spring.yarn.client.launchcontext.archiveFile` |No |String |null
+
+|`spring.yarn.client.launchcontext.runnerClass` |No |Class |null
+
+|`spring.yarn.client.launchcontext.options` |No |List |null
+
+|`spring.yarn.client.launchcontext.arguments` |No |Map |null
+
+|`spring.yarn.client.launchcontext.containerAppClasspath` |No |List
+|null
+
+|`spring.yarn.client.launchcontext.pathSeparator` |No |String |:
+
+|`spring.yarn.client.launchcontext.includeBaseDirectory` |No |Boolean
+|true
+
+|`spring.yarn.client.launchcontext.useYarnAppClasspath` |No |Boolean
+|true
+
+|`spring.yarn.client.launchcontext.useMapreduceAppClasspath` |No
+|Boolean |true
+
+|`spring.yarn.client.launchcontext.includeSystemEnv` |No |Boolean |true
+|=======================================================================
+
+`spring.yarn.client.launchcontext.archiveFile`::
+  Indicates that a container main file is treated as executable jar or
+  exploded zip.
+`spring.yarn.client.launchcontext.runnerClass`::
+  Indicates a fully qualified class name for a container runner.
+`spring.yarn.client.launchcontext.options`::
+  JVM system options.
+`spring.yarn.client.launchcontext.arguments`::
+  Application arguments.
+`spring.yarn.client.launchcontext.containerAppClasspath`::
+  Additional classpath entries.
+`spring.yarn.client.launchcontext.pathSeparator`::
+  Separator in a classpath.
+`spring.yarn.client.launchcontext.includeBaseDirectory`::
+  If base directory should be added in a classpath.
+`spring.yarn.client.launchcontext.useYarnAppClasspath`::
+  If default yarn application classpath should be added.
+`spring.yarn.client.launchcontext.useMapreduceAppClasspath`::
+  If default mr application classpath should be added.
+`spring.yarn.client.launchcontext.includeSystemEnv`::
+  If system environment variables are added to a container environment.
+
+.`spring.yarn.client.localizer` configuration properties
+[width="100%",cols="<40%,20%,20%,20%",options="header",]
+|=================================================================
+|Property Name |Required |Type |Default Value
+|`spring.yarn.client.localizer.patterns` |No |List |null
+|`spring.yarn.client.localizer.zipPattern` |No |String |null
+|`spring.yarn.client.localizer.propertiesNames` |No |List |null
+|`spring.yarn.client.localizer.propertiesSuffixes` |No |List |null
+|=================================================================
+
+`spring.yarn.client.localizer.patterns`::
+  A simple patterns to choose localized files.
+`spring.yarn.client.localizer.zipPattern`::
+  A simple pattern to mark a file as archive to be exploded.
+`spring.yarn.client.localizer.propertiesNames`::
+  Base name of a configuration files.
+`spring.yarn.client.localizer.propertiesSuffixes`::
+  Suffixes for a configuration files.
+
+.`spring.yarn.client.resource` configuration properties
+[width="100%",cols="<40%,20%,20%,20%",options="header",]
+|============================================================
+|Property Name |Required |Type |Default Value
+|`spring.yarn.client.resource.memory` |No |String |null
+|`spring.yarn.client.resource.virtualCores` |No |String |null
+|============================================================
+
+`spring.yarn.client.resource.memory`::
+  Application master memory allocation.
+`spring.yarn.client.resource.virtualCores`::
+  Application master cpu allocation.
+
+.`spring.yarn.container` configuration properties
+[width="100%",cols="<40%,20%,20%,20%",options="header",]
+|===========================================================
+|Property Name |Required |Type |Default Value
+|`spring.yarn.container.keepContextAlive` |No |Boolean |true
+|`spring.yarn.container.containerClass` |No |Class |null
+|===========================================================
+
+`spring.yarn.container.keepContextAlive`::
+  Setting for an application container runner to stop main thread to
+  wait a latch before continuing. This is needed in cases where main
+  thread needs to wait event from other threads to be able to exit.
+`spring.yarn.container.containerClass`::
+  Fully qualified classname which auto-configuration can automatically
+  instantiate as a custom container.
+
+.`spring.yarn.batch` configuration properties
+[width="100%",cols="<40%,20%,20%,20%",options="header",]
+|===============================================
+|Property Name |Required |Type |Default Value
+|`spring.yarn.batch.name` |No |String |null
+|`spring.yarn.batch.enabled` |No |Boolean |false
+|`spring.yarn.batch.jobs` |No |List |null
+|===============================================
+
+`spring.yarn.batch.name`::
+  Comma-delimited list of search patterns to find jobs to run defined
+  either locally in application context or in job registry.
+`spring.yarn.batch.enabled`::
+  Indicates if batch processing on yarn is enabled.
+`spring.yarn.batch.jobs`::
+  Indicates a list of individual configuration properties for jobs.
+
+.`spring.yarn.batch.jobs` configuration properties
+[width="100%",cols="<40%,20%,20%,20%",options="header",]
+|========================================================
+|Property Name |Required |Type |Default Value
+|`spring.yarn.batch.jobs.name` |No |String |null
+|`spring.yarn.batch.jobs.enabled` |No |Boolean |false
+|`spring.yarn.batch.jobs.next` |No |Boolean |false
+|`spring.yarn.batch.jobs.failNext` |No |Boolean |false
+|`spring.yarn.batch.jobs.restart` |No |Boolean |false
+|`spring.yarn.batch.jobs.failRestart` |No |Boolean |false
+|`spring.yarn.batch.jobs.parameters` |No |String |null
+|========================================================
+
+`spring.yarn.batch.jobs.name`::
+  Name of a job to configure.
+`spring.yarn.batch.jobs.enabled`::
+  Indicates if job is enabled.
+`spring.yarn.batch.jobs.next`::
+  Indicates if job parameters incrementer is used to prepare a job for
+  next run.
+`spring.yarn.batch.jobs.failNext`::
+  Indicates if job execution should fail if job cannot be prepared for
+  next execution.
+`spring.yarn.batch.jobs.restart`::
+  Indicates of job should be restarted.
+`spring.yarn.batch.jobs.failRestart`::
+  Indicates if job execution should fail if job cannot be restarted.
+`spring.yarn.batch.jobs.parameters`::
+  Defines a Map of additional job parameters. Keys and values are in
+  normal format supported by Batch.
+
+==== Container Groups
+
+Hadoop YARN is a simple resource scheduler and thus doesn’t provide any
+higher level functionality for controlling containers for failures or
+grouping. Currently these type of features need to be implemented atop
+of YARN using a third party components such as Spring YARN. Containers
+controlled by YARN are handled as one big pool of resources and any
+functionality for grouping containers needs to be implemented within a
+custom application master. Spring YARN provides components which can be
+used to control containers as groups.
+
+Container Group is a logical representation of containers managed by a
+single YARN application. In a typical YARN application a container which
+is allocated and launched shares a same configuration for
+Resource(memory, cpu), Localized Files(application files) and Launch
+Context(process command). Grouping brings a separate configuration for
+each group which allows to run different logical applications within a
+one application master. Logical application simply mean that different
+containers are meant to do totally different things. A simple use case
+for such things is an application which needs to run two different types
+of containers, admin and worker nodes respectively.
+
+YARN itself is not meant to be a task scheduler meaning you can’t
+request a container for specific task which would then run on a Hadoop
+cluster. In layman’s terms this simply mean that you can’t associate a
+container allocation request for response received from a resource
+manager. This decision was made to keep a resource manager relatively
+light and spawn all the task activities into an application master. All
+the allocated containers are requested and received from YARN
+asynchronously thus making a one big pool of resources. All the task
+activities needs to be build using this pool. This brings a new concept
+of doing a container projection from a single allocated pool of
+containers.
+
+_Application Master_ which is meant to be used with container groups
+need to implement interface ContainerClusterAppmaster shown below.
+Currently one built-in implementation
+org.springframework.yarn.am.cluster.ManagedContainerClusterAppmaster
+exists.
+
+[source,java]
+----
+public interface ContainerClusterAppmaster extends YarnAppmaster {
+  Map<String, ContainerCluster> getContainerClusters();
+  ContainerCluster createContainerCluster(String clusterId, ProjectionData projection);
+  ContainerCluster createContainerCluster(String clusterId,
+    String clusterDef, ProjectionData projection, Map<String, Object> extraProperties);
+  void startContainerCluster(String id);
+  void stopContainerCluster(String id);
+  void destroyContainerCluster(String id);
+  void modifyContainerCluster(String id, ProjectionData data);
+}
+----
+
+Order to use default implementation ManagedContainerClusterAppmaster,
+configure it using a `spring.yarn.appmaster.appmasterClass`
+configuration key. If you plan to control this container groups
+externally via internal rest api, set
+`spring.yarn.endpoints.containercluster.enabled` to `true`.
+
+[source,yaml]
+----
+spring:
+  yarn:
+    appmaster:
+      appmasterClass: org.springframework.yarn.am.cluster.ManagedContainerClusterAppmaster
+    endpoints:
+      containercluster:
+        enabled: true
+----
+
+===== Grid Projection
+
+Container cluster is always associated with a grid projection. This
+allows de-coupling of cluster configuration and its grid projection.
+Cluster or group is not directly aware of how containers are chosen.
+
+[source,java]
+----
+public interface GridProjection {
+  boolean acceptMember(GridMember member);
+  GridMember removeMember(GridMember member);
+  Collection<GridMember> getMembers();
+  SatisfyStateData getSatisfyState();
+  void setProjectionData(ProjectionData data);
+  ProjectionData getProjectionData();
+}
+----
+
+GridProjection has its projection configuration in ProjectionData.
+SatisfyStateData defines a data object to satisfy a grid projection
+state.
+
+Projections are created via GridProjectionFactory beans. Default factory
+named as `gridProjectionFactory` currently handles one different type of
+projection named DefaultGridProjection which is registered with name
+`default`. You can replace this factory by defining a bean with a same
+name or introduce more factories just by defining your own factory
+implementations.
+
+[source,java]
+----
+public interface GridProjectionFactory {
+  GridProjection getGridProjection(ProjectionData projectionData);
+  Set<String> getRegisteredProjectionTypes();
+}
+----
+
+Registered types needs to be mapped into projections itself created by a
+factory. For example default implementation does mapping of type
+`default`.
+
+===== Group Configuration
+
+Typical configuration is shown below:
+
+[source,yaml]
+----
+spring:
+  hadoop:
+    fsUri: hdfs://node1:8020
+    resourceManagerHost: node1
+  yarn:
+    appType: BOOT
+    appName: gs-yarn-uimodel
+    applicationBaseDir: /app/
+    applicationDir: /app/gs-yarn-uimodel/
+    appmaster:
+      appmasterClass: org.springframework.yarn.am.cluster.ManagedContainerClusterAppmaster
+      keepContextAlive: true
+      containercluster:
+        clusters:
+          cluster1:
+            projection:
+              type: default
+              data:
+                any: 1
+                hosts:
+                  node3: 1
+                  node4: 1
+                racks:
+                  rack1: 1
+                  rack2: 1 
+            resource:
+              priority: 1
+              memory: 64
+              virtualCores: 1
+            launchcontext:
+              locality: true
+              archiveFile: gs-yarn-uimodel-cont1-0.1.0.jar
+            localizer:
+              patterns:
+                - "*cont1*jar"
+----
+
+These container cluster configurations will also work as a blueprint
+when creating groups manually on demand. If `projectionType` is defined
+in a configuration it indicates that a group should be created
+automatically.
+
+===== Container Restart
+
+Currently a simple support for automatically re-starting a failed
+container is implemented by a fact that if container goes away group
+projection is no longer satisfied and Spring YARN will try to allocate
+and start new containers as long as projection is satisfied again.
+
+===== REST API
+
+While grouping configuration can be static and solely be what’s defined
+in a yml file, it would be a nice feature if you could control the
+runtime behaviour of these groups externally. REST API provides methods
+to create groups with a specific projects, start group, stop group and
+modify group projection.
+
+Boot based REST API endpoint need to be explicitly enabled by using a
+configuration shown below:
+
+[source,yaml]
+----
+spring:
+  yarn:
+    endpoints:
+      containercluster:
+        enabled: true
+----
+
+GET /yarn_containercluster
+
+Returns info about existing clusters
+
+Response Class
+
+[source,text]
+----
+ContainerClusters {
+  clusters (array[string])
+}
+----
+
+Response Schema
+
+[source,text]
+----
+{
+  "clusters":[
+    "<clusterId>"
+  ]
+}
+----
+
+POST /yarn_containercluster
+
+Create a new container cluster
+
+.Parameters
+[width="100%",cols="<20%,<20%,<20%,<40%",options="header",]
+|============================================================
+|Parameter |Description |Parameter Type |Data Type
+|body |Cluster to be created |body |[multiblock cell omitted]
+|============================================================
+
+.Response Messages
+[width="100%",cols="<34%,<33%,<33%",options="header",]
+|=============================================
+|HTTP Status Code |Reason |Response Model
+|405 |Invalid input |[multiblock cell omitted]
+|=============================================
+
+GET /yarn_containercluster/\{clusterId}
+
+Returns info about a container cluster.
+
+Response Class
+
+[source,text]
+----
+code,text------------------------------------------------ code,text
+ContainerCluster {
+  id (string): unique identifier for a cluster,
+  gridProjection (GridProjection),
+  containerClusterState (ContainerClusterState)
+}
+
+GridProjection {
+  members (array[Member]),
+  projectionData (ProjectionData),
+  satisfyState (SatisfyState)
+}
+
+Member {
+  id (string): unique identifier for a member,  
+}
+
+ProjectionData {
+  type (string),
+  priority (integer),
+  any (integer, optional),
+  hosts (map, optional),
+  racks (map, optional)
+}
+
+SatisfyState {
+  removeData (array(string)),
+  allocateData (AllocateData)
+}
+
+AllocateData {
+  any (integer, optional),
+  hosts (map, optional),
+  racks (map, optional)
+}
+
+ContainerClusterState {
+  clusterState (string)
+}
+----
+
+Response Schema
+
+[source,text]
+----
+{
+  "id":"",
+  "gridProjection":{
+    "members":[
+      {
+        "id":""
+      }
+    ],
+    "projectionData":{
+      "type":"",
+      "priority":0,
+      "any":0,
+      "hosts":{
+      },
+      "racks":{
+      }
+    },
+    "satisfyState":{
+      "removeData":[
+      ],
+      "allocateData":{
+        "any":0,
+        "hosts":{
+        },
+        "racks":{
+        }
+      }
+    }
+  },
+  "containerClusterState":{
+    "clusterState":""
+  }
+}
+----
+
+.Parameters
+[width="100%",cols="<20%,<20%,<20%,<40%",options="header",]
+|============================================================
+|Parameter |Description |Parameter Type |Data Type
+|clusterId |ID of a cluster needs to be fetched |path |string
+|============================================================
+
+.Response Messages
+[width="100%",cols="<34%,<33%,<33%",options="header",]
+|===============================================
+|HTTP Status Code |Reason |Response Model
+|404 |No such cluster |[multiblock cell omitted]
+|===============================================
+
+PUT /yarn_containercluster/\{clusterId}
+
+Modify a container cluster state.
+
+.Parameters
+[width="100%",cols="<20%,<20%,<20%,<40%",options="header",]
+|===================================================================
+|Parameter |Description |Parameter Type |Data Type
+|clusterId |ID of a cluster needs to be fetched |path |string
+|body |Cluster state to be modified |body |[multiblock cell omitted]
+|===================================================================
+
+.Response Messages
+[width="100%",cols="<34%,<33%,<33%",options="header",]
+|===============================================
+|HTTP Status Code |Reason |Response Model
+|404 |No such cluster |[multiblock cell omitted]
+|404 |No such action |[multiblock cell omitted]
+|===============================================
+
+PATCH /yarn_containercluster/\{clusterId}
+
+Modify a container cluster projection.
+
+.Parameters
+[width="100%",cols="<20%,<20%,<20%,<40%",options="header",]
+|============================================================
+|Parameter |Description |Parameter Type |Data Type
+|clusterId |ID of a cluster needs to be fetched |path |string
+|body |Cluster to be created |body |[multiblock cell omitted]
+|============================================================
+
+.Response Messages
+[width="100%",cols="<34%,<33%,<33%",options="header",]
+|===============================================
+|HTTP Status Code |Reason |Response Model
+|404 |No such cluster |[multiblock cell omitted]
+|===============================================
+
+DELETE /yarn_containercluster/\{clusterId}
+
+Destroy a container cluster.
+
+.Parameters
+[width="100%",cols="<20%,<20%,<20%,<40%",options="header",]
+|============================================================
+|Parameter |Description |Parameter Type |Data Type
+|clusterId |ID of a cluster needs to be fetched |path |string
+|============================================================
+
+.Response Messages
+[width="100%",cols="<34%,<33%,<33%",options="header",]
+|===============================================
+|HTTP Status Code |Reason |Response Model
+|404 |No such cluster |[multiblock cell omitted]
+|===============================================
+
+==== Controlling Applications
+
+We've already talked about how resources are localized into a running
+container. These resources are always localized from a HDFS file system
+which effectively means that the whole process of getting application
+files into a newly launched YARN application is a two phase process;
+firstly files are copied into HDFS and secondly files are localized from
+a HDFS.
+
+When application instance is submitted into YARN, there are two ways how
+these application files can be handled. First which is the most obvious
+is to just copy all the necessary files into a known location in HDFS
+and then instruct YARN to localize files from there. Second method is to
+split this into two different stages, first install application files
+into HDFS and then submit application from there. At first there seem to
+be no difference with these two ways to handle application deployment.
+However if files are always copied into HDFS when application is
+submitted, you need a physical access to those files. This may not
+always be possible so it's easier if you have a change to prepare these
+files by first installing application into HDFS and then just send a
+submit command to a YARN resource manager.
+
+To ease a process of handling a full application life cycle, few utility
+classes exist which are meant to be used with Spring Boot. These classes
+are considered to be a foundational Boot application classes, not a
+ready packaged Boot executable jars. Instead you would use these from
+your own application whether that application is a Boot or other Spring
+based application.
+
+===== Generic Usage
+
+Internally these applications are executed using a
+SpringApplicationBuilder and a dedicated _Spring Application Context_.
+This allows to isolate Boot application instance from your current
+context if you have one. One fundamental idea in these applications is
+to make it possible to work with Spring profiles and Boot configuration
+properties. If your existing application is already using profiles and
+configuration properties, simply launching a new Boot would most likely
+derive those settings automatically which is something what you may not
+want.
+
+AbstractClientApplication which all these built-in applications are
+based on contains methods to work with _Spring profiles_ and additional
+configuration properties.
+
+Let's go through all this using an example:
+
+===== Using Configuration Properties
+
+Below sample is pretty much a similar from all other examples except of
+two settings, `applicationBaseDir` and `clientClass`. Property
+`applicationBaseDir` defines where in HDFS a new app will be installed.
+DefaultApplicationYarnClient defined using `clientClass` adds better
+functionality to guard against starting app which doesn't exist or not
+overwriting existing apps in HDFS.
+
+[source,yaml]
+----
+spring:
+  hadoop:
+    fsUri: hdfs://localhost:8020
+    resourceManagerHost: localhost
+  yarn:
+    appType: GS
+    appName: gs-yarn-appmodel
+    applicationBaseDir: /app/
+    applicationDir: /app/gs-yarn-appmodel/
+    client:
+      clientClass: org.springframework.yarn.client.DefaultApplicationYarnClient
+      files:
+        - "file:build/libs/gs-yarn-appmodel-container-0.1.0.jar"
+        - "file:build/libs/gs-yarn-appmodel-appmaster-0.1.0.jar"
+      launchcontext:
+        archiveFile: gs-yarn-appmodel-appmaster-0.1.0.jar
+    appmaster:
+      containerCount: 1
+      launchcontext:
+        archiveFile: gs-yarn-appmodel-container-0.1.0.jar
+----
+
+===== Using YarnPushApplication
+
+YarnPushApplication is used to push your application into HDFS.
+
+[source,java]
+----
+public void doInstall() {
+  YarnPushApplication app = new YarnPushApplication();
+  app.applicationVersion("version1");
+  Properties instanceProperties = new Properties();
+  instanceProperties.setProperty("spring.yarn.applicationVersion", "version1");
+  app.configFile("application.properties", instanceProperties);
+  app.run();
+}
+----
+
+In above example we simply created a YarnPushApplication, set its
+`applicationVersion` and executed a run method. We also instructed
+YarnPushApplication to write used `applicationVersion` into a
+configuration file named _application.properties_ so that it'd be
+available to an application itself.
+
+===== Using YarnSubmitApplication
+
+YarnSubmitApplication is used to submit your application from HDFS into
+YARN.
+
+[source,java]
+----
+public void doSubmit() {
+  YarnSubmitApplication app = new YarnSubmitApplication();
+  app.applicationVersion("version1");
+  ApplicationId applicationId = app.run();
+}
+----
+
+In above example we simply created a YarnSubmitApplication, set its
+`applicationVersion` and executed a run method.
+
+===== Using YarnInfoApplication
+
+YarnInfoApplication is used to query application info from a YARN
+Resource Manager and HDFS.
+
+[source,java]
+----
+public void doListPushed() {
+  YarnInfoApplication app = new YarnInfoApplication();
+  Properties appProperties = new Properties();
+  appProperties.setProperty("spring.yarn.internal.YarnInfoApplication.operation", "PUSHED");
+  app.appProperties(appProperties);
+  String info = app.run();
+  System.out.println(info);
+}
+
+public void doListSubmitted() {
+  YarnInfoApplication app = new YarnInfoApplication();
+  Properties appProperties = new Properties();
+  appProperties.setProperty("spring.yarn.internal.YarnInfoApplication.operation", "SUBMITTED");
+  appProperties.setProperty("spring.yarn.internal.YarnInfoApplication.verbose", "true");
+  appProperties.setProperty("spring.yarn.internal.YarnInfoApplication.type", "GS");
+  app.appProperties(appProperties);
+  String info = app.run();
+  System.out.println(info);
+}
+----
+
+In above example we simply created a YarnInfoApplication, and used it to
+list installed and running applications. By adding `appProperties` will
+make Boot to pick these properties after every other source of
+configuration properties but still allows to pass command-line options
+to override everything which is a normal way in Boot.
+
+====== Using YarnKillApplication
+
+YarnKillApplication is used to kill running application instances.
+
+[source,java]
+----
+public void doKill() {
+  YarnKillApplication app = new YarnKillApplication();
+  Properties appProperties = new Properties();
+  appProperties.setProperty("spring.yarn.internal.YarnKillApplication.applicationId", "application_1395058039949_0052");
+  app.appProperties(appProperties);
+  String info = app.run();
+  System.out.println(info);
+}
+----
+
+In above example we simply created a YarnKillApplication, and used it to
+send a application kill request into a YARN resource manager.
+
+===== Using YarnContainerClusterApplication
+
+YarnContainerClusterApplication is a simple Boot application which knows
+how to talk with Container Cluster MVC Endpoint. More information about
+this see javadocs for commands introduced in below chapter.
+
+==== Cli Integration
+
+Due to nature of being a foundational library, Spring YARN doesn’t
+provide a generic purpose client out of a box for communicating with
+your application. Reason for this is that Spring YARN is not a product,
+but an application build on top of Spring YARN would be a product which
+could have its own client. There is no good way of doing a generic
+purpose ‘client’ which would suit every needs and anyway user may want
+to customize how client works and how his own code is packaged.
+
+We’ve made it as simple as possible to create your own client which can
+be used to control applications on YARN and if container clustering is
+enabled a similar utility classes can be used to control it. Only thing
+what is left for the end user to implement is defining which commands
+should be enabled.
+
+Client facing component _spring-yarn-boot-cli_ contains implementation
+based on _spring-boot-cli_ which can be used to build application cli's.
+It also container built-in commands which are easy to re-use or extend.
+
+Example above shows a typical main method to use all built-in commands.
+
+[source,java]
+----
+public class ClientApplication extends AbstractCli {
+
+  public static void main(String... args) {
+    List<Command> commands = new ArrayList<Command>();
+    commands.add(new YarnPushCommand());
+    commands.add(new YarnPushedCommand());
+    commands.add(new YarnSubmitCommand());
+    commands.add(new YarnSubmittedCommand());
+    commands.add(new YarnKillCommand());
+    commands.add(new YarnClustersInfoCommand());
+    commands.add(new YarnClusterInfoCommand());
+    commands.add(new YarnClusterCreateCommand());
+    commands.add(new YarnClusterStartCommand());
+    commands.add(new YarnClusterStopCommand());
+    commands.add(new YarnClusterModifyCommand());
+    commands.add(new YarnClusterDestroyCommand());
+    ClientApplication app = new ClientApplication();
+    app.registerCommands(commands);
+    app.registerCommand(new ShellCommand(commands));
+    app.doMain(args);
+  }
+
+}
+----
+
+===== Build-in Commands
+
+Built-in commands can be used to either control YARN applications or
+container clusters. All commands are under a package
+`org.springframework.yarn.boot.cli`.
+
+Push Application
+
+[source,text]
+----
+java -jar <jar> push - Push new application version
+
+usage: java -jar <jar> push [options]
+
+Option                     Description                       
+------                     -----------                       
+-v, --application-version  Application version (default: app)
+----
+
+YarnPushCommand can be used to push an application into hdfs.
+
+List Pushed Applications
+
+[source,text]
+----
+java -jar <jar> pushed - List pushed applications
+
+usage: java -jar <jar> pushed [options]
+
+No options specified  
+----
+
+YarnPushedCommand can be used to list information about an pushed
+applications.
+
+Submit Application
+
+[source,text]
+----
+java -jar <jar> submit - Submit application
+
+usage: java -jar <jar> submit [options]
+
+Option                     Description                       
+------                     -----------                       
+-v, --application-version  Application version (default: app)
+----
+
+YarnSubmitCommand can be used to submit a new application instance.
+
+List Submitted Applications
+
+[source,text]
+----
+java -jar <jar> submitted - List submitted applications
+
+usage: java -jar <jar> submitted [options]
+
+Option                   Description                     
+------                   -----------                     
+-t, --application-type   Application type (default: BOOT)
+-v, --verbose [Boolean]  Verbose output (default: true)  
+----
+
+YarnSubmittedCommand can be used to list info about an submitted
+applications.
+
+Kill Application
+
+[source,text]
+----
+java -jar <jar> kill - Kill application
+
+usage: java -jar <jar> kill [options]
+
+Option                Description                
+------                -----------                
+-a, --application-id  Specify YARN application id
+----
+
+YarnKillCommand can be used to kill a running application instance.
+
+List Clusters Info
+
+[source,text]
+----
+java -jar <jar> clustersinfo - List clusters
+
+usage: java -jar <jar> clustersinfo [options]
+
+Option                Description                
+------                -----------                
+-a, --application-id  Specify YARN application id
+----
+
+YarnClustersInfoCommand can be used to list info about existing
+clusters.
+
+List Cluster Info
+
+[source,text]
+----
+java -jar <jar> clusterinfo - List cluster info
+
+usage: java -jar <jar> clusterinfo [options]
+
+Option                   Description                   
+------                   -----------                   
+-a, --application-id     Specify YARN application id   
+-c, --cluster-id         Specify cluster id            
+-v, --verbose [Boolean]  Verbose output (default: true)
+----
+
+YarnClusterInfoCommand can be used to list info about a cluster.
+
+Create Container Cluster
+
+[source,text]
+----
+java -jar <jar> clustercreate - Create cluster
+
+usage: java -jar <jar> clustercreate [options]
+
+Option                  Description                
+------                  -----------                
+-a, --application-id    Specify YARN application id
+-c, --cluster-id        Specify cluster id         
+-h, --projection-hosts  Projection hosts counts    
+-i, --cluster-def       Specify cluster def id     
+-p, --projection-type   Projection type            
+-r, --projection-racks  Projection racks counts    
+-w, --projection-any    Projection any count    
+----
+
+YarnClusterCreateCommand can be used to create a new cluster.
+
+Start Container Cluster
+
+[source,text]
+----
+java -jar <jar> clusterstart - Start cluster
+
+usage: java -jar <jar> clusterstart [options]
+
+Option                Description                
+------                -----------                
+-a, --application-id  Specify YARN application id
+-c, --cluster-id      Specify cluster id         
+----
+
+YarnClusterStartCommand can be used to start an existing cluster.
+
+Stop Container Cluster
+
+[source,text]
+----
+java -jar <jar> clusterstop - Stop cluster
+
+usage: java -jar <jar> clusterstop [options]
+
+Option                Description                
+------                -----------                
+-a, --application-id  Specify YARN application id
+-c, --cluster-id      Specify cluster id         
+----
+
+YarnClusterStopCommand can be used to stop an existing cluster.
+
+Modify Container Cluster
+
+[source,text]
+----
+java -jar <jar> clustermodify - Modify cluster
+
+usage: java -jar <jar> clustermodify [options]
+
+Option                  Description                
+------                  -----------                
+-a, --application-id    Specify YARN application id
+-c, --cluster-id        Specify cluster id         
+-h, --projection-hosts  Projection hosts counts    
+-r, --projection-racks  Projection racks counts    
+-w, --projection-any    Projection any count       
+----
+
+YarnClusterModifyCommand can be used to modify an existing cluster.
+
+Destroy Container Cluster
+
+[source,text]
+----
+java -jar <jar> clusterdestroy - Destroy cluster
+
+usage: java -jar <jar> clusterdestroy [options]
+
+Option                Description                
+------                -----------                
+-a, --application-id  Specify YARN application id
+-c, --cluster-id      Specify cluster id         
+----
+
+YarnClusterDestroyCommand can be used to destroy an existing cluster.
+
+===== Implementing Command
+
+There are few different ways to implement a custom command. At a lowest
+level org.springframework.boot.cli.command.Command need to be
+implemented by all commands to be used. Spring boot provides helper
+classes named org.springframework.boot.cli.command.AbstractCommand and
+org.springframework.boot.cli.command.OptionParsingCommand to easy with
+command implementation. All Spring YARN Boot Cli commands are based on
+org.springframework.yarn.boot.cli.AbstractApplicationCommand which makes
+it easier to execute a boot based application context.
+
+===== Using Shell
+
+While all commands can be used as is using an executable jar, there is a
+little overhead for bootstrapping jvm and Boot application context. To
+overcome this problem all commands can be used within a shell instance.
+Shell also brings you a command history and all commands are executed
+faster because a whole jvm and its libraries are already loaded.
+
+Special command org.springframework.yarn.boot.cli.shell.ShellCommand can
+be used to register an internal shell instance which is reusing all
+other registered commands.
+
+[source,text]
+----
+Spring YARN Cli (v2.1.0.BUILD-SNAPSHOT)
+Hit TAB to complete. Type 'help' and hit RETURN for help, and 'exit' to quit.
+$ 
+clear            clustercreate    clusterdestroy   clusterinfo      
+clustermodify    clustersinfo     clusterstart     clusterstop      
+exit             help             kill             prompt           
+push             pushed           submit           submitted        
+$ help submitted
+submitted - List submitted applications
+
+usage: submitted [options]
+
+Option                   Description                     
+------                   -----------                     
+-t, --application-type   Application type (default: BOOT)
+-v, --verbose [Boolean]  Verbose output (default: true)  
+----
+
+

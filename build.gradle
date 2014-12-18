@@ -9,9 +9,10 @@ buildscript {
 	}
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:$springBootVersion")
-		classpath("org.springframework.build.gradle:propdeps-plugin:0.0.5")
-		classpath("org.springframework.build.gradle:docbook-reference-plugin:0.2.8")
+		classpath("org.springframework.build.gradle:propdeps-plugin:0.0.7")
 		classpath("org.springframework.build.gradle:spring-io-plugin:0.0.3.RELEASE")
+		classpath('org.asciidoctor:asciidoctor-gradle-plugin:1.5.1')
+		classpath("io.spring.gradle:docbook-reference-plugin:0.3.0")
 	}
 }
 
@@ -68,6 +69,8 @@ def List hadoopTestArtifacts = []
 def hadoopDefault = "hadoop25"
 def hadoopDistro = project.hasProperty("distro") ? project.getProperty("distro") : hadoopDefault
 def hadoopVersion = "default"
+// hadoopVanillaVersion for used in docs
+def hadoopVanillaVersion = hd25Version
 
 // Common Hadoop libraries
 def hiveVersion = defaultHiveVersion
@@ -650,12 +653,44 @@ configure(rootProject) {
 
 	apply plugin: 'eclipse'
 	apply plugin: 'idea'
-
+	apply plugin: 'org.asciidoctor.gradle.asciidoctor'
 	apply plugin: "docbook-reference"
 
+	ext.expandPlaceholders = ""
+
 	reference {
-		sourceDir = file("docs/src/reference/docbook")
+		sourceDir = new File(asciidoctor.outputDir , 'docbook5')
 		pdfFilename = "spring-data-hadoop-reference.pdf"
+		epubFilename = "spring-data-hadoop-reference.epub"
+		expandPlaceholders = ""
+	}
+
+	afterEvaluate {
+		tasks.findAll { it.name.startsWith("reference") }.each{ it.dependsOn.add("asciidoctor") }
+	}
+
+	asciidoctorj {
+		version = '1.5.2'
+	}
+
+	asciidoctor {
+		sourceDir = file("docs/src/reference/asciidoc")
+		backends = ['docbook5']
+		options eruby: 'erubis'
+		attributes docinfo: '',
+			copycss : '',
+			icons : 'font',
+			'source-highlighter': 'prettify',
+			sectanchors : '',
+			toc2: '',
+			idprefix: '',
+			idseparator: '-',
+			doctype: 'book',
+			numbered: '',
+			'spring-hadoop-version' : project.version,
+			'spring-version' : springVersion,
+			'hadoop-version' : hadoopVanillaVersion,
+			revnumber : project.version
 	}
 
 	// don't publish the default jar for the root project
@@ -1162,9 +1197,6 @@ project('spring-yarn:spring-yarn-batch') {
 
 project('spring-yarn:spring-yarn-boot') {
 	description = 'Spring Yarn Boot'
-	configurations.all {
-		exclude group: 'javax.servlet', module: 'servlet-api', version: '2.5'
-	}
 	dependencies {
 		compile project(":spring-yarn:spring-yarn-core")
 		provided project(":spring-yarn:spring-yarn-batch")
@@ -1312,6 +1344,6 @@ project('spring-yarn:spring-yarn-boot-test') {
 
 task wrapper(type: Wrapper) {
 	description = "Generates gradlew[.bat] scripts"
-	gradleVersion = "1.8"
+	gradleVersion = "2.2.1"
 }
 

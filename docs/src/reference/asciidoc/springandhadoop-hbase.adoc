@@ -1,0 +1,141 @@
+[[springandhadoop-hbase]]
+== Working with HBase
+
+SHDP provides basic configuration for http://hbase.apache.org[HBase]
+through the `hbase-configuration` namespace element (or its backing
+HbaseConfigurationFactoryBean).
+
+[source,xml]
+----
+<!-- default bean id is 'hbaseConfiguration' that uses the existing 'hadoopCconfiguration' object -->
+<hdp:hbase-configuration configuration-ref="hadoopCconfiguration" />
+----
+
+The above declaration does more than easily create an HBase
+configuration object; it will also manage the backing HBase connections:
+when the application context shuts down, so will any HBase connections
+opened - this behavior can be adjusted through the `stop-proxy` and
+`delete-connection` attributes:
+
+[source,xml]
+----
+<!-- delete associated connections but do not stop the proxies -->
+<hdp:hbase-configuration stop-proxy="false" delete-connection="true">
+  foo=bar
+  property=value
+</hdp:hbase-configuration>
+----
+
+Additionally, one can specify the ZooKeeper port used by the HBase
+server - this is especially useful when connecting to a remote instance
+(note one can fully configure HBase including the ZooKeeper host and
+port through properties; the attributes here act as shortcuts for easier
+declaration):
+
+[source,xml]
+----
+<!-- specify ZooKeeper host/port -->
+<hdp:hbase-configuration zk-quorum="${hbase.host}" zk-port="${hbase.port}">
+----
+
+Notice that like with the other elements, one can specify additional
+properties specific to this configuration. In fact `hbase-configuration`
+provides the same properties configuration `knobs` as
+#hadoop:config:properties[hadoop configuration]:
+
+[source,xml]
+----
+<hdp:hbase-configuration properties-ref="some-props-bean" properties-location="classpath:/conf/testing/hbase.properties"/>
+----
+
+=== Data Access Object (DAO) Support
+
+One of the most popular and powerful feature in Spring Framework is the
+Data Access Object (or DAO)
+http://docs.spring.io/spring/docs/4.0.x/spring-framework-reference/html/dao.html[support].
+It makes dealing with data access technologies easy and consistent
+allowing easy switch or interconnection of the aforementioned persistent
+stores with minimal friction (no worrying about catching exceptions,
+writing boiler-plate code or handling resource acquisition and
+disposal). Rather than reiterating here the value proposal of the DAO
+support, we recommend the DAO
+http://docs.spring.io/spring/docs/4.0.x/spring-framework-reference/html/jdbc.html[section]
+in the Spring Framework reference documentation
+
+SHDP provides the same functionality for Apache HBase through its
+`org.springframework.data.hadoop.hbase` package: an `HbaseTemplate`
+along with several callbacks such as `TableCallback`, `RowMapper` and
+`ResultsExtractor` that remove the low-level, tedious details for
+finding the HBase table, run the query, prepare the scanner, analyze the
+results then clean everything up, letting the developer focus on her
+actual job (users familiar with Spring should find the class/method
+names quite familiar).
+
+At the core of the DAO support lies `HbaseTemplate` - a high-level
+abstraction for interacting with HBase. The template requires an HBase
+link:#hbase[configuration], once it's set, the template is thread-safe
+and can be reused across multiple instances at the same time:
+
+[source,xml]
+----
+// default HBase configuration
+<hdp:hbase-configuration/>
+
+// wire hbase configuration (using default name 'hbaseConfiguration') into the template 
+<bean id="htemplate" class="org.springframework.data.hadoop.hbase.HbaseTemplate" p:configuration-ref="hbaseConfiguration"/>
+----
+
+The template provides generic callbacks, for executing logic against the
+tables or doing result or row extraction, but also utility methods (the
+so-called _one-liner_s) for common operations. Below are some examples
+of how the template usage looks like:
+
+[source,java]
+----
+// writing to 'MyTable'
+template.execute("MyTable", new TableCallback<Object>() {
+  @Override
+  public Object doInTable(HTable table) throws Throwable {
+    Put p = new Put(Bytes.toBytes("SomeRow"));
+    p.add(Bytes.toBytes("SomeColumn"), Bytes.toBytes("SomeQualifier"), Bytes.toBytes("AValue"));
+    table.put(p);
+    return null;
+  }
+});
+----
+
+[source,java]
+----
+// read each row from 'MyTable'
+List<String> rows = template.find("MyTable", "SomeColumn", new RowMapper<String>() {
+  @Override
+  public String mapRow(Result result, int rowNum) throws Exception {
+    return result.toString();
+  }
+}));
+----
+
+The first snippet showcases the generic `TableCallback` - the most
+generic of the callbacks, it does the table lookup and resource cleanup
+so that the user code does not have to. Notice the callback signature -
+any exception thrown by the HBase API is automatically caught, converted
+to Spring's
+http://docs.spring.io/spring/docs/4.0.x/spring-framework-reference/html/dao.html#dao-exceptions[DAO
+exceptions] and resource clean-up applied transparently. The second
+example, displays the dedicated lookup methods - in this case `find`
+which, as the name implies, finds all the rows matching the given
+criteria and allows user code to be executed against each of them
+(typically for doing some sort of type conversion or mapping). If the
+entire result is required, then one can use `ResultsExtractor` instead
+of `RowMapper`.
+
+Besides the template, the package offers support for automatically
+binding HBase table to the current thread through `HbaseInterceptor` and
+`HbaseSynchronizationManager`. That is, each class that performs DAO
+operations on HBase can be
+http://docs.spring.io/spring/docs/4.0.x/spring-framework-reference/html/aop.html#aop-schema-advisors[_wrapped_]
+by `HbaseInterceptor` so that each table in use, once found, is bound to
+the thread so any subsequent call to it avoids the lookup. Once the call
+ends, the table is automatically closed so there is no leakage between
+requests. Please refer to the Javadocs for more information.
+

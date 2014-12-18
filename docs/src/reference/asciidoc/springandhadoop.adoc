@@ -1,0 +1,27 @@
+= Spring and Hadoop
+
+This part of the reference documentation explains the core functionality
+that Spring for Apache Hadoop (SHDP) provides to any Spring based application.
+
+<<springandhadoop-config>> describes the Spring support for bootstrapping,
+initializing and working with core Hadoop.
+
+<<springandhadoop-fs>> describes the Spring support for interacting with
+the Hadoop file system.
+
+<<springandhadoop-store>> describes the store abstraction support.
+
+<<springandhadoop-hbase>> describes the Spring support for HBase.
+
+<<springandhadoop-hive>> describes the Hive integration in SHDP.
+
+<<springandhadoop-pig>> describes the Pig support in Spring for Apache Hadoop.
+
+<<springandhadoop-runners>> describes the runner support.
+
+<<springandhadoop-security>> describes how to configure and interact
+with Hadoop in a secure environment.
+
+<<springandhadoop-yarn>> describes the Hadoop YARN support.
+
+<<springandhadoop-testing>> describes the Spring testing integration.

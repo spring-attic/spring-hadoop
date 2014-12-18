@@ -1,0 +1,65 @@
+[[springandhadoop-runners]]
+== Using the runner classes
+
+Spring for Apache Hadoop provides for each Hadoop interaction type,
+whether it is vanilla Map/Reduce, Hive or Pig, a _runner_, a dedicated
+class used for declarative (or programmatic) interaction. The list below
+illustrates the existing _runner_ classes for each type, their name and
+namespace element.
+
+.Available _Runner_s
+[width="100%",cols="18%,16%,16%,50%",options="header",]
+|=======================================================================
+|Type |Name |Namespace element |Description
+|Map/Reduce `Job` |`JobRunner` |`job-runner` |Runner for Map/Reduce
+jobs, whether vanilla M/R or streaming
+
+|Hadoop `Tool` |`ToolRunner` |`tool-runner` |Runner for Hadoop `Tool`s
+(whether stand-alone or as jars).
+
+|Hadoop `jar`s |`JarRunner` |`jar-runner` |Runner for Hadoop jars.
+
+|Hive queries and scripts |`HiveRunner` |`hive-runner` |Runner for
+executing Hive queries or scripts.
+
+|Pig queries and scripts |`PigRunner` |`pig-runner` |Runner for
+executing Pig scripts.
+
+|JSR-223/JVM scripts |`HdfsScriptRunner` |`script` |Runner for executing
+JVM 'scripting' languages (implementing the JSR-223 API).
+|=======================================================================
+
+While most of the configuration depends on the underlying type, the
+runners share common attributes and behaviour so one can use them in a
+predictive, consistent way. Below is a list of common features:
+
+* declaration does *not* imply execution
++
+The runner allows a script, a job to run but the execution can be
+triggered either programmatically or by the container at start-up.
+* `run-at-startup`
++
+Each runner can execute its action at start-up. By default, this flag is
+set to `false`. For multiple or on demand execution (such as scheduling)
+use the Callable contract (see below).
+* JDK Callable interface
++
+Each runner implements the JDK Callable interface. Thus one can inject
+the runner into other beans or its own classes to trigger the execution
+(as many or as little times as she wants).
+* `pre` and `post` actions
++
+Each runner allows one or multiple, pre or/and post actions to be
+specified (to chain them together such as executing a job after another
+or perfoming clean up). Typically other runners can be used but _any_
+`Callable` can be specified. The actions will be executed before and
+after the main action, in the declaration order. The runner uses a
+_fail-safe_ behaviour meaning, any exception will interrupt the run and
+will propagated immediately to the caller.
+* consider Spring Batch
++
+The runners are meant as a way to execute basic tasks. When multiple
+executions need to be coordinated and the flow becomes non-trivial, we
+strongly recommend using Spring Batch which provides all the features of
+the runners and more (a complete, mature framework for batch execution).
+

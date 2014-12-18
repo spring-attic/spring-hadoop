@@ -1,0 +1,675 @@
+[[springandhadoop-testing]]
+== Testing Support
+
+Hadoop testing has always been a cumbersome process especially if you
+try to do testing phase during the normal project build process.
+Traditionally developers have had few options like running Hadoop
+cluster either as a local or pseudo-distributed mode and then utilise
+that to run MapReduce jobs. Hadoop project itself is using a lot of mini
+clusters during the tests which provides better tools to run your code
+in an isolated environment.
+
+Spring Hadoop and especially its Yarn module faced similar testing
+problems. Spring Hadoop provides testing facilities order to make
+testing on Hadoop much easier especially if code relies on Spring Hadoop
+itself. These testing facilities are also used internally to test Spring
+Hadoop, although some test cases still rely on a running Hadoop instance
+on a host where project build is executed.
+
+Two central concepts of testing using Spring Hadoop is, firstly fire up
+the mini cluster and secondly use the configuration prepared by the mini
+cluster to talk to the Hadoop components. Now let's go through the
+general testing facilities offered by Spring Hadoop.
+
+Testing for MapReduce and Yarn in Spring Hadoop is separated into
+different packages mostly because these two components doesn't have hard
+dependencies with each others. You will see a lot of similarities when
+creating tests for MapReduce and Yarn.
+
+=== Testing MapReduce
+
+==== Mini Clusters for MapReduce
+
+Mini clusters usually contain testing components from a Hadoop project
+itself. These are clusters for _MapReduce Job_ handling and _HDFS_ which
+are all run within a same process. In Spring Hadoop mini clusters are
+implementing interface HadoopCluster which provides methods for
+lifecycle and configuration. _Spring Hadoop_ provides transitive maven
+dependencies against different _Hadoop_ distributions and thus mini
+clusters are started using different implementations. This is mostly
+because we want to support _HadoopV1_ and _HadoopV2_ at a same time. All
+this is handled automatically at runtime so everything should be
+transparent to the end user.
+
+[source,java]
+----
+public interface HadoopCluster {
+  Configuration getConfiguration();
+  void start() throws Exception;
+  void stop();
+  FileSystem getFileSystem() throws IOException;
+}
+----
+
+Currently one implementation named _StandaloneHadoopCluster_ exists
+which supports simple cluster type where a number of nodes can be
+defined and then all the nodes will contain utilities for _MapReduce
+Job_ handling and _HDFS_.
+
+There are few ways how this cluster can be started depending on a use
+case. It is possible to use StandaloneHadoopCluster directly or
+configure and start it through HadoopClusterFactoryBean. Existing
+HadoopClusterManager is used in unit tests to cache running clusters.
+
+[NOTE]
+====
+It's advisable not to use HadoopClusterManager outside of tests because
+literally it is using static fields to cache cluster references. This is
+a same concept used in _Spring Test_ order to cache application contexts
+between the unit tests within a jvm.
+====
+
+[source,xml]
+----
+<bean id="hadoopCluster" class="org.springframework.data.hadoop.test.support.HadoopClusterFactoryBean">
+  <property name="clusterId" value="HadoopClusterTests"/>
+  <property name="autoStart" value="true"/>
+  <property name="nodes" value="1"/>
+</bean>
+----
+
+Example above defines a bean named _hadoopCluster_ using a factory bean
+HadoopClusterFactoryBean. It defines a simple one node cluster which is
+started automatically.
+
+==== Configuration
+
+_Spring Hadoop_ components usually depend on _Hadoop_ configuration
+which is then wired into these components during the application context
+startup phase. This was explained in previous chapters so we don't go
+through it again. However this is now a catch-22 because we need the
+configuration for the context but it is not known until mini cluster has
+done its startup magic and prepared the configuration with correct
+values reflecting current runtime status of the cluster itself. Solution
+for this is to use other bean named ConfigurationDelegatingFactoryBean
+which will simply delegate the configuration request into the running
+cluster.
+
+[source,xml]
+----
+<bean id="hadoopConfiguredConfiguration" class="org.springframework.data.hadoop.test.support.ConfigurationDelegatingFactoryBean">
+  <property name="cluster" ref="hadoopCluster"/>
+</bean>
+
+<hdp:configuration id="hadoopConfiguration" configuration-ref="hadoopConfiguredConfiguration"/>
+----
+
+In the above example we created a bean named
+_hadoopConfiguredConfiguration_ using ConfigurationDelegatingFactoryBean
+which simple delegates to _hadoopCluster_ bean. Returned bean
+_hadoopConfiguredConfiguration_ is type of _Hadoop's_ Configuration
+object so it could be used as it is.
+
+Latter part of the example show how _Spring Hadoop_ namespace is used to
+create another Configuration object which is using
+_hadoopConfiguredConfiguration_ as a reference. This scenario would make
+sense if there is a need to add additional configuration options into
+running configuration used by other components. Usually it is suiteable
+to use cluster prepared configuration as it is.
+
+==== Simplified Testing
+
+It is perfecly all right to create your tests from scratch and for
+example create the cluster manually and then get the runtime
+configuration from there. This just needs some boilerplate code in your
+context configuration and unit test lifecycle.
+
+_Spring Hadoop_ adds additional facilities for the testing to make all
+this even easier.
+
+[source,java]
+----
+@RunWith(SpringJUnit4ClassRunner.class)
+public abstract class AbstractHadoopClusterTests implements ApplicationContextAware {
+  ...
+}
+
+@ContextConfiguration(loader=HadoopDelegatingSmartContextLoader.class)
+@MiniHadoopCluster
+public class ClusterBaseTestClassTests extends AbstractHadoopClusterTests {
+  ...
+}
+----
+
+Above example shows the AbstractHadoopClusterTests and how
+ClusterBaseTestClassTests is prepared to be aware of a mini cluster.
+HadoopDelegatingSmartContextLoader offers same base functionality as the
+default DelegatingSmartContextLoader in a spring-test package. One
+additional thing what HadoopDelegatingSmartContextLoader does is to
+automatically handle running clusters and inject Configuration into the
+application context.
+
+[source,java]
+----
+@MiniHadoopCluster(configName="hadoopConfiguration", clusterName="hadoopCluster", nodes=1, id="default")
+----
+
+Generally @MiniHadoopCluster annotation allows you to define injected
+bean name for mini cluster, its Configurations and a number of nodes you
+like to have in a cluster.
+
+_Spring Hadoop_ testing is dependant of general facilities of _Spring
+Test framework_ meaning that everything what is cached during the test
+are reuseable withing other tests. One need to understand that if
+_Hadoop_ mini cluster and its Configuration is injected into an
+Application Context, caching happens on a mercy of a Spring Testing
+meaning if a test Application Context is cached also mini cluster
+instance is cached. While caching is always prefered, one needs to
+understant that if tests are expecting vanilla environment to be
+present, test context should be dirtied using @DirtiesContext
+annotation.
+
+==== Wordcount Example
+
+Let's study a proper example of existing _MapReduce Job_ which is
+executed and tested using _Spring Hadoop_. This example is the Hadoop's
+classic wordcount. We don't go through all the details of this example
+because we want to concentrate on testing specific code and
+configuration.
+
+[source,xml]
+----
+<context:property-placeholder location="hadoop.properties" />
+
+<hdp:job id="wordcountJob"
+  input-path="${wordcount.input.path}"
+  output-path="${wordcount.output.path}"
+  libs="file:build/libs/mapreduce-examples-wordcount-*.jar"
+  mapper="org.springframework.data.hadoop.examples.TokenizerMapper"
+  reducer="org.springframework.data.hadoop.examples.IntSumReducer" />
+
+<hdp:script id="setupScript" location="copy-files.groovy">
+  <hdp:property name="localSourceFile" value="data/nietzsche-chapter-1.txt" />
+  <hdp:property name="inputDir" value="${wordcount.input.path}" />
+  <hdp:property name="outputDir" value="${wordcount.output.path}" />
+</hdp:script>
+
+<hdp:job-runner id="runner"
+  run-at-startup="false"
+  kill-job-at-shutdown="false"
+  wait-for-completion="false"
+  pre-action="setupScript"
+  job-ref="wordcountJob" />
+----
+
+In above configuration example we can see few differences with the
+actual runtime configuration. Firstly you can see that we didn't specify
+any kind of configuration for hadoop. This is because it's is injected
+automatically by testing framework. Secondly because we want to
+explicitely wait the job to be run and finished, _kill-job-at-shutdown_
+and _wait-for-completion_ are set to _false_.
+
+[source,java]
+----
+@ContextConfiguration(loader=HadoopDelegatingSmartContextLoader.class)
+@MiniHadoopCluster
+public class WordcountTests extends AbstractMapReduceTests {
+  @Test
+  public void testWordcountJob() throws Exception {
+    // run blocks and throws exception if job failed
+    JobRunner runner = getApplicationContext().getBean("runner", JobRunner.class);
+    Job wordcountJob = getApplicationContext().getBean("wordcountJob", Job.class);
+
+    runner.call();
+
+    JobStatus finishedStatus = waitFinishedStatus(wordcountJob, 60, TimeUnit.SECONDS);
+    assertThat(finishedStatus, notNullValue());
+
+    // get output files from a job
+    Path[] outputFiles = getOutputFilePaths("/user/gutenberg/output/word/");
+    assertEquals(1, outputFiles.length);
+    assertThat(getFileSystem().getFileStatus(outputFiles[0]).getLen(), greaterThan(0l));
+
+    // read through the file and check that line with
+    // "themselves  6" was found
+    boolean found = false;
+    InputStream in = getFileSystem().open(outputFiles[0]);
+    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+    String line = null;
+    while ((line = reader.readLine()) != null) {
+      if (line.startsWith("themselves")) {
+        assertThat(line, is("themselves\t6"));
+        found = true;
+      }
+    }
+    reader.close();
+    assertThat("Keyword 'themselves' not found", found);
+  }
+}
+----
+
+In above unit test class we simply run the job defined in xml,
+explicitely wait it to finish and then check the output content from
+_HDFS_ by searching expected strings.
+
+=== Testing Yarn
+
+==== Mini Clusters for Yarn
+
+Mini cluster usually contain testing components from a _Hadoop_ project
+itself. These are MiniYARNCluster for Resource Manager and
+MiniDFSCluster for Datanode and Namenode which are all run within a same
+process. In _Spring Hadoop_ mini clusters are implementing interface
+YarnCluster which provides methods for lifecycle and configuration.
+
+[source,java]
+----
+public interface YarnCluster {
+  Configuration getConfiguration();
+  void start() throws Exception;
+  void stop();
+  File getYarnWorkDir();
+}
+----
+
+Currently one implementation named StandaloneYarnCluster exists which
+supports simple cluster type where a number of nodes can be defined and
+then all the nodes will have _Yarn Node Manager_ and _Hdfs Datanode_,
+additionally a _Yarn Resource Manager_ and _Hdfs Namenode_ components
+are started.
+
+There are few ways how this cluster can be started depending on a use
+case. It is possible to use StandaloneYarnCluster directly or configure
+and start it through YarnClusterFactoryBean. Existing YarnClusterManager
+is used in unit tests to cache running clusters.
+
+[NOTE]
+====
+It's advisable not to use YarnClusterManager outside of tests because
+literally it is using static fields to cache cluster references. This is
+a same concept used in _Spring Test_ order to cache application contexts
+between the unit tests within a jvm.
+====
+
+[source,xml]
+----
+<bean id="yarnCluster" class="org.springframework.yarn.test.support.YarnClusterFactoryBean">
+  <property name="clusterId" value="YarnClusterTests"/>
+  <property name="autoStart" value="true"/>
+  <property name="nodes" value="1"/>
+</bean>
+----
+
+Example above defines a bean named _yarnCluster_ using a factory bean
+YarnClusterFactoryBean. It defines a simple one node cluster which is
+started automatically. Cluster working directories would then exist
+under below paths:
+
+[source,text]
+----
+target/YarnClusterTests/
+target/YarnClusterTests-dfs/
+----
+
+[NOTE]
+====
+We rely on base classes from a _Hadoop_ distribution and target base
+directory is hardcoded in Hadoop and is not configurable.
+====
+
+==== Configuration
+
+_Spring Yarn_ components usually depend on _Hadoop_ configuration which
+is then wired into these components during the application context
+startup phase. This was explained in previous chapters so we don't go
+through it again. However this is now a catch-22 because we need the
+configuration for the context but it is not known until mini cluster has
+done its startup magic and prepared the configuration with correct
+values reflecting current runtime status of the cluster itself. Solution
+for this is to use other factory bean class named
+ConfigurationDelegatingFactoryBean which will simple delegate the
+configuration request into the running cluster.
+
+[source,xml]
+----
+<bean id="yarnConfiguredConfiguration" class="org.springframework.yarn.test.support.ConfigurationDelegatingFactoryBean">
+  <property name="cluster" ref="yarnCluster"/>
+</bean>
+
+<yarn:configuration id="yarnConfiguration" configuration-ref="yarnConfiguredConfiguration"/>
+----
+
+In the above example we created a bean named
+_yarnConfiguredConfiguration_ using ConfigurationDelegatingFactoryBean
+which simple delegates to _yarnCluster_ bean. Returned bean
+_yarnConfiguredConfiguration_ is type of _Hadoop's_ Configuration object
+so it could be used as it is.
+
+Latter part of the example show how _Spring Yarn_ namespace is used to
+create another Configuration object which is using
+_yarnConfiguredConfiguration_ as a reference. This scenario would make
+sense if there is a need to add additional configuration options into
+running configuration used by other components. Usually it is suiteable
+to use cluster prepared configuration as it is.
+
+==== Simplified Testing
+
+It is perfecly all right to create your tests from scratch and for
+example create the cluster manually and then get the runtime
+configuration from there. This just needs some boilerplate code in your
+context configuration and unit test lifecycle.
+
+_Spring Hadoop_ adds additional facilities for the testing to make all
+this even easier.
+
+[source,java]
+----
+@RunWith(SpringJUnit4ClassRunner.class)
+public abstract class AbstractYarnClusterTests implements ApplicationContextAware {
+  ...
+}
+
+@ContextConfiguration(loader=YarnDelegatingSmartContextLoader.class)
+@MiniYarnCluster
+public class ClusterBaseTestClassTests extends AbstractYarnClusterTests {
+  ...
+}
+----
+
+Above example shows the AbstractYarnClusterTests and how
+ClusterBaseTestClassTests is prepared to be aware of a mini cluster.
+YarnDelegatingSmartContextLoader offers same base functionality as the
+default DelegatingSmartContextLoader in a spring-test package. One
+additional thing what YarnDelegatingSmartContextLoader does is to
+automatically handle running clusters and inject Configuration into the
+application context.
+
+[source,java]
+----
+@MiniYarnCluster(configName="yarnConfiguration", clusterName="yarnCluster", nodes=1, id="default")
+----
+
+Generally @MiniYarnCluster annotation allows you to define injected bean
+names for mini cluster, its Configurations and a number of nodes you
+like to have in a cluster.
+
+_Spring Hadoop Yarn_ testing is dependant of general facilities of
+_Spring Test_ framework meaning that everything what is cached during
+the test are reuseable withing other tests. One need to understand that
+if _Hadoop_ mini cluster and its Configuration is injected into an
+Application Context, caching happens on a mercy of a Spring Testing
+meaning if a test Application Context is cached also mini cluster
+instance is cached. While caching is always prefered, one needs to
+understant that if tests are expecting vanilla environment to be
+present, test context should be dirtied using @DirtiesContext
+annotation.
+
+_Spring Test Context_ configuration works exactly like you'd work with
+any other _Spring Test_ based tests. It defaults on finding xml based
+config and fall back to Annotation based config. For example if one is
+working with _JavaConfig_ a simple static configuration class can be
+used within the test class.
+
+For test cases where additional context configuration is not needed a
+simple helper annotation @MiniYarnClusterTest can be used.
+
+[source,java]
+----
+@MiniYarnClusterTest
+public class ActivatorTests extends AbstractBootYarnClusterTests {
+  @Test
+  public void testSomething(){
+    ...
+  }
+}
+----
+
+In above example a simple test case was created using annontation
+_@MiniYarnClusterTest_. Behind a scenes it's using junit and prepares a
+YARN minicluster for you and injects needed configuration for you.
+
+Drawback of using a composed annotation like this is that the
+_@Configuration_ is then applied from an annotation class itself and
+user can't no longer add a static _@Configuration_ class in a test class
+itself and expect Spring to pick it up from there which is a normal
+behaviour in Spring testing support. If user wants to use a simple
+composed annotation and use a custom _@Configuration_, one can simply
+duplicate functionality of this _@MiniYarnClusterTest_ annotation.
+
+[source,java]
+----
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+@ContextConfiguration(loader=YarnDelegatingSmartContextLoader.class)
+@MiniYarnCluster
+public @interface CustomMiniYarnClusterTest {
+
+  @Configuration
+  public static class Config {
+    @Bean
+    public String myCustomBean() {
+      return "myCustomBean";
+    }
+  }
+
+}
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@CustomMiniYarnClusterTest
+public class ComposedAnnotationTests {
+
+  @Autowired
+  private ApplicationContext ctx;
+
+  @Test
+  public void testBean() {
+    assertTrue(ctx.containsBean("myCustomBean"));
+  }
+
+}
+----
+
+In above example a custom composed annotation
+_@CustomMiniYarnClusterTest_ was created and then used within a test
+class. This a great way to put your configuration is one place and still
+keep your test class relatively non-verbose.
+
+==== Multi Context Example
+
+Let's study a proper example of existing Spring Yarn application and how
+this is tested during the build process. Multi Context Example is a
+simple Spring Yarn based application which simply launches Application
+Master and four Containers and withing those containers a custom code is
+executed. In this case simply a log message is written.
+
+In real life there are different ways to test whether Hadoop Yarn
+application execution has been succesful or not. The obvious method
+would be to check the application instance execution status reported by
+Hadoop Yarn. Status of the execution doesn't always tell the whole truth
+so i.e. if application is about to write something into HDFS as an
+output that could be used to check the proper outcome of an execution.
+
+This example doesn't write anything into HDFS and anyway it would be out
+of scope of this document for obvious reason. It is fairly
+straightforward to check file content from HDFS. One other interesting
+method is simply to check to application log files that being the
+Application Master and Container logs. Test methods can check exceptions
+or expected log entries from a log files to determine whether test is
+succesful or not.
+
+In this chapter we don't go through how Multi Context Example is
+configured and what it actually does, for that read the documentation
+about the examples. However we go through what needs to be done order to
+test this example application using testing support offered by Spring
+Hadoop.
+
+In this example we gave instructions to copy library dependencies into
+Hdfs and then those entries were used within resouce localizer to tell
+Yarn to copy those files into Container working directory. During the
+unit testing when mini cluster is launched there are no files present in
+Hdfs because cluster is initialized from scratch. Furtunalety Spring
+Hadoop allows you to copy files into Hdfs during the localization
+process from a local file system where Application Context is executed.
+Only thing we need is the actual library files which can be assembled
+during the build process. Spring Hadoop Examples build system rely on
+Gradle so collecting dependencies is an easy task.
+
+[source,xml]
+----
+<yarn:localresources>
+  <yarn:hdfs path="/app/multi-context/*.jar"/>
+  <yarn:hdfs path="/lib/*.jar"/>
+</yarn:localresources>
+----
+
+Above configuration exists in application-context.xml and
+appmaster-context.xml files. This is a normal application configuration
+expecting static files already be present in Hdfs. This is usually done
+to minimize latency during the application submission and execution.
+
+[source,xml]
+----
+<yarn:localresources>
+  <yarn:copy src="file:build/dependency-libs/*" dest="/lib/"/>
+  <yarn:copy src="file:build/libs/*" dest="/app/multi-context/"/>
+  <yarn:hdfs path="/app/multi-context/*.jar"/>
+  <yarn:hdfs path="/lib/*.jar"/>
+</yarn:localresources>
+----
+
+Above example is from MultiContextTest-context.xml which provides the
+runtime context configuration talking with mini cluster during the test
+phase.
+
+When we do context configuration for YarnClient during the testing phase
+all we need to do is to add copy elements which will transfer needed
+libraries into Hdfs before the actual localization process will fire up.
+When those files are copied into Hdfs running in a mini cluster we're
+basically in a same point if using a real Hadoop cluster with existing
+files.
+
+[NOTE]
+====
+Running tests which depends on copying files into Hdfs it is mandatory
+to use build system which is able to prepare these files for you. You
+can't do this within IDE's which have its own ways to execute unit
+tests.
+====
+
+The complete example of running the test, checking the application
+execution status and finally checking the expected state of log files:
+
+[source,java]
+----
+@ContextConfiguration(loader=YarnDelegatingSmartContextLoader.class)
+@MiniYarnCluster
+public class MultiContextTests extends AbstractYarnClusterTests {
+  @Test
+  @Timed(millis=70000)
+  public void testAppSubmission() throws Exception {
+    YarnApplicationState state = submitApplicationAndWait();
+    assertNotNull(state);
+    assertTrue(state.equals(YarnApplicationState.FINISHED));
+
+    File workDir = getYarnCluster().getYarnWorkDir();
+
+    PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+    String locationPattern = "file:" + workDir.getAbsolutePath() + "/**/*.std*";
+    Resource[] resources = resolver.getResources(locationPattern);
+
+    // appmaster and 4 containers should
+    // make it 10 log files
+    assertThat(resources, notNullValue());
+    assertThat(resources.length, is(10));
+
+    for (Resource res : resources) {
+      File file = res.getFile();
+      if (file.getName().endsWith("stdout")) {
+        // there has to be some content in stdout file
+        assertThat(file.length(), greaterThan(0l));
+        if (file.getName().equals("Container.stdout")) {
+          Scanner scanner = new Scanner(file);
+          String content = scanner.useDelimiter("\\A").next();
+          scanner.close();
+          // this is what container will log in stdout
+          assertThat(content, containsString("Hello from MultiContextBeanExample"));
+        }
+      } else if (file.getName().endsWith("stderr")) {
+        // can't have anything in stderr files
+        assertThat(file.length(), is(0l));
+      }
+    }
+  }
+}
+----
+
+=== Testing Boot Based Applications
+
+In previous sections we showed a generic concepts of unit testing in
+_Spring Hadoop_ and _Spring YARN_. We also have a first class support
+for testing _Spring Boot_ based applications made for YARN.
+
+[source,java]
+----
+@MiniYarnClusterTest
+public class AppTests extends AbstractBootYarnClusterTests {
+
+  @Test
+  public void testApp() throws Exception {
+    ApplicationInfo info = submitApplicationAndWait(ClientApplication.class, new String[0]);
+    assertThat(info.getYarnApplicationState(), is(YarnApplicationState.FINISHED));
+
+    List<Resource> resources = ContainerLogUtils.queryContainerLogs(
+      getYarnCluster(), info.getApplicationId());
+    assertThat(resources, notNullValue());
+    assertThat(resources.size(), is(4));
+
+    for (Resource res : resources) {
+      File file = res.getFile();
+      String content = ContainerLogUtils.getFileContent(file);
+      if (file.getName().endsWith("stdout")) {
+        assertThat(file.length(), greaterThan(0l));
+        if (file.getName().equals("Container.stdout")) {
+          assertThat(content, containsString("Hello from HelloPojo"));
+        }
+      } else if (file.getName().endsWith("stderr")) {
+        assertThat("stderr with content: " + content, file.length(), is(0l));
+      }
+    }
+  }
+
+}
+----
+
+Let’s go through step by step what’s happening in this JUnit class. As
+already mentioned earlier we don’t need any existing or running Hadoop
+instances, instead testing framework from Spring YARN provides an easy
+way to fire up a mini cluster where your tests can be run in an isolated
+environment.
+
+* @ContextConfiguration together with YarnDelegatingSmartContextLoader
+tells Spring to prepare a testing context for a mini cluster.
+EmptyConfig is a simple helper class to use if there are no additional
+configuration for tests.
+* @MiniYarnCluster tells Spring to start a Hadoop’s mini cluster having
+components for _HDFS_ and _YARN_. Hadoop’s configuration from this
+minicluster is automatically injected into your testing context.
+* @MiniYarnClusterTest is basically a replacement of @MiniYarnCluster
+and @ContextConfiguration having an empty context configuration.
+* AbstractBootYarnClusterTests is a class containing a lot of base
+functionality what you need in your tests.
+
+Then it’s time to deploy the application into a running minicluster
+
+* `submitApplicationAndWait()` method simply runs your ClientApplication
+and expects it to an application deployment. On default it will wait 60
+seconds an application to finish and returns an current state.
+* We make sure that we have a correct application state
+
+We use ContainerLogUtils to find our container logs files from a
+minicluster.
+
+* We assert count of a log files
+* We expect some specified content from log file
+* We expect stderr files to be empty
+

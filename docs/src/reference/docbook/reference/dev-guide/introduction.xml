@@ -1,6 +1,0 @@
-<partintro>
-  <para>This section provides some guidance on how one can use the
-  Spring for Apache Hadoop project in conjunction with other Spring projects, starting
-  with the Spring Framework itself, then Spring Batch, and then Spring
-  Integration.</para>
-</partintro>
