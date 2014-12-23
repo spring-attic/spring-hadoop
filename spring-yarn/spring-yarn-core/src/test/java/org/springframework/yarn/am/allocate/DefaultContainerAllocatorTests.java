@@ -274,46 +274,20 @@ public class DefaultContainerAllocatorTests {
 
 		ContainerAllocateData data = new ContainerAllocateData();
 		data.addRacks("/default-rack", 2);
-		data.addHosts("host1", 1);
+		data.addHosts("hostX", 1);
 		allocator.allocateContainers(data);
 
 		List<ResourceRequest> createRequests = TestUtils.callMethod("createRequests", allocator);
 		assertThat(createRequests, notNullValue());
 		assertThat(createRequests.size(), is(5));
 
-		ResourceRequest req;
-		req = createRequests.get(0);
-		assertThat(req.getResourceName(), is("host1"));
-		assertThat(req.getPriority().getPriority(), is(0));
-		assertThat(req.getNumContainers(), is(1));
-		assertThat(req.getRelaxLocality(), is(true));
-
-		req = createRequests.get(1);
-		assertThat(req.getResourceName(), is("/default-rack"));
-		assertThat(req.getPriority().getPriority(), is(0));
-		assertThat(req.getNumContainers(), is(1));
-		assertThat(req.getRelaxLocality(), is(false));
-
-		req = createRequests.get(2);
-		assertThat(req.getResourceName(), is("*"));
-		assertThat(req.getPriority().getPriority(), is(0));
-		assertThat(req.getNumContainers(), is(2));
-		assertThat(req.getRelaxLocality(), is(false));
-
-		req = createRequests.get(3);
-		assertThat(req.getResourceName(), is("/default-rack"));
-		assertThat(req.getPriority().getPriority(), is(1));
-		assertThat(req.getNumContainers(), is(2));
-		assertThat(req.getRelaxLocality(), is(true));
-
-		req = createRequests.get(4);
-		assertThat(req.getResourceName(), is("*"));
-		assertThat(req.getPriority().getPriority(), is(1));
-		assertThat(req.getNumContainers(), is(2));
-		assertThat(req.getRelaxLocality(), is(false));
-
+		assertThat(matchRequest(createRequests, "hostX", 0, 1, true), notNullValue());
+		assertThat(matchRequest(createRequests, "/default-rack", 0, 1, false), notNullValue());
+		assertThat(matchRequest(createRequests, "*", 0, 2, false), notNullValue());
+		assertThat(matchRequest(createRequests, "/default-rack", 1, 2, true), notNullValue());
+		assertThat(matchRequest(createRequests, "*", 1, 2, false), notNullValue());
 	}
-
+	
 	@Test
 	public void testAnyAndHostLocalityRequests() throws Exception {
 		DefaultContainerAllocator allocator = new DefaultContainerAllocator();
@@ -411,4 +385,15 @@ public class DefaultContainerAllocatorTests {
 		}
 	}
 
+	private static ResourceRequest matchRequest(List<ResourceRequest> createRequests, String name, int priority,
+			int containers, boolean relax) {
+		for (ResourceRequest r : createRequests) {
+			if (r.getResourceName().equals(name) && r.getPriority().getPriority() == priority
+					&& r.getNumContainers() == containers && r.getRelaxLocality() == relax) {
+				return r;
+			}
+		}
+		return null;
+	}	
+	
 }

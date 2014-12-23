@@ -114,22 +114,28 @@ public class DefaultAllocateCountTracker {
 		Iterator<Entry<String, Integer>> iterator = containerAllocateData.getHosts().entrySet().iterator();
 		while (iterator.hasNext()) {
 			Entry<String, Integer> entry = iterator.next();
-			AtomicInteger atomicInteger = pendingHosts.get(entry.getKey());
-			if (atomicInteger == null) {
-				atomicInteger = new AtomicInteger();
-				pendingHosts.put(entry.getKey(), atomicInteger);
+			AtomicInteger pendingHostsCount = pendingHosts.get(entry.getKey());
+			if (pendingHostsCount == null) {
+				pendingHostsCount = new AtomicInteger();
+				pendingHosts.put(entry.getKey(), pendingHostsCount);
 			}
-			atomicInteger.addAndGet(entry.getValue());
+			pendingHostsCount.addAndGet(entry.getValue());
 
 			String resolvedRack = resolveRack(configuration, entry.getKey());
 			if (StringUtils.hasText(resolvedRack)) {
-				AtomicInteger atomicInteger2 = pendingRacks.get(resolvedRack);
-				if (atomicInteger2 == null) {
-					atomicInteger2 = new AtomicInteger();
-					pendingRacks.put(resolvedRack, atomicInteger2);
+				AtomicInteger pendingRacksCount = pendingRacks.get(resolvedRack);
+				if (pendingRacksCount == null) {
+					pendingRacksCount = new AtomicInteger();
+					pendingRacks.put(resolvedRack, pendingRacksCount);
 				}
-				atomicInteger2.addAndGet(entry.getValue());
-				rackCountsAdded.put(resolvedRack, entry.getValue());
+				pendingRacksCount.addAndGet(entry.getValue());
+				
+				Integer rackCountsAddedCount = rackCountsAdded.get(resolvedRack);
+				if (rackCountsAddedCount == null) {
+					rackCountsAddedCount = 0;
+				}
+				rackCountsAddedCount += entry.getValue();
+				rackCountsAdded.put(resolvedRack, rackCountsAddedCount);
 			}
 
 		}
@@ -138,14 +144,13 @@ public class DefaultAllocateCountTracker {
 		iterator = containerAllocateData.getRacks().entrySet().iterator();
 		while (iterator.hasNext()) {
 			Entry<String, Integer> entry = iterator.next();
-			AtomicInteger atomicInteger = pendingRacks.get(entry.getKey());
-			if (atomicInteger == null) {
-				atomicInteger = new AtomicInteger();
-				pendingRacks.put(entry.getKey(), atomicInteger);
+			AtomicInteger pendingRacksCount = pendingRacks.get(entry.getKey());
+			if (pendingRacksCount == null) {
+				pendingRacksCount = new AtomicInteger();
+				pendingRacks.put(entry.getKey(), pendingRacksCount);
 			}
-			Integer rackCountAlreadyAdded = rackCountsAdded.get(entry.getKey());
-			Integer toAdd = rackCountAlreadyAdded != null ? entry.getValue() - rackCountAlreadyAdded : entry.getValue();
-			atomicInteger.addAndGet(Math.max(toAdd, 0));
+			Integer toAdd = entry.getValue() != null ? entry.getValue() : 0;
+			pendingRacksCount.addAndGet(Math.max(toAdd, 0));
 		}
 
 		// Adding incoming any count
@@ -215,13 +220,14 @@ public class DefaultAllocateCountTracker {
 
 	public Container processAllocatedContainer(Container container) {
 		String host = container.getNodeId().getHost();
+		String rack = resolveRack(configuration, host);
 
 		if (modifyWithKey(requestedHosts, host, false)) {
 			// match hosts
 			log.debug("Found reservation match from hosts for " + host);
-		} else if (modifyWithKey(requestedRacks, host, false)) {
+		} else if (modifyWithKey(requestedRacks, rack, false)) {
 			// match racks
-			log.debug("Found reservation match from racks for " + host);
+			log.debug("Found reservation match from racks for " + rack);
 		} else if (modify(requestedAny, false)) {
 			// match anys
 			log.debug("Found reservation match from anys for " + host);
@@ -303,6 +309,9 @@ public class DefaultAllocateCountTracker {
 	 * @return true, if value is modified, false otherwise
 	 */
 	private static boolean modifyWithKey(Map<String, AtomicInteger> map, String key, boolean increment) {
+		if (key == null) {
+			return false;
+		}
 		AtomicInteger value = map.get(key);
 		if (value != null) {
 			if (increment) {
