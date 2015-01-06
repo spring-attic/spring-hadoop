@@ -1,10 +1,26 @@
+/*
+ * Copyright 2013-2015 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.springframework.data.hadoop.store.dataset;
+
+import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.generic.GenericRecordBuilder;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.kitesdk.data.Dataset;
 import org.kitesdk.data.DatasetWriter;
 import org.kitesdk.data.Formats;
@@ -13,23 +29,18 @@ import org.springframework.beans.PropertyAccessorFactory;
 import org.springframework.data.hadoop.store.StoreException;
 import org.springframework.util.Assert;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-
 /**
  * A {@code DataStoreWriter} for writing Datasets using the Parquet format.
- *
+ * 
  * @author Thomas Risberg
+ * @author Janne Valkealahti
+ *
+ * @param <T> the type of entity to write
+ * 
  */
-public class ParquetDatasetStoreWriter<T> extends AbstractDatasetStoreWriter<T> {
-
-	private final static Log log = LogFactory.getLog(AvroPojoDatasetStoreWriter.class);
-
-	protected volatile DatasetWriter<GenericRecord> writer;
+public class ParquetDatasetStoreWriter<T> extends AbstractDatasetStoreWriter<T, GenericRecord> {
 
 	protected volatile Schema schema;
-
-	private final Object monitor = new Object();
 
 	/**
 	 * Instantiates a new {@code DataStoreWriter} for writing Parquet records to a {@code org.kitesdk.data.Dataset}.
@@ -55,23 +66,28 @@ public class ParquetDatasetStoreWriter<T> extends AbstractDatasetStoreWriter<T> 
 	@Override
 	public void write(T entity) throws IOException {
 		Assert.notNull(entity, "Entity to be written can't be 'null'.");
-		if (!entity.getClass().equals(entityClass)) {
+		if (!entity.getClass().equals(getEntityClass())) {
 			throw new IllegalArgumentException("Entity to write is of class " + entity.getClass().getName() +
-					". Expected " + entityClass.getName());
+					". Expected " + getEntityClass().getName());
 		}
-		synchronized (monitor) {
-			if (writer == null) {
-				if (Formats.PARQUET.getName().equals(datasetDefinition.getFormat().getName())) {
-					Dataset<GenericRecord> dataset =
-							DatasetUtils.getOrCreateDataset(datasetRepositoryFactory, datasetDefinition, entityClass, GenericRecord.class);
-					writer = dataset.newWriter();
-					schema = dataset.getDescriptor().getSchema();
-				} else {
-					throw new StoreException("Invalid format " + datasetDefinition.getFormat() +
-							" specified, you must use 'parquet' with " + this.getClass().getSimpleName() + ".");
-				}
-			}
+		super.write(entity);
+	}
+
+	@Override
+	protected DatasetWriter<GenericRecord> createWriter() {
+		if (Formats.PARQUET.getName().equals(getDatasetDefinition().getFormat().getName())) {
+			Dataset<GenericRecord> dataset =
+					DatasetUtils.getOrCreateDataset(getDatasetRepositoryFactory(), getDatasetDefinition(), getEntityClass(), GenericRecord.class);
+			schema = dataset.getDescriptor().getSchema();
+			return dataset.newWriter();
+		} else {
+			throw new StoreException("Invalid format " + getDatasetDefinition().getFormat() +
+					" specified, you must use 'parquet' with " + this.getClass().getSimpleName() + ".");
 		}
+	}
+	
+	@Override
+	protected GenericRecord convertEntity(T entity) {
 		GenericRecordBuilder builder = new GenericRecordBuilder(schema);
 		BeanWrapper beanWrapper = PropertyAccessorFactory.forBeanPropertyAccess(entity);
 		for (Schema.Field f : schema.getFields()) {
@@ -107,30 +123,10 @@ public class ParquetDatasetStoreWriter<T> extends AbstractDatasetStoreWriter<T> 
 			}
 		}
 		try {
-			writer.write(builder.build());
-		} catch (ClassCastException cce) {
-			throw new StoreException("Failed to write record with schema: " +
-					schema, cce);
+			return builder.build();			
+		} catch (ClassCastException e) {
+			throw new StoreException("Failed to write record with schema: " + schema, e);
 		}
 	}
-
-	@Override
-	public void flush() throws IOException {
-		if (log.isDebugEnabled()) {
-			log.debug("Flushing writer " + writer);
-		}
-		if (writer != null) {
-			writer.flush();
-		}
-	}
-
-	@Override
-	public void close() throws IOException {
-		if (log.isDebugEnabled()) {
-			log.debug("Closing writer " + writer);
-		}
-		if (writer != null) {
-			writer.close();
-		}
-	}
+	
 }

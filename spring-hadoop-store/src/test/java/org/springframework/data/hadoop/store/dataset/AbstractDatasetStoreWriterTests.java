@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.springframework.data.hadoop.store.dataset;
 
 import org.apache.hadoop.fs.FileSystem;
@@ -24,6 +23,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.hadoop.store.DataStoreWriter;
 import org.springframework.data.hadoop.test.context.HadoopDelegatingSmartContextLoader;
 import org.springframework.data.hadoop.test.context.MiniHadoopCluster;
 import org.springframework.data.hadoop.test.junit.AbstractHadoopClusterTests;
@@ -47,7 +47,7 @@ import static org.junit.Assert.assertTrue;
 public abstract class AbstractDatasetStoreWriterTests<T extends Comparable<T>> extends AbstractHadoopClusterTests {
 
 	protected DatasetOperations datasetOperations;
-	protected AbstractDatasetStoreWriter<T> datasetStoreWriter;
+	protected DataStoreWriter<T> datasetStoreWriter;
 	protected List<T> records = new ArrayList<T>();
 	protected Class<T> recordClass;
 
@@ -88,6 +88,5 @@ public abstract class AbstractDatasetStoreWriterTests<T extends Comparable<T>> e
 		assertTrue(result.isReadableProperty("id"));
 		assertTrue(result.getPropertyValue("id").equals(48L));
 	}
-
 
 }

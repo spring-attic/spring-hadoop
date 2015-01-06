@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 the original author or authors.
+ * Copyright 2013-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.springframework.data.hadoop.store.dataset;
 
 import java.io.IOException;
@@ -34,6 +33,7 @@ import org.kitesdk.data.RefinableView;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.PropertyAccessorFactory;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.data.hadoop.store.DataStoreWriter;
 import org.springframework.data.hadoop.store.StoreException;
 import org.springframework.util.Assert;
 
@@ -260,7 +260,7 @@ public class DatasetTemplate implements InitializingBean, DatasetOperations {
 		@SuppressWarnings("unchecked")
 		Class<T> pojoClass = (Class<T>) records.iterator().next().getClass();
 		DatasetDefinition datasetDefinition = getDatasetDefinitionToUseFor(pojoClass);
-		AbstractDatasetStoreWriter<T> writer;
+		DataStoreWriter<T> writer;
 		if (Formats.PARQUET.getName().equals(datasetDefinition.getFormat().getName())) {
 			writer = new ParquetDatasetStoreWriter<T>(pojoClass, dsFactory, datasetDefinition);
 		} else {
