@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 the original author or authors.
+ * Copyright 2011-2015 the original author or authors.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,50 +15,58 @@
  */
 package org.springframework.data.hadoop.fs;
 
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.lang.reflect.UndeclaredThrowableException;
 import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.ipc.RemoteException;
 import org.apache.hadoop.security.UserGroupInformation;
+import org.apache.hadoop.tools.DistCpOptions;
+import org.apache.hadoop.tools.OptionsParser;
+import org.springframework.data.hadoop.HadoopException;
 import org.springframework.data.hadoop.configuration.ConfigurationUtils;
 import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
-
 /**
- * Exposes the Hadoop command-line <a href="http://hadoop.apache.org/common/docs/current/distcp.html">distcp</a> as an embeddable API.
- * Due to the number of options available in DistCp, one can either specify them in a command-like style (through one or multiple {@link String}s)
- * through {@link #copy(String...)} or specify individual arguments through the rest of the methods. 
+ * Exposes the Hadoop command-line DistCp functionality as
+ * an embeddable API. Due to the number of options available in DistCp, one can
+ * either specify them in a command-like style (through one or multiple
+ * {@link String}s) through {@link #copy(String...)} or specify individual
+ * arguments through the rest of the methods.
  * 
  * @author Costin Leau
  * @author Thomas Risberg
+ * @author Janne Valkealahti
+ * 
  */
 public class DistCp {
 
-	//TODO: SHDP-364 Rewrite DistCp for Hadoop v2 API
-
+	private final static Log log = LogFactory.getLog(DistCp.class);
+	
 	private final Configuration configuration;
 	private String user;
 
 	/**
-	 * Constructs a new <code>DistCp</code> instance.
+	 * Instantiates a new DistCp.
 	 *
-	 * @param configuration Hadoop configuration to use.
+	 * @param configuration the hadoop configuration
 	 */
 	public DistCp(Configuration configuration) {
 		this(configuration, null);
-	};
+	}
 
+	/**
+	 * Instantiates a new DistCp.
+	 *
+	 * @param configuration the hadoop configuration
+	 * @param user the user
+	 */
 	public DistCp(Configuration configuration, String user) {
 		Assert.notNull(configuration, "configuration required");
 		this.configuration = ConfigurationUtils.createFrom(configuration, null);
@@ -71,8 +79,6 @@ public class DistCp {
 
 	/**
 	 * Enumeration for the possible attributes that can be preserved by a copy operation.
-	 * 
-	 * @author Costin Leau
 	 */
 	public enum Preserve {
 		REPLICATION, BLOCKSIZE, USER, GROUP, PERMISSION;
@@ -86,7 +92,8 @@ public class DistCp {
 					preserve.contains(GROUP), preserve.contains(PERMISSION));
 		}
 
-		static String toString(Boolean preserveReplication, Boolean preserveBlockSize, Boolean preserveUser, Boolean preserveGroup, Boolean preservePermission) {
+		static String toString(Boolean preserveReplication, Boolean preserveBlockSize, Boolean preserveUser,
+				Boolean preserveGroup, Boolean preservePermission) {
 
 			StringBuilder sb = new StringBuilder();
 
@@ -115,7 +122,8 @@ public class DistCp {
 	}
 
 	/**
-	 *
+	 * Copies the given resources using the given parameters.
+	 * 
 	 * @param preserve preserve
 	 * @param ignoreFailures ignoreFailures
 	 * @param overwrite overwrite
@@ -123,7 +131,8 @@ public class DistCp {
 	 * @param delete delete
 	 * @param uris uris
 	 */
-	public void copy(EnumSet<Preserve> preserve, Boolean ignoreFailures, Boolean overwrite, Boolean update, Boolean delete, String... uris) {
+	public void copy(EnumSet<Preserve> preserve, Boolean ignoreFailures, Boolean overwrite, Boolean update,
+			Boolean delete, String... uris) {
 		copy(preserve, ignoreFailures, Boolean.FALSE, null, null, overwrite, update, delete, null, null, null, uris);
 	}
 
@@ -143,7 +152,9 @@ public class DistCp {
 	 * @param fileList fileList
 	 * @param uris uris
 	 */
-	public void copy(EnumSet<Preserve> preserve, Boolean ignoreFailures, Boolean skipCrc, String logDir, Integer mappers, Boolean overwrite, Boolean update, Boolean delete, Long fileLimit, Long sizeLimit, String fileList, String... uris) {
+	public void copy(EnumSet<Preserve> preserve, Boolean ignoreFailures, Boolean skipCrc, String logDir,
+			Integer mappers, Boolean overwrite, Boolean update, Boolean delete, Long fileLimit, Long sizeLimit,
+			String fileList, String... uris) {
 		Boolean r = (preserve != null && preserve.contains(Preserve.REPLICATION));
 		Boolean b = (preserve != null && preserve.contains(Preserve.BLOCKSIZE));
 		Boolean u = (preserve != null && preserve.contains(Preserve.USER));
@@ -174,7 +185,10 @@ public class DistCp {
 	 * @param fileList fileList
 	 * @param uris uris
 	 */
-	public void copy(Boolean preserveReplication, Boolean preserveBlockSize, Boolean preserveUser, Boolean preserveGroup, Boolean preservePermission, Boolean ignoreFailures, Boolean skipCrc, String logDir, Integer mappers, Boolean overwrite, Boolean update, Boolean delete, Long fileLimit, Long sizeLimit, String fileList, String... uris) {
+	public void copy(Boolean preserveReplication, Boolean preserveBlockSize, Boolean preserveUser,
+			Boolean preserveGroup, Boolean preservePermission, Boolean ignoreFailures, Boolean skipCrc, String logDir,
+			Integer mappers, Boolean overwrite, Boolean update, Boolean delete, Long fileLimit, Long sizeLimit,
+			String fileList, String... uris) {
 
 		List<String> args = new ArrayList<String>();
 
@@ -203,9 +217,11 @@ public class DistCp {
 			args.add("-delete");
 		}
 		if (fileLimit != null) {
+			log.warn("Hadoop DistCp v2 will ignore fileLimit argument");
 			args.add("-filelimit " + fileLimit);
 		}
 		if (sizeLimit != null) {
+			log.warn("Hadoop DistCp v2 will ignore sizeLimit argument");
 			args.add("-sizelimit " + sizeLimit);
 		}
 		if (StringUtils.hasText(fileList)) {
@@ -213,35 +229,37 @@ public class DistCp {
 		}
 
 		CollectionUtils.mergeArrayIntoCollection(uris, args);
-
 		copy(args.toArray(new String[args.size()]));
 	}
 
 	/**
-	 * Basic copy operation, between a source and a destination using the defaults.
+	 * Initiate a basic copy operation, between a source and a destination using
+	 * the defaults.
 	 * 
-	 * @param arg1 arg1
-	 * @param arg2 arg2
+	 * @param source the source
+	 * @param destination the destination
 	 */
-	public void copy(String arg1, String arg2) {
-		copy(new String[] { arg1, arg2 });
+	public void copy(String source, String destination) {
+		copy(new String[] { source, destination });
 	}
 
 	/**
-	 * Basic copy operation, between a source and a destination using the defaults.
+	 * Initiate a basic copy operation, between two sources and a destination
+	 * using the defaults.
 	 * 
-	 * @param arg1 arg1
-	 * @param arg2 arg2
-	 * @param arg3 arg3
+	 * @param source1 the first source
+	 * @param source2 the second source
+	 * @param destination the destination
 	 */
-	public void copy(String arg1, String arg2, String arg3) {
-		copy(new String[] { arg1, arg2, arg3 });
+	public void copy(String source1, String source2, String destination) {
+		copy(new String[] { source1, source2, destination });
 	}
 
 	/**
-	 * DistCopy using a command-line style (arguments are specified as {@link String}s).
+	 * Initiate a copy operation using a command-line style (arguments are
+	 * specified as {@link String}s).
 	 * 
-	 * @param arguments copy arguments
+	 * @param arguments the copy arguments
 	 */
 	public void copy(String... arguments) {
 		Assert.notEmpty(arguments, "invalid number of arguments");
@@ -269,41 +287,15 @@ public class DistCp {
 			throw new IllegalStateException("Cannot run distCp impersonated as '" + user + "'", ex);
 		}
 	}
-
+	
 	private static void invokeCopy(Configuration config, String[] parsedArgs) {
 		try {
-			Class<org.apache.hadoop.tools.DistCp> cl = org.apache.hadoop.tools.DistCp.class;
-			Class<?> argClass = ClassUtils.resolveClassName("org.apache.hadoop.tools.DistCp$Arguments",
-					cl.getClassLoader());
-			Method m = ReflectionUtils.findMethod(cl, "copy", Configuration.class, argClass);
-			ReflectionUtils.makeAccessible(m);
-			Method v = ReflectionUtils.findMethod(argClass, "valueOf", String[].class, Configuration.class);
-			ReflectionUtils.makeAccessible(v);
-
-			// Arguments.valueOf()
-			Object args = ReflectionUtils.invokeMethod(v, null, parsedArgs, config);
-			// DistCp.copy()
-			ReflectionUtils.invokeMethod(m, null, config, args);
-		} catch (UndeclaredThrowableException ex) {
-			Throwable throwable = ex.getUndeclaredThrowable();
-
-			if (throwable instanceof IOException) {
-				IOException ioe = ((IOException) throwable);
-//TODO: SHDP-364 Rewrite DistCp for Hadoop v2 API
-//				if (!VersionUtils.isHadoop2X()) {
-//					try {
-//						Class<?> duplicationException = Class.forName("org.apache.hadoop.tools.DistCp.DuplicationException");
-//						if (duplicationException.isAssignableFrom(ioe.getClass())) {
-//							throw new IllegalStateException("Duplicated files found...", ioe);
-//						}
-//					} catch (ClassNotFoundException e) {}
-//				}
-				if (ioe instanceof RemoteException) {
-					throw new IllegalStateException("Cannot distCopy", ((RemoteException) ioe).unwrapRemoteException());
-				}
-			}
-
-			throw ex;
+			log.info("Running DistCp with arguments [" + StringUtils.arrayToCommaDelimitedString(parsedArgs) + "]");
+			DistCpOptions inputOptions = OptionsParser.parse(parsedArgs);
+			org.apache.hadoop.tools.DistCp distCp = new org.apache.hadoop.tools.DistCp(config, inputOptions);
+			distCp.execute();
+		} catch (Exception e) {
+			throw new HadoopException("Error running DistCp job", e);
 		}
 	}
 
