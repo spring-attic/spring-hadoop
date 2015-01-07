@@ -15,9 +15,6 @@
  */
 package org.springframework.data.hadoop.fs;
 
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.lang.reflect.UndeclaredThrowableException;
 import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,13 +22,12 @@ import java.util.EnumSet;
 import java.util.List;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.ipc.RemoteException;
 import org.apache.hadoop.security.UserGroupInformation;
+import org.apache.hadoop.tools.OptionsParser;
+import org.apache.hadoop.util.ToolRunner;
 import org.springframework.data.hadoop.configuration.ConfigurationUtils;
 import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
 
@@ -42,6 +38,7 @@ import org.springframework.util.StringUtils;
  * 
  * @author Costin Leau
  * @author Thomas Risberg
+ * @author David Liu
  */
 public class DistCp {
 
@@ -270,41 +267,10 @@ public class DistCp {
 		}
 	}
 
-	private static void invokeCopy(Configuration config, String[] parsedArgs) {
-		try {
-			Class<org.apache.hadoop.tools.DistCp> cl = org.apache.hadoop.tools.DistCp.class;
-			Class<?> argClass = ClassUtils.resolveClassName("org.apache.hadoop.tools.DistCp$Arguments",
-					cl.getClassLoader());
-			Method m = ReflectionUtils.findMethod(cl, "copy", Configuration.class, argClass);
-			ReflectionUtils.makeAccessible(m);
-			Method v = ReflectionUtils.findMethod(argClass, "valueOf", String[].class, Configuration.class);
-			ReflectionUtils.makeAccessible(v);
-
-			// Arguments.valueOf()
-			Object args = ReflectionUtils.invokeMethod(v, null, parsedArgs, config);
-			// DistCp.copy()
-			ReflectionUtils.invokeMethod(m, null, config, args);
-		} catch (UndeclaredThrowableException ex) {
-			Throwable throwable = ex.getUndeclaredThrowable();
-
-			if (throwable instanceof IOException) {
-				IOException ioe = ((IOException) throwable);
-//TODO: SHDP-364 Rewrite DistCp for Hadoop v2 API
-//				if (!VersionUtils.isHadoop2X()) {
-//					try {
-//						Class<?> duplicationException = Class.forName("org.apache.hadoop.tools.DistCp.DuplicationException");
-//						if (duplicationException.isAssignableFrom(ioe.getClass())) {
-//							throw new IllegalStateException("Duplicated files found...", ioe);
-//						}
-//					} catch (ClassNotFoundException e) {}
-//				}
-				if (ioe instanceof RemoteException) {
-					throw new IllegalStateException("Cannot distCopy", ((RemoteException) ioe).unwrapRemoteException());
-				}
-			}
-
-			throw ex;
-		}
+	private static void invokeCopy(Configuration config, String[] parsedArgs) throws IllegalArgumentException, Exception {
+		org.apache.hadoop.tools.DistCp distCp = new org.apache.hadoop.tools.DistCp(
+						config, OptionsParser.parse(parsedArgs));
+		ToolRunner.run(config, distCp, parsedArgs);
 	}
 
 	/**
