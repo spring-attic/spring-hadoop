@@ -88,7 +88,7 @@ public class YarnPushCommand extends AbstractApplicationCommand {
 		@Override
 		protected void handleApplicationRun(ClientApplicationRunner<String> app) {
 			app.run();
-			handleOutput("New instance submitted");
+			handleOutput("New version installed");
 		}
 
 		public OptionSpec<String> getApplicationVersionOption() {
