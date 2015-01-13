@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 the original author or authors.
+ * Copyright 2013-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,31 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.springframework.data.hadoop.store.dataset;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.io.IOException;
+
 import org.kitesdk.data.Dataset;
 import org.kitesdk.data.DatasetWriter;
 import org.kitesdk.data.Formats;
 import org.springframework.data.hadoop.store.StoreException;
 import org.springframework.util.Assert;
 
-import java.io.IOException;
-
 /**
  * A {@code DataStoreWriter} for writing Datasets using the Avro format.
  *
  * @author Thomas Risberg
+ * @author Janne Valkealahti
+ *
  */
-public class AvroPojoDatasetStoreWriter<T> extends AbstractDatasetStoreWriter<T> {
-
-	private final static Log log = LogFactory.getLog(AvroPojoDatasetStoreWriter.class);
-
-	protected volatile DatasetWriter<T> writer;
-
-	private final Object monitor = new Object();
+public class AvroPojoDatasetStoreWriter<T> extends AbstractDatasetStoreWriter<T, T> {
 
 	/**
 	 * Instantiates a new {@code DataStoreWriter} for writing Avro records to a {@code org.kitesdk.data.Dataset}.
@@ -62,43 +55,30 @@ public class AvroPojoDatasetStoreWriter<T> extends AbstractDatasetStoreWriter<T>
 
 	@Override
 	public void write(T entity) throws IOException {
+		// pre-checks before write
 		Assert.notNull(entity, "Entity to be written can't be 'null'.");
-		if (!entity.getClass().equals(entityClass)) {
-			throw new IllegalArgumentException("Entity to write is of class " + entity.getClass().getName() +
-					". Expected " + entityClass.getName());
+		if (!entity.getClass().equals(getEntityClass())) {
+			throw new IllegalArgumentException("Entity to write is of class " + entity.getClass().getName()
+					+ ". Expected " + getEntityClass().getName());
 		}
-		synchronized (monitor) {
-			if (writer == null) {
-				if (Formats.AVRO.getName().equals(datasetDefinition.getFormat().getName())) {
-					Dataset<T> dataset =
-							DatasetUtils.getOrCreateDataset(datasetRepositoryFactory, datasetDefinition, entityClass, entityClass);
-					writer = dataset.newWriter();
-				} else {
-					throw new StoreException("Invalid format " + datasetDefinition.getFormat() +
-							" specified, you must use 'avro' with " + this.getClass().getSimpleName() + ".");
-				}
-			}
-		}
-		writer.write(entity);
+		super.write(entity);
 	}
 
 	@Override
-	public void flush() throws IOException {
-		if (log.isDebugEnabled()) {
-			log.debug("Flushing writer " + writer);
+	protected DatasetWriter<T> createWriter() {
+		if (Formats.AVRO.getName().equals(getDatasetDefinition().getFormat().getName())) {
+			Dataset<T> dataset = DatasetUtils.getOrCreateDataset(getDatasetRepositoryFactory(), getDatasetDefinition(),
+					getEntityClass(), getEntityClass());
+			return dataset.newWriter();
+		} else {
+			throw new StoreException("Invalid format " + getDatasetDefinition().getFormat()
+					+ " specified, you must use 'avro' with " + this.getClass().getSimpleName() + ".");
 		}
-		if (writer != null) {
-			writer.flush();
-		}
+	}
+	
+	@Override
+	protected T convertEntity(T entity) {
+		return entity;
 	}
 
-	@Override
-	public void close() throws IOException {
-		if (log.isDebugEnabled()) {
-			log.debug("Closing writer " + writer);
-		}
-		if (writer != null) {
-			writer.close();
-		}
-	}
 }
