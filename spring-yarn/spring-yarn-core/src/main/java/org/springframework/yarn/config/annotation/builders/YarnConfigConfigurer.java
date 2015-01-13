@@ -114,9 +114,9 @@ public interface YarnConfigConfigurer {
 	/**
 	 * Specify security options with a {@link SecurityConfigurer}.
 	 *
-	 * <p>
-	 * <p>JavaConfig:
-	 * <p>
+	 * <br>
+	 * <br>JavaConfig:
+	 * <br>
 	 * <pre>
 	 * public void configure(YarnConfigConfigure config) throws Exception {
 	 *   config
@@ -128,7 +128,7 @@ public interface YarnConfigConfigurer {
 	 * </pre>
 	 *
 	 * <p>XML:
-	 * <p>
+	 * <br>
 	 * No equivalent
 	 *
 	 * @return {@link SecurityConfigurer} for chaining

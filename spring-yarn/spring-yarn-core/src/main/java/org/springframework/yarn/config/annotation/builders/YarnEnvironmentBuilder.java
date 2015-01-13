@@ -145,6 +145,7 @@ public final class YarnEnvironmentBuilder
 	/**
 	 * Adds the classpath entries.
 	 *
+	 * @param id the id
 	 * @param classpathEntries the classpath entries
 	 */
 	public void addClasspathEntries(String id, ArrayList<String> classpathEntries) {
@@ -163,6 +164,7 @@ public final class YarnEnvironmentBuilder
 	/**
 	 * Sets the default classpath.
 	 *
+	 * @param id the id
 	 * @param useDefaultClasspath the new default classpath
 	 */
 	public void setUseDefaultYarnClasspath(String id, boolean useDefaultClasspath) {
@@ -172,6 +174,7 @@ public final class YarnEnvironmentBuilder
 	/**
 	 * Sets the default classpath.
 	 *
+	 * @param id the id
 	 * @param useDefaultClasspath the new default classpath
 	 */
 	public void setUseDefaultMapreduceClasspath(String id, boolean useDefaultClasspath) {
@@ -181,6 +184,7 @@ public final class YarnEnvironmentBuilder
 	/**
 	 * Sets the include base directory.
 	 *
+	 * @param id the id
 	 * @param includeBaseDirectory the new include base directory
 	 */
 	public void setIncludeBaseDirectory(String id, boolean includeBaseDirectory) {
@@ -190,6 +194,7 @@ public final class YarnEnvironmentBuilder
 	/**
 	 * Sets the delimiter.
 	 *
+	 * @param id the id
 	 * @param delimiter the new delimiter
 	 */
 	public void setDelimiter(String id, String delimiter) {
@@ -199,6 +204,7 @@ public final class YarnEnvironmentBuilder
 	/**
 	 * Sets the default yarn app classpath.
 	 *
+	 * @param id the id
 	 * @param defaultYarnAppClasspath the new default yarn app classpath
 	 */
 	public void setDefaultYarnAppClasspath(String id, String defaultYarnAppClasspath) {
@@ -208,6 +214,7 @@ public final class YarnEnvironmentBuilder
 	/**
 	 * Sets the default mr app classpath.
 	 *
+	 * @param id the id
 	 * @param defaultMapreduceAppClasspath the new default mr app classpath
 	 */
 	public void setDefaultMapreduceAppClasspath(String id, String defaultMapreduceAppClasspath) {

@@ -204,9 +204,9 @@ public interface MasterContainerAllocatorConfigurer extends AnnotationConfigurer
 	 * Specify a collection of container allocator attributes. Applies a new
 	 * {@link DefaultMasterContainerAllocatorCollectionConfigurer} into a current configurer.
 	 *
-	 * <p>
-	 * <p>JavaConfig:
-	 * <p>
+	 * <br>
+	 * <br>JavaConfig:
+	 * <br>
 	 * <pre>
 	 *
 	 * public void configure(YarnAppmasterConfigure master) throws Exception {
@@ -217,7 +217,7 @@ public interface MasterContainerAllocatorConfigurer extends AnnotationConfigurer
 	 * }
 	 * </pre>
 	 *
-	 * @param id
+	 * @param id the id
 	 * @return {@link MasterContainerAllocatorCollectionConfigurer} for chaining
 	 */
 	MasterContainerAllocatorCollectionConfigurer withCollection(String id);

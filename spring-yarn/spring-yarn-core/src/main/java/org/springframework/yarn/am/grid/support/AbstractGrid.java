@@ -84,6 +84,8 @@ public abstract class AbstractGrid implements Grid {
 
 	/**
 	 * Set the list of channel interceptors. This will clear any existing interceptors.
+	 *
+	 * @param interceptors list of interceptors
 	 */
 	public void setInterceptors(List<GridMemberInterceptor> interceptors) {
 		this.interceptorChain.set(interceptors);
@@ -99,13 +101,17 @@ public abstract class AbstractGrid implements Grid {
 
 	/**
 	 * Return a read-only list of the configured interceptors.
+	 *
+	 * @return list of interceptors
 	 */
 	public List<GridMemberInterceptor> getInterceptors() {
 		return this.interceptorChain.getInterceptors();
 	}
 
 	/**
-	 * Exposes the interceptor list for subclasses.
+	 * Exposes the interceptor chain for subclasses.
+	 *
+	 * @return interceptor chain
 	 */
 	protected GridMemberInterceptorChain getInterceptorChain() {
 		return this.interceptorChain;

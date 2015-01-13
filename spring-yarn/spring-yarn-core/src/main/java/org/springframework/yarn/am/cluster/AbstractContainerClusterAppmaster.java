@@ -339,7 +339,8 @@ public abstract class AbstractContainerClusterAppmaster extends AbstractEventing
 	 * a final modifications in these commands. Default implementation
 	 * returns commands as is.
 	 *
-	 * @param cluster the cluster id
+	 * @param container the container
+	 * @param cluster the cluster
 	 * @param commands the original commands
 	 * @return modified commands
 	 */

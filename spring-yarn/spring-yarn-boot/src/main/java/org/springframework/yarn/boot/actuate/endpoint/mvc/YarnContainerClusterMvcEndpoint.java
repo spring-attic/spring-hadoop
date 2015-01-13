@@ -170,6 +170,7 @@ public class YarnContainerClusterMvcEndpoint extends EndpointMvcAdapter {
 	 * Modify a container cluster
 	 *
 	 * @param clusterId the container cluster identifier
+	 * @param request the request
 	 * @return the container cluster modify response
 	 */
 	@RequestMapping(value = "/{clusterId}", method = RequestMethod.PATCH)
