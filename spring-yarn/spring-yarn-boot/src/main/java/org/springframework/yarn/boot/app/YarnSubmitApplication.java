@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,6 +49,8 @@ import org.springframework.yarn.client.YarnClient;
 		EndpointMBeanExportAutoConfiguration.class, EndpointAutoConfiguration.class })
 public class YarnSubmitApplication extends AbstractClientApplication<ApplicationId, YarnSubmitApplication> {
 
+	private String applicationName;
+	
 	/**
 	 * Run a {@link SpringApplication} build by a
 	 * {@link SpringApplicationBuilder} using an empty args.
@@ -91,7 +93,7 @@ public class YarnSubmitApplication extends AbstractClientApplication<Application
 				SpringYarnProperties syp = context.getBean(SpringYarnProperties.class);
 				String applicationdir = SpringYarnBootUtils.resolveApplicationdir(syp);
 				if (client instanceof ApplicationYarnClient) {
-					return ((ApplicationYarnClient)client).submitApplication(new ApplicationDescriptor(applicationdir));
+					return ((ApplicationYarnClient)client).submitApplication(new ApplicationDescriptor(applicationdir, applicationName));
 				} else {
 					return client.submitApplication(false);
 				}
@@ -103,6 +105,18 @@ public class YarnSubmitApplication extends AbstractClientApplication<Application
 	@Override
 	protected YarnSubmitApplication getThis() {
 		return this;
+	}
+
+	/**
+	 * Sets the application name used for submit. Effectively this will override
+	 * setting from set for yarn client for configuration properties.
+	 * 
+	 * @param applicationName the application name 
+	 * @return the YarnSubmitApplication for chaining
+	 */
+	public YarnSubmitApplication applicationName(String applicationName) {
+		this.applicationName = applicationName;
+		return getThis();
 	}
 
 }

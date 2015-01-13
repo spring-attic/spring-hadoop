@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,8 @@ public class ApplicationDescriptor {
 	// are in place.
 
 	private String directory;
+	
+	private String name;
 
 	/**
 	 * Instantiates a new application descriptor.
@@ -45,7 +47,18 @@ public class ApplicationDescriptor {
 	 * @param directory the application directory
 	 */
 	public ApplicationDescriptor(String directory) {
+		this(directory, null);
+	}
+	
+	/**
+	 * Instantiates a new application descriptor.
+	 *
+	 * @param directory the application directory
+	 * @param name the application name
+	 */
+	public ApplicationDescriptor(String directory, String name) {
 		this.directory = directory;
+		this.name = name;
 	}
 
 	/**
@@ -64,6 +77,24 @@ public class ApplicationDescriptor {
 	 */
 	public void setDirectory(String directory) {
 		this.directory = directory;
+	}
+
+	/**
+	 * Gets the application name.
+	 * 
+	 * @return the application name
+	 */
+	public String getName() {
+		return name;
+	}
+	
+	/**
+	 * Sets the application name.
+	 * 
+	 * @param name the application name
+	 */
+	public void setName(String name) {
+		this.name = name;
 	}
 
 }

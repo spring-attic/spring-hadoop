@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package org.springframework.yarn.boot.cli;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import joptsimple.OptionSet;
 
@@ -34,8 +35,9 @@ public class YarnSubmitCommandTests {
 
 	@Test
 	public void testDefaultOptionHelp() {
-		YarnPushCommand command = new YarnPushCommand();
+		YarnSubmitCommand command = new YarnSubmitCommand();
 		assertThat(command.getHelp(), containsString("-v, --application-version"));
+		assertThat(command.getHelp(), containsString("-n, --application-name"));
 	}
 
 	@Test
@@ -44,6 +46,7 @@ public class YarnSubmitCommandTests {
 		YarnSubmitCommand command = new YarnSubmitCommand(handler);
 		command.run();
 		assertThat(handler.appVersion, is("app"));
+		assertThat(handler.appName, nullValue());
 	}
 
 	@Test
@@ -62,7 +65,25 @@ public class YarnSubmitCommandTests {
 		command.run();
 		assertThat(handler.output, is("output"));
 	}
+	
+	@Test
+	public void testSetOptionsShort() throws Exception {
+		NoRunSubmitOptionHandler handler = new NoRunSubmitOptionHandler();
+		YarnSubmitCommand command = new YarnSubmitCommand(handler);
+		command.run("-v", "foo", "-n", "bar");
+		assertThat(handler.appVersion, is("foo"));
+		assertThat(handler.appName, is("bar"));
+	}
 
+	@Test
+	public void testSetOptionsLong() throws Exception {
+		NoRunSubmitOptionHandler handler = new NoRunSubmitOptionHandler();
+		YarnSubmitCommand command = new YarnSubmitCommand(handler);
+		command.run("--application-version", "foo", "--application-name", "bar");
+		assertThat(handler.appVersion, is("foo"));
+		assertThat(handler.appName, is("bar"));
+	}
+	
 	private static class CustomSubmitOptionHandler extends SubmitOptionHandler {
 
 		@Override
@@ -78,10 +99,12 @@ public class YarnSubmitCommandTests {
 	private static class NoRunSubmitOptionHandler extends SubmitOptionHandler {
 
 		String appVersion;
+		String appName;
 
 		@Override
 		protected void runApplication(OptionSet options) throws Exception {
 			appVersion = options.valueOf(getApplicationVersionOption());
+			appName = options.valueOf(getApplicationNameOption());
 		}
 
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,8 @@ public abstract class CliSystemConstants {
 
 	public final static List<String> OPTIONS_APPLICATION_VERSION  = asList("application-version", "v");
 
+	public final static List<String> OPTIONS_APPLICATION_NAME  = asList("application-name", "n");
+
 	public final static List<String> OPTIONS_CLUSTER_ID  = asList("cluster-id", "c");
 
 	public final static List<String> OPTIONS_CLUSTER_DEF  = asList("cluster-def", "i");
@@ -58,6 +60,8 @@ public abstract class CliSystemConstants {
 	public final static String DESC_APPLICATION_TYPE = "Application type";
 
 	public final static String DESC_APPLICATION_VERSION = "Application version";
+
+	public final static String DESC_APPLICATION_NAME = "Application name";
 
 	public final static String DESC_VERBOSE = "Verbose output";
 

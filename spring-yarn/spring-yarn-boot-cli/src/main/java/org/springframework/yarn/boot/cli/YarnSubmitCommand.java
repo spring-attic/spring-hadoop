@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import joptsimple.OptionSpec;
 
 import org.apache.hadoop.yarn.api.records.ApplicationId;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 import org.springframework.yarn.boot.app.ClientApplicationRunner;
 import org.springframework.yarn.boot.app.YarnSubmitApplication;
 
@@ -68,17 +69,25 @@ public class YarnSubmitCommand extends AbstractApplicationCommand {
 
 		private OptionSpec<String> applicationVersionOption;
 
+		private OptionSpec<String> applicationNameOption;
+		
 		@Override
 		protected final void options() {
 			this.applicationVersionOption = option(CliSystemConstants.OPTIONS_APPLICATION_VERSION,
 					CliSystemConstants.DESC_APPLICATION_VERSION).withOptionalArg().defaultsTo("app");
+			this.applicationNameOption = option(CliSystemConstants.OPTIONS_APPLICATION_NAME,
+					CliSystemConstants.DESC_APPLICATION_NAME).withOptionalArg();
 		}
 
 		@Override
 		protected void runApplication(OptionSet options) throws Exception {
 			String appVersion = options.valueOf(applicationVersionOption);
+			String appName = options.valueOf(applicationNameOption);
 			Assert.hasText(appVersion, "Application version must be defined");
 			YarnSubmitApplication app = new YarnSubmitApplication();
+			if (StringUtils.hasText(appName)) {
+				app.applicationName(appName);
+			}
 			app.applicationVersion(appVersion);
 			handleApplicationRun(app);
 		}
@@ -89,9 +98,23 @@ public class YarnSubmitCommand extends AbstractApplicationCommand {
 			handleOutput("New instance submitted with id " + applicationId);
 		}
 
+		/**
+		 * Get the application version option.
+		 * 
+		 * @return the application version option
+		 */
 		public OptionSpec<String> getApplicationVersionOption() {
 			return applicationVersionOption;
 		}
+		
+		/**
+		 * Get the application name option.
+		 * 
+		 * @return the application name option
+		 */
+		public OptionSpec<String> getApplicationNameOption() {
+			return applicationNameOption;
+		}		
 
 	}
 
