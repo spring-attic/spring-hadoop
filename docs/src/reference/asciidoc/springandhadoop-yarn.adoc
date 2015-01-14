@@ -2034,455 +2034,885 @@ public void publicVoidParameterArgsMethod(@YarnParameter("key") String value) {
 ==== Configuration Properties
 
 Configuration properties can be defined using various methods. See a
-Spring Boot dodumentation for details.
+Spring Boot dodumentation for details. More about configuration
+properties for `spring.hadoop` namespace can be found from
+<<springandhadoop-config-bootsupport>>.
 
-.`spring.hadoop` configuration properties
-[width="100%",cols="<40%,20%,20%,20%",options="header",]
-|=================================================================
-|Property Name |Required |Type |Default Value
-|`spring.hadoop.fsUri` |Yes |String |null
-|`spring.hadoop.resourceManagerAddress` |No |String |null
-|`spring.hadoop.resourceManagerSchedulerAddress` |No |String |null
-|`spring.hadoop.resourceManagerHost` |No |String |null
-|`spring.hadoop.resourceManagerPort` |No |Integer |8032
-|`spring.hadoop.resourceManagerSchedulerPort` |No |Integer |8030
-|`spring.hadoop.resources` |No |List |null
-|`spring.hadoop.config` |No |Map |null
-|=================================================================
+===== `spring.yarn` configuration properties
 
-`spring.hadoop.fsUri`::
-  A hdfs file system uri for a namenode.
-`spring.hadoop.resourceManagerAddress`::
-  Address of a YARN resource manager.
-`spring.hadoop.resourceManagerSchedulerAddress`::
-  Address of a YARN resource manager scheduler.
-`spring.hadoop.resourceManagerHost`::
-  Hostname of a YARN resource manager.
-`spring.hadoop.resourceManagerPort`::
-  Port of a YARN resource manager.
-`spring.hadoop.resourceManagerSchedulerPort`::
-  Port of a YARN resource manager scheduler. This property is only
-  needed for an application master.
-`spring.hadoop.resources`::
-  List of Spring resource locations to be initialized in Hadoop
-  configuration. These resources should be in Hadoop's own site xml
-  format and location format can be anything Spring supports. For
-  example, _classpath:/myentry.xml_ from a classpath or
-  _file:/myentry.xml_ from a file system.
-`spring.hadoop.config`::
-  Map of generic hadoop configuration properties.
+Namespace `spring.yarn` supports following properties;·
+<<spring.yarn.applicationDir,applicationDir>>,
+<<spring.yarn.applicationBaseDir,applicationBaseDir>>,
+<<spring.yarn.applicationVersion,applicationVersion>>,
+<<spring.yarn.stagingDir,stagingDir>>,
+<<spring.yarn.appName,appName>>,
+<<spring.yarn.appType,appType>>,
+<<spring.yarn.siteYarnAppClasspath,siteYarnAppClasspath>> and
+<<spring.yarn.siteMapreduceAppClasspath,siteMapreduceAppClasspath>>.
 
-.`spring.hadoop.security` configuration properties
-[width="100%",cols="<40%,20%,20%,20%",options="header",]
-|=============================================================
-|Property Name |Required |Type |Default Value
-|`spring.hadoop.security.authMethod` |No |String |null
-|`spring.hadoop.security.userPrincipal` |No |String |null
-|`spring.hadoop.security.userKeytab` |No |String |null
-|`spring.hadoop.security.namenodePrincipal` |No |String |null
-|`spring.hadoop.security.rmManagerPrincipal` |No |String |null
-|=============================================================
+[[spring.yarn.applicationDir]]`spring.yarn.applicationDir`::
+  Description:::
+An application home directory in hdfs. If client copies files into a
+hdfs during an application submission, files will end up in this
+directory. If this property is omitted, a staging directory will be
+used instead.
+  Required:::
+No
+  Type:::
+String
+   Default Value:::
+null
 
-`spring.hadoop.security.authMethod`::
-  Hadoop security method.
-`spring.hadoop.security.userPrincipal`::
-  Principal for user.
-`spring.hadoop.security.userKeytab`::
-  Path to user keytab file.
-`spring.hadoop.security.namenodePrincipal`::
-  Namenode principal
-`spring.hadoop.security.rmManagerPrincipal`::
-  Resource manager principal
+[[spring.yarn.applicationBaseDir]]`spring.yarn.applicationBaseDir`::
+  Description:::
+An applications base directory where build-in application deployment
+functionality would create a new application instance. For a normal
+application submit operation, this is not needed.
+  Required:::
+No
+  Type:::
+String
+   Default Value:::
+null
 
-.`spring.yarn` configuration properties
-[width="100%",cols="<40%,20%,20%,20%",options="header",]
-|=========================================================
-|Property Name |Required |Type |Default Value
-|`spring.yarn.applicationDir` |No |String |null
-|`spring.yarn.applicationBaseDir` |No |String |null
-|`spring.yarn.applicationVersion` |No |String |null
-|`spring.yarn.stagingDir` |No |String |/spring/staging
-|`spring.yarn.appName` |No |String |null
-|`spring.yarn.appType` |No |String |YARN
-|`spring.yarn.siteYarnAppClasspath` |No |String |null
-|`spring.yarn.siteMapreduceAppClasspath` |No |String |null
-|=========================================================
+[[spring.yarn.applicationVersion]]`spring.yarn.applicationVersion`::
+  Description:::
+An application version identifier used together with
+`applicationBaseDir` in deployment scenarios where `applicationDir`
+cannot be hard coded.
+  Required:::
+No
+  Type:::
+String
+   Default Value:::
+null
 
-`spring.yarn.applicationDir`::
-  An application home directory in hdfs. If client copies files into a
-  hdfs during an application submission, files will end up in this
-  directory. If this property is omitted, a staging directory will be
-  used instead.
-`spring.yarn.applicationBaseDir`::
-  An applications base directory where build-in application deployment
-  functionality would create a new application instance. For a normal
-  application submit operation, this is not needed.
-`spring.yarn.applicationVersion`::
-  An application version identifier used together with
-  `applicationBaseDir` in deployment scenarios where `applicationDir`
-  cannot be hard coded.
-`spring.yarn.stagingDir`::
-  A global staging base directory in hdfs.
-`spring.yarn.appName`::
-  Defines a registered application name visible from a YARN resource
-  manager.
-`spring.yarn.appType`::
-  Defines a registered application type used in YARN resource manager.
-`spring.yarn.siteYarnAppClasspath`::
-  Defines a default base YARN application classpath entries.
-`spring.yarn.siteMapreduceAppClasspath`::
-  Defines a default base MR application classpath entries.
+[[spring.yarn.stagingDir]]`spring.yarn.stagingDir`::
+  Description:::
+A global staging base directory in hdfs.
+  Required:::
+No
+  Type:::
+String
+   Default Value:::
+`/spring/staging`
 
-.`spring.yarn.appmaster` configuration properties
-[width="100%",cols="<40%,20%,20%,20%",options="header",]
-|===========================================================
-|Property Name |Required |Type |Default Value
-|`spring.yarn.appmaster.appmasterClass` |No |Class |null
-|`spring.yarn.appmaster.containerCount` |No |Integer |1
-|`spring.yarn.appmaster.keepContextAlive` |No |Boolean |true
-|===========================================================
+[[spring.yarn.appName]]`spring.yarn.appName`::
+  Description:::
+Defines a registered application name visible from a YARN resource
+manager.
+  Required:::
+No
+  Type:::
+String
+   Default Value:::
+null
 
-`spring.yarn.appmaster.appmasterClass`::
-  Fully qualified classname which auto-configuration can automatically
-  instantiate as a custom application master.
-`spring.yarn.appmaster.containerCount`::
-  Property which is automatically kept in configuration as a hint which
-  an application master can choose to use when determing how many
-  containers should be launched.
-`spring.yarn.appmaster.keepContextAlive`::
-  Setting for an application master runner to stop main thread to wait a
-  latch before continuing. This is needed in cases where main thread
-  needs to wait event from other threads to be able to exit.
+[[spring.yarn.appType]]`spring.yarn.appType`::
+  Description:::
+Defines a registered application type used in YARN resource manager.
+  Required:::
+No
+  Type:::
+String
+   Default Value:::
+`YARN`
 
-.`spring.yarn.appmaster.launchcontext` configuration properties
-[width="100%",cols="<40%,20%,20%,20%",options="header",]
-|=======================================================================
-|Property Name |Required |Type |Default Value
-|`spring.yarn.appmaster.launchcontext.archiveFile` |No |String |null
+[[spring.yarn.siteYarnAppClasspath]]`spring.yarn.siteYarnAppClasspath`::
+  Description:::
+Defines a default base YARN application classpath entries.
+  Required:::
+No
+  Type:::
+String
+   Default Value:::
+null
 
-|`spring.yarn.appmaster.launchcontext.runnerClass` |No |Class |null
+[[spring.yarn.siteMapreduceAppClasspath]]`spring.yarn.siteMapreduceAppClasspath`::
+  Description:::
+Defines a default base MR application classpath entries.
+  Required:::
+No
+  Type:::
+String
+   Default Value:::
+null
 
-|`spring.yarn.appmaster.launchcontext.options` |No |List |null
+===== `spring.yarn.appmaster` configuration properties
 
-|`spring.yarn.appmaster.launchcontext.arguments` |No |Map |null
+Namespace `spring.yarn.appmaster` supports following properties;·
+<<spring.yarn.appmaster.appmasterClass,appmasterClass>>,
+<<spring.yarn.appmaster.containerCount,containerCount>> and
+<<spring.yarn.appmaster.keepContextAlive,keepContextAlive>>.
 
-|`spring.yarn.appmaster.launchcontext.containerAppClasspath` |No |List
-|null
+[[spring.yarn.appmaster.appmasterClass]]`spring.yarn.appmaster.appmasterClass`::
+  Description:::
+Fully qualified classname which auto-configuration can automatically
+instantiate as a custom application master.
+  Required:::
+No
+  Type:::
+Class
+   Default Value:::
+null
 
-|`spring.yarn.appmaster.launchcontext.pathSeparator` |No |String |:
+[[spring.yarn.appmaster.containerCount]]`spring.yarn.appmaster.containerCount`::
+  Description:::
+Property which is automatically kept in configuration as a hint which
+an application master can choose to use when determing how many
+containers should be launched.
+  Required:::
+No
+  Type:::
+Integer
+   Default Value:::
+1
 
-|`spring.yarn.appmaster.launchcontext.includeBaseDirectory` |No |Boolean
-|true
+[[spring.yarn.appmaster.keepContextAlive]]`spring.yarn.appmaster.keepContextAlive`::
+  Description:::
+Setting for an application master runner to stop main thread to wait a
+latch before continuing. This is needed in cases where main thread
+needs to wait event from other threads to be able to exit.
+  Required:::
+No
+  Type:::
+Boolean
+   Default Value:::
+true
 
-|`spring.yarn.appmaster.launchcontext.useYarnAppClasspath` |No |Boolean
-|true
+[[spring.yarn.appmaster.launchcontext]]
+===== `spring.yarn.appmaster.launchcontext` configuration properties
 
-|`spring.yarn.appmaster.launchcontext.useMapreduceAppClasspath` |No
-|Boolean |true
+Namespace `spring.yarn.appmaster.launchcontext` supports following properties;·
+<<spring.yarn.appmaster.launchcontext.archiveFile,archiveFile>>,
+<<spring.yarn.appmaster.launchcontext.runnerClass,runnerClass>>,
+<<spring.yarn.appmaster.launchcontext.options,options>>,
+<<spring.yarn.appmaster.launchcontext.arguments,arguments>>,
+<<spring.yarn.appmaster.launchcontext.containerAppClasspath,containerAppClasspath>>,
+<<spring.yarn.appmaster.launchcontext.pathSeparator,pathSeparator>>,
+<<spring.yarn.appmaster.launchcontext.includeBaseDirectory,includeBaseDirectory>>,
+<<spring.yarn.appmaster.launchcontext.useYarnAppClasspath,useYarnAppClasspath>>,
+<<spring.yarn.appmaster.launchcontext.useMapreduceAppClasspath,useMapreduceAppClasspath>>,
+<<spring.yarn.appmaster.launchcontext.includeSystemEnv,includeSystemEnv>> and
+<<spring.yarn.appmaster.launchcontext.locality,locality>>.
 
-|`spring.yarn.appmaster.launchcontext.includeSystemEnv` |No |Boolean
-|true
+[[spring.yarn.appmaster.launchcontext.archiveFile]]`spring.yarn.appmaster.launchcontext.archiveFile`::
+  Description:::
+Indicates that a container main file is treated as executable jar or
+exploded zip.
+  Required:::
+No
+  Type:::
+String
+   Default Value:::
+null
 
-|`spring.yarn.appmaster.launchcontext.locality` |No |Boolean |false
-|=======================================================================
+[[spring.yarn.appmaster.launchcontext.runnerClass]]`spring.yarn.appmaster.launchcontext.runnerClass`::
+  Description:::
+Indicates a fully qualified class name for a container runner.
+  Required:::
+No
+  Type:::
+Class
+   Default Value:::
+null
 
-`spring.yarn.appmaster.launchcontext.archiveFile`::
-  Indicates that a container main file is treated as executable jar or
-  exploded zip.
-`spring.yarn.appmaster.launchcontext.runnerClass`::
-  Indicates a fully qualified class name for a container runner.
-`spring.yarn.appmaster.launchcontext.options`::
-  JVM system options.
-`spring.yarn.appmaster.launchcontext.arguments`::
-  Application arguments.
-`spring.yarn.appmaster.launchcontext.containerAppClasspath`::
-  Additional classpath entries.
-`spring.yarn.appmaster.launchcontext.pathSeparator`::
-  Separator in a classpath.
-`spring.yarn.appmaster.launchcontext.includeBaseDirectory`::
-  If base directory should be added in a classpath.
-`spring.yarn.appmaster.launchcontext.useYarnAppClasspath`::
-  If default yarn application classpath should be added.
-`spring.yarn.appmaster.launchcontext.useMapreduceAppClasspath`::
-  If default mr application classpath should be added.
-`spring.yarn.appmaster.launchcontext.includeSystemEnv`::
-  If system environment variables are added to a container environment.
-`spring.yarn.appmaster.launchcontext.locality`::
-  If set to true indicates that resources are not relaxed.
+[[spring.yarn.appmaster.launchcontext.options]]`spring.yarn.appmaster.launchcontext.options`::
+  Description:::
+JVM system options.
+  Required:::
+No
+  Type:::
+List
+   Default Value:::
+null
 
-.`spring.yarn.appmaster.localizer` configuration properties
-[width="100%",cols="<40%,20%,20%,20%",options="header",]
-|====================================================================
-|Property Name |Required |Type |Default Value
-|`spring.yarn.appmaster.localizer.patterns` |No |List |null
-|`spring.yarn.appmaster.localizer.zipPattern` |No |String |null
-|`spring.yarn.appmaster.localizer.propertiesNames` |No |List |null
-|`spring.yarn.appmaster.localizer.propertiesSuffixes` |No |List |null
-|====================================================================
+[[spring.yarn.appmaster.launchcontext.arguments]]`spring.yarn.appmaster.launchcontext.arguments`::
+  Description:::
+JVM system options.
+  Required:::
+No
+  Type:::
+Map
+   Default Value:::
+null
 
-`spring.yarn.appmaster.localizer.patterns`::
-  A simple patterns to choose localized files.
-`spring.yarn.appmaster.localizer.zipPattern`::
-  A simple pattern to mark a file as archive to be exploded.
-`spring.yarn.appmaster.localizer.propertiesNames`::
-  Base name of a configuration files.
-`spring.yarn.appmaster.localizer.propertiesSuffixes`::
-  Suffixes for a configuration files.
+[[spring.yarn.appmaster.launchcontext.containerAppClasspath]]`spring.yarn.appmaster.launchcontext.containerAppClasspath`::
+  Description:::
+Additional classpath entries.
+  Required:::
+No
+  Type:::
+List
+   Default Value:::
+null
 
-.`spring.yarn.appmaster.resource` configuration properties
-[width="100%",cols="<40%,20%,20%,20%",options="header",]
-|===============================================================
-|Property Name |Required |Type |Default Value
-|`spring.yarn.appmaster.resource.priority` |No |String |null
-|`spring.yarn.appmaster.resource.memory` |No |String |null
-|`spring.yarn.appmaster.resource.virtualCores` |No |String |null
-|===============================================================
+[[spring.yarn.appmaster.launchcontext.pathSeparator]]`spring.yarn.appmaster.launchcontext.pathSeparator`::
+  Description:::
+Separator in a classpath.
+  Required:::
+No
+  Type:::
+String
+   Default Value:::
+null
 
-`spring.yarn.appmaster.resource.priority`::
-  Container priority.
-`spring.yarn.appmaster.resource.memory`::
-  Container memory allocation.
-`spring.yarn.appmaster.resource.virtualCores`::
-  Container cpu allocation.
+[[spring.yarn.appmaster.launchcontext.includeBaseDirectory]]`spring.yarn.appmaster.launchcontext.includeBaseDirectory`::
+  Description:::
+If base directory should be added in a classpath.
+  Required:::
+No
+  Type:::
+Boolean
+   Default Value:::
+true
 
-.`spring.yarn.appmaster.containercluster` configuration properties
-[width="100%",cols="<40%,20%,20%,20%",options="header",]
-|================================================================
-|Property Name |Required |Type |Default Value
-|`spring.yarn.appmaster.containercluster.clusters` |No |Map |null
-|================================================================
+[[spring.yarn.appmaster.launchcontext.useYarnAppClasspath]]`spring.yarn.appmaster.launchcontext.useYarnAppClasspath`::
+  Description:::
+If default yarn application classpath should be added.
+  Required:::
+No
+  Type:::
+Boolean
+   Default Value:::
+true
 
-`spring.yarn.appmaster.containercluster.clusters`::
-  Definitions of container clusters.
+[[spring.yarn.appmaster.launchcontext.useMapreduceAppClasspath]]`spring.yarn.appmaster.launchcontext.useMapreduceAppClasspath`::
+  Description:::
+If default mr application classpath should be added.
+  Required:::
+No
+  Type:::
+Boolean
+   Default Value:::
+true
 
-.`spring.yarn.appmaster.containercluster.clusters.<name>` configuration
-properties
-[width="100%",cols="<40%,20%,20%,20%",options="header",]
-|=======================================================================
-|Property Name |Required |Type |Default Value
-|`spring.yarn.appmaster.containercluster.clusters.<name>.resource` |No
-|Config |null
+[[spring.yarn.appmaster.launchcontext.includeSystemEnv]]`spring.yarn.appmaster.launchcontext.includeSystemEnv`::
+  Description:::
+If system environment variables are added to a container environment.
+  Required:::
+No
+  Type:::
+Boolean
+   Default Value:::
+true
 
-|`spring.yarn.appmaster.containercluster.clusters.<name>.launchcontext`
-|No |Config |null
+[[spring.yarn.appmaster.launchcontext.locality]]`spring.yarn.appmaster.launchcontext.locality`::
+  Description:::
+If set to true indicates that resources are not relaxed.
+  Required:::
+No
+  Type:::
+Boolean
+   Default Value:::
+false
 
-|`spring.yarn.appmaster.containercluster.clusters.<name>.localizer` |No
-|Config |null
+[[spring.yarn.appmaster.localizer]]
+===== `spring.yarn.appmaster.localizer` configuration properties
 
-|`spring.yarn.appmaster.containercluster.clusters.<name>.projection` |No
-|Config |null
-|=======================================================================
+Namespace `spring.yarn.appmaster.localizer` supports following properties;·
+<<spring.yarn.appmaster.localizer.patterns,patterns>>,
+<<spring.yarn.appmaster.localizer.zipPattern,zipPattern>>,
+<<spring.yarn.appmaster.localizer.propertiesNames,propertiesNames>> and
+<<spring.yarn.appmaster.localizer.propertiesSuffixes,propertiesSuffixes>>.
 
-`spring.yarn.appmaster.containercluster.clusters.<name>.resource`::
-  Same as `spring.yarn.appmaster.resource` config property.
-`spring.yarn.appmaster.containercluster.clusters.<name>.launchcontext`::
-  Same as `spring.yarn.appmaster.launchcontext` config property.
-`spring.yarn.appmaster.containercluster.clusters.<name>.localizer`::
-  Same as `spring.yarn.aptpmaster.localizer` config property.
-`spring.yarn.appmaster.containercluster.clusters.<name>.projection`::
-  Config collection for a projection settings.
+[[spring.yarn.appmaster.localizer.patterns]]`spring.yarn.appmaster.localizer.patterns`::
+  Description:::
+A simple patterns to choose localized files.
+  Required:::
+No
+  Type:::
+List
+   Default Value:::
+null
 
-.`spring.yarn.appmaster.containercluster.clusters.<name>.projection`
-configuration properties
-[width="100%",cols="<40%,20%,20%,20%",options="header",]
-|=======================================================================
-|Property Name |Required |Type |Default Value
-|`spring.yarn.appmaster.containercluster.clusters.<name>.projection.type`
-|No |String |null
+[[spring.yarn.appmaster.localizer.zipPattern]]`spring.yarn.appmaster.localizer.zipPattern`::
+  Description:::
+A simple pattern to mark a file as archive to be exploded.
+  Required:::
+No
+  Type:::
+String
+   Default Value:::
+null
 
-|`spring.yarn.appmaster.containercluster.clusters.<name>.projection.data`
-|No |Map |null
-|=======================================================================
+[[spring.yarn.appmaster.localizer.propertiesNames]]`spring.yarn.appmaster.localizer.propertiesNames`::
+  Description:::
+Base name of a configuration files.
+  Required:::
+No
+  Type:::
+List
+   Default Value:::
+null
 
-`spring.yarn.appmaster.containercluster.clusters.<name>.projection.type`::
-  Type of a projection to use. `default` is supported on default or any
-  other projection added via a custom factory.
-`spring.yarn.appmaster.containercluster.clusters.<name>.projection.data`::
-  Map of config keys and values. `any` takes an integer, `hosts` as name
-  to integer map, `racks` as name to integer map, `properties` as a
-  generic map values.
+[[spring.yarn.appmaster.localizer.propertiesSuffixes]]`spring.yarn.appmaster.localizer.propertiesSuffixes`::
+  Description:::
+Suffixes for a configuration files.
+  Required:::
+No
+  Type:::
+List
+   Default Value:::
+null
 
-.`spring.yarn.endpoints.containercluster` configuration properties
-[width="100%",cols="<40%,20%,20%,20%",options="header",]
-|===================================================================
-|Property Name |Required |Type |Default Value
-|`spring.yarn.endpoints.containercluster.enabled` |No |Boolean |null
-|===================================================================
+[[spring.yarn.appmaster.resource]]
+===== `spring.yarn.appmaster.resource` configuration properties
 
-`spring.yarn.endpoints.containercluster.enabled`::
-  Enabling endpoint MVC REST API controlling container clusters.
+Namespace `spring.yarn.appmaster.resource` supports following properties;·
+<<spring.yarn.appmaster.resource.priority,priority>>,
+<<spring.yarn.appmaster.resource.memory,memory>> and
+<<spring.yarn.appmaster.resource.virtualCores,virtualCores>>.
 
-.`spring.yarn.client` configuration properties
-[width="100%",cols="<40%,20%,20%,20%",options="header",]
-|=====================================================
-|Property Name |Required |Type |Default Value
-|`spring.yarn.client.files` |No |List |null
-|`spring.yarn.client.priority` |No |Integer |null
-|`spring.yarn.client.queue` |No |String |null
-|`spring.yarn.client.clientClass` |No |Class |null
-|`spring.yarn.client.startup.action` |No |String |null
-|=====================================================
+[[spring.yarn.appmaster.resource.priority]]`spring.yarn.appmaster.resource.priority`::
+  Description:::
+Container priority.
+  Required:::
+No
+  Type:::
+String
+   Default Value:::
+null
 
-`spring.yarn.client.files`::
-  Files to copy into hdfs during application submission.
-`spring.yarn.client.priority`::
-  Application priority.
-`spring.yarn.client.queue`::
-  Application submission queue.
-`spring.yarn.client.clientClass`::
-  Fully qualified classname which auto-configuration can automatically
-  instantiate as a custom client.
-`spring.yarn.client.startup.action`::
-  Default action to perform on YarnClient. Currently only one action
-  named _submit_ is supported. This action is simply calling
-  `submitApplication` method on YarnClient.
+[[spring.yarn.appmaster.resource.memory]]`spring.yarn.appmaster.resource.memory`::
+  Description:::
+Container memory allocation.
+  Required:::
+No
+  Type:::
+String
+   Default Value:::
+null
 
-.`spring.yarn.client.launchcontext` configuration properties
-[width="100%",cols="<40%,20%,20%,20%",options="header",]
-|=======================================================================
-|Property Name |Required |Type |Default Value
-|`spring.yarn.client.launchcontext.archiveFile` |No |String |null
+[[spring.yarn.appmaster.resource.virtualCores]]`spring.yarn.appmaster.resource.virtualCores`::
+  Description:::
+Container cpu allocation.
+  Required:::
+No
+  Type:::
+String
+   Default Value:::
+null
 
-|`spring.yarn.client.launchcontext.runnerClass` |No |Class |null
+===== `spring.yarn.appmaster.containercluster` configuration properties
 
-|`spring.yarn.client.launchcontext.options` |No |List |null
+Namespace `spring.yarn.appmaster.containercluster` supports following properties;·
+<<spring.yarn.appmaster.containercluster.clusters,clusters>>.
 
-|`spring.yarn.client.launchcontext.arguments` |No |Map |null
+[[spring.yarn.appmaster.containercluster.clusters]]`spring.yarn.appmaster.containercluster.clusters`::
+  Description:::
+Definitions of container clusters.
+  Required:::
+No
+  Type:::
+Map
+   Default Value:::
+null
 
-|`spring.yarn.client.launchcontext.containerAppClasspath` |No |List
-|null
+===== `spring.yarn.appmaster.containercluster.clusters.<name>` configuration properties
 
-|`spring.yarn.client.launchcontext.pathSeparator` |No |String |:
+Namespace `spring.yarn.appmaster.containercluster.clusters.<name>` supports following properties;·
+<<spring.yarn.appmaster.containercluster.clusters.name.resource,resource>>,
+<<spring.yarn.appmaster.containercluster.clusters.name.launchcontext,launchcontext>>,
+<<spring.yarn.appmaster.containercluster.clusters.name.localizer,localizer>>
+and
+<<spring.yarn.appmaster.containercluster.clusters.name.projection,projection>>.
 
-|`spring.yarn.client.launchcontext.includeBaseDirectory` |No |Boolean
-|true
+[[spring.yarn.appmaster.containercluster.clusters.name.resource]]`spring.yarn.appmaster.containercluster.clusters.<name>.resource`::
+  Description:::
+Same as
+<<spring.yarn.appmaster.resource,`spring.yarn.appmaster.resource`>>
+config property.
+  Required:::
+No
+  Type:::
+Config
+   Default Value:::
+null
 
-|`spring.yarn.client.launchcontext.useYarnAppClasspath` |No |Boolean
-|true
+[[spring.yarn.appmaster.containercluster.clusters.name.launchcontext]]`spring.yarn.appmaster.containercluster.clusters.<name>.launchcontext`::
+  Description:::
+Same as
+<<spring.yarn.appmaster.launchcontext,`spring.yarn.appmaster.launchcontext`>>
+config property.
+  Required:::
+No
+  Type:::
+Config
+   Default Value:::
+null
 
-|`spring.yarn.client.launchcontext.useMapreduceAppClasspath` |No
-|Boolean |true
+[[spring.yarn.appmaster.containercluster.clusters.name.localizer]]`spring.yarn.appmaster.containercluster.clusters.<name>.localizer`::
+  Description:::
+Same as
+<<spring.yarn.appmaster.localizer,`spring.yarn.appmaster.localizer`>>
+config property.
+  Required:::
+No
+  Type:::
+Config
+   Default Value:::
+null
 
-|`spring.yarn.client.launchcontext.includeSystemEnv` |No |Boolean |true
-|=======================================================================
+[[spring.yarn.appmaster.containercluster.clusters.name.projection]]`spring.yarn.appmaster.containercluster.clusters.<name>.projection`::
+  Description:::
+Config collection for a projection settings.
+  Required:::
+No
+  Type:::
+Config
+   Default Value:::
+null
 
-`spring.yarn.client.launchcontext.archiveFile`::
-  Indicates that a container main file is treated as executable jar or
-  exploded zip.
-`spring.yarn.client.launchcontext.runnerClass`::
-  Indicates a fully qualified class name for a container runner.
-`spring.yarn.client.launchcontext.options`::
-  JVM system options.
-`spring.yarn.client.launchcontext.arguments`::
-  Application arguments.
-`spring.yarn.client.launchcontext.containerAppClasspath`::
-  Additional classpath entries.
-`spring.yarn.client.launchcontext.pathSeparator`::
-  Separator in a classpath.
-`spring.yarn.client.launchcontext.includeBaseDirectory`::
-  If base directory should be added in a classpath.
-`spring.yarn.client.launchcontext.useYarnAppClasspath`::
-  If default yarn application classpath should be added.
-`spring.yarn.client.launchcontext.useMapreduceAppClasspath`::
-  If default mr application classpath should be added.
-`spring.yarn.client.launchcontext.includeSystemEnv`::
-  If system environment variables are added to a container environment.
+===== `spring.yarn.appmaster.containercluster.clusters.<name>.projection` configuration properties
 
-.`spring.yarn.client.localizer` configuration properties
-[width="100%",cols="<40%,20%,20%,20%",options="header",]
-|=================================================================
-|Property Name |Required |Type |Default Value
-|`spring.yarn.client.localizer.patterns` |No |List |null
-|`spring.yarn.client.localizer.zipPattern` |No |String |null
-|`spring.yarn.client.localizer.propertiesNames` |No |List |null
-|`spring.yarn.client.localizer.propertiesSuffixes` |No |List |null
-|=================================================================
+Namespace `spring.yarn.appmaster.containercluster.clusters.<name>.projection`
+supports following properties;·
+<<spring.yarn.appmaster.containercluster.clusters.name.projection.type,type>> and
+<<spring.yarn.appmaster.containercluster.clusters.name.projection.data,data>>.
 
-`spring.yarn.client.localizer.patterns`::
-  A simple patterns to choose localized files.
-`spring.yarn.client.localizer.zipPattern`::
-  A simple pattern to mark a file as archive to be exploded.
-`spring.yarn.client.localizer.propertiesNames`::
-  Base name of a configuration files.
-`spring.yarn.client.localizer.propertiesSuffixes`::
-  Suffixes for a configuration files.
+[[spring.yarn.appmaster.containercluster.clusters.name.projection.type]]`spring.yarn.appmaster.containercluster.clusters.<name>.projection.type`::
+  Description:::
+Type of a projection to use. `default` is supported on default or any
+other projection added via a custom factory.
+  Required:::
+No
+  Type:::
+String
+   Default Value:::
+null
 
-.`spring.yarn.client.resource` configuration properties
-[width="100%",cols="<40%,20%,20%,20%",options="header",]
-|============================================================
-|Property Name |Required |Type |Default Value
-|`spring.yarn.client.resource.memory` |No |String |null
-|`spring.yarn.client.resource.virtualCores` |No |String |null
-|============================================================
+[[spring.yarn.appmaster.containercluster.clusters.name.projection.data]]`spring.yarn.appmaster.containercluster.clusters.<name>.projection.data`::
+  Description:::
+Map of config keys and values. `any` takes an integer, `hosts` as name to
+integer map, `racks` as name to integer map, properties as a generic map
+values.
+  Required:::
+No
+  Type:::
+Map
+   Default Value:::
+null
 
-`spring.yarn.client.resource.memory`::
-  Application master memory allocation.
-`spring.yarn.client.resource.virtualCores`::
-  Application master cpu allocation.
+===== `spring.yarn.endpoints.containercluster` configuration properties
 
-.`spring.yarn.container` configuration properties
-[width="100%",cols="<40%,20%,20%,20%",options="header",]
-|===========================================================
-|Property Name |Required |Type |Default Value
-|`spring.yarn.container.keepContextAlive` |No |Boolean |true
-|`spring.yarn.container.containerClass` |No |Class |null
-|===========================================================
+Namespace `spring.yarn.endpoints.containercluster` supports following properties;·
+<<spring.yarn.endpoints.containercluster.enabled,enabled>>.
 
-`spring.yarn.container.keepContextAlive`::
-  Setting for an application container runner to stop main thread to
-  wait a latch before continuing. This is needed in cases where main
-  thread needs to wait event from other threads to be able to exit.
-`spring.yarn.container.containerClass`::
-  Fully qualified classname which auto-configuration can automatically
-  instantiate as a custom container.
+[[spring.yarn.endpoints.containercluster.enabled]]`spring.yarn.endpoints.containercluster.enabled`::
+  Description:::
+Enabling endpoint MVC REST API controlling container clusters.
+  Required:::
+No
+  Type:::
+Boolean
+   Default Value:::
+false
 
-.`spring.yarn.batch` configuration properties
-[width="100%",cols="<40%,20%,20%,20%",options="header",]
-|===============================================
-|Property Name |Required |Type |Default Value
-|`spring.yarn.batch.name` |No |String |null
-|`spring.yarn.batch.enabled` |No |Boolean |false
-|`spring.yarn.batch.jobs` |No |List |null
-|===============================================
+===== `spring.yarn.client` configuration properties
 
-`spring.yarn.batch.name`::
-  Comma-delimited list of search patterns to find jobs to run defined
-  either locally in application context or in job registry.
-`spring.yarn.batch.enabled`::
-  Indicates if batch processing on yarn is enabled.
-`spring.yarn.batch.jobs`::
-  Indicates a list of individual configuration properties for jobs.
+Namespace `spring.yarn.client` supports following properties;·
+<<spring.yarn.client.files,files>>,
+<<spring.yarn.client.priority,priority>>,
+<<spring.yarn.client.queue,queue>>,
+<<spring.yarn.client.clientClass,clientClass>> and
+<<spring.yarn.client.startup.action,startup.action>>.
 
-.`spring.yarn.batch.jobs` configuration properties
-[width="100%",cols="<40%,20%,20%,20%",options="header",]
-|========================================================
-|Property Name |Required |Type |Default Value
-|`spring.yarn.batch.jobs.name` |No |String |null
-|`spring.yarn.batch.jobs.enabled` |No |Boolean |false
-|`spring.yarn.batch.jobs.next` |No |Boolean |false
-|`spring.yarn.batch.jobs.failNext` |No |Boolean |false
-|`spring.yarn.batch.jobs.restart` |No |Boolean |false
-|`spring.yarn.batch.jobs.failRestart` |No |Boolean |false
-|`spring.yarn.batch.jobs.parameters` |No |String |null
-|========================================================
+[[spring.yarn.client.files]]`spring.yarn.client.files`::
+  Description:::
+Files to copy into hdfs during application submission.
+  Required:::
+No
+  Type:::
+List
+   Default Value:::
+null
 
-`spring.yarn.batch.jobs.name`::
-  Name of a job to configure.
-`spring.yarn.batch.jobs.enabled`::
-  Indicates if job is enabled.
-`spring.yarn.batch.jobs.next`::
-  Indicates if job parameters incrementer is used to prepare a job for
-  next run.
-`spring.yarn.batch.jobs.failNext`::
-  Indicates if job execution should fail if job cannot be prepared for
-  next execution.
-`spring.yarn.batch.jobs.restart`::
-  Indicates of job should be restarted.
-`spring.yarn.batch.jobs.failRestart`::
-  Indicates if job execution should fail if job cannot be restarted.
-`spring.yarn.batch.jobs.parameters`::
-  Defines a Map of additional job parameters. Keys and values are in
-  normal format supported by Batch.
+[[spring.yarn.client.priority]]`spring.yarn.client.priority`::
+  Description:::
+Application priority.
+  Required:::
+No
+  Type:::
+Integer
+   Default Value:::
+null
+
+[[spring.yarn.client.queue]]`spring.yarn.client.queue`::
+  Description:::
+Application submission queue.
+  Required:::
+No
+  Type:::
+String
+   Default Value:::
+null
+
+[[spring.yarn.client.clientClass]]`spring.yarn.client.clientClass`::
+  Description:::
+Fully qualified classname which auto-configuration can automatically
+instantiate as a custom client.
+  Required:::
+No
+  Type:::
+Class
+   Default Value:::
+null
+
+[[spring.yarn.client.startup.action]]`spring.yarn.client.startup.action`::
+  Description:::
+Default action to perform on YarnClient. Currently only one action
+named submit is supported. This action is simply calling
+`submitApplication` method on `YarnClient`.
+  Required:::
+No
+  Type:::
+String
+   Default Value:::
+null
+
+[[spring.yarn.client.launchcontext]]
+===== `spring.yarn.client.launchcontext` configuration properties
+
+Namespace `spring.yarn.client.launchcontext` supports following properties;·
+<<spring.yarn.client.launchcontext.archiveFile,archiveFile>>,
+<<spring.yarn.client.launchcontext.runnerClass,runnerClass>>,
+<<spring.yarn.client.launchcontext.options,options>>,
+<<spring.yarn.client.launchcontext.arguments,arguments>>,
+<<spring.yarn.client.launchcontext.containerAppClasspath,containerAppClasspath>>,
+<<spring.yarn.client.launchcontext.pathSeparator,pathSeparator>>,
+<<spring.yarn.client.launchcontext.includeBaseDirectory,includeBaseDirectory>>,
+<<spring.yarn.client.launchcontext.useYarnAppClasspath,useYarnAppClasspath>>,
+<<spring.yarn.client.launchcontext.useMapreduceAppClasspath,useMapreduceAppClasspath>> and
+<<spring.yarn.client.launchcontext.includeSystemEnv,includeSystemEnv>>.
+
+[[spring.yarn.client.launchcontext.archiveFile]]`spring.yarn.client.launchcontext.archiveFile`::
+  Description:::
+Indicates that a container main file is treated as executable jar or
+exploded zip.
+  Required:::
+No
+  Type:::
+String
+   Default Value:::
+null
+
+[[spring.yarn.client.launchcontext.runnerClass]]`spring.yarn.client.launchcontext.runnerClass`::
+  Description:::
+Indicates a fully qualified class name for a container runner.
+  Required:::
+No
+  Type:::
+Class
+   Default Value:::
+null
+
+[[spring.yarn.client.launchcontext.options]]`spring.yarn.client.launchcontext.options`::
+  Description:::
+JVM system options.
+  Required:::
+No
+  Type:::
+List
+   Default Value:::
+null
+
+[[spring.yarn.client.launchcontext.arguments]]`spring.yarn.client.launchcontext.arguments`::
+  Description:::
+JVM system options.
+  Required:::
+No
+  Type:::
+Map
+   Default Value:::
+null
+
+[[spring.yarn.client.launchcontext.containerAppClasspath]]`spring.yarn.client.launchcontext.containerAppClasspath`::
+  Description:::
+Additional classpath entries.
+  Required:::
+No
+  Type:::
+List
+   Default Value:::
+null
+
+[[spring.yarn.client.launchcontext.pathSeparator]]`spring.yarn.client.launchcontext.pathSeparator`::
+  Description:::
+Separator in a classpath.
+  Required:::
+No
+  Type:::
+String
+   Default Value:::
+null
+
+[[spring.yarn.client.launchcontext.includeBaseDirectory]]`spring.yarn.client.launchcontext.includeBaseDirectory`::
+  Description:::
+If base directory should be added in a classpath.
+  Required:::
+No
+  Type:::
+Boolean
+   Default Value:::
+true
+
+[[spring.yarn.client.launchcontext.useYarnAppClasspath]]`spring.yarn.client.launchcontext.useYarnAppClasspath`::
+  Description:::
+If default yarn application classpath should be added.
+  Required:::
+No
+  Type:::
+Boolean
+   Default Value:::
+true
+
+[[spring.yarn.client.launchcontext.useMapreduceAppClasspath]]`spring.yarn.client.launchcontext.useMapreduceAppClasspath`::
+  Description:::
+If default mr application classpath should be added.
+  Required:::
+No
+  Type:::
+Boolean
+   Default Value:::
+true
+
+[[spring.yarn.client.launchcontext.includeSystemEnv]]`spring.yarn.client.launchcontext.includeSystemEnv`::
+  Description:::
+If system environment variables are added to a container environment.
+  Required:::
+No
+  Type:::
+Boolean
+   Default Value:::
+true
+
+[[spring.yarn.client.localizer]]
+===== `spring.yarn.client.localizer` configuration properties
+
+Namespace `spring.yarn.appmaster.localizer` supports following properties;·
+<<spring.yarn.client.localizer.patterns,patterns>>,
+<<spring.yarn.client.localizer.zipPattern,zipPattern>>,
+<<spring.yarn.client.localizer.propertiesNames,propertiesNames>> and
+<<spring.yarn.client.localizer.propertiesSuffixes,propertiesSuffixes>>.
+
+[[spring.yarn.client.localizer.patterns]]`spring.yarn.client.localizer.patterns`::
+  Description:::
+A simple patterns to choose localized files.
+  Required:::
+No
+  Type:::
+List
+   Default Value:::
+null
+
+[[spring.yarn.client.localizer.zipPattern]]`spring.yarn.client.localizer.zipPattern`::
+  Description:::
+A simple pattern to mark a file as archive to be exploded.
+  Required:::
+No
+  Type:::
+String
+   Default Value:::
+null
+
+[[spring.yarn.client.localizer.propertiesNames]]`spring.yarn.client.localizer.propertiesNames`::
+  Description:::
+Base name of a configuration files.
+  Required:::
+No
+  Type:::
+List
+   Default Value:::
+null
+
+[[spring.yarn.client.localizer.propertiesSuffixes]]`spring.yarn.client.localizer.propertiesSuffixes`::
+  Description:::
+Suffixes for a configuration files.
+  Required:::
+No
+  Type:::
+List
+   Default Value:::
+null
+
+[[spring.yarn.client.resource]]
+===== `spring.yarn.client.resource` configuration properties
+
+Namespace `spring.yarn.client.resource` supports following properties;·
+<<spring.yarn.client.resource.memory,memory>> and
+<<spring.yarn.client.resource.virtualCores,virtualCores>>.
+
+[[spring.yarn.client.resource.memory]]`spring.yarn.client.resource.memory`::
+  Description:::
+Container memory allocation.
+  Required:::
+No
+  Type:::
+String
+   Default Value:::
+null
+
+[[spring.yarn.client.resource.virtualCores]]`spring.yarn.client.resource.virtualCores`::
+  Description:::
+Container cpu allocation.
+  Required:::
+No
+  Type:::
+String
+   Default Value:::
+null
+
+===== `spring.yarn.container` configuration properties
+
+Namespace `spring.yarn.container` supports following properties;·
+<<spring.yarn.container.keepContextAlive,keepContextAlive>> and
+<<spring.yarn.container.containerClass,containerClass>>.
+
+[[spring.yarn.container.keepContextAlive]]`spring.yarn.container.keepContextAlive`::
+  Description:::
+Setting for an application container runner to stop main thread to
+wait a latch before continuing. This is needed in cases where main
+thread needs to wait event from other threads to be able to exit.
+  Required:::
+No
+  Type:::
+Boolean
+   Default Value:::
+true
+
+[[spring.yarn.container.containerClass]]`spring.yarn.container.containerClass`::
+  Description:::
+Fully qualified classname which auto-configuration can automatically
+instantiate as a custom container.
+  Required:::
+No
+  Type:::
+Class
+   Default Value:::
+null
+
+===== `spring.yarn.batch` configuration properties
+
+Namespace `spring.yarn.batch` supports following properties;·
+<<spring.yarn.batch.name,name>>,
+<<spring.yarn.batch.enabled,enabled>> and
+<<spring.yarn.batch.jobs,jobs>>.
+
+[[spring.yarn.batch.name]]`spring.yarn.batch.name`::
+  Description:::
+Comma-delimited list of search patterns to find jobs to run defined
+either locally in application context or in job registry.
+  Required:::
+No
+  Type:::
+String
+   Default Value:::
+null
+
+[[spring.yarn.batch.enabled]]`spring.yarn.batch.enabled`::
+  Description:::
+Indicates if batch processing on yarn is enabled.
+  Required:::
+No
+  Type:::
+Boolean
+   Default Value:::
+false
+
+[[spring.yarn.batch.jobs]]`spring.yarn.batch.jobs`::
+  Description:::
+Configures a list of individual configuration properties for jobs.
+  Required:::
+No
+  Type:::
+List
+   Default Value:::
+null
+
+===== `spring.yarn.batch.jobs` configuration properties
+
+Namespace `spring.yarn.batch.jobs` supports following properties;·
+<<spring.yarn.batch.jobs.name,name>>,
+<<spring.yarn.batch.jobs.enabled,enabled>>,
+<<spring.yarn.batch.jobs.next,next>>,
+<<spring.yarn.batch.jobs.failNext,failNext>>,
+<<spring.yarn.batch.jobs.restart,restart>>,
+<<spring.yarn.batch.jobs.failRestart,failRestart>> and
+<<spring.yarn.batch.jobs.parameters,parameters>>.
+
+[[spring.yarn.batch.jobs.name]]`spring.yarn.batch.jobs.name`::
+  Description:::
+Name of a job to configure.
+  Required:::
+No
+  Type:::
+String
+   Default Value:::
+null
+
+[[spring.yarn.batch.jobs.enabled]]`spring.yarn.batch.jobs.enabled`::
+  Description:::
+Indicates if job is enabled.
+  Required:::
+No
+  Type:::
+Boolean
+   Default Value:::
+false
+
+[[spring.yarn.batch.jobs.next]]`spring.yarn.batch.jobs.next`::
+  Description:::
+Indicates if job parameters incrementer is used to prepare a job for
+next run.
+  Required:::
+No
+  Type:::
+Boolean
+   Default Value:::
+false
+
+[[spring.yarn.batch.jobs.failNext]]`spring.yarn.batch.jobs.failNext`::
+  Description:::
+Indicates if job execution should fail if job cannot be prepared for
+next execution.
+  Required:::
+No
+  Type:::
+Boolean
+   Default Value:::
+false
+
+[[spring.yarn.batch.jobs.restart]]`spring.yarn.batch.jobs.restart`::
+  Description:::
+Indicates of job should be restarted.
+  Required:::
+No
+  Type:::
+Boolean
+   Default Value:::
+false
+
+[[spring.yarn.batch.jobs.failRestart]]`spring.yarn.batch.jobs.failRestart`::
+  Description:::
+Indicates if job execution should fail if job cannot be restarted.
+  Required:::
+No
+  Type:::
+Boolean
+   Default Value:::
+false
+
+[[spring.yarn.batch.jobs.parameters]]`spring.yarn.batch.jobs.parameters`::
+  Description:::
+Defines a Map of additional job parameters. Keys and values are in
+normal format supported by Batch.
+  Required:::
+No
+  Type:::
+Map
+   Default Value:::
+null
 
 ==== Container Groups
 
@@ -3113,8 +3543,8 @@ java -jar <jar> push - Push new application version
 
 usage: java -jar <jar> push [options]
 
-Option                     Description                       
-------                     -----------                       
+Option                     Description
+------                     -----------
 -v, --application-version  Application version (default: app)
 ----
 
@@ -3142,8 +3572,9 @@ java -jar <jar> submit - Submit application
 
 usage: java -jar <jar> submit [options]
 
-Option                     Description                       
-------                     -----------                       
+Option                     Description
+------                     -----------
+-n, --application-name     Application name
 -v, --application-version  Application version (default: app)
 ----
 
@@ -3157,8 +3588,8 @@ java -jar <jar> submitted - List submitted applications
 
 usage: java -jar <jar> submitted [options]
 
-Option                   Description                     
-------                   -----------                     
+Option                   Description
+------                   -----------
 -t, --application-type   Application type (default: BOOT)
 -v, --verbose [Boolean]  Verbose output (default: true)  
 ----
@@ -3174,8 +3605,8 @@ java -jar <jar> kill - Kill application
 
 usage: java -jar <jar> kill [options]
 
-Option                Description                
-------                -----------                
+Option                Description
+------                -----------
 -a, --application-id  Specify YARN application id
 ----
 
@@ -3189,8 +3620,8 @@ java -jar <jar> clustersinfo - List clusters
 
 usage: java -jar <jar> clustersinfo [options]
 
-Option                Description                
-------                -----------                
+Option                Description
+------                -----------
 -a, --application-id  Specify YARN application id
 ----
 
@@ -3205,10 +3636,10 @@ java -jar <jar> clusterinfo - List cluster info
 
 usage: java -jar <jar> clusterinfo [options]
 
-Option                   Description                   
-------                   -----------                   
--a, --application-id     Specify YARN application id   
--c, --cluster-id         Specify cluster id            
+Option                   Description
+------                   -----------
+-a, --application-id     Specify YARN application id
+-c, --cluster-id         Specify cluster id
 -v, --verbose [Boolean]  Verbose output (default: true)
 ----
 
@@ -3222,15 +3653,16 @@ java -jar <jar> clustercreate - Create cluster
 
 usage: java -jar <jar> clustercreate [options]
 
-Option                  Description                
-------                  -----------                
+Option                  Description
+------                  -----------
 -a, --application-id    Specify YARN application id
--c, --cluster-id        Specify cluster id         
--h, --projection-hosts  Projection hosts counts    
--i, --cluster-def       Specify cluster def id     
--p, --projection-type   Projection type            
--r, --projection-racks  Projection racks counts    
--w, --projection-any    Projection any count    
+-c, --cluster-id        Specify cluster id
+-h, --projection-hosts  Projection hosts counts
+-i, --cluster-def       Specify cluster def id
+-p, --projection-type   Projection type
+-r, --projection-racks  Projection racks counts
+-w, --projection-any    Projection any count
+-y, --projection-data   Raw projection data
 ----
 
 YarnClusterCreateCommand can be used to create a new cluster.
@@ -3243,10 +3675,10 @@ java -jar <jar> clusterstart - Start cluster
 
 usage: java -jar <jar> clusterstart [options]
 
-Option                Description                
-------                -----------                
+Option                Description
+------                -----------
 -a, --application-id  Specify YARN application id
--c, --cluster-id      Specify cluster id         
+-c, --cluster-id      Specify cluster id
 ----
 
 YarnClusterStartCommand can be used to start an existing cluster.
@@ -3259,10 +3691,10 @@ java -jar <jar> clusterstop - Stop cluster
 
 usage: java -jar <jar> clusterstop [options]
 
-Option                Description                
-------                -----------                
+Option                Description
+------                -----------
 -a, --application-id  Specify YARN application id
--c, --cluster-id      Specify cluster id         
+-c, --cluster-id      Specify cluster id
 ----
 
 YarnClusterStopCommand can be used to stop an existing cluster.
@@ -3275,13 +3707,13 @@ java -jar <jar> clustermodify - Modify cluster
 
 usage: java -jar <jar> clustermodify [options]
 
-Option                  Description                
-------                  -----------                
+Option                  Description
+------                  -----------
 -a, --application-id    Specify YARN application id
--c, --cluster-id        Specify cluster id         
--h, --projection-hosts  Projection hosts counts    
--r, --projection-racks  Projection racks counts    
--w, --projection-any    Projection any count       
+-c, --cluster-id        Specify cluster id
+-h, --projection-hosts  Projection hosts counts
+-r, --projection-racks  Projection racks counts
+-w, --projection-any    Projection any count
 ----
 
 YarnClusterModifyCommand can be used to modify an existing cluster.
@@ -3294,10 +3726,10 @@ java -jar <jar> clusterdestroy - Destroy cluster
 
 usage: java -jar <jar> clusterdestroy [options]
 
-Option                Description                
-------                -----------                
+Option                Description
+------                -----------
 -a, --application-id  Specify YARN application id
--c, --cluster-id      Specify cluster id         
+-c, --cluster-id      Specify cluster id
 ----
 
 YarnClusterDestroyCommand can be used to destroy an existing cluster.

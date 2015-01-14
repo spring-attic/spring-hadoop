@@ -3,10 +3,8 @@
 
 When working with http://hive.apache.org[] from a Java environment, one
 can choose between the http://thrift.apache.org/[Thrift] client or using
-the Hive JDBC-like
-http://hive.apache.org/docs/r0.7.1/api/org/apache/hadoop/hive/jdbc/package-summary.html[driver].
-Both have their pros and cons but no matter the choice, Spring and SHDP
-support both of them.
+the Hive JDBC-like driver. Both have their pros and cons but no matter
+the choice, Spring and SHDP support both of them.
 
 === Starting a Hive Server
 
@@ -23,8 +21,8 @@ respectively) and you're good to go:
 
 If needed the Hadoop configuration can be passed in or additional
 properties specified. In fact `hiver-server` provides the same
-properties configuration `knobs` as #hadoop:config:properties[hadoop
-configuration]:
+properties configuration `knobs` as
+<<springandhadoop-config,hadoop configuration>>:
 
 [source,xml]
 ----
@@ -77,9 +75,7 @@ client is created (if the scripts need to be executed only once consider
 using a tasklet) by the factory. The first script is defined inline
 while the second is read from the classpath and passed one parameter.
 For more information on using parameters (or variables) in Hive scripts,
-see
-http://hive.apache.org/docs/r0.9.0/language_manual/var_substitution.html[this]
-section in the Hive manual.
+see Hive manual.
 
 === Using the Hive JDBC Client
 
@@ -87,9 +83,8 @@ Another attractive option for accessing Hive is through its JDBC driver.
 This exposes Hive through the
 http://docs.oracle.com/javase/6/docs/technotes/guides/jdbc/[JDBC API]
 meaning one can use the standard API or its derived utilities to
-interact with Hive, such as the rich
-http://docs.spring.io/spring/docs/4.0.x/spring-framework-reference/html/jdbc.html[JDBC
-support] in Spring Framework.
+interact with Hive, such as the rich {core-jdbc}[JDBC support] in
+Spring Framework.
 
 [WARNING]
 ====
@@ -130,9 +125,7 @@ as you would with any other JDBC Driver:
 
 And that is it! Following the example above, one can use the `hive-ds`
 DataSource bean to manually get a hold of Connections or better yet, use
-Spring's
-http://docs.spring.io/spring/docs/4.0.x/spring-framework-reference/html/jdbc.html#jdbc-JdbcTemplate[JdbcTemplate]
-as in the example above.
+Spring's {core-jdbc-JdbcTemplate}[JdbcTemplate] as in the example above.
 
 === Running a Hive script or query
 
@@ -155,11 +148,11 @@ The runner will trigger the execution during the application start-up
 (notice the `run-at-startup` flag which is by default `false`). Do note
 that the runner will not run unless triggered manually or if
 `run-at-startup` is set to `true`. Additionally the runner (as in fact
-do all link:#runners[runners] in SHDP) allows one or multiple `pre` and
+do all <<springandhadoop-runners,runners>> in SHDP) allows one or multiple `pre` and
 `post` actions to be specified to be executed before and after each run.
 Typically other runners (such as other jobs or scripts) can be specified
 but any JDK `Callable` can be passed in. For more information on
-runners, see the link:#runners[dedicated] chapter.
+runners, see the <<springandhadoop-runners,dedicated>> chapter.
 
 ==== Using the Hive tasklet
 

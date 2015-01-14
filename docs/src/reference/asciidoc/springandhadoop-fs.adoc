@@ -4,13 +4,12 @@
 A common task in Hadoop is interacting with its file system, whether for
 provisioning, adding new files to be processed, parsing results, or
 performing cleanup. Hadoop offers several ways to achieve that: one can
-use its Java API (namely
-http://hadoop.apache.org/common/docs/stable/api/index.html?org/apache/hadoop/fs/FileSystem.html[`FileSystem`])
+use its Java API (namely {hadoop-FileSystem}[`FileSystem`]
 or use the `hadoop` command line, in particular the file system
-http://hadoop.apache.org/common/docs/stable/file_system_shell.html[shell].
-However there is no middle ground, one either has to use the (somewhat
-verbose, full of checked exceptions) API or fall back to the command
-line, outside the application. SHDP addresses this issue by bridging the
+{hadoop-FileSystemShell}[shell]. However there is no middle ground,
+one either has to use the (somewhat verbose, full of checked exceptions)
+API or fall back to the command line, outside the application.
+SHDP addresses this issue by bridging the
 two worlds, exposing both the `FileSystem` and the fs shell through an
 intuitive, easy-to-use Java API. Add your favorite
 http://en.wikipedia.org/wiki/List_of_JVM_languages[JVM scripting]
@@ -38,8 +37,8 @@ The table below describes the common HDFS APIs in use:
 |=======================================================================
 
 This chapter focuses on the core file-system protocols supported by
-Hadoop. S3 (see the link:#appendix-amazon-emr[Appendix]), FTP and the
-rest of the other `FileSystem` implementations are supported as well -
+Hadoop. S3 (see the <<appendices-access-filesystem,Appendix>>),
+FTP and the rest of the other `FileSystem` implementations are supported as well -
 Spring for Apache Hadoop has no dependency on the underlying system
 rather just on the public Hadoop API.
 
@@ -65,17 +64,15 @@ other languages can use it with minimal effort.
 ====
 Not all file systems work out of the box. For example WebHDFS needs to
 be enabled first in the cluster (through `dfs.webhdfs.enabled` property,
-see this
-http://hadoop.apache.org/common/docs/r1.0.0/webhdfs.html#Document+Conventions[document]
+see this {hadoop-WebHdfs}[document]
 for more information) while the secure `hftp`, `hsftp` requires the SSL
 configuration (such as certificates) to be specified. More about this
-(and how to use `hftp/hsftp` for proxying) in this
-http://hadoop.apache.org/hdfs/docs/r0.21.0/hdfsproxy.html[page].
+(and how to use `hftp/hsftp` for proxying) in this {hadoop-Hftp}[page].
 ====
 
 Once the scheme has been decided upon, one can specify it through the
-standard Hadoop #hadoop:config[configuration], either through the Hadoop
-configuration files or its properties:
+standard Hadoop <<springandhadoop-config,configuration>>, either
+through the Hadoop configuration files or its properties:
 
 [source,xml]
 ----
@@ -368,7 +365,7 @@ and after each run. Typically other runners (such as other jobs or
 scripts) can be specified but any JDK `Callable` can be passed in. Do
 note that the runner will not run unless triggered manually or if
 `run-at-startup` is set to `true`. For more information on runners, see
-the link:#runners[dedicated] chapter.
+the <<springandhadoop-runners,dedicated>> chapter.
 
 ==== Using scripts
 
@@ -537,15 +534,14 @@ external resource.
 === File System Shell (FsShell)
 
 A handy utility provided by the Hadoop distribution is the file system
-http://hadoop.apache.org/common/docs/stable/file_system_shell.html[shell]
-which allows UNIX-like commands to be executed against HDFS. One can
-check for the existence of files, delete, move, copy directories or
-files or set up permissions. However the utility is only available from
-the command-line which makes it hard to use from/inside a Java
-application. To address this problem, SHDP provides a lightweight, fully
-embeddable shell, called `FsShell` which mimics most of the commands
-available from the command line: rather than dealing with `System.in` or
-`System.out`, one deals with objects.
+{hadoop-FileSystemShell}[shell] which allows UNIX-like commands to be
+executed against HDFS. One can check for the existence of files, delete,
+move, copy directories or files or set up permissions. However the
+utility is only available from the command-line which makes it hard to
+use from/inside a Java application. To address this problem, SHDP provides
+a lightweight, fully embeddable shell, called `FsShell` which mimics most
+of the commands available from the command line: rather than dealing
+with `System.in` or `System.out`, one deals with objects.
 
 Let us take a look at using `FsShell` by building on the previous
 scripting examples:
@@ -582,8 +578,7 @@ the class offers enhanced methods (such as `chmodr` which stands for
 _recursive_ `chmod`) and multiple overloaded methods taking advantage of
 http://docs.oracle.com/javase/1.5.0/docs/guide/language/varargs.html[varargs]
 so that multiple parameters can be specified. Consult the
-http://docs.spring.io/spring-hadoop/docs/current/api/index.html?org/springframework/data/hadoop/fs/FsShell.html[API]
-for more information.
+{shdp-FsShell}[API] for more information.
 
 To be as close as possible to the command-line shell, `FsShell` mimics
 even the messages being displayed. Take a look at line 9 which prints
@@ -643,9 +638,7 @@ http://hadoop.apache.org/common/docs/stable/distcp.html[`DistCp`]
 version that builds on top of the `distcp` from the Hadoop distro. The
 semantics and configuration options are the same however, one can use it
 from within a Java application without having to use the command-line.
-See the
-http://docs.spring.io/spring-hadoop/docs/current/api/index.html?org/springframework/data/hadoop/fs/DistCp.html[API]
-for more information:
+See the {shdp-DistCp}[API] for more information:
 
 [source,xml]
 ----

@@ -24,7 +24,7 @@ based solutions provided by the integration with Spring Batch.
 Spring for Apache Hadoop 2.1 is built and tested with JDK 7.0 (generated
 jars are usable in JDK 6.0 and above),
 http://projects.spring.io/spring-framework/[Spring Framework] 4.0 and is
-by default built against http://hadoop.apache.org/[Apache Hadoop] 2.5.1.
+by default built against http://hadoop.apache.org/[Apache Hadoop] 2.6.0.
 
 Spring for Apache Hadoop 2.1 supports the following versions and
 distributions:

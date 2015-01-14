@@ -41,7 +41,7 @@ declaration):
 Notice that like with the other elements, one can specify additional
 properties specific to this configuration. In fact `hbase-configuration`
 provides the same properties configuration `knobs` as
-#hadoop:config:properties[hadoop configuration]:
+<<springandhadoop-config, hadoop configuration>>:
 
 [source,xml]
 ----
@@ -51,15 +51,13 @@ provides the same properties configuration `knobs` as
 === Data Access Object (DAO) Support
 
 One of the most popular and powerful feature in Spring Framework is the
-Data Access Object (or DAO)
-http://docs.spring.io/spring/docs/4.0.x/spring-framework-reference/html/dao.html[support].
+Data Access Object (or DAO) {core-dao}[support].
 It makes dealing with data access technologies easy and consistent
 allowing easy switch or interconnection of the aforementioned persistent
 stores with minimal friction (no worrying about catching exceptions,
 writing boiler-plate code or handling resource acquisition and
 disposal). Rather than reiterating here the value proposal of the DAO
-support, we recommend the DAO
-http://docs.spring.io/spring/docs/4.0.x/spring-framework-reference/html/jdbc.html[section]
+support, we recommend the JDBC {core-jdbc}[section]
 in the Spring Framework reference documentation
 
 SHDP provides the same functionality for Apache HBase through its
@@ -73,7 +71,7 @@ names quite familiar).
 
 At the core of the DAO support lies `HbaseTemplate` - a high-level
 abstraction for interacting with HBase. The template requires an HBase
-link:#hbase[configuration], once it's set, the template is thread-safe
+<<springandhadoop-hbase,configuration>>, once it's set, the template is thread-safe
 and can be reused across multiple instances at the same time:
 
 [source,xml]
@@ -119,21 +117,18 @@ The first snippet showcases the generic `TableCallback` - the most
 generic of the callbacks, it does the table lookup and resource cleanup
 so that the user code does not have to. Notice the callback signature -
 any exception thrown by the HBase API is automatically caught, converted
-to Spring's
-http://docs.spring.io/spring/docs/4.0.x/spring-framework-reference/html/dao.html#dao-exceptions[DAO
-exceptions] and resource clean-up applied transparently. The second
-example, displays the dedicated lookup methods - in this case `find`
-which, as the name implies, finds all the rows matching the given
-criteria and allows user code to be executed against each of them
-(typically for doing some sort of type conversion or mapping). If the
-entire result is required, then one can use `ResultsExtractor` instead
+to Spring's {core-dao-exceptions}[DAO exceptions] and resource clean-up
+applied transparently. The second example, displays the dedicated lookup
+methods - in this case `find` which, as the name implies, finds all the
+rows matching the given criteria and allows user code to be executed against
+each of them (typically for doing some sort of type conversion or mapping).
+If the entire result is required, then one can use `ResultsExtractor` instead
 of `RowMapper`.
 
 Besides the template, the package offers support for automatically
 binding HBase table to the current thread through `HbaseInterceptor` and
 `HbaseSynchronizationManager`. That is, each class that performs DAO
-operations on HBase can be
-http://docs.spring.io/spring/docs/4.0.x/spring-framework-reference/html/aop.html#aop-schema-advisors[_wrapped_]
+operations on HBase can be {core-aop-schema-advisors}[_wrapped_]
 by `HbaseInterceptor` so that each table in use, once found, is bound to
 the thread so any subsequent call to it avoids the lookup. Once the call
 ends, the table is automatically closed so there is no leakage between

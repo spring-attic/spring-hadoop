@@ -11,8 +11,7 @@ usage) it has on the various SHDP features.
 === HDFS permissions
 
 HDFS layer provides file permissions designed to be similar to those
-present in *nix OS. The official
-http://hadoop.apache.org/common/docs/r1.0.3/hdfs_permissions_guide.html[guide]
+present in *nix OS. The official {hadoop-Security}[guide]
 explains the major components but in short, the access for each file
 (whether it's for reading, writing or in case of directories accessing)
 can be restricted to certain users or groups. Depending on the user
@@ -71,4 +70,69 @@ current user is used - however one can specify the different identity
 Note that the user running the application (or the current user) must
 have the proper kerberos credentials to be able to impersonate the
 target user (in this case _joe_).
+
+=== Boot Support
+
+==== `spring.hadoop.security` configuration properties
+
+Namespace `spring.hadoop.security` supports following properties; 
+<<spring.hadoop.security.authMethod,authMethod>>,
+<<spring.hadoop.security.userPrincipal,userPrincipal>>,
+<<spring.hadoop.security.userKeytab,userKeytab>>,
+<<spring.hadoop.security.namenodePrincipal,namenodePrincipal>> and
+<<spring.hadoop.security.rmManagerPrincipal,rmManagerPrincipal>>.
+
+[[spring.hadoop.security.authMethod]]`spring.hadoop.security.authMethod`::
+  Description:::
+Defines a used Hadoop security authentication method. Currently if set
+only value `KERBEROS` is supported.
+  Required:::
+No
+  Type:::
+String
+  Default Value:::
+null
+
+[[spring.hadoop.security.userPrincipal]]`spring.hadoop.security.userPrincipal`::
+  Description:::
+Defines a used Hadoop kerberos user principal.
+  Required:::
+No
+  Type:::
+String
+  Default Value:::
+null
+
+[[spring.hadoop.security.userKeytab]]`spring.hadoop.security.userKeytab`::
+  Description:::
+Defines a used Spring Hadoop user facing kerberos keytab file path.
+This needs to be a fully qualified path to a file existing on a local
+file system. Due to restrictions in jvm's kerberos implementation,
+relative paths or resolving from a classpath are not supported.
+  Required:::
+No
+  Type:::
+String
+  Default Value:::
+null
+
+[[spring.hadoop.security.namenodePrincipal]]`spring.hadoop.security.namenodePrincipal`::
+  Description:::
+Defines a used Hadoop kerberos namenode principal.
+  Required:::
+No
+  Type:::
+String
+  Default Value:::
+null
+
+[[spring.hadoop.security.rmManagerPrincipal]]`spring.hadoop.security.rmManagerPrincipal`::
+  Description:::
+Defines a used Hadoop kerberos resource manager principal.
+  Required:::
+No
+  Type:::
+String
+  Default Value:::
+null
 

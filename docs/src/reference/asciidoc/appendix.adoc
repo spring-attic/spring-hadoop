@@ -162,6 +162,7 @@ For security reasons, we recommend copying the 'emr-settings.xml' file
 to one of your S3 buckets and use that location instead.
 ====
 
+[[appendices-access-filesystem]]
 === Accessing the file-system
 
 Amazon EMR offers Simple Storage Service, also known as

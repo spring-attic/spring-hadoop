@@ -43,7 +43,7 @@ that additional properties can be specified (either by declaring them
 inlined or/and loading them from an external file) - in fact,
 `<hdp:pig-factory/>` just like the rest of the libraries configuration
 elements, supports common properties attributes as described in the
-#hadoop:config:properties[hadoop configuration] section.
+<<springandhadoop-config,hadoop configuration>> section.
 
 The definition contains also two scripts: `script.pig` (read from the
 classpath) to which one pair of arguments, relevant to the script, is
@@ -74,11 +74,11 @@ The runner will trigger the execution during the application start-up
 (notice the `run-at-startup` flag which is by default `false`). Do note
 that the runner will not run unless triggered manually or if
 `run-at-startup` is set to `true`. Additionally the runner (as in fact
-do all link:#runners[runners] in SHDP) allows one or multiple `pre` and
+do all <<springandhadoop-runners,runners>> in SHDP) allows one or multiple `pre` and
 `post` actions to be specified to be executed before and after each run.
 Typically other runners (such as other jobs or scripts) can be specified
 but any JDK `Callable` can be passed in. For more information on
-runners, see the link:#runners[dedicated] chapter.
+runners, see the <<springandhadoop-runners,dedicated>> chapter.
 
 ==== Using the Pig tasklet
 

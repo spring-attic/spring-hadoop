@@ -145,7 +145,7 @@ public interface PartitionDataStoreWriter<T,K> extends DataStoreWriter<T> {
 }
 ----
 
-DefaultPartitionStrategy
+====== DefaultPartitionStrategy
 
 DefaultPartitionStrategy is a generic default implementation meant to be
 used together with an expression using Spring's _SpEL_ expression
@@ -158,47 +158,46 @@ In order to make it easy to work with SpEL and partitioning, map values
 can be directly accessed with keys and additional partitioning methods
 has been registered.
 
-Partition Path Expression
+====== Partition Path Expression
 
 SpEL expression is evaluated against a partition key passed into a HDFS
 writer.
 
-Accessing Properties
+====== Accessing Properties
 
 If partition key is a type of Map any property given to a SpEL
 expression is automatically resolved from a map.
 
-Custom Methods
+====== Custom Methods
 
 In addition to normal SpEL functionality, a few custom methods have been
 added to make it easier to build partition paths. These custom methods
 can be used to work with normal partition concepts like date formatting,
 lists, ranges and hashes.
 
-path
-
+path::
++
 [source,java]
 ----
 path(String... paths)
 ----
 
++
 You can concatenate paths together with a `/` delimiter. This method can
 be used to make the expression less verbose than using a native SpEL
 functionality to combine path parts together. To create a path
 _part1/part2_, expression _'part1' + '/' + 'part2'_ is equivalent to
 _path('part1','part2')_.
 
-Parameters
-
-_paths_. +
+Parameters:::
+_paths_::::
 Any number of path parts
 
-Return Value
-
+Return Value:::
 Concatenated value of paths delimited with `/`.
 
-dateFormat
-
+dateFormat::
++
 [source,java]
 ----
 dateFormat(String pattern)
@@ -208,47 +207,49 @@ dateFormat(String pattern, String datestring)
 dateFormat(String pattern, String datestring, String dateformat)
 ----
 
++
 Creates a path using date formatting. Internally this method delegates
 to SimpleDateFormat and needs a Date and a pattern.
 
++
 Method signature with three parameters can be used to create a custom
 Date object which is then passed to SimpleDateFormat conversion using a
 dateformat pattern. This is useful in use cases where partition should
 be based on a date or time string found from a payload content itself.
 Default dateformat pattern if omitted is _yyyy-MM-dd_.
 
-Parameters
-
-_pattern_. +
+Parameters:::
+_pattern_::::
 Pattern compatible with SimpleDateFormat to produce a final output.
 
-_epoch_. +
+_epoch_::::
 Timestamp as Long which is converted into a Date.
 
-_date_. +
+_date_::::
 A Date to be formatted.
 
-_dateformat_. +
+_dateformat_::::
 Secondary pattern to convert datestring into a Date.
 
-_datestring_. +
+_datestring_::::
 Date as a String
 
-Return Value
-
+Return Value:::
 A path part representation which can be a simple file or directory name
 or a directory structure.
 
-list
-
+list::
++
 [source,java]
 ----
 list(Object source, List<List<Object>> lists)
 ----
 
++
 Creates a partition path part by matching a source against a lists
 denoted by _lists_.
 
++
 Lets assume that data is being written and it’s possible to extract an
 _appid_ from the content. We can automatically do a list based partition
 by using a partition method
@@ -257,29 +258,29 @@ This method would create three partitions, _1TO3_list_, _4TO6_list_ and
 _list_. The latter is used if no match is found from partition lists
 passed to lists.
 
-Parameters
-
-_source_. +
+Parameters:::
+_source_::::
 An Object to be matched against lists.
 
-_lists_. +
+_lists_::::
 A definition of list of lists.
 
-Return Value
-
+Return Value:::
 A path part prefixed with a matched key i.e. _XXX_list_ or list if no
 match.
 
-range
-
+range::
++
 [source,java]
 ----
 range(Object source, List<Object> list)
 ----
 
++
 Creates a partition path part by matching a source against a list
 denoted by _list_ using a simple binary search.
 
++
 The partition method takes source as first argument and a list as the
 second argument. Behind the scenes this is using the JVM’s binarySearch
 which works on an Object level so we can pass in anything. Remember that
@@ -292,44 +293,43 @@ _Integer.MAX_VALUE_ as last range would overflow everything above 5000
 into a new partition. Created partitions would then be _1000_range_,
 _3000_range_ and _5000_range_.
 
-Parameters
-
-_source_. +
+Parameters:::
+_source_::::
 An Object to be matched against list.
 
-_list_. +
+_list_::::
 A definition of list.
 
-Return Value
-
+Return Value:::
 A path part prefixed with a matched key i.e. XXX_range.
 
-hash
+hash::
 
++
 [source,java]
 ----
 hash(Object source, int bucketcount)
 ----
 
++
 Creates a partition path part by calculating hashkey using source`s
 hashCode and bucketcount. Using a partition method _hash(timestamp,2)_
 would then create partitions named _0_hash_, _1_hash_ and _2_hash_.
 Number suffixed with _hash is simply calculated using _Object.hashCode()
 % bucketcount_.
 
-Parameters
+Parameters:::
 
-_source_. +
+_source_::::
 An Object which hashCode will be used.
 
-_bucketcount_. +
+_bucketcount_::::
 A number of buckets
 
-Return Value
-
+Return Value:::
 A path part prefixed with a hash key i.e. _XXX_hash_.
 
-Creating a Custom Partition Strategy
+===== Creating a Custom Partition Strategy
 
 Creating a custom partition strategy is as easy as just implementing
 needed interfaces. Custom strategy may be needed in use cases where it
@@ -890,4 +890,38 @@ Multiple expressions can be specified by simply chaining them like:
 ------------------------------------------------------------------------------
 identity("region", "R", String.class, 10).year("timestamp").month("timestamp")
 ------------------------------------------------------------------------------
+
+=== Using the Spring for Apache JavaConfig
+
+Spring Hadoop doesn't have support for configuring store components
+using xml but have a support using JavaConfig for writer configuration.
+
+JavaConfig is using same concepts found from other parts of a Spring
+Hadoop where the whole configuration logic works around use of an
+adapter.
+
+[source,java]
+----
+@Configuration
+@EnableDataStoreTextWriter
+static class Config extends SpringDataStoreTextWriterConfigurerAdapter {
+
+  @Override
+  public void configure(DataStoreTextWriterConfigurer config) throws Exception {
+    config
+      .basePath("/tmp/foo1");
+  }
+}
+----
+
+In above example we created a normal Spring `@Configuration` class
+extending
+{shdp-SpringDataStoreTextWriterConfigurerAdapter}[SpringDataStoreTextWriterConfigurerAdapter].
+Class needs to be annotated with
+{shdp-EnableDataStoreTextWriter}[EnableDataStoreTextWriter] order to
+enable some needed functionality. Then what is left for a user to do
+is to override some configure methods from an adapter and use exposed
+interface, namely {shdp-DataStoreTextWriterConfigurer}[DataStoreTextWriterConfigurer]
+in this case to do a writer configuration. Bean of type
+{shdp-DataStoreWriter}[DataStoreWriter] is then created automatically.
 
