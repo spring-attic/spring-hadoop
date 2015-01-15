@@ -34,7 +34,7 @@ The following distros and versions are also supported:
 - Hortonworks HDP 2.1 (hdp21)
 - Hortonworks HDP 2.2 (hdp22)
 
-* For anyone using older distros and versions we recommend using either Spring for Apache Hadoop 1.0.x which is maintained here: https://github.com/spring-projects/spring-hadoop/tree/1.0.x or Spring for Apache Hadoop 2.0.x which is maintained here: https://github.com/spring-projects/spring-hadoop/tree/2.0.x
+For anyone using older distros and versions we recommend using either Spring for Apache Hadoop 1.0.x which is maintained here: https://github.com/spring-projects/spring-hadoop/tree/1.0.x or Spring for Apache Hadoop 2.0.x which is maintained here: https://github.com/spring-projects/spring-hadoop/tree/2.0.x
 
 To compile against a specific distro version pass the `-Pdistro=<label>` project property, like so:
 
