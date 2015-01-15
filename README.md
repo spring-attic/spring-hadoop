@@ -22,17 +22,17 @@ from the project root folder. This will compile the sources, run the tests and c
 
 ## Supported distros
 
-By default Spring for Apache Hadoop compiles against the Apache Hadoop 2.5.x stable relase (hadoop25) *.
+By default Spring for Apache Hadoop compiles against the Apache Hadoop 2.6.x stable relase (hadoop26).
 
 The following distros and versions are also supported:
 
-- Apache Hadoop 2.4.x (hadoop24) *
-- Pivotal HD 2.1 (phd21) *
-- Cloudera CDH5 (cdh5) *
-- Hortonworks HDP 2.0 (hdp20) *
-- Hortonworks HDP 2.1 (hdp21) *
-
-\* The distributions noted with and asterisk will include spring-yarn support in the build.
+- Apache Hadoop 2.5.x (hadoop25)
+- Apache Hadoop 2.4.x (hadoop24)
+- Pivotal HD 2.1 (phd21)
+- Cloudera CDH5 (cdh5)
+- Hortonworks HDP 2.0 (hdp20)
+- Hortonworks HDP 2.1 (hdp21)
+- Hortonworks HDP 2.2 (hdp22)
 
 * For anyone using older distros and versions we recommend using either Spring for Apache Hadoop 1.0.x which is maintained here: https://github.com/spring-projects/spring-hadoop/tree/1.0.x or Spring for Apache Hadoop 2.0.x which is maintained here: https://github.com/spring-projects/spring-hadoop/tree/2.0.x
 
@@ -51,7 +51,7 @@ In this case, the specified Hadoop distribution (above Apache Hadoop 2.4.x) is u
 The results for CI builds are available at [Spring Data Hadoop: Project Summary - Spring CI](https://build.spring.io/browse/SPRINGDATAHADOOP)
 
 We are currently running tests against the following distributions:
-* Apache Hadoop 2.5.1
+* Apache Hadoop 2.6.0
 * Cloudera CDH5
 * Hortonworks HDP 2.1
 * Pivotal HD 2.1
