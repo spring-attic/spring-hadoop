@@ -5,6 +5,29 @@ http://projects.spring.io/spring-hadoop/
 Commit changelog: http://github.com/spring-projects/spring-hadoop/tree/v[version]
 Issues changelog: https://jira.spring.io/secure/ReleaseNote.jspa?projectId=10801
 
+Changes in version 2.1.0 RC1 (2015-01-14)
+-----------------------------------------
+
+Release Notes - Spring for Apache Hadoop - Version 2.1.0 RC1
+
+General
+* Update build to use Hortonworks repo versions for hdp20 and hdp21 [SHDP-446]
+* Update the build to use Cloudera 5.3.0 [SHDP-459]
+* Update the build to use Hadoop 2.5.2 and make hadoop26 the default [SHDP-462]
+* Update to Spring Boot 1.2.1 and Spring Framework 4.1.4 [SHDP-465]
+
+Core
+* Rewrite DistCp for Hadoop v2 API [SHDP-364]
+
+YARN
+* Fix DefaultAllocateCountTracker.addContainers when two hosts on the same rack are specified [SHDP-440]
+* Fix DefaultAllocateCountTracker to handle container allocated by rack correctly [SHDP-441]
+* Support yarn app name in cli submit command [SHDP-464]
+
+Store
+* Enhance Dataset Writer and Create Reader class that keep resource open [SHDP-352]
+
+
 Changes in version 2.1.0 M3 (2014-12-18)
 ----------------------------------------
 General
