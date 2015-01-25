@@ -496,6 +496,30 @@ public class DefaultYarnContainerTests {
 		assertThat(testBean14.future2.interrupted, is(true));
 	}
 
+	@Test
+	public void testNoMethods() {
+		@SuppressWarnings("resource")
+		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(BaseConfig.class);
+		DefaultYarnContainer container = context.getBean(DefaultYarnContainer.class);
+		final StateWrapper stateWrapper = new StateWrapper();
+
+		container.addContainerStateListener(new ContainerStateListener() {
+			@Override
+			public void state(ContainerState state, Object exit) {
+				stateWrapper.count.incrementAndGet();
+				stateWrapper.state = state;
+				stateWrapper.exit = exit;
+			}
+		});
+
+		container.run();
+		assertThat(stateWrapper.state, nullValue());
+		assertThat(stateWrapper.exit, nullValue());
+		assertThat(stateWrapper.count.get(), is(0));
+
+		context.stop();
+	}
+
 	@Configuration
 	static class BaseConfig {
 

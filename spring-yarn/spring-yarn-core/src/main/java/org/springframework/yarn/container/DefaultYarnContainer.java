@@ -68,7 +68,16 @@ public class DefaultYarnContainer extends AbstractYarnContainer implements Appli
 		});
 
 		try {
-			handleResults(getContainerHandlerResults(getContainerHandlers()));
+			// if we don't have any handlers thus meaning no results we
+			// explicitly disable handling which should disable possible
+			// end state notification and container is left running as is.
+			List<ContainerHandler> containerHandlers = getContainerHandlers();
+			if (containerHandlers.size() > 0) {
+				log.info("Processing " + containerHandlers.size() + " @YarnComponent handlers");
+				handleResults(getContainerHandlerResults(containerHandlers));
+			} else {
+				log.info("Found no @YarnComponent methods, not going to notify end state.");
+			}
 		} catch (Exception e) {
 			log.info("About to notifyEndState from catched exception", e);
 			notifyEndState(new ArrayList<Object>(), e);
