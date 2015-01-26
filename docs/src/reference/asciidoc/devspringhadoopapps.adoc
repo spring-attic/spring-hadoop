@@ -104,6 +104,9 @@ they can be developed independently of the Spring for Apache Hadoop
 release cycle. They can be found on GitHub
 https://github.com/spring-projects/spring-hadoop-samples/.
 
+We also keep a numerous Spring IO getting started guides up to date
+with a latest GA release at https://spring.io/guides?filter=yarn.
+
 The
 https://github.com/spring-projects/spring-hadoop/wiki/Sample-Projects[wiki
 page] for the Spring for Apache Hadoop project has more documentation

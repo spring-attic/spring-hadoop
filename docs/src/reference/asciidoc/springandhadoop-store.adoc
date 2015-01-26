@@ -897,31 +897,116 @@ Spring Hadoop doesn't have support for configuring store components
 using xml but have a support using JavaConfig for writer configuration.
 
 JavaConfig is using same concepts found from other parts of a Spring
-Hadoop where the whole configuration logic works around use of an
+Hadoop where whole configuration logic works around use of an
 adapter.
 
 [source,java]
 ----
 @Configuration
 @EnableDataStoreTextWriter
-static class Config extends SpringDataStoreTextWriterConfigurerAdapter {
+static class Config
+    extends SpringDataStoreTextWriterConfigurerAdapter {
 
   @Override
-  public void configure(DataStoreTextWriterConfigurer config) throws Exception {
+  public void configure(DataStoreTextWriterConfigurer config)
+      throws Exception {
     config
-      .basePath("/tmp/foo1");
+      .basePath("/tmp/foo");
   }
 }
 ----
 
-In above example we created a normal Spring `@Configuration` class
-extending
+What happened in above example:
+
+* We created a normal Spring `@Configuration` class extending
 {shdp-SpringDataStoreTextWriterConfigurerAdapter}[SpringDataStoreTextWriterConfigurerAdapter].
-Class needs to be annotated with
+* Class needs to be annotated with
 {shdp-EnableDataStoreTextWriter}[EnableDataStoreTextWriter] order to
-enable some needed functionality. Then what is left for a user to do
-is to override some configure methods from an adapter and use exposed
-interface, namely {shdp-DataStoreTextWriterConfigurer}[DataStoreTextWriterConfigurer]
-in this case to do a writer configuration. Bean of type
-{shdp-DataStoreWriter}[DataStoreWriter] is then created automatically.
+enable some needed functionality.
+* Override `configure` method having
+ {shdp-DataStoreTextWriterConfigurer}[DataStoreTextWriterConfigurer]
+as its argument.
+* Set writer base path to `/tmp/foo`.
+* Bean of type {shdp-DataStoreWriter}[DataStoreWriter] is created automatically.
+
+We can also do configuration for other usual properties like,
+`idleTimeout`, `partitioning strategy`, `naming strategy` and
+`rollover strategy`.
+
+[source,java]
+----
+@Configuration
+@EnableDataStoreTextWriter
+static class Config
+    extends SpringDataStoreTextWriterConfigurerAdapter {
+
+  @Override
+  public void configure(DataStoreTextWriterConfigurer config)
+      throws Exception {
+    config
+      .basePath("/tmp/store")
+      .idleTimeout(60000)
+      .inWritingSuffix(".tmp")
+      .withPartitionStrategy()
+        .map("dateFormat('yyyy/MM/dd/HH/mm', timestamp)")
+        .and()
+      .withNamingStrategy()
+        .name("data")
+        .uuid()
+        .rolling()
+        .name("txt", ".")
+        .and()
+      .withRolloverStrategy()
+        .size("1M");
+  }
+}
+----
+
+What happened in above example:
+
+* We set idle timeout meaning file will be closed automatically if
+  no writes are done in 60 seconds.
+* We set the in-writing suffix to `.tmp` which will indicate that file
+  is currently open for writing. Writer will automatically remove this
+  suffix when file is closed.
+* We defined a partitioning strategy using date format
+  `yyyy/MM/dd/HH/mm`. This will partition data based on timestamp when
+  write operation happens.
+* We defined naming strategy so that file would have name
+  `data-38400000-8cf0-11bd-b23e-10b96e4ef00d-1.txt`.
+* We set file to rollover after `1M` data is written.
+
+Writer can be auto-wired using either `DataStoreWriter` or
+`PartitionDataStoreWriter` if partitioning strategy is enabled.
+
+[source,java]
+----
+static class MyBean {
+
+  @Autowired
+  DataStoreWriter<String> writer;
+
+  @Autowired
+  PartitionDataStoreWriter<String, Map<String, Object>> writer;
+}
+----
+
+In some cases it is more convenient to name the bean instead letting
+Spring to create that name automatically. `@EnableDataStoreTextWriter`
+has a `name` field which works in a same way than normal Spring
+`@Bean` annotation. You'd use this custom naming in cases where
+multiple writers are created and auto-wiring by type would no longer
+work.
+
+[source,java]
+----
+@Configuration
+@EnableDataStoreTextWriter(name={"mywriter", "myalias"})
+static class Config
+    extends SpringDataStoreTextWriterConfigurerAdapter {
+}
+----
+
+In above example bean was created with a name `mywriter` having an
+alias named `myalias`.
 

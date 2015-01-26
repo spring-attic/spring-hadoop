@@ -1930,16 +1930,27 @@ public class AppmasterApplication {
 ==== Container as POJO
 
 In Boot application model if _YarnContainer_ is not explicitly defined
-it defaults to DefaultYarnContainer which expects to find a `POJO`
+it defaults to _DefaultYarnContainer_ which expects to find a `POJO`
 created as a bean having a specific annotations instructing the actual
 functionality.
 
-@YarnComponent is a stereotype annotation itself having a Spring's
-@Component defined in it. This is automatically marking a class to be a
-candidate having a @YarnComponent functionality.
+`@YarnComponent` is a stereotype annotation itself having a Spring's
+`@Component` defined in it. This is automatically marking a class to be a
+candidate having a `@YarnComponent` functionality.
 
-Within a `POJO` class we can use @OnContainerStart annotation to mark a
+Within a `POJO` class we can use `@OnContainerStart` annotation to mark a
 public method to act as an activator for a method endpoint.
+
+[NOTE]
+====
+Return values from a `@OnContainerStart` will participate to a
+container exit value. If you omit these methods from a
+`@YarnComponent`, no return values are present thus making container
+not to exist automatically. This is useful in cases where you just
+want to have a mvc endpoints interacting with other containers.
+Otherwise you need to use dummy thread sleep or return a `Future`
+value.
+====
 
 [source,java]
 ----
@@ -1990,7 +2001,7 @@ public void publicThrowsException() {
 }
 ----
 
-Method parameter can be bound with @YarnEnvironments to get access to
+Method parameter can be bound with `@YarnEnvironments` to get access to
 current _YarnContainer_ environment variables.
 
 [source,java]
@@ -2000,7 +2011,7 @@ public void publicVoidEnvironmentsArgsMethod(@YarnEnvironments Map<String,String
 }
 ----
 
-Method parameter can be bound with @YarnEnvironment to get access to
+Method parameter can be bound with `@YarnEnvironment` to get access to
 specific _YarnContainer_ environment variable.
 
 [source,java]
@@ -2010,7 +2021,7 @@ public void publicVoidEnvironmentArgsMethod(@YarnEnvironment("key") String value
 }
 ----
 
-Method parameter can be bound with @YarnParameters to get access to
+Method parameter can be bound with `@YarnParameters` to get access to
 current _YarnContainer_ arguments.
 
 [source,java]
@@ -2020,7 +2031,7 @@ public void publicVoidParametersArgsMethod(@YarnParameters Properties properties
 }
 ----
 
-Method parameter can be bound with @YarnParameter to get access to a
+Method parameter can be bound with `@YarnParameter` to get access to a
 specific _YarnContainer_ arguments.
 
 [source,java]
@@ -2029,6 +2040,103 @@ specific _YarnContainer_ arguments.
 public void publicVoidParameterArgsMethod(@YarnParameter("key") String value) {
 }
 ----
+
+It is possible to use multiple `@YarnComponent` classes and
+`@OnContainerStart` methods but a care must be taken in a way
+execution happens. In default these methods are executed synchronously
+and ordering is pretty much random. Few tricks can be used to overcome
+synchronous execution and ordering.
+
+We support `@Order' annotation both on class and method levels. If
+`@Order' is defined on both the one from method takes a presense.
+
+[source,java]
+----
+@YarnComponent
+@Order(1)
+static class Bean {
+
+  @OnContainerStart
+  @Order(10)
+  public void method1() {
+  }
+
+  @OnContainerStart
+  @Order(11)
+  public void method2() {
+  }
+
+}
+----
+
+`@OnContainerStart` also supports return values of `Future` or
+`ListenableFuture`. This is a convenient way to do something
+asynchronously because future is returned immediately and execution
+goes to a next method and later waits future values to be set.
+
+[source,java]
+----
+@YarnComponent
+static class Bean {
+
+  @OnContainerStart
+  Future<Integer> void method1() {
+    return new AsyncResult<Integer>(1);
+  }
+
+  @OnContainerStart
+  Future<Integer> void method1() {
+    return new AsyncResult<Integer>(2);
+  }
+
+}
+----
+
+Below is an example to use more sophisticated functionality with a
+`ListenableFuture` and scheduling work within a `@OnContainerStart`
+method. In this case `YarnContainerSupport` class simply provides an
+easy access to a `TaskScheduler`.
+
+[source,java]
+----
+@YarnComponent
+static class Bean extends YarnContainerSupport {
+
+  @OnContainerStart
+  public ListenableFuture<?> method() throws Exception {
+
+    final MyFuture future = new MyFuture();
+
+    getTaskScheduler().schedule(new FutureTask<Void>(new Runnable() {
+
+      @Override
+      public void run() {
+        try {
+          while (!future.interrupted) {
+            // do something
+          }
+        } catch (Exception e) {
+          // bail out from error
+          future.set(false);
+        }
+      }
+    }, null), new Date());
+
+    return future;
+  }
+
+  static class MyFuture extends SettableListenableFuture<Boolean> {
+    boolean interrupted = false;
+
+    @Override
+    protected void interruptTask() {
+      interrupted = true;
+    }
+  }
+
+}
+----
+
 
 [[configurationproperties]]
 ==== Configuration Properties
@@ -2502,6 +2610,22 @@ Namespace `spring.yarn.endpoints.containercluster` supports following properties
 [[spring.yarn.endpoints.containercluster.enabled]]`spring.yarn.endpoints.containercluster.enabled`::
   Description:::
 Enabling endpoint MVC REST API controlling container clusters.
+  Required:::
+No
+  Type:::
+Boolean
+   Default Value:::
+false
+
+===== `spring.yarn.endpoints.containerregister` configuration properties
+
+Namespace `spring.yarn.endpoints.containerregister` supports following properties;·
+<<spring.yarn.endpoints.containerregister.enabled,enabled>>.
+
+[[spring.yarn.endpoints.containerregister.enabled]]`spring.yarn.endpoints.containerregister.enabled`::
+  Description:::
+Enabling container registering endpoint. This is needed if graceful
+application shutdown is needed.
   Required:::
 No
   Type:::
@@ -3101,12 +3225,11 @@ spring:
         enabled: true
 ----
 
-GET /yarn_containercluster
-
+GET /yarn_containercluster::
 Returns info about existing clusters
 
-Response Class
-
+Response Class:::
++
 [source,text]
 ----
 ContainerClusters {
@@ -3114,9 +3237,9 @@ ContainerClusters {
 }
 ----
 
-Response Schema
-
-[source,text]
+Response Schema:::
++
+[source,json]
 ----
 {
   "clusters":[
@@ -3125,33 +3248,73 @@ Response Schema
 }
 ----
 
-POST /yarn_containercluster
-
+POST /yarn_containercluster::
 Create a new container cluster
 
-.Parameters
-[width="100%",cols="<20%,<20%,<20%,<40%",options="header",]
+Parameters:::
++
+[cols="a,a,a,3a", options="header"]
 |============================================================
 |Parameter |Description |Parameter Type |Data Type
-|body |Cluster to be created |body |[multiblock cell omitted]
-|============================================================
+|body |Cluster to be created |body |
 
-.Response Messages
-[width="100%",cols="<34%,<33%,<33%",options="header",]
-|=============================================
-|HTTP Status Code |Reason |Response Model
-|405 |Invalid input |[multiblock cell omitted]
-|=============================================
-
-GET /yarn_containercluster/\{clusterId}
-
-Returns info about a container cluster.
-
-Response Class
-
+.Request Class
 [source,text]
 ----
-code,text------------------------------------------------ code,text
+Cluster {
+  clusterId (string),
+  clusterDef (string),
+  projection (string),
+  projectionData (ProjectionData),
+  extraProperties (map<string,object>)
+}
+
+ProjectionData {
+  type (string),
+  priority (integer),
+  any (integer, optional),
+  hosts (map, optional),
+  racks (map, optional)
+}
+----
+
+.Request Schema
+[source,json]
+----
+{
+  "clusterId":"",
+  "clusterDef":"",
+  "projection":"",
+  "projectionData":{
+    "any":0,
+    "hosts":{
+      "<hostname>":0
+    },
+    "racks":{
+      "<rackname>":0
+    },
+    "extraProperties":{
+    }
+  }
+}
+----
+|============================================================
+
+Response Messages:::
++
+[cols="a,a,3a", options="header"]
+|=============================================
+|HTTP Status Code |Reason |Response Model
+|405 |Invalid input |
+|=============================================
+
+GET /yarn_containercluster/\{clusterId}::
+Returns info about a container cluster.
+
+Response Class:::
++
+[source,text]
+----
 ContainerCluster {
   id (string): unique identifier for a cluster,
   gridProjection (GridProjection),
@@ -3192,9 +3355,9 @@ ContainerClusterState {
 }
 ----
 
-Response Schema
-
-[source,text]
+Response Schema:::
++
+[source,json]
 ----
 {
   "id":"",
@@ -3231,75 +3394,133 @@ Response Schema
 }
 ----
 
-.Parameters
-[width="100%",cols="<20%,<20%,<20%,<40%",options="header",]
+Parameters:::
++
+[cols="a,a,a,3a", options="header"]
 |============================================================
 |Parameter |Description |Parameter Type |Data Type
 |clusterId |ID of a cluster needs to be fetched |path |string
 |============================================================
 
-.Response Messages
-[width="100%",cols="<34%,<33%,<33%",options="header",]
+Response Messages:::
++
+[cols="a,a,3a", options="header"]
 |===============================================
 |HTTP Status Code |Reason |Response Model
-|404 |No such cluster |[multiblock cell omitted]
+|404 |No such cluster |
 |===============================================
 
-PUT /yarn_containercluster/\{clusterId}
-
+PUT /yarn_containercluster/\{clusterId}::
 Modify a container cluster state.
 
-.Parameters
-[width="100%",cols="<20%,<20%,<20%,<40%",options="header",]
+Parameters:::
++
+[cols="a,a,a,3a", options="header"]
 |===================================================================
 |Parameter |Description |Parameter Type |Data Type
 |clusterId |ID of a cluster needs to be fetched |path |string
-|body |Cluster state to be modified |body |[multiblock cell omitted]
+|body |Cluster state to be modified |body |
+.Request Class
+[source,text]
+----
+ContainerClusterModifyRequest {
+  action (string)
+}
+----
+
+.Request Schema
+[source,json]
+----
+{
+  "action":""
+}
+----
+
 |===================================================================
 
-.Response Messages
-[width="100%",cols="<34%,<33%,<33%",options="header",]
+Response Messages:::
++
+[cols="a,a,3a", options="header"]
 |===============================================
 |HTTP Status Code |Reason |Response Model
-|404 |No such cluster |[multiblock cell omitted]
-|404 |No such action |[multiblock cell omitted]
+|404 |No such cluster |
+|404 |No such action |
 |===============================================
 
-PATCH /yarn_containercluster/\{clusterId}
-
+PATCH /yarn_containercluster/\{clusterId}::
 Modify a container cluster projection.
 
-.Parameters
-[width="100%",cols="<20%,<20%,<20%,<40%",options="header",]
+Parameters:::
++
+[cols="a,a,a,3a", options="header"]
 |============================================================
 |Parameter |Description |Parameter Type |Data Type
 |clusterId |ID of a cluster needs to be fetched |path |string
-|body |Cluster to be created |body |[multiblock cell omitted]
+|body |Cluster to be created |body |
+.Request Class
+[source,text]
+----
+Cluster {
+  clusterId (string),
+  clusterDef (string),
+  projection (string),
+  projectionData (ProjectionData),
+  extraProperties (map<string,object>)
+}
+
+ProjectionData {
+  type (string),
+  priority (integer),
+  any (integer, optional),
+  hosts (map, optional),
+  racks (map, optional)
+}
+----
+
+.Request Schema
+[source,json]
+----
+{
+  "clusterId":"",
+  "projection":"",
+  "projectionData":{
+    "any":0,
+    "hosts":{
+      "<hostname>":0
+    },
+    "racks":{
+      "<rackname>":0
+    }
+  }
+}
+----
 |============================================================
 
-.Response Messages
-[width="100%",cols="<34%,<33%,<33%",options="header",]
+Response Messages:::
++
+[cols="a,a,3a", options="header"]
 |===============================================
 |HTTP Status Code |Reason |Response Model
-|404 |No such cluster |[multiblock cell omitted]
+|404 |No such cluster |
 |===============================================
 
-DELETE /yarn_containercluster/\{clusterId}
-
+DELETE /yarn_containercluster/\{clusterId}::
 Destroy a container cluster.
 
-.Parameters
-[width="100%",cols="<20%,<20%,<20%,<40%",options="header",]
+Parameters:::
++
+[cols="a,a,a,3a", options="header"]
 |============================================================
 |Parameter |Description |Parameter Type |Data Type
 |clusterId |ID of a cluster needs to be fetched |path |string
 |============================================================
 
-.Response Messages
-[width="100%",cols="<34%,<33%,<33%",options="header",]
+Response Messages:::
++
+[cols="a,a,3a", options="header"]
 |===============================================
 |HTTP Status Code |Reason |Response Model
-|404 |No such cluster |[multiblock cell omitted]
+|404 |No such cluster |
 |===============================================
 
 ==== Controlling Applications
@@ -3455,7 +3676,7 @@ make Boot to pick these properties after every other source of
 configuration properties but still allows to pass command-line options
 to override everything which is a normal way in Boot.
 
-====== Using YarnKillApplication
+===== Using YarnKillApplication
 
 YarnKillApplication is used to kill running application instances.
 
@@ -3473,6 +3694,55 @@ public void doKill() {
 
 In above example we simply created a YarnKillApplication, and used it to
 send a application kill request into a YARN resource manager.
+
+[[springandhadoop-yarn-shutdown]]
+===== Using YarnShutdownApplication
+
+YarnShutdownApplication is used to gracefully shutdown running application instances.
+
+[source,java]
+----
+public void doShutdown() {
+  YarnShutdownApplication app = new YarnShutdownApplication();
+  Properties appProperties = new Properties();
+  appProperties.setProperty("spring.yarn.internal.YarnShutdownApplication.applicationId", "application_1395058039949_0052");
+  app.appProperties(appProperties);
+  String info = app.run();
+  System.out.println(info);
+}
+----
+
+Shutdown functionality is based on Boot `shutdown` endpoint which can
+be used to instruct shutdown of the running application context and
+thus shutdown of a whole running application instance. This endpoint
+is considered to be a sensitive and thus is disabled by default.
+
+To enable this functionality `shutdown` endpoint needs to be enabled
+on both appmaster and containers. Addition to that a special
+`containerregister` needs to be enabled on appmaster for containers to
+be able to register itself to appmaster. Below config examples shows
+howto do this.
+
+.for appmaster config
+[source,yaml]
+----
+endpoints:
+  shutdown:
+    enabled: true
+spring:
+  yarn:
+    endpoints:
+      containerregister:
+        enabled: true
+----
+
+.for container config
+[source,yaml]
+----
+endpoints:
+  shutdown:
+    enabled: true
+----
 
 ===== Using YarnContainerClusterApplication
 
@@ -3513,6 +3783,7 @@ public class ClientApplication extends AbstractCli {
     commands.add(new YarnSubmitCommand());
     commands.add(new YarnSubmittedCommand());
     commands.add(new YarnKillCommand());
+    commands.add(new YarnShutdownCommand());
     commands.add(new YarnClustersInfoCommand());
     commands.add(new YarnClusterInfoCommand());
     commands.add(new YarnClusterCreateCommand());
@@ -3535,8 +3806,8 @@ Built-in commands can be used to either control YARN applications or
 container clusters. All commands are under a package
 `org.springframework.yarn.boot.cli`.
 
-Push Application
-
+Push Application::
++
 [source,text]
 ----
 java -jar <jar> push - Push new application version
@@ -3547,25 +3818,25 @@ Option                     Description
 ------                     -----------
 -v, --application-version  Application version (default: app)
 ----
++
+`YarnPushCommand` can be used to push an application into hdfs.
 
-YarnPushCommand can be used to push an application into hdfs.
-
-List Pushed Applications
-
+List Pushed Applications::
++
 [source,text]
 ----
 java -jar <jar> pushed - List pushed applications
 
 usage: java -jar <jar> pushed [options]
 
-No options specified  
+No options specified
 ----
-
-YarnPushedCommand can be used to list information about an pushed
++
+`YarnPushedCommand` can be used to list information about an pushed
 applications.
 
-Submit Application
-
+Submit Application::
++
 [source,text]
 ----
 java -jar <jar> submit - Submit application
@@ -3577,11 +3848,11 @@ Option                     Description
 -n, --application-name     Application name
 -v, --application-version  Application version (default: app)
 ----
++
+`YarnSubmitCommand` can be used to submit a new application instance.
 
-YarnSubmitCommand can be used to submit a new application instance.
-
-List Submitted Applications
-
+List Submitted Applications::
++
 [source,text]
 ----
 java -jar <jar> submitted - List submitted applications
@@ -3593,12 +3864,12 @@ Option                   Description
 -t, --application-type   Application type (default: BOOT)
 -v, --verbose [Boolean]  Verbose output (default: true)  
 ----
-
-YarnSubmittedCommand can be used to list info about an submitted
++
+`YarnSubmittedCommand` can be used to list info about an submitted
 applications.
 
-Kill Application
-
+Kill Application::
++
 [source,text]
 ----
 java -jar <jar> kill - Kill application
@@ -3609,11 +3880,31 @@ Option                Description
 ------                -----------
 -a, --application-id  Specify YARN application id
 ----
++
+`YarnKillCommand` can be used to kill a running application instance.
 
-YarnKillCommand can be used to kill a running application instance.
+Shutdown Application::
++
+[source,text]
+----
+java -jar <jar> shutdown - Shutdown application
 
-List Clusters Info
+usage: java -jar <jar> shutdown [options]
 
+Option                Description
+------                -----------
+-a, --application-id  Specify YARN application id
+----
++
+`YarnShutdownCommand` can be used to gracefully shutdown a running application instance.
++
+[IMPORTANT]
+====
+See configuration requirements from <<springandhadoop-yarn-shutdown>>.
+====
+
+List Clusters Info::
++
 [source,text]
 ----
 java -jar <jar> clustersinfo - List clusters
@@ -3624,12 +3915,12 @@ Option                Description
 ------                -----------
 -a, --application-id  Specify YARN application id
 ----
-
-YarnClustersInfoCommand can be used to list info about existing
++
+`YarnClustersInfoCommand` can be used to list info about existing
 clusters.
 
-List Cluster Info
-
+List Cluster Info::
++
 [source,text]
 ----
 java -jar <jar> clusterinfo - List cluster info
@@ -3642,11 +3933,11 @@ Option                   Description
 -c, --cluster-id         Specify cluster id
 -v, --verbose [Boolean]  Verbose output (default: true)
 ----
++
+`YarnClusterInfoCommand` can be used to list info about a cluster.
 
-YarnClusterInfoCommand can be used to list info about a cluster.
-
-Create Container Cluster
-
+Create Container Cluster::
++
 [source,text]
 ----
 java -jar <jar> clustercreate - Create cluster
@@ -3664,11 +3955,11 @@ Option                  Description
 -w, --projection-any    Projection any count
 -y, --projection-data   Raw projection data
 ----
++
+`YarnClusterCreateCommand` can be used to create a new cluster.
 
-YarnClusterCreateCommand can be used to create a new cluster.
-
-Start Container Cluster
-
+Start Container Cluster::
++
 [source,text]
 ----
 java -jar <jar> clusterstart - Start cluster
@@ -3680,11 +3971,11 @@ Option                Description
 -a, --application-id  Specify YARN application id
 -c, --cluster-id      Specify cluster id
 ----
++
+`YarnClusterStartCommand` can be used to start an existing cluster.
 
-YarnClusterStartCommand can be used to start an existing cluster.
-
-Stop Container Cluster
-
+Stop Container Cluster::
++
 [source,text]
 ----
 java -jar <jar> clusterstop - Stop cluster
@@ -3696,11 +3987,11 @@ Option                Description
 -a, --application-id  Specify YARN application id
 -c, --cluster-id      Specify cluster id
 ----
++
+`YarnClusterStopCommand` can be used to stop an existing cluster.
 
-YarnClusterStopCommand can be used to stop an existing cluster.
-
-Modify Container Cluster
-
+Modify Container Cluster::
++
 [source,text]
 ----
 java -jar <jar> clustermodify - Modify cluster
@@ -3715,11 +4006,11 @@ Option                  Description
 -r, --projection-racks  Projection racks counts
 -w, --projection-any    Projection any count
 ----
++
+`YarnClusterModifyCommand` can be used to modify an existing cluster.
 
-YarnClusterModifyCommand can be used to modify an existing cluster.
-
-Destroy Container Cluster
-
+Destroy Container Cluster::
++
 [source,text]
 ----
 java -jar <jar> clusterdestroy - Destroy cluster
@@ -3731,19 +4022,90 @@ Option                Description
 -a, --application-id  Specify YARN application id
 -c, --cluster-id      Specify cluster id
 ----
-
-YarnClusterDestroyCommand can be used to destroy an existing cluster.
++
+`YarnClusterDestroyCommand` can be used to destroy an existing cluster.
 
 ===== Implementing Command
 
 There are few different ways to implement a custom command. At a lowest
-level org.springframework.boot.cli.command.Command need to be
+level `org.springframework.boot.cli.command.Command` need to be
 implemented by all commands to be used. Spring boot provides helper
-classes named org.springframework.boot.cli.command.AbstractCommand and
+classes named `org.springframework.boot.cli.command.AbstractCommand` and
 org.springframework.boot.cli.command.OptionParsingCommand to easy with
 command implementation. All Spring YARN Boot Cli commands are based on
-org.springframework.yarn.boot.cli.AbstractApplicationCommand which makes
+`org.springframework.yarn.boot.cli.AbstractApplicationCommand` which makes
 it easier to execute a boot based application context.
+
+[source,java]
+----
+public class MyCommand extends AbstractCommand {
+
+  public MyCommand() {
+    super("command name", "command desc");
+  }
+
+  public ExitStatus run(String... args) throws InterruptedException {
+    // do something
+    return ExitStatus.OK;
+  }
+
+}
+----
+
+Above you can see the mostly simplistic command example.
+
+[source,java]
+----
+public class MyCommand extends AbstractCommand {
+
+  public MyCommand() {
+    super("command name", "command desc", new MyOptionHandler());
+  }
+
+  public static class MyOptionHandler
+      extends ApplicationOptionHandler<String> {
+
+    @Override
+    protected void runApplication(OptionSet options)
+        throws Exception {
+      handleApplicationRun(new MyApplication());
+    }
+  }
+
+  public static class MyApplication
+      extends AbstractClientApplication<String, MyApplication> {
+
+    @Override
+    public String run(String... args) {
+      SpringApplicationBuilder builder = new SpringApplicationBuilder();
+      builder.web(false);
+      builder.sources(MyApplication.class);
+      SpringApplicationTemplate template = new SpringApplicationTemplate(builder);
+
+      return template.execute(new SpringApplicationCallback<String>() {
+
+        @Override
+        public String runWithSpringApplication(ApplicationContext context)
+            throws Exception {
+          // do something
+          return "Hello from my command";
+        }
+      }, args);
+    }
+
+    @Override
+    protected MyApplication getThis() {
+      return this;
+    }
+  }
+
+}
+----
+
+Above example is more sophisticated command example where the actual
+function of a command is done within a `runWithSpringApplication`
+template callback which allows command to interact with Spring
+`ApplicationContext`.
 
 ===== Using Shell
 
