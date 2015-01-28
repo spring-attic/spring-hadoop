@@ -177,7 +177,6 @@ public class HdfsScriptRunner extends Jsr223ScriptRunner implements ApplicationC
 	}
 
 
-	@SuppressWarnings("resource")
 	private Object detectFS(String variableName, Configuration detectedCfg) {
 		String defaultName = "hadoopFs";
 		Class<?> defaultType = FileSystem.class;
