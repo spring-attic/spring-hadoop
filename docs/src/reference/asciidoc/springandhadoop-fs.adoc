@@ -37,7 +37,7 @@ The table below describes the common HDFS APIs in use:
 |=======================================================================
 
 This chapter focuses on the core file-system protocols supported by
-Hadoop. S3 (see the <<appendices-access-filesystem,Appendix>>),
+Hadoop. S3,
 FTP and the rest of the other `FileSystem` implementations are supported as well -
 Spring for Apache Hadoop has no dependency on the underlying system
 rather just on the public Hadoop API.

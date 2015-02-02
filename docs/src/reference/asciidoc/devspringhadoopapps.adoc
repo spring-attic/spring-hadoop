@@ -61,7 +61,7 @@ and other basic scheduling trigger functionality. See the
 http://docs.spring.io/spring-batch/faq.html#schedulers[Task Execution
 and Scheduling] documention for more info. A middle ground it to use
 Spring's Quartz integration, see
-http://docs.spring.io/spring/docs/4.0.x/spring-framework-reference/html/scheduling.html#scheduling-quartz[Using
+http://docs.spring.io/spring/docs/4.1.x/spring-framework-reference/html/scheduling.html#scheduling-quartz[Using
 the OpenSymphony Quartz Scheduler] for more information. The Spring
 Batch distribution contains an example, but this documentation will be
 updated to provide some more directed examples with Hadoop, check for
