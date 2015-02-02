@@ -24,8 +24,9 @@ from the project root folder. This will compile the sources, run the tests and c
 
 By default Spring for Apache Hadoop compiles against the Apache Hadoop 2.6.x stable relase (hadoop26).
 
-The following distros and versions are also supported:
+The following distros and versions are supported:
 
+- Apache Hadoop 2.6.x (hadoop26) default
 - Apache Hadoop 2.5.x (hadoop25)
 - Apache Hadoop 2.4.x (hadoop24)
 - Pivotal HD 2.1 (phd21)

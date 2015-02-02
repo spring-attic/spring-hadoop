@@ -32,11 +32,8 @@ distributions:
 * http://hadoop.apache.org/[Apache Hadoop] 2.4.1
 * http://hadoop.apache.org/[Apache Hadoop] 2.5.2
 * http://hadoop.apache.org/[Apache Hadoop] 2.6.0
-* http://www.pivotal.io/[Pivotal] HD 2.0
 * http://www.pivotal.io/[Pivotal] HD 2.1
 * http://www.cloudera.com/[Cloudera] CDH5 (2.5.0-cdh5.3.0)
-* http://www.hortonworks.com/[Hortonworks] Data Platform 2.0
-* http://www.hortonworks.com/[Hortonworks] Data Platform 2.1
 * http://www.hortonworks.com/[Hortonworks] Data Platform 2.2
 
 Any distribution compatible with Apache Hadoop 2.2.x or later should be
