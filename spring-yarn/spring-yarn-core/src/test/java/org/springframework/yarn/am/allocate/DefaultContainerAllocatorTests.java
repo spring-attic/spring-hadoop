@@ -104,23 +104,9 @@ public class DefaultContainerAllocatorTests {
 		assertThat(createRequests, notNullValue());
 		assertThat(createRequests.size(), is(3));
 
-		ResourceRequest req0 = createRequests.get(0);
-		assertThat(req0.getResourceName(), is("host1"));
-		assertThat(req0.getPriority().getPriority(), is(0));
-		assertThat(req0.getNumContainers(), is(1));
-		assertThat(req0.getRelaxLocality(), is(true));
-
-		ResourceRequest req1 = createRequests.get(1);
-		assertThat(req1.getResourceName(), is("/default-rack"));
-		assertThat(req1.getPriority().getPriority(), is(0));
-		assertThat(req1.getNumContainers(), is(1));
-		assertThat(req1.getRelaxLocality(), is(false));
-
-		ResourceRequest req2 = createRequests.get(2);
-		assertThat(req2.getResourceName(), is("*"));
-		assertThat(req2.getPriority().getPriority(), is(0));
-		assertThat(req2.getNumContainers(), is(2));
-		assertThat(req2.getRelaxLocality(), is(false));
+		assertThat(matchRequest(createRequests, "host1", 0, 1, true), notNullValue());
+		assertThat(matchRequest(createRequests, "/default-rack", 0, 1, false), notNullValue());
+		assertThat(matchRequest(createRequests, "*", 0, 2, false), notNullValue());
 	}
 
 	@Test
@@ -138,17 +124,8 @@ public class DefaultContainerAllocatorTests {
 		assertThat(createRequests, notNullValue());
 		assertThat(createRequests.size(), is(2));
 
-		ResourceRequest req0 = createRequests.get(0);
-		assertThat(req0.getResourceName(), is("/default-rack"));
-		assertThat(req0.getPriority().getPriority(), is(0));
-		assertThat(req0.getNumContainers(), is(1));
-		assertThat(req0.getRelaxLocality(), is(true));
-
-		ResourceRequest req1 = createRequests.get(1);
-		assertThat(req1.getResourceName(), is("*"));
-		assertThat(req1.getPriority().getPriority(), is(0));
-		assertThat(req1.getNumContainers(), is(1));
-		assertThat(req1.getRelaxLocality(), is(false));
+		assertThat(matchRequest(createRequests, "/default-rack", 0, 1, true), notNullValue());
+		assertThat(matchRequest(createRequests, "*", 0, 1, false), notNullValue());
 	}
 
 	@Test
@@ -166,23 +143,9 @@ public class DefaultContainerAllocatorTests {
 		assertThat(createRequests, notNullValue());
 		assertThat(createRequests.size(), is(3));
 
-		ResourceRequest req0 = createRequests.get(0);
-		assertThat(req0.getResourceName(), is("host1"));
-		assertThat(req0.getPriority().getPriority(), is(0));
-		assertThat(req0.getNumContainers(), is(1));
-		assertThat(req0.getRelaxLocality(), is(true));
-
-		ResourceRequest req1 = createRequests.get(1);
-		assertThat(req1.getResourceName(), is("/default-rack"));
-		assertThat(req1.getPriority().getPriority(), is(0));
-		assertThat(req1.getNumContainers(), is(1));
-		assertThat(req1.getRelaxLocality(), is(true));
-
-		ResourceRequest req2 = createRequests.get(2);
-		assertThat(req2.getResourceName(), is("*"));
-		assertThat(req2.getPriority().getPriority(), is(0));
-		assertThat(req2.getNumContainers(), is(2));
-		assertThat(req2.getRelaxLocality(), is(true));
+		assertThat(matchRequest(createRequests, "host1", 0, 1, true), notNullValue());
+		assertThat(matchRequest(createRequests, "/default-rack", 0, 1, true), notNullValue());
+		assertThat(matchRequest(createRequests, "*", 0, 2, true), notNullValue());
 	}
 
 	@Test
@@ -304,30 +267,10 @@ public class DefaultContainerAllocatorTests {
 		assertThat(createRequests, notNullValue());
 		assertThat(createRequests.size(), is(4));
 
-		ResourceRequest req;
-		req = createRequests.get(0);
-		assertThat(req.getResourceName(), is("host1"));
-		assertThat(req.getPriority().getPriority(), is(1));
-		assertThat(req.getNumContainers(), is(1));
-		assertThat(req.getRelaxLocality(), is(true));
-
-		req = createRequests.get(1);
-		assertThat(req.getResourceName(), is("/default-rack"));
-		assertThat(req.getPriority().getPriority(), is(1));
-		assertThat(req.getNumContainers(), is(1));
-		assertThat(req.getRelaxLocality(), is(false));
-
-		req = createRequests.get(2);
-		assertThat(req.getResourceName(), is("*"));
-		assertThat(req.getPriority().getPriority(), is(1));
-		assertThat(req.getNumContainers(), is(2));
-		assertThat(req.getRelaxLocality(), is(false));
-
-		req = createRequests.get(3);
-		assertThat(req.getResourceName(), is("*"));
-		assertThat(req.getPriority().getPriority(), is(0));
-		assertThat(req.getNumContainers(), is(1));
-		assertThat(req.getRelaxLocality(), is(true));
+		assertThat(matchRequest(createRequests, "host1", 1, 1, true), notNullValue());
+		assertThat(matchRequest(createRequests, "/default-rack", 1, 1, false), notNullValue());
+		assertThat(matchRequest(createRequests, "*", 1, 2, false), notNullValue());
+		assertThat(matchRequest(createRequests, "*", 0, 1, true), notNullValue());
 	}
 
 	private static void assertResourceRequest(ResourceRequest req, String resourceName, Integer priority, Integer numContainers, Boolean relaxLocality, Integer capMemory, Integer capCores) {
