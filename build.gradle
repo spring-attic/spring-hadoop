@@ -376,8 +376,8 @@ configure(javaProjects()) {
 
 	forceDependencyVersions(it, 'cdh5')
 
-	sourceCompatibility=1.6
-	targetCompatibility=1.6
+	sourceCompatibility=1.7
+	targetCompatibility=1.7
 
 	// assume we are skipping these tests (must be enabled explicitly)
 	ext.skipPig = true
