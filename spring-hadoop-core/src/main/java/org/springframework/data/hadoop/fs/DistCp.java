@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 the original author or authors.
+ * Copyright 2011-2015 the original author or authors.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package org.springframework.data.hadoop.fs;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.security.PrivilegedExceptionAction;
@@ -27,6 +28,7 @@ import java.util.List;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.ipc.RemoteException;
 import org.apache.hadoop.security.UserGroupInformation;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.hadoop.configuration.ConfigurationUtils;
 import org.springframework.data.hadoop.util.VersionUtils;
 import org.springframework.util.Assert;
@@ -270,6 +272,49 @@ public class DistCp {
 	}
 
 	private static void invokeCopy(Configuration config, String[] parsedArgs) {
+		if (VersionUtils.isHadoop2X()) {
+			invokeCopy2X(config, parsedArgs);
+		} else {
+			invokeCopy1X(config, parsedArgs);
+		}
+	}
+
+	private static void invokeCopy2X(Configuration config, String[] parsedArgs) {
+		try {
+			Class<org.apache.hadoop.tools.DistCp> cl = org.apache.hadoop.tools.DistCp.class;
+			Class<?> OptionsParserClass = ClassUtils.resolveClassName("org.apache.hadoop.tools.OptionsParser",
+					cl.getClassLoader());
+			Class<?> DistCpOptionsClass = ClassUtils.resolveClassName("org.apache.hadoop.tools.DistCpOptions",
+					cl.getClassLoader());
+
+			// DistCpOptions inputOptions = OptionsParser.parse(parsedArgs);
+			Method parseMethod = ReflectionUtils.findMethod(OptionsParserClass, "parse", String[].class);
+			Object inputOptions = ReflectionUtils.invokeMethod(parseMethod, null, new Object[] { parsedArgs });
+
+			Constructor<org.apache.hadoop.tools.DistCp> ctor = cl.getConstructor(Configuration.class, DistCpOptionsClass);
+			// org.apache.hadoop.tools.DistCp distCp = new org.apache.hadoop.tools.DistCp(config, inputOptions);
+			org.apache.hadoop.tools.DistCp distCp = BeanUtils.instantiateClass(ctor, config, inputOptions);
+
+			// distCp.execute();
+			Method executeMethod = ReflectionUtils.findMethod(cl, "execute");
+			ReflectionUtils.invokeMethod(executeMethod, distCp);
+		} catch (UndeclaredThrowableException ex) {
+			Throwable throwable = ex.getUndeclaredThrowable();
+
+			if (throwable instanceof IOException) {
+				IOException ioe = ((IOException) throwable);
+				if (ioe instanceof RemoteException) {
+					throw new IllegalStateException("Cannot distCopy", ((RemoteException) ioe).unwrapRemoteException());
+				}
+			}
+
+			throw ex;
+		} catch (Exception ex) {
+			throw new IllegalStateException("Cannot distCopy", ex);
+		}
+	}
+
+	private static void invokeCopy1X(Configuration config, String[] parsedArgs) {
 		try {
 			Class<org.apache.hadoop.tools.DistCp> cl = org.apache.hadoop.tools.DistCp.class;
 			Class<?> argClass = ClassUtils.resolveClassName("org.apache.hadoop.tools.DistCp$Arguments",
@@ -288,14 +333,12 @@ public class DistCp {
 
 			if (throwable instanceof IOException) {
 				IOException ioe = ((IOException) throwable);
-				if (!VersionUtils.isHadoop2X()) {
-					try {
-						Class<?> duplicationException = Class.forName("org.apache.hadoop.tools.DistCp.DuplicationException");
-						if (duplicationException.isAssignableFrom(ioe.getClass())) {
-							throw new IllegalStateException("Duplicated files found...", ioe);
-						}
-					} catch (ClassNotFoundException e) {}
-				}
+				try {
+					Class<?> duplicationException = Class.forName("org.apache.hadoop.tools.DistCp.DuplicationException");
+					if (duplicationException.isAssignableFrom(ioe.getClass())) {
+						throw new IllegalStateException("Duplicated files found...", ioe);
+					}
+				} catch (ClassNotFoundException e) {}
 				if (ioe instanceof RemoteException) {
 					throw new IllegalStateException("Cannot distCopy", ((RemoteException) ioe).unwrapRemoteException());
 				}
