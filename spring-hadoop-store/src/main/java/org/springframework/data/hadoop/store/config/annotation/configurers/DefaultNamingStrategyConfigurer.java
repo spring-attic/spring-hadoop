@@ -18,9 +18,9 @@ package org.springframework.data.hadoop.store.config.annotation.configurers;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.data.hadoop.config.common.annotation.AnnotationConfigurer;
 import org.springframework.data.hadoop.config.common.annotation.AnnotationConfigurerAdapter;
+import org.springframework.data.hadoop.store.config.annotation.SpringDataStoreWriterConfigs;
 import org.springframework.data.hadoop.store.config.annotation.builders.DataStoreTextWriterBuilder;
 import org.springframework.data.hadoop.store.config.annotation.builders.DataStoreTextWriterConfigurer;
 import org.springframework.data.hadoop.store.strategy.naming.ChainedFileNamingStrategy;
@@ -37,7 +37,7 @@ import org.springframework.data.hadoop.store.strategy.naming.UuidFileNamingStrat
  *
  */
 public class DefaultNamingStrategyConfigurer extends
-		AnnotationConfigurerAdapter<BeanDefinition, DataStoreTextWriterConfigurer, DataStoreTextWriterBuilder> implements
+		AnnotationConfigurerAdapter<SpringDataStoreWriterConfigs, DataStoreTextWriterConfigurer, DataStoreTextWriterBuilder> implements
 		NamingStrategyConfigurer {
 
 	private List<FileNamingStrategy> fileNamingStrategies = new ArrayList<FileNamingStrategy>();

@@ -15,7 +15,6 @@
  */
 package org.springframework.data.hadoop.store.config.annotation.builders;
 
-import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.data.hadoop.config.common.annotation.AbstractConfiguredAnnotationBuilder;
 import org.springframework.data.hadoop.config.common.annotation.AnnotationBuilder;
 import org.springframework.data.hadoop.store.config.annotation.SpringDataStoreWriterConfigs;
@@ -31,10 +30,7 @@ public class SpringDataStoreTextWriterBuilder extends
 
 	@Override
 	protected SpringDataStoreWriterConfigs performBuild() throws Exception {
-		SpringDataStoreWriterConfigs configs = new SpringDataStoreWriterConfigs();
-		BeanDefinition buildWriter = getSharedObject(DataStoreTextWriterBuilder.class).build();
-		configs.setWriter(buildWriter);
-		return configs;
+		return getSharedObject(DataStoreTextWriterBuilder.class).build();
 	}
 
 }

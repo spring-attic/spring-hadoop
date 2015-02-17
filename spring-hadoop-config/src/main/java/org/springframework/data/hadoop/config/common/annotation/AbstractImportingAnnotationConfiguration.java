@@ -1,11 +1,11 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,15 +16,15 @@
 package org.springframework.data.hadoop.config.common.annotation;
 
 import java.lang.annotation.Annotation;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
+import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.ListableBeanFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanNameGenerator;
@@ -56,26 +56,26 @@ public abstract class AbstractImportingAnnotationConfiguration<B extends Annotat
 
 	private final BeanNameGenerator beanNameGenerator = new DefaultBeanNameGenerator();
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
-		ListableBeanFactory f = (ListableBeanFactory) getBeanFactory();
-		List<AnnotationConfigurer<O, B>> configurers = new ArrayList<AnnotationConfigurer<O,B>>();
-		Class<?> annotationType = getAnnotation();
-		AnnotationAttributes attributes = AnnotationAttributes.fromMap(importingClassMetadata.getAnnotationAttributes(
-				annotationType.getName(), false));
-		String[] names = attributes.getStringArray("name");
-
-		Map<String, Object> beansWithAnnotation = f.getBeansWithAnnotation(getAnnotation());
-		for (Entry<String, Object> e : beansWithAnnotation.entrySet()) {
-			if (e.getValue().getClass().getName().equals(importingClassMetadata.getClassName())) {
-				configurers.add((AnnotationConfigurer<O, B>) e.getValue());
+		List<Class<? extends Annotation>> annotationTypes = getAnnotations();
+		Class<? extends Annotation> namedAnnotation = null;
+		String[] names = null;
+		if (annotationTypes != null) {
+			for (Class<? extends Annotation> annotationType : annotationTypes) {
+				AnnotationAttributes attributes = AnnotationAttributes.fromMap(importingClassMetadata.getAnnotationAttributes(
+						annotationType.getName(), false));
+				if (attributes != null && attributes.containsKey("name")) {
+					names = attributes.getStringArray("name");
+					namedAnnotation = annotationType;
+					break;
+				}
 			}
 		}
 
 		BeanDefinition beanDefinition;
 		try {
-			beanDefinition = buildBeanDefinition(configurers);
+			beanDefinition = buildBeanDefinition(importingClassMetadata, namedAnnotation);
 		} catch (Exception e) {
 			throw new RuntimeException("Error with onConfigurers", e);
 		}
@@ -106,21 +106,22 @@ public abstract class AbstractImportingAnnotationConfiguration<B extends Annotat
 	}
 
 	/**
-	 * Called with a specific annotation configurers to get
-	 * a bean definition to register.
+	 * Called to get a bean definition to register.
 	 *
-	 * @param configurers the configurers
+	 * @param importingClassMetadata annotation metadata of the importing class
+	 * @param namedAnnotation found annotations for bean names
 	 * @return the bean definition to register
-	 * @throws Exception
+	 * @throws Exception if error occurred
 	 */
-	protected abstract BeanDefinition buildBeanDefinition(List<AnnotationConfigurer<O, B>> configurers) throws Exception;
+	protected abstract BeanDefinition buildBeanDefinition(AnnotationMetadata importingClassMetadata,
+			Class<? extends Annotation> namedAnnotation) throws Exception;
 
 	/**
-	 * Gets the annotation specific for this configurer.
+	 * Gets the annotations specific for this configurer.
 	 *
-	 * @return the annotation
+	 * @return the annotations
 	 */
-	protected abstract Class<? extends Annotation> getAnnotation();
+	protected abstract List<Class<? extends Annotation>> getAnnotations();
 
 	/**
 	 * Gets the bean factory.
@@ -138,6 +139,67 @@ public abstract class AbstractImportingAnnotationConfiguration<B extends Annotat
 	 */
 	protected Environment getEnvironment() {
 		return environment;
+	}
+
+	protected abstract static class BeanDelegatingFactoryBean<T, B extends AnnotationBuilder<O>, O> implements
+			FactoryBean<T>, BeanFactoryAware, InitializingBean {
+
+		private final B builder;
+
+		private T object;
+
+		private List<AnnotationConfigurer<O, B>> configurers;
+
+		private BeanFactory beanFactory;
+
+		private Class<T> clazz;
+
+		public BeanDelegatingFactoryBean(B builder, Class<T> clazz) {
+			this.builder = builder;
+			this.clazz = clazz;
+		}
+
+		@Override
+		public Class<?> getObjectType() {
+			return clazz;
+		}
+
+		@Override
+		public T getObject() throws Exception {
+			return object;
+		}
+
+		@Override
+		public boolean isSingleton() {
+			return true;
+		}
+
+		@Autowired(required = false)
+		public void setConfigurers(List<AnnotationConfigurer<O, B>> configurers) {
+			this.configurers = configurers;
+		}
+
+		@Override
+		public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+			this.beanFactory = beanFactory;
+		}
+
+		public B getBuilder() {
+			return builder;
+		}
+
+		public List<AnnotationConfigurer<O, B>> getConfigurers() {
+			return configurers;
+		}
+
+		protected void setObject(T object) {
+			this.object = object;
+		}
+
+		protected BeanFactory getBeanFactory() {
+			return beanFactory;
+		}
+
 	}
 
 }

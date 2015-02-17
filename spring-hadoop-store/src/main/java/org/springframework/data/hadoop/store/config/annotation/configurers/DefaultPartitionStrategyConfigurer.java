@@ -15,9 +15,9 @@
  */
 package org.springframework.data.hadoop.store.config.annotation.configurers;
 
-import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.data.hadoop.config.common.annotation.AnnotationConfigurer;
 import org.springframework.data.hadoop.config.common.annotation.AnnotationConfigurerAdapter;
+import org.springframework.data.hadoop.store.config.annotation.SpringDataStoreWriterConfigs;
 import org.springframework.data.hadoop.store.config.annotation.builders.DataStoreTextWriterBuilder;
 import org.springframework.data.hadoop.store.config.annotation.builders.DataStoreTextWriterConfigurer;
 import org.springframework.data.hadoop.store.partition.DefaultPartitionStrategy;
@@ -30,7 +30,7 @@ import org.springframework.data.hadoop.store.partition.PartitionStrategy;
  *
  */
 public class DefaultPartitionStrategyConfigurer extends
-		AnnotationConfigurerAdapter<BeanDefinition, DataStoreTextWriterConfigurer, DataStoreTextWriterBuilder>
+		AnnotationConfigurerAdapter<SpringDataStoreWriterConfigs, DataStoreTextWriterConfigurer, DataStoreTextWriterBuilder>
 		implements PartitionStrategyConfigurer {
 
 	private PartitionStrategy<?, ?> partitionStrategy;
