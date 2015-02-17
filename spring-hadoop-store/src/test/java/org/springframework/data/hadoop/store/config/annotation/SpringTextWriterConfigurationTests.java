@@ -103,6 +103,9 @@ public class SpringTextWriterConfigurationTests {
 				ConfigurationConfig.class, AutowireTypeBean2.class);
 		AutowireTypeBean2 bean = ctx.getBean(AutowireTypeBean2.class);
 		assertNotNull(bean.writer);
+		Object beanInjected = TestUtils.readField("partitionStrategy", bean.writer);
+		Object beanBuilt = ctx.getBean("partitionStrategy");
+		assertThat(beanBuilt, sameInstance(beanInjected));
 		ctx.close();
 	}
 
@@ -176,7 +179,7 @@ public class SpringTextWriterConfigurationTests {
 	}
 
 	@Configuration
-	@EnableDataStoreTextWriter(name=WRITER5_ID)
+	@EnableDataStorePartitionTextWriter(name=WRITER5_ID)
 	static class Config5 extends SpringDataStoreTextWriterConfigurerAdapter {
 
 		@Override

@@ -15,7 +15,12 @@
  */
 package org.springframework.data.hadoop.store.config.annotation;
 
-import org.springframework.beans.factory.config.BeanDefinition;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.Path;
+import org.springframework.data.hadoop.store.codec.CodecInfo;
+import org.springframework.data.hadoop.store.partition.PartitionStrategy;
+import org.springframework.data.hadoop.store.strategy.naming.FileNamingStrategy;
+import org.springframework.data.hadoop.store.strategy.rollover.RolloverStrategy;
 
 /**
  * A holder object for all configured configs for Spring Hadoop.
@@ -25,14 +30,124 @@ import org.springframework.beans.factory.config.BeanDefinition;
  */
 public class SpringDataStoreWriterConfigs {
 
-	BeanDefinition writer;
+	private Configuration configuration;
 
-	public void setWriter(BeanDefinition writer) {
-		this.writer = writer;
+	private Path basePath;
+
+	private CodecInfo codec;
+
+	private PartitionStrategy<?, ?> partitionStrategy;
+
+	private FileNamingStrategy fileNamingStrategy;
+
+	private RolloverStrategy rolloverStrategy;
+
+	private Boolean overwrite;
+
+	private Boolean appendable;
+
+	private Long idleTimeout;
+
+	private Integer fileOpenAttempts;
+
+	private String inWritingPrefix;
+
+	private String inWritingSuffix;
+
+	public Configuration getConfiguration() {
+		return configuration;
 	}
 
-	public BeanDefinition getWriter() {
-		return writer;
+	public void setConfiguration(Configuration configuration) {
+		this.configuration = configuration;
+	}
+
+	public Path getBasePath() {
+		return basePath;
+	}
+
+	public void setBasePath(Path basePath) {
+		this.basePath = basePath;
+	}
+
+	public CodecInfo getCodec() {
+		return codec;
+	}
+
+	public void setCodec(CodecInfo codec) {
+		this.codec = codec;
+	}
+
+	public PartitionStrategy<?, ?> getPartitionStrategy() {
+		return partitionStrategy;
+	}
+
+	public void setPartitionStrategy(PartitionStrategy<?, ?> partitionStrategy) {
+		this.partitionStrategy = partitionStrategy;
+	}
+
+	public FileNamingStrategy getFileNamingStrategy() {
+		return fileNamingStrategy;
+	}
+
+	public void setFileNamingStrategy(FileNamingStrategy fileNamingStrategy) {
+		this.fileNamingStrategy = fileNamingStrategy;
+	}
+
+	public RolloverStrategy getRolloverStrategy() {
+		return rolloverStrategy;
+	}
+
+	public void setRolloverStrategy(RolloverStrategy rolloverStrategy) {
+		this.rolloverStrategy = rolloverStrategy;
+	}
+
+	public Boolean getOverwrite() {
+		return overwrite;
+	}
+
+	public void setOverwrite(Boolean overwrite) {
+		this.overwrite = overwrite;
+	}
+
+	public Boolean getAppendable() {
+		return appendable;
+	}
+
+	public void setAppendable(Boolean appendable) {
+		this.appendable = appendable;
+	}
+
+	public Long getIdleTimeout() {
+		return idleTimeout;
+	}
+
+	public void setIdleTimeout(Long idleTimeout) {
+		this.idleTimeout = idleTimeout;
+	}
+
+	public Integer getFileOpenAttempts() {
+		return fileOpenAttempts;
+	}
+
+	public void setFileOpenAttempts(Integer fileOpenAttempts) {
+		this.fileOpenAttempts = fileOpenAttempts;
+	}
+
+	public String getInWritingPrefix() {
+		return inWritingPrefix;
+	}
+
+	public void setInWritingPrefix(String inWritingPrefix) {
+		this.inWritingPrefix = inWritingPrefix;
+	}
+
+	public String getInWritingSuffix() {
+		return inWritingSuffix;
+	}
+
+	public void setInWritingSuffix(String inWritingSuffix) {
+		this.inWritingSuffix = inWritingSuffix;
 	}
 
 }

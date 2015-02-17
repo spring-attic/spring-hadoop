@@ -18,22 +18,19 @@ package org.springframework.data.hadoop.store.config.annotation.builders;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.data.hadoop.HadoopSystemConstants;
 import org.springframework.data.hadoop.config.common.annotation.AbstractConfiguredAnnotationBuilder;
 import org.springframework.data.hadoop.config.common.annotation.AnnotationBuilder;
 import org.springframework.data.hadoop.config.common.annotation.ObjectPostProcessor;
 import org.springframework.data.hadoop.store.DataStoreWriter;
 import org.springframework.data.hadoop.store.codec.CodecInfo;
 import org.springframework.data.hadoop.store.codec.Codecs;
+import org.springframework.data.hadoop.store.config.annotation.SpringDataStoreWriterConfigs;
 import org.springframework.data.hadoop.store.config.annotation.configurers.DefaultNamingStrategyConfigurer;
 import org.springframework.data.hadoop.store.config.annotation.configurers.DefaultPartitionStrategyConfigurer;
 import org.springframework.data.hadoop.store.config.annotation.configurers.DefaultRolloverStrategyConfigurer;
 import org.springframework.data.hadoop.store.config.annotation.configurers.NamingStrategyConfigurer;
 import org.springframework.data.hadoop.store.config.annotation.configurers.PartitionStrategyConfigurer;
 import org.springframework.data.hadoop.store.config.annotation.configurers.RolloverStrategyConfigurer;
-import org.springframework.data.hadoop.store.output.PartitionTextFileWriter;
-import org.springframework.data.hadoop.store.output.TextFileWriter;
 import org.springframework.data.hadoop.store.partition.PartitionStrategy;
 import org.springframework.data.hadoop.store.strategy.naming.FileNamingStrategy;
 import org.springframework.data.hadoop.store.strategy.rollover.RolloverStrategy;
@@ -47,7 +44,7 @@ import org.springframework.data.hadoop.store.strategy.rollover.RolloverStrategy;
  */
 public final class DataStoreTextWriterBuilder
 		extends
-		AbstractConfiguredAnnotationBuilder<BeanDefinition, DataStoreTextWriterConfigurer, DataStoreTextWriterBuilder>
+		AbstractConfiguredAnnotationBuilder<SpringDataStoreWriterConfigs, DataStoreTextWriterConfigurer, DataStoreTextWriterBuilder>
 		implements DataStoreTextWriterConfigurer {
 
 	private Configuration configuration;
@@ -90,77 +87,21 @@ public final class DataStoreTextWriterBuilder
 	}
 
 	@Override
-	protected BeanDefinition performBuild() throws Exception {
-		BeanDefinitionBuilder builder;
-		if (partitionStrategy == null) {
-			builder = BeanDefinitionBuilder.rootBeanDefinition(TextFileWriter.class);
-			if (configuration != null) {
-				builder.addConstructorArgValue(configuration);
-			} else {
-				builder.addConstructorArgReference(HadoopSystemConstants.DEFAULT_ID_CONFIGURATION);
-			}
-			builder.addConstructorArgValue(basePath);
-			builder.addConstructorArgValue(codec);
-			if (overwrite != null) {
-				builder.addPropertyValue("overwrite", overwrite);
-			}
-			if (appendable != null) {
-				builder.addPropertyValue("appendable", appendable);
-			}
-			if (inWritingPrefix != null) {
-				builder.addPropertyValue("inWritingPrefix", inWritingPrefix);
-			}
-			if (inWritingSuffix != null) {
-				builder.addPropertyValue("inWritingSuffix", inWritingSuffix);
-			}
-			if (idleTimeout != null) {
-				builder.addPropertyValue("idleTimeout", idleTimeout);
-			}
-			if (fileOpenAttempts != null) {
-				builder.addPropertyValue("maxOpenAttempts", fileOpenAttempts);
-			}
-			if (fileNamingStrategy != null) {
-				builder.addPropertyValue("fileNamingStrategy", fileNamingStrategy);
-			}
-			if (rolloverStrategy != null) {
-				builder.addPropertyValue("rolloverStrategy", rolloverStrategy);
-			}
-		} else {
-			builder = BeanDefinitionBuilder.rootBeanDefinition(PartitionTextFileWriter.class);
-			if (configuration != null) {
-				builder.addConstructorArgValue(configuration);
-			} else {
-				builder.addConstructorArgReference(HadoopSystemConstants.DEFAULT_ID_CONFIGURATION);
-			}
-			builder.addConstructorArgValue(basePath);
-			builder.addConstructorArgValue(codec);
-			builder.addConstructorArgValue(partitionStrategy);
-			if (overwrite != null) {
-				builder.addPropertyValue("overwrite", overwrite);
-			}
-			if (appendable != null) {
-				builder.addPropertyValue("appendable", appendable);
-			}
-			if (inWritingPrefix != null) {
-				builder.addPropertyValue("inWritingPrefix", inWritingPrefix);
-			}
-			if (inWritingSuffix != null) {
-				builder.addPropertyValue("inWritingSuffix", inWritingSuffix);
-			}
-			if (idleTimeout != null) {
-				builder.addPropertyValue("idleTimeout", idleTimeout);
-			}
-			if (fileOpenAttempts != null) {
-				builder.addPropertyValue("maxOpenAttempts", fileOpenAttempts);
-			}
-			if (fileNamingStrategy != null) {
-				builder.addPropertyValue("fileNamingStrategyFactory", fileNamingStrategy);
-			}
-			if (rolloverStrategy != null) {
-				builder.addPropertyValue("rolloverStrategyFactory", rolloverStrategy);
-			}
-		}
-		return builder.getBeanDefinition();
+	protected SpringDataStoreWriterConfigs performBuild() throws Exception {
+		SpringDataStoreWriterConfigs configs = new SpringDataStoreWriterConfigs();
+		configs.setConfiguration(configuration);
+		configs.setBasePath(basePath);
+		configs.setCodec(codec);
+		configs.setPartitionStrategy(partitionStrategy);
+		configs.setFileNamingStrategy(fileNamingStrategy);
+		configs.setRolloverStrategy(rolloverStrategy);
+		configs.setOverwrite(overwrite);
+		configs.setAppendable(appendable);
+		configs.setIdleTimeout(idleTimeout);
+		configs.setFileOpenAttempts(fileOpenAttempts);
+		configs.setInWritingPrefix(inWritingPrefix);
+		configs.setInWritingSuffix(inWritingSuffix);
+		return configs;
 	}
 
 	@Override

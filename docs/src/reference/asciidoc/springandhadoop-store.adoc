@@ -976,8 +976,14 @@ What happened in above example:
   `data-38400000-8cf0-11bd-b23e-10b96e4ef00d-1.txt`.
 * We set file to rollover after `1M` data is written.
 
-Writer can be auto-wired using either `DataStoreWriter` or
-`PartitionDataStoreWriter` if partitioning strategy is enabled.
+Writer can be auto-wired using `DataStoreWriter`.
+
+[IMPORTANT]
+====
+Autowiring by type `PartitionDataStoreWriter` only works if adapter is
+used with annotation `@EnableDataStorePartitionTextWriter` which will
+introduce a correct bean type.
+====
 
 [source,java]
 ----
@@ -993,10 +999,10 @@ static class MyBean {
 
 In some cases it is more convenient to name the bean instead letting
 Spring to create that name automatically. `@EnableDataStoreTextWriter`
-has a `name` field which works in a same way than normal Spring
-`@Bean` annotation. You'd use this custom naming in cases where
-multiple writers are created and auto-wiring by type would no longer
-work.
+and `@EnableDataStorePartitionTextWriter` both have a `name` field
+which works in a same way than normal Spring `@Bean` annotation. You'd
+use this custom naming in cases where multiple writers are created and
+auto-wiring by type would no longer work.
 
 [source,java]
 ----
