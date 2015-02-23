@@ -394,6 +394,7 @@ configure(javaProjects()) {
 		whenMerged { classpath ->
 			classpath.entries.removeAll { entry -> entry.toString().contains(".pom") }
 			classpath.entries.removeAll { entry -> entry.toString().contains("servlet-api") }
+			classpath.entries.removeAll { entry -> entry.toString().contains("jline") && !entry.toString().contains("jline-2")  }
 		}
 	}
 
