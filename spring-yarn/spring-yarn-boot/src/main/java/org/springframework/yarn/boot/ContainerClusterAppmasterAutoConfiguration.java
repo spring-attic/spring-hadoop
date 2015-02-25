@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,23 @@
  */
 package org.springframework.yarn.boot;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.autoconfigure.EndpointWebMvcAutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.yarn.am.YarnAppmaster;
 import org.springframework.yarn.am.cluster.ContainerClusterStateMachineConfiguration;
+import org.springframework.yarn.boot.actuate.endpoint.YarnContainerClusterEndpoint;
+import org.springframework.yarn.boot.actuate.endpoint.mvc.YarnContainerClusterMvcEndpoint;
 import org.springframework.yarn.boot.condition.ConditionalOnYarnAppmaster;
+import org.springframework.yarn.boot.properties.SpringYarnAppmasterProperties;
 import org.springframework.yarn.config.annotation.EnableYarn;
 
 @Configuration
@@ -35,4 +42,27 @@ import org.springframework.yarn.config.annotation.EnableYarn;
 @AutoConfigureBefore({EndpointWebMvcAutoConfiguration.class, YarnAppmasterAutoConfiguration.class})
 @Import(ContainerClusterStateMachineConfiguration.class)
 public class ContainerClusterAppmasterAutoConfiguration {
+
+	@Configuration
+	@EnableConfigurationProperties({ SpringYarnAppmasterProperties.class })
+	@ConditionalOnExpression("${spring.yarn.endpoints.containercluster.enabled:false}")
+	public static class ContainerClusterEndPointConfig {
+
+		@Autowired
+		private SpringYarnAppmasterProperties syap;
+
+		@Bean
+		@ConditionalOnMissingBean
+		public YarnContainerClusterEndpoint yarnContainerClusterEndpoint() {
+			return new YarnContainerClusterEndpoint();
+		}
+
+		@Bean
+		@ConditionalOnBean(YarnContainerClusterEndpoint.class)
+		public YarnContainerClusterMvcEndpoint yarnContainerClusterMvcEndpoint(YarnContainerClusterEndpoint delegate) {
+			return new YarnContainerClusterMvcEndpoint(delegate);
+		}
+
+	}
+
 }

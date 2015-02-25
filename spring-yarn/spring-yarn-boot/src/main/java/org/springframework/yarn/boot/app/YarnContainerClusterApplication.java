@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,8 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.yarn.YarnSystemConstants;
 import org.springframework.yarn.am.cluster.ContainerCluster;
 import org.springframework.yarn.boot.SpringApplicationCallback;
 import org.springframework.yarn.boot.SpringApplicationTemplate;
@@ -87,6 +89,8 @@ public class YarnContainerClusterApplication extends AbstractClientApplication<S
 			public String runWithSpringApplication(ApplicationContext context) throws Exception {
 				OperationProperties operationProperties = context.getBean(OperationProperties.class);
 				YarnClient client = context.getBean(YarnClient.class);
+				RestTemplate restTemplate = context.getBean(YarnSystemConstants.DEFAULT_ID_RESTTEMPLATE,
+						RestTemplate.class);
 				ApplicationId applicationId = ConverterUtils.toApplicationId(operationProperties.getApplicationId());
 				String clusterId = operationProperties.getClusterId();
 				String clusterDef = operationProperties.getClusterDef();
@@ -101,22 +105,22 @@ public class YarnContainerClusterApplication extends AbstractClientApplication<S
 				boolean verbose = operationProperties.isVerbose();
 
 				if (Operation.CLUSTERSINFO == operation) {
-					return doClustersInfo(client, applicationId);
+					return doClustersInfo(restTemplate, client, applicationId);
 				} else if (Operation.CLUSTERINFO == operation) {
-					return doClusterInfo(client, applicationId, clusterId, verbose);
+					return doClusterInfo(restTemplate, client, applicationId, clusterId, verbose);
 				} else if (Operation.CLUSTERCREATE == operation) {
-					return doClusterCreate(client, applicationId, clusterId, clusterDef, projectionType,
+					return doClusterCreate(restTemplate, client, applicationId, clusterId, clusterDef, projectionType,
 							projectionDataAny, projectionDataHosts, projectionDataRacks, projectionDataProperties,
 							extraProperties);
 				} else if (Operation.CLUSTERDESTROY == operation) {
-					return doClusterDestroy(client, applicationId, clusterId);
+					return doClusterDestroy(restTemplate, client, applicationId, clusterId);
 				} else if (Operation.CLUSTERMODIFY == operation) {
-					return doClusterModify(client, applicationId, clusterId, projectionDataAny, projectionDataHosts,
+					return doClusterModify(restTemplate, client, applicationId, clusterId, projectionDataAny, projectionDataHosts,
 							projectionDataRacks, projectionDataProperties);
 				} else if (Operation.CLUSTERSTART == operation) {
-					return doClusterStart(client, applicationId, clusterId);
+					return doClusterStart(restTemplate, client, applicationId, clusterId);
 				} else if (Operation.CLUSTERSTOP == operation) {
-					return doClusterStop(client, applicationId, clusterId);
+					return doClusterStop(restTemplate, client, applicationId, clusterId);
 				}
 				return null;
 			}
@@ -125,8 +129,8 @@ public class YarnContainerClusterApplication extends AbstractClientApplication<S
 
 	}
 
-	private String doClustersInfo(YarnClient client, ApplicationId applicationId) {
-		YarnContainerClusterOperations operations = buildClusterOperations(client, applicationId);
+	private String doClustersInfo(RestTemplate restTemplate, YarnClient client, ApplicationId applicationId) {
+		YarnContainerClusterOperations operations = buildClusterOperations(restTemplate, client, applicationId);
 		YarnContainerClusterEndpointResource response = operations.getClusters();
 		return ContainerClusterReport.clustersInfoReportBuilder()
 				.add(ClustersInfoField.ID)
@@ -134,8 +138,8 @@ public class YarnContainerClusterApplication extends AbstractClientApplication<S
 				.build().toString();
 	}
 
-	private String doClusterInfo(YarnClient client, ApplicationId applicationId, String clusterId, boolean verbose) {
-		YarnContainerClusterOperations operations = buildClusterOperations(client, applicationId);
+	private String doClusterInfo(RestTemplate restTemplate, YarnClient client, ApplicationId applicationId, String clusterId, boolean verbose) {
+		YarnContainerClusterOperations operations = buildClusterOperations(restTemplate, client, applicationId);
 		ContainerClusterResource response = operations.clusterInfo(clusterId);
 
 		List<ClustersInfoReportData> data = new ArrayList<ClustersInfoReportData>();
@@ -170,10 +174,10 @@ public class YarnContainerClusterApplication extends AbstractClientApplication<S
 		}
 	}
 
-	private String doClusterCreate(YarnClient client, ApplicationId applicationId, String clusterId, String clusterDef,
+	private String doClusterCreate(RestTemplate restTemplate, YarnClient client, ApplicationId applicationId, String clusterId, String clusterDef,
 			String projectionType, Integer projectionDataAny, Map<String, Integer> hosts, Map<String, Integer> racks,
 			Map<String, Object> projectionDataProperties, Map<String, Object> extraProperties) {
-		YarnContainerClusterOperations operations = buildClusterOperations(client, applicationId);
+		YarnContainerClusterOperations operations = buildClusterOperations(restTemplate, client, applicationId);
 
 		ContainerClusterCreateRequest request = new ContainerClusterCreateRequest();
 		request.setClusterId(clusterId);
@@ -192,32 +196,32 @@ public class YarnContainerClusterApplication extends AbstractClientApplication<S
 		return "Cluster " + clusterId + " created.";
 	}
 
-	private String doClusterDestroy(YarnClient client, ApplicationId applicationId, String clusterId) {
-		YarnContainerClusterOperations operations = buildClusterOperations(client, applicationId);
+	private String doClusterDestroy(RestTemplate restTemplate, YarnClient client, ApplicationId applicationId, String clusterId) {
+		YarnContainerClusterOperations operations = buildClusterOperations(restTemplate, client, applicationId);
 		operations.clusterDestroy(clusterId);
 		return "Cluster " + clusterId + " destroyed.";
 	}
 
-	private String doClusterStart(YarnClient client, ApplicationId applicationId, String clusterId) {
-		YarnContainerClusterOperations operations = buildClusterOperations(client, applicationId);
+	private String doClusterStart(RestTemplate restTemplate, YarnClient client, ApplicationId applicationId, String clusterId) {
+		YarnContainerClusterOperations operations = buildClusterOperations(restTemplate, client, applicationId);
 		ContainerClusterModifyRequest request = new ContainerClusterModifyRequest();
 		request.setAction("start");
 		operations.clusterStart(clusterId, request);
 		return "Cluster " + clusterId + " started.";
 	}
 
-	private String doClusterStop(YarnClient client, ApplicationId applicationId, String clusterId) {
-		YarnContainerClusterOperations operations = buildClusterOperations(client, applicationId);
+	private String doClusterStop(RestTemplate restTemplate, YarnClient client, ApplicationId applicationId, String clusterId) {
+		YarnContainerClusterOperations operations = buildClusterOperations(restTemplate, client, applicationId);
 		ContainerClusterModifyRequest request = new ContainerClusterModifyRequest();
 		request.setAction("stop");
 		operations.clusterStop(clusterId, request);
 		return "Cluster " + clusterId + " stopped.";
 	}
 
-	private String doClusterModify(YarnClient client, ApplicationId applicationId, String clusterId,
+	private String doClusterModify(RestTemplate restTemplate, YarnClient client, ApplicationId applicationId, String clusterId,
 			Integer projectionDataAny, Map<String, Integer> hosts, Map<String, Integer> racks,
 			Map<String, Object> properties) {
-		YarnContainerClusterOperations operations = buildClusterOperations(client, applicationId);
+		YarnContainerClusterOperations operations = buildClusterOperations(restTemplate, client, applicationId);
 
 		ContainerClusterCreateRequest request = new ContainerClusterCreateRequest();
 		request.setClusterId(clusterId);
@@ -234,10 +238,10 @@ public class YarnContainerClusterApplication extends AbstractClientApplication<S
 		return "Cluster " + clusterId + " modified.";
 	}
 
-	private YarnContainerClusterOperations buildClusterOperations(YarnClient client, ApplicationId applicationId) {
+	private YarnContainerClusterOperations buildClusterOperations(RestTemplate restTemplate, YarnClient client, ApplicationId applicationId) {
 		ApplicationReport report = client.getApplicationReport(applicationId);
 		String trackingUrl = report.getOriginalTrackingUrl();
-		return new YarnContainerClusterTemplate(trackingUrl + "/" + YarnContainerClusterEndpoint.ENDPOINT_ID);
+		return new YarnContainerClusterTemplate(trackingUrl + "/" + YarnContainerClusterEndpoint.ENDPOINT_ID, restTemplate);
 	}
 
 	@ConfigurationProperties(value = "spring.yarn.internal.ContainerClusterApplication")

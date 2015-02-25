@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.boot.context.embedded.EmbeddedServletContainerInitializedEvent;
 import org.springframework.context.ApplicationListener;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.yarn.YarnSystemConstants;
 import org.springframework.yarn.boot.actuate.endpoint.mvc.domain.ContainerRegisterResource;
 import org.springframework.yarn.support.LifecycleObjectSupport;
 import org.springframework.yarn.support.NetworkUtils;
@@ -60,9 +60,8 @@ public class ContainerRegistrar extends LifecycleObjectSupport implements
 
 		int port = event.getEmbeddedServletContainer().getPort();
 		try {
-			// TODO: need to integrate auth
 			// TODO: need to handle proper network address
-			RestTemplate restTemplate = new RestTemplate(new HttpComponentsClientHttpRequestFactory());
+			RestTemplate restTemplate = getBeanFactory().getBean(YarnSystemConstants.DEFAULT_ID_RESTTEMPLATE, RestTemplate.class);
 			String url = "http://" + NetworkUtils.getDefaultAddress() + ":" + port;
 			ContainerRegisterResource request = new ContainerRegisterResource(containerId, url);
 			log.info("Registering containerId=[" + containerId + "] with url=[" + url + "]");

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,14 @@ package org.springframework.yarn.boot.actuate.endpoint;
 
 import java.util.Map;
 
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.BeansException;
 import org.springframework.boot.actuate.endpoint.AbstractEndpoint;
 import org.springframework.boot.actuate.endpoint.Endpoint;
-import org.springframework.util.Assert;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.yarn.YarnSystemConstants;
 import org.springframework.yarn.am.YarnAppmaster;
 import org.springframework.yarn.am.cluster.ContainerCluster;
 import org.springframework.yarn.am.cluster.ContainerClusterAppmaster;
@@ -33,11 +36,11 @@ import org.springframework.yarn.am.grid.support.ProjectionData;
  * @author Janne Valkealahti
  *
  */
-public class YarnContainerClusterEndpoint extends AbstractEndpoint<Map<String, ContainerCluster>> implements InitializingBean {
+public class YarnContainerClusterEndpoint extends AbstractEndpoint<Map<String, ContainerCluster>> implements ApplicationContextAware {
 
 	public final static String ENDPOINT_ID = "yarn_containercluster";
 
-	private ContainerClusterAppmaster appmaster;
+	private ApplicationContext applicationContext;
 
 	/**
 	 * Instantiates a new yarn container cluster endpoint.
@@ -46,9 +49,10 @@ public class YarnContainerClusterEndpoint extends AbstractEndpoint<Map<String, C
 		super(ENDPOINT_ID);
 	}
 
+
 	@Override
-	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(appmaster, "ContainerClusterAppmaster must be set");
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		this.applicationContext = applicationContext;
 	}
 
 	@Override
@@ -56,41 +60,47 @@ public class YarnContainerClusterEndpoint extends AbstractEndpoint<Map<String, C
 		return getClusters();
 	}
 
-	/**
-	 * Sets {@link ContainerClusterAppmaster} if passed {@link YarnAppmaster} is
-	 * instance of it.
-	 *
-	 * @param yarnAppmaster the yarn application master
-	 */
-	@Autowired
-	public void setYarnAppmaster(YarnAppmaster yarnAppmaster) {
-		if (yarnAppmaster instanceof ContainerClusterAppmaster) {
-			appmaster = ((ContainerClusterAppmaster)yarnAppmaster);
-		}
-	}
-
 	public Map<String, ContainerCluster> getClusters() {
-		return appmaster.getContainerClusters();
+		return getAppmaster().getContainerClusters();
 	}
 
 	public ContainerCluster createCluster(String clusterId, String clusterDef, ProjectionData projectionData, Map<String, Object> extraProperties) {
-		return appmaster.createContainerCluster(clusterId, clusterDef, projectionData, extraProperties);
+		return getAppmaster().createContainerCluster(clusterId, clusterDef, projectionData, extraProperties);
 	}
 
 	public void startCluster(String clusterId) {
-		appmaster.startContainerCluster(clusterId);
+		getAppmaster().startContainerCluster(clusterId);
 	}
 
 	public void stopCluster(String clusterId) {
-		appmaster.stopContainerCluster(clusterId);
+		getAppmaster().stopContainerCluster(clusterId);
 	}
 
 	public void destroyCluster(String clusterId) {
-		appmaster.destroyContainerCluster(clusterId);
+		getAppmaster().destroyContainerCluster(clusterId);
 	}
 
 	public void modifyCluster(String id, ProjectionData projectionData) {
-		appmaster.modifyContainerCluster(id, projectionData);
+		getAppmaster().modifyContainerCluster(id, projectionData);
+	}
+
+	private ContainerClusterAppmaster getAppmaster() {
+		YarnAppmaster yarnAppmaster = applicationContext.getBean(YarnAppmaster.class,
+				YarnSystemConstants.DEFAULT_ID_APPMASTER);
+		if (yarnAppmaster instanceof ContainerClusterAppmaster) {
+			return ((ContainerClusterAppmaster)yarnAppmaster);
+		}
+		throw new InvalidAppmasterException("Appmaster of type ContainerClusterAppmaster not found");
+	}
+
+	@SuppressWarnings("serial")
+	@ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Appmaster not found")
+	private static class InvalidAppmasterException extends RuntimeException {
+
+		public InvalidAppmasterException(String string) {
+			super(string);
+		}
+
 	}
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,11 @@ import java.util.Map.Entry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.yarn.api.records.Container;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.yarn.YarnSystemConstants;
 import org.springframework.yarn.am.container.ContainerRegisterInfo;
 import org.springframework.yarn.am.container.ContainerShutdown;
 
@@ -33,14 +36,17 @@ import org.springframework.yarn.am.container.ContainerShutdown;
  * @author Janne Valkealahti
  *
  */
-public class EndpointContainerShutdown implements ContainerShutdown {
+public class EndpointContainerShutdown implements ContainerShutdown, BeanFactoryAware {
 
 	private static final Log log = LogFactory.getLog(EndpointContainerShutdown.class);
+
+	private BeanFactory beanFactory;
 
 	@Override
 	public boolean shutdown(Map<Container, ContainerRegisterInfo> containers) {
 		log.info("Shutting down containers using boot shutdown endpoint");
-		RestTemplate restTemplate = new RestTemplate(new HttpComponentsClientHttpRequestFactory());
+		RestTemplate restTemplate = beanFactory
+				.getBean(YarnSystemConstants.DEFAULT_ID_RESTTEMPLATE, RestTemplate.class);
 		boolean ok = true;
 		for (Entry<Container, ContainerRegisterInfo> entry : containers.entrySet()) {
 			Container c = entry.getKey();
@@ -48,7 +54,6 @@ public class EndpointContainerShutdown implements ContainerShutdown {
 			String url = i.getTrackUrl() + "/shutdown";
 			log.info("Shutting down container=[" + c + "] using url=[" + url + "]");
 			try {
-				// TODO: need to integrate auth
 				restTemplate.postForObject(url, null, Void.class);
 			} catch (Exception e) {
 				log.warn("Error shutting down container=[" + c + "]");
@@ -56,6 +61,11 @@ public class EndpointContainerShutdown implements ContainerShutdown {
 			}
 		}
 		return ok;
+	}
+
+	@Override
+	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+		this.beanFactory = beanFactory;
 	}
 
 }

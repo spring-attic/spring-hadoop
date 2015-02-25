@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,6 +64,9 @@ public class YarnSystemConstants {
 
 	/** Default bean id for appmaster client service. */
 	public static final String DEFAULT_ID_CLIENT_AMSERVICE = "yarnClientAmservice";
+
+	/** Default bean id for yarn specific rest template. */
+	public static final String DEFAULT_ID_RESTTEMPLATE = "yarnRestTemplate";
 
 	/** Default name of client context file. */
 	public static final String DEFAULT_CONTEXT_FILE_CLIENT = "application-context.xml";

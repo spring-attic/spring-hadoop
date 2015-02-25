@@ -1188,8 +1188,11 @@ project('spring-yarn:spring-yarn-boot') {
 		compile "org.springframework.boot:spring-boot-autoconfigure:$springBootVersion"
 		compile "org.springframework.boot:spring-boot-actuator:$springBootVersion"
 		compile "org.apache.httpcomponents:httpclient:$httpclientVersion"
+		optional "org.springframework.security:spring-security-config:$springSecurityVersion"
+		optional "org.springframework.security:spring-security-web:$springSecurityVersion"
 		runtime "org.yaml:snakeyaml:$snakeYamlVersion"
-		testRuntime "org.apache.tomcat.embed:tomcat-embed-jasper:$tomcatEmbedVersion"
+		testRuntime "org.apache.tomcat.embed:tomcat-embed-core:$tomcatEmbedVersion"
+		testRuntime "org.apache.tomcat.embed:tomcat-embed-logging-juli:$tomcatEmbedVersion"
 		testCompile("org.mockito:mockito-core:$mockitoVersion") { dep ->
 			exclude group: "org.hamcrest"
 		}
@@ -1215,6 +1218,7 @@ project('spring-yarn:spring-yarn-boot-build-tests') {
 	dependencies {
 		compile project(":spring-yarn:spring-yarn-boot")
 		testCompile project(":spring-yarn:spring-yarn-test")
+		testRuntime "org.springframework:spring-web:$springVersion"
 	}
 
 	// create a boot jar which we can use in tests
