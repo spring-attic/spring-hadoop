@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,6 +74,9 @@ public abstract class AbstractPartitionDataStoreWriter<T, K> extends LifecycleOb
 
 	/** Idle timeout for writers */
 	private long idleTimeout;
+
+	/** Close timeout for writers */
+	private long closeTimeout;
 
 	/** Append flag for writers */
 	private boolean append = false;
@@ -260,6 +263,15 @@ public abstract class AbstractPartitionDataStoreWriter<T, K> extends LifecycleOb
 		this.idleTimeout = idleTimeout;
 	}
 
+	/**
+	 * Sets the close timeout.
+	 *
+	 * @param closeTimeout the new idle timeout
+	 */
+	public void setCloseTimeout(long closeTimeout) {
+		this.closeTimeout = closeTimeout;
+	}
+
     /**
      * Sets the in writing suffix.
      *
@@ -343,6 +355,15 @@ public abstract class AbstractPartitionDataStoreWriter<T, K> extends LifecycleOb
 	 */
 	public long getIdleTimeout() {
 		return idleTimeout;
+	}
+
+	/**
+	 * Gets the close timeout.
+	 *
+	 * @return the close timeout
+	 */
+	public long getCloseTimeout() {
+		return closeTimeout;
 	}
 
 	/**

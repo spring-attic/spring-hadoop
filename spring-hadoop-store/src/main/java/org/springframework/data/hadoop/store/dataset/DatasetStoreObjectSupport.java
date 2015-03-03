@@ -40,6 +40,12 @@ public class DatasetStoreObjectSupport extends LifecycleObjectSupport {
 	/** Trigger in poller */
 	private volatile IdleTimeoutTrigger idleTrigger;
 
+	/** Poller checking idle timeouts */
+	private CloseTimeoutPoller closePoller;
+
+	/** Trigger in poller */
+	private volatile IdleTimeoutTrigger closeTrigger;
+
 	/**
 	 * In millis last idle time reset. We explicitly use negative value to indicate reset state
 	 * because we can't use long max value which would flip if adding something. We reset this
@@ -50,6 +56,9 @@ public class DatasetStoreObjectSupport extends LifecycleObjectSupport {
 	/** In millis an idle timeout for writer/reader. */
 	private volatile long idleTimeout;
 
+	/** In millis a close timeout for writer/reader. */
+	private volatile long closeTimeout;
+
 	@Override
 	protected void onInit() throws Exception {
 		// if we have timeout, enable polling by creating it
@@ -58,12 +67,22 @@ public class DatasetStoreObjectSupport extends LifecycleObjectSupport {
 			idlePoller = new IdleTimeoutPoller(getTaskScheduler(), getTaskExecutor(), idleTrigger);
 			idlePoller.init();
 		}
+		// if we have close timeout, setup trigger with delay
+		if (closeTimeout > 0) {
+			closeTrigger = new IdleTimeoutTrigger(closeTimeout);
+			closeTrigger.setInitialDelay(closeTimeout);
+			closePoller = new CloseTimeoutPoller(getTaskScheduler(), getTaskExecutor(), closeTrigger);
+			closePoller.init();
+		}
 	}
 
 	@Override
 	protected void doStart() {
 		if (idlePoller != null) {
 			idlePoller.start();
+		}
+		if (closePoller != null) {
+			closePoller.start();
 		}
 	}
 
@@ -73,6 +92,10 @@ public class DatasetStoreObjectSupport extends LifecycleObjectSupport {
 			idlePoller.stop();
 		}
 		idlePoller = null;
+		if (closePoller != null) {
+			closePoller.stop();
+		}
+		closePoller = null;
 	}
 
 	/**
@@ -82,6 +105,15 @@ public class DatasetStoreObjectSupport extends LifecycleObjectSupport {
 	 */
 	public void setIdleTimeout(long idleTimeout) {
 		this.idleTimeout = idleTimeout;
+	}
+
+	/**
+	 * Sets the close timeout.
+	 *
+	 * @param closeTimeout the new close timeout
+	 */
+	public void setCloseTimeout(long closeTimeout) {
+		this.closeTimeout = closeTimeout;
 	}
 
 	/**
@@ -135,6 +167,30 @@ public class DatasetStoreObjectSupport extends LifecycleObjectSupport {
 			}
 		}
 
+	}
+
+	/**
+	 * Poller which gets called by a close timeout and closes a writer.
+	 */
+	private class CloseTimeoutPoller extends PollingTaskSupport<Void> {
+
+		public CloseTimeoutPoller(TaskScheduler taskScheduler, TaskExecutor taskExecutor, Trigger trigger) {
+			super(taskScheduler, taskExecutor, trigger);
+		}
+
+		@Override
+		protected Void doPoll() {
+			try {
+				if (log.isDebugEnabled()) {
+					log.debug("Close timeout detected, calling handleIdleTimeout()");
+				}
+				handleIdleTimeout();
+			} catch (Exception e) {
+				// TODO: handle error
+				log.error("error closing", e);
+			}
+			return null;
+		}
 	}
 
 }

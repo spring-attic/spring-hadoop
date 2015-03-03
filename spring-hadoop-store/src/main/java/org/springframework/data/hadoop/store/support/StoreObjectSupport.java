@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,6 +49,12 @@ public abstract class StoreObjectSupport extends LifecycleObjectSupport {
 	/** Trigger in poller */
 	private volatile IdleTimeoutTrigger idleTrigger;
 
+	/** Poller checking idle timeouts */
+	private CloseTimeoutPoller closePoller;
+
+	/** Trigger in poller */
+	private volatile IdleTimeoutTrigger closeTrigger;
+
 	/**
 	 * In millis last idle time reset. We explicitly use negative value to indicate reset state
 	 * because we can't use long max value which would flip if adding something. We reset this
@@ -58,6 +64,9 @@ public abstract class StoreObjectSupport extends LifecycleObjectSupport {
 
 	/** In millis an idle timeout for writer/reader. */
 	private volatile long idleTimeout;
+
+	/** In millis a close timeout for writer/reader. */
+	private volatile long closeTimeout;
 
 	/**
 	 * Instantiates a new abstract store support.
@@ -74,11 +83,18 @@ public abstract class StoreObjectSupport extends LifecycleObjectSupport {
 
 	@Override
 	protected void onInit() throws Exception {
-		// if we have timeout, enable polling by creating it
+		// if we have idle timeout, enable polling by creating it
 		if (idleTimeout > 0) {
 			idleTrigger = new IdleTimeoutTrigger(idleTimeout);
 			idlePoller = new IdleTimeoutPoller(getTaskScheduler(), getTaskExecutor(), idleTrigger);
 			idlePoller.init();
+		}
+		// if we have close timeout, setup trigger with delay
+		if (closeTimeout > 0) {
+			closeTrigger = new IdleTimeoutTrigger(closeTimeout);
+			closeTrigger.setInitialDelay(closeTimeout);
+			closePoller = new CloseTimeoutPoller(getTaskScheduler(), getTaskExecutor(), closeTrigger);
+			closePoller.init();
 		}
 	}
 
@@ -86,6 +102,9 @@ public abstract class StoreObjectSupport extends LifecycleObjectSupport {
 	protected void doStart() {
 		if (idlePoller != null) {
 			idlePoller.start();
+		}
+		if (closePoller != null) {
+			closePoller.start();
 		}
 	}
 
@@ -95,6 +114,10 @@ public abstract class StoreObjectSupport extends LifecycleObjectSupport {
 			idlePoller.stop();
 		}
 		idlePoller = null;
+		if (closePoller != null) {
+			closePoller.stop();
+		}
+		closePoller = null;
 	}
 
 	/**
@@ -140,6 +163,15 @@ public abstract class StoreObjectSupport extends LifecycleObjectSupport {
 	 */
 	public void setIdleTimeout(long idleTimeout) {
 		this.idleTimeout = idleTimeout;
+	}
+
+	/**
+	 * Sets the close timeout.
+	 *
+	 * @param closeTimeout the new close timeout
+	 */
+	public void setCloseTimeout(long closeTimeout) {
+		this.closeTimeout = closeTimeout;
 	}
 
 	/**
@@ -193,6 +225,30 @@ public abstract class StoreObjectSupport extends LifecycleObjectSupport {
 			}
 		}
 
+	}
+
+	/**
+	 * Poller which gets called by a close timeout and closes a writer.
+	 */
+	private class CloseTimeoutPoller extends PollingTaskSupport<Void> {
+
+		public CloseTimeoutPoller(TaskScheduler taskScheduler, TaskExecutor taskExecutor, Trigger trigger) {
+			super(taskScheduler, taskExecutor, trigger);
+		}
+
+		@Override
+		protected Void doPoll() {
+			try {
+				if (log.isDebugEnabled()) {
+					log.debug("Close timeout detected, calling handleIdleTimeout()");
+				}
+				handleIdleTimeout();
+			} catch (Exception e) {
+				// TODO: handle error
+				log.error("error closing", e);
+			}
+			return null;
+		}
 	}
 
 }

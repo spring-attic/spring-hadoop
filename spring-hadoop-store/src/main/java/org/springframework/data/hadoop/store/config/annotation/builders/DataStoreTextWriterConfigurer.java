@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -393,6 +393,30 @@ public interface DataStoreTextWriterConfigurer {
 	 * @return {@link DataStoreTextWriterConfigurer} for chaining
 	 */
 	DataStoreTextWriterConfigurer idleTimeout(long timeout);
+
+	/**
+	 * Specify a writer's close timeout.
+	 *
+	 * <br>
+	 * <br>JavaConfig:
+	 * <br>
+	 * <pre>
+	 *
+	 * public void configure(DataStoreTextWriterConfigurer writer) throws Exception {
+	 *   writer
+	 *     .closeTimeout(60000);
+	 * }
+	 * </pre>
+	 *
+	 * <br>XML:
+	 * <br>
+	 * No equivalent
+	 *
+	 * @param timeout the close timeout
+	 *
+	 * @return {@link DataStoreTextWriterConfigurer} for chaining
+	 */
+	DataStoreTextWriterConfigurer closeTimeout(long timeout);
 
 	/**
 	 * Specify a writer's max file open attempts.

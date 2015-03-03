@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 the original author or authors.
+ * Copyright 2014-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,19 +69,19 @@ public class DatasetStoreTests {
 
 		writer.write(new DatasetPojo(11, "testname11"));
 		writer.close();
-		
-		ArrayList<DatasetPojo> results = new ArrayList<DatasetPojo>();		
+
+		ArrayList<DatasetPojo> results = new ArrayList<DatasetPojo>();
 		for (DatasetPojo pojo = reader.read(); pojo != null; pojo = reader.read()) {
 			results.add(pojo);
-		}		
+		}
 		Collections.sort(results);
 
 		assertThat(results.get(0).getAge(), is(10));
 		assertThat(results.get(0).getName(), is("testname10"));
-		
+
 		assertThat(results.get(1).getAge(), is(11));
 		assertThat(results.get(1).getName(), is("testname11"));
-				
+
 		assertThat(reader.read(), nullValue());
 
 		ctx.close();
@@ -104,19 +104,19 @@ public class DatasetStoreTests {
 
 		writer.write(new DatasetPojo(11, "testname11"));
 		writer.close();
-		
-		ArrayList<DatasetPojo> results = new ArrayList<DatasetPojo>();		
+
+		ArrayList<DatasetPojo> results = new ArrayList<DatasetPojo>();
 		for (DatasetPojo pojo = reader.read(); pojo != null; pojo = reader.read()) {
 			results.add(pojo);
-		}		
+		}
 		Collections.sort(results);
 
 		assertThat(results.get(0).getAge(), is(10));
 		assertThat(results.get(0).getName(), is("testname10"));
-		
+
 		assertThat(results.get(1).getAge(), is(11));
 		assertThat(results.get(1).getName(), is("testname11"));
-				
+
 		assertThat(reader.read(), nullValue());
 
 		ctx.close();
@@ -136,21 +136,21 @@ public class DatasetStoreTests {
 
 		writer.write(new DatasetPojo(10, "testname10"));
 		writer.write(new DatasetPojo(11, "testname11"));
-		
+
 		Thread.sleep(2000);
-		
-		ArrayList<DatasetPojo> results = new ArrayList<DatasetPojo>();		
+
+		ArrayList<DatasetPojo> results = new ArrayList<DatasetPojo>();
 		for (DatasetPojo pojo = reader.read(); pojo != null; pojo = reader.read()) {
 			results.add(pojo);
-		}		
+		}
 		Collections.sort(results);
 
 		assertThat(results.get(0).getAge(), is(10));
 		assertThat(results.get(0).getName(), is("testname10"));
-		
+
 		assertThat(results.get(1).getAge(), is(11));
 		assertThat(results.get(1).getName(), is("testname11"));
-				
+
 		assertThat(reader.read(), nullValue());
 
 		ctx.close();
@@ -176,35 +176,69 @@ public class DatasetStoreTests {
 		writer.write(new DatasetPojo(12, "testname12"));
 		// close ctx used for writing without closing a writer
 		ctx.close();
-		
+
 		// open new ctx for reader
 		ctx = new AnnotationConfigApplicationContext();
 		ctx.setParent(context);
 		ctx.register(Config4.class);
 		ctx.refresh();
-		
+
 		DataStoreReader<DatasetPojo> reader = ctx.getBean(DataStoreReader.class);
-		ArrayList<DatasetPojo> results = new ArrayList<DatasetPojo>();		
+		ArrayList<DatasetPojo> results = new ArrayList<DatasetPojo>();
 		for (DatasetPojo pojo = reader.read(); pojo != null; pojo = reader.read()) {
 			results.add(pojo);
-		}		
+		}
 		Collections.sort(results);
 
 		assertThat(results.get(0).getAge(), is(10));
 		assertThat(results.get(0).getName(), is("testname10"));
-		
+
 		assertThat(results.get(1).getAge(), is(11));
 		assertThat(results.get(1).getName(), is("testname11"));
 
 		assertThat(results.get(2).getAge(), is(12));
 		assertThat(results.get(2).getName(), is("testname12"));
-		
+
 		assertThat(reader.read(), nullValue());
 
 		ctx.close();
 		TestUtils.printLsR(Config4.PATH, configuration);
 	}
-	
+
+	@SuppressWarnings({ "unchecked" })
+	@Test
+	public void testCloseTimeout() throws IOException, InterruptedException {
+		AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext();
+		ctx.setParent(context);
+		ctx.register(Config5.class);
+		ctx.refresh();
+
+		DataStoreWriter<DatasetPojo> writer = ctx.getBean(DataStoreWriter.class);
+		DataStoreReader<DatasetPojo> reader = ctx.getBean(DataStoreReader.class);
+
+		writer.write(new DatasetPojo(10, "testname10"));
+		writer.write(new DatasetPojo(11, "testname11"));
+
+		Thread.sleep(2000);
+
+		ArrayList<DatasetPojo> results = new ArrayList<DatasetPojo>();
+		for (DatasetPojo pojo = reader.read(); pojo != null; pojo = reader.read()) {
+			results.add(pojo);
+		}
+		Collections.sort(results);
+
+		assertThat(results.get(0).getAge(), is(10));
+		assertThat(results.get(0).getName(), is("testname10"));
+
+		assertThat(results.get(1).getAge(), is(11));
+		assertThat(results.get(1).getName(), is("testname11"));
+
+		assertThat(reader.read(), nullValue());
+
+		ctx.close();
+		TestUtils.printLsR(Config5.PATH, configuration);
+	}
+
 	@Configuration
 	static class Config1 {
 
@@ -324,7 +358,7 @@ public class DatasetStoreTests {
 					DatasetPojo.class, datasetRepositoryFactory(), datasetDefinition());
 			return reader;
 		}
-		
+
 		@Bean
 		public TaskScheduler taskScheduler() {
 			return new ConcurrentTaskScheduler();
@@ -376,7 +410,58 @@ public class DatasetStoreTests {
 		}
 
 	}
-	
+
+	@Configuration
+	static class Config5 {
+
+		final static String PATH = "/tmp/DatasetStoreTests/Config5";
+		final static String NAMESPACE = "test";
+
+		@Autowired
+		org.apache.hadoop.conf.Configuration configuration;
+
+		@Bean
+		public DatasetRepositoryFactory datasetRepositoryFactory() {
+			DatasetRepositoryFactory factory = new DatasetRepositoryFactory();
+			factory.setConf(configuration);
+			factory.setBasePath(PATH);
+			factory.setNamespace(NAMESPACE);
+			return factory;
+		}
+
+		@Bean
+		public DatasetDefinition datasetDefinition() {
+			DatasetDefinition definition = new DatasetDefinition();
+			return definition;
+		}
+
+		@Bean
+		public DataStoreWriter<DatasetPojo> dataStoreWriter() {
+			AvroPojoDatasetStoreWriter<DatasetPojo> writer = new AvroPojoDatasetStoreWriter<DatasetPojo>(
+					DatasetPojo.class, datasetRepositoryFactory(), datasetDefinition());
+			writer.setCloseTimeout(500);
+			return writer;
+		}
+
+		@Bean
+		public DataStoreReader<DatasetPojo> dataStoreReader() {
+			AvroPojoDatasetStoreReader<DatasetPojo> reader = new AvroPojoDatasetStoreReader<DatasetPojo>(
+					DatasetPojo.class, datasetRepositoryFactory(), datasetDefinition());
+			return reader;
+		}
+
+		@Bean
+		public TaskScheduler taskScheduler() {
+			return new ConcurrentTaskScheduler();
+		}
+
+		@Bean
+		public TaskExecutor taskExecutor() {
+			return new ConcurrentTaskExecutor();
+		}
+
+	}
+
 	@Configuration
 	static class EmptyConfig {
 	}
@@ -405,7 +490,7 @@ public class DatasetStoreTests {
 		@Override
 		public int compareTo(DatasetPojo o) {
 			return age.compareTo(o.getAge());
-		}		
+		}
 	}
 
 }

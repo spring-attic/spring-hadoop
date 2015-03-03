@@ -119,6 +119,9 @@ public class SpringDataStoreTextWriterConfiguration extends
 				if (configs.getIdleTimeout() != null) {
 					writer.setIdleTimeout(configs.getIdleTimeout());
 				}
+				if (configs.getCloseTimeout() != null) {
+					writer.setCloseTimeout(configs.getCloseTimeout());
+				}
 				if (configs.getFileOpenAttempts() != null) {
 					writer.setMaxOpenAttempts(configs.getFileOpenAttempts());
 				}
@@ -151,6 +154,9 @@ public class SpringDataStoreTextWriterConfiguration extends
 				}
 				if (configs.getIdleTimeout() != null) {
 					writer.setIdleTimeout(configs.getIdleTimeout());
+				}
+				if (configs.getCloseTimeout() != null) {
+					writer.setCloseTimeout(configs.getCloseTimeout());
 				}
 				if (configs.getFileOpenAttempts() != null) {
 					writer.setMaxOpenAttempts(configs.getFileOpenAttempts());

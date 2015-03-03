@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,6 +65,8 @@ public final class DataStoreTextWriterBuilder
 
 	private Long idleTimeout;
 
+	private Long closeTimeout;
+
 	private Integer fileOpenAttempts;
 
 	private String inWritingPrefix;
@@ -98,6 +100,7 @@ public final class DataStoreTextWriterBuilder
 		configs.setOverwrite(overwrite);
 		configs.setAppendable(appendable);
 		configs.setIdleTimeout(idleTimeout);
+		configs.setCloseTimeout(closeTimeout);
 		configs.setFileOpenAttempts(fileOpenAttempts);
 		configs.setInWritingPrefix(inWritingPrefix);
 		configs.setInWritingSuffix(inWritingSuffix);
@@ -164,6 +167,12 @@ public final class DataStoreTextWriterBuilder
 	@Override
 	public DataStoreTextWriterConfigurer idleTimeout(long timeout) {
 		this.idleTimeout = timeout;
+		return this;
+	}
+
+	@Override
+	public DataStoreTextWriterConfigurer closeTimeout(long timeout) {
+		this.closeTimeout = timeout;
 		return this;
 	}
 

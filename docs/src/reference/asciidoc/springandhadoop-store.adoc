@@ -36,8 +36,8 @@ public interface DataWriter<T> {
 
 The DataStoreWriter interface adds methods to close and flush a writer.
 Some of the writers have a property to close a stream after an idle time
-has been reached but generally this interface is meant for programmatic
-control of these operations.
+or a close time has been reached but generally this interface is meant
+for programmatic control of these operations.
 
 [source,java]
 ----
@@ -930,8 +930,8 @@ as its argument.
 * Bean of type {shdp-DataStoreWriter}[DataStoreWriter] is created automatically.
 
 We can also do configuration for other usual properties like,
-`idleTimeout`, `partitioning strategy`, `naming strategy` and
-`rollover strategy`.
+`idleTimeout`, `closeTimeout`, `partitioning strategy`,
+`naming strategy` and `rollover strategy`.
 
 [source,java]
 ----
@@ -946,6 +946,7 @@ static class Config
     config
       .basePath("/tmp/store")
       .idleTimeout(60000)
+      .closeTimeout(120000)
       .inWritingSuffix(".tmp")
       .withPartitionStrategy()
         .map("dateFormat('yyyy/MM/dd/HH/mm', timestamp)")
@@ -966,6 +967,8 @@ What happened in above example:
 
 * We set idle timeout meaning file will be closed automatically if
   no writes are done in 60 seconds.
+* We set close timeout meaning file will be closed automatically when
+  120 seconds has been elapsed.
 * We set the in-writing suffix to `.tmp` which will indicate that file
   is currently open for writing. Writer will automatically remove this
   suffix when file is closed.
