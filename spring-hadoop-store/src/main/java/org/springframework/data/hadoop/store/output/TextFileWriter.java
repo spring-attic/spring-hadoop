@@ -96,16 +96,27 @@ public class TextFileWriter extends AbstractDataStreamWriter implements DataStor
 	@Override
 	public synchronized void close() throws IOException {
 		if (streamsHolder != null) {
-			streamsHolder.close();
 
-			renameFile(streamsHolder.getPath());
-
-			StoreEventPublisher storeEventPublisher = getStoreEventPublisher();
-			if (storeEventPublisher != null) {
-				storeEventPublisher.publishEvent(new FileWrittenEvent(this, streamsHolder.getPath()));
+			// we store the possible error and rethrow it
+			// later so that we can null holder for further
+			// operations not to fail
+			IOException rethrow = null;
+			try {
+				streamsHolder.close();
+				renameFile(streamsHolder.getPath());
+				StoreEventPublisher storeEventPublisher = getStoreEventPublisher();
+				if (storeEventPublisher != null) {
+					storeEventPublisher.publishEvent(new FileWrittenEvent(this, streamsHolder.getPath()));
+				}
+			} catch (IOException e) {
+				rethrow = e;
+				log.error("error in close", e);
+			} finally {
+				streamsHolder = null;
 			}
-
-			streamsHolder = null;
+			if (rethrow != null) {
+				throw rethrow;
+			}
 		}
 	}
 
