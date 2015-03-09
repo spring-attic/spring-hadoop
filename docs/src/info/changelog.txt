@@ -5,6 +5,18 @@ http://projects.spring.io/spring-hadoop/
 Commit changelog: http://github.com/spring-projects/spring-hadoop/tree/v[version]
 Issues changelog: https://jira.spring.io/secure/ReleaseNote.jspa?projectId=10801
 
+Changes in version 2.1.1 RELEASE (2015-03-09)
+---------------------------------------------
+
+General
+* Update Spring Batch and Integration versions [SHDP-485]
+* Annotation config doesn't always use beans [SHDP-476]
+* Backport ObjectPostProcessorConfiguration fixes from SHDP-451 [SHDP-483]
+
+Store
+* TextFileWriter unable to continue after close errors [SHDP-482]
+
+
 Changes in version 2.1.0 RELEASE (2015-02-02)
 ---------------------------------------------
 
