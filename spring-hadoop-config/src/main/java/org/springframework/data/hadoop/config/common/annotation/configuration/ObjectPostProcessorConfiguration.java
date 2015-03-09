@@ -34,7 +34,7 @@ import org.springframework.data.hadoop.config.common.annotation.ObjectPostProces
 public class ObjectPostProcessorConfiguration {
 
 	@Bean
-	public ObjectPostProcessor<Object> objectPostProcessor(AutowireCapableBeanFactory beanFactory) {
+	public ObjectPostProcessor<Object> yarnObjectPostProcessor(AutowireCapableBeanFactory beanFactory) {
 		return new AutowireBeanFactoryObjectPostProcessor(beanFactory);
 	}
 
