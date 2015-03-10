@@ -16,3 +16,4 @@ metastore_db
 .DS_Store
 /out/
 target
+*.log

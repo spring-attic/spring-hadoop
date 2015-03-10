@@ -130,10 +130,13 @@ public class HiveBatchTest {
 		String uri = data.getURI().getPath();
 		System.out.println("Loading data from " + uri);
 
-		String script = "DROP TABLE IF EXISTS ${hiveconf:xxx};set zzz;set hiveconf:yyy;"
-				+ "create table ${hiveconf:xxx} (key int, value string);"
-				+ "LOAD DATA LOCAL INPATH '${hiveconf:data}' INTO TABLE ${hiveconf:xxx};"
-				+ "select count(1) from ${hiveconf:xxx};";
+		String prepScript = "DROP TABLE IF EXISTS ${hiveconf:xxx};" +
+				"create table ${hiveconf:xxx} (key int, value string);";
+		String script = "DROP TABLE IF EXISTS ${hiveconf:xxx};set zzz;set hiveconf:yyy;" +
+				"create table ${hiveconf:xxx} (key int, value string);" +
+				"LOAD DATA LOCAL INPATH '${hiveconf:data}' INTO TABLE ${hiveconf:xxx};" +
+				"select count(1) from ${hiveconf:xxx};";
+		Resource prep = new ByteArrayResource(prepScript.getBytes());
 		Resource res = new ByteArrayResource(script.getBytes());
 		Properties params = new Properties();
 		params.put("xxx", "nonExisting");
@@ -141,6 +144,7 @@ public class HiveBatchTest {
 		params.put("zzz", "onions");
 		params.put("yyy", "unleashed");
 
+		template.executeScript(new HiveScript(prep, params));
 		List<String> run = template.executeScript(new HiveScript(res, params));
 		System.out.println(run);
 		assertEquals("zzz=onions", run.get(0));
