@@ -107,10 +107,12 @@ public class TextFileWriter extends AbstractDataStreamWriter implements DataStor
 			IOException rethrow = null;
 			try {
 				streamsHolder.close();
-				renameFile(streamsHolder.getPath());
+
+				Path path = renameFile(streamsHolder.getPath());
+
 				StoreEventPublisher storeEventPublisher = getStoreEventPublisher();
 				if (storeEventPublisher != null) {
-					storeEventPublisher.publishEvent(new FileWrittenEvent(this, streamsHolder.getPath()));
+					storeEventPublisher.publishEvent(new FileWrittenEvent(this, path));
 				}
 			} catch (IOException e) {
 				rethrow = e;

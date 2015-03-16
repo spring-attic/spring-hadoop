@@ -70,11 +70,11 @@ public class TextSequenceFileWriter extends AbstractSequenceFileWriter implement
 		if (holder != null) {
 			holder.close();
 
-			renameFile(holder.getPath());
+			Path path = renameFile(holder.getPath());
 
 			StoreEventPublisher storeEventPublisher = getStoreEventPublisher();
 			if (storeEventPublisher != null) {
-				storeEventPublisher.publishEvent(new FileWrittenEvent(this, holder.getPath()));
+				storeEventPublisher.publishEvent(new FileWrittenEvent(this, path));
 			}
 
 			holder = null;

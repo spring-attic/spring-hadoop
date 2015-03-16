@@ -19,6 +19,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
+import java.lang.Override;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -111,6 +112,24 @@ public class OutputStoreObjectSupportTests {
 		assertThat(strategy2.resolve(null).toString(), is("base-fakeuuid-1-2.extension"));
 	}
 
+	@Test
+	public void testRenameWithSuffix() {
+		MockPath mockPath = new MockPath(1, 1, "/foo");
+		TestOutputStoreObjectSupport support = new TestOutputStoreObjectSupport(new Configuration(), mockPath, null);
+		support.setInWritingSuffix(".tmp");
+		Path path = new MockPath("/foo/data.txt.tmp");
+		assertThat(support.renameFile(path).toString(), is("/foo/data.txt"));
+	}
+
+	@Test
+	public void testRenameWithPrefix() {
+		MockPath mockPath = new MockPath("/foo");
+		TestOutputStoreObjectSupport support = new TestOutputStoreObjectSupport(new Configuration(), mockPath, null);
+		support.setInWritingPrefix("tmp.");
+		Path path = new MockPath("/foo/tmp.data.txt");
+		assertThat(support.renameFile(path).toString(), is("/foo/data.txt"));
+	}
+
 	private static class TestOutputStoreObjectSupport extends OutputStoreObjectSupport {
 
 		public TestOutputStoreObjectSupport(Configuration configuration, Path basePath, CodecInfo codec) {
@@ -142,6 +161,11 @@ public class OutputStoreObjectSupportTests {
 		}
 
 		@Override
+		public boolean rename(Path src, Path dst) throws IOException {
+			return true;
+		}
+
+		@Override
 		public boolean exists(Path f) throws IOException {
 			return true;
 		}
@@ -152,6 +176,10 @@ public class OutputStoreObjectSupportTests {
 
 		int count = 1;
 		int unique = 1;
+
+		public MockPath(String pathString) throws IllegalArgumentException {
+			super(pathString);
+		}
 
 		public MockPath(int unique, int count, String pathString) throws IllegalArgumentException {
 			super(pathString);
