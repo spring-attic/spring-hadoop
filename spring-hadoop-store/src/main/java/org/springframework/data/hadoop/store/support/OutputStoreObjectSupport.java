@@ -262,11 +262,11 @@ public abstract class OutputStoreObjectSupport extends StoreObjectSupport {
 	 *
 	 * @param path the path to rename
 	 */
-	protected void renameFile(Path path) {
+	protected Path renameFile(Path path) {
 		log.debug("renameFile called with path=[" + path + "]");
 		// bail out if there's no in-writing settings
 		if (!StringUtils.hasText(prefix) && !StringUtils.hasText(suffix)) {
-			return;
+			return path;
 		}
 		String name = path.getName();
 		if (StringUtils.startsWithIgnoreCase(name, prefix)) {
@@ -295,6 +295,7 @@ public abstract class OutputStoreObjectSupport extends StoreObjectSupport {
 			log.error("Error renaming file", e);
 			throw new StoreException("Error renaming file", e);
 		}
+		return toPath;
 	}
 
 	private boolean pathExists(Path path) {

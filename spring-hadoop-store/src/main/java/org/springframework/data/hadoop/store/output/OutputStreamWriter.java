@@ -72,11 +72,11 @@ public class OutputStreamWriter extends AbstractDataStreamWriter implements Data
 		if (streamsHolder != null) {
 			streamsHolder.close();
 
-			renameFile(streamsHolder.getPath());
+			Path path = renameFile(streamsHolder.getPath());
 
 			StoreEventPublisher storeEventPublisher = getStoreEventPublisher();
 			if (storeEventPublisher != null) {
-				storeEventPublisher.publishEvent(new FileWrittenEvent(this, streamsHolder.getPath()));
+				storeEventPublisher.publishEvent(new FileWrittenEvent(this, path));
 			}
 
 			streamsHolder = null;
