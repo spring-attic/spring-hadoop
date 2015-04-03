@@ -339,7 +339,7 @@ switch (hadoopDistro) {
 				println "Using Apache Hadoop 2.6 - [$hadoopVersion]"
 			} else {
 				println "Failing build: $hadoopDistro is not a supported distro"
-				println "Supported distros: hadoop24, hadoop25, hadoop26[*], hdp20, hdp21, cdh5, phd20 and phd21"
+				println "Supported distros: hadoop24, hadoop25, hadoop26[*], hdp20, hdp21, hdp22, cdh5, phd20, phd21 and phd30"
 				println "* default"
 				throw new InvalidUserDataException("$hadoopDistro is not a supported distro")
 			}
