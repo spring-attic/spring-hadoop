@@ -5,6 +5,16 @@ http://projects.spring.io/spring-hadoop/
 Commit changelog: http://github.com/spring-projects/spring-hadoop/tree/v[version]
 Issues changelog: https://jira.spring.io/secure/ReleaseNote.jspa?projectId=10801
 
+Changes in version 2.1.2 RELEASE (2015-04-03)
+---------------------------------------------
+
+General
+* Update Spring Framework and Boot versions [SHDP-492]
+* Update Hortonworks HDP 2.2 to 2.6.0.2.2.4.0-2633 [SHDP-491]
+* Update Cloudera support to cdh5.3.2 [SHDP-489]
+* Add support for Pivotal HD 3.0 [SHDP-488]
+
+
 Changes in version 2.1.1 RELEASE (2015-03-09)
 ---------------------------------------------
 
