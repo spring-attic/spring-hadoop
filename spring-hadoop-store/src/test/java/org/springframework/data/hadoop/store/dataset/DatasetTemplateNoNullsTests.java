@@ -63,7 +63,7 @@ public class DatasetTemplateNoNullsTests extends AbstractDatasetTemplateTests {
 		});
 	}
 
-	@Test(expected = org.apache.avro.file.DataFileWriter.AppendWriteException.class)
+	@Test(expected = org.kitesdk.data.DatasetRecordException.class)
 	public void testWritePojoWithNullValuesShouldFail() {
 		datasetOperations.write(records);
 		TestPojo pojo4 = new TestPojo();

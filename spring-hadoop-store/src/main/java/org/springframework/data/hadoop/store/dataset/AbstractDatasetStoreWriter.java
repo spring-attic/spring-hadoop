@@ -20,6 +20,7 @@ import java.io.IOException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.kitesdk.data.DatasetWriter;
+import org.kitesdk.data.Flushable;
 import org.springframework.data.hadoop.store.DataStoreWriter;
 import org.springframework.util.Assert;
 
@@ -45,7 +46,7 @@ public abstract class AbstractDatasetStoreWriter<T, R> extends DatasetStoreObjec
 	private DatasetDefinition datasetDefinition;
 
 	private DatasetWriter<R> writer;
-	
+
 	/** Sync lock for writer creation */
 	private final Object lock = new Object();
 
@@ -71,7 +72,7 @@ public abstract class AbstractDatasetStoreWriter<T, R> extends DatasetStoreObjec
 		if (writer == null) {
 			synchronized (lock) {
 				if (writer == null) {
-					writer = createWriter();					
+					writer = createWriter();
 				}
 			}
 		}
@@ -84,8 +85,8 @@ public abstract class AbstractDatasetStoreWriter<T, R> extends DatasetStoreObjec
 		if (log.isDebugEnabled()) {
 			log.debug("Flushing writer " + writer);
 		}
-		if (writer != null) {
-			writer.flush();
+		if (writer != null && writer instanceof Flushable) {
+			((Flushable) writer).flush();
 		}
 	}
 
@@ -99,7 +100,7 @@ public abstract class AbstractDatasetStoreWriter<T, R> extends DatasetStoreObjec
 			writer = null;
 		}
 	}
-	
+
 	@Override
 	protected void handleIdleTimeout() {
 		log.info("Idle timeout detected, closing writer");
@@ -108,12 +109,12 @@ public abstract class AbstractDatasetStoreWriter<T, R> extends DatasetStoreObjec
 		} catch (IOException e) {
 		}
 	}
-	
+
 	/**
 	 * Convert entity to be written into a entity used
 	 * by a writer.
-	 * 
-	 * @param entity the entity 
+	 *
+	 * @param entity the entity
 	 * @return the converted entity
 	 */
 	protected abstract R convertEntity(T entity);
