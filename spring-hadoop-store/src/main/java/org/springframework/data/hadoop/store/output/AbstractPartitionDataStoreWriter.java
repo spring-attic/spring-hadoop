@@ -96,6 +96,9 @@ public abstract class AbstractPartitionDataStoreWriter<T, K> extends LifecycleOb
 	/** In-house flag indicating if this partition writer is closed */
 	private volatile boolean closed = false;
 
+	/** Flag enabling Syncable hflush*/
+	private boolean syncable = false;
+
 	/**
 	 * Instantiates a new abstract data store partition writer.
 	 *
@@ -346,6 +349,26 @@ public abstract class AbstractPartitionDataStoreWriter<T, K> extends LifecycleOb
 	 */
 	public void setAppendable(boolean append) {
 		this.append = append;
+	}
+
+	/**
+	 * Checks if syncable is enabled.
+	 *
+	 * @return true, if syncable is enabled
+	 */
+	public boolean isSyncable() {
+		return syncable;
+	}
+
+	/**
+	 * Sets the syncable. Enabling will result automatic
+	 * call to hdfs Syncable hflush() if available. This
+	 * is disable by default.
+	 *
+	 * @param syncable the syncable flag
+	 */
+	public void setSyncable(boolean syncable) {
+		this.syncable = syncable;
 	}
 
 	/**

@@ -400,6 +400,28 @@ Hadoop's SequenceFile.
 wraps multiple TextFileWriters providing automatic partitioning
 functionality.
 
+===== Append and Sync Data
+
+HDFS client library which is usually referred as a _DFS Client_ is
+using a rather complex set of buffers to make writes fast. Using a
+compression codec adds yet another internal buffer. One big problem
+with these buffers is that if a jvm suddenly dies bufferred data is
+naturally lost.
+
+With _TextFileWriter_ and _TextSequenceFileWriter_ it is possible to
+enable either append or syncable mode which effectively is causing our
+store libraries to call sync method which will flush buffers from a
+client side into a currently active datanodes.
+
+[NOTE]
+====
+Appending or synching data will be considerably slower than a normal
+write. It is always a trade-off between fast write and data integrity.
+Using append or sync with a compression is also problematic because
+it's up to a codec implementation when it can actually flush its own
+data to a datanode.
+====
+
 ==== Reading Data
 
 Main interface reading from a store is a DataReader.

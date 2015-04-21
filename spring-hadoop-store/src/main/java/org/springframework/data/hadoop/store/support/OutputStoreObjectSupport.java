@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,6 +59,9 @@ public abstract class OutputStoreObjectSupport extends StoreObjectSupport {
 
 	/** Flag guarding if file is appended or not */
 	private boolean append = false;
+
+	/** Flag enabling Syncable hflush*/
+	private boolean syncable = false;
 
 	/**
 	 * Instantiates a new abstract output store support.
@@ -212,6 +215,26 @@ public abstract class OutputStoreObjectSupport extends StoreObjectSupport {
 	 */
 	public void setAppendable(boolean append) {
 		this.append = append;
+	}
+
+	/**
+	 * Checks if syncable is enabled.
+	 *
+	 * @return true, if syncable is enabled
+	 */
+	public boolean isSyncable() {
+		return syncable;
+	}
+
+	/**
+	 * Sets the syncable. Enabling will result automatic
+	 * call to hdfs Syncable hflush() if available. This
+	 * is disable by default.
+	 *
+	 * @param syncable the syncable flag
+	 */
+	public void setSyncable(boolean syncable) {
+		this.syncable = syncable;
 	}
 
 	/**
