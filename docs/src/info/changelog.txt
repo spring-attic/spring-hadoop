@@ -5,6 +5,25 @@ http://projects.spring.io/spring-hadoop/
 Commit changelog: http://github.com/spring-projects/spring-hadoop/tree/v[version]
 Issues changelog: https://jira.spring.io/secure/ReleaseNote.jspa?projectId=10801
 
+Changes in version 2.2.0 M1 (2015-04-30)
+----------------------------------------
+General
+* Update Spring Dependencies [SHDP-479][SHDP-485][SHDP-492]
+* Update Cloudera support to cdh5.3.3 [SHDP-489] [SHDP-495]
+* Add support for Pivotal HD 3.0 [SHDP-488]
+* Update Hortonworks HDP 2.2 to 2.6.0.2.2.4.0-2633 [SHDP-491]
+* Remove support for JDK6 [SHDP-403]
+
+Core
+* Annotation config doesn't always use beans [SHDP-476]
+
+Store
+* Update Kite SDK to 1.0.0 version [SHDP-480]
+* TextFileWriter unable to continue after close errors [SHDP-482]
+* Add close timeout for writing to HDFS [SHDP-481]
+* Provide way to use Syncable methods [SHDP-490]
+
+
 Changes in version 2.1.0 RELEASE (2015-02-02)
 ---------------------------------------------
 
@@ -14,9 +33,6 @@ YARN
 
 Changes in version 2.1.0 RC1 (2015-01-14)
 -----------------------------------------
-
-Release Notes - Spring for Apache Hadoop - Version 2.1.0 RC1
-
 General
 * Update build to use Hortonworks repo versions for hdp20 and hdp21 [SHDP-446]
 * Update the build to use Cloudera 5.3.0 [SHDP-459]
