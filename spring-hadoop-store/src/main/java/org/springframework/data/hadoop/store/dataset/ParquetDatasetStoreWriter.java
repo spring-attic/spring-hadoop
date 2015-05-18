@@ -88,6 +88,9 @@ public class ParquetDatasetStoreWriter<T> extends AbstractDatasetStoreWriter<T, 
 	
 	@Override
 	protected GenericRecord convertEntity(T entity) {
+		if (entity instanceof GenericRecord) {
+			return (GenericRecord) entity;
+		}
 		GenericRecordBuilder builder = new GenericRecordBuilder(schema);
 		BeanWrapper beanWrapper = PropertyAccessorFactory.forBeanPropertyAccess(entity);
 		for (Schema.Field f : schema.getFields()) {
