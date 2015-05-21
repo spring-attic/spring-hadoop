@@ -5,6 +5,15 @@ http://projects.spring.io/spring-hadoop/
 Commit changelog: http://github.com/spring-projects/spring-hadoop/tree/v[version]
 Issues changelog: https://jira.spring.io/secure/ReleaseNote.jspa?projectId=10801
 
+Changes in version 2.2.0 RC1 (2015-05-21)
+----------------------------------------
+General
+* Update Spring Batch version to 3.0.4 [SHDP-501]
+
+Store
+* Fix path for TextFileWriter FileWrittenEvent when prefixes or suffixes are used [SHDP-497]
+
+
 Changes in version 2.2.0 M1 (2015-04-30)
 ----------------------------------------
 General
