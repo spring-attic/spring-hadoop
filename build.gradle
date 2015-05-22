@@ -195,6 +195,33 @@ switch (hadoopDistro) {
 		pigQualifier = ':h2'
 		break;
 
+	// Hadoop 2.7.x
+	case "hadoop27":
+		hadoopVersion = hd27Version
+		println "Using Apache Hadoop 2.7.x - [$hadoopVersion]"
+		hadoopArtifacts = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-yarn-common:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-streaming:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-distcp:$hadoopVersion"]
+		hadoopTestArtifacts = ["org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion:tests",
+					"org.apache.hadoop:hadoop-hdfs:$hadoopVersion:tests",
+					"org.apache.hadoop:hadoop-common:$hadoopVersion:tests",
+					"org.apache.hadoop:hadoop-mapreduce-client-app:$hadoopVersion",
+					"org.apache.hadoop:hadoop-mapreduce-client-hs:$hadoopVersion",
+					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion",
+					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion:tests"]
+		hbaseVersion = hd27HbaseVersion
+		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion",
+				  "org.apache.hbase:hbase-common:$hbaseVersion",
+				  "org.apache.hbase:hbase-client:$hbaseVersion"]
+		hiveVersion = hd27HiveVersion
+		pigVersion = hd27PigVersion
+		pigQualifier = ':h2'
+		break;
+
 	// Hadoop 2.6.x
 	default:
 		hadoopVersion = hd26Version
@@ -202,10 +229,10 @@ switch (hadoopDistro) {
 			println "Using default distro: Apache Hadoop [$hadoopVersion]"
 		} else {
 			if (hadoopDistro == hadoopDefault) {
-				println "Using Apache Hadoop 2.6 - [$hadoopVersion]"
+				println "Using Apache Hadoop 2.6.x - [$hadoopVersion]"
 			} else {
 				println "Failing build: $hadoopDistro is not a supported distro"
-				println "Supported distros: hadoop26[*], hdp22, cdh5, phd21 and phd30"
+				println "Supported distros: hadoop26[*], hadoop27, hdp22, cdh5, phd21 and phd30"
 				println "* default"
 				throw new InvalidUserDataException("$hadoopDistro is not a supported distro")
 			}
@@ -435,6 +462,15 @@ configure(hadoopProjects()) {
 
 		// Hortonworks Data Platform 2.2
 		case "hdp22":
+			dependencies {
+				testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
+				testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
+				testRuntime "dk.brics.automaton:automaton:1.11-8"
+			}
+			break;
+
+		// Hadoop 2.7.x
+		case "hadoop27":
 			dependencies {
 				testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
 				testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
