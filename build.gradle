@@ -113,33 +113,6 @@ switch (hadoopDistro) {
 					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion:tests"]
 		break;
 
-	// Pivotal HD 2.0
-	case "phd20":
-		hadoopVersion = phd20Version
-		println "Using Pivotal HD 2.0 - [$hadoopVersion]"
-		hadoopArtifacts = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-yarn-common:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-streaming:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-distcp:$hadoopVersion"]
-		hadoopTestArtifacts = ["org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion:tests",
-					"org.apache.hadoop:hadoop-hdfs:$hadoopVersion:tests",
-					"org.apache.hadoop:hadoop-common:$hadoopVersion:tests",
-					"org.apache.hadoop:hadoop-mapreduce-client-app:$hadoopVersion",
-					"org.apache.hadoop:hadoop-mapreduce-client-hs:$hadoopVersion",
-					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion",
-					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion:tests"]
-		hbaseVersion = phd20HbaseVersion
-		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion",
-				  "org.apache.hbase:hbase-common:$hbaseVersion",
-				  "org.apache.hbase:hbase-client:$hbaseVersion"]
-		hiveVersion = phd20HiveVersion
-		pigVersion = phd20PigVersion
-		pigQualifier = ':h2'
-		break;
-
 	// Pivotal HD 2.1
 	case "phd21":
 		hadoopVersion = phd21Version
@@ -194,60 +167,6 @@ switch (hadoopDistro) {
 		pigQualifier = ':h2'
 		break;
 
-	// Hortonworks Data Platform 2.0
-	case "hdp20":
-		hadoopVersion = hdp20Version
-		println "Using Hortonworks Data Platform 2.0 [$hadoopVersion]"
-		hadoopArtifacts = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-yarn-common:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-streaming:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-distcp:$hadoopVersion"]
-		hadoopTestArtifacts = ["org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion:tests",
-					"org.apache.hadoop:hadoop-hdfs:$hadoopVersion:tests",
-					"org.apache.hadoop:hadoop-common:$hadoopVersion:tests",
-					"org.apache.hadoop:hadoop-mapreduce-client-app:$hadoopVersion",
-					"org.apache.hadoop:hadoop-mapreduce-client-hs:$hadoopVersion",
-					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion",
-					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion:tests"]
-		hbaseVersion = hdp20HbaseVersion
-		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion",
-				  "org.apache.hbase:hbase-common:$hbaseVersion",
-				  "org.apache.hbase:hbase-client:$hbaseVersion"]
-		hiveVersion = hdp20HiveVersion
-		pigVersion = hdp20PigVersion
-		pigQualifier = ':h2'
-		break;
-
-	// Hortonworks Data Platform 2.1
-	case "hdp21":
-		hadoopVersion = hdp21Version
-		println "Using Hortonworks Data Platform 2.1 [$hadoopVersion]"
-		hadoopArtifacts = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-yarn-common:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-streaming:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-distcp:$hadoopVersion"]
-		hadoopTestArtifacts = ["org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion:tests",
-					"org.apache.hadoop:hadoop-hdfs:$hadoopVersion:tests",
-					"org.apache.hadoop:hadoop-common:$hadoopVersion:tests",
-					"org.apache.hadoop:hadoop-mapreduce-client-app:$hadoopVersion",
-					"org.apache.hadoop:hadoop-mapreduce-client-hs:$hadoopVersion",
-					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion",
-					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion:tests"]
-		hbaseVersion = hdp21HbaseVersion
-		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion",
-				  "org.apache.hbase:hbase-common:$hbaseVersion",
-				  "org.apache.hbase:hbase-client:$hbaseVersion"]
-		hiveVersion = hdp21HiveVersion
-		pigVersion = hdp21PigVersion
-		pigQualifier = ':h2'
-		break;
-
 	// Hortonworks Data Platform 2.2
 	case "hdp22":
 		hadoopVersion = hdp22Version
@@ -275,60 +194,6 @@ switch (hadoopDistro) {
 		pigQualifier = ':h2'
 		break;
 
-	// Hadoop 2.4.x
-	case "hadoop24":
-		hadoopVersion = hd24Version
-		println "Using Apache Hadoop 2.4 - [$hadoopVersion]"
-		hadoopArtifacts = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-yarn-common:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-streaming:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-distcp:$hadoopVersion"]
-		hadoopTestArtifacts = ["org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion:tests",
-					"org.apache.hadoop:hadoop-hdfs:$hadoopVersion:tests",
-					"org.apache.hadoop:hadoop-common:$hadoopVersion:tests",
-					"org.apache.hadoop:hadoop-mapreduce-client-app:$hadoopVersion",
-					"org.apache.hadoop:hadoop-mapreduce-client-hs:$hadoopVersion",
-					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion",
-					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion:tests"]
-		hbaseVersion = hd24HbaseVersion
-		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion",
-				  "org.apache.hbase:hbase-common:$hbaseVersion",
-				  "org.apache.hbase:hbase-client:$hbaseVersion"]
-		hiveVersion = hd24HiveVersion
-		pigVersion = hd24PigVersion
-		pigQualifier = ':h2'
-		break;
-
-	// Hadoop 2.5.x
-	case "hadoop25":
-		hadoopVersion = hd25Version
-		println "Using Apache Hadoop 2.5 - [$hadoopVersion]"
-		hadoopArtifacts = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-yarn-common:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-streaming:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-distcp:$hadoopVersion"]
-		hadoopTestArtifacts = ["org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion:tests",
-					"org.apache.hadoop:hadoop-hdfs:$hadoopVersion:tests",
-					"org.apache.hadoop:hadoop-common:$hadoopVersion:tests",
-					"org.apache.hadoop:hadoop-mapreduce-client-app:$hadoopVersion",
-					"org.apache.hadoop:hadoop-mapreduce-client-hs:$hadoopVersion",
-					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion",
-					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion:tests"]
-		hbaseVersion = hd25HbaseVersion
-		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion",
-				  "org.apache.hbase:hbase-common:$hbaseVersion",
-				  "org.apache.hbase:hbase-client:$hbaseVersion"]
-		hiveVersion = hd25HiveVersion
-		pigVersion = hd25PigVersion
-		pigQualifier = ':h2'
-		break;
-
 	// Hadoop 2.6.x
 	default:
 		hadoopVersion = hd26Version
@@ -339,7 +204,7 @@ switch (hadoopDistro) {
 				println "Using Apache Hadoop 2.6 - [$hadoopVersion]"
 			} else {
 				println "Failing build: $hadoopDistro is not a supported distro"
-				println "Supported distros: hadoop24, hadoop25, hadoop26[*], hdp20, hdp21, hdp22, cdh5, phd20, phd21 and phd30"
+				println "Supported distros: hadoop26[*], hdp22, cdh5, phd21 and phd30"
 				println "* default"
 				throw new InvalidUserDataException("$hadoopDistro is not a supported distro")
 			}
@@ -532,7 +397,7 @@ configure(javaProjects()) {
 
 configure(hadoopProjects()) {
 
-	// default is Hadoop 2.5.x
+	// default is Hadoop 2.6.x
 	switch (hadoopDistro) {
 
 		// Cloudera CDH5 YARN
@@ -548,15 +413,6 @@ configure(hadoopProjects()) {
 				testRuntime "dk.brics.automaton:automaton:1.11-8"
 			}
 			break;	
-
-		// Pivotal HD 2.0
-		case "phd20":
-			dependencies {
-				testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
-				testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
-				testRuntime "dk.brics.automaton:automaton:1.11-8"
-			}
-			break;
 
 		// Pivotal HD 2.1
 		case "phd21":
@@ -576,44 +432,8 @@ configure(hadoopProjects()) {
 			}
 			break;
 
-		// Hortonworks Data Platform 2.0
-		case "hdp20":
-			dependencies {
-				testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
-				testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
-				testRuntime "dk.brics.automaton:automaton:1.11-8"
-			}
-			break;
-
-		// Hortonworks Data Platform 2.1
-		case "hdp21":
-			dependencies {
-				testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
-				testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
-				testRuntime "dk.brics.automaton:automaton:1.11-8"
-			}
-			break;
-
 		// Hortonworks Data Platform 2.2
 		case "hdp22":
-			dependencies {
-				testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
-				testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
-				testRuntime "dk.brics.automaton:automaton:1.11-8"
-			}
-			break;
-
-		// Hadoop 2.4.x
-		case "hadoop24":
-			dependencies {
-				testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
-				testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
-				testRuntime "dk.brics.automaton:automaton:1.11-8"
-			}
-			break;
-
-		// Hadoop 2.5.x
-		case "hadoop25":
 			dependencies {
 				testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
 				testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
