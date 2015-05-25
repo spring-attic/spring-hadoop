@@ -15,18 +15,20 @@
  */
 package org.springframework.data.hadoop.hbase;
 
-import java.io.IOException;
-import java.util.List;
-
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hbase.client.Delete;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.HTableInterface;
+import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
 import org.springframework.dao.DataAccessException;
 import org.springframework.util.Assert;
+
+import java.io.IOException;
+import java.util.List;
 
 /**
  * Central class for accessing the HBase API. Simplifies the use of HBase and helps to avoid common errors.
@@ -187,12 +189,56 @@ public class HbaseTemplate extends HbaseAccessor implements HbaseOperations {
 		});
 	}
 
-	/**
-	 * Sets the auto flush.
-	 *
-	 * @param autoFlush The autoFlush to set.
-	 */
-	public void setAutoFlush(boolean autoFlush) {
-		this.autoFlush = autoFlush;
-	}
+    @Override
+    public void put(String tableName, final String rowName, final String familyName, final String qualifier, final byte[] value) {
+        Assert.hasLength(rowName);
+        Assert.hasLength(familyName);
+        Assert.hasLength(qualifier);
+        Assert.notNull(value);
+        execute(tableName, new TableCallback<Object>() {
+            @Override
+            public Object doInTable(HTableInterface htable) throws Throwable {
+                Put put = new Put(rowName.getBytes(getCharset())).add(familyName.getBytes(getCharset()), qualifier.getBytes(getCharset()), value);
+                htable.put(put);
+                return null;
+            }
+        });        
+    }
+
+    @Override
+    public void delete(String tableName, final String rowName, final String familyName) {
+        delete(tableName, rowName, familyName, null);
+    }
+    
+    @Override
+    public void delete(String tableName, final String rowName, final String familyName, final String qualifier) {
+        Assert.hasLength(rowName);
+        Assert.hasLength(familyName);
+        execute(tableName, new TableCallback<Object>() {
+            @Override
+            public Object doInTable(HTableInterface htable) throws Throwable {
+                Delete delete = new Delete(rowName.getBytes(getCharset()));
+                byte[] family = familyName.getBytes(getCharset());
+
+                if (qualifier != null) {
+                    delete.deleteColumn(family, qualifier.getBytes(getCharset()));
+                }
+                else {
+                    delete.deleteFamily(family);
+                }
+                
+                htable.delete(delete);
+                return null;
+            }
+        });        
+    }    
+
+    /**
+     * Sets the auto flush.
+     *
+     * @param autoFlush The autoFlush to set.
+     */
+    public void setAutoFlush(boolean autoFlush) {
+        this.autoFlush = autoFlush;
+    }    
 }
