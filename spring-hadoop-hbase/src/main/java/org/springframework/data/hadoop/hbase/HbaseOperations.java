@@ -151,33 +151,33 @@ public interface HbaseOperations {
 	 */
 	<T> T get(String tableName, final String rowName, final String familyName, final String qualifier, final RowMapper<T> mapper);
 	
-    /**
-     * Puts a single value in to the given table. 
-     * 
-     * @param tableName target table
-     * @param rowName row name
-     * @param familyName family 
-     * @param qualifier column qualifier
-     * @param data the byte array of the data value to be put
-     */
-    void put(String tableName, final String rowName, final String familyName, final String qualifier, final byte[] data);
-    
-    /**
-     * Deletes a single qualifier in the given table and family. 
-     * 
-     * @param tableName target table
-     * @param rowName row name
-     * @param familyName family 
-     */
-    void delete(String tableName, final String rowName, final String familyName);
-    
-    /**
-     * Deletes a single cell in the given table. 
-     * 
-     * @param tableName target table
-     * @param rowName row name
-     * @param familyName family 
-     * @param qualifier column qualifier
-     */
-    void delete(String tableName, final String rowName, final String familyName, final String qualifier);
+	/**
+	 * Puts a single value in to the given table. 
+	 * 
+	 * @param tableName target table
+	 * @param rowName row name
+	 * @param familyName family 
+	 * @param qualifier column qualifier
+	 * @param data the byte array of the data value to be put
+	 */
+	void put(String tableName, final String rowName, final String familyName, final String qualifier, final byte[] data);
+	
+	/**
+	 * Deletes a single qualifier in the given table and family. 
+	 * 
+	 * @param tableName target table
+	 * @param rowName row name
+	 * @param familyName family 
+	 */
+	void delete(String tableName, final String rowName, final String familyName);
+	
+	/**
+	 * Deletes a single cell in the given table. 
+	 * 
+	 * @param tableName target table
+	 * @param rowName row name
+	 * @param familyName family 
+	 * @param qualifier column qualifier
+	 */
+	void delete(String tableName, final String rowName, final String familyName, final String qualifier);
 }
