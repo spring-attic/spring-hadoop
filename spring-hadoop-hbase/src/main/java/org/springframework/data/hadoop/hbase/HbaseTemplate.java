@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 the original author or authors.
+ * Copyright 2011-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ import java.util.List;
  * It executes core HBase workflow, leaving application code to invoke actions and extract results.
  *
  * @author Costin Leau
+ * @author Shaun Elliott
  */
 public class HbaseTemplate extends HbaseAccessor implements HbaseOperations {
 

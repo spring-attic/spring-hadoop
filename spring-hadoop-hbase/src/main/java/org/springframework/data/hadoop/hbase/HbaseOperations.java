@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 the original author or authors.
+ * Copyright 2011-2015 the original author or authors.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,11 @@ import java.util.List;
 
 
 /**
- * Interface that specifies a basic set of Hbase operations, implemented by {@link HbaseTemplate}. Not often used, but a useful option to enhance testability, as it can easily be mocked or stubbed.
+ * Interface that specifies a basic set of Hbase operations, implemented by {@link HbaseTemplate}. Not often used,
+ * but a useful option to enhance testability, as it can easily be mocked or stubbed.
+ *
  * @author Costin Leau
+ * @author Shaun Elliott
  */
 public interface HbaseOperations {
 

@@ -1,0 +1,19 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:hdp="http://www.springframework.org/schema/hadoop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+      	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+      	http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
+
+	<import resource="../hadoop-ctx.xml"/>
+	 
+	<hdp:hbase-configuration zk-quorum="${hbase.host}" zk-port="${hbase.port}">
+		head=bucket
+	</hdp:hbase-configuration>
+	 
+	<context:property-placeholder location="test.properties"/>
+	
+	<bean id="template" class="org.springframework.data.hadoop.hbase.HbaseTemplate" p:configuration-ref="hbaseConfiguration"/>
+</beans>
