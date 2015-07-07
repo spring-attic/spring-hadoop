@@ -46,7 +46,7 @@ Instructions for setting up project builds using various supported
 distributions are provided on the Spring for Apache Hadoop wiki -
 https://github.com/spring-projects/spring-hadoop/wiki
 
-Regarding Hadoop-related projects, SDHP supports
+Regarding Hadoop-related projects, SHDP supports
 http://hbase.apache.org/[HBase] 0.94.11, http://hive.apache.org/[Hive]
 0.11.0 and http://pig.apache.org/[Pig] 0.11.0 and above. As a rule of
 thumb, when using Hadoop-related projects, such as Hive or Pig, use the
