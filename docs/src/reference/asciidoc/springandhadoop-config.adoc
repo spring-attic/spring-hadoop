@@ -230,7 +230,7 @@ specific properties from the main code base easing the deployment across
 multiple machines. In the example above, the default file system is
 replaced based on the properties available in `hadoop.properties` while
 the temp dir is determined dynamically through `SpEL`. Both approaches
-offer a lot of flexbility in adapting to the running environment - in
+offer a lot of flexibility in adapting to the running environment - in
 fact we use this approach extensivly in the Spring for Apache Hadoop
 test suite to cope with the differences between the different
 development boxes and the CI server.
