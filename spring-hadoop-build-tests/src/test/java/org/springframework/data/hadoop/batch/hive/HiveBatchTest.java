@@ -42,6 +42,7 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * @author Costin Leau
+ * @author Thomas Risberg
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration

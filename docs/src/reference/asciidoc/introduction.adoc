@@ -23,11 +23,12 @@ based solutions provided by the integration with Spring Batch.
 
 Spring for Apache Hadoop is built and tested with JDK 7,
 http://projects.spring.io/spring-framework/[Spring Framework] 4.2 and is
-by default built against http://hadoop.apache.org/[Apache Hadoop] 2.6.0.
+by default built against http://hadoop.apache.org/[Apache Hadoop] 2.7.1.
 
 Spring for Apache Hadoop supports the following versions and
 distributions:
 
+* http://hadoop.apache.org/[Apache Hadoop] 2.7.1
 * http://hadoop.apache.org/[Apache Hadoop] 2.6.0
 * http://www.pivotal.io/[Pivotal] HD 2.1
 * http://www.pivotal.io/[Pivotal] HD 3.0

@@ -67,11 +67,11 @@ println "Using Java version: [" + System.getProperty("java.version") + "]"
 //
 def List hadoopArtifacts = []
 def List hadoopTestArtifacts = []
-def hadoopDefault = "hadoop26"
+def hadoopDefault = "hadoop27"
 def hadoopDistro = project.hasProperty("distro") ? project.getProperty("distro") : hadoopDefault
 def hadoopVersion = "default"
 // hadoopVanillaVersion for used in docs
-def hadoopVanillaVersion = hd26Version
+def hadoopVanillaVersion = hd27Version
 
 // Common Hadoop libraries
 def hiveVersion = defaultHiveVersion
@@ -85,7 +85,7 @@ def hiveGroup = "org.apache.hive"
 // make it possible to use Pig jars compiled for Hadoop 2.0
 def pigQualifier = ''
 
-// default is Hadoop 2.6.x
+// default is Hadoop 2.7.x
 switch (hadoopDistro) {
 
 	// Cloudera CDH5 YARN 2.3.x base
@@ -195,48 +195,10 @@ switch (hadoopDistro) {
 		pigQualifier = ':h2'
 		break;
 
-	// Hadoop 2.7.x
-	case "hadoop27":
-		hadoopVersion = hd27Version
-		println "Using Apache Hadoop 2.7.x - [$hadoopVersion]"
-		hadoopArtifacts = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-yarn-common:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-streaming:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-distcp:$hadoopVersion"]
-		hadoopTestArtifacts = ["org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion:tests",
-					"org.apache.hadoop:hadoop-hdfs:$hadoopVersion:tests",
-					"org.apache.hadoop:hadoop-common:$hadoopVersion:tests",
-					"org.apache.hadoop:hadoop-mapreduce-client-app:$hadoopVersion",
-					"org.apache.hadoop:hadoop-mapreduce-client-hs:$hadoopVersion",
-					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion",
-					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion:tests"]
-		hbaseVersion = hd27HbaseVersion
-		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion",
-				  "org.apache.hbase:hbase-common:$hbaseVersion",
-				  "org.apache.hbase:hbase-client:$hbaseVersion"]
-		hiveVersion = hd27HiveVersion
-		pigVersion = hd27PigVersion
-		pigQualifier = ':h2'
-		break;
-
 	// Hadoop 2.6.x
-	default:
+	case "hadoop26":
 		hadoopVersion = hd26Version
-		if (!project.hasProperty("distro")) {
-			println "Using default distro: Apache Hadoop [$hadoopVersion]"
-		} else {
-			if (hadoopDistro == hadoopDefault) {
-				println "Using Apache Hadoop 2.6.x - [$hadoopVersion]"
-			} else {
-				println "Failing build: $hadoopDistro is not a supported distro"
-				println "Supported distros: hadoop26[*], hadoop27, hdp22, cdh5, phd21 and phd30"
-				println "* default"
-				throw new InvalidUserDataException("$hadoopDistro is not a supported distro")
-			}
-		}
+		println "Using Apache Hadoop 2.6.x - [$hadoopVersion]"
 		hadoopArtifacts = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
@@ -257,6 +219,44 @@ switch (hadoopDistro) {
 				  "org.apache.hbase:hbase-client:$hbaseVersion"]
 		hiveVersion = hd26HiveVersion
 		pigVersion = hd26PigVersion
+		pigQualifier = ':h2'
+		break;
+
+	// Hadoop 2.7.x
+	default:
+		hadoopVersion = hd27Version
+		if (!project.hasProperty("distro")) {
+			println "Using default distro: Apache Hadoop [$hadoopVersion]"
+		} else {
+			if (hadoopDistro == hadoopDefault) {
+				println "Using Apache Hadoop 2.7.x - [$hadoopVersion]"
+			} else {
+				println "Failing build: $hadoopDistro is not a supported distro"
+				println "Supported distros: hadoop26, hadoop27[*], hdp22, cdh5, phd21 and phd30"
+				println "* default"
+				throw new InvalidUserDataException("$hadoopDistro is not a supported distro")
+			}
+		}
+		hadoopArtifacts = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-yarn-common:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-streaming:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-distcp:$hadoopVersion"]
+		hadoopTestArtifacts = ["org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion:tests",
+					"org.apache.hadoop:hadoop-hdfs:$hadoopVersion:tests",
+					"org.apache.hadoop:hadoop-common:$hadoopVersion:tests",
+					"org.apache.hadoop:hadoop-mapreduce-client-app:$hadoopVersion",
+					"org.apache.hadoop:hadoop-mapreduce-client-hs:$hadoopVersion",
+					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion",
+					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion:tests"]
+		hbaseVersion = hd27HbaseVersion
+		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion",
+				  "org.apache.hbase:hbase-common:$hbaseVersion",
+				  "org.apache.hbase:hbase-client:$hbaseVersion"]
+		hiveVersion = hd27HiveVersion
+		pigVersion = hd27PigVersion
 		pigQualifier = ':h2'
 }
 
@@ -469,8 +469,8 @@ configure(hadoopProjects()) {
 			}
 			break;
 
-		// Hadoop 2.7.x
-		case "hadoop27":
+		// Hadoop 2.6.x
+		case "hadoop26":
 			dependencies {
 				testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
 				testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
@@ -478,7 +478,7 @@ configure(hadoopProjects()) {
 			}
 			break;
 
-		// Hadoop 2.6.x
+		// Hadoop 2.7.x
 		default:
 			dependencies {
 				testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
