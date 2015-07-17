@@ -58,17 +58,17 @@ public class TextFileStoreAppendTests extends AbstractStoreTests {
 		TextFileWriter writer = new TextFileWriter(getConfiguration(), testDefaultPath, null);
 		writer.setAppendable(true);
 		TestUtils.writeData(writer, DATA09ARRAY, false);
+		writer.close();
 		TextFileReader reader = new TextFileReader(getConfiguration(), testDefaultPath, null);
 		TestUtils.readDataAndAssert(reader, DATA09ARRAY);
-		writer.close();
 		reader.close();
 
 		writer = new TextFileWriter(getConfiguration(), testDefaultPath, null);
 		writer.setAppendable(true);
 		TestUtils.writeData(writer, DATA09ARRAY, false);
+		writer.close();
 		reader = new TextFileReader(getConfiguration(), testDefaultPath, null);
 		TestUtils.readDataAndAssert(reader, StringUtils.concatenateStringArrays(DATA09ARRAY, DATA09ARRAY));
-		writer.close();
 		reader.close();
 	}
 
