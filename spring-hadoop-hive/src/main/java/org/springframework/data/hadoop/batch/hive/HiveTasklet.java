@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 the original author or authors.
+ * Copyright 2011-2015 the original author or authors.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  */
 package org.springframework.data.hadoop.batch.hive;
 
-import org.apache.hadoop.hive.service.HiveClient;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -23,9 +22,10 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.data.hadoop.hive.HiveExecutor;
 
 /**
- * Hive tasklet running Hive scripts on demand, against a {@link HiveClient}.
+ * Hive tasklet running Hive scripts on demand.
  * 
  * @author Costin Leau
+ * @author Thomas Risberg
  */
 public class HiveTasklet extends HiveExecutor implements Tasklet {
 

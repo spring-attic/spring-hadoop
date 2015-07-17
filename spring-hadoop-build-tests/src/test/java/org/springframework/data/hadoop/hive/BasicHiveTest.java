@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 the original author or authors.
+ * Copyright 2011-2015 the original author or authors.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,7 @@ package org.springframework.data.hadoop.hive;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.apache.hadoop.hive.service.HiveClient;
-import org.apache.thrift.server.TServer;
+import org.apache.hive.service.server.HiveServer2;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,15 +30,14 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import static org.hamcrest.core.Is.*;
 import static org.junit.Assert.*;
-import static org.junit.Assume.*;
 
 /**
  * Test for basic JDBC connectivity to Hive following 
  * https://cwiki.apache.org/confluence/display/Hive/HiveClient
  * 
  * @author Costin Leau
+ * @author Thomas Risberg
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("/org/springframework/data/hadoop/hive/basic.xml")
@@ -90,17 +88,16 @@ public class BasicHiveTest {
 		System.out.println(hiveTemplate.execute(new HiveClientCallback<Object>() {
 			@Override
 			public Object doInHive(HiveClient hiveClient) throws Exception {
-				return hiveClient.get_all_databases();
+				TODO:
+				return hiveClient.execute("show tables");
 			}
 		}));
 	}
 
 	@Test
-	// disabled due to antlr incompatibility between Pig (which requires antlr 3.4) and Hive (3.0.x) 
 	public void testHiveServer() throws Exception {
-		assumeThat(ctx.containsBean("hive-server"), is(Boolean.TRUE));
-		TServer server = ctx.getBean("hive-server", TServer.class);
+		HiveServer2 server = ctx.getBean(HiveServer2.class);
 		assertNotNull(server);
-		assertTrue(server.isServing());
+		assertTrue(server.getServiceState().equals(HiveServer2.STATE.STARTED));
 	}
 }

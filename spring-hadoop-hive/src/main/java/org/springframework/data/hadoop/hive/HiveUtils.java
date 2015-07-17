@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 the original author or authors.
+ * Copyright 2011-2015 the original author or authors.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@ import java.util.Map;
 import org.apache.hadoop.hive.metastore.api.AlreadyExistsException;
 import org.apache.hadoop.hive.metastore.api.ConfigValSecurityException;
 import org.apache.hadoop.hive.metastore.api.IndexAlreadyExistsException;
-import org.apache.hadoop.hive.service.HiveClient;
 import org.apache.hadoop.hive.service.HiveServerException;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.thrift.TBase;
@@ -49,6 +48,7 @@ import org.springframework.util.StringUtils;
  * is to handle the parsing of the script content before submitting that to the {@link HiveClient}.
  * 
  * @author Costin Leau
+ * @author Thomas Risberg
  */
 abstract class HiveUtils {
 
@@ -185,8 +185,6 @@ abstract class HiveUtils {
 	 * 
 	 * @param hive hive client
 	 * @param script script to run
-	 * @param encoding script encoding
-	 * @param params script parameters
 	 * @return the script results
 	 * @throws Exception
 	 */
@@ -247,15 +245,6 @@ abstract class HiveUtils {
 	}
 
 	private static List<String> runCommand(HiveClient hive, String command) throws Exception {
-		try {
-			hive.execute(command);
-			return hive.fetchAll();
-		} catch (Exception ex) {
-			try {
-				hive.clean();
-			} catch (Exception exc) {
-			}
-			throw ex;
-		}
+		return hive.execute(command);
 	}
 }

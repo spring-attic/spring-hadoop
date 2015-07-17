@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 the original author or authors.
+ * Copyright 2011-2015 the original author or authors.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,49 +16,43 @@
 package org.springframework.data.hadoop.hive;
 
 import java.util.Properties;
-import java.util.concurrent.Executor;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.common.ServerUtils;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.ql.processors.CommandProcessorFactory;
-import org.apache.hadoop.hive.service.HiveServer;
-import org.apache.hadoop.hive.service.HiveServer.HiveServerHandler;
-import org.apache.hadoop.hive.service.HiveServer.ThriftHiveProcessorFactory;
-import org.apache.thrift.protocol.TBinaryProtocol;
-import org.apache.thrift.server.TServer;
-import org.apache.thrift.server.TThreadPoolServer;
-import org.apache.thrift.transport.TServerSocket;
-import org.apache.thrift.transport.TServerTransport;
-import org.apache.thrift.transport.TTransportFactory;
+import org.apache.hive.service.server.HiveServer2;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.SmartLifecycle;
-import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.data.hadoop.configuration.ConfigurationUtils;
 
 /**
  * FactoryBean for easy declaration and creation of an embeddable Hive server. 
- * Similar in functionality to {@link HiveServer} but not tied to the command line. 
+ * Similar in functionality to {@link HiveServer2} but not tied to the command line.
+ *
+ * This class is intended for using as part of integration testing. For production use
+ * a Hiveserver2 running on the Hadoop cluster is preferred.
  * 
  * @author Costin Leau
+ * @author Thomas Risberg
  */
-public class HiveServerFactoryBean implements FactoryBean<TServer>, InitializingBean, DisposableBean, SmartLifecycle {
+public class HiveServerFactoryBean implements FactoryBean<HiveServer2>, InitializingBean, DisposableBean, SmartLifecycle {
 
 	private boolean autoStartup = true;
-	private TServer server;
+	private HiveServer2 server;
+	private String host = "localhost";
 	private int port = 10000;
 	private int minThreads = 10, maxThreads = 100;
 	private Configuration configuration;
-	private Executor executor;
 	private Properties properties;
-	private HiveConf conf;
+	private HiveConf hiveConf;
 
 	@Override
 	public void destroy() {
 		stop();
-		CommandProcessorFactory.clean(conf);
+		CommandProcessorFactory.clean(hiveConf);
 		server = null;
 	}
 
@@ -66,45 +60,30 @@ public class HiveServerFactoryBean implements FactoryBean<TServer>, Initializing
 	public void afterPropertiesSet() throws Exception {
 
 		Configuration cfg = ConfigurationUtils.createFrom(configuration, properties);
+		hiveConf = new HiveConf(cfg, HiveServer2.class);
+		hiveConf.set("hive.server2.thrift.bind.host", host);
+		hiveConf.set("hive.server2.thrift.port", String.valueOf(port));
+		hiveConf.set("hive.server2.thrift.min.worker.threads", String.valueOf(minThreads));
+		hiveConf.set("hive.server2.thrift.max.worker.threads", String.valueOf(maxThreads));
 
-		conf = new HiveConf(cfg, HiveServerHandler.class);
+		ServerUtils.cleanUpScratchDir(hiveConf);
 
-		ServerUtils.cleanUpScratchDir(conf);
-		TServerTransport serverTransport = new TServerSocket(port);
+		server = new HiveServer2();
+		server.init(hiveConf);
 
-		// Hive 0.8.0
-		ThriftHiveProcessorFactory hfactory = new ThriftHiveProcessorFactory(null, conf);
-
-		TThreadPoolServer.Args sargs = new TThreadPoolServer.Args(serverTransport).processorFactory(hfactory).
-				transportFactory(new TTransportFactory()).
-				protocolFactory(new TBinaryProtocol.Factory()).
-				minWorkerThreads(minThreads).
-				maxWorkerThreads(maxThreads);
-		server = new TThreadPoolServer(sargs);
-
-		//	Hive 0.7.x (unfortunately it doesn't support passing a configuration object to it)
-		// 
-		//		ThriftHiveProcessorFactory hfactory = new ThriftHiveProcessorFactory(null);
-		//		TThreadPoolServer.Options options = new TThreadPoolServer.Options();
-		//		options.minWorkerThreads = minThreads;
-		//		options.maxWorkerThreads = maxThreads;
-
-		//		server = new TThreadPoolServer(hfactory, serverTransport, new TTransportFactory(), new TTransportFactory(),
-		//				new TBinaryProtocol.Factory(), new TBinaryProtocol.Factory(), options);
-
-		if (executor == null) {
-			executor = new SimpleAsyncTaskExecutor(getClass().getSimpleName());
+		if (autoStartup) {
+			server.start();
 		}
 	}
 
 	@Override
-	public TServer getObject() {
+	public HiveServer2 getObject() {
 		return server;
 	}
 
 	@Override
 	public Class<?> getObjectType() {
-		return (server != null ? server.getClass() : TServer.class);
+		return (server != null ? server.getClass() : HiveServer2.class);
 	}
 
 	@Override
@@ -115,12 +94,7 @@ public class HiveServerFactoryBean implements FactoryBean<TServer>, Initializing
 	@Override
 	public void start() {
 		if (!isRunning()) {
-			executor.execute(new Runnable() {
-				@Override
-				public void run() {
-					server.serve();
-				}
-			});
+			server.start();
 		}
 	}
 
@@ -133,7 +107,10 @@ public class HiveServerFactoryBean implements FactoryBean<TServer>, Initializing
 
 	@Override
 	public boolean isRunning() {
-		return server.isServing();
+		if (server != null && server.getServiceState().equals(HiveServer2.STATE.STARTED)) {
+			return true;
+		}
+		return false;
 	}
 
 	@Override
@@ -153,12 +130,21 @@ public class HiveServerFactoryBean implements FactoryBean<TServer>, Initializing
 	}
 
 	/**
-	 * Indicates whether the Hive client should start automatically (default) or not.
+	 * Indicates whether the Hive server should start automatically (default) or not.
 	 * 
 	 * @param autoStartup whether to automatically start or not
 	 */
 	public void setAutoStartup(boolean autoStartup) {
 		this.autoStartup = autoStartup;
+	}
+
+	/**
+	 * Sets the server host to bind to.
+	 *
+	 * @param host The host to use.
+	 */
+	public void setHost(String host) {
+		this.host = host;
 	}
 
 	/**
@@ -206,13 +192,4 @@ public class HiveServerFactoryBean implements FactoryBean<TServer>, Initializing
 		this.properties = properties;
 	}
 
-	/**
-	 * Sets the executor for starting the server (which is a blocking operation).
-	 * By default, an internal {@link SimpleAsyncTaskExecutor} instance is used.
-	 * 
-	 * @param executor The executor to set.
-	 */
-	public void setExecutor(Executor executor) {
-		this.executor = executor;
-	}
 }

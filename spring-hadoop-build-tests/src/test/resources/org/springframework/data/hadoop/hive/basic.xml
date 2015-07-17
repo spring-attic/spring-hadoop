@@ -32,7 +32,7 @@
 
 	<util:properties id="props" location="props.properties"/>
 	
-	<hdp:hive-client-factory host="${hive.host}" port="${hive.port}"/>
+	<hdp:hive-client-factory hive-data-source-ref="hiveDataSource"/>
 	
 	<hdp:hive-template />
 	
@@ -42,14 +42,14 @@
 		<hdp:script location="org/springframework/data/hadoop/hive/drop-script.q"/>
 	</hdp:hive-runner>
 
-	<bean id="hiveDriver" class="org.apache.hadoop.hive.jdbc.HiveDriver"/>
-	<bean id="hiveDs" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
+	<bean id="hiveDriver" class="org.apache.hive.jdbc.HiveDriver"/>
+	<bean id="hiveDataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
 		<constructor-arg name="driver" ref="hiveDriver"/>
 		<constructor-arg name="url" value="${hive.url}"/>
 	</bean>
-	
+
 	<bean id="template" class="org.springframework.jdbc.core.JdbcTemplate">
-		<constructor-arg ref="hiveDs"/>
+		<constructor-arg ref="hiveDataSource"/>
 	</bean>		
 	
 </beans>
