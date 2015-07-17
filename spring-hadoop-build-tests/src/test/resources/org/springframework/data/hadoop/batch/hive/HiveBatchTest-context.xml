@@ -15,7 +15,7 @@
 	<import resource="../../batch-common.xml"/>
 	<import resource="../../hadoop-ctx.xml"/>
 
-	<hdp:hive-server properties-ref="props" properties-location="cfg-1.properties, cfg-2.properties" port="${hive.port}" configuration-ref="hadoopConfiguration">
+	<hdp:hive-server properties-ref="props" properties-location="cfg-1.properties, cfg-2.properties" port="${hive.port}" max-threads="10" configuration-ref="hadoopConfiguration">
 		star=chasing
 		return=captain eo
 		train=last
@@ -54,7 +54,7 @@
 			</list>
 		</property>
 	</bean>
-	<hdp:hive-client-factory host="${hive.host}" port="${hive.port}">
+	<hdp:hive-client-factory hive-data-source-ref="hiveDataSource">
 		<hdp:script>
 			DROP TABLE IF EXISTS testHiveBatchTable; 
 			CREATE TABLE testHiveBatchTable (key int, value string);
@@ -66,8 +66,14 @@
 				white=wash
 			</hdp:arguments>
 		</hdp:script>
-	</hdp:hive-client-factory> 
-	
+	</hdp:hive-client-factory>
+
+	<bean id="hiveDriver" class="org.apache.hive.jdbc.HiveDriver"/>
+	<bean id="hiveDataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
+		<constructor-arg name="driver" ref="hiveDriver"/>
+		<constructor-arg name="url" value="${hive.url}"/>
+	</bean>
+
 	<bean class="org.springframework.data.hadoop.hive.HiveTemplate" p:hive-client-factory-ref="hiveClientFactory"/>
 	
 	<hdp:hive-tasklet id="hive-script" scope="prototype">

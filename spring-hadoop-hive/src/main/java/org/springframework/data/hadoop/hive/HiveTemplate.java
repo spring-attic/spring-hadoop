@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 the original author or authors.
+ * Copyright 2011-2015 the original author or authors.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.hadoop.hive.service.HiveClient;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.ByteArrayResource;
@@ -32,10 +31,11 @@ import org.springframework.util.Assert;
 import org.springframework.util.ResourceUtils;
 
 /**
- * Helper class that simplifies Hive data access code. Automatically handles the creation of a {@link HiveClient} (which is non-thread-safe) 
+ * Helper class that simplifies Hive data access code. Automatically handles the creation of a {@link HiveClient}
  * and converts Hive exceptions into DataAccessExceptions.
  *
  * @author Costin Leau
+ * @author Thomas Risberg
  */
 public class HiveTemplate implements InitializingBean, HiveOperations, ResourceLoaderAware {
 
@@ -66,7 +66,7 @@ public class HiveTemplate implements InitializingBean, HiveOperations, ResourceL
 	}
 
 	/**
-	 * Executes the action specified by the given callback object within an active {@link HiveClient}. 
+	 * Executes the action specified by the given callback object within an active connection.
 	 * 
 	 * @param action callback object that specifies the Hive action
 	 * @return the action result object

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 the original author or authors.
+ * Copyright 2011-2015 the original author or authors.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,38 +16,54 @@
 package org.springframework.data.hadoop.hive;
 
 
+import java.sql.Connection;
 import java.util.Collection;
 
-import org.apache.hadoop.hive.service.HiveClient;
-import org.apache.hadoop.hive.service.ThriftHive;
-import org.apache.thrift.protocol.TBinaryProtocol;
-import org.apache.thrift.transport.TSocket;
-import org.apache.thrift.transport.TTransportException;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.ObjectFactory;
-import org.springframework.util.CollectionUtils;
+import org.springframework.jdbc.datasource.DataSourceUtils;
+import org.springframework.jdbc.datasource.SingleConnectionDataSource;
+import org.springframework.util.Assert;
+
+import javax.sql.DataSource;
 
 /**
- * FactoryBean for easy declaration and creation of a {@link HiveClient} using {@link ThriftHive}.
- * Since Thrift clients are not thread-safe, neither is HiveClient. And since the Hive API does not provide
- * some type of factory, the factory bean returns an instance of {@link ObjectFactory} (that handles the creation
- * of {@link HiveClient} instances) instead of the raw {@link HiveClient} instance. 
+ * FactoryBean for easy declaration and creation of a {@link HiveClient} using a {@link org.springframework.jdbc.core.JdbcTemplate}.
+ *
+ * The HiveClient class is not thread-safe. We use a {@link SingleConnectionDataSource} to hold on to a connection for
+ * the duration of the client. This means that all operations while happen in the same session. This is important when
+ * setting properties on the session.
  * 
  * Note that the caller needs to handle the object clean-up,  specifically calling {@link HiveClient#shutdown()}. 
  * 
  * In general, to avoid leaks it is recommended to use the {@link HiveTemplate}.
  * 
  * @author Costin Leau
+ * @author Thomas Risberg
  */
-public class HiveClientFactoryBean implements FactoryBean<HiveClientFactory> {
+public class HiveClientFactoryBean implements FactoryBean<HiveClientFactory>, InitializingBean, DisposableBean {
 
 	private Collection<HiveScript> scripts;
 
-	private String host = "localhost";
-	private int port = 10000;
-	private int timeout = 0;
+	private DataSource hiveDataSource;
+
+	private SingleConnectionDataSource factoryDataSource;
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		Assert.notNull(hiveDataSource, "HiveDataSource must be set");
+		Connection con = DataSourceUtils.getConnection(hiveDataSource);
+		factoryDataSource = new SingleConnectionDataSource(con, true);
+	}
+
+	@Override
+	public void destroy() throws Exception {
+		factoryDataSource.destroy();
+	}
 
 	private class DefaultHiveClientFactory implements HiveClientFactory {
 		@Override
@@ -73,78 +89,24 @@ public class HiveClientFactoryBean implements FactoryBean<HiveClientFactory> {
 	}
 
 	protected HiveClient createHiveClient() {
-		TSocket transport = new TSocket(host, port, timeout);
-		HiveClient hive = new HiveClient(new TBinaryProtocol(transport));
-
-		try {
-			transport.open();
-
-			if (!CollectionUtils.isEmpty(scripts)) {
-				HiveUtils.runWithConversion(hive, scripts, false);
-			}
-		} catch (TTransportException ex) {
-			throw HiveUtils.convert(ex);
+		if (factoryDataSource == null) {
+			throw new IllegalStateException("HiveDataSource must be set before requesting a HiveClient");
 		}
-
-		return hive;
+		return new HiveClient(factoryDataSource);
 	}
 
 	public int getPhase() {
 		return Integer.MIN_VALUE;
 	}
 
-	/**
-	 * Returns the host.
-	 *
-	 * @return Returns the host
-	 */
-	public String getHost() {
-		return host;
-	}
 
 	/**
-	 * Sets the server host. 
+	 * Sets the DataSource.
 	 * 
-	 * @param host The host to set.
+	 * @param dataSource The DataSource.
 	 */
-	public void setHost(String host) {
-		this.host = host;
-	}
-
-	/**
-	 * Returns the port.
-	 *
-	 * @return Returns the port
-	 */
-	public int getPort() {
-		return port;
-	}
-
-	/**
-	 * Sets the server port.
-	 * 
-	 * @param port The port to set.
-	 */
-	public void setPort(int port) {
-		this.port = port;
-	}
-
-	/**
-	 * Returns the timeout.
-	 *
-	 * @return Returns the timeout
-	 */
-	public int getTimeout() {
-		return timeout;
-	}
-
-	/**
-	 * Sets the connection timeout.
-	 * 
-	 * @param timeout The timeout to set.
-	 */
-	public void setTimeout(int timeout) {
-		this.timeout = timeout;
+	public void setHiveDataSource(DataSource dataSource) {
+		this.hiveDataSource = dataSource;
 	}
 
 	/**

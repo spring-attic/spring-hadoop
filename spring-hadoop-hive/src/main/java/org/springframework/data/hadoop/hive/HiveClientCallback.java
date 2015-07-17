@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 the original author or authors.
+ * Copyright 2011-2015 the original author or authors.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,12 @@
  */
 package org.springframework.data.hadoop.hive;
 
-import org.apache.hadoop.hive.service.HiveClient;
-
 /**
- * Callback interface for Hive code. To be used with {@link HiveTemplate} execute method, assumably often as anonymous
+ * Callback interface for Hive code. To be used with {@link HiveTemplate} execute method, often as anonymous
  * classes within a method implementation.
  * 
  * @author Costin Leau
+ * @author Thomas Risberg
  */
 public interface HiveClientCallback<T> {
 
@@ -34,7 +33,7 @@ public interface HiveClientCallback<T> {
 	 * the callback signature uses a generic declaration.
 	 * For user specific error, consider runtime exceptions which are not translated.
 	 * 
-	 * @param hiveClient active hive client
+	 * @param hiveClient active hive connection
 	 * @return action result
 	 * @throws Exception if thrown by {@link HiveClient}
 	 */
