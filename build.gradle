@@ -168,10 +168,10 @@ switch (hadoopDistro) {
 		pigQualifier = ':h2'
 		break;
 
-	// Hortonworks Data Platform 2.2
-	case "hdp22":
-		hadoopVersion = hdp22Version
-		println "Using Hortonworks Data Platform 2.2 [$hadoopVersion]"
+	// Hortonworks Data Platform 2.3
+	case "hdp23":
+		hadoopVersion = hdp23Version
+		println "Using Hortonworks Data Platform 2.3 [$hadoopVersion]"
 		hadoopArtifacts = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
@@ -186,12 +186,12 @@ switch (hadoopDistro) {
 					"org.apache.hadoop:hadoop-mapreduce-client-hs:$hadoopVersion",
 					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion",
 					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion:tests"]
-		hbaseVersion = hdp22HbaseVersion
+		hbaseVersion = hdp23HbaseVersion
 		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion",
 				  "org.apache.hbase:hbase-common:$hbaseVersion",
 				  "org.apache.hbase:hbase-client:$hbaseVersion"]
-		hiveVersion = hdp22HiveVersion
-		pigVersion = hdp22PigVersion
+		hiveVersion = hdp23HiveVersion
+		pigVersion = hdp23PigVersion
 		pigQualifier = ':h2'
 		break;
 
@@ -232,7 +232,7 @@ switch (hadoopDistro) {
 				println "Using Apache Hadoop 2.7.x - [$hadoopVersion]"
 			} else {
 				println "Failing build: $hadoopDistro is not a supported distro"
-				println "Supported distros: hadoop26, hadoop27[*], hdp22, cdh5, phd21 and phd30"
+				println "Supported distros: hadoop26, hadoop27[*], hdp23, cdh5, phd21 and phd30"
 				println "* default"
 				throw new InvalidUserDataException("$hadoopDistro is not a supported distro")
 			}
@@ -460,8 +460,8 @@ configure(hadoopProjects()) {
 			}
 			break;
 
-		// Hortonworks Data Platform 2.2
-		case "hdp22":
+		// Hortonworks Data Platform 2.3
+		case "hdp23":
 			dependencies {
 				testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
 				testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
