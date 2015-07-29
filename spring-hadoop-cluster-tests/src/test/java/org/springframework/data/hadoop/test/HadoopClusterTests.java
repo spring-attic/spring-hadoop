@@ -58,7 +58,7 @@ public class HadoopClusterTests {
 		assertTrue(ctx.containsBean("hadoopConfiguration"));
 		Configuration config = (Configuration) ctx.getBean("hadoopConfiguration");
 		assertNotNull(config);
-		
+
         Path inDir = new Path("testing/jobconf/input");
         Path outDir = new Path("testing/jobconf/output");
 		FileSystem fs = FileSystem.get(config);

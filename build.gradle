@@ -989,6 +989,38 @@ project('spring-data-hadoop-build-tests') {
 
 }
 
+project('spring-data-hadoop-cluster-tests') {
+	description = 'Spring for Apache Hadoop Cluster Tests'
+
+	dependencies {
+		compile project(":spring-data-hadoop-core")
+		compile project(":spring-data-hadoop")
+		compile project(":spring-data-hadoop-test")
+		testCompile project(path:":spring-data-hadoop-test", configuration:"testArtifacts")
+
+		// Testing
+		testCompile "junit:junit:$junitVersion"
+		testCompile "org.springframework:spring-test:$springVersion"
+	}
+
+	tasks.withType(Test).all {
+		if (project.hasProperty('test.forkEvery')) {
+			forkEvery = project.getProperty('test.forkEvery').toInteger()
+		}
+		systemProperties['input.path'] = 'build/classes/test/input'
+		systemProperties['output.path'] = 'build/classes/test/output'
+		includes = ["**/*.class"]
+
+		testLogging {
+			events "started"
+			minGranularity 2
+			maxGranularity 2
+		}
+
+	}
+
+}
+
 configure(yarnProjects()) {
 	task integrationTest(type: Test) {
 		include '**/*IntegrationTests.*'
