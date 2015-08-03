@@ -17,7 +17,6 @@ package org.springframework.data.hadoop.hive;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
-import org.springframework.jdbc.InvalidResultSetAccessException;
 import org.springframework.jdbc.core.ConnectionCallback;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -52,7 +51,7 @@ public class HiveClient {
 		return DataSourceUtils.getConnection(jdbcTemplate.getDataSource());
 	}
 
-	public String fetchOne(final String command) {
+	public String executeAndfetchOne(final String command) {
 		List<String> results = execute(command);
 		if (results.size() < 1) {
 			throw new IncorrectResultSizeDataAccessException(1);
