@@ -12,7 +12,7 @@ buildscript {
 		classpath("org.springframework.build.gradle:propdeps-plugin:0.0.7")
 		classpath("org.springframework.build.gradle:spring-io-plugin:0.0.3.RELEASE")
 		classpath('org.asciidoctor:asciidoctor-gradle-plugin:1.5.2')
-		classpath("io.spring.gradle:docbook-reference-plugin:0.3.0")
+		classpath("io.spring.gradle:docbook-reference-plugin:0.3.1")
 	}
 }
 
@@ -1174,6 +1174,21 @@ project('spring-yarn:spring-yarn-boot-build-tests') {
 	// disabling startScripts and distZip tasks
 	startScripts.enabled = false
 	distZip.enabled = false
+
+	// with gradle 2.4/2.5 build barks that zip file cannot be
+	// found which would be the one we just disabled, so
+	// remove it from archives
+	configurations.archives.artifacts.with { archives ->
+		def zipArtifact
+		archives.each {
+			if (it.file =~ 'zip') {
+				zipArtifact = it
+			}
+		}
+		println "ZIP archive to delete: ${zipArtifact}"
+		remove(zipArtifact)
+	}
+
 }
 
 project('spring-yarn:spring-yarn-test') {
@@ -1263,6 +1278,6 @@ project('spring-yarn:spring-yarn-boot-test') {
 
 task wrapper(type: Wrapper) {
 	description = "Generates gradlew[.bat] scripts"
-	gradleVersion = "2.2.1"
+	gradleVersion = "2.4"
 }
 
