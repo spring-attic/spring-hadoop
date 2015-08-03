@@ -21,7 +21,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.hadoop.boot.properties.SpringHadoopEnvProperties;
 import org.springframework.data.hadoop.boot.properties.SpringHadoopProperties;
 import org.springframework.data.hadoop.config.annotation.EnableHadoop;
 import org.springframework.data.hadoop.config.annotation.SpringHadoopConfigurerAdapter;
@@ -39,7 +38,7 @@ import org.springframework.data.hadoop.config.annotation.builders.HadoopConfigCo
 public class HadoopAutoConfiguration {
 
 	@Configuration
-	@EnableConfigurationProperties({ SpringHadoopProperties.class, SpringHadoopEnvProperties.class })
+	@EnableConfigurationProperties({ SpringHadoopProperties.class })
 	@EnableHadoop
 	public static class SpringHadoopConfig extends SpringHadoopConfigurerAdapter {
 

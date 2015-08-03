@@ -35,7 +35,7 @@ import org.springframework.yarn.batch.support.YarnBatchProperties.JobProperties;
 public class SpringYarnBatchPropertiesTests {
 
 	@Test
-	public void testAllPropertiesSet() {
+	public void testAllPropertiesSetYml() {
 		SpringApplication app = new SpringApplication(TestConfiguration.class);
 		app.setWebEnvironment(false);
 		ConfigurableApplicationContext context = app
@@ -62,6 +62,34 @@ public class SpringYarnBatchPropertiesTests {
 		context.close();
 	}
 
+	@Test
+	public void testAllPropertiesSetProperties() {
+		SpringApplication app = new SpringApplication(TestConfiguration.class);
+		app.setWebEnvironment(false);
+		ConfigurableApplicationContext context = app
+				.run(new String[] { "--spring.config.name=SpringYarnBatchPropertiesTests2" });
+		SpringYarnBatchProperties properties = context.getBean(SpringYarnBatchProperties.class);
+		assertThat(properties, notNullValue());
+		assertThat(properties.isEnabled(), is(true));
+		assertThat(properties.getName(), is("nameFoo1"));
+
+		assertThat(properties.getJobs(), notNullValue());
+		assertThat(properties.getJobs().size(), is(1));
+		assertThat(properties.getJobProperties("jobsName1"), notNullValue());
+
+		JobProperties jobProperties = properties.getJobProperties("jobsName1");
+		assertThat(jobProperties.isEnabled(), is(true));
+		assertThat(jobProperties.isFailNext(), is(true));
+		assertThat(jobProperties.isFailRestart(), is(true));
+		assertThat(jobProperties.isNext(), is(true));
+		assertThat(jobProperties.isRestart(), is(true));
+		assertThat(jobProperties.getParameters(), notNullValue());
+		assertThat(jobProperties.getParameters().size(), is(2));
+		assertThat((String)jobProperties.getParameters().get("job1key1"), is("job1val1"));
+		assertThat((String)jobProperties.getParameters().get("job1key2"), is("job1val2"));
+		context.close();
+	}
+	
 	@Configuration
 	@EnableConfigurationProperties({SpringYarnBatchProperties.class})
 	protected static class TestConfiguration {

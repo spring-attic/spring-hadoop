@@ -1,0 +1,10 @@
+{
+  "properties": [
+    {
+      "name": "spring.yarn.endpoints.containerregister.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enable container registrar.",
+      "defaultValue": false
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "properties": [
+    {
+      "name": "spring.hadoop.fsshell.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enable FsShell.",
+      "defaultValue": true
+    }
+  ]
+}

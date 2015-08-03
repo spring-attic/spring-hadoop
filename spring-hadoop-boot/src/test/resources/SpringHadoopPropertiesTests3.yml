@@ -3,3 +3,7 @@ spring:
         config:
             key1: value1
             key2: value2
+            foo1.bar1: jee1
+            foo2:
+                bar21: jee21
+                bar22: jee22

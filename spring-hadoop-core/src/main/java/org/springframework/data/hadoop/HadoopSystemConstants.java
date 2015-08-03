@@ -35,4 +35,13 @@ public abstract class HadoopSystemConstants {
 	/** Default bean id for hadoop fsshell. */
 	public static final String DEFAULT_ID_FSSHELL = "hadoopFsShell";
 
+	/** Default env variable for resource manager address. */
+	public static final String RM_ADDRESS = "SHDP_HD_RM";
+
+	/** Default env variable for hdfs address. */
+	public static final String FS_ADDRESS = "SHDP_HD_FS";
+
+	/** Default env variable for resource manager scheduler address. */
+	public static final String SCHEDULER_ADDRESS = "SHDP_HD_SCHEDULER";
+	
 }

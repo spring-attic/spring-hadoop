@@ -810,12 +810,14 @@ project('spring-data-hadoop-boot') {
 	dependencies {
 		compile project(":spring-data-hadoop")
 		compile "org.springframework.boot:spring-boot-autoconfigure:$springBootVersion"
+		optional "org.springframework.boot:spring-boot-configuration-processor:$springBootVersion"
 		runtime "org.yaml:snakeyaml:$snakeYamlVersion"
 		testCompile "org.springframework:spring-test:$springVersion"
 		testCompile "org.hamcrest:hamcrest-core:$hamcrestVersion"
 		testCompile "org.hamcrest:hamcrest-library:$hamcrestVersion"
 		testCompile "junit:junit:$junitVersion"
 	}
+	compileJava.dependsOn(processResources)
 }
 
 project('spring-data-hadoop-test') {
@@ -1119,6 +1121,7 @@ project('spring-yarn:spring-yarn-boot') {
 		provided "org.springframework:spring-webmvc:$springVersion"
 		compile "org.springframework.boot:spring-boot-autoconfigure:$springBootVersion"
 		compile "org.springframework.boot:spring-boot-actuator:$springBootVersion"
+		optional "org.springframework.boot:spring-boot-configuration-processor:$springBootVersion"
 		compile "org.apache.httpcomponents:httpclient:$httpclientVersion"
 		optional "org.springframework.security:spring-security-config:$springSecurityVersion"
 		optional "org.springframework.security:spring-security-web:$springSecurityVersion"
@@ -1131,6 +1134,7 @@ project('spring-yarn:spring-yarn-boot') {
 		testCompile "com.jayway.jsonpath:json-path:$jsonpathVersion"
 		testCompile "com.jayway.jsonpath:json-path-assert:$jsonpathVersion"
 	}
+	compileJava.dependsOn(processResources)
 }
 
 project('spring-yarn:spring-yarn-boot-cli') {

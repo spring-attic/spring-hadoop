@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,10 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.EnvironmentAware;
+import org.springframework.core.env.Environment;
+import org.springframework.data.hadoop.HadoopSystemConstants;
 import org.springframework.data.hadoop.security.SecurityAuthMethod;
 import org.springframework.util.StringUtils;
 
@@ -32,28 +34,56 @@ import org.springframework.util.StringUtils;
  *
  */
 @ConfigurationProperties(value = "spring.hadoop")
-public class SpringHadoopProperties {
+public class SpringHadoopProperties implements EnvironmentAware {
 
 	private final static Log log = LogFactory.getLog(SpringHadoopProperties.class);
 
+	// javadocs for fields are for boot configuration metadata processor
+	// so keep it simple and end with '.'.
+	
+	/** Hadoop filesystem uri. */
 	private String fsUri;
+	
+	/** YARN resource manager host. */
 	private String resourceManagerHost;
+	
+	/** YARN resource manager scheduler host. */
 	private String resourceManagerSchedulerHost;
+	
+	/** YARN resource manager port. */
 	private Integer resourceManagerPort = 8032;
+	
+	/** YARN resource manager scheduler port. */
 	private Integer resourceManagerSchedulerPort = 8030;
+
+	/** Additional Spring properties resources to import. */
 	private List<String> resources;
+	
+	/** Hadoop security and kerberos configuration. */
 	private SpringHadoopSecurityProperties security;
+	
+	/** Additional Hadoop configuration keys and values. */
 	private Map<String, String> config;
 
-	@Autowired
-	private SpringHadoopEnvProperties shep;
+	private String syepFsUri;
+	
+	private String syepRm;
+	
+	private String syepScheduler;
 
+	@Override
+	public void setEnvironment(Environment environment) {
+		syepFsUri = environment.getProperty(HadoopSystemConstants.FS_ADDRESS);
+		syepRm = environment.getProperty(HadoopSystemConstants.RM_ADDRESS);
+		syepScheduler = environment.getProperty(HadoopSystemConstants.SCHEDULER_ADDRESS);
+	}
+	
 	public String getFsUri() {
 		if (log.isDebugEnabled()) {
 			log.debug("syp fsUri=[" + fsUri + "]");
-			log.debug("syep fsUri=[" + shep.getFs() + "]");
+			log.debug("syep fsUri=[" + syepFsUri + "]");
 		}
-		return shep.getFs() != null ? shep.getFs() : fsUri;
+		return syepFsUri != null ? syepFsUri : fsUri;
 	}
 
 	public void setFsUri(String fsUri) {
@@ -61,7 +91,7 @@ public class SpringHadoopProperties {
 	}
 
 	public String getResourceManagerAddress() {
-		return shep.getRm() != null ? shep.getRm() : resourceManagerHost + ":" + getResourceManagerPort();
+		return syepRm != null ? syepRm : resourceManagerHost + ":" + getResourceManagerPort();
 	}
 
 	public void setResourceManagerAddress(String resourceManagerAddress) {
@@ -76,7 +106,7 @@ public class SpringHadoopProperties {
 	}
 
 	public String getResourceManagerSchedulerAddress() {
-		return shep.getScheduler() != null ? shep.getScheduler() : resourceManagerSchedulerHost + ":" + getResourceManagerSchedulerPort();
+		return syepScheduler != null ? syepScheduler : resourceManagerSchedulerHost + ":" + getResourceManagerSchedulerPort();
 	}
 
 	public void setResourceManagerSchedulerAddress(String resourceManagerSchedulerAddress) {
@@ -140,10 +170,20 @@ public class SpringHadoopProperties {
 	}
 
 	public static class SpringHadoopSecurityProperties {
+		
+		/** Hadoop security method. */
 		private SecurityAuthMethod authMethod;
+		
+		/** Kerberos user principal. */
 		private String userPrincipal;
+		
+		/** Path to kerberos user keytab file. */
 		private String userKeytab;
+		
+		/** Hadoop namenode kerberos principal. */
 		private String namenodePrincipal;
+		
+		/** Hadoop resource manager kerberos principal. */
 		private String rmManagerPrincipal;
 
 		public SecurityAuthMethod getAuthMethod() {

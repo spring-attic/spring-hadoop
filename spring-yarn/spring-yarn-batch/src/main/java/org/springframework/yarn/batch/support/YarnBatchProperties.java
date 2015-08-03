@@ -30,6 +30,16 @@ public class YarnBatchProperties {
 	private String name;
 	private boolean enabled = false;
 	private List<JobProperties> jobs;
+	
+	private Map<Jobs2Enum, Object> test;
+	
+	public void setTest(Map<Jobs2Enum, Object> test) {
+		this.test = test;
+	}
+	
+	public Map<Jobs2Enum, Object> getTest() {
+		return test;
+	}
 
 	public String getName() {
 		return name;
@@ -75,6 +85,10 @@ public class YarnBatchProperties {
 	@Override
 	public String toString() {
 		return "SpringYarnBatchProperties [jobs=" + jobs + "]";
+	}
+	
+	public static enum Jobs2Enum {
+		name,enabled
 	}
 
 	/**

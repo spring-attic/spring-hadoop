@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,7 +74,7 @@ public class SpringHadoopPropertiesTests {
 	}
 
 	@Test
-	public void testHadoopConfig() {
+	public void testHadoopConfigFromYaml() {
 		SpringApplication app = new SpringApplication(TestConfiguration.class);
 		app.setWebEnvironment(false);
 		ConfigurableApplicationContext context = app
@@ -84,11 +84,29 @@ public class SpringHadoopPropertiesTests {
 		assertThat(properties.getConfig(), notNullValue());
 		assertThat(properties.getConfig().get("key1"), is("value1"));
 		assertThat(properties.getConfig().get("key2"), is("value2"));
+		assertThat(properties.getConfig().get("foo1.bar1"), is("jee1"));
+		assertThat(properties.getConfig().get("foo2.bar21"), is("jee21"));
+		assertThat(properties.getConfig().get("foo2.bar22"), is("jee22"));
 		context.close();
 	}
 
+	@Test
+	public void testHadoopConfigFromProperties() {
+		SpringApplication app = new SpringApplication(TestConfiguration.class);
+		app.setWebEnvironment(false);
+		ConfigurableApplicationContext context = app
+				.run(new String[] { "--spring.config.name=SpringHadoopPropertiesTests4" });
+		SpringHadoopProperties properties = context.getBean(SpringHadoopProperties.class);
+		assertThat(properties, notNullValue());
+		assertThat(properties.getConfig(), notNullValue());
+		assertThat(properties.getConfig().get("key1"), is("value1"));
+		assertThat(properties.getConfig().get("key2"), is("value2"));
+		assertThat(properties.getConfig().get("fs.defaultFS"), is("defaultFSValue"));
+		context.close();
+	}
+	
 	@Configuration
-	@EnableConfigurationProperties({ SpringHadoopProperties.class, SpringHadoopEnvProperties.class })
+	@EnableConfigurationProperties({ SpringHadoopProperties.class })
 	protected static class TestConfiguration {
 	}
 
