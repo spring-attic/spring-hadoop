@@ -47,7 +47,7 @@ class RunProcessCommand extends AbstractCommand {
 
 	protected ExitStatus run(Collection<String> args) throws IOException {
 		this.process = new RunProcess(this.command);
-		int code = this.process.run(args.toArray(new String[args.size()]));
+		int code = this.process.run(true, args.toArray(new String[args.size()]));
 		if (code == 0) {
 			return ExitStatus.OK;
 		}
