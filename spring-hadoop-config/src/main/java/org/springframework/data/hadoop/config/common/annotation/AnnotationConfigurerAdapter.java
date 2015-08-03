@@ -59,10 +59,10 @@ public abstract class AnnotationConfigurerAdapter<O,I,B extends AnnotationBuilde
 	}
 
 	/**
-	 * Gets the {@link AnnotationBuilder}. Cannot be null.
+	 * Gets the {@link AnnotationBuilder}. Cannot be null. This method
+	 * throws {@link IllegalStateException} if {@link AnnotationBuilder} is null.
 	 *
 	 * @return the {@link AnnotationBuilder}
-	 * @throw {@link IllegalStateException} if {@link AnnotationBuilder} is null
 	 */
 	protected final B getBuilder() {
 		if(builder == null) {
@@ -73,7 +73,7 @@ public abstract class AnnotationConfigurerAdapter<O,I,B extends AnnotationBuilde
 
 	/**
 	 * Adds an {@link ObjectPostProcessor} to be used for this
-	 * {@link SecurityConfigurerAdapter}. The default implementation does
+	 * {@link AnnotationConfigurerAdapter}. The default implementation does
 	 * nothing to the object.
 	 *
 	 * @param objectPostProcessor the {@link ObjectPostProcessor} to use

@@ -40,8 +40,8 @@ import org.springframework.data.hadoop.config.common.annotation.AnnotationConfig
  * using {@link EnableHadoop}.
  *
  * @author Janne Valkealahti
- * @see EnableYarn
- * @see SpringYarnConfigBuilder
+ * @see EnableHadoop
+ * @see SpringHadoopConfigBuilder
  *
  */
 @Configuration

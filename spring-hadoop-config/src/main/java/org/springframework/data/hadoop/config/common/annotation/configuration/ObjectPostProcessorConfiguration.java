@@ -18,6 +18,7 @@ package org.springframework.data.hadoop.config.common.annotation.configuration;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.hadoop.config.common.annotation.EnableAnnotationConfiguration;
 import org.springframework.data.hadoop.config.common.annotation.ObjectPostProcessor;
 
 /**
