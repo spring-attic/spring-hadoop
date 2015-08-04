@@ -1,131 +1,31 @@
 [[springandhadoop-hive]]
-== Hive integration
+== Hive integration 
 
-When working with http://hive.apache.org[] from a Java environment, one
-can choose between the http://thrift.apache.org/[Thrift] client or using
-the Hive JDBC-like driver. Both have their pros and cons but no matter
-the choice, Spring and SHDP support both of them.
+Starting with Spring for Apache Hadoop 2.3 and Hive 1.0 support for HiveServer1 and the Hive Thrift 
+client have been dropped. You should instead use HiveServer2 and the JDBC driver for Hive.
+
+The SHDP programming model for HiveServer1 have been updated to use the JDBC driver instead of directly using the Thrift client. If you have existing code you will have to modify it if you use the `HiveClient` directly. If you use the `HiveTemplate` then you should be able to simply update your configuration files to use the JDBC driver.
 
 === Starting a Hive Server
 
-SHDP provides a dedicated namespace element for starting a Hive server
-as a Thrift service (only when using Hive 0.8 or higher). Simply specify
-the host, the port (the defaults are `localhost` and `10000`
-respectively) and you're good to go:
+The new HiveServer2 now supports multi-user access and is typically run in the Hadoop cluster. See the http://hive.apache.org[Hive Project] for details.
 
-[source,xml]
-----
-<!-- by default, the definition name is 'hive-server' -->
-<hdp:hive-server host="some-other-host" port="10001" />
-----
+=== Using the Hive JDBC Client
 
-If needed the Hadoop configuration can be passed in or additional
-properties specified. In fact `hiver-server` provides the same
-properties configuration `knobs` as
-<<springandhadoop-config,hadoop configuration>>:
-
-[source,xml]
-----
-<hdp:hive-server host="some-other-host" port="10001" properties-location="classpath:hive-dev.properties" configuration-ref="hadoopConfiguration">
-  someproperty=somevalue
-  hive.exec.scratchdir=/tmp/mydir
-</hdp:hive-server>
-----
-
-The Hive server is bound to the enclosing application context
-life-cycle, that is it will automatically startup and shutdown
-along-side the application context.
-
-=== Using the Hive Thrift Client
-
-Similar to the server, SHDP provides a dedicated namespace element for
+We provide a dedicated namespace element for
 configuring a Hive client (that is Hive accessing a server node through
-the Thrift). Likewise, simply specify the host, the port (the defaults
-are `localhost` and `10000` respectively) and you're done:
+JDBC). You also need a hiveDataSource using the JDBC driver for HiveServer2:
 
 [source,xml]
 ----
 <!-- by default, the definition name is 'hiveClientFactory' -->
-<hdp:hive-client-factory host="some-other-host" port="10001" />
+<hive-client-factory id="hiveClientFactory" hive-data-source-ref="hiveDataSource"/>
+<beans:bean id="hiveDriver" class="org.apache.hive.jdbc.HiveDriver"/>
+<beans:bean id="hiveDataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
+  <beans:constructor-arg name="driver" ref="hiveDriver"/>
+  <beans:constructor-arg name="url" value="jdbc:hive2://localhost:1000"/>
+</beans:bean>
 ----
-
-Note that since Thrift clients are not thread-safe,
-`hive-client-factory` returns a factory (named
-`org.springframework.data.hadoop.hive.HiveClientFactory`) for creating
-`HiveClient` new instances for each invocation. Furthermore, the client
-definition also allows Hive scripts (either declared inlined or
-externally) to be executed during initialization, once the client
-connects; this is quite useful for doing Hive specific initialization:
-
-[source,xml]
-----
-<hive-client-factory host="some-host" port="some-port" xmlns="http://www.springframework.org/schema/hadoop">
-   <hdp:script>
-     DROP TABLE IF EXITS testHiveBatchTable; 
-     CREATE TABLE testHiveBatchTable (key int, value string);
-   </hdp:script>
-   <hdp:script location="classpath:org/company/hive/script.q">
-       <arguments>ignore-case=true</arguments>
-   </hdp:script>
-</hive-client-factory>
-----
-
-In the example above, two scripts are executed each time a new Hive
-client is created (if the scripts need to be executed only once consider
-using a tasklet) by the factory. The first script is defined inline
-while the second is read from the classpath and passed one parameter.
-For more information on using parameters (or variables) in Hive scripts,
-see Hive manual.
-
-=== Using the Hive JDBC Client
-
-Another attractive option for accessing Hive is through its JDBC driver.
-This exposes Hive through the
-http://docs.oracle.com/javase/6/docs/technotes/guides/jdbc/[JDBC API]
-meaning one can use the standard API or its derived utilities to
-interact with Hive, such as the rich {core-jdbc}[JDBC support] in
-Spring Framework.
-
-[WARNING]
-====
-Note that the JDBC driver is a work-in-progress and not all the JDBC
-features are available (and probably never will since Hive cannot
-support all of them as it is not the typical relational database). Do
-read the official documentation and examples.
-====
-
-SHDP does not offer any dedicated support for the JDBC integration -
-Spring Framework itself provides the needed tools; simply configure Hive
-as you would with any other JDBC Driver:
-
-[source,xml]
-----
-<beans xmlns="http://www.springframework.org/schema/beans"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:c="http://www.springframework.org/schema/c"
-    xmlns:context="http://www.springframework.org/schema/context"
-    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
-    
-    <!-- basic Hive driver bean -->
-    <bean id="hive-driver" class="org.apache.hadoop.hive.jdbc.HiveDriver"/>
-
-    <!-- wrapping a basic datasource around the driver -->
-    <!-- notice the 'c:' namespace for inlining constructor arguments, 
-         in this case the url (default is 'jdbc:hive://localhost:10000/default') -->
-    <bean id="hive-ds" class="org.springframework.jdbc.datasource.SimpleDriverDataSource"
-       c:driver-ref="hive-driver" c:url="${hive.url}"/>
-
-    <!-- standard JdbcTemplate declaration -->
-    <bean id="template" class="org.springframework.jdbc.core.JdbcTemplate" c:data-source-ref="hive-ds"/>
-    
-    <context:property-placeholder location="hive.properties"/>
-</beans>
-----
-
-And that is it! Following the example above, one can use the `hive-ds`
-DataSource bean to manually get a hold of Connections or better yet, use
-Spring's {core-jdbc-JdbcTemplate}[JdbcTemplate] as in the example above.
 
 === Running a Hive script or query
 
