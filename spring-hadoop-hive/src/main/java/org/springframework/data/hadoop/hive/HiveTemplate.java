@@ -15,6 +15,7 @@
  */
 package org.springframework.data.hadoop.hive;
 
+import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +26,9 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.dao.TypeMismatchDataAccessException;
+import org.springframework.dao.UncategorizedDataAccessException;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ResourceUtils;
@@ -84,7 +87,7 @@ public class HiveTemplate implements InitializingBean, HiveOperations, ResourceL
 			try {
 				hiveClient.shutdown();
 			} catch (Exception ex) {
-				// ignore for now
+				throw new InvalidDataAccessResourceUsageException("Error while closing client connection", ex);
 			}
 		}
 	}

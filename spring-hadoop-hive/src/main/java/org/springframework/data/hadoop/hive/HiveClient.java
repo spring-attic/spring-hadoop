@@ -100,11 +100,7 @@ public class HiveClient {
 		return jdbcTemplate;
 	}
 
-	public void shutdown() {
-		//TODO:
-		try {
-			jdbcTemplate.getDataSource().getConnection().close();
-		} catch (SQLException e) {
-		}
+	public void shutdown() throws SQLException {
+		jdbcTemplate.getDataSource().getConnection().close();
 	}
 }

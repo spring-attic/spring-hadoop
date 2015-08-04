@@ -173,6 +173,7 @@ abstract class HiveUtils {
 					hive.shutdown();
 				}
 			} catch (Exception ex) {
+				throw new InvalidDataAccessResourceUsageException("Error while closing client connection", ex);
 			}
 		}
 	}
