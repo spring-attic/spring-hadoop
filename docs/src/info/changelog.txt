@@ -5,6 +5,27 @@ http://projects.spring.io/spring-hadoop/
 Commit changelog: http://github.com/spring-projects/spring-hadoop/tree/v[version]
 Issues changelog: https://jira.spring.io/secure/ReleaseNote.jspa?projectId=10801
 
+Changes in version 2.3.0 M1 (2015-08-04)
+----------------------------------------
+General
+* Remove distros no longer actively supported from build [SHDP-502]
+* Add Hadoop 2.7.x to the build [SHDP-503] 
+* Update Hadoop 2.7.x to 2.7.1 stable release and make it the default [SHDP-508]
+* Add support for HDP 2.3 to build [SHDP-507]
+* Update CDH5 distro to use CDH 5.4 [SHDP-494]
+* Update build to use latest Spring versions and Spring Framework 4.2 RC [SHDP-504]
+
+Core
+* Support boot config props metadata [SHDP-452]
+
+Store
+* Fix for append reopen may fail [SHDP-510]
+
+Hive
+* Support for Hive 1.x in build [SHDP-484]
+* Support HiveServer2 in HiveTemplate [SHDP-331]
+
+
 Changes in version 2.2.0 RELEASE (2015-06-09)
 ---------------------------------------------
 General
