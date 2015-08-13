@@ -126,7 +126,7 @@ public class YarnContainerClusterMvcEndpoint extends EndpointMvcAdapter {
 	 * @param clusterId the container cluster identifier
 	 * @return the container cluster status response
 	 */
-	@RequestMapping(value = "/{clusterId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{clusterId:.*}", method = RequestMethod.GET)
 	public HttpEntity<ContainerClusterResource> clusterInfo(@PathVariable("clusterId") String clusterId) {
 		ContainerCluster cluster = delegate.getClusters().get(clusterId);
 		if (cluster == null) {
@@ -143,7 +143,7 @@ public class YarnContainerClusterMvcEndpoint extends EndpointMvcAdapter {
 	 * @param request Binding for modify request content
 	 * @return the container cluster status response
 	 */
-	@RequestMapping(value = "/{clusterId}", method = RequestMethod.PUT)
+	@RequestMapping(value = "/{clusterId:.*}", method = RequestMethod.PUT)
 	public HttpEntity<Void> modifyCluster(@PathVariable("clusterId") String clusterId,
 			@RequestBody ContainerClusterModifyRequest request) {
 		ModifyAction action = ContainerClusterModifyRequest.getModifyAction(request.getAction());
@@ -159,7 +159,7 @@ public class YarnContainerClusterMvcEndpoint extends EndpointMvcAdapter {
 		return new ResponseEntity<Void>(HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/{clusterId}", method = RequestMethod.DELETE)
+	@RequestMapping(value = "/{clusterId:.*}", method = RequestMethod.DELETE)
 	public ResponseEntity<Void> destroyCluster(@PathVariable("clusterId") String clusterId) {
 		ContainerCluster cluster = getClusterMayThrow(clusterId);
 		delegate.destroyCluster(cluster.getId());
@@ -173,7 +173,7 @@ public class YarnContainerClusterMvcEndpoint extends EndpointMvcAdapter {
 	 * @param request the request
 	 * @return the container cluster modify response
 	 */
-	@RequestMapping(value = "/{clusterId}", method = RequestMethod.PATCH)
+	@RequestMapping(value = "/{clusterId:.*}", method = RequestMethod.PATCH)
 	public HttpEntity<Void> updateCluster(@PathVariable("clusterId") String clusterId, @RequestBody ContainerClusterCreateRequest request) {
 		ContainerCluster cluster = delegate.getClusters().get(clusterId);
 		if (cluster == null) {
