@@ -311,6 +311,57 @@ public class YarnContainerClusterMvcEndpointTests {
 		assertThat(clusters.get("foo").getGridProjection().getProjectionData().getAny(), is(2));
 	}
 
+	@Test
+	public void testDotsInClusterName() throws Exception {
+		String content = "{\"clusterId\":\"cluster.1.1\",\"clusterDef\":\"cluster1\",\"projection\":\"DEFAULT\",\"projectionData\":{\"any\":1}},\"extraProperties\":{\"key1\":\"value1\"}}";
+		mvc.
+			perform(post(BASE).content(content).contentType(MediaType.APPLICATION_JSON)).
+			andExpect(status().isCreated()).
+			andExpect(content().string(is(""))).
+			andExpect(header().string("Location", endsWith("/cluster.1.1")));
+		Map<String, ContainerCluster> clusters = TestUtils.readField("clusters", appmaster);
+		assertThat(clusters.size(), is(1));
+		assertThat(clusters.containsKey("cluster.1.1"), is(true));
+		assertThat(clusters.get("cluster.1.1").getGridProjection().getProjectionData().getAny(), is(1));
+
+		mvc.
+			perform(get(BASE)).
+			andExpect(status().isOk()).
+			andExpect(content().string(not(isEmptyString()))).
+			andExpect(jsonPath("$.*", hasSize(1))).
+			andExpect(jsonPath("$.clusters", hasSize(1))).
+			andExpect(jsonPath("$.clusters[0]", is("cluster.1.1")));
+
+		TestUtils.callMethod("doTask", appmaster);
+		allocateContainer(appmaster, 1);
+		mvc.
+			perform(get(BASE + "/cluster.1.1")).
+			andExpect(status().isOk()).
+			andExpect(content().string(not(isEmptyString()))).
+			andExpect(jsonPath("$.*", hasSize(3))).
+			andExpect(jsonPath("$.id", is("cluster.1.1"))).
+			andExpect(jsonPath("$.gridProjection.*", hasSize(3))).
+			andExpect(jsonPath("$.gridProjection.members", hasSize(1))).
+			andExpect(jsonPath("$.gridProjection.projectionData.*", hasSize(9))).
+			andExpect(jsonPath("$.gridProjection.projectionData.type", is("default"))).
+			andExpect(jsonPath("$.gridProjection.projectionData.priority", is(0))).
+			andExpect(jsonPath("$.gridProjection.projectionData.memory", is(0))).
+			andExpect(jsonPath("$.gridProjection.projectionData.virtualCores", is(0))).
+			andExpect(jsonPath("$.gridProjection.projectionData.locality", nullValue())).
+			andExpect(jsonPath("$.gridProjection.projectionData.any", is(1))).
+			andExpect(jsonPath("$.gridProjection.projectionData.hosts.*", hasSize(0))).
+			andExpect(jsonPath("$.gridProjection.projectionData.racks.*", hasSize(0))).
+			andExpect(jsonPath("$.gridProjection.projectionData.properties.*", hasSize(0))).
+			andExpect(jsonPath("$.gridProjection.satisfyState.*", hasSize(2))).
+			andExpect(jsonPath("$.gridProjection.satisfyState.allocateData.*", hasSize(3))).
+			andExpect(jsonPath("$.gridProjection.satisfyState.allocateData.racks.*", hasSize(0))).
+			andExpect(jsonPath("$.gridProjection.satisfyState.allocateData.any", is(0))).
+			andExpect(jsonPath("$.gridProjection.satisfyState.allocateData.hosts.*", hasSize(0))).
+			andExpect(jsonPath("$.gridProjection.satisfyState.removeData", hasSize(0))).
+			andExpect(jsonPath("$.containerClusterState.clusterState", is(ClusterState.INITIAL.toString())));
+	}
+
+
 	@Import({ ContainerClusterStateMachineConfiguration.class, EndpointWebMvcAutoConfiguration.class, ManagementServerPropertiesAutoConfiguration.class,
 			HypermediaAutoConfiguration.class })
 	@EnableWebMvc
