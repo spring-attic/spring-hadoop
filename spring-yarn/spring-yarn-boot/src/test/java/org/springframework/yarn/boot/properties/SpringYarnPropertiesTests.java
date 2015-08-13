@@ -52,6 +52,21 @@ public class SpringYarnPropertiesTests {
 		context.close();
 	}
 
+	@Test
+	public void testEnvProperties() {
+		SpringApplication app = new SpringApplication(TestConfiguration.class);
+		app.setWebEnvironment(false);
+		ConfigurableApplicationContext context = app.run(new String[] { "--SHDP_HD_FS=myshdphdfs",
+				"--SHDP_HD_RM=myshdphdrm", "--SHDP_HD_SCHEDULER=myshdpscheduler",
+				"--SHDP_AMSERVICE_TRACKURL=myshdpamservicetrackurl", "--SHDP_CONTAINERID=myshdpcontainerid" });
+		SpringYarnEnvProperties properties = context.getBean(SpringYarnEnvProperties.class);
+		assertThat(properties.getFs(), is("myshdphdfs"));
+		assertThat(properties.getRm(), is("myshdphdrm"));
+		assertThat(properties.getScheduler(), is("myshdpscheduler"));
+		assertThat(properties.getTrackUrl(), is("myshdpamservicetrackurl"));
+		assertThat(properties.getContainerId(), is("myshdpcontainerid"));
+	}
+
 	@Configuration
 	@EnableConfigurationProperties({ SpringYarnProperties.class, SpringYarnEnvProperties.class })
 	protected static class TestConfiguration {
