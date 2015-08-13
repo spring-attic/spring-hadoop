@@ -1175,8 +1175,7 @@ project('spring-yarn:spring-yarn-boot-build-tests') {
 	// boot plugin imports gradle application plugin
 	// which creates distZip task which fails
 	// because we don't need mainClassname, so
-	// disabling startScripts and distZip tasks
-	startScripts.enabled = false
+	// disabling distZip task
 	distZip.enabled = false
 
 	// with gradle 2.4/2.5 build barks that zip file cannot be

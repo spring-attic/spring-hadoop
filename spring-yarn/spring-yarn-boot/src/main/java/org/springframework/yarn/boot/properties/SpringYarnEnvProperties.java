@@ -48,7 +48,7 @@ public class SpringYarnEnvProperties {
 	 *
 	 * @param fs file system URL
 	 */
-	public void setSHDP_HD_FS(String fs) {
+	public void setShdpHdFs(String fs) {
 		this.fs = fs;
 	}
 
@@ -66,7 +66,7 @@ public class SpringYarnEnvProperties {
 	 *
 	 * @param rm resource manager address
 	 */
-	public void setSHDP_HD_RM(String rm) {
+	public void setShdpHdRm(String rm) {
 		this.rm = rm;
 	}
 
@@ -85,7 +85,7 @@ public class SpringYarnEnvProperties {
 	 *
 	 * @param scheduler scheduler address
 	 */
-	public void setSHDP_HD_SCHEDULER(String scheduler) {
+	public void setShdpHdScheduler(String scheduler) {
 		this.scheduler = scheduler;
 	}
 
@@ -104,7 +104,7 @@ public class SpringYarnEnvProperties {
 	 *
 	 * @param trackUrl track url
 	 */
-	public void setSHDP_AMSERVICE_TRACKURL(String trackUrl) {
+	public void setShdpAmserviceTrackurl(String trackUrl) {
 		this.trackUrl = trackUrl;
 	}
 
@@ -123,7 +123,7 @@ public class SpringYarnEnvProperties {
 	 *
 	 * @param containerId container id
 	 */
-	public void setSHDP_CONTAINERID(String containerId) {
+	public void setShdpContainerid(String containerId) {
 		this.containerId = containerId;
 	}
 
