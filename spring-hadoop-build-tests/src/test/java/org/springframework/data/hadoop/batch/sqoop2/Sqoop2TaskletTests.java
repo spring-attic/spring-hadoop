@@ -37,6 +37,10 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * @author Thomas Risberg
+ *
+ * This test only runs if you specify 'enableSqoop2Tests' during the build. 
+ * It requires that you have Sqoop2 installed and running on the default port 12000 on localhost. 
+ * You also need a job with ID 1 defined.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("/org/springframework/data/hadoop/batch/sqoop2/sqoop2-batch.xml")
