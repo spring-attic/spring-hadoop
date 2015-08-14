@@ -95,7 +95,7 @@ public class OutputStreamWriter extends AbstractDataStreamWriter implements Data
 
 		OutputContext context = getOutputContext();
 		if (context.getRolloverState()) {
-			log.info("after write, rollever state is true");
+			log.info("After write, rollover state is true");
 			close();
 			context.rollStrategies();
 		}
@@ -113,7 +113,7 @@ public class OutputStreamWriter extends AbstractDataStreamWriter implements Data
 				close();
 			}
 		} catch (IOException e) {
-			log.error("error closing", e);
+			log.error("Error closing", e);
 		}
 		getOutputContext().rollStrategies();
 	}
