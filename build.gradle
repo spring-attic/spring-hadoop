@@ -77,6 +77,7 @@ def hiveVersion = defaultHiveVersion
 def pigVersion = defaultPigVersion
 def hbaseVersion = defaultHbaseVersion
 def List hbaseArtifacts = []
+def sqoop2Version = defaultSqoop2Version
 
 // handle older Hive version
 def hiveGroup = "org.apache.hive"
@@ -97,6 +98,7 @@ switch (hadoopDistro) {
 				  "org.apache.hbase:hbase-client:$hbaseVersion"]
 		hiveVersion = cdh5HiveVersion
 		pigVersion = cdh5PigVersion
+		sqoop2Version = cdh5Sqoop2Version
 		hadoopArtifacts = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
@@ -303,6 +305,7 @@ configure(javaProjects()) {
 	ext.skipHive = true
 	ext.skipHBase = true
 	ext.skipWebHdfs = true
+	ext.skipSqoop2 = true
 
 	test {
 		systemProperty("testGroups", project.properties.get("testGroups"))
@@ -790,6 +793,17 @@ project('spring-data-hadoop-pig') {
 
 }
 
+project('spring-data-hadoop-sqoop2') {
+	description = 'Spring for Apache Hadoop Sqoop2 Support'
+
+	dependencies {
+		compile project(":spring-data-hadoop-core")
+		compile "org.springframework.batch:spring-batch-core:$springBatchVersion"
+		compile("org.apache.sqoop:sqoop-client:$sqoop2Version")
+	}
+
+}
+
 project('spring-data-hadoop') {
 	description = 'Spring for Apache Hadoop Configuration'
 
@@ -851,6 +865,7 @@ project('spring-data-hadoop-build-tests') {
 		compile project(":spring-data-hadoop")
 		compile project(":spring-data-hadoop-test")
 		testCompile project(path:":spring-data-hadoop-test", configuration:"testArtifacts")
+		testCompile project(path:":spring-data-hadoop-sqoop2")
 
 		// Testing
 		testCompile "junit:junit:$junitVersion"
@@ -918,6 +933,14 @@ project('spring-data-hadoop-build-tests') {
 		}
 	}
 
+	task enableSqoop2Tests {
+		description = "Enabling Sqoop2 tests"
+		group = "Verification"
+		doLast() {
+			project.ext.skipSqoop2 = false
+		}
+	}
+
 	task enableAllTests() {
 		description = "Enabling all (incl. Pig, Hive, HBase, WebHdfs) tests"
 		group = "Verification"
@@ -926,6 +949,7 @@ project('spring-data-hadoop-build-tests') {
 			project.ext.skipHive = false
 			project.ext.skipHBase = false
 			project.ext.skipWebHdfs = false
+			project.ext.skipSqoop2 = false
 		}
 	}
 
@@ -963,6 +987,11 @@ project('spring-data-hadoop-build-tests') {
 			if (project.ext.skipWebHdfs) {
 				ext.msg += "WebHdfs "
 				excludes.add("**/WebHdfs*")
+			}
+
+			if (project.ext.skipSqoop2) {
+				ext.msg += "Sqoop2 "
+				excludes.add("**/sqoop2/**")
 			}
 
 			if (!msg.trim().isEmpty())
