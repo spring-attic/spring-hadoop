@@ -69,6 +69,7 @@ public class HadoopAutoConfigurationTests {
 		Configuration configuration = ctx.getBean(HadoopSystemConstants.DEFAULT_ID_CONFIGURATION, Configuration.class);
 		assertThat(configuration, notNullValue());
 		assertThat(configuration.get("fs.defaultFS"), is("hdfs://host:1234"));
+		assertThat(configuration.get("mapreduce.jobhistory.address"), is("jobHistoryAddressFoo:10020"));
 		assertThat(configuration.get("key1"), is("value1"));
 		assertThat(configuration.get("key2"), is("value2"));
 	}

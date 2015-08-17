@@ -1,6 +1,7 @@
 spring:
     hadoop:
         fsUri: hdfs://host:1234
+        jobHistoryAddress: jobHistoryAddressFoo:10020
         config:
             key1: value1
             key2: value2

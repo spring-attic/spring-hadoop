@@ -69,6 +69,7 @@ public class SpringHadoopPropertiesTests {
 		assertThat(properties.getResourceManagerHost(), is("resourceManagerHostFoo"));
 		assertThat(properties.getResourceManagerPort(), is(321));
 		assertThat(properties.getResourceManagerSchedulerPort(), is(123));
+		assertThat(properties.getJobHistoryAddress(), is("jobHistoryAddressFoo:10020"));
 		assertThat(properties.getResources(), nullValue());
 		context.close();
 	}
@@ -104,7 +105,7 @@ public class SpringHadoopPropertiesTests {
 		assertThat(properties.getConfig().get("fs.defaultFS"), is("defaultFSValue"));
 		context.close();
 	}
-	
+
 	@Configuration
 	@EnableConfigurationProperties({ SpringHadoopProperties.class })
 	protected static class TestConfiguration {

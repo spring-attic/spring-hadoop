@@ -4,3 +4,4 @@ spring:
         resourceManagerHost: resourceManagerHostFoo
         resourceManagerPort: 321
         resourceManagerSchedulerPort: 123
+        jobHistoryAddress: jobHistoryAddressFoo:10020

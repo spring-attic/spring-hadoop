@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -152,7 +152,7 @@ public interface HadoopConfigConfigurer {
 	 * <br>XML:
 	 * <br>
 	 * <pre>
-	 * &lt;yarn:configuration fs-uri="hdfs://myhost:8020"/&gt;
+	 * &lt;hadoop:configuration file-system-uri="hdfs://myhost:8020"/&gt;
 	 * </pre>
 	 *
 	 * @param uri The Hdfs uri
@@ -176,13 +176,37 @@ public interface HadoopConfigConfigurer {
 	 * <br>XML:
 	 * <br>
 	 * <pre>
-	 * &lt;yarn:configuration rm-address="myRmHost:8032"/&gt;
+	 * &lt;hadoop:configuration rm-manager-uri="myRmHost:8032"/&gt;
 	 * </pre>
 	 *
 	 * @param address The Yarn resource manager address
 	 * @return {@link HadoopConfigConfigurer} for chaining
 	 */
 	HadoopConfigConfigurer resourceManagerAddress(String address);
+
+	/**
+	 * Specify a MapReduce job history address.
+	 *
+	 * <br>
+	 * <br>JavaConfig:
+	 * <br>
+	 * <pre>
+	 * public void configure(HadoopConfigConfigurer config) throws Exception {
+	 *   config
+	 *     .jobHistoryAddress("myJobHistoryHost:10020");
+	 * }
+	 * </pre>
+	 *
+	 * <br>XML:
+	 * <br>
+	 * <pre>
+	 * &lt;hadoop:configuration job-history-uri="myJobHistoryHost:10020"/&gt;
+	 * </pre>
+	 *
+	 * @param address The Yarn resource manager address
+	 * @return {@link HadoopConfigConfigurer} for chaining
+	 */
+	HadoopConfigConfigurer jobHistoryAddress(String address);
 
 	/**
 	 * Specify if Hadoop {@link Configuration} is initially

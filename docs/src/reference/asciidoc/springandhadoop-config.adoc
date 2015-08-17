@@ -414,6 +414,7 @@ Namespace `spring.hadoop` supports following properties;
 <<spring.hadoop.resourceManagerHost,resourceManagerHost>>,
 <<spring.hadoop.resourceManagerPort,resourceManagerPort>>,
 <<spring.hadoop.resourceManagerSchedulerPort,resourceManagerSchedulerPort>>,
+<<spring.hadoop.jobHistoryAddress,jobHistoryAddress>>,
 <<spring.hadoop.resources,resources>> and
 <<spring.hadoop.config,config>>.
 
@@ -472,6 +473,15 @@ No
 Integer
   Default Value:::
 8030
+[[spring.hadoop.jobHistoryAddress]]`spring.hadoop.jobHistoryAddress`::
+  Description:::
+Address of a MapReduce job history server.
+  Required:::
+No
+  Type:::
+String
+  Default Value:::
+null
 [[spring.hadoop.resources]]`spring.hadoop.resources`::
   Description:::
 List of Spring resource locations to be initialized in

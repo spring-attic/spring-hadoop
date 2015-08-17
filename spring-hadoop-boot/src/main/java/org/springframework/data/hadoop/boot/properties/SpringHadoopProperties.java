@@ -40,35 +40,38 @@ public class SpringHadoopProperties implements EnvironmentAware {
 
 	// javadocs for fields are for boot configuration metadata processor
 	// so keep it simple and end with '.'.
-	
+
 	/** Hadoop filesystem uri. */
 	private String fsUri;
-	
+
 	/** YARN resource manager host. */
 	private String resourceManagerHost;
-	
+
 	/** YARN resource manager scheduler host. */
 	private String resourceManagerSchedulerHost;
-	
+
 	/** YARN resource manager port. */
 	private Integer resourceManagerPort = 8032;
-	
+
 	/** YARN resource manager scheduler port. */
 	private Integer resourceManagerSchedulerPort = 8030;
 
+	/** MapReduce job history address */
+	private String jobHistoryAddress;
+
 	/** Additional Spring properties resources to import. */
 	private List<String> resources;
-	
+
 	/** Hadoop security and kerberos configuration. */
 	private SpringHadoopSecurityProperties security;
-	
+
 	/** Additional Hadoop configuration keys and values. */
 	private Map<String, String> config;
 
 	private String syepFsUri;
-	
+
 	private String syepRm;
-	
+
 	private String syepScheduler;
 
 	@Override
@@ -77,7 +80,7 @@ public class SpringHadoopProperties implements EnvironmentAware {
 		syepRm = environment.getProperty(HadoopSystemConstants.RM_ADDRESS);
 		syepScheduler = environment.getProperty(HadoopSystemConstants.SCHEDULER_ADDRESS);
 	}
-	
+
 	public String getFsUri() {
 		if (log.isDebugEnabled()) {
 			log.debug("syp fsUri=[" + fsUri + "]");
@@ -145,6 +148,14 @@ public class SpringHadoopProperties implements EnvironmentAware {
 		this.resourceManagerSchedulerPort = resourceManagerSchedulerPort;
 	}
 
+	public String getJobHistoryAddress() {
+		return jobHistoryAddress;
+	}
+
+	public void setJobHistoryAddress(String jobHistoryAddress) {
+		this.jobHistoryAddress = jobHistoryAddress;
+	}
+
 	public List<String> getResources() {
 		return resources;
 	}
@@ -170,19 +181,19 @@ public class SpringHadoopProperties implements EnvironmentAware {
 	}
 
 	public static class SpringHadoopSecurityProperties {
-		
+
 		/** Hadoop security method. */
 		private SecurityAuthMethod authMethod;
-		
+
 		/** Kerberos user principal. */
 		private String userPrincipal;
-		
+
 		/** Path to kerberos user keytab file. */
 		private String userKeytab;
-		
+
 		/** Hadoop namenode kerberos principal. */
 		private String namenodePrincipal;
-		
+
 		/** Hadoop resource manager kerberos principal. */
 		private String rmManagerPrincipal;
 

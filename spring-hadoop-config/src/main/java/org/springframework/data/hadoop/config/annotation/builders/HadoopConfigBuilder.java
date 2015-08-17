@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,6 +52,7 @@ public final class HadoopConfigBuilder extends
 	private HadoopSecurity hadoopSecurity;
 	private String fileSystemUri;
 	private String rmAddress;
+	private String jobHistoryAddress;
 	private boolean loadDefaults = true;
 
 	/**
@@ -80,6 +81,7 @@ public final class HadoopConfigBuilder extends
 		fb.setProperties(properties);
 		fb.setFileSystemUri(fileSystemUri);
 		fb.setRmManagerUri(rmAddress);
+		fb.setJobHistoryUri(jobHistoryAddress);
 
 		if (hadoopSecurity != null) {
 			SecurityAuthMethod securityAuthMethod = hadoopSecurity.getSecurityAuthMethod();
@@ -138,6 +140,12 @@ public final class HadoopConfigBuilder extends
 	@Override
 	public HadoopConfigConfigurer resourceManagerAddress(String address) {
 		rmAddress = address;
+		return this;
+	}
+
+	@Override
+	public HadoopConfigConfigurer jobHistoryAddress(String jobHistoryAddress) {
+		this.jobHistoryAddress = jobHistoryAddress;
 		return this;
 	}
 
