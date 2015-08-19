@@ -78,6 +78,7 @@ def pigVersion = defaultPigVersion
 def hbaseVersion = defaultHbaseVersion
 def List hbaseArtifacts = []
 def sqoop2Version = defaultSqoop2Version
+def sparkVersion = defaultSparkVersion
 
 // handle older Hive version
 def hiveGroup = "org.apache.hive"
@@ -98,6 +99,7 @@ switch (hadoopDistro) {
 				  "org.apache.hbase:hbase-client:$hbaseVersion"]
 		hiveVersion = cdh5HiveVersion
 		pigVersion = cdh5PigVersion
+		sparkVersion = cdh5SparkVersion
 		sqoop2Version = cdh5Sqoop2Version
 		hadoopArtifacts = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
@@ -140,6 +142,7 @@ switch (hadoopDistro) {
 		hiveVersion = phd21HiveVersion
 		pigVersion = phd21PigVersion
 		pigQualifier = ':h2'
+		sparkVersion = phd21SparkVersion
 		break;
 
 	// Pivotal HD 3.0
@@ -167,6 +170,7 @@ switch (hadoopDistro) {
 		hiveVersion = phd30HiveVersion
 		pigVersion = phd30PigVersion
 		pigQualifier = ':h2'
+		sparkVersion = phd30SparkVersion
 		break;
 
 	// Hortonworks Data Platform 2.3
@@ -194,6 +198,7 @@ switch (hadoopDistro) {
 		hiveVersion = hdp23HiveVersion
 		pigVersion = hdp23PigVersion
 		pigQualifier = ':h2'
+		sparkVersion = hdp23SparkVersion
 		break;
 
 	// Hadoop 2.6.x
@@ -305,6 +310,7 @@ configure(javaProjects()) {
 	ext.skipHive = true
 	ext.skipHBase = true
 	ext.skipWebHdfs = true
+	ext.skipSpark = true
 	ext.skipSqoop2 = true
 
 	test {
@@ -793,6 +799,30 @@ project('spring-data-hadoop-pig') {
 
 }
 
+project('spring-data-hadoop-spark') {
+	description = 'Spring for Apache Hadoop Spark Support'
+
+	// expose test classes so that dependant project
+	// may define it as dependency
+	configurations {
+		testArtifacts.extendsFrom testRuntime
+	}
+	artifacts {
+		testArtifacts testJar
+	}
+
+	dependencies {
+		compile project(":spring-data-hadoop-core")
+		compile "org.springframework.batch:spring-batch-core:$springBatchVersion"
+		provided("org.apache.spark:spark-yarn_2.10:$sparkVersion")
+		runtime("org.apache.hadoop:hadoop-yarn-api:$hadoopVersion")
+		runtime("org.apache.hadoop:hadoop-yarn-client:$hadoopVersion")
+		runtime("org.apache.hadoop:hadoop-yarn-server-web-proxy:$hadoopVersion")
+		runtime("org.apache.hadoop:hadoop-client:$hadoopVersion")
+	}
+
+}
+
 project('spring-data-hadoop-sqoop2') {
 	description = 'Spring for Apache Hadoop Sqoop2 Support'
 
@@ -811,7 +841,6 @@ project('spring-data-hadoop') {
 		compile project(":spring-data-hadoop-core")
         compile project(":spring-data-hadoop-hive")
         compile project(":spring-data-hadoop-pig")
-        //compile project(":spring-data-hadoop-spark")
         compile project(":spring-data-hadoop-batch")
         compile project(":spring-data-hadoop-hbase")
 	}
@@ -865,6 +894,7 @@ project('spring-data-hadoop-build-tests') {
 		compile project(":spring-data-hadoop")
 		compile project(":spring-data-hadoop-test")
 		testCompile project(path:":spring-data-hadoop-test", configuration:"testArtifacts")
+		testCompile project(path:":spring-data-hadoop-spark")
 		testCompile project(path:":spring-data-hadoop-sqoop2")
 
 		// Testing
@@ -888,6 +918,9 @@ project('spring-data-hadoop-build-tests') {
 	
 		// specify a version of antlr that works with both hive and pig
 		testRuntime "org.antlr:antlr-runtime:$antlrVersion"
+
+		// Spark dependency for Spark tests
+		testRuntime "org.apache.spark:spark-yarn_2.10:$sparkVersion"
 	}
 
     task downloadGutenbergBooks {
@@ -933,6 +966,14 @@ project('spring-data-hadoop-build-tests') {
 		}
 	}
 
+	task enableSparkTests {
+		description = "Enabling Spark tests"
+		group = "Verification"
+		doLast() {
+			project.ext.skipSpark = false
+		}
+	}
+
 	task enableSqoop2Tests {
 		description = "Enabling Sqoop2 tests"
 		group = "Verification"
@@ -942,13 +983,14 @@ project('spring-data-hadoop-build-tests') {
 	}
 
 	task enableAllTests() {
-		description = "Enabling all (incl. Pig, Hive, HBase, WebHdfs) tests"
+		description = "Enabling all (incl. Pig, Hive, HBase, WebHdfs, Spark, Sqoop2) tests"
 		group = "Verification"
 		doLast() {
 			project.ext.skipPig = false
 			project.ext.skipHive = false
 			project.ext.skipHBase = false
 			project.ext.skipWebHdfs = false
+			project.ext.skipSpark = false
 			project.ext.skipSqoop2 = false
 		}
 	}
@@ -987,6 +1029,11 @@ project('spring-data-hadoop-build-tests') {
 			if (project.ext.skipWebHdfs) {
 				ext.msg += "WebHdfs "
 				excludes.add("**/WebHdfs*")
+			}
+
+			if (project.ext.skipSpark) {
+				ext.msg += "Spark "
+				excludes.add("**/spark/**")
 			}
 
 			if (project.ext.skipSqoop2) {

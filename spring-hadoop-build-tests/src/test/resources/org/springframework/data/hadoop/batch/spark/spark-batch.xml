@@ -1,0 +1,47 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:hdp="http://www.springframework.org/schema/hadoop"
+	xmlns:c="http://www.springframework.org/schema/c"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+      	http://www.springframework.org/schema/batch	http://www.springframework.org/schema/batch/spring-batch.xsd
+      	http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
+
+	<bean name="ppc" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
+	      p:valueSeparator="|" p:location="test.properties" p:systemPropertiesModeName="SYSTEM_PROPERTIES_MODE_OVERRIDE" p:order="100"/>
+
+	<import resource="../../batch-common.xml"/>
+	<hdp:configuration file-system-uri="${hadoop.fs}" register-url-handler="false">
+	</hdp:configuration>
+
+	<hdp:script language="groovy" run-at-startup="true">
+		dir="/test/spark/"
+		if (fsh.test(dir+"/input/")) {
+			fsh.rmr(dir+"/input/")
+		}
+		if (fsh.test(dir+"/output/")) {
+			fsh.rmr(dir+"/output/")
+		}
+		fs.copyFromLocalFile("src/test/resources/tweets.txt", dir+"/input/tweets.txt")
+	</hdp:script>
+
+	<job id="mainJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="spark">
+			<tasklet ref="spark-tasklet"/>
+		</step>
+	</job>
+
+	<bean id="spark-tasklet" class="org.springframework.data.hadoop.batch.spark.SparkYarnTasklet">
+		<property name="sparkAssemblyJar" value="hdfs:///app/spark/spark-assembly-1.4.1-hadoop2.6.0.jar"/>
+		<property name="hadoopConfiguration" ref="hadoopConfiguration"/>
+		<property name="appClass" value="org.springframework.data.hadoop.batch.spark.test.SparkHashtags"/>
+		<property name="appJar" value="src/test/resources/spark-tests.jar"/>
+		<property name="executorMemory" value="1G"/>
+		<property name="numExecutors" value="1"/>
+		<property name="arguments">
+			<list><value>/test/spark/input/tweets.txt</value></list>
+		</property>
+	</bean>
+
+</beans>
