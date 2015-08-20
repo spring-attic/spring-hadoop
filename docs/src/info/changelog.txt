@@ -5,6 +5,21 @@ http://projects.spring.io/spring-hadoop/
 Commit changelog: http://github.com/spring-projects/spring-hadoop/tree/v[version]
 Issues changelog: https://jira.spring.io/secure/ReleaseNote.jspa?projectId=10801
 
+Changes in version 2.3.0 M2 (2015-08-20)
+----------------------------------------
+General
+* Update build to use Spring Framework 4.2 GA and latest versions of Spring projects [SHDP-509]
+* Add support for running a simple Spark app [SHDP-397]
+* Add support for running a simple Sqoop2 Job [SHDP-506]
+
+Boot
+* Fix env variable bindings for boot 1.3.x [SHDP-516]
+* Add jobHistoryAddress to SpringHadoopProperties for Boot configuration [SHDP-517]
+
+YARN
+* Support dots in yarn container group names [SHDP-515]
+
+
 Changes in version 2.3.0 M1 (2015-08-04)
 ----------------------------------------
 General
