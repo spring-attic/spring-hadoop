@@ -1248,26 +1248,6 @@ project('spring-yarn:spring-yarn-boot-build-tests') {
 	bootRepackage.enabled = false
 	tasks.withType(Test).all { dependsOn(appmasterBootJar) }
 
-	// boot plugin imports gradle application plugin
-	// which creates distZip task which fails
-	// because we don't need mainClassname, so
-	// disabling distZip task
-	distZip.enabled = false
-
-	// with gradle 2.4/2.5 build barks that zip file cannot be
-	// found which would be the one we just disabled, so
-	// remove it from archives
-	configurations.archives.artifacts.with { archives ->
-		def zipArtifact
-		archives.each {
-			if (it.file =~ 'zip') {
-				zipArtifact = it
-			}
-		}
-		println "ZIP archive to delete: ${zipArtifact}"
-		remove(zipArtifact)
-	}
-
 }
 
 project('spring-yarn:spring-yarn-test') {
