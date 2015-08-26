@@ -382,7 +382,7 @@ little limited and only supports configuring of `hadoopConfiguration`
 and `fsShell` beans.
 
 Configuration properties can be defined using various methods. See a
-Spring Boot dodumentation for details.
+Spring Boot documentation for details.
 
 [source,groovy,subs="attributes"]
 ----
