@@ -46,9 +46,15 @@ public class SparkYarnTasklet implements InitializingBean, Tasklet, StepExecutio
 
 	private Configuration hadoopConfiguration;
 
+	private String appName;
+
 	private String appClass;
 
 	private String appJar;
+
+	private String resourceFiles;
+
+	private String resourceArchives;
 
 	private String executorMemory;
 
@@ -60,10 +66,22 @@ public class SparkYarnTasklet implements InitializingBean, Tasklet, StepExecutio
 		SparkConf sparkConf = new SparkConf();
 		sparkConf.set("spark.yarn.jar", sparkAssemblyJar);
 		List<String> submitArgs = new ArrayList<String>();
+		if (StringUtils.hasText(appName)) {
+			submitArgs.add("--name");
+			submitArgs.add(appName);
+		}
 		submitArgs.add("--jar");
 		submitArgs.add(appJar);
 		submitArgs.add("--class");
 		submitArgs.add(appClass);
+		if (StringUtils.hasText(resourceFiles)) {
+			submitArgs.add("--files");
+			submitArgs.add(resourceFiles);
+		}
+		if (StringUtils.hasText(resourceArchives)) {
+			submitArgs.add("--archives");
+			submitArgs.add(resourceArchives);
+		}
 		submitArgs.add("--executor-memory");
 		submitArgs.add(executorMemory);
 		submitArgs.add("--num-executors");
@@ -123,12 +141,24 @@ public class SparkYarnTasklet implements InitializingBean, Tasklet, StepExecutio
 		this.hadoopConfiguration = configuration;
 	}
 
+	public void setAppName(String appName) {
+		this.appName = appName;
+	}
+
 	public void setAppClass(String appClass) {
 		this.appClass = appClass;
 	}
 
 	public void setAppJar(String appJar) {
 		this.appJar = appJar;
+	}
+
+	public void setResourceFiles(String resourceFiles) {
+		this.resourceFiles = resourceFiles;
+	}
+
+	public void setResourceArchives(String resourceArchives) {
+		this.resourceArchives = resourceArchives;
 	}
 
 	public void setExecutorMemory(String executorMemory) {
