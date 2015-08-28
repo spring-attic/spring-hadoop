@@ -52,7 +52,7 @@ one can use `hftp://` which is HTTP-based or its more secure brother
 `hsftp://` (based on SSL) which gives you a version independent protocol
 meaning you can use it to interact with clusters with an unknown or
 different version than that of the client. `hftp` is read only (write
-operations will fail right away) and it is typically used with `disctp`
+operations will fail right away) and it is typically used with `distcp`
 for reading data. `webhdfs://` is one of the additions in Hadoop 1.0 and
 is a mixture between `hdfs` and `hftp` protocol - it provides a
 version-independent, read-write, REST-based protocol which means that
