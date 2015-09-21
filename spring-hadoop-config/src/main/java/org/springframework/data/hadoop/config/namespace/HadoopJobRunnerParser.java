@@ -13,47 +13,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.hadoop.config;
+package org.springframework.data.hadoop.config.namespace;
 
-import java.util.Collection;
-
-import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.data.hadoop.pig.PigRunner;
-import org.springframework.util.CollectionUtils;
+import org.springframework.data.hadoop.mapreduce.JobRunner;
 import org.w3c.dom.Element;
 
 /**
+ * Parser for job-runner.
+ * 
  * @author Costin Leau
  */
-class PigRunnerParser extends AbstractImprovedSimpleBeanDefinitionParser {
+class HadoopJobRunnerParser extends AbstractImprovedSimpleBeanDefinitionParser {
 
 	@Override
 	protected Class<?> getBeanClass(Element element) {
-		return PigRunner.class;
+		return JobRunner.class;
 	}
 
 	@Override
 	protected boolean isEligibleAttribute(String attributeName) {
-		return !("location".equals(attributeName) || "pre-action".equals(attributeName) || "post-action".equals(attributeName))
+		return !("job-ref".equals(attributeName) || "pre-action".equals(attributeName) || "post-action".equals(attributeName))
 				&& super.isEligibleAttribute(attributeName);
 	}
-
 
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 		// parse attributes using conventions
 		super.doParse(element, parserContext, builder);
 
+		NamespaceUtils.setCSVProperty(element, builder, "job-ref", "jobNames");
+
 		NamespaceUtils.setCSVReferenceProperty(element, builder, "pre-action", "preAction");
 		NamespaceUtils.setCSVReferenceProperty(element, builder, "post-action", "postAction");
-
-		// parse scripts
-		Collection<BeanDefinition> scripts = PigServerParser.parseScripts(parserContext, element);
-		if (!CollectionUtils.isEmpty(scripts)) {
-			builder.addPropertyValue("scripts", scripts);
-		}
 	}
 
 	@Override

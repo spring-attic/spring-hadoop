@@ -13,35 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.hadoop.config;
+package org.springframework.data.hadoop.config.namespace;
 
 import java.util.Collection;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.data.hadoop.batch.pig.PigTasklet;
-import org.springframework.data.hadoop.config.AbstractImprovedSimpleBeanDefinitionParser;
-import org.springframework.data.hadoop.config.PigServerParser;
+import org.springframework.data.hadoop.pig.PigRunner;
 import org.springframework.util.CollectionUtils;
 import org.w3c.dom.Element;
 
 /**
- * Parser for 'pig-tasklet' element.
- * 
  * @author Costin Leau
  */
-class PigTaskletParser extends AbstractImprovedSimpleBeanDefinitionParser {
+class PigRunnerParser extends AbstractImprovedSimpleBeanDefinitionParser {
 
 	@Override
 	protected Class<?> getBeanClass(Element element) {
-		return PigTasklet.class;
+		return PigRunner.class;
 	}
+
+	@Override
+	protected boolean isEligibleAttribute(String attributeName) {
+		return !("location".equals(attributeName) || "pre-action".equals(attributeName) || "post-action".equals(attributeName))
+				&& super.isEligibleAttribute(attributeName);
+	}
+
 
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 		// parse attributes using conventions
 		super.doParse(element, parserContext, builder);
+
+		NamespaceUtils.setCSVReferenceProperty(element, builder, "pre-action", "preAction");
+		NamespaceUtils.setCSVReferenceProperty(element, builder, "post-action", "postAction");
+
 		// parse scripts
 		Collection<BeanDefinition> scripts = PigServerParser.parseScripts(parserContext, element);
 		if (!CollectionUtils.isEmpty(scripts)) {

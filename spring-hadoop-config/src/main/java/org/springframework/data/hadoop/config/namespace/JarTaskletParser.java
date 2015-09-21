@@ -13,31 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.hadoop.config;
+package org.springframework.data.hadoop.config.namespace;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.data.hadoop.batch.mapreduce.ToolTasklet;
-import org.springframework.data.hadoop.config.AbstractGenericOptionsParser;
-import org.springframework.data.hadoop.config.ToolRunnerParser;
+import org.springframework.data.hadoop.batch.mapreduce.JarTasklet;
 import org.w3c.dom.Element;
 
 /**
- * Parser for 'tool-tasklet' element.
+ * Parser for 'jar-tasklet' element.
  * 
  * @author Costin Leau
  */
-class ToolTaskletParser extends AbstractGenericOptionsParser {
+class JarTaskletParser extends AbstractGenericOptionsParser {
 
 	@Override
 	protected Class<?> getBeanClass(Element element) {
-		return ToolTasklet.class;
+		return JarTasklet.class;
 	}
 
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 		super.doParse(element, parserContext, builder);
-		ToolRunnerParser.parseToolDefinition(element, parserContext, builder);
+		JarRunnerParser.parseJarDefinition(element, parserContext, builder);
 	}
 
 	@Override

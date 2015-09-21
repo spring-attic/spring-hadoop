@@ -13,26 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.hadoop.config;
+package org.springframework.data.hadoop.config.namespace;
 
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.data.hadoop.pig.PigTemplate;
+import org.springframework.data.hadoop.hive.HiveTemplate;
 import org.w3c.dom.Element;
 
 /**
- * Parser for 'pig-template'.
+ * Parser for 'hive-template'.
  * 
  * @author Costin Leau
  */
-class PigTemplateParser extends AbstractImprovedSimpleBeanDefinitionParser {
+class HiveTemplateParser extends AbstractImprovedSimpleBeanDefinitionParser {
 
 	@Override
 	protected Class<?> getBeanClass(Element element) {
-		return PigTemplate.class;
+		return HiveTemplate.class;
 	}
 
 	@Override
 	protected String defaultId(ParserContext context, Element element) {
-		return "pigTemplate";
+		return "hiveTemplate";
 	}
 }

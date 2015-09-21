@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 the original author or authors.
+ * Copyright 2011-2013 the original author or authors.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,43 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.hadoop.config;
+package org.springframework.data.hadoop.config.namespace;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.data.hadoop.hbase.HbaseConfigurationFactoryBean;
-import org.springframework.util.StringUtils;
-import org.springframework.util.xml.DomUtils;
+import org.springframework.data.hadoop.batch.mapreduce.ToolTasklet;
 import org.w3c.dom.Element;
 
 /**
- * Parser for "hbase-configuration" element.
+ * Parser for 'tool-tasklet' element.
  * 
  * @author Costin Leau
  */
-class HbaseConfigurationParser extends AbstractPropertiesConfiguredBeanDefinitionParser {
+class ToolTaskletParser extends AbstractGenericOptionsParser {
 
 	@Override
 	protected Class<?> getBeanClass(Element element) {
-		return HbaseConfigurationFactoryBean.class;
+		return ToolTasklet.class;
 	}
-
-	@Override
-	protected String defaultId(ParserContext context, Element element) {
-		return "hbaseConfiguration";
-	}
-	
 
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
-		// parse attributes using conventions
 		super.doParse(element, parserContext, builder);
+		ToolRunnerParser.parseToolDefinition(element, parserContext, builder);
+	}
 
-		// parse properties
-		String props = DomUtils.getTextValue(element);
-
-		if (StringUtils.hasText(props)) {
-			builder.addPropertyValue("properties", props);
-		}
+	@Override
+	protected boolean shouldGenerateIdAsFallback() {
+		return true;
 	}
 }

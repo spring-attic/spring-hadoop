@@ -13,42 +13,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.hadoop.config;
+package org.springframework.data.hadoop.config.namespace;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.data.hadoop.batch.mapreduce.JobTasklet;
-import org.springframework.data.hadoop.config.AbstractImprovedSimpleBeanDefinitionParser;
-import org.springframework.data.hadoop.config.NamespaceUtils;
+import org.springframework.data.hadoop.hbase.HbaseConfigurationFactoryBean;
+import org.springframework.util.StringUtils;
+import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
 
 /**
- * Hadoop Tasklet Parser.
+ * Parser for "hbase-configuration" element.
  * 
  * @author Costin Leau
  */
-class HadoopJobTaskletParser extends AbstractImprovedSimpleBeanDefinitionParser {
+class HbaseConfigurationParser extends AbstractPropertiesConfiguredBeanDefinitionParser {
 
 	@Override
 	protected Class<?> getBeanClass(Element element) {
-		return JobTasklet.class;
+		return HbaseConfigurationFactoryBean.class;
 	}
 
 	@Override
-	protected boolean isEligibleAttribute(String attributeName) {
-		return (!"job-ref".equals(attributeName)) && super.isEligibleAttribute(attributeName);
+	protected String defaultId(ParserContext context, Element element) {
+		return "hbaseConfiguration";
 	}
+	
 
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 		// parse attributes using conventions
 		super.doParse(element, parserContext, builder);
 
-		NamespaceUtils.setCSVProperty(element, builder, "job-ref", "jobNames");
-	}
+		// parse properties
+		String props = DomUtils.getTextValue(element);
 
-	@Override
-	protected boolean shouldGenerateIdAsFallback() {
-		return true;
+		if (StringUtils.hasText(props)) {
+			builder.addPropertyValue("properties", props);
+		}
 	}
 }

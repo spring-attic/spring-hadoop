@@ -13,25 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.hadoop.config;
+package org.springframework.data.hadoop.config.namespace;
+
+import java.util.Collection;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.data.hadoop.mapreduce.StreamJobFactoryBean;
-import org.springframework.util.StringUtils;
-import org.springframework.util.xml.DomUtils;
+import org.springframework.data.hadoop.hive.HiveClientFactoryBean;
+import org.springframework.util.CollectionUtils;
 import org.w3c.dom.Element;
 
 /**
- * Job declaration parser.
+ * Parser for "hive-client" element.
  * 
  * @author Costin Leau
  */
-class HadoopStreamJobParser extends AbstractGenericOptionsParser {
+class HiveClientParser extends AbstractImprovedSimpleBeanDefinitionParser {
 
 	@Override
 	protected Class<?> getBeanClass(Element element) {
-		return StreamJobFactoryBean.class;
+		return HiveClientFactoryBean.class;
+	}
+
+	@Override
+	protected String defaultId(ParserContext context, Element element) {
+		return "hiveClientFactory";
 	}
 
 	@Override
@@ -39,11 +45,10 @@ class HadoopStreamJobParser extends AbstractGenericOptionsParser {
 		// parse attributes using conventions
 		super.doParse(element, parserContext, builder);
 
-		// parse properties
-		String props = DomUtils.getChildElementValueByTagName(element, "cmd-env");
-
-		if (StringUtils.hasText(props)) {
-			builder.addPropertyValue("cmdEnv", props);
+		// parse scripts
+		Collection<Object> scripts = HiveRunnerParser.parseScripts(parserContext, element);
+		if (!CollectionUtils.isEmpty(scripts)) {
+			builder.addPropertyValue("scripts", scripts);
 		}
 	}
 }

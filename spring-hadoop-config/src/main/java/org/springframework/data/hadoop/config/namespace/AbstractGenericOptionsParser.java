@@ -13,33 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.hadoop.config;
-
-import java.util.Collection;
+package org.springframework.data.hadoop.config.namespace;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.data.hadoop.hive.HiveServerFactoryBean;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
-import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
 
 /**
- * Parser for "hive-server" element.
- * 
  * @author Costin Leau
  */
-class HiveServerParser extends AbstractPropertiesConfiguredBeanDefinitionParser {
+public class AbstractGenericOptionsParser extends AbstractPropertiesConfiguredBeanDefinitionParser {
 
-	@Override
-	protected Class<?> getBeanClass(Element element) {
-		return HiveServerFactoryBean.class;
-	}
-
-	@Override
-	protected String defaultId(ParserContext context, Element element) {
-		return "hiveServer";
+	protected boolean isEligibleAttribute(String attributeName) {
+		return !("files".equals(attributeName) || "libs".equals(attributeName) || "archives".equals(attributeName))
+				&& super.isEligibleAttribute(attributeName);
 	}
 
 	@Override
@@ -47,17 +34,8 @@ class HiveServerParser extends AbstractPropertiesConfiguredBeanDefinitionParser 
 		// parse attributes using conventions
 		super.doParse(element, parserContext, builder);
 
-		// parse properties
-		String props = DomUtils.getTextValue(element);
-
-		if (StringUtils.hasText(props)) {
-			builder.addPropertyValue("properties", props);
-		}
-
-		// parse scripts
-		Collection<Object> scripts = HiveRunnerParser.parseScripts(parserContext, element);
-		if (!CollectionUtils.isEmpty(scripts)) {
-			builder.addPropertyValue("scripts", scripts);
-		}
+		NamespaceUtils.setCSVProperty(element, builder, "files");
+		NamespaceUtils.setCSVProperty(element, builder, "libs");
+		NamespaceUtils.setCSVProperty(element, builder, "archives");
 	}
 }

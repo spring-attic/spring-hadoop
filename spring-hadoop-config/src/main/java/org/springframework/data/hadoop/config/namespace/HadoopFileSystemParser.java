@@ -13,35 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.hadoop.config;
+package org.springframework.data.hadoop.config.namespace;
 
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.data.hadoop.batch.mapreduce.JarTasklet;
-import org.springframework.data.hadoop.config.AbstractGenericOptionsParser;
-import org.springframework.data.hadoop.config.JarRunnerParser;
+import org.springframework.data.hadoop.fs.FileSystemFactoryBean;
 import org.w3c.dom.Element;
 
 /**
- * Parser for 'jar-tasklet' element.
- * 
  * @author Costin Leau
  */
-class JarTaskletParser extends AbstractGenericOptionsParser {
+class HadoopFileSystemParser extends AbstractImprovedSimpleBeanDefinitionParser {
 
 	@Override
 	protected Class<?> getBeanClass(Element element) {
-		return JarTasklet.class;
+		return FileSystemFactoryBean.class;
 	}
 
 	@Override
-	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
-		super.doParse(element, parserContext, builder);
-		JarRunnerParser.parseJarDefinition(element, parserContext, builder);
-	}
-
-	@Override
-	protected boolean shouldGenerateIdAsFallback() {
-		return true;
+	protected String defaultId(ParserContext context, Element element) {
+		return "hadoopFs";
 	}
 }

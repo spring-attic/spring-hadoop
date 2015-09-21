@@ -13,24 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.hadoop.config;
+package org.springframework.data.hadoop.config.namespace;
 
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.data.hadoop.fs.FileSystemFactoryBean;
+import org.springframework.data.hadoop.pig.PigTemplate;
 import org.w3c.dom.Element;
 
 /**
+ * Parser for 'pig-template'.
+ * 
  * @author Costin Leau
  */
-class HadoopFileSystemParser extends AbstractImprovedSimpleBeanDefinitionParser {
+class PigTemplateParser extends AbstractImprovedSimpleBeanDefinitionParser {
 
 	@Override
 	protected Class<?> getBeanClass(Element element) {
-		return FileSystemFactoryBean.class;
+		return PigTemplate.class;
 	}
 
 	@Override
 	protected String defaultId(ParserContext context, Element element) {
-		return "hadoopFs";
+		return "pigTemplate";
 	}
 }

@@ -1,1 +1,1 @@
-http\://www.springframework.org/schema/hadoop=org.springframework.data.hadoop.config.HadoopNamespaceHandler
+http\://www.springframework.org/schema/hadoop=org.springframework.data.hadoop.config.namespace.HadoopNamespaceHandler

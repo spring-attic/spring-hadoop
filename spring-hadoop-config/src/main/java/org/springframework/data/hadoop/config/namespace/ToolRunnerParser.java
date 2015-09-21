@@ -13,40 +13,67 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.hadoop.config;
+package org.springframework.data.hadoop.config.namespace;
+
+import java.util.List;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.data.hadoop.mapreduce.JobRunner;
+import org.springframework.data.hadoop.mapreduce.ToolRunner;
+import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
 
 /**
- * Parser for job-runner.
+ * Parser for 'tool-runner' element.
  * 
  * @author Costin Leau
  */
-class HadoopJobRunnerParser extends AbstractImprovedSimpleBeanDefinitionParser {
+public class ToolRunnerParser extends AbstractGenericOptionsParser {
 
 	@Override
 	protected Class<?> getBeanClass(Element element) {
-		return JobRunner.class;
+		return ToolRunner.class;
 	}
 
 	@Override
 	protected boolean isEligibleAttribute(String attributeName) {
-		return !("job-ref".equals(attributeName) || "pre-action".equals(attributeName) || "post-action".equals(attributeName))
+		return !("pre-action".equals(attributeName) || "post-action".equals(attributeName))
 				&& super.isEligibleAttribute(attributeName);
 	}
 
+
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
-		// parse attributes using conventions
 		super.doParse(element, parserContext, builder);
-
-		NamespaceUtils.setCSVProperty(element, builder, "job-ref", "jobNames");
+		parseToolDefinition(element, parserContext, builder);
 
 		NamespaceUtils.setCSVReferenceProperty(element, builder, "pre-action", "preAction");
 		NamespaceUtils.setCSVReferenceProperty(element, builder, "post-action", "postAction");
+	}
+
+	public static void parseToolDefinition(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
+		List<Element> list = DomUtils.getChildElements(element);
+		
+		ManagedList<Object> args = new ManagedList<Object>();
+
+		for (Element child : list) {
+			String localName = child.getLocalName();
+			if ("arg".equals(localName)) {
+				args.add(child.getAttribute("value").trim());
+			}
+			if ("tool".equals(localName)) {
+				if (element.hasAttribute("tool-class") || element.hasAttribute("tool-ref")) {
+					parserContext.getReaderContext().error("Cannot define nested and top-level tool-class/tool-ref attributes - use only one", element);
+				}
+				
+				builder.addPropertyValue("tool",
+						parserContext.getDelegate().parsePropertySubElement(DomUtils.getChildElements(child).get(0),
+								builder.getRawBeanDefinition()));
+			}
+		}
+		
+		builder.addPropertyValue("arguments", args);
 	}
 
 	@Override
