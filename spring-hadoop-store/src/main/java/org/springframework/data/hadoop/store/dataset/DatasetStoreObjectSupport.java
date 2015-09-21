@@ -128,7 +128,7 @@ public class DatasetStoreObjectSupport extends LifecycleObjectSupport {
 	 * to be notified of idle timeouts. Default implementation
 	 * doesn't do anything.
 	 */
-	protected void handleIdleTimeout() {
+	protected void handleTimeout() {
 	}
 
 	/**
@@ -154,9 +154,9 @@ public class DatasetStoreObjectSupport extends LifecycleObjectSupport {
 			if (result) {
 				try {
 					if (log.isDebugEnabled()) {
-						log.debug("Idle timeout detected, calling handleIdleTimeout()");
+						log.debug("Idle timeout detected, calling handleTimeout()");
 					}
-					handleIdleTimeout();
+					handleTimeout();
 				} catch (Exception e) {
 					// TODO: handle error
 					log.error("error closing", e);
@@ -182,9 +182,9 @@ public class DatasetStoreObjectSupport extends LifecycleObjectSupport {
 		protected Void doPoll() {
 			try {
 				if (log.isDebugEnabled()) {
-					log.debug("Close timeout detected, calling handleIdleTimeout()");
+					log.debug("Close timeout detected, calling handleTimeout()");
 				}
-				handleIdleTimeout();
+				handleTimeout();
 			} catch (Exception e) {
 				// TODO: handle error
 				log.error("error closing", e);

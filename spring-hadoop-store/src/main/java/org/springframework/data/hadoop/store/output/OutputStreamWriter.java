@@ -103,13 +103,13 @@ public class OutputStreamWriter extends AbstractDataStreamWriter implements Data
 	}
 
 	@Override
-	protected void handleIdleTimeout() {
+	protected void handleTimeout() {
 		try {
 			if (isAppendable()) {
-				log.info("Idle timeout detected for this writer, flushing stream");
+				log.info("Timeout detected for this writer, flushing stream");
 				hflush();
 			} else {
-				log.info("Idle timeout detected for this writer, closing stream");
+				log.info("Timeout detected for this writer, closing stream");
 				close();
 			}
 		} catch (IOException e) {

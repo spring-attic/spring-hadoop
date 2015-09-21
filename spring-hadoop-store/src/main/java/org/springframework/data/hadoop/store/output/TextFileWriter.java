@@ -145,9 +145,9 @@ public class TextFileWriter extends AbstractDataStreamWriter implements DataStor
 	}
 
 	@Override
-	protected void handleIdleTimeout() {
+	protected void handleTimeout() {
 		try {
-			log.info("Idle timeout detected for this writer=[" + this +  "], closing stream");
+			log.info("Timeout detected for this writer=[" + this +  "], closing stream");
 			flush();
 			close();
 		} catch (IOException e) {

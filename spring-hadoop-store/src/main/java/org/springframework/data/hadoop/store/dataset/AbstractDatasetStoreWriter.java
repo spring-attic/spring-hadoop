@@ -102,8 +102,8 @@ public abstract class AbstractDatasetStoreWriter<T, R> extends DatasetStoreObjec
 	}
 
 	@Override
-	protected void handleIdleTimeout() {
-		log.info("Idle timeout detected, closing writer");
+	protected void handleTimeout() {
+		log.info("Timeout detected, closing writer");
 		try {
 			close();
 		} catch (IOException e) {
