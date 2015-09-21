@@ -753,11 +753,12 @@ project('spring-data-hadoop-store') {
 	}
 
 	dependencies {
-		compile project(":spring-data-hadoop")
+		compile project(":spring-data-hadoop-config")
 		compile "org.springframework:spring-messaging:$springVersion"
 		compile("org.kitesdk:kite-data-core:$kiteVersion") { dep ->
 			exclude group: "log4j", module: "log4j"
 		}
+		testCompile project(":spring-data-hadoop")
 		testCompile project(path:":spring-data-hadoop-test", configuration:"testArtifacts")
 		testCompile "org.springframework:spring-test:$springVersion"
 		testCompile("org.mockito:mockito-core:$mockitoVersion") { dep ->
@@ -834,8 +835,17 @@ project('spring-data-hadoop-sqoop2') {
 
 }
 
+project('spring-data-hadoop-config') {
+	description = 'Spring for Apache Hadoop Annotation Configuration'
+
+	dependencies {
+		compile project(":spring-data-hadoop-core")
+	}
+
+}
+
 project('spring-data-hadoop') {
-	description = 'Spring for Apache Hadoop Configuration'
+	description = 'Spring for Apache Hadoop Namspace Configuration'
 
 	dependencies {
 		compile project(":spring-data-hadoop-core")
@@ -851,7 +861,7 @@ project('spring-data-hadoop-boot') {
 	description = 'Spring for Apache Hadoop Boot'
 
 	dependencies {
-		compile project(":spring-data-hadoop")
+		compile project(":spring-data-hadoop-config")
 		compile "org.springframework.boot:spring-boot-autoconfigure:$springBootVersion"
 		optional "org.springframework.boot:spring-boot-configuration-processor:$springBootVersion"
 		runtime "org.yaml:snakeyaml:$snakeYamlVersion"
@@ -891,6 +901,7 @@ project('spring-data-hadoop-build-tests') {
 	dependencies {
 		compile project(":spring-data-hadoop-core")
 		compile project(":spring-data-hadoop-batch")
+		compile project(":spring-data-hadoop-config")
 		compile project(":spring-data-hadoop")
 		compile project(":spring-data-hadoop-test")
 		testCompile project(path:":spring-data-hadoop-test", configuration:"testArtifacts")
@@ -1070,8 +1081,8 @@ project('spring-data-hadoop-cluster-tests') {
 	description = 'Spring for Apache Hadoop Cluster Tests'
 
 	dependencies {
-		compile project(":spring-data-hadoop-core")
 		compile project(":spring-data-hadoop")
+		compile project(":spring-data-hadoop-config")
 		compile project(":spring-data-hadoop-test")
 		testCompile project(path:":spring-data-hadoop-test", configuration:"testArtifacts")
 
@@ -1124,7 +1135,7 @@ project('spring-yarn') {
 project('spring-yarn:spring-yarn-core') {
 	description = 'Spring Yarn Core'
 	dependencies {
-		compile project(":spring-data-hadoop")
+		compile project(":spring-data-hadoop-config")
 		compile "org.springframework:spring-messaging:$springVersion"
 		compile("org.apache.hadoop:hadoop-yarn-client:$hadoopVersion") { dep ->
 			exclude group: "org.slf4j", module: "slf4j-log4j12"
