@@ -156,4 +156,13 @@ public class TextFileWriter extends AbstractDataStreamWriter implements DataStor
 		getOutputContext().rollStrategies();
 	}
 
+	@Override
+	protected void flushTimeout() {
+		try {
+			flush();
+		} catch (IOException e) {
+			log.error("Error flushing stream", e);
+		}
+	}
+
 }

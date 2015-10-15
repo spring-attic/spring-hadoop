@@ -78,6 +78,9 @@ public abstract class AbstractPartitionDataStoreWriter<T, K> extends LifecycleOb
 	/** Close timeout for writers */
 	private long closeTimeout;
 
+	/** Flush timeout for writers */
+	private long flushTimeout;
+
 	/** Append flag for writers */
 	private boolean append = false;
 
@@ -269,10 +272,19 @@ public abstract class AbstractPartitionDataStoreWriter<T, K> extends LifecycleOb
 	/**
 	 * Sets the close timeout.
 	 *
-	 * @param closeTimeout the new idle timeout
+	 * @param closeTimeout the new close timeout
 	 */
 	public void setCloseTimeout(long closeTimeout) {
 		this.closeTimeout = closeTimeout;
+	}
+
+	/**
+	 * Sets the flush timeout.
+	 *
+	 * @param flushTimeout the new flush timeout
+	 */
+	public void setFlushTimeout(long flushTimeout) {
+		this.flushTimeout = flushTimeout;
 	}
 
     /**
@@ -387,6 +399,15 @@ public abstract class AbstractPartitionDataStoreWriter<T, K> extends LifecycleOb
 	 */
 	public long getCloseTimeout() {
 		return closeTimeout;
+	}
+
+	/**
+	 * Gets the flush timeout.
+	 *
+	 * @return the flush timeout
+	 */
+	public long getFlushTimeout() {
+		return flushTimeout;
 	}
 
 	/**

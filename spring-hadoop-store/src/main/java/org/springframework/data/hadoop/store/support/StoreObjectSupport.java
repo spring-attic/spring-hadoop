@@ -55,6 +55,12 @@ public abstract class StoreObjectSupport extends LifecycleObjectSupport {
 	/** Trigger in poller */
 	private volatile IdleTimeoutTrigger closeTrigger;
 
+	/** Poller checking flush timeouts */
+	private FlushTimeoutPoller flushPoller;
+
+	/** Trigger in flush poller */
+	private volatile IdleTimeoutTrigger flushTrigger;
+
 	/**
 	 * In millis last idle time reset. We explicitly use negative value to indicate reset state
 	 * because we can't use long max value which would flip if adding something. We reset this
@@ -67,6 +73,9 @@ public abstract class StoreObjectSupport extends LifecycleObjectSupport {
 
 	/** In millis a close timeout for writer/reader. */
 	private volatile long closeTimeout;
+
+	/** In millis a flush timeout for writer/reader. */
+	private volatile long flushTimeout;
 
 	/**
 	 * Instantiates a new abstract store support.
@@ -96,6 +105,13 @@ public abstract class StoreObjectSupport extends LifecycleObjectSupport {
 			closePoller = new CloseTimeoutPoller(getTaskScheduler(), getTaskExecutor(), closeTrigger);
 			closePoller.init();
 		}
+		// if we have flush timeout, setup trigger with delay
+		if (flushTimeout > 0) {
+			flushTrigger = new IdleTimeoutTrigger(flushTimeout);
+			flushTrigger.setInitialDelay(flushTimeout);
+			flushPoller = new FlushTimeoutPoller(getTaskScheduler(), getTaskExecutor(), flushTrigger);
+			flushPoller.init();
+		}
 	}
 
 	@Override
@@ -106,10 +122,18 @@ public abstract class StoreObjectSupport extends LifecycleObjectSupport {
 		if (closePoller != null) {
 			closePoller.start();
 		}
+		if (flushPoller != null) {
+			flushPoller.start();
+		}
 	}
 
 	@Override
 	protected void doStop() {
+		// stop flush before others
+		if (flushPoller != null) {
+			flushPoller.stop();
+		}
+		flushPoller = null;
 		if (idlePoller != null) {
 			idlePoller.stop();
 		}
@@ -175,6 +199,15 @@ public abstract class StoreObjectSupport extends LifecycleObjectSupport {
 	}
 
 	/**
+	 * Sets the flush timeout.
+	 *
+	 * @param flushTimeout the new flush timeout
+	 */
+	public void setFlushTimeout(long flushTimeout) {
+		this.flushTimeout = flushTimeout;
+	}
+
+	/**
 	 * Reset idle timeout.
 	 */
 	public void resetIdleTimeout() {
@@ -187,6 +220,14 @@ public abstract class StoreObjectSupport extends LifecycleObjectSupport {
 	 * doesn't do anything.
 	 */
 	protected void handleIdleTimeout() {
+	}
+
+	/**
+	 * Handle flush timeout. This method should be overriden
+	 * to be notified of flush timeouts. Default implementation
+	 * doesn't do anything.
+	 */
+	protected void flushTimeout() {
 	}
 
 	/**
@@ -246,6 +287,30 @@ public abstract class StoreObjectSupport extends LifecycleObjectSupport {
 			} catch (Exception e) {
 				// TODO: handle error
 				log.error("error closing", e);
+			}
+			return null;
+		}
+	}
+
+	/**
+	 * Poller which gets called by a flush timeout and flushes a writer.
+	 */
+	private class FlushTimeoutPoller extends PollingTaskSupport<Void> {
+
+		public FlushTimeoutPoller(TaskScheduler taskScheduler, TaskExecutor taskExecutor, Trigger trigger) {
+			super(taskScheduler, taskExecutor, trigger);
+		}
+
+		@Override
+		protected Void doPoll() {
+			try {
+				if (log.isDebugEnabled()) {
+					log.debug("Flush timeout detected, calling flushTimeout()");
+				}
+				flushTimeout();
+			} catch (Exception e) {
+				// TODO: handle error
+				log.error("error flushing", e);
 			}
 			return null;
 		}
