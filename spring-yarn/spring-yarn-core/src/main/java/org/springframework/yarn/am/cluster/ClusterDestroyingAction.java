@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,14 @@
 package org.springframework.yarn.am.cluster;
 
 import org.springframework.messaging.MessageHeaders;
-import org.springframework.yarn.support.statemachine.action.Action;
+import org.springframework.statemachine.StateContext;
+import org.springframework.statemachine.action.Action;
 
-public class ClusterDestroyingAction implements Action {
+public class ClusterDestroyingAction implements Action<ClusterState, ClusterEvent> {
 
 	@Override
-	public void execute(MessageHeaders headers) {
+	public void execute(StateContext<ClusterState, ClusterEvent> context) {
+		MessageHeaders headers = context.getMessageHeaders();
 		ContainerCluster cluster = headers.get("containercluster", ContainerCluster.class);
 		AbstractContainerClusterAppmaster appmaster = headers.get("appmaster", AbstractContainerClusterAppmaster.class);
 		ContainerCluster removed = appmaster.clusters.remove(cluster.getId());

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,11 @@ package org.springframework.yarn.am.cluster;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.yarn.support.statemachine.config.EnableStateMachineFactory;
-import org.springframework.yarn.support.statemachine.config.EnumStateMachineConfigurerAdapter;
-import org.springframework.yarn.support.statemachine.config.builders.StateMachineStateConfigurer;
-import org.springframework.yarn.support.statemachine.config.builders.StateMachineTransitionConfigurer;
+import org.springframework.statemachine.config.EnableStateMachineFactory;
+import org.springframework.statemachine.config.EnumStateMachineConfigurerAdapter;
+import org.springframework.statemachine.config.builders.StateMachineConfigurationConfigurer;
+import org.springframework.statemachine.config.builders.StateMachineStateConfigurer;
+import org.springframework.statemachine.config.builders.StateMachineTransitionConfigurer;
 
 /**
  * Configuration for state machine build used by {@link AbstractContainerClusterAppmaster}.
@@ -31,6 +32,13 @@ import org.springframework.yarn.support.statemachine.config.builders.StateMachin
 @Configuration
 @EnableStateMachineFactory
 public class ContainerClusterStateMachineConfiguration extends EnumStateMachineConfigurerAdapter<ClusterState, ClusterEvent> {
+
+	@Override
+	public void configure(StateMachineConfigurationConfigurer<ClusterState, ClusterEvent> config) throws Exception {
+		config
+			.withConfiguration()
+				.autoStartup(true);
+	}
 
 	@Override
 	public void configure(StateMachineStateConfigurer<ClusterState, ClusterEvent> states) throws Exception {

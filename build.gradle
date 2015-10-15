@@ -1137,6 +1137,7 @@ project('spring-yarn:spring-yarn-core') {
 	dependencies {
 		compile project(":spring-data-hadoop-config")
 		compile "org.springframework:spring-messaging:$springVersion"
+		compile "org.springframework.statemachine:spring-statemachine-core:$springStatemachineVersion"
 		compile("org.apache.hadoop:hadoop-yarn-client:$hadoopVersion") { dep ->
 			exclude group: "org.slf4j", module: "slf4j-log4j12"
 		}

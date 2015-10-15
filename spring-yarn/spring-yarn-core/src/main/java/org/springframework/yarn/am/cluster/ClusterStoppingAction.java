@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,20 +18,20 @@ package org.springframework.yarn.am.cluster;
 import java.util.ArrayList;
 
 import org.springframework.messaging.MessageHeaders;
+import org.springframework.statemachine.StateContext;
+import org.springframework.statemachine.action.Action;
 import org.springframework.yarn.am.grid.GridMember;
 import org.springframework.yarn.am.grid.support.SatisfyStateData;
-import org.springframework.yarn.support.statemachine.action.Action;
 
-public class ClusterStoppingAction implements Action {
+public class ClusterStoppingAction implements Action<ClusterState, ClusterEvent> {
 
 	@Override
-	public void execute(MessageHeaders headers) {
+	public void execute(StateContext<ClusterState, ClusterEvent> context) {
+		MessageHeaders headers = context.getMessageHeaders();
 		ContainerCluster cluster = headers.get("containercluster", ContainerCluster.class);
 		AbstractContainerClusterAppmaster appmaster = headers.get("appmaster", AbstractContainerClusterAppmaster.class);
 		SatisfyStateData satisfyData = new SatisfyStateData(new ArrayList<GridMember>(cluster.getGridProjection().getMembers()));
 		appmaster.handleSatisfyStateData(cluster, satisfyData);
-//		ContainerCluster removed = appmaster.clusters.remove(cluster.getId());
-//		appmaster.projectedGrid.removeProjection(removed.getGridProjection());
 	}
 
 }

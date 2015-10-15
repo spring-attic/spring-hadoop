@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,8 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.statemachine.StateMachineSystemConstants;
+import org.springframework.statemachine.config.StateMachineFactory;
 import org.springframework.yarn.MockUtils;
 import org.springframework.yarn.TestUtils;
 import org.springframework.yarn.am.allocate.ContainerAllocateData;
@@ -50,8 +52,6 @@ import org.springframework.yarn.am.grid.support.GridProjectionFactoryRegistry;
 import org.springframework.yarn.am.grid.support.ProjectionDataRegistry;
 import org.springframework.yarn.am.grid.support.SatisfyStateData;
 import org.springframework.yarn.listener.ContainerAllocatorListener;
-import org.springframework.yarn.support.statemachine.StateMachineSystemConstants;
-import org.springframework.yarn.support.statemachine.config.EnumStateMachineFactory;
 
 /**
  * Base class for tests for {@link ManagedContainerClusterAppmaster}.
@@ -63,7 +63,7 @@ public abstract class AbstractManagedContainerClusterAppmasterTests {
 
 	private AnnotationConfigApplicationContext ctx;
 
-	protected EnumStateMachineFactory<ClusterState, ClusterEvent> stateMachineFactory;
+	protected StateMachineFactory<ClusterState, ClusterEvent> stateMachineFactory;
 
 	protected Container allocateContainer(Object appmaster, int id) throws Exception {
 		// force host as "host"
@@ -131,7 +131,7 @@ public abstract class AbstractManagedContainerClusterAppmasterTests {
 	@Before
 	public void setup() {
 		ctx = new AnnotationConfigApplicationContext(ContainerClusterStateMachineConfiguration.class, TestConfig.class);
-		stateMachineFactory = ctx.getBean(StateMachineSystemConstants.DEFAULT_ID_STATEMACHINEFACTORY, EnumStateMachineFactory.class);
+		stateMachineFactory = ctx.getBean(StateMachineSystemConstants.DEFAULT_ID_STATEMACHINEFACTORY, StateMachineFactory.class);
 	}
 
 	@After

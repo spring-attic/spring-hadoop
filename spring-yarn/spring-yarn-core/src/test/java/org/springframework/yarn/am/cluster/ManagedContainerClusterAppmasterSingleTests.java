@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,13 +27,13 @@ import java.util.Map;
 
 import org.apache.hadoop.yarn.api.records.Container;
 import org.junit.Test;
+import org.springframework.statemachine.StateMachine;
+import org.springframework.statemachine.listener.StateMachineListenerAdapter;
+import org.springframework.statemachine.state.State;
 import org.springframework.yarn.TestUtils;
 import org.springframework.yarn.am.grid.GridProjection;
 import org.springframework.yarn.am.grid.support.ProjectionData;
 import org.springframework.yarn.am.grid.support.SatisfyStateData;
-import org.springframework.yarn.support.statemachine.StateMachine;
-import org.springframework.yarn.support.statemachine.listener.StateMachineListener;
-import org.springframework.yarn.support.statemachine.state.State;
 
 /**
  * Tests for {@link ManagedContainerClusterAppmaster} using single cluster.
@@ -335,7 +335,7 @@ public class ManagedContainerClusterAppmasterSingleTests extends AbstractManaged
 
 		// we hook into statemachine to listen its events
 		TestStateMachineListener sml = new TestStateMachineListener();
-		StateMachine<State<ClusterState, ClusterEvent>, ClusterEvent> stateMachine = appmaster.getContainerClusters().get("foo").getStateMachine();
+		StateMachine<ClusterState, ClusterEvent> stateMachine = appmaster.getContainerClusters().get("foo").getStateMachine();
 		stateMachine.addStateListener(sml);
 
 		appmaster.startContainerCluster("foo");
@@ -360,7 +360,7 @@ public class ManagedContainerClusterAppmasterSingleTests extends AbstractManaged
 		assertThat(sml.states.size(), greaterThan(0));
 	}
 
-	private static class TestStateMachineListener implements StateMachineListener<State<ClusterState,ClusterEvent>, ClusterEvent> {
+	private static class TestStateMachineListener extends StateMachineListenerAdapter<ClusterState,ClusterEvent> {
 
 		ArrayList<State<ClusterState, ClusterEvent>> states = new ArrayList<State<ClusterState,ClusterEvent>>();
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,8 @@ package org.springframework.yarn.am.cluster;
 
 import java.util.Map;
 
+import org.springframework.statemachine.StateMachine;
 import org.springframework.yarn.am.grid.GridProjection;
-import org.springframework.yarn.support.statemachine.StateMachine;
-import org.springframework.yarn.support.statemachine.state.State;
 
 public class DefaultContainerCluster implements ContainerCluster {
 
@@ -27,15 +26,15 @@ public class DefaultContainerCluster implements ContainerCluster {
 
 	private final GridProjection projection;
 
-	private StateMachine<State<ClusterState, ClusterEvent>, ClusterEvent> stateMachine;
+	private StateMachine<ClusterState, ClusterEvent> stateMachine;
 
 	private Map<String, Object> extraProperties;
 
-	public DefaultContainerCluster(String id, GridProjection projection, StateMachine<State<ClusterState, ClusterEvent>, ClusterEvent> stateMachine) {
+	public DefaultContainerCluster(String id, GridProjection projection, StateMachine<ClusterState, ClusterEvent> stateMachine) {
 		this(id, projection, stateMachine, null);
 	}
 
-	public DefaultContainerCluster(String id, GridProjection projection, StateMachine<State<ClusterState, ClusterEvent>, ClusterEvent> stateMachine, Map<String, Object> extraProperties) {
+	public DefaultContainerCluster(String id, GridProjection projection, StateMachine<ClusterState, ClusterEvent> stateMachine, Map<String, Object> extraProperties) {
 		this.id = id;
 		this.projection = projection;
 		this.stateMachine = stateMachine;
@@ -53,7 +52,7 @@ public class DefaultContainerCluster implements ContainerCluster {
 	}
 
 	@Override
-	public StateMachine<State<ClusterState, ClusterEvent>, ClusterEvent> getStateMachine() {
+	public StateMachine<ClusterState, ClusterEvent> getStateMachine() {
 		return stateMachine;
 	}
 
