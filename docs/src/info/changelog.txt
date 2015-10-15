@@ -5,6 +5,18 @@ http://projects.spring.io/spring-hadoop/
 Commit changelog: http://github.com/spring-projects/spring-hadoop/tree/v[version]
 Issues changelog: https://jira.spring.io/secure/ReleaseNote.jspa?projectId=10801
 
+Changes in version 2.3.0 RC1 (2015-10-15)
+-----------------------------------------
+General
+* Update build to use Spring Integration 4.2.0 [SHDP-520]
+
+Store
+* Add FlushTimeoutTrigger to StoreObjectSupport [SHDP-526]
+
+YARN
+* Replace internal state machine implementation with new "spring-statemachine" project [SHDP-530]
+
+
 Changes in version 2.3.0 M3 (2015-09-22)
 ----------------------------------------
 General
