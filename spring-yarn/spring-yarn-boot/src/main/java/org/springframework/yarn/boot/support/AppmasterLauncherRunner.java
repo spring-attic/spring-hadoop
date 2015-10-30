@@ -16,6 +16,7 @@
 package org.springframework.yarn.boot.support;
 
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -41,6 +42,8 @@ public class AppmasterLauncherRunner extends CommandLineRunnerSupport implements
 
 	@Autowired(required = false)
 	private YarnAppmaster yarnAppmaster;
+
+	private final AtomicBoolean exitCallGuard = new AtomicBoolean();
 
 	@Override
 	public void run(String... args) throws Exception {
@@ -74,10 +77,14 @@ public class AppmasterLauncherRunner extends CommandLineRunnerSupport implements
 			public void state(AppmasterState state) {
 				if (state == AppmasterState.COMPLETED) {
 					countDownLatch();
-					exit(ExitStatus.COMPLETED.getExitCode());
+					if (exitCallGuard.compareAndSet(false, true)) {
+						exit(ExitStatus.COMPLETED.getExitCode());
+					}
 				} else if (state == AppmasterState.FAILED) {
 					countDownLatch();
-					exit(ExitStatus.FAILED.getExitCode());
+					if (exitCallGuard.compareAndSet(false, true)) {
+						exit(ExitStatus.FAILED.getExitCode());
+					}
 				}
 			}
 		});
