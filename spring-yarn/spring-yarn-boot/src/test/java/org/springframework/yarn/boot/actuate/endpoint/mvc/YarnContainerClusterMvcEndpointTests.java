@@ -218,6 +218,13 @@ public class YarnContainerClusterMvcEndpointTests {
 	public void testClusterWithMember() throws Exception {
 		testHomeWithAnyCluster();
 		TestUtils.callMethod("doTask", appmaster);
+
+		String content = "{\"action\":\"start\"}";
+		mvc.
+			perform(put(BASE + "/cluster1").content(content).contentType(MediaType.APPLICATION_JSON)).
+			andExpect(status().isOk()).
+			andExpect(content().string(isEmptyString()));
+
 		allocateContainer(appmaster, 1);
 
 		mvc.
@@ -244,7 +251,7 @@ public class YarnContainerClusterMvcEndpointTests {
 			andExpect(jsonPath("$.gridProjection.satisfyState.allocateData.any", is(0))).
 			andExpect(jsonPath("$.gridProjection.satisfyState.allocateData.hosts.*", hasSize(0))).
 			andExpect(jsonPath("$.gridProjection.satisfyState.removeData", hasSize(0))).
-			andExpect(jsonPath("$.containerClusterState.clusterState", is(ClusterState.INITIAL.toString())));
+			andExpect(jsonPath("$.containerClusterState.clusterState", is(ClusterState.RUNNING.toString())));
 	}
 
 	@Test
@@ -332,6 +339,12 @@ public class YarnContainerClusterMvcEndpointTests {
 			andExpect(jsonPath("$.clusters", hasSize(1))).
 			andExpect(jsonPath("$.clusters[0]", is("cluster.1.1")));
 
+		content = "{\"action\":\"start\"}";
+		mvc.
+			perform(put(BASE + "/cluster.1.1").content(content).contentType(MediaType.APPLICATION_JSON)).
+			andExpect(status().isOk()).
+			andExpect(content().string(isEmptyString()));
+
 		TestUtils.callMethod("doTask", appmaster);
 		allocateContainer(appmaster, 1);
 		mvc.
@@ -358,7 +371,7 @@ public class YarnContainerClusterMvcEndpointTests {
 			andExpect(jsonPath("$.gridProjection.satisfyState.allocateData.any", is(0))).
 			andExpect(jsonPath("$.gridProjection.satisfyState.allocateData.hosts.*", hasSize(0))).
 			andExpect(jsonPath("$.gridProjection.satisfyState.removeData", hasSize(0))).
-			andExpect(jsonPath("$.containerClusterState.clusterState", is(ClusterState.INITIAL.toString())));
+			andExpect(jsonPath("$.containerClusterState.clusterState", is(ClusterState.RUNNING.toString())));
 	}
 
 

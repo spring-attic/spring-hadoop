@@ -172,6 +172,7 @@ public abstract class AbstractManagedContainerClusterAppmasterTests {
 	protected static class TestManagedContainerClusterAppmaster extends ManagedContainerClusterAppmaster {
 
 		Map<ContainerCluster, SatisfyStateData> satisfyStateData = new HashMap<ContainerCluster, SatisfyStateData>();
+		List<ContainerCluster> onContainerLaunchCommandsData = new ArrayList<ContainerCluster>();
 
 		public SatisfyStateData getSatisfyStateDataByCluster(String cluster) {
 			if (satisfyStateData == null) {
@@ -186,12 +187,20 @@ public abstract class AbstractManagedContainerClusterAppmasterTests {
 		}
 
 		public void resetTestData() {
-			satisfyStateData.clear();;
+			satisfyStateData.clear();
+			onContainerLaunchCommandsData.clear();
 		}
 
 		@Override
 		protected void handleSatisfyStateData(ContainerCluster cluster, SatisfyStateData satisfyData) {
 			satisfyStateData.put(cluster, satisfyData);
+		}
+
+		@Override
+		protected List<String> onContainerLaunchCommands(Container container, ContainerCluster cluster,
+				List<String> commands) {
+			onContainerLaunchCommandsData.add(cluster);
+			return super.onContainerLaunchCommands(container, cluster, commands);
 		}
 
 	}

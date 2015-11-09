@@ -62,6 +62,7 @@ public class ContainerClusterStateMachineConfiguration extends EnumStateMachineC
 				.source(ClusterState.INITIAL)
 				.target(ClusterState.RUNNING)
 				.event(ClusterEvent.START)
+				.action(clusterStartAction())
 				.and()
 			.withExternal()
 				.source(ClusterState.RUNNING)
@@ -118,6 +119,11 @@ public class ContainerClusterStateMachineConfiguration extends EnumStateMachineC
 	@Bean
 	public ClusterDestroyingAction clusterDestroyingAction() {
 		return new ClusterDestroyingAction();
+	}
+
+	@Bean
+	public ClusterStartAction clusterStartAction() {
+		return new ClusterStartAction();
 	}
 
 }

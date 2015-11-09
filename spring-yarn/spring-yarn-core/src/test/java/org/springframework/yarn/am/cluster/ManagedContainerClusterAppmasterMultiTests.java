@@ -101,6 +101,60 @@ public class ManagedContainerClusterAppmasterMultiTests extends AbstractManagedC
 	}
 
 	@Test
+	public void testAllocateMatchCorrectClusterAfterOnlyOneStarted() throws Exception {
+		TestContainerAllocator allocator = new TestContainerAllocator();
+		TestContainerLauncher launcher = new TestContainerLauncher();
+		TestManagedContainerClusterAppmaster appmaster = createTestAppmaster(allocator, launcher);
+		appmaster.setStateMachineFactory(stateMachineFactory);
+
+		Map<String, Object> extraProperties1 = new HashMap<String, Object>();
+		extraProperties1.put("key", "value1");
+		ProjectionData projectionData1 = new ProjectionData(1, null, null, "default", 0);
+		projectionData1.setMemory(0);
+		projectionData1.setVirtualCores(0);
+		appmaster.createContainerCluster("cluster1", "cluster", projectionData1, extraProperties1);
+
+		Map<String, Object> extraProperties2 = new HashMap<String, Object>();
+		extraProperties2.put("key", "value2");
+		ProjectionData projectionData2 = new ProjectionData(1, null, null, "default", 0);
+		projectionData2.setMemory(0);
+		projectionData2.setVirtualCores(0);
+		appmaster.createContainerCluster("cluster2", "cluster", projectionData2, extraProperties2);
+
+		appmaster.startContainerCluster("cluster2");
+
+		// should get 1 any alloc and no container kills
+		TestUtils.callMethod("doTask", appmaster);
+		assertThat(appmaster.satisfyStateData.size(), is(1));
+
+		// allocate 1
+		appmaster.resetTestData();
+		allocateContainer(appmaster, 1);
+		TestUtils.callMethod("doTask", appmaster);
+		assertThat(launcher.container, notNullValue());
+		assertThat(allocator.containerAllocateData, nullValue());
+		assertThat(allocator.releaseContainers, nullValue());
+		assertThat(appmaster.onContainerLaunchCommandsData.size(), is(1));
+		assertThat(appmaster.onContainerLaunchCommandsData.get(0).getId(), is("cluster2"));
+		launcher.resetTestData();
+		allocator.resetTestData();
+
+		appmaster.startContainerCluster("cluster1");
+
+		// allocate 2
+		appmaster.resetTestData();
+		allocateContainer(appmaster, 1);
+		TestUtils.callMethod("doTask", appmaster);
+		assertThat(launcher.container, notNullValue());
+		assertThat(allocator.containerAllocateData, nullValue());
+		assertThat(allocator.releaseContainers, nullValue());
+		assertThat(appmaster.onContainerLaunchCommandsData.size(), is(1));
+		assertThat(appmaster.onContainerLaunchCommandsData.get(0).getId(), is("cluster1"));
+		launcher.resetTestData();
+		allocator.resetTestData();
+	}
+
+	@Test
 	public void testCreateStartModifyTwoAnyClusters() throws Exception {
 		TestContainerAllocator allocator = new TestContainerAllocator();
 		TestContainerLauncher launcher = new TestContainerLauncher();
