@@ -237,7 +237,6 @@ public abstract class AbstractContainerClusterAppmaster extends AbstractEventing
 				.getStateMachine();
 		DefaultContainerCluster cluster = new DefaultContainerCluster(clusterId, projection, stateMachine, extraProperties);
 		clusters.put(cluster.getId(), cluster);
-		projectedGrid.addProjection(cluster.getGridProjection());
 		clusterIdToRef.put(clusterId, clusterDef);
 		return cluster;
 	}
@@ -247,7 +246,8 @@ public abstract class AbstractContainerClusterAppmaster extends AbstractEventing
 		ContainerCluster cluster = clusters.get(id);
 		if (cluster != null) {
 			StateMachine<State<ClusterState, ClusterEvent>, ClusterEvent> stateMachine = cluster.getStateMachine();
-			stateMachine.sendEvent(ClusterEvent.START);
+			stateMachine.sendEvent(MessageBuilder.withPayload(ClusterEvent.START)
+					.setHeader("containercluster", cluster).setHeader("appmaster", AbstractContainerClusterAppmaster.this).build());
 			stateMachine.sendEvent(MessageBuilder.withPayload(ClusterEvent.CONFIGURE)
 					.setHeader("containercluster", cluster).setHeader("appmaster", AbstractContainerClusterAppmaster.this).build());
 		}
