@@ -94,7 +94,11 @@ public class HadoopClusterTests {
 			reader.close();
 		} catch (Exception e) {
 			// printing info before failing test
-			log.info("Job failure info: " + job.getStatus().getFailureInfo());
+			try {
+				log.info("Job info: " + job);
+			} catch (Exception e1) {
+				log.info("Can't print job info", e1);
+			}
 			throw e;
 		}
 	}	
