@@ -23,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.hadoop.yarn.api.records.ApplicationId;
 import org.apache.hadoop.yarn.api.records.YarnApplicationState;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.yarn.boot.support.SpringYarnBootUtils;
 
@@ -37,6 +38,7 @@ public class YarnSubmitApplicationTests extends AbstractApplicationTests {
 	private final String BASE = "/tmp/YarnSubmitApplicationTests/";
 
 	@Test
+	@Ignore
 	public void testPushSubmit() throws Exception {
 		String ID = "testPushSubmit";
 

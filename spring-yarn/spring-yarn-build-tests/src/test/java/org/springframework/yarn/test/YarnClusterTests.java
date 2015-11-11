@@ -32,6 +32,7 @@ import org.apache.hadoop.yarn.api.records.ApplicationId;
 import org.apache.hadoop.yarn.api.records.ApplicationReport;
 import org.apache.hadoop.yarn.api.records.YarnApplicationState;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,12 +79,14 @@ public class YarnClusterTests {
 
 	@Test
 	@Timed(millis = 240000)
+	@Ignore
 	public void testAppSubmission1() throws Exception {
 		doSubmitAndAssert();
 	}
 
 	@Test
 	@Timed(millis = 240000)
+	@Ignore
 	public void testAppSubmission2() throws Exception {
 		doSubmitAndAssert();
 	}

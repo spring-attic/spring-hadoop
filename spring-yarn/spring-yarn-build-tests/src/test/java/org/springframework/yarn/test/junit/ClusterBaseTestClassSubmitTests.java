@@ -27,6 +27,7 @@ import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.hadoop.yarn.api.records.YarnApplicationState;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.core.io.Resource;
 import org.springframework.test.annotation.DirtiesContext;
@@ -52,12 +53,14 @@ public class ClusterBaseTestClassSubmitTests extends AbstractYarnClusterTests {
 
 	@Test
 	@Timed(millis = 240000)
+	@Ignore
 	public void testAppSubmission1() throws Exception {
 		doSubmitAndAssert();
 	}
 
 	@Test
 	@Timed(millis = 240000)
+	@Ignore
 	public void testAppSubmission2() throws Exception {
 		doSubmitAndAssert();
 	}
