@@ -25,6 +25,6 @@
 		 mapper="org.springframework.data.hadoop.test.MyMapper"
 		 reducer="org.springframework.data.hadoop.test.MyReduce"/>
 
-	<hdp:job-runner id="runner" run-at-startup="false" job-ref="wordcountJob" />
+	<hdp:job-runner id="runner" run-at-startup="false" job-ref="wordcountJob" wait-for-completion="false"/>
 
 </beans>

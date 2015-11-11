@@ -84,6 +84,18 @@ public class HadoopClusterTests {
 			JobRunner runner = (JobRunner) ctx.getBean("runner");
 			runner.call();
 
+			long end = System.currentTimeMillis() + 180000;
+			do {
+				boolean isComplete = job.isComplete();
+				log.info("Job isComplete=" + isComplete);
+				if (job.isComplete()) {
+					break;
+				}
+				Thread.sleep(1000);
+			} while (System.currentTimeMillis() < end);
+			assertTrue(job.isComplete());
+			assertTrue(job.isSuccessful());
+
 			Path[] outputFiles = FileUtil.stat2Paths(
 			        fs.listStatus(outDir, new Utils.OutputFileUtils.OutputFilesFilter()));
 
