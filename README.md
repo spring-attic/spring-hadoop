@@ -22,40 +22,36 @@ from the project root folder. This will compile the sources, run the tests and c
 
 ## Supported distros
 
-By default Spring for Apache Hadoop compiles against the Apache Hadoop 2.6.x stable relase (hadoop26).
+By default Spring for Apache Hadoop compiles against the Apache Hadoop 2.7.x stable relase (hadoop27).
 
 The following distros and versions are supported:
 
-- Apache Hadoop 2.6.x (hadoop26) default
-- Apache Hadoop 2.5.x (hadoop25)
-- Apache Hadoop 2.4.x (hadoop24)
+- Apache Hadoop 2.7.x (hadoop27) default
+- Apache Hadoop 2.6.x (hadoop26)
+- Pivotal HD 3.0 (phd30)
 - Pivotal HD 2.1 (phd21)
 - Cloudera CDH5 (cdh5)
-- Hortonworks HDP 2.0 (hdp20)
-- Hortonworks HDP 2.1 (hdp21)
 - Hortonworks HDP 2.2 (hdp22)
 
-For anyone using older distros and versions we recommend using either Spring for Apache Hadoop 1.0.x which is maintained here: https://github.com/spring-projects/spring-hadoop/tree/1.0.x or Spring for Apache Hadoop 2.0.x which is maintained here: https://github.com/spring-projects/spring-hadoop/tree/2.0.x
+For anyone using older distros and versions we recommend using either one of these:
+- Spring for Apache Hadoop 2.0.x which is maintained here: https://github.com/spring-projects/spring-hadoop/tree/2.2.x
+- Spring for Apache Hadoop 2.1.x which is maintained here: https://github.com/spring-projects/spring-hadoop/tree/2.1.x
+- Spring for Apache Hadoop 2.0.x which is maintained here: https://github.com/spring-projects/spring-hadoop/tree/2.0.x
+- Spring for Apache Hadoop 1.1.x which is maintained here: https://github.com/spring-projects/spring-hadoop/tree/1.1.x 
 
 To compile against a specific distro version pass the `-Pdistro=<label>` project property, like so:
 
-    gradlew -Pdistro=hadoop24 build
+    gradlew -Pdistro=hadoop26 build
 
 Note that the chosen distro is displayed on the screen:
 
-    Using Apache Hadoop 2.4.x [2.4.1]
+    Using Apache Hadoop 2.6.x [2.6.0]
 
-In this case, the specified Hadoop distribution (above Apache Hadoop 2.4.x) is used to create the project binaries.
+In this case, the specified Hadoop distribution (above Apache Hadoop 2.6.x) is used to create the project binaries.
 
 # CI Builds
 
 The results for CI builds are available at [Spring Data Hadoop: Project Summary - Spring CI](https://build.spring.io/browse/SPRINGDATAHADOOP)
-
-We are currently running tests against the following distributions:
-* Apache Hadoop 2.6.0
-* Cloudera CDH5
-* Hortonworks HDP 2.1
-* Pivotal HD 2.1
 
 # Testing
 
