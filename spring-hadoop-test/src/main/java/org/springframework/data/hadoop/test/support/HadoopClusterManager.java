@@ -91,7 +91,7 @@ public class HadoopClusterManager {
 			log.info("Building new cluster for ClusterInfo=" + clusterInfo);
 			try {
 				HadoopClusterFactoryBean fb = new HadoopClusterFactoryBean();
-				fb.setClusterId("hadoop-" + clusterInfo.hashCode());
+				fb.setClusterId("hadoop-" + clusterInfo.getId() + "-" + clusterInfo.hashCode());
 				fb.setAutoStart(true);
 				fb.afterPropertiesSet();
 				cluster = fb.getObject();

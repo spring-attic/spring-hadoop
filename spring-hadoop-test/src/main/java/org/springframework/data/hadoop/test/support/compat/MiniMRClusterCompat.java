@@ -56,13 +56,14 @@ public abstract class MiniMRClusterCompat {
 	 * Instantiates a minimrcluster.
 	 *
 	 * @param caller the one who called this method
+	 * @param identifier the cluster identifier
 	 * @param nodes number of nodes
 	 * @param configuration passed configuration
 	 * @param fileSystem hdfs filesystem
 	 * @param classLoader the class loader
 	 * @return the cluster object
 	 */
-	public static Object instantiateCluster(Class<?> caller, int nodes,
+	public static Object instantiateCluster(Class<?> caller, String identifier, int nodes,
 			Configuration configuration, FileSystem fileSystem,
 			ClassLoader classLoader) {
 
@@ -78,8 +79,9 @@ public abstract class MiniMRClusterCompat {
 		log.info("Cluster classes resolved, factory=" + factoryClass + " legacy=" + legacyClass);
 
 		if (factoryClass != null) {
-			Method method = ReflectionUtils.findMethod(factoryClass, "create", Class.class, int.class, Configuration.class);
-			cluster = ReflectionUtils.invokeMethod(method, null, caller, nodes, configuration);
+			Method method = ReflectionUtils.findMethod(factoryClass, "create", Class.class, String.class, int.class,
+					Configuration.class);
+			cluster = ReflectionUtils.invokeMethod(method, null, caller, identifier, nodes, configuration);
 		} else if (legacyClass != null) {
 			Constructor<?> constructor = ClassUtils.getConstructorIfAvailable(legacyClass, int.class, String.class, int.class);
 			cluster = BeanUtils.instantiateClass(constructor, nodes, fileSystem.getUri().toString(), 1);

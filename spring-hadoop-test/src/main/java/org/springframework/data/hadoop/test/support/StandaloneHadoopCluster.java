@@ -140,7 +140,7 @@ public class StandaloneHadoopCluster implements HadoopCluster {
 			log.info("Dfs cluster uri= " + fs.getUri());
 
 			mrClusterObject = MiniMRClusterCompat.instantiateCluster(this.getClass(),
-					nodes, config, fs, this.getClass().getClassLoader());
+					clusterName, nodes, config, fs, this.getClass().getClassLoader());
 
 			configuration = MiniMRClusterCompat.getConfiguration(mrClusterObject);
 
