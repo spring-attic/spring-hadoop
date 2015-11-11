@@ -21,12 +21,14 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -93,6 +95,14 @@ public class HadoopClusterTests {
 			assertNull(reader.readLine());
 			reader.close();
 		} catch (Exception e) {
+			// attempt to copy minicluster files before
+			// those are cleaned
+			try {
+				FileUtils.copyDirectory(new File("target/HadoopClusterTests"),
+						new File("target/HadoopClusterTests-copy"));
+			} catch (Exception e2) {
+				log.error("Can't make copy of target/HadoopClusterTests", e2);
+			}
 			// printing info before failing test
 			try {
 				log.info("Job info: " + job);
