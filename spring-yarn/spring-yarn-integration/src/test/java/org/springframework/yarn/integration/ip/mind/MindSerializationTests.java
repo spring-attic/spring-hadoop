@@ -26,13 +26,13 @@ import javax.net.ServerSocketFactory;
 import javax.net.SocketFactory;
 
 import org.junit.Test;
-import org.springframework.integration.test.util.SocketUtils;
+import org.springframework.util.SocketUtils;
 
 public class MindSerializationTests {
 
 	@Test
 	public void testEmpty() throws Exception {
-		final int port = SocketUtils.findAvailableServerSocket();
+		final int port = SocketUtils.findAvailableTcpPort();
 		ServerSocket server = ServerSocketFactory.getDefault().createServerSocket(port);
 		server.setSoTimeout(10000);
 		Thread t = new Thread(new Runnable() {

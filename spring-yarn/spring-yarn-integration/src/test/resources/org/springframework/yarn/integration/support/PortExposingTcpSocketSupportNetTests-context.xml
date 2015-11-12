@@ -13,14 +13,14 @@
 			http://www.springframework.org/schema/integration/ip
 			http://www.springframework.org/schema/integration/ip/spring-integration-ip.xsd">
 
-	<bean id="tcpIpUtils" class="org.springframework.integration.test.util.SocketUtils" />
+	<bean id="tcpIpUtils" class="org.springframework.util.SocketUtils" />
 
 	<bean id="socketSupport" class="org.springframework.yarn.integration.support.DefaultPortExposingTcpSocketSupport" />
 
 	<ip:tcp-connection-factory id="serverConnectionFactory"
 		type="server"
 		using-nio="false"
-		port="#{tcpIpUtils.findAvailableServerSocket(7400)}"
+		port="#{tcpIpUtils.findAvailableTcpPort(7400)}"
 		socket-support="socketSupport"/>
 
 	<ip:tcp-inbound-gateway id="inboundGateway"

@@ -14,9 +14,9 @@
 			http://www.springframework.org/schema/integration/ip/spring-integration-ip.xsd">
 
 	<!-- We can't use random ports in tests, so use below trick to get one available -->
-	<bean id="tcpIpUtils" class="org.springframework.integration.test.util.SocketUtils" />
+	<bean id="tcpIpUtils" class="org.springframework.util.SocketUtils" />
 	<bean id="socketPort" class="java.lang.Integer" >
-		<constructor-arg index="0" value="#{tcpIpUtils.findAvailableServerSocket(7400)}"/>
+		<constructor-arg index="0" value="#{tcpIpUtils.findAvailableTcpPort(7400)}"/>
 	</bean>
 
 	<bean id="mapper" class="org.springframework.yarn.integration.support.Jackson2ObjectMapperFactoryBean" />
