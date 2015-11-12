@@ -24,7 +24,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.hadoop.yarn.api.records.ApplicationId;
 import org.apache.hadoop.yarn.api.records.YarnApplicationState;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.yarn.boot.support.SpringYarnBootUtils;
 
@@ -39,7 +38,6 @@ public class YarnKillApplicationTests extends AbstractApplicationTests {
 	private final String BASE = "/tmp/YarnKillApplicationTests/";
 
 	@Test
-	@Ignore
 	public void testKill() throws Exception {
 		String ID = "testKill";
 
