@@ -5,6 +5,22 @@ http://projects.spring.io/spring-hadoop/
 Commit changelog: http://github.com/spring-projects/spring-hadoop/tree/v[version]
 Issues changelog: https://jira.spring.io/secure/ReleaseNote.jspa?projectId=10801
 
+Changes in version 2.2.1 RELEASE (2015-11-12)
+---------------------------------------------
+General
+* Update Hadoop distro versions [SHDP-534]
+* Update versions for Spring projects [SHDP-538]
+
+Store
+* Backport SHDP-526 Add FlushTimeoutTrigger to StoreObjectSupport [SHDP-535]
+* Backport SHDP-510 Fix append read error [SHDP-536]
+
+YARN
+* Backport SHDP-515 Support dots in yarn container group names [SHDP-540]
+* Backport SHDP-531 AppmasterLauncherRunner can call exit() twice causing jvm to block [SHDP-542]
+* Backport SHDP-532 Container cluster may start wrong member [SHDP-543]
+
+
 Changes in version 2.2.0 RELEASE (2015-06-09)
 ---------------------------------------------
 General
