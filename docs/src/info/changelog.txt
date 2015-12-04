@@ -5,6 +5,17 @@ http://projects.spring.io/spring-hadoop/
 Commit changelog: http://github.com/spring-projects/spring-hadoop/tree/v[version]
 Issues changelog: https://jira.spring.io/secure/ReleaseNote.jspa?projectId=10801
 
+Changes in version 2.3.0 RC2 (2015-12-04)
+-----------------------------------------
+General
+* Update versions for Spring Framework, Integration, Security and Boot [SHDP-544]
+
+YARN
+* AppmasterLauncherRunner can call exit() twice causing jvm to block [SHDP-531]
+* Container cluster may start wrong member [SHDP-532]
+* @MiniHadoopCluster mixes cluster work dirs [SHDP-533]
+
+
 Changes in version 2.3.0 RC1 (2015-10-15)
 -----------------------------------------
 General
