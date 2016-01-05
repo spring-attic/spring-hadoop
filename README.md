@@ -29,12 +29,12 @@ The following distros and versions are supported:
 - Apache Hadoop 2.7.x (hadoop27) default
 - Apache Hadoop 2.6.x (hadoop26)
 - Pivotal HD 3.0 (phd30)
-- Pivotal HD 2.1 (phd21)
 - Cloudera CDH5 (cdh5)
-- Hortonworks HDP 2.2 (hdp22)
+- Hortonworks HDP 2.3 (hdp23)
 
 For anyone using older distros and versions we recommend using either one of these:
-- Spring for Apache Hadoop 2.0.x which is maintained here: https://github.com/spring-projects/spring-hadoop/tree/2.2.x
+- Spring for Apache Hadoop 2.3.x which is maintained here: https://github.com/spring-projects/spring-hadoop/tree/2.3.x
+- Spring for Apache Hadoop 2.2.x which is maintained here: https://github.com/spring-projects/spring-hadoop/tree/2.2.x
 - Spring for Apache Hadoop 2.1.x which is maintained here: https://github.com/spring-projects/spring-hadoop/tree/2.1.x
 - Spring for Apache Hadoop 2.0.x which is maintained here: https://github.com/spring-projects/spring-hadoop/tree/2.0.x
 - Spring for Apache Hadoop 1.1.x which is maintained here: https://github.com/spring-projects/spring-hadoop/tree/1.1.x 
