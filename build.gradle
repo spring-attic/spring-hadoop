@@ -1110,6 +1110,9 @@ project('spring-yarn:spring-yarn-core') {
 		testCompile("org.mockito:mockito-core:$mockitoVersion") { dep ->
 			exclude group: "org.hamcrest"
 		}
+		testCompile "org.powermock:powermock-core:$powermockVersion"
+		testCompile "org.powermock:powermock-api-mockito:$powermockVersion"
+		testCompile "org.powermock:powermock-module-junit4:$powermockVersion"
 	}
 
 	tasks.withType(Test).all {

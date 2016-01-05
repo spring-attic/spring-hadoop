@@ -63,6 +63,7 @@ import org.springframework.yarn.boot.properties.SpringYarnAppmasterProperties.Co
 import org.springframework.yarn.boot.properties.SpringYarnAppmasterResourceProperties;
 import org.springframework.yarn.boot.properties.SpringYarnBatchProperties;
 import org.springframework.yarn.boot.properties.SpringYarnEnvProperties;
+import org.springframework.yarn.boot.properties.SpringYarnHostInfoDiscoveryProperties;
 import org.springframework.yarn.boot.properties.SpringYarnProperties;
 import org.springframework.yarn.boot.support.AppmasterLauncherRunner;
 import org.springframework.yarn.boot.support.BootApplicationEventTransformer;
@@ -85,6 +86,8 @@ import org.springframework.yarn.fs.LocalResourcesSelector;
 import org.springframework.yarn.fs.LocalResourcesSelector.Entry;
 import org.springframework.yarn.fs.MultiLocalResourcesSelector;
 import org.springframework.yarn.launch.LaunchCommandsFactoryBean;
+import org.springframework.yarn.net.DefaultHostInfoDiscovery;
+import org.springframework.yarn.net.HostInfoDiscovery;
 import org.springframework.yarn.support.ParsingUtils;
 import org.springframework.yarn.support.YarnContextUtils;
 
@@ -105,13 +108,36 @@ public class YarnAppmasterAutoConfiguration {
 
 	@Configuration
 	@ConditionalOnWebApplication
+	@EnableConfigurationProperties({ SpringYarnHostInfoDiscoveryProperties.class })
 	public static class TrackServiceConfig {
+
+		@Autowired
+		private SpringYarnHostInfoDiscoveryProperties syhidp;
+
+		@Bean
+		@ConditionalOnMissingBean(HostInfoDiscovery.class)
+		public HostInfoDiscovery hostInfoDiscovery() {
+			DefaultHostInfoDiscovery discovery = new DefaultHostInfoDiscovery();
+			if (StringUtils.hasText(syhidp.getMatchIpv4())) {
+				discovery.setMatchIpv4(syhidp.getMatchIpv4());
+			}
+			if (StringUtils.hasText(syhidp.getMatchInterface())) {
+				discovery.setMatchInterface(syhidp.getMatchInterface());
+			}
+			if (syhidp.getPreferInterface() != null) {
+				discovery.setPreferInterface(syhidp.getPreferInterface());
+			}
+			discovery.setLoopback(syhidp.isLoopback());
+			discovery.setPointToPoint(syhidp.isPointToPoint());
+			return discovery;
+		}
+
 		// if embedded servlet container exists we try to register
 		// it as a track service with its address
 		@Bean(name=YarnSystemConstants.DEFAULT_ID_AMTRACKSERVICE)
 		@ConditionalOnMissingBean(AppmasterTrackService.class)
-		public AppmasterTrackService appmasterTrackService() {
-			return new EmbeddedAppmasterTrackService();
+		public AppmasterTrackService appmasterTrackService(HostInfoDiscovery hostInfoDiscovery) {
+			return new EmbeddedAppmasterTrackService(hostInfoDiscovery);
 		}
 	}
 

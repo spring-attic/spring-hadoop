@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,9 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.yarn.YarnSystemConstants;
 import org.springframework.yarn.boot.actuate.endpoint.mvc.domain.ContainerRegisterResource;
+import org.springframework.yarn.net.HostInfoDiscovery;
+import org.springframework.yarn.net.HostInfoDiscovery.HostInfo;
 import org.springframework.yarn.support.LifecycleObjectSupport;
-import org.springframework.yarn.support.NetworkUtils;
 
 /**
  * Component which registers itself with container registrar boot endpoint.
@@ -36,19 +37,21 @@ public class ContainerRegistrar extends LifecycleObjectSupport implements
 
 	private static final Log log = LogFactory.getLog(ContainerRegistrar.class);
 
-	private String trackUrl;
-
-	private String containerId;
+	private final String trackUrl;
+	private final String containerId;
+	private final HostInfoDiscovery hostInfoDiscovery;
 
 	/**
 	 * Instantiates a new container registrar.
 	 *
 	 * @param trackUrl the track url
 	 * @param containerId the container id
+	 * @param hostInfoDiscovery host info discovery
 	 */
-	public ContainerRegistrar(String trackUrl, String containerId) {
+	public ContainerRegistrar(String trackUrl, String containerId, HostInfoDiscovery hostInfoDiscovery) {
 		this.trackUrl = trackUrl;
 		this.containerId = containerId;
+		this.hostInfoDiscovery = hostInfoDiscovery;
 	}
 
 	@Override
@@ -60,9 +63,9 @@ public class ContainerRegistrar extends LifecycleObjectSupport implements
 
 		int port = event.getEmbeddedServletContainer().getPort();
 		try {
-			// TODO: need to handle proper network address
 			RestTemplate restTemplate = getBeanFactory().getBean(YarnSystemConstants.DEFAULT_ID_RESTTEMPLATE, RestTemplate.class);
-			String url = "http://" + NetworkUtils.getDefaultAddress() + ":" + port;
+			HostInfo hostInfo = hostInfoDiscovery.getHostInfo();
+			String url = "http://" + (hostInfo != null ? hostInfo.getAddress() : "127.0.0.1") + ":" + port;
 			ContainerRegisterResource request = new ContainerRegisterResource(containerId, url);
 			log.info("Registering containerId=[" + containerId + "] with url=[" + url + "]");
 			restTemplate.postForObject(trackUrl + "/yarn_containerregister", request, Object.class);
