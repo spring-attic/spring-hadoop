@@ -21,6 +21,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class SpringYarnAppmasterResourceProperties extends AbstractResourceProperties {
 
 	private Integer priority;
+	private String labelExpression;
 
 	public Integer getPriority() {
 		return priority;
@@ -28,6 +29,14 @@ public class SpringYarnAppmasterResourceProperties extends AbstractResourcePrope
 
 	public void setPriority(Integer priority) {
 		this.priority = priority;
+	}
+
+	public String getLabelExpression() {
+		return labelExpression;
+	}
+
+	public void setLabelExpression(String labelExpression) {
+		this.labelExpression = labelExpression;
 	}
 
 }

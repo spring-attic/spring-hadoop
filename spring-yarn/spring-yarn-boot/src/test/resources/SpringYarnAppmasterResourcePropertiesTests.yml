@@ -5,3 +5,4 @@ spring:
                 priority: 234
                 memory: memoryFoo
                 virtualCores: 123
+                labelExpression: appLabelExpressionFoo

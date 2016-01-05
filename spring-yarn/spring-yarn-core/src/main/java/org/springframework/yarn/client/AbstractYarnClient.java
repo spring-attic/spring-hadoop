@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,6 +72,9 @@ public abstract class AbstractYarnClient implements YarnClient, InitializingBean
 
 	/** Yarn queue for the request */
 	private String queue = "default";
+
+	/** Application label expression */
+	private String labelExpression;
 
 	/** Yarn configuration for client */
 	private Configuration configuration;
@@ -321,6 +324,15 @@ public abstract class AbstractYarnClient implements YarnClient, InitializingBean
 	}
 
 	/**
+	 * Sets the application label expression.
+	 *
+	 * @param labelExpression the new application label expression
+	 */
+	public void setLabelExpression(String labelExpression) {
+		this.labelExpression = labelExpression;
+	}
+
+	/**
 	 * Sets the staging dir path.
 	 *
 	 * @param stagingDirPath the new staging dir path
@@ -375,6 +387,9 @@ public abstract class AbstractYarnClient implements YarnClient, InitializingBean
 		record.setPriority(priority);
 		context.setPriority(record);
 		context.setQueue(queue);
+		if (StringUtils.hasText(labelExpression)) {
+			context.setNodeLabelExpression(labelExpression);
+		}
 		return context;
 	}
 

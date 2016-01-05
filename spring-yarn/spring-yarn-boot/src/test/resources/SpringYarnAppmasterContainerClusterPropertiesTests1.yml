@@ -20,6 +20,7 @@ spring:
                     : priority: 234
                       memory: memoryFoo
                       virtualCores: 123
+                      labelExpression: appLabelExpressionFoo1
                     ? launchcontext
                     : archiveFile: archiveFileFoo
                       runnerClass: runnerClassFoo
@@ -54,3 +55,4 @@ spring:
                     : priority: 2344
                       memory: memoryFooo
                       virtualCores: 1233
+                      labelExpression: appLabelExpressionFoo2

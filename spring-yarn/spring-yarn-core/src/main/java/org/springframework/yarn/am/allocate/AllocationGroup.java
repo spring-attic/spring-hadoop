@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -162,15 +162,17 @@ class AllocationGroup {
 		return trackers.get(priToIdMap.get(priority));
 	}
 
-    public static class ContainerAllocationValues {
-        int priority = 0;
-        int virtualcores = 1;
-        int memory = 64;
-        boolean locality = false;
-		public ContainerAllocationValues(Integer priority, Integer virtualcores, Integer memory, Boolean locality) {
+	public static class ContainerAllocationValues {
+		int priority = 0;
+		String labelExpression;
+		int virtualcores = 1;
+		int memory = 64;
+		boolean locality = false;
+		public ContainerAllocationValues(Integer priority, String labelExpression, Integer virtualcores, Integer memory, Boolean locality) {
 			if (priority != null) {
 				this.priority = priority;
 			}
+			this.labelExpression = labelExpression;
 			if (virtualcores != null) {
 				this.virtualcores = virtualcores;
 			}
@@ -181,12 +183,13 @@ class AllocationGroup {
 				this.locality = locality;
 			}
 		}
+
 		@Override
 		public String toString() {
-			return "ContainerAllocationValues [priority=" + priority + ", virtualcores=" + virtualcores + ", memory="
-					+ memory + ", locality=" + locality + "]";
+			return "ContainerAllocationValues [priority=" + priority + ", labelExpression=" + labelExpression + ", virtualcores="
+					+ virtualcores + ", memory=" + memory + ", locality=" + locality + "]";
 		}
 
-    }
+	}
 
 }

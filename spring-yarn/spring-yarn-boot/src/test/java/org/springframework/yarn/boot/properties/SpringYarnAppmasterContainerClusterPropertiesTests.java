@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,6 +63,7 @@ public class SpringYarnAppmasterContainerClusterPropertiesTests {
 		assertThat(properties.getContainercluster().getClusters().get("cluster1").getResource().getPriority(), is(234));
 		assertThat(properties.getContainercluster().getClusters().get("cluster1").getResource().getMemory(), is("memoryFoo"));
 		assertThat(properties.getContainercluster().getClusters().get("cluster1").getResource().getVirtualCores(), is(123));
+		assertThat(properties.getContainercluster().getClusters().get("cluster1").getResource().getLabelExpression(), is("appLabelExpressionFoo1"));
 
 		assertThat(properties.getContainercluster().getClusters().get("cluster1").getLaunchcontext(), notNullValue());
 		SpringYarnAppmasterLaunchContextProperties properties1 = properties.getContainercluster().getClusters().get("cluster1").getLaunchcontext();
@@ -122,6 +123,7 @@ public class SpringYarnAppmasterContainerClusterPropertiesTests {
 		assertThat(properties.getContainercluster().getClusters().get("cluster2").getResource().getPriority(), is(2344));
 		assertThat(properties.getContainercluster().getClusters().get("cluster2").getResource().getMemory(), is("memoryFooo"));
 		assertThat(properties.getContainercluster().getClusters().get("cluster2").getResource().getVirtualCores(), is(1233));
+		assertThat(properties.getContainercluster().getClusters().get("cluster2").getResource().getLabelExpression(), is("appLabelExpressionFoo2"));
 		context.close();
 	}
 

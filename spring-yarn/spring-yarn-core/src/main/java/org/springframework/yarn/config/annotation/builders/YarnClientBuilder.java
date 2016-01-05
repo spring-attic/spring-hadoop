@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,6 +47,7 @@ public class YarnClientBuilder
 	private String[] commands;
 	private Integer priority;
 	private String queue;
+	private String labelExpression;
 	private String memory;
 	private Integer virtualCores;
 	private Class<? extends YarnClient> clientClass;
@@ -75,6 +76,9 @@ public class YarnClientBuilder
 		}
 		if (queue != null) {
 			fb.setQueue(queue);
+		}
+		if (labelExpression != null) {
+			fb.setLabelExpression(labelExpression);
 		}
 		if (virtualCores != null) {
 			fb.setVirtualcores(virtualCores);
@@ -124,6 +128,12 @@ public class YarnClientBuilder
 	@Override
 	public YarnClientConfigurer queue(String queue) {
 		this.queue = queue;
+		return this;
+	}
+
+	@Override
+	public YarnClientConfigurer labelExpression(String labelExpression) {
+		this.labelExpression= labelExpression;
 		return this;
 	}
 

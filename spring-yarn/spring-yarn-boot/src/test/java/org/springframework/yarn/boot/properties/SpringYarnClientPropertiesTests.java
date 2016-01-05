@@ -52,6 +52,7 @@ public class SpringYarnClientPropertiesTests {
 
 		assertThat(properties.getPriority(), is(234));
 		assertThat(properties.getQueue(), is("queueFoo"));
+		assertThat(properties.getLabelExpression(), is("labelExpressionFoo"));
 
 		assertThat(properties.getClientClass(), is("clientClassFoo"));
 

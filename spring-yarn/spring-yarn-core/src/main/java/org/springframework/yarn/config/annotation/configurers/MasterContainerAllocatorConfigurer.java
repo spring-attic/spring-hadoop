@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,6 +72,26 @@ public interface MasterContainerAllocatorConfigurer extends AnnotationConfigurer
 	 * @return {@link MasterContainerAllocatorConfigurer} for chaining
 	 */
 	MasterContainerAllocatorConfigurer priority(Integer priority);
+
+	/**
+	 * Specify a container label expression for {@link ContainerAllocator}.
+	 *
+	 * <br>
+	 * <br>JavaConfig:
+	 * <br>
+	 * <pre>
+	 *
+	 * public void configure(YarnAppmasterConfigure master) throws Exception {
+	 *   master
+	 *     .withContainerAllocator()
+	 *       .labelExpression("expression");
+	 * }
+	 * </pre>
+	 *
+	 * @param labelExpression the label expression
+	 * @return {@link MasterContainerAllocatorConfigurer} for chaining
+	 */
+	MasterContainerAllocatorConfigurer labelExpression(String labelExpression);
 
 	/**
 	 * Specify a container virtual cores for {@link ContainerAllocator}.
@@ -238,6 +258,15 @@ public interface MasterContainerAllocatorConfigurer extends AnnotationConfigurer
 		 * @see MasterContainerAllocatorConfigurer#priority(Integer)
 		 */
 		MasterContainerAllocatorCollectionConfigurer priority(Integer priority);
+
+		/**
+		 * Specify a container label expression for {@link ContainerAllocator}.
+		 *
+		 * @param labelExpression the label expression
+		 * @return {@link MasterContainerAllocatorCollectionConfigurer} for chaining
+		 * @see MasterContainerAllocatorConfigurer#labelExpression(String)
+		 */
+		MasterContainerAllocatorCollectionConfigurer labelExpression(String labelExpression);
 
 		/**
 		 * Specify a container virtual cores for {@link ContainerAllocator}.

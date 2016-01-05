@@ -6,6 +6,7 @@ spring:
               - "files2Foo"
             priority: 234
             queue: queueFoo
+            labelExpression: labelExpressionFoo
             clientClass: clientClassFoo
             startup:
                 action: submit

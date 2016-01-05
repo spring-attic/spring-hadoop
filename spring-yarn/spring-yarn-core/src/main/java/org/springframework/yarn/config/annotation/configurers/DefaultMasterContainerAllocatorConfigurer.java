@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@ public class DefaultMasterContainerAllocatorConfigurer
 		implements MasterContainerAllocatorConfigurer {
 
 	private Integer priority;
+	private String labelExpression;
 	private String memory;
 	private Integer virtualCores;
 	private boolean locality;
@@ -51,6 +52,9 @@ public class DefaultMasterContainerAllocatorConfigurer
 		if (priority != null) {
 			allocator.setPriority(priority);
 		}
+		if (labelExpression != null) {
+			allocator.setLabelExpression(labelExpression);
+		}
 		if (virtualCores != null) {
 			allocator.setVirtualcores(virtualCores);
 		}
@@ -60,7 +64,7 @@ public class DefaultMasterContainerAllocatorConfigurer
 		allocator.setLocality(locality);
 
 		for (DefaultMasterContainerAllocatorCollectionConfigurer configurer : collectionConfigurers) {
-			allocator.setAllocationValues(configurer.id, configurer.priority, configurer.virtualCores,
+			allocator.setAllocationValues(configurer.id, configurer.priority, configurer.labelExpression, configurer.virtualCores,
 					StringUtils.hasText(configurer.memory) ? ParsingUtils.parseBytesAsMegs(configurer.memory) : null,
 					configurer.locality);
 		}
@@ -71,6 +75,12 @@ public class DefaultMasterContainerAllocatorConfigurer
 	@Override
 	public MasterContainerAllocatorConfigurer priority(Integer priority) {
 		this.priority = priority;
+		return this;
+	}
+
+	@Override
+	public MasterContainerAllocatorConfigurer labelExpression(String labelExpression) {
+		this.labelExpression = labelExpression;
 		return this;
 	}
 
@@ -110,6 +120,7 @@ public class DefaultMasterContainerAllocatorConfigurer
 
 		private final String id;
 		private Integer priority;
+		private String labelExpression;
 		private String memory;
 		private Integer virtualCores;
 		private boolean locality;
@@ -121,6 +132,12 @@ public class DefaultMasterContainerAllocatorConfigurer
 		@Override
 		public MasterContainerAllocatorCollectionConfigurer priority(Integer priority) {
 			this.priority = priority;
+			return this;
+		}
+
+		@Override
+		public MasterContainerAllocatorCollectionConfigurer labelExpression(String labelExpression) {
+			this.labelExpression = labelExpression;
 			return this;
 		}
 

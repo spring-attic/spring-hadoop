@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,6 +73,9 @@ public class YarnClientFactoryBean implements InitializingBean, FactoryBean<Yarn
 	/** Type of the application */
 	private String appType;
 
+	/** Application label expression */
+	private String labelExpression;
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		// set template if not defined
@@ -90,6 +93,7 @@ public class YarnClientFactoryBean implements InitializingBean, FactoryBean<Yarn
 			c.setVirtualcores(virtualcores);
 			c.setMemory(memory);
 			c.setQueue(queue);
+			c.setLabelExpression(labelExpression);
 			c.setAppName(appName);
 			c.setAppType(appType);
 			c.setCommands(commands);
@@ -220,6 +224,15 @@ public class YarnClientFactoryBean implements InitializingBean, FactoryBean<Yarn
 	 */
 	public void setQueue(String queue) {
 		this.queue = queue;
+	}
+
+	/**
+	 * Sets the application label expression.
+	 *
+	 * @param labelExpression the new application label expression
+	 */
+	public void setLabelExpression(String labelExpression) {
+		this.labelExpression = labelExpression;
 	}
 
 	public void setTemplate(ClientRmOperations template) {

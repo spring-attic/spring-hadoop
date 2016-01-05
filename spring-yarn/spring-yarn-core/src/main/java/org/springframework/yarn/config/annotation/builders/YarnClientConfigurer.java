@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -306,6 +306,34 @@ public interface YarnClientConfigurer {
 	 * @return {@link YarnClientConfigurer} for chaining
 	 */
 	YarnClientConfigurer queue(String queue);
+
+	/**
+	 * Specify a yarn application submission label expression. If this is set,
+	 * all containers of this application without setting label expression
+	 * in resource request will get allocated resources on only those nodes that
+	 * satisfy this label expression. If different label expression of this app
+	 * and resource request are set at the same time, the one set in resource
+	 * request will be used when allocating container.
+	 *
+	 * <br>
+	 * <br>JavaConfig:
+	 * <br>
+	 * <pre>
+	 *
+	 * public void configure(YarnClientConfigure client) throws Exception {
+	 *   client
+	 *     .labelExpression("expression");
+	 * }
+	 * </pre>
+	 *
+	 * <br>XML:
+	 * <br>
+	 * No equivalent
+	 *
+	 * @param labelExpression The Yarn application label expression
+	 * @return {@link YarnClientConfigurer} for chaining
+	 */
+	YarnClientConfigurer labelExpression(String labelExpression);
 
 	/**
 	 * Specify a {@code YarnClient} class.

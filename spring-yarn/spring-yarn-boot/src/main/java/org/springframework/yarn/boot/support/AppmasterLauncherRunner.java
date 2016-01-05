@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,6 +75,9 @@ public class AppmasterLauncherRunner extends CommandLineRunnerSupport implements
 		appmaster.addAppmasterStateListener(new AppmasterStateListener() {
 			@Override
 			public void state(AppmasterState state) {
+				if (log.isDebugEnabled()) {
+					log.debug("Received appmaster state " + state);
+				}
 				if (state == AppmasterState.COMPLETED) {
 					countDownLatch();
 					if (exitCallGuard.compareAndSet(false, true)) {

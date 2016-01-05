@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,6 +57,9 @@ public class StaticAppmaster extends AbstractProcessingAppmaster implements Yarn
 		getMonitor().addContainerMonitorStateListener(new ContainerMonitorListener() {
 			@Override
 			public void state(ContainerMonitorState state) {
+				if (log.isDebugEnabled()) {
+					log.debug("Received monitor state " + state);
+				}
 				if (getMonitor().freeCount() == 0) {
 					int completed = state.getCompleted();
 					int failed = state.getFailed();

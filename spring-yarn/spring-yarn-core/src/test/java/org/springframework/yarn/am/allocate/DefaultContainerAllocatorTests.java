@@ -152,8 +152,8 @@ public class DefaultContainerAllocatorTests {
 	public void testMixedHostRequests() throws Exception {
 		DefaultContainerAllocator allocator = new DefaultContainerAllocator();
 		allocator.setConfiguration(new Configuration());
-		allocator.setAllocationValues("cluster1", 1, 1, 64, false);
-		allocator.setAllocationValues("cluster2", 2, 2, 128, true);
+		allocator.setAllocationValues("cluster1", 1, null, 1, 64, false);
+		allocator.setAllocationValues("cluster2", 2, null, 2, 128, true);
 		TestUtils.callMethod("internalInit", allocator);
 
 		ContainerAllocateData data1 = new ContainerAllocateData();
@@ -183,8 +183,8 @@ public class DefaultContainerAllocatorTests {
 	public void testMixedAnyAndHostRequests() throws Exception {
 		DefaultContainerAllocator allocator = new DefaultContainerAllocator();
 		allocator.setConfiguration(new Configuration());
-		allocator.setAllocationValues("cluster1", 1, 1, 64, false);
-		allocator.setAllocationValues("cluster2", 2, 2, 128, true);
+		allocator.setAllocationValues("cluster1", 1, null, 1, 64, false);
+		allocator.setAllocationValues("cluster2", 2, null, 2, 128, true);
 		TestUtils.callMethod("internalInit", allocator);
 
 		ContainerAllocateData data1 = new ContainerAllocateData();
@@ -250,7 +250,7 @@ public class DefaultContainerAllocatorTests {
 		assertThat(matchRequest(createRequests, "/default-rack", 1, 2, true), notNullValue());
 		assertThat(matchRequest(createRequests, "*", 1, 2, false), notNullValue());
 	}
-	
+
 	@Test
 	public void testAnyAndHostLocalityRequests() throws Exception {
 		DefaultContainerAllocator allocator = new DefaultContainerAllocator();
@@ -337,6 +337,6 @@ public class DefaultContainerAllocatorTests {
 			}
 		}
 		return null;
-	}	
-	
+	}
+
 }
