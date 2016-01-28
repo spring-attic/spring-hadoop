@@ -473,7 +473,7 @@ public class DefaultContainerAllocator extends AbstractPollingAllocator implemen
 		request.setRelaxLocality(relaxLocality);
 		request.setResourceName(hostName);
 		request.setNumContainers(numContainers);
-		request.setNodeLabelExpression(labelExpression);
+		request.setNodeLabelExpression(allocationValues.labelExpression);
 		Priority pri = Records.newRecord(Priority.class);
 		pri.setPriority(priority);
 		request.setPriority(pri);
