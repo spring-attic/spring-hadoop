@@ -26,6 +26,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.hadoop.util.net.DefaultHostInfoDiscovery;
+import org.springframework.data.hadoop.util.net.HostInfoDiscovery;
 import org.springframework.util.StringUtils;
 import org.springframework.yarn.YarnSystemConstants;
 import org.springframework.yarn.boot.condition.ConditionalOnYarnContainer;
@@ -42,8 +44,6 @@ import org.springframework.yarn.config.annotation.SpringYarnConfigurerAdapter;
 import org.springframework.yarn.config.annotation.builders.YarnConfigConfigurer;
 import org.springframework.yarn.config.annotation.builders.YarnContainerConfigurer;
 import org.springframework.yarn.container.YarnContainer;
-import org.springframework.yarn.net.DefaultHostInfoDiscovery;
-import org.springframework.yarn.net.HostInfoDiscovery;
 
 /**
  * {@link EnableAutoConfiguration Auto-configuration} for Spring Hadoop Yarn container.

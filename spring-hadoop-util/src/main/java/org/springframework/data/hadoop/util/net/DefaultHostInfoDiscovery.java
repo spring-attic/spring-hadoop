@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.yarn.net;
+package org.springframework.data.hadoop.util.net;
 
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
@@ -28,6 +28,8 @@ import java.util.List;
 
 import org.apache.commons.net.util.SubnetUtils;
 import org.apache.commons.net.util.SubnetUtils.SubnetInfo;
+
+import org.springframework.data.hadoop.util.net.HostInfoDiscovery;
 import org.springframework.util.StringUtils;
 
 /**

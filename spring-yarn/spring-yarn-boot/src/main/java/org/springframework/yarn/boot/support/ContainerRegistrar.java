@@ -19,11 +19,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.boot.context.embedded.EmbeddedServletContainerInitializedEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.data.hadoop.util.net.HostInfoDiscovery;
+import org.springframework.data.hadoop.util.net.HostInfoDiscovery.HostInfo;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.yarn.YarnSystemConstants;
 import org.springframework.yarn.boot.actuate.endpoint.mvc.domain.ContainerRegisterResource;
-import org.springframework.yarn.net.HostInfoDiscovery;
-import org.springframework.yarn.net.HostInfoDiscovery.HostInfo;
 import org.springframework.yarn.support.LifecycleObjectSupport;
 
 /**

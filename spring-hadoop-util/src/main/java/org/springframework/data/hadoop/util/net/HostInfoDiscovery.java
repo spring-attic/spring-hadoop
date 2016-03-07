@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.yarn.net;
+package org.springframework.data.hadoop.util.net;
 
 /**
  * Interface used to discover a {@link HostInfo} from a system.

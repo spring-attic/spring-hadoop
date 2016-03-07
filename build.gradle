@@ -734,6 +734,15 @@ project('spring-data-hadoop-store') {
 
 }
 
+project('spring-data-hadoop-util') {
+	description = 'Spring for Apache Hadoop Utility Classes'
+
+	dependencies {
+		optional "commons-net:commons-net:3.1"
+	}
+
+}
+
 project('spring-data-hadoop-hbase') {
 	description = 'Spring for Apache Hadoop HBase Support'
 
@@ -1170,6 +1179,7 @@ project('spring-yarn:spring-yarn-boot') {
 	description = 'Spring Yarn Boot'
 	dependencies {
 		compile project(":spring-yarn:spring-yarn-core")
+		compile project(":spring-data-hadoop-util")
 		provided project(":spring-yarn:spring-yarn-batch")
 		provided "org.springframework:spring-web:$springVersion"
 		provided "org.springframework:spring-webmvc:$springVersion"

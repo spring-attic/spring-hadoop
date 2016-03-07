@@ -37,6 +37,8 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.data.hadoop.util.net.DefaultHostInfoDiscovery;
+import org.springframework.data.hadoop.util.net.HostInfoDiscovery;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.StringUtils;
 import org.springframework.yarn.YarnSystemConstants;
@@ -86,8 +88,6 @@ import org.springframework.yarn.fs.LocalResourcesSelector;
 import org.springframework.yarn.fs.LocalResourcesSelector.Entry;
 import org.springframework.yarn.fs.MultiLocalResourcesSelector;
 import org.springframework.yarn.launch.LaunchCommandsFactoryBean;
-import org.springframework.yarn.net.DefaultHostInfoDiscovery;
-import org.springframework.yarn.net.HostInfoDiscovery;
 import org.springframework.yarn.support.ParsingUtils;
 import org.springframework.yarn.support.YarnContextUtils;
 
