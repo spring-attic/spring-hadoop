@@ -198,7 +198,14 @@ public abstract class AbstractLocalResourcesSelector implements LocalResourcesSe
 			entries.add(new Entry(dir + name, null));
 		}
 		for (String pattern : getPatterns()) {
-			entries.add(new Entry(dir + pattern, isZipArchive(pattern) ? LocalResourceType.ARCHIVE : null));
+			if (StringUtils.hasText(pattern)) {
+				if (pattern.startsWith("/")) {
+					// full root path, don't add dir prefix
+					entries.add(new Entry(pattern, isZipArchive(pattern) ? LocalResourceType.ARCHIVE : null));
+				} else {
+					entries.add(new Entry(dir + pattern, isZipArchive(pattern) ? LocalResourceType.ARCHIVE : null));
+				}
+			}
 		}
 		return entries;
 	}

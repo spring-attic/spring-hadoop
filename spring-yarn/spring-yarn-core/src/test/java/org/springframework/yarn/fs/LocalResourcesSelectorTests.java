@@ -183,6 +183,23 @@ public class LocalResourcesSelectorTests {
 		assertThat(entry.getType(), nullValue());
 	}
 
+	@Test
+	public void testFoo() {
+		TestLocalResourcesSelector selector = new TestLocalResourcesSelector();
+		selector.addPattern("/path/from/root/file.txt");
+		List<Entry> entries = selector.select("");
+		assertThat(entries, notNullValue());
+		assertThat(entries.size(), is(3));
+		assertThat(entries.get(2).getPath(), is("/path/from/root/file.txt"));
+
+		selector = new TestLocalResourcesSelector();
+		selector.addPattern("/path/from/root/file.txt");
+		entries = selector.select("/tmp");
+		assertThat(entries, notNullValue());
+		assertThat(entries.size(), is(3));
+		assertThat(entries.get(2).getPath(), is("/path/from/root/file.txt"));
+	}
+
 	private static class TestLocalResourcesSelector extends AbstractLocalResourcesSelector {
 	}
 
