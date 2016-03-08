@@ -145,6 +145,34 @@ switch (hadoopDistro) {
 		sparkVersion = phd30SparkVersion
 		break;
 
+	// Hortonworks Data Platform 2.4
+	case "hdp24":
+		hadoopVersion = hdp24Version
+		println "Using Hortonworks Data Platform 2.4 [$hadoopVersion]"
+		hadoopArtifacts = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-yarn-common:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-streaming:$hadoopVersion",
+				   "org.apache.hadoop:hadoop-distcp:$hadoopVersion"]
+		hadoopTestArtifacts = ["org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion:tests",
+					"org.apache.hadoop:hadoop-hdfs:$hadoopVersion:tests",
+					"org.apache.hadoop:hadoop-common:$hadoopVersion:tests",
+					"org.apache.hadoop:hadoop-mapreduce-client-app:$hadoopVersion",
+					"org.apache.hadoop:hadoop-mapreduce-client-hs:$hadoopVersion",
+					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion",
+					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion:tests"]
+		hbaseVersion = hdp24HbaseVersion
+		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion",
+				  "org.apache.hbase:hbase-common:$hbaseVersion",
+				  "org.apache.hbase:hbase-client:$hbaseVersion"]
+		hiveVersion = hdp24HiveVersion
+		pigVersion = hdp24PigVersion
+		pigQualifier = ':h2'
+		sparkVersion = hdp24SparkVersion
+		break;
+
 	// Hortonworks Data Platform 2.3
 	case "hdp23":
 		hadoopVersion = hdp23Version
@@ -424,6 +452,15 @@ configure(hadoopProjects()) {
 
 		// Pivotal HD 3.0
 		case "phd30":
+			dependencies {
+				testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
+				testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
+				testRuntime "dk.brics.automaton:automaton:1.11-8"
+			}
+			break;
+
+		// Hortonworks Data Platform 2.4
+		case "hdp24":
 			dependencies {
 				testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
 				testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
