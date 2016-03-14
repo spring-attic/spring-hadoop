@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+
+<configuration>
+	<property>
+		<!-- At least with 2.7.1.2.4.0.0-169 causes extra file in yarn log dirs -->
+		<name>yarn.nodemanager.log-container-debug-info.enabled</name>
+		<value>false</value>
+	</property>
+</configuration>
