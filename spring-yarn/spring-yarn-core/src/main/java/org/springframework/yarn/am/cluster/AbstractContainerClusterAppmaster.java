@@ -424,28 +424,32 @@ public abstract class AbstractContainerClusterAppmaster extends AbstractEventing
 		}
 	}
 
+	protected Map<String, LocalResource> buildLocalizedResources(ContainerCluster cluster) {
+		if (getResourceLocalizer() instanceof MultiResourceLocalizer) {
+			if (cluster != null) {
+				MultiResourceLocalizer loc = (MultiResourceLocalizer) getResourceLocalizer();
+				Map<String, LocalResource> resources = loc.getResources(clusterIdToRef.get(cluster.getId()));
+				return resources;
+			}
+		} else {
+			log.warn("Can't use container specific local resources because MultiResourceLocalizer expected instead of "
+					+ getResourceLocalizer());
+		}
+		return new HashMap<String, LocalResource>();
+	}
+
 	private class ContainerLaunchContextModifyInterceptor implements ContainerLauncherInterceptor {
 
 		@Override
 		public ContainerLaunchContext preLaunch(Container container, ContainerLaunchContext context) {
 			ContainerCluster cluster = findContainerClusterByContainer(container);
-			if (getResourceLocalizer() instanceof MultiResourceLocalizer) {
-				if (cluster != null) {
-					MultiResourceLocalizer loc = (MultiResourceLocalizer) getResourceLocalizer();
-					Map<String, LocalResource> resources = loc.getResources(clusterIdToRef.get(cluster.getId()));
-					context.setLocalResources(resources);
-				}
-			} else {
-				log.warn("Can't use container specific local resources because MultiResourceLocalizer expected instead of "
-						+ getResourceLocalizer());
-			}
-
 			if (cluster != null) {
+				Map<String, LocalResource> resources = buildLocalizedResources(cluster);
+				context.setLocalResources(resources);
 				Map<String, String> environment = new HashMap<String, String>(context.getEnvironment());
 				environment.putAll(getEnvironment(clusterIdToRef.get(cluster.getId())));
 				context.setEnvironment(environment);
 			}
-
 			return context;
 		}
 	}
