@@ -219,8 +219,8 @@ public class DefaultHostInfoDiscovery implements HostInfoDiscovery {
 	}
 
 	private List<NetworkInterface> sortInterfaces(List<NetworkInterface> interfaces) {
-		Collections.sort(interfaces, new NicPreferNameComparator());
 		Collections.sort(interfaces, new NicIndexComparator());
+		Collections.sort(interfaces, new NicPreferNameComparator());
 		return interfaces;
 	}
 
