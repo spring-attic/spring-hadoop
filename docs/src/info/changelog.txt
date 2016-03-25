@@ -5,6 +5,22 @@ http://projects.spring.io/spring-hadoop/
 Commit changelog: http://github.com/spring-projects/spring-hadoop/tree/v[version]
 Issues changelog: https://jira.spring.io/secure/ReleaseNote.jspa?projectId=10801
 
+Changes in version 2.4.0 M1 (2016-03-25)
+----------------------------------------
+General
+* Create utils sub-project [SHDP-556]
+* NetworkUtils may find wrong default address [SHDP-546]
+* Remove phd21 from build [SHDP-549]
+* Update version for Hadoop 2.6.x [SHDP-550]
+* Update CDH5 distro to use latest CDH 5.5.x [SHDP-552]
+* Update HDP distro to use latest HDP 2.3.4.x [SHDP-553]
+* Add build support for HDP 2.4 [SHDP-557]
+
+YARN
+* Support for yarn resource labels [SHDP-545]
+* Allow to select localized resource outside of app dir [SHDP-555]
+
+
 Changes in version 2.3.0 RELEASE (2015-12-22)
 ---------------------------------------------
 General
