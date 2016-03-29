@@ -31,7 +31,7 @@ def javaProjects() {
 }
 
 def hadoopProjects() {
-	subprojects.findAll { project -> project.name.contains('-hadoop-') }
+	subprojects.findAll { project -> project.name.contains('-hadoop-') && !project.name.contains('-util') }
 }
 
 def yarnProjects() {
