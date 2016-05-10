@@ -33,7 +33,7 @@ distributions:
 * http://www.pivotal.io/[Pivotal] HD 2.1
 * http://www.pivotal.io/[Pivotal] HD 3.0
 * http://www.cloudera.com/[Cloudera] CDH5
-* http://www.hortonworks.com/[Hortonworks] Data Platform 2.2
+* http://www.hortonworks.com/[Hortonworks] Data Platform 2.3 and 2.4
 
 Any distribution compatible with Apache Hadoop 2.2.x or later should be
 usable.
