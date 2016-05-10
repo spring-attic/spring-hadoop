@@ -49,7 +49,8 @@ https://github.com/spring-projects/spring-hadoop/wiki
 
 Regarding Hadoop-related projects, SHDP supports
 http://hbase.apache.org/[HBase] 0.94.11, http://hive.apache.org/[Hive]
-0.11.0 and http://pig.apache.org/[Pig] 0.11.0 and above. As a rule of
+0.11.0 (As of version 2.3.0 we only support HiveServer2 using the JDBC driver) 
+and http://pig.apache.org/[Pig] 0.11.0 and above. As a rule of
 thumb, when using Hadoop-related projects, such as Hive or Pig, use the
 required Hadoop version as a basis for discovering the supported
 versions.
