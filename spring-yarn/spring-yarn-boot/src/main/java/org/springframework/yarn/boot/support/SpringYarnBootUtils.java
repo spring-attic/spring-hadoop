@@ -146,7 +146,11 @@ public final class SpringYarnBootUtils {
 					.getApplicationBaseDir() + "/")
 					+ syp.getApplicationVersion() + "/";
 		} else {
-			return syp.getApplicationDir();
+			String dir = syp.getApplicationDir();
+			if (StringUtils.hasText(dir) && !dir.endsWith("/")) {
+				dir = dir + "/";
+			}
+			return dir;
 		}
 	}
 
