@@ -28,7 +28,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
-import org.springframework.yarn.boot.condition.ConditionalOnMissingYarn;
+import org.springframework.yarn.boot.condition.ConditionalOnYarnClient;
 import org.springframework.yarn.boot.properties.SpringHadoopProperties;
 import org.springframework.yarn.boot.properties.SpringYarnClientLaunchContextProperties;
 import org.springframework.yarn.boot.properties.SpringYarnClientLocalizerProperties;
@@ -61,7 +61,7 @@ import org.springframework.yarn.launch.LaunchCommandsFactoryBean;
  *
  */
 @Configuration
-@ConditionalOnMissingYarn
+@ConditionalOnYarnClient
 @ConditionalOnClass(EnableYarn.class)
 @ConditionalOnMissingBean(YarnClient.class)
 public class YarnClientAutoConfiguration {
