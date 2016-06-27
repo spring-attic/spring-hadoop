@@ -5,6 +5,19 @@ http://projects.spring.io/spring-hadoop/
 Commit changelog: http://github.com/spring-projects/spring-hadoop/tree/v[version]
 Issues changelog: https://jira.spring.io/secure/ReleaseNote.jspa?projectId=10801
 
+Changes in version 2.4.0 RC1 (2016-06-27)
+-----------------------------------------
+General
+* Update to statemachine 1.1.0.RELEASE [SHDP-563]
+* Update to CDH 5.7 [SHDP-564]
+* Update to Hortonworks HDP 2.4.2 [SHDP-565]
+* Update Spring dependency versions [SHDP-566]
+
+YARN
+* Missing trailing slash on spring.yarn.applicationDir path fails to localize [SHDP-562]
+* Conditional autoconfig [SHDP-568]
+
+
 Changes in version 2.4.0 M1 (2016-03-25)
 ----------------------------------------
 General
