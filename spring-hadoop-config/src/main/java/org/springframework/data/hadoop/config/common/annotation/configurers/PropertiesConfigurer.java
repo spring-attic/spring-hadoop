@@ -27,7 +27,7 @@ import org.springframework.data.hadoop.config.common.annotation.AnnotationConfig
  *
  * @author Janne Valkealahti
  *
- * @param <I>
+ * @param <I> configurer type
  */
 public interface PropertiesConfigurer<I> extends AnnotationConfigurerBuilder<I> {
 

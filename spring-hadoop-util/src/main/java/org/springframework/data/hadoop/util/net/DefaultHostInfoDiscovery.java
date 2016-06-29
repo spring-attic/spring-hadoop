@@ -36,7 +36,6 @@ import org.springframework.util.StringUtils;
  * Default implementation of {@link HostInfoDiscovery}.
  * <p>
  * Discovery logic for finding ip address is:
- * <p>
  * <ul>
  * <li>all possible network interfaces are requested
  * <li>for interfaces, filter out point to point if not enabled

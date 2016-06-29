@@ -30,7 +30,7 @@ import org.springframework.core.GenericTypeResolver;
  * @author Janne Valkealahti
  *
  * @param <O> The Object being built by B
- * @param <I>
+ * @param <I> The type of the builder
  * @param <B> The Builder that is building O and is configured by {@link AnnotationConfigurerAdapter}
  */
 public abstract class AnnotationConfigurerAdapter<O,I,B extends AnnotationBuilder<O>>

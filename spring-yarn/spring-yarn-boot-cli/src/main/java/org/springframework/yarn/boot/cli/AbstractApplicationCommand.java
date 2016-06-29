@@ -87,7 +87,7 @@ public class AbstractApplicationCommand extends OptionParsingCommand {
 		 * Default implementation simply logs using boot
 		 * cli {@link Log}.
 		 *
-		 * @param output
+		 * @param output command output
 		 */
 		protected void handleOutput(String output) {
 			Log.info(output);

@@ -114,9 +114,7 @@ public interface HadoopConfigConfigurer {
 	/**
 	 * Specify security options with a {@link SecurityConfigurer}.
 	 *
-	 * <p>
 	 * <p>JavaConfig:
-	 * <p>
 	 * <pre>
 	 * public void configure(HadoopConfigConfigurer config) throws Exception {
 	 *   config

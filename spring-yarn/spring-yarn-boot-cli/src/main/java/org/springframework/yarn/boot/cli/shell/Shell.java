@@ -51,7 +51,8 @@ public class Shell {
 
 	/**
 	 * Create a new {@link Shell} instance.
-	 * @throws IOException
+	 * @param commands Commands
+	 * @throws IOException on error
 	 */
 	public Shell(List<Command> commands) throws IOException {
 		attachSignalHandler();

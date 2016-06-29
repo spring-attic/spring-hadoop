@@ -40,7 +40,7 @@ import org.springframework.util.Assert;
  * @author Janne Valkealahti
  *
  * @param <O> The object that this builder returns
- * @param <I>
+ * @param <I> The type of the builder
  * @param <B> The type of this builder (that is returned by the base class)
  */
 public abstract class AbstractConfiguredAnnotationBuilder<O,I,B extends AnnotationBuilder<O>>
@@ -142,6 +142,7 @@ public abstract class AbstractConfiguredAnnotationBuilder<O,I,B extends Annotati
 	 * {@link AnnotationConfigurerAdapter#setBuilder(AnnotationBuilder)}.
 	 *
 	 * @param configurer the configurer
+	 * @param <C> configurer type
 	 * @return Configurer passed as parameter
 	 * @throws Exception if error occurred
 	 */
@@ -158,6 +159,7 @@ public abstract class AbstractConfiguredAnnotationBuilder<O,I,B extends Annotati
 	 * to determine if {@link #apply(AnnotationConfigurer)} needs to be called first.
 	 *
 	 * @param configurer the configurer
+	 * @param <C> configurer type
 	 * @return Configurer passed as parameter
 	 * @throws Exception if error occurred
 	 */
@@ -176,6 +178,7 @@ public abstract class AbstractConfiguredAnnotationBuilder<O,I,B extends Annotati
 	 * that object hierarchies are not considered.
 	 *
 	 * @param configurer the configurer
+	 * @param <C> configurer type
 	 * @return Configurer passed as parameter
 	 * @throws Exception if error occurred
 	 */
@@ -188,6 +191,7 @@ public abstract class AbstractConfiguredAnnotationBuilder<O,I,B extends Annotati
 	 * Sets an object that is shared by multiple {@link AnnotationConfigurer}.
 	 *
 	 * @param sharedType the Class to key the shared object by.
+	 * @param <C> type
 	 * @param object the Object to store
 	 */
 	@SuppressWarnings("unchecked")
@@ -199,6 +203,7 @@ public abstract class AbstractConfiguredAnnotationBuilder<O,I,B extends Annotati
 	 * Gets a shared Object. Note that object hierarchies are not considered.
 	 *
 	 * @param sharedType the type of the shared Object
+	 * @param <C> type
 	 * @return the shared Object or null if it is not found
 	 */
 	@SuppressWarnings("unchecked")
@@ -260,6 +265,7 @@ public abstract class AbstractConfiguredAnnotationBuilder<O,I,B extends Annotati
 	 * empty List if not found. Note that object hierarchies are not considered.
 	 *
 	 * @param clazz the {@link AnnotationConfigurer} class to look for
+	 * @param <C> configurer type
 	 * @return All configurers
 	 */
 	@SuppressWarnings("unchecked")
@@ -276,6 +282,7 @@ public abstract class AbstractConfiguredAnnotationBuilder<O,I,B extends Annotati
 	 * empty List if not found. Note that object hierarchies are not considered.
 	 *
 	 * @param clazz the {@link AnnotationConfigurer} class to look for
+	 * @param <C> configurer type
 	 * @return Empty list of configurers
 	 */
 	@SuppressWarnings("unchecked")
@@ -293,6 +300,7 @@ public abstract class AbstractConfiguredAnnotationBuilder<O,I,B extends Annotati
 	 * considered.
 	 *
 	 * @param clazz the configurer class type
+	 * @param <C> configurer type
 	 * @return Matched configurers
 	 */
 	@SuppressWarnings("unchecked")
@@ -313,6 +321,7 @@ public abstract class AbstractConfiguredAnnotationBuilder<O,I,B extends Annotati
 	 * considered.
 	 *
 	 * @param clazz the configurer class type
+	 * @param <C> configurer type
 	 * @return Matched configurers
 	 */
 	@SuppressWarnings("unchecked")
@@ -344,6 +353,7 @@ public abstract class AbstractConfiguredAnnotationBuilder<O,I,B extends Annotati
 	 * {@link ObjectPostProcessor}.
 	 *
 	 * @param object the Object to post process
+	 * @param <P> type
 	 * @return the possibly modified Object to use
 	 */
 	protected <P> P postProcess(P object) {
@@ -355,6 +365,8 @@ public abstract class AbstractConfiguredAnnotationBuilder<O,I,B extends Annotati
 	 * {@link AnnotationConfigurer#init(AnnotationBuilder)} method. Subclasses may
 	 * override this method to hook into the lifecycle without using a
 	 * {@link AnnotationConfigurer}.
+	 *
+	 * @throws Exception on error
 	 */
 	protected void beforeInit() throws Exception {
 	}
@@ -364,6 +376,8 @@ public abstract class AbstractConfiguredAnnotationBuilder<O,I,B extends Annotati
 	 * {@link AnnotationConfigurer#configure(AnnotationBuilder)} method.
 	 * Subclasses may override this method to hook into the lifecycle without
 	 * using a {@link AnnotationConfigurer}.
+	 *
+	 * @throws Exception on error
 	 */
 	protected void beforeConfigureMains() throws Exception {
 	}
@@ -373,6 +387,8 @@ public abstract class AbstractConfiguredAnnotationBuilder<O,I,B extends Annotati
 	 * {@link AnnotationConfigurer#configure(AnnotationBuilder)} method.
 	 * Subclasses may override this method to hook into the lifecycle without
 	 * using a {@link AnnotationConfigurer}.
+	 *
+	 * @throws Exception on error
 	 */
 	protected void beforeConfigurePosts() throws Exception {
 	}
@@ -381,6 +397,7 @@ public abstract class AbstractConfiguredAnnotationBuilder<O,I,B extends Annotati
 	 * Subclasses must implement this method to build the object that is being returned.
 	 *
 	 * @return Object build by this builder
+	 * @throws Exception on error
 	 */
 	protected abstract O performBuild() throws Exception;
 

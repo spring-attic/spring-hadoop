@@ -284,6 +284,7 @@ public abstract class OutputStoreObjectSupport extends StoreObjectSupport {
 	 * Rename file using prefix and suffix settings.
 	 *
 	 * @param path the path to rename
+	 * @return path
 	 */
 	protected Path renameFile(Path path) {
 		log.debug("renameFile called with path=[" + path + "]");
