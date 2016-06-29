@@ -5,6 +5,12 @@ http://projects.spring.io/spring-hadoop/
 Commit changelog: http://github.com/spring-projects/spring-hadoop/tree/v[version]
 Issues changelog: https://jira.spring.io/secure/ReleaseNote.jspa?projectId=10801
 
+Changes in version 2.4.0 RELEASE (2016-06-29)
+---------------------------------------------
+General
+* Fix JavaDoc warnings [SHDP-569]
+
+
 Changes in version 2.4.0 RC1 (2016-06-27)
 -----------------------------------------
 General
