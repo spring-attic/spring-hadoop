@@ -173,10 +173,10 @@ switch (hadoopDistro) {
 		sparkVersion = hdp24SparkVersion
 		break;
 
-	// Hortonworks Data Platform 2.3
-	case "hdp23":
-		hadoopVersion = hdp23Version
-		println "Using Hortonworks Data Platform 2.3 [$hadoopVersion]"
+	// Hortonworks Data Platform 2.5
+	case "hdp25":
+		hadoopVersion = hdp25Version
+		println "Using Hortonworks Data Platform 2.5 [$hadoopVersion]"
 		hadoopArtifacts = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
@@ -191,14 +191,14 @@ switch (hadoopDistro) {
 					"org.apache.hadoop:hadoop-mapreduce-client-hs:$hadoopVersion",
 					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion",
 					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion:tests"]
-		hbaseVersion = hdp23HbaseVersion
+		hbaseVersion = hdp25HbaseVersion
 		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion",
 				  "org.apache.hbase:hbase-common:$hbaseVersion",
 				  "org.apache.hbase:hbase-client:$hbaseVersion"]
-		hiveVersion = hdp23HiveVersion
-		pigVersion = hdp23PigVersion
+		hiveVersion = hdp25HiveVersion
+		pigVersion = hdp25PigVersion
 		pigQualifier = ':h2'
-		sparkVersion = hdp23SparkVersion
+		sparkVersion = hdp25SparkVersion
 		break;
 
 	// Hadoop 2.6.x
@@ -238,7 +238,7 @@ switch (hadoopDistro) {
 				println "Using Apache Hadoop 2.7.x - [$hadoopVersion]"
 			} else {
 				println "Failing build: $hadoopDistro is not a supported distro"
-				println "Supported distros: hadoop26, hadoop27[*], hdp23, cdh5 and phd30"
+				println "Supported distros: hadoop26, hadoop27[*], hdp24, hdp25, cdh5 and phd30"
 				println "* default"
 				throw new InvalidUserDataException("$hadoopDistro is not a supported distro")
 			}
@@ -468,8 +468,8 @@ configure(hadoopProjects()) {
 			}
 			break;
 
-		// Hortonworks Data Platform 2.3
-		case "hdp23":
+		// Hortonworks Data Platform 2.5
+		case "hdp25":
 			dependencies {
 				testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
 				testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
