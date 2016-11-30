@@ -924,6 +924,8 @@ project('spring-data-hadoop-build-tests') {
 		}
 		testCompile "org.springframework:spring-test:$springVersion"
 		testCompile("javax.annotation:jsr250-api:1.0")
+		testCompile "org.hamcrest:hamcrest-core:$hamcrestVersion"
+		testCompile "org.hamcrest:hamcrest-library:$hamcrestVersion"
 		testCompile "org.springframework.integration:spring-integration-stream:$springIntVersion"
 		testCompile "org.springframework.integration:spring-integration-file:$springIntVersion"
 		testRuntime "org.springframework.integration:spring-integration-event:$springIntVersion"
