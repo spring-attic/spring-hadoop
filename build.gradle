@@ -334,10 +334,14 @@ configure(javaProjects()) {
 
 	// dependencies that are common across all java projects
 	dependencies {
+		compile "org.springframework:spring-core:$springVersion"
+		compile "org.springframework:spring-beans:$springVersion"
 		compile "org.springframework:spring-aop:$springVersion"
 		compile "org.springframework:spring-context:$springVersion"
 		compile "org.springframework:spring-context-support:$springVersion"
+		compile "org.springframework:spring-expression:$springVersion"
 		compile "org.springframework:spring-jdbc:$springVersion"
+		compile "org.springframework:spring-messaging:$springVersion"
 		compile "org.springframework:spring-tx:$springVersion"
 	}
 
