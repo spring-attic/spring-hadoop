@@ -155,7 +155,7 @@ public class FsShell implements Closeable, DisposableBean {
 	}
 
 	public void chgrp(String group, String uri) {
-		chgrp(group, uri);
+		chgrp(group, new String[] { uri });
 	}
 
 	public void chgrp(String group, String... uris) {
@@ -163,7 +163,7 @@ public class FsShell implements Closeable, DisposableBean {
 	}
 
 	public void chgrpr(String group, String uri) {
-		chgrp(group, new String[] { uri });
+		chgrpr(group, new String[] { uri });
 	}
 
 	public void chgrpr(String group, String... uris) {
