@@ -5,7 +5,7 @@ solutions around Hadoop.
 
 Spring for Apache Hadoop extends Spring Batch by providing support for reading from and writing to HDFS, running 
 various types of Hadoop jobs (Java MapReduce, Streaming, [Hive](http://hive.apache.org), 
-[Spark](http://spark.apache.org/), [Pig](http://pig.apache.org)) and [HBase](http://hbase.apache.org). 
+[Spark](http://spark.apache.org/), [Pig](http://pig.apache.org)) and using [HBase](http://hbase.apache.org). 
 An important goal is to provide excellent support for non-Java based developers to be productive using Spring Hadoop 
 and not have to write any Java code to use the core feature set.
 
