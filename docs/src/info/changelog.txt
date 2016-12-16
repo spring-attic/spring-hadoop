@@ -5,6 +5,20 @@ http://projects.spring.io/spring-hadoop/
 Commit changelog: http://github.com/spring-projects/spring-hadoop/tree/v[version]
 Issues changelog: https://jira.spring.io/secure/ReleaseNote.jspa?projectId=10801
 
+Changes in version 2.5.0 M1 (2016-12-16)
+----------------------------------------
+General
+* Add build support for HDP 2.5 [SHDP-571]
+* Update to latest 5.9.x CDH versions [SHDP-574]
+* Update to Hadoop 2.7.3 [SHDP-576]
+* Update Spring dependency versions [SHDP-577]
+* Update to Boot 1.4.x [SHDP-578]
+* Update to latest versions for HDP 2.4 [SHDP-579]
+
+Core
+* Fix issue where FsShell.chgrp fires a chmod operation instead of chgrp [SHDP-572]
+
+
 Changes in version 2.4.0 RELEASE (2016-06-29)
 ---------------------------------------------
 General
