@@ -20,6 +20,8 @@ the Hadoop file system.
 
 <<springandhadoop-pig>> describes the Pig support in Spring for Apache Hadoop.
 
+<<springandhadoop-spark>> describes the Spark support in Spring for Apache Hadoop.
+
 <<springandhadoop-runners>> describes the runner support.
 
 <<springandhadoop-security>> describes how to configure and interact

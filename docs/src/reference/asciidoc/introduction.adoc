@@ -22,26 +22,24 @@ based solutions provided by the integration with Spring Batch.
 == Requirements
 
 Spring for Apache Hadoop is built and tested with JDK 7,
-http://projects.spring.io/spring-framework/[Spring Framework] 4.2 and is
-by default built against http://hadoop.apache.org/[Apache Hadoop] 2.7.1.
+http://projects.spring.io/spring-framework/[Spring Framework] 4.3 and is
+by default built against http://hadoop.apache.org/[Apache Hadoop] 2.7.3.
 
 Spring for Apache Hadoop supports the following versions and
 distributions:
 
-* http://hadoop.apache.org/[Apache Hadoop] 2.7.1
-* http://hadoop.apache.org/[Apache Hadoop] 2.6.0
-* http://www.pivotal.io/[Pivotal] HD 2.1
+* http://hadoop.apache.org/[Apache Hadoop] 2.7.3
+* http://hadoop.apache.org/[Apache Hadoop] 2.6.3
 * http://www.pivotal.io/[Pivotal] HD 3.0
 * http://www.cloudera.com/[Cloudera] CDH5
-* http://www.hortonworks.com/[Hortonworks] Data Platform 2.3 and 2.4
+* http://www.hortonworks.com/[Hortonworks] Data Platform 2.5 and 2.4
 
 Any distribution compatible with Apache Hadoop 2.2.x or later should be
 usable.
 
-Spring for Apache Hadoop is tested daily against a number of Hadoop
-distributions. See the
+See the
 https://build.spring.io/browse/SPRINGDATAHADOOP[test plan page] for
-current status.
+current build status.
 
 Instructions for setting up project builds using various supported
 distributions are provided on the Spring for Apache Hadoop wiki -
