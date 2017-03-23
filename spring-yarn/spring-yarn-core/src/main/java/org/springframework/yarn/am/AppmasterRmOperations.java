@@ -15,11 +15,7 @@
  */
 package org.springframework.yarn.am;
 
-import org.apache.hadoop.yarn.api.protocolrecords.AllocateRequest;
-import org.apache.hadoop.yarn.api.protocolrecords.AllocateResponse;
-import org.apache.hadoop.yarn.api.protocolrecords.FinishApplicationMasterRequest;
-import org.apache.hadoop.yarn.api.protocolrecords.FinishApplicationMasterResponse;
-import org.apache.hadoop.yarn.api.protocolrecords.RegisterApplicationMasterResponse;
+import org.apache.hadoop.yarn.api.protocolrecords.*;
 
 /**
  * Interface for appmaster to resource manager communication.
@@ -27,34 +23,41 @@ import org.apache.hadoop.yarn.api.protocolrecords.RegisterApplicationMasterRespo
  * @author Janne Valkealahti
  * @see org.springframework.yarn.am.AppmasterRmTemplate
  * @see org.apache.hadoop.yarn.api.ApplicationMasterProtocol
- *
  */
 public interface AppmasterRmOperations {
-
-	/**
-	 * Register application master.
-	 *
-	 * @param host the host
-	 * @param rpcPort the rpc port
-	 * @param trackUrl the track url
-	 * @return the {@link RegisterApplicationMasterResponse}
-	 */
-	RegisterApplicationMasterResponse registerApplicationMaster(String host, Integer rpcPort, String trackUrl);
-
-	/**
-	 * Allocate container.
-	 *
-	 * @param request the request
-	 * @return the allocate response
-	 */
-	AllocateResponse allocate(AllocateRequest request);
-
-	/**
-	 * Finish the application master.
-	 *
-	 * @param request the {@link FinishApplicationMasterRequest}
-	 * @return the {@link FinishApplicationMasterResponse}
-	 */
-	FinishApplicationMasterResponse finish(FinishApplicationMasterRequest request);
-
+    
+    /**
+     * Register application master.
+     *
+     * @param host     the host
+     * @param rpcPort  the rpc port
+     * @param trackUrl the track url
+     * @return the {@link RegisterApplicationMasterResponse}
+     */
+    RegisterApplicationMasterResponse registerApplicationMaster(String host, Integer rpcPort, String trackUrl);
+    
+    /**
+     * Allocate container.
+     *
+     * @param request the request
+     * @return the allocate response
+     */
+    AllocateResponse allocate(AllocateRequest request);
+    
+    /**
+     * Finish the application master.
+     *
+     * @param request the {@link FinishApplicationMasterRequest}
+     * @return the {@link FinishApplicationMasterResponse}
+     */
+    FinishApplicationMasterResponse finish(FinishApplicationMasterRequest request);
+    
+    /**
+     * Re-registed appmaster when allocate container failed.
+     *
+     * @param request the request
+     * @return the allocate response
+     * @author li.hzh
+     */
+    AllocateResponse allocate(AllocateRequest request, String host, Integer rpcPort, String trackUrl);
 }

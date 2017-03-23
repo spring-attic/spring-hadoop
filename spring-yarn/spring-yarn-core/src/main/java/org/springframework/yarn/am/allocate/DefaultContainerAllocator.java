@@ -37,10 +37,13 @@ import org.apache.hadoop.yarn.api.records.Resource;
 import org.apache.hadoop.yarn.api.records.ResourceRequest;
 import org.apache.hadoop.yarn.util.Records;
 import org.springframework.util.StringUtils;
+import org.springframework.yarn.am.AppmasterService;
+import org.springframework.yarn.am.AppmasterTrackService;
 import org.springframework.yarn.am.allocate.AllocationGroup.ContainerAllocationValues;
 import org.springframework.yarn.am.allocate.DefaultAllocateCountTracker.AllocateCountInfo;
 import org.springframework.yarn.listener.CompositeContainerAllocatorListener;
 import org.springframework.yarn.listener.ContainerAllocatorListener;
+import org.springframework.yarn.support.YarnContextUtils;
 import org.springframework.yarn.support.compat.ResourceCompat;
 
 /**
@@ -224,7 +227,13 @@ public class DefaultContainerAllocator extends AbstractPollingAllocator implemen
 		request.setProgress(applicationProgress);
 
 		// do request and return response
-		AllocateResponse allocate = getRmTemplate().allocate(request);
+        AppmasterService appmasterClientService = YarnContextUtils.getAppmasterClientService(getBeanFactory());
+        AppmasterTrackService appmasterTrackService = YarnContextUtils.getAppmasterTrackService(getBeanFactory());
+        String host = appmasterClientService == null ? "" : appmasterClientService.getHost();
+        int port = appmasterClientService == null ? 0 : appmasterClientService.getPort();
+        String trackUrl = appmasterTrackService == null ? null : appmasterTrackService.getTrackUrl();
+        log.info("Host: " + host + " ,port: " + port + ", trackUrl: " + trackUrl);
+        AllocateResponse allocate = getRmTemplate().allocate(request, host, port, trackUrl);
 		requestId.set(allocate.getResponseId());
 		return allocate;
 	}
