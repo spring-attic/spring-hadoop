@@ -118,34 +118,6 @@ switch (hadoopDistro) {
 					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion:tests"]
 		break;
 
-	// Pivotal HD 3.0
-	case "phd30":
-		hadoopVersion = phd30Version
-		println "Using Pivotal HD 3.0 - [$hadoopVersion]"
-		hadoopArtifacts = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-yarn-common:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-streaming:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-distcp:$hadoopVersion"]
-		hadoopTestArtifacts = ["org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion:tests",
-					"org.apache.hadoop:hadoop-hdfs:$hadoopVersion:tests",
-					"org.apache.hadoop:hadoop-common:$hadoopVersion:tests",
-					"org.apache.hadoop:hadoop-mapreduce-client-app:$hadoopVersion",
-					"org.apache.hadoop:hadoop-mapreduce-client-hs:$hadoopVersion",
-					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion",
-					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion:tests"]
-		hbaseVersion = phd30HbaseVersion
-		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion",
-				  "org.apache.hbase:hbase-common:$hbaseVersion",
-				  "org.apache.hbase:hbase-client:$hbaseVersion"]
-		hiveVersion = phd30HiveVersion
-		pigVersion = phd30PigVersion
-		pigQualifier = ':h2'
-		sparkVersion = phd30SparkVersion
-		break;
-
 	// Hortonworks Data Platform 2.6
 	case "hdp26":
 		hadoopVersion = hdp26Version
@@ -239,7 +211,7 @@ switch (hadoopDistro) {
 				println "Using Apache Hadoop 2.7.x - [$hadoopVersion]"
 			} else {
 				println "Failing build: $hadoopDistro is not a supported distro"
-				println "Supported distros: hadoop26, hadoop27[*], hdp25, hdp26, cdh5 and phd30"
+				println "Supported distros: hadoop26, hadoop27[*], hdp25, hdp26 and cdh5"
 				println "* default"
 				throw new InvalidUserDataException("$hadoopDistro is not a supported distro")
 			}
@@ -449,15 +421,6 @@ configure(hadoopProjects()) {
 				compile("org.apache.hadoop:hadoop-distcp:$cdh5Version")
 				compile("org.apache.hadoop:hadoop-hdfs:$cdh5Version")
 				optional("org.apache.hadoop:hadoop-streaming:$cdh5Version")
-				testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
-				testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
-				testRuntime "dk.brics.automaton:automaton:1.11-8"
-			}
-			break;
-
-		// Pivotal HD 3.0
-		case "phd30":
-			dependencies {
 				testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
 				testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
 				testRuntime "dk.brics.automaton:automaton:1.11-8"
