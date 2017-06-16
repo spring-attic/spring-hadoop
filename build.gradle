@@ -146,10 +146,10 @@ switch (hadoopDistro) {
 		sparkVersion = phd30SparkVersion
 		break;
 
-	// Hortonworks Data Platform 2.4
-	case "hdp24":
-		hadoopVersion = hdp24Version
-		println "Using Hortonworks Data Platform 2.4 [$hadoopVersion]"
+	// Hortonworks Data Platform 2.6
+	case "hdp26":
+		hadoopVersion = hdp26Version
+		println "Using Hortonworks Data Platform 2.6 [$hadoopVersion]"
 		hadoopArtifacts = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
 				   "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
@@ -164,14 +164,14 @@ switch (hadoopDistro) {
 					"org.apache.hadoop:hadoop-mapreduce-client-hs:$hadoopVersion",
 					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion",
 					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion:tests"]
-		hbaseVersion = hdp24HbaseVersion
+		hbaseVersion = hdp26HbaseVersion
 		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion",
 				  "org.apache.hbase:hbase-common:$hbaseVersion",
 				  "org.apache.hbase:hbase-client:$hbaseVersion"]
-		hiveVersion = hdp24HiveVersion
-		pigVersion = hdp24PigVersion
+		hiveVersion = hdp26HiveVersion
+		pigVersion = hdp26PigVersion
 		pigQualifier = ':h2'
-		sparkVersion = hdp24SparkVersion
+		sparkVersion = hdp26SparkVersion
 		break;
 
 	// Hortonworks Data Platform 2.5
@@ -239,7 +239,7 @@ switch (hadoopDistro) {
 				println "Using Apache Hadoop 2.7.x - [$hadoopVersion]"
 			} else {
 				println "Failing build: $hadoopDistro is not a supported distro"
-				println "Supported distros: hadoop26, hadoop27[*], hdp24, hdp25, cdh5 and phd30"
+				println "Supported distros: hadoop26, hadoop27[*], hdp25, hdp26, cdh5 and phd30"
 				println "* default"
 				throw new InvalidUserDataException("$hadoopDistro is not a supported distro")
 			}
@@ -370,7 +370,7 @@ configure(javaProjects()) {
 
 	javadoc {
 		ext.srcDir = file("${projectDir}/docs/src/api")
-	  
+
 		configure(options) {
 			stylesheetFile = file("${rootProject.projectDir}/docs/src/api/stylesheet.css")
 			overview = "${rootProject.projectDir}/docs/src/api/overview.html"
@@ -383,7 +383,7 @@ configure(javaProjects()) {
 	//		groups = [
 	//		'Spring Data Hadoop' : ['org.springframework.data.hadoop*'],
 	//		]
-  
+
 			links = [
 				"http://docs.spring.io/spring/docs/4.0.x/javadoc-api/",
 				"http://docs.oracle.com/javase/6/docs/api/",
@@ -453,7 +453,7 @@ configure(hadoopProjects()) {
 				testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
 				testRuntime "dk.brics.automaton:automaton:1.11-8"
 			}
-			break;	
+			break;
 
 		// Pivotal HD 3.0
 		case "phd30":
@@ -464,8 +464,8 @@ configure(hadoopProjects()) {
 			}
 			break;
 
-		// Hortonworks Data Platform 2.4
-		case "hdp24":
+		// Hortonworks Data Platform 2.6
+		case "hdp26":
 			dependencies {
 				testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
 				testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
@@ -503,19 +503,19 @@ configure(hadoopProjects()) {
 	dependencies {
 		hadoopArtifacts.each {
 			compile(it) { dep ->
-				if (it.contains("hadoop-common") || 
+				if (it.contains("hadoop-common") ||
 					it.contains("hadoop-yarn-common") ||
 					it.contains("hadoop-mapreduce-client-core") ||
 					it.contains("hadoop-mapreduce-client-app") ||
 					it.contains("hadoop-mapreduce-client-hs") ||
 					it.contains("hadoop-mapreduce-client-jobclient") ||
-					it.contains("hive-service")) { 
+					it.contains("hive-service")) {
 					exclude group: "org.slf4j", module: "slf4j-log4j12"
 				}
 				if (it.contains("hadoop-common") ||
 					it.contains("hadoop-hdfs") ||
 					it.contains("hadoop-mapreduce-client-core") ||
-					it.contains("hadoop-mapreduce-client-jobclient") || 
+					it.contains("hadoop-mapreduce-client-jobclient") ||
 					it.contains("hadoop-yarn-common") ||
 					it.contains("hadoop-yarn-client") ||
 					it.contains("hadoop-yarn-server-tests") ||
@@ -536,7 +536,7 @@ configure(hadoopProjects()) {
 		optional("org.springframework:spring-tx:$springVersion")
 		// used by Hive package
 		optional("org.springframework:spring-jdbc:$springVersion")
-	
+
 		// Missing dependency in Hadoop 1.0.3
 		testRuntime "commons-io:commons-io:$commonsioVersion"
 		testRuntime "org.codehaus.jackson:jackson-mapper-asl:$jacksonVersion"
@@ -544,15 +544,15 @@ configure(hadoopProjects()) {
 
 		// Hive
 		optional("$hiveGroup:hive-service:$hiveVersion")
-	
+
 		// needed by JDBC test
 		testRuntime "$hiveGroup:hive-jdbc:$hiveVersion"
-	
+
 		// Pig
 		optional("org.apache.pig:pig:$pigVersion$pigQualifier") { dep ->
 			exclude group: "junit", module: "junit"
 		}
-	
+
 		// HBase
 		hbaseArtifacts.each {
 			optional(it)
@@ -943,7 +943,7 @@ project('spring-data-hadoop-build-tests') {
 		testRuntime "org.codehaus.groovy:groovy:$groovyVersion"
 		testRuntime "org.jruby:jruby:$jrubyVersion"
 		testRuntime "org.python:jython-standalone:$jythonVersion"
-	
+
 		// specify a version of antlr that works with both hive and pig
 		testRuntime "org.antlr:antlr-runtime:$antlrVersion"
 
@@ -1048,7 +1048,7 @@ project('spring-data-hadoop-build-tests') {
 				ext.msg += "HBase "
 				excludes.add("**/hbase/**")
 			}
-	
+
 			if (project.ext.skipHive) {
 				ext.msg += "Hive "
 				excludes.add("**/hive/**")
@@ -1071,18 +1071,18 @@ project('spring-data-hadoop-build-tests') {
 
 			if (!msg.trim().isEmpty())
 					println "Skipping [$msg] Tests";
-	
+
 			// check prefix for hd.fs
 			// first copy the properties since we can't change them
 			ext.projProps = project.properties
-	
+
 			if (projProps.containsKey("hd.fs")) {
 					String hdfs = projProps["hd.fs"].toString()
 					if (!hdfs.contains("://")) {
 						projProps.put("hd.fs", "hdfs://" + hdfs)
 					}
 			}
-			
+
 			// due to GRADLE-2475, set the system properties manually
 			projProps.each { k,v ->
 					if (k.toString().startsWith("hd.")) {
@@ -1182,7 +1182,7 @@ project('spring-yarn:spring-yarn-core') {
 						projProps.put("hd.fs", "hdfs://" + hdfs)
 					}
 			}
-		
+
 			// due to GRADLE-2475, set the system properties manually
 			projProps.each { k,v ->
 					if (k.toString().startsWith("hd.")) {
@@ -1373,4 +1373,3 @@ task wrapper(type: Wrapper) {
 	description = "Generates gradlew[.bat] scripts"
 	gradleVersion = "2.4"
 }
-
