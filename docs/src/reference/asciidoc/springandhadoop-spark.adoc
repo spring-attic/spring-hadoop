@@ -157,7 +157,7 @@ The second step is to configure and execute the `SparkYarnTasklet`:
 
 For the `SparkYarnTasklet`, we set the following properties:
 
-- _sparkAssembly_: the path to the Spark Assembly jar file
+- _sparkAssemblyJar_: the path to the Spark Assembly jar file
 
 - _hadoopConfiguration_: a refernce of the standard Spring Hadoop Configuration that we are having autowired by Spring Boot
 
