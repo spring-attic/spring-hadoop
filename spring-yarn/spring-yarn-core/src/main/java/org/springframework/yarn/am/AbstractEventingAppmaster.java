@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 the original author or authors.
+ * Copyright 2013-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,11 +86,11 @@ public abstract class AbstractEventingAppmaster extends AbstractServicesAppmaste
 			onContainerLaunchRequestFailed(((ContainerLaunchRequestFailedEvent) event).getContainer());
 		} else if (event instanceof ContainerCompletedEvent) {
 			ContainerStatus containerStatus = ((ContainerCompletedEvent) event).getContainerStatus();
-			onContainerCompleted(containerStatus);
 			Container container = runningContainers.remove(containerStatus.getContainerId());
 			if (container != null) {
 				registeredContainers.remove(container);
 			}
+			onContainerCompleted(containerStatus);
 		} else if (event instanceof ContainerRegisterEvent) {
 			ContainerRegisterEvent e = (ContainerRegisterEvent) event;
 			ContainerId containerId = ConverterUtils.toContainerId(e.getContainerId());
