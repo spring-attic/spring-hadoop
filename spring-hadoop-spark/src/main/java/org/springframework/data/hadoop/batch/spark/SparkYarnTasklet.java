@@ -44,6 +44,8 @@ public class SparkYarnTasklet implements InitializingBean, Tasklet, StepExecutio
 
 	private String sparkAssemblyJar;
 
+	private String extraClassPath;
+
 	private Configuration hadoopConfiguration;
 
 	private String appName;
@@ -58,6 +60,12 @@ public class SparkYarnTasklet implements InitializingBean, Tasklet, StepExecutio
 
 	private String executorMemory;
 
+	private String executorCores;
+
+	private String driverMemory;
+
+	private String driverCores;
+
 	private int numExecutors;
 
 	private String[] arguments;
@@ -65,6 +73,10 @@ public class SparkYarnTasklet implements InitializingBean, Tasklet, StepExecutio
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		SparkConf sparkConf = new SparkConf();
 		sparkConf.set("spark.yarn.jar", sparkAssemblyJar);
+		if (StringUtils.hasText(extraClassPath)) {
+			sparkConf.set("spark.driver.extraClassPath", extraClassPath);
+			sparkConf.set("spark.executor.extraClassPath", extraClassPath);
+		}
 		List<String> submitArgs = new ArrayList<String>();
 		if (StringUtils.hasText(appName)) {
 			submitArgs.add("--name");
@@ -82,10 +94,22 @@ public class SparkYarnTasklet implements InitializingBean, Tasklet, StepExecutio
 			submitArgs.add("--archives");
 			submitArgs.add(resourceArchives);
 		}
-		submitArgs.add("--executor-memory");
-		submitArgs.add(executorMemory);
 		submitArgs.add("--num-executors");
 		submitArgs.add("" + numExecutors);
+		submitArgs.add("--executor-memory");
+		submitArgs.add(executorMemory);
+		if (!StringUtils.hasText(executorCores)) {
+			submitArgs.add("--executor-cores");
+			submitArgs.add(executorCores);
+		}
+		if (!StringUtils.hasText(driverMemory)) {
+			submitArgs.add("--driver-memory");
+			submitArgs.add(driverMemory);
+		}
+		if (!StringUtils.hasText(driverCores)) {
+			submitArgs.add("--driver-cores");
+			submitArgs.add(driverCores);
+		}
 		for (String arg : arguments) {
 			submitArgs.add("--arg");
 			submitArgs.add(arg);
@@ -137,6 +161,10 @@ public class SparkYarnTasklet implements InitializingBean, Tasklet, StepExecutio
 		this.sparkAssemblyJar = sparkAssemblyJar;
 	}
 
+	public void setExtraClassPath(String extraClassPath) {
+		this.extraClassPath = extraClassPath;
+	}
+
 	public void setHadoopConfiguration(Configuration configuration) {
 		this.hadoopConfiguration = configuration;
 	}
@@ -163,6 +191,18 @@ public class SparkYarnTasklet implements InitializingBean, Tasklet, StepExecutio
 
 	public void setExecutorMemory(String executorMemory) {
 		this.executorMemory = executorMemory;
+	}
+
+	public void setExecutorCores(String executorCores) {
+		this.executorCores = executorCores;
+	}
+
+	public void setDriverMemory(String driverMemory) {
+		this.driverMemory = driverMemory;
+	}
+
+	public void setDriverCores(String driverCores) {
+		this.driverCores = driverCores;
 	}
 
 	public void setNumExecutors(int numExecutors) {
