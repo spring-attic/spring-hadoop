@@ -61,6 +61,7 @@ def forceDependencyVersions(project, distro) {
 println "Building Spring for Apache Hadoop version: [$version]"
 println "Using Spring Framework version: [$springVersion]"
 println "Using Java version: [" + System.getProperty("java.version") + "]"
+println "Using JAVA_HOME: [" + System.getenv("JAVA_HOME") + "]"
 
 //
 //  Select the Hadoop distribution used for building the binaries
