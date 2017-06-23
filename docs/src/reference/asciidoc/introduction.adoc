@@ -28,11 +28,10 @@ by default built against http://hadoop.apache.org/[Apache Hadoop] 2.7.3.
 Spring for Apache Hadoop supports the following versions and
 distributions:
 
-* http://hadoop.apache.org/[Apache Hadoop] 2.7.3
-* http://hadoop.apache.org/[Apache Hadoop] 2.6.3
-* http://www.pivotal.io/[Pivotal] HD 3.0
-* http://www.cloudera.com/[Cloudera] CDH5
-* http://www.hortonworks.com/[Hortonworks] Data Platform 2.5 and 2.4
+* http://hadoop.apache.org/[Apache Hadoop] 2.7.x
+* http://hadoop.apache.org/[Apache Hadoop] 2.6.x
+* http://www.cloudera.com/[Cloudera] CDH 5.x
+* http://www.hortonworks.com/[Hortonworks] Data Platform 2.x
 
 Any distribution compatible with Apache Hadoop 2.2.x or later should be
 usable.
