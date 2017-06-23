@@ -5,6 +5,22 @@ http://projects.spring.io/spring-hadoop/
 Commit changelog: http://github.com/spring-projects/spring-hadoop/tree/v[version]
 Issues changelog: https://jira.spring.io/secure/ReleaseNote.jspa?projectId=10801
 
+Changes in version 2.5.0 RC1 (2017-06-23)
+-----------------------------------------
+General
+* Add build support for HDP 2.6 [SHDP-583]
+* Update to CDH version 5.10 [SHDP-584]
+* Remove Pivotal HD as a build option [SHDP-585]
+* Update to use latest Spring, Boot, Integration and Security versions [SHDP-586]
+
+Spark
+* SparkYarnTasklet - improve tasklet configuration for spark/yarn by exposing frequently used settings [SHDP-559]
+* SparkYarnTasklet: improve configuration to accept classpath properties [SHDP-582]
+
+YARN
+* Race condition in AbstractEventingAppmaster [SHDP-561]
+
+
 Changes in version 2.5.0 M1 (2016-12-16)
 ----------------------------------------
 General
