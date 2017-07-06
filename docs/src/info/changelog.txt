@@ -5,6 +5,12 @@ http://projects.spring.io/spring-hadoop/
 Commit changelog: http://github.com/spring-projects/spring-hadoop/tree/v[version]
 Issues changelog: https://jira.spring.io/secure/ReleaseNote.jspa?projectId=10801
 
+Changes in version 2.5.0 RELEASE (2017-07-06)
+---------------------------------------------
+General
+* Update changelog
+
+
 Changes in version 2.5.0 RC1 (2017-06-23)
 -----------------------------------------
 General
