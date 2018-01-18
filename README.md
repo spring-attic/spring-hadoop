@@ -97,7 +97,7 @@ You can disable all tests by skipping the `test` task:
 Here are some ways for you to get involved in the community:
 
 * Get involved with the Spring community on StackOverflow using the [spring-data-hadoop](https://stackoverflow.com/questions/tagged/spring-data-hadoop) tag to post and answer questions.
-* Create [JIRA](https://jira.springframework.org/browse/SHDP) tickets for bugs and new features and comment and vote on the ones that you are interested in.
+* Create [JIRA](https://jira.spring.io/browse/SHDP) tickets for bugs and new features and comment and vote on the ones that you are interested in.
 * Watch for upcoming articles on Spring by [subscribing](https://spring.io/blog.atom) to the Spring Blog.
 
 Github is for social coding: if you want to write code, we encourage contributions through pull requests from 
