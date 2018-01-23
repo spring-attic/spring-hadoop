@@ -918,11 +918,11 @@ project('spring-data-hadoop-build-tests') {
     task downloadGutenbergBooks {
         ant.get(src: 'http://mirror.its.dal.ca/gutenberg/1/0/100/100.txt',
                 dest: 'src/test/resources/input/gutenberg',skipexisting:true)
-        ant.get(src: 'http://mirror.its.dal.ca/gutenberg/1/3/135/135.txt',
+        ant.get(src: 'http://mirror.its.dal.ca/gutenberg/1/3/135/135-0.txt',
                 dest: 'src/test/resources/input/gutenberg',skipexisting:true)
         ant.get(src: 'http://mirror.its.dal.ca/gutenberg/1/3/9/1399/1399.txt',
                 dest: 'src/test/resources/input/gutenberg',skipexisting:true)
-        ant.get(src: 'http://mirror.its.dal.ca/gutenberg/2/6/0/2600/2600.txt',
+        ant.get(src: 'http://mirror.its.dal.ca/gutenberg/2/6/0/2600/2600-0.txt',
                 dest: 'src/test/resources/input/gutenberg',skipexisting:true)
     }
 
