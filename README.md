@@ -1,3 +1,5 @@
+> NOTICE: The Spring for Apache Hadoop project will reach End-Of-Life status on April 5th, 2019. We will publish occasional 2.5.x maintenance releases as needed up until that point and will then move the project to the attic. The current Spring for Apache Hadoop 2.5.0 release is built using Apache Hadoop version 2.7.3 and should be compatible with the latest releases of the most popular Hadoop distributions.
+
 The [Spring for Apache Hadoop](http://projects.spring.io/spring-hadoop/) project provides extensions to 
 [Spring](http://projects.spring.io/spring-framework/), [Spring Batch](http://projects.spring.io/spring-batch/), 
 and [Spring Integration](http://projects.spring.io/spring-integration/) to build manageable and robust pipeline 
