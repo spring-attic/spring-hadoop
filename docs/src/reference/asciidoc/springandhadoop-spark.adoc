@@ -1,7 +1,7 @@
 [[springandhadoop-spark]]
 == Apache Spark integration 
 
-Starting with Spring for Apache Hadoop 2.3 we have added a new Spring Batch tasklet for launching Spark jobs in YARN. This support requires access to the Spark Assembly jar that is shipped as part of the Spark distribution. We recommend copying this jar file to a shared location in HDFS. In the example below we chave already copied this jar file to HDFS with the path `hdfs:///app/spark/spark-assembly-1.5.0-hadoop2.6.0.jar`. You also need your Spark app built and ready to be executed. In the example below we are referencing a pre-built app jar file named `spark-hashtags_2.10-0.1.0.jar` located in an `app` directory in our project. The Spark job will be launched using the Spark YARN integration so there is no need to have a separate Spark cluster for this example.
+Starting with Spring for Apache Hadoop 2.3 we have added a new Spring Batch tasklet for launching Spark jobs in YARN. This support requires access to the Spark Assembly jar that is shipped as part of the Spark distribution. We recommend copying this jar file to a shared location in HDFS. In the example below we have already copied this jar file to HDFS with the path `hdfs:///app/spark/spark-assembly-1.5.0-hadoop2.6.0.jar`. You also need your Spark app built and ready to be executed. In the example below we are referencing a pre-built app jar file named `spark-hashtags_2.10-0.1.0.jar` located in an `app` directory in our project. The Spark job will be launched using the Spark YARN integration so there is no need to have a separate Spark cluster for this example.
 
 === Simple example for running a Spark YARN Tasklet
 
