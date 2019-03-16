@@ -4,8 +4,8 @@ defaultTasks 'build'
 
 buildscript {
 	repositories {
-		maven { url "http://repo.spring.io/plugins-release" }
-		maven { url "http://repo.spring.io/plugins-snapshot" }
+		maven { url "https://repo.spring.io/plugins-release" }
+		maven { url "https://repo.spring.io/plugins-snapshot" }
 	}
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:$springBootVersion")
@@ -21,8 +21,8 @@ allprojects {
 
 	repositories {
 		mavenCentral()
-		maven { url 'http://repo.spring.io/libs-release' }
-		maven { url 'http://repo.spring.io/libs-milestone' }
+		maven { url 'https://repo.spring.io/libs-release' }
+		maven { url 'https://repo.spring.io/libs-milestone' }
 	}
 }
 
@@ -380,16 +380,16 @@ configure(javaProjects()) {
 	//		]
   
 			links = [
-				"http://docs.spring.io/spring/docs/4.0.x/javadoc-api/",
-				"http://docs.oracle.com/javase/6/docs/api/",
-				"http://commons.apache.org/proper/commons-logging/apidocs/",
-				"http://logging.apache.org/log4j/1.2/apidocs/",
-				"http://hadoop.apache.org/common/docs/current/api/",
-				"http://hbase.apache.org/apidocs/",
-				"http://pig.apache.org/docs/r0.12.0/api/",
-				"http://hive.apache.org/javadocs/r0.12.0/api/",
-				"http://docs.spring.io/spring-batch/apidocs/",
-				"http://docs.spring.io/spring-integration/api/"
+				"https://docs.spring.io/spring/docs/4.0.x/javadoc-api/",
+				"https://docs.oracle.com/javase/6/docs/api/",
+				"https://commons.apache.org/proper/commons-logging/apidocs/",
+				"https://logging.apache.org/log4j/1.2/apidocs/",
+				"https://hadoop.apache.org/common/docs/current/api/",
+				"https://hbase.apache.org/apidocs/",
+				"https://pig.apache.org/docs/r0.12.0/api/",
+				"https://hive.apache.org/javadocs/r0.12.0/api/",
+				"https://docs.spring.io/spring-batch/apidocs/",
+				"https://docs.spring.io/spring-integration/api/"
 			]
 
 			exclude "org/springframework/data/hadoop/config/**"
@@ -402,7 +402,7 @@ configure(javaProjects()) {
 		manifest.attributes["Created-By"] = "${System.getProperty("java.version")} (${System.getProperty("java.specification.vendor")})"
 		manifest.attributes['Implementation-Title'] = 'spring-data-hadoop'
 		manifest.attributes['Implementation-Version'] = project.version
-		manifest.attributes['Implementation-URL'] = "http://projects.spring.io/spring-hadoop/"
+		manifest.attributes['Implementation-URL'] = "https://projects.spring.io/spring-hadoop/"
 		manifest.attributes['Implementation-Vendor'] = "Spring by Pivotal"
 		manifest.attributes['Implementation-Vendor-Id'] = "org.springframework"
 
@@ -641,7 +641,7 @@ configure(rootProject) {
 		baseName = "spring-data-hadoop"
 		classifier = "docs"
 		description = "Builds -${classifier} archive containing api and reference " +
-			"for deployment at http://static.springframework.org/spring-hadoop/docs."
+			"for deployment at https://docs.spring.io/spring-hadoop/docs."
 
 		from("docs/src/info") {
 			include "changelog.txt"
@@ -661,7 +661,7 @@ configure(rootProject) {
 		baseName = "spring-data-hadoop"
 		classifier = "schema"
 		description = "Builds -${classifier} archive containing all " +
-			"XSDs for deployment at http://springframework.org/schema."
+			"XSDs for deployment at https://springframework.org/schema."
 
 		subprojects.each { subproject ->
 			def Properties schemas = new Properties();
