@@ -29,7 +29,7 @@ model.
 
 Another project of interest to Hadoop developers is Spring Integration.
 Spring Integration provides an extension of the Spring programming model
-to support the well-known http://www.eaipatterns.com[Enterprise
+to support the well-known https://www.enterpriseintegrationpatterns.com/[Enterprise
 Integration Patterns]. It enables lightweight messaging _within_
 Spring-based applications and supports integration with external systems
 via declarative adapters. These adapters are of particular interest to
@@ -58,14 +58,14 @@ Tivoli, Control-M, etc. It is intended to work in conjunction with a
 scheduler, not replace a scheduler. As a lightweight solution, you can
 use Spring's built in scheduling support that will give you cron-like
 and other basic scheduling trigger functionality. See the
-http://docs.spring.io/spring-batch/faq.html#schedulers[Task Execution
+https://docs.spring.io/spring-batch/faq.html#schedulers[Task Execution
 and Scheduling] documention for more info. A middle ground it to use
 Spring's Quartz integration, see
-http://docs.spring.io/spring/docs/4.1.x/spring-framework-reference/html/scheduling.html#scheduling-quartz[Using
+https://docs.spring.io/spring/docs/4.1.x/spring-framework-reference/html/scheduling.html#scheduling-quartz[Using
 the OpenSymphony Quartz Scheduler] for more information. The Spring
 Batch distribution contains an example, but this documentation will be
 updated to provide some more directed examples with Hadoop, check for
-updates on the http://projects.spring.io/spring-hadoop/[main web site of
+updates on the https://projects.spring.io/spring-hadoop/[main web site of
 Spring for Apache Hadoop].
 
 === Batch Job Listeners
@@ -74,7 +74,7 @@ Spring Batch lets you attach listeners at the job and step levels to
 perform additional processing. For example, at the end of a job you can
 perform some notification or perhaps even start another Spring Batch
 job. As a brief example, implement the interface
-http://docs.spring.io/spring-batch/apidocs/org/springframework/batch/core/JobExecutionListener.html[JobExecutionListener]
+https://docs.spring.io/spring-batch/apidocs/org/springframework/batch/core/JobExecutionListener.html[JobExecutionListener]
 and configure it into the Spring Batch job as shown below.
 
 [source,xml]

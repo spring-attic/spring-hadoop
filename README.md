@@ -1,13 +1,13 @@
 > **NOTICE: The Spring for Apache Hadoop project will reach End-Of-Life status on April 5th, 2019. We will publish occasional 2.5.x maintenance releases as needed up until that point and will then move the project to the attic. The current Spring for Apache Hadoop 2.5.0 release is built using Apache Hadoop version 2.7.3 and should be compatible with the latest releases of the most popular Hadoop distributions.**
 
-The [Spring for Apache Hadoop](http://projects.spring.io/spring-hadoop/) project provides extensions to 
-[Spring](http://projects.spring.io/spring-framework/), [Spring Batch](http://projects.spring.io/spring-batch/), 
-and [Spring Integration](http://projects.spring.io/spring-integration/) to build manageable and robust pipeline 
+The [Spring for Apache Hadoop](https://projects.spring.io/spring-hadoop/) project provides extensions to 
+[Spring](https://projects.spring.io/spring-framework/), [Spring Batch](https://projects.spring.io/spring-batch/), 
+and [Spring Integration](https://projects.spring.io/spring-integration/) to build manageable and robust pipeline 
 solutions around Hadoop.
 
 Spring for Apache Hadoop extends Spring Batch by providing support for reading from and writing to HDFS, running 
-various types of Hadoop jobs (Java MapReduce, Streaming, [Hive](http://hive.apache.org), 
-[Spark](http://spark.apache.org/), [Pig](http://pig.apache.org)) and using [HBase](http://hbase.apache.org). 
+various types of Hadoop jobs (Java MapReduce, Streaming, [Hive](https://hive.apache.org), 
+[Spark](https://spark.apache.org/), [Pig](https://pig.apache.org)) and using [HBase](https://hbase.apache.org). 
 An important goal is to provide excellent support for non-Java based developers to be productive using Spring Hadoop 
 and not have to write any Java code to use the core feature set.
 
@@ -17,13 +17,13 @@ classes from Hadoop specific details such as base classes and data types.
 
 # Docs
 
-You can find out more details from the [user documentation](http://docs.spring.io/spring-hadoop/docs/current/reference/html/) 
-or by browsing the [javadocs](http://docs.spring.io/spring-hadoop/docs/current/api/). If you have ideas about how to improve 
+You can find out more details from the [user documentation](https://docs.spring.io/spring-hadoop/docs/current/reference/html/) 
+or by browsing the [javadocs](https://docs.spring.io/spring-hadoop/docs/current/api/). If you have ideas about how to improve 
 or extend the scope, please feel free to contribute.
 
 # Artifacts
 
-For build dependencies to use in your own projects see our [Quick Start](http://projects.spring.io/spring-hadoop/#quick-start) page.
+For build dependencies to use in your own projects see our [Quick Start](https://projects.spring.io/spring-hadoop/#quick-start) page.
 
 # Building
 
@@ -96,12 +96,12 @@ You can disable all tests by skipping the `test` task:
 
 Here are some ways for you to get involved in the community:
 
-* Get involved with the Spring community on StackOverflow using the [spring-data-hadoop](http://stackoverflow.com/questions/tagged/spring-data-hadoop) tag to post and answer questions.
+* Get involved with the Spring community on StackOverflow using the [spring-data-hadoop](https://stackoverflow.com/questions/tagged/spring-data-hadoop) tag to post and answer questions.
 * Create [JIRA](https://jira.springframework.org/browse/SHDP) tickets for bugs and new features and comment and vote on the ones that you are interested in.
-* Watch for upcoming articles on Spring by [subscribing](http://spring.io/blog.atom) to the Spring Blog.
+* Watch for upcoming articles on Spring by [subscribing](https://spring.io/blog.atom) to the Spring Blog.
 
 Github is for social coding: if you want to write code, we encourage contributions through pull requests from 
-[forks of this repository](http://help.github.com/forking/). If you want to contribute code this way, read the Spring Framework 
+[forks of this repository](https://help.github.com/forking/). If you want to contribute code this way, read the Spring Framework 
 [contributor guidelines](https://github.com/spring-projects/spring-framework/blob/master/CONTRIBUTING.md).
 
 ## Code of Conduct
@@ -112,6 +112,6 @@ unacceptable behavior to spring-code-of-conduct@pivotal.io.
 
 # Staying in touch
 
-Follow the project team ([Mark](http://twitter.com/markpollack), [Thomas](http://twitter.com/trisberg) or [Janne](https://twitter.com/tunebluez)) on Twitter.
+Follow the project team ([Mark](https://twitter.com/markpollack), [Thomas](https://twitter.com/trisberg) or [Janne](https://twitter.com/tunebluez)) on Twitter.
 
-In-depth articles can be found at the Spring [blog](http://spring.io/blog), and releases are announced via our [news feed](http://spring.io/blog/category/news).
+In-depth articles can be found at the Spring [blog](https://spring.io/blog), and releases are announced via our [news feed](https://spring.io/blog/category/news).
