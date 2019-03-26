@@ -1,7 +1,7 @@
 [[springandhadoop-hbase]]
 == Working with HBase
 
-SHDP provides basic configuration for http://hbase.apache.org[HBase]
+SHDP provides basic configuration for https://hbase.apache.org[HBase]
 through the `hbase-configuration` namespace element (or its backing
 HbaseConfigurationFactoryBean).
 

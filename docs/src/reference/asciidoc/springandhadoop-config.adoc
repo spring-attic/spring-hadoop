@@ -15,7 +15,7 @@ To simplify configuration, SHDP provides a dedicated namespace for most
 of its components. However, one can opt to configure the beans directly
 through the usual `<bean>` definition. For more information about XML
 Schema-based configuration in Spring, see
-http://docs.spring.io/spring/docs/4.1.x/spring-framework-reference/html/xsd-config.html[this]
+https://docs.spring.io/spring/docs/4.1.x/spring-framework-reference/html/xsd-config.html[this]
 appendix in the Spring Framework reference documentation.
 
 To use the SHDP namespace, one just needs to import it inside the
@@ -28,9 +28,9 @@ configuration:
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xmlns:hdp="http://www.springframework.org/schema/hadoop"<!--1--><!--2-->
    xsi:schemaLocation="
-    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
     http://www.springframework.org/schema/hadoop
-    http://www.springframework.org/schema/hadoop/spring-hadoop.xsd"><!--3-->
+    https://www.springframework.org/schema/hadoop/spring-hadoop.xsd"><!--3-->
 
    <bean/>
 
@@ -65,8 +65,8 @@ xmlns="http://www.springframework.org/schema/hadoop"<!--1-->
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xmlns:beans="http://www.springframework.org/schema/beans"<!--2-->
    xsi:schemaLocation="
-    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-    http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
+    http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/hadoop https://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
         
     <beans:bean id ... ><!--3-->
 
@@ -159,7 +159,7 @@ to the configuration.
 [NOTE]
 ====
 Note that the configuration makes use of Spring's
-http://docs.spring.io/spring/docs/4.1.x/spring-framework-reference/html/resources.html[Resource]
+https://docs.spring.io/spring/docs/4.1.x/spring-framework-reference/html/resources.html[Resource]
 abstraction to locate the file. This allows various search patterns to
 be used, depending on the running environment or the prefix specified
 (if any) by the value - in this example the classpath is used.
@@ -175,8 +175,8 @@ just a few options need to be changed:
 <beans xmlns="http://www.springframework.org/schema/beans"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:hdp="http://www.springframework.org/schema/hadoop"
-    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-        http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
+    xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/hadoop https://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
         
      <hdp:configuration>
         fs.defaultFS=hdfs://localhost:8020
@@ -206,9 +206,9 @@ respectively.
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:hdp="http://www.springframework.org/schema/hadoop"
     xmlns:context="http://www.springframework.org/schema/context"
-    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
-        http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
+    xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/hadoop https://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
         
      <hdp:configuration>
         fs.defaultFS=${hd.fs}
@@ -221,10 +221,10 @@ respectively.
 ----
 
 Through Spring's property placeholder
-http://docs.spring.io/spring/docs/4.1.x/spring-framework-reference/html/beans.html#beans-factory-placeholderconfigurer[support],
-http://docs.spring.io/spring/docs/4.1.x/spring-framework-reference/html/expressions.html[SpEL]
+https://docs.spring.io/spring/docs/4.1.x/spring-framework-reference/html/beans.html#beans-factory-placeholderconfigurer[support],
+https://docs.spring.io/spring/docs/4.1.x/spring-framework-reference/html/expressions.html[SpEL]
 and the
-http://spring.io/blog/2011/06/09/spring-framework-3-1-m2-released/[environment
+https://spring.io/blog/2011/06/09/spring-framework-3-1-m2-released/[environment
 abstraction]. one can externalize environment
 specific properties from the main code base easing the deployment across
 multiple machines. In the example above, the default file system is
@@ -247,10 +247,10 @@ allows customized configurations to be easily declared:
     xmlns:hdp="http://www.springframework.org/schema/hadoop"
     xmlns:context="http://www.springframework.org/schema/context"
     xmlns:util="http://www.springframework.org/schema/util"
-    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
-        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
-        http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
+    xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/util https://www.springframework.org/schema/util/spring-util.xsd
+        http://www.springframework.org/schema/hadoop https://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
 
    <!-- merge the local properties, the props bean and the two properties files -->        
    <hdp:configuration properties-ref="props" properties-location="cfg-1.properties, cfg-2.properties">
