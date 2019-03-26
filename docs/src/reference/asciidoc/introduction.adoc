@@ -22,16 +22,16 @@ based solutions provided by the integration with Spring Batch.
 == Requirements
 
 Spring for Apache Hadoop is built and tested with JDK 7,
-http://projects.spring.io/spring-framework/[Spring Framework] 4.3 and is
-by default built against http://hadoop.apache.org/[Apache Hadoop] 2.7.3.
+https://projects.spring.io/spring-framework/[Spring Framework] 4.3 and is
+by default built against https://hadoop.apache.org/[Apache Hadoop] 2.7.3.
 
 Spring for Apache Hadoop supports the following versions and
 distributions:
 
-* http://hadoop.apache.org/[Apache Hadoop] 2.7.x
-* http://hadoop.apache.org/[Apache Hadoop] 2.6.x
-* http://www.cloudera.com/[Cloudera] CDH 5.x
-* http://www.hortonworks.com/[Hortonworks] Data Platform 2.x
+* https://hadoop.apache.org/[Apache Hadoop] 2.7.x
+* https://hadoop.apache.org/[Apache Hadoop] 2.6.x
+* https://www.cloudera.com/[Cloudera] CDH 5.x
+* https://www.hortonworks.com/[Hortonworks] Data Platform 2.x
 
 Any distribution compatible with Apache Hadoop 2.2.x or later should be
 usable.
@@ -45,9 +45,9 @@ distributions are provided on the Spring for Apache Hadoop wiki -
 https://github.com/spring-projects/spring-hadoop/wiki
 
 Regarding Hadoop-related projects, SHDP supports
-http://hbase.apache.org/[HBase] 0.94.11, http://hive.apache.org/[Hive]
+https://hbase.apache.org/[HBase] 0.94.11, https://hive.apache.org/[Hive]
 0.11.0 (As of version 2.3.0 we only support HiveServer2 using the JDBC driver) 
-and http://pig.apache.org/[Pig] 0.11.0 and above. As a rule of
+and https://pig.apache.org/[Pig] 0.11.0 and above. As a rule of
 thumb, when using Hadoop-related projects, such as Hive or Pig, use the
 required Hadoop version as a basis for discovering the supported
 versions.
@@ -56,7 +56,7 @@ To take full advantage of Spring for Apache Hadoop you need a running
 Hadoop cluster. If you don't already have one in your environment, a
 good first step is to create a single-node cluster. To install the most
 recent stable verision of Hadoop, the
-http://hadoop.apache.org/common/docs/stable/#Getting+Started[Getting
+https://hadoop.apache.org/common/docs/stable/#Getting+Started[Getting
 Started] page from the official Apache project is a good general
 guide. There should be a link for "Single Node Setup".
 
@@ -77,11 +77,11 @@ https://github.com/spring-projects/spring-hadoop-samples/[samples]_. +
 Official repository full of SHDP samples demonstrating the various
 project features.
 * _Spring Data
-http://shop.oreilly.com/product/0636920024767.do[Book]_. +
+https://shop.oreilly.com/product/0636920024767.do[Book]_. +
 Guide to Spring Data projects, written by the committers behind them.
 Covers Spring Data Hadoop stand-alone but in tandem with its _siblings_
 projects. All author royalties from book sales are donated to
-http://creativecommons.org/about[Creative Commons] organization.
+https://creativecommons.org/about[Creative Commons] organization.
 * _Spring Data Book
 https://github.com/spring-projects/spring-data-book/tree/master/hadoop[examples]_. +
 Complete running samples for the Spring Data book. Note that some of
