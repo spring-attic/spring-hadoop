@@ -6,7 +6,7 @@
 [appendix]
 == Using Spring for Apache Hadoop with Amazon EMR
 A popular option for creating on-demand Hadoop cluster is Amazon Elastic
-Map Reduce or http://aws.amazon.com/elasticmapreduce/[Amazon EMR
+Map Reduce or https://aws.amazon.com/elasticmapreduce/[Amazon EMR
 service]. The user can through the command-line, API or a web UI
 configure, start, stop and manage a Hadoop cluster in the _cloud_
 without having to worry about the actual set-up or hardware resources
@@ -36,10 +36,10 @@ flow does not have to change.
 Amazon EMR allows clusters to be created through the management console,
 through the API or the command-line. This documentation will focus on
 the
-http://docs.amazonwebservices.com/ElasticMapReduce/latest/GettingStartedGuide/SignUp.html#emr-gsg-install-cli[command-line]
+https://docs.aws.amazon.com/ElasticMapReduce/latest/GettingStartedGuide/SignUp.html#emr-gsg-install-cli[command-line]
 but the setup is not limited to it - feel free to adjust it according to
 your needs or preference. Make sure to properly setup the
-http://docs.amazonwebservices.com/ElasticMapReduce/latest/GettingStartedGuide/SignUp.html#ConfigCredentials[credentials]
+https://docs.aws.amazon.com/ElasticMapReduce/latest/GettingStartedGuide/SignUp.html#ConfigCredentials[credentials]
 so that the S3 file-system can be properly accessed.
 
 === Start up the cluster
@@ -53,7 +53,7 @@ A nice feature of Amazon EMR is starting a cluster for an indefinite
 period. That is rather then submitting a job and creating the cluster
 until it finished, one can create a cluster (along side a job) but
 request to be kept _alive_ even if there is no work for it. This is
-http://docs.amazonwebservices.com/ElasticMapReduce/latest/GettingStartedGuide/Essentials.html#emr-gsg-creating-a-job-flow[easily
+https://docs.aws.amazon.com/ElasticMapReduce/latest/GettingStartedGuide/Essentials.html#emr-gsg-creating-a-job-flow[easily
 done] through the `--create --alive` parameters:
 
 ------------------------------------
@@ -100,9 +100,9 @@ machine on the cluster preventing any snooping or man-in-the-middle
 attacks. Further more it is quite easy to automate and be executed along
 side the cluster creation, programmatically or through some script. The
 Amazon EMR docs have dedicated sections on
-http://docs.amazonwebservices.com/ElasticMapReduce/latest/GettingStartedGuide/SignUp.html#emr-gsg-ssh-setup-config[SSH
+https://docs.aws.amazon.com/ElasticMapReduce/latest/GettingStartedGuide/SignUp.html#emr-gsg-ssh-setup-config[SSH
 Setup and Configuration] and on opening a
-http://docs.amazonwebservices.com/ElasticMapReduce/latest/DeveloperGuide/emr-ssh-tunnel.html[SSH
+https://docs.aws.amazon.com/ElasticMapReduce/latest/DeveloperGuide/emr-ssh-tunnel.html[SSH
 Tunnel to the master node] so please refer to them. Make sure to setup
 the SSH tunnel as a SOCKS proxy, that is to redirect all calls to remote
 ports - this is crucial when working with Hadoop (or other applications)
@@ -132,7 +132,7 @@ configuration be read by the cluster nodes (which would mean the nodes
 would try to use a SOCKS proxy on the remote side as well), make sure
 the master node (and thus all its nodes) `hadoop-site.xml` marks the
 default network setting as final (see this
-http://blog.cloudera.com/blog/2008/12/securing-a-hadoop-cluster-through-a-gateway/[blog
+https://blog.cloudera.com/blog/2008/12/securing-a-hadoop-cluster-through-a-gateway/[blog
 post] for a detailed explanation):
 
 [source,xml]
@@ -146,7 +146,7 @@ post] for a detailed explanation):
 
 Simply pass this configuration (and other options that you might have)
 to the master node using a
-http://docs.aws.amazon.com/ElasticMapReduce/latest/DeveloperGuide/Bootstrap.html[bootstrap]
+https://docs.aws.amazon.com/ElasticMapReduce/latest/DeveloperGuide/Bootstrap.html[bootstrap]
 action. One can find this file ready for usage, already deployed to
 Amazon S3 at
 http://dist.springframework.org.s3.amazonaws.com/release/SHDP/emr-settings.xml[s3://dist.springframework.org/release/SHDP/emr-settings.xml].
@@ -166,16 +166,16 @@ to one of your S3 buckets and use that location instead.
 === Accessing the file-system
 
 Amazon EMR offers Simple Storage Service, also known as
-http://aws.amazon.com/s3/[S3] service, as means for durable read-write
+https://aws.amazon.com/s3/[S3] service, as means for durable read-write
 storage for EMR. While the cluster is active, one can write additional
 data to HDFS but unless S3 is used, the data will be lost once the
 cluster shuts down. Note that when using an S3 location for the first
 time, the proper
-http://docs.amazonwebservices.com/ElasticMapReduce/latest/DeveloperGuide/emr-s3-acls.html[access
+https://docs.aws.amazon.com/ElasticMapReduce/latest/DeveloperGuide/emr-s3-acls.html[access
 permissions] needs to be setup. Accessing S3 is easier then the job
 tracker - in fact the Hadoop distribution provides not one but two
 file-system
-http://docs.amazonwebservices.com/ElasticMapReduce/latest/DeveloperGuide/FileSystemConfig.html[implementations
+https://docs.aws.amazon.com/ElasticMapReduce/latest/DeveloperGuide/FileSystemConfig.html[implementations
 for S3]:
 
 .Hadoop S3 File Systems
@@ -187,7 +187,7 @@ file-system as the data is read/written in its native format and can be
 used not just by Hadoop but also other systems without any translation.
 The down-side is that it does not support large files (5GB) out of the
 box (though there is a work-around through the
-http://docs.amazonwebservices.com/ElasticMapReduce/latest/DeveloperGuide/Config_Multipart.html#Config_Multipart.title[multipart]
+https://docs.aws.amazon.com/ElasticMapReduce/latest/DeveloperGuide/Config_Multipart.html#Config_Multipart.title[multipart]
 upload feature).
 
 |S3 Block FS |`s3://` |Block Based |The files are stored as blocks
@@ -199,13 +199,13 @@ bucket and is not inter-operable with other S3 tools.
 To access the data in S3 one can either use an HDFS file-system on top
 of it, which requires no extra setup, or copy the data from S3 to the
 HDFS cluster using manual tools,
-http://wiki.apache.org/hadoop/AmazonS3#Running_bulk_copies_in_and_out_of_S3[distcp
+https://wiki.apache.org/hadoop/AmazonS3#Running_bulk_copies_in_and_out_of_S3[distcp
 with S3], its dedicated version
-http://docs.amazonwebservices.com/ElasticMapReduce/latest/DeveloperGuide/UsingEMR_s3distcp.html[s3distcp],
+https://docs.aws.amazon.com/ElasticMapReduce/latest/DeveloperGuide/UsingEMR_s3distcp.html[s3distcp],
 Hadoop
-http://docs.amazonwebservices.com/ElasticMapReduce/latest/DeveloperGuide/DistributedCache.html[DistributedCache]
+https://docs.aws.amazon.com/ElasticMapReduce/latest/DeveloperGuide/DistributedCache.html[DistributedCache]
 (which SHDP #hadoop:distributed-cache[supports] as well) or third-party
-tools such as http://s3tools.org/s3cmd[s3cmd].
+tools such as https://s3tools.org/s3cmd[s3cmd].
 
 For newbies and development we recommend accessing the S3 directly
 through the File-System abstraction as in most cases, its performance is
@@ -218,7 +218,7 @@ tests first.
 
 Once the cluster is no longer needed for a longer period of time, one
 can shut it down fairly
-http://docs.amazonwebservices.com/ElasticMapReduce/latest/GettingStartedGuide/CleanUp.html[straight
+https://docs.aws.amazon.com/ElasticMapReduce/latest/GettingStartedGuide/CleanUp.html[straight
 forward]:
 
 --------------------------------
@@ -229,7 +229,7 @@ Note that the EMR cluster is billed by the hour and since the time is
 rounded upwards, starting and shutting down the cluster repeateadly
 might end up being more expensive then just keeping it alive. Consult
 the
-http://aws.amazon.com/elasticmapreduce/faqs/#billing-2[documentation]
+https://aws.amazon.com/elasticmapreduce/faqs/#billing-2[documentation]
 for more information.
 
 === Example configuration
@@ -261,9 +261,9 @@ hadoop-context.xml
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:context="http://www.springframework.org/schema/context"
     xmlns:hdp="http://www.springframework.org/schema/hadoop"
-    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
-        http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
+    xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/hadoop https://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
 
 <!-- property placeholder backed by hadoop.properties -->     
 <context:property-placeholder location="hadoop.properties"/>
@@ -327,7 +327,7 @@ As mentioned above, those interested in using on-demand Hadoop clusters
 can use Amazon Elastic Map Reduce (or Amazon EMR) service. An
 alternative to that, for those that want maximum control over the
 cluster, is to use Amazon Elastic Compute Cloud or
-http://aws.amazon.com/ec2/[EC2]. EC2 is in fact the service on top of
+https://aws.amazon.com/ec2/[EC2]. EC2 is in fact the service on top of
 which Amazon EMR runs and that is, a resizable, configurable compute
 capacity in the cloud.
 
@@ -343,14 +343,14 @@ service you run on it) runs in the cloud and thus 'development' access
 to it, is different then when running the service in local network.
 There are various tips and tools out there that can handle the initial
 provisioning and configure the access to the cluster. Such a solution is
-http://whirr.apache.org/[Apache Whirr] which is a set of libraries for
+https://whirr.apache.org/[Apache Whirr] which is a set of libraries for
 running cloud services. Though it provides a Java API as well, one can
 easily configure, start and stop services from the command-line.
 
 === Setting up the Hadoop cluster on EC2 with Apache Whirr
 
 The Whirr
-http://whirr.apache.org/docs/0.8.1/quick-start-guide.html[documentation]
+https://whirr.apache.org/docs/0.8.1/quick-start-guide.html[documentation]
 provides more detail on how to interact with the various cloud providers
 out-there through Whirr. In case of EC2, one needs Java 6 (which is
 required by Apache Hadoop), an account on EC2 and an SSH client
