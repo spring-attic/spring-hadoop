@@ -8,7 +8,7 @@ The SHDP programming model for HiveServer1 have been updated to use the JDBC dri
 
 === Starting a Hive Server
 
-The new HiveServer2 now supports multi-user access and is typically run in the Hadoop cluster. See the http://hive.apache.org[Hive Project] for details.
+The new HiveServer2 now supports multi-user access and is typically run in the Hadoop cluster. See the https://hive.apache.org[Hive Project] for details.
 
 === Using the Hive JDBC Client
 
@@ -78,7 +78,7 @@ bean definition followed by another located on the classpath.
 
 For those that need to programmatically interact with the Hive API,
 Spring for Apache Hadoop provides a dedicated
-http://en.wikipedia.org/wiki/Template_method_pattern[template], similar
+https://en.wikipedia.org/wiki/Template_method_pattern[template], similar
 to the aforementioned `JdbcTemplate`. The template handles the
 redundant, boiler-plate code, required for interacting with Hive such as
 creating a new `HiveClient`, executing the queries, catching any
