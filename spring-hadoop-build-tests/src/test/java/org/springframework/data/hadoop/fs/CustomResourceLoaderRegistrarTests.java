@@ -63,7 +63,7 @@ public class CustomResourceLoaderRegistrarTests {
 		assertThat(resource4, notNullValue());
 		assertThat(resource4, instanceOf(UrlResource.class));
 
-		Resource resource5 = context.getResource("http://example.com/tmp/test.txt");
+		Resource resource5 = context.getResource("https://example.com/tmp/test.txt");
 		assertThat(resource5, notNullValue());
 		assertThat(resource5, instanceOf(UrlResource.class));
 	}
