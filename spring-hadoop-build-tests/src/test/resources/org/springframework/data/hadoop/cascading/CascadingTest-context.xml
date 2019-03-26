@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:hdp="http://www.springframework.org/schema/hadoop"
-	xmlns:casc="http://www.springframework.org/schema/cascading"
-	xmlns:p="http://www.springframework.org/schema/p"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd
-		http://www.springframework.org/schema/cascading http://www.springframework.org/schema/cascading/spring-cascading.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+<beans xmlns="https://www.springframework.org/schema/beans"
+	xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="https://www.springframework.org/schema/context"
+	xmlns:hdp="https://www.springframework.org/schema/hadoop"
+	xmlns:casc="https://www.springframework.org/schema/cascading"
+	xmlns:p="https://www.springframework.org/schema/p"
+	xsi:schemaLocation="https://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		https://www.springframework.org/schema/hadoop https://www.springframework.org/schema/hadoop/spring-hadoop.xsd
+		https://www.springframework.org/schema/cascading https://www.springframework.org/schema/cascading/spring-cascading.xsd
+		https://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
 
 	<import resource="../hadoop-ctx.xml"/>
 	
