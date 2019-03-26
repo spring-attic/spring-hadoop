@@ -1,12 +1,12 @@
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:batch="http://www.springframework.org/schema/batch"
-	xmlns:hdp="http://www.springframework.org/schema/hadoop"
-	xmlns:c="http://www.springframework.org/schema/c"
-	xmlns:p="http://www.springframework.org/schema/p"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-      	http://www.springframework.org/schema/batch	http://www.springframework.org/schema/batch/spring-batch.xsd
-      	http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
+<beans xmlns="https://www.springframework.org/schema/beans"
+	xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
+    xmlns:batch="https://www.springframework.org/schema/batch"
+	xmlns:hdp="https://www.springframework.org/schema/hadoop"
+	xmlns:c="https://www.springframework.org/schema/c"
+	xmlns:p="https://www.springframework.org/schema/p"
+	xsi:schemaLocation="https://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+      	https://www.springframework.org/schema/batch	https://www.springframework.org/schema/batch/spring-batch.xsd
+      	https://www.springframework.org/schema/hadoop https://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
 
 	<import resource="../batch-common.xml"/>
 	<import resource="../hadoop-ctx.xml"/>
@@ -14,7 +14,7 @@
 	<!-- required since Job is a class not an interface -->
 	<bean class="org.springframework.batch.core.scope.StepScope" p:proxyTargetClass="true"/>
 	
-	<job id="mainJob" xmlns="http://www.springframework.org/schema/batch">
+	<job id="mainJob" xmlns="https://www.springframework.org/schema/batch">
 		<step id="import" next="import-2">
 			<tasklet ref="nested-script-tasklet"/>
 		</step>
