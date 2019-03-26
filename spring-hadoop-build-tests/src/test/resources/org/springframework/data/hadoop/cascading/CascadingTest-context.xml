@@ -5,10 +5,10 @@
 	xmlns:hdp="http://www.springframework.org/schema/hadoop"
 	xmlns:casc="http://www.springframework.org/schema/cascading"
 	xmlns:p="http://www.springframework.org/schema/p"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd
-		http://www.springframework.org/schema/cascading http://www.springframework.org/schema/cascading/spring-cascading.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+	xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/hadoop https://www.springframework.org/schema/hadoop/spring-hadoop.xsd
+		http://www.springframework.org/schema/cascading https://www.springframework.org/schema/cascading/spring-cascading.xsd
+		http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
 
 	<import resource="../hadoop-ctx.xml"/>
 	
