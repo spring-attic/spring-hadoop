@@ -542,7 +542,7 @@ environment.
 ==== Data Formats
 
 The Kite SDK project provides support for writing data using both the
-http://avro.apache.org/[Avro] and http://parquet.io/[Parquet] data
+https://avro.apache.org/[Avro] and https://parquet.incubator.apache.org[Parquet] data
 formats. The data format you choose to use influences the data types you
 can use in your POJO classes. We'll discuss the basics of the Java type
 mapping for the two data formats but we recommend that you consult each
