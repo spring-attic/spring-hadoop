@@ -1,16 +1,16 @@
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:batch="http://www.springframework.org/schema/batch"
-	xmlns:util="http://www.springframework.org/schema/util"
-	xmlns:hdp="http://www.springframework.org/schema/hadoop"
-	xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:c="http://www.springframework.org/schema/c"
-	xmlns:p="http://www.springframework.org/schema/p"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-      	http://www.springframework.org/schema/batch	http://www.springframework.org/schema/batch/spring-batch.xsd
-      	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
-      	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
-      	http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
+<beans xmlns="https://www.springframework.org/schema/beans"
+	xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
+	xmlns:batch="https://www.springframework.org/schema/batch"
+	xmlns:util="https://www.springframework.org/schema/util"
+	xmlns:hdp="https://www.springframework.org/schema/hadoop"
+	xmlns:context="https://www.springframework.org/schema/context"
+	xmlns:c="https://www.springframework.org/schema/c"
+	xmlns:p="https://www.springframework.org/schema/p"
+	xsi:schemaLocation="https://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+      	https://www.springframework.org/schema/batch	https://www.springframework.org/schema/batch/spring-batch.xsd
+      	https://www.springframework.org/schema/util https://www.springframework.org/schema/util/spring-util.xsd
+      	https://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd
+      	https://www.springframework.org/schema/hadoop https://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
 
 	<import resource="../../batch-common.xml"/>
 	<import resource="../../hadoop-ctx.xml"/>
@@ -36,7 +36,7 @@
 	</bean>
 	
 	
-	<job id="mainJob" xmlns="http://www.springframework.org/schema/batch">
+	<job id="mainJob" xmlns="https://www.springframework.org/schema/batch">
 		<step id="bean" next="ns">
 			<tasklet ref="tasklet"/>
 		</step>
