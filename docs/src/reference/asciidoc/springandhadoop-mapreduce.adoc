@@ -67,8 +67,8 @@ Hadoop {hadoop-Streaming}[Streaming] job (or in short streaming),
 is a popular feature of Hadoop as it allows
 the creation of Map/Reduce jobs with any executable or script (the
 equivalent of using the previous counting words example is to use
-http://en.wikipedia.org/wiki/Cat_%28Unix%29[`cat`] and
-http://en.wikipedia.org/wiki/Wc_%28Unix%29[`wc`] commands). While it is
+https://en.wikipedia.org/wiki/Cat_%2528Unix%2529[`cat`] and
+https://en.wikipedia.org/wiki/Wc_%2528Unix%2529[`wc`] commands). While it is
 rather easy to start up streaming from the command line, doing so
 programatically, such as from a Java environment, can be challenging due
 to the various number of parameters (and their ordering) that need to be
@@ -250,7 +250,7 @@ versions; rather then adding them all into the same app (which might be
 impossible due to versioning conflicts), one can simply point to the
 different jars and be on her way. Note that when using a jar, if the
 main class (as specified by the
-http://docs.oracle.com/javase/tutorial/deployment/jar/appman.html[Main-Class]
+https://docs.oracle.com/javase/tutorial/deployment/jar/appman.html[Main-Class]
 entry) is the target Tool, one can skip specifying the tool as it will
 picked up automatically.
 

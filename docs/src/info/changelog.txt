@@ -1,8 +1,8 @@
 SPRING for APACHE HADOOP CHANGELOG
 ==================================
-http://projects.spring.io/spring-hadoop/
+https://projects.spring.io/spring-hadoop/
 
-Commit changelog: http://github.com/spring-projects/spring-hadoop/tree/v[version]
+Commit changelog: https://github.com/spring-projects/spring-hadoop/tree/v[version]
 Issues changelog: https://jira.spring.io/secure/ReleaseNote.jspa?projectId=10801
 
 Changes in version 2.4.0 RC1 (2016-06-27)

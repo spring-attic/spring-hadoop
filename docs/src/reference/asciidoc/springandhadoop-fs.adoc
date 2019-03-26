@@ -12,7 +12,7 @@ API or fall back to the command line, outside the application.
 SHDP addresses this issue by bridging the
 two worlds, exposing both the `FileSystem` and the fs shell through an
 intuitive, easy-to-use Java API. Add your favorite
-http://en.wikipedia.org/wiki/List_of_JVM_languages[JVM scripting]
+https://en.wikipedia.org/wiki/List_of_JVM_languages[JVM scripting]
 language right inside your Spring for Apache Hadoop application and you
 have a powerful combination.
 
@@ -260,12 +260,12 @@ loader_ bean. Default value is 'hadoopResourceLoader'.
 === Scripting the Hadoop API
 
 SHDP scripting supports any
-http://www.jcp.org/en/jsr/detail?id=223[JSR-223] (also known as
+https://www.jcp.org/en/jsr/detail?id=223[JSR-223] (also known as
 `javax.scripting`) compliant scripting engine. Simply add the engine jar
 to the classpath and the application should be able to find it. Most
 languages (such as Groovy or JRuby) provide JSR-233 support out of the
 box; for those that do not see the
-http://java.net/projects/scripting[scripting] project that provides
+https://java.net/projects/scripting[scripting] project that provides
 various adapters.
 
 Since Hadoop is written in Java, accessing its APIs in a _native_ way
@@ -281,9 +281,9 @@ one needs to write Java code, compile the classes and configure them
 which is somewhat cumbersome especially when performing simple,
 straightforward operations (like copy a file or delete a directory).
 
-JVM scripting languages (such as http://groovy.codehaus.org/[Groovy],
-http://jruby.org/[JRuby], http://www.jython.org/[Jython] or
-http://www.mozilla.org/rhino/[Rhino] to name just a few) provide a nice
+JVM scripting languages (such as https://groovy.codehaus.org/[Groovy],
+https://www.jruby.org[JRuby], https://www.jython.org/[Jython] or
+https://www.mozilla.org/rhino/[Rhino] to name just a few) provide a nice
 solution to the Java language; they run on the JVM, can interact with
 the Java code with no or few changes or restrictions and have a nicer,
 simpler, less _ceremonial_ syntax; that is, there is no need to define a
@@ -576,7 +576,7 @@ returns actual objects (rather than `String`s) making it easy to use
 them programmatically whether in Java or another language. Furthermore,
 the class offers enhanced methods (such as `chmodr` which stands for
 _recursive_ `chmod`) and multiple overloaded methods taking advantage of
-http://docs.oracle.com/javase/1.5.0/docs/guide/language/varargs.html[varargs]
+https://docs.oracle.com/javase/1.5.0/docs/guide/language/varargs.html[varargs]
 so that multiple parameters can be specified. Consult the
 {shdp-FsShell}[API] for more information.
 
@@ -634,7 +634,7 @@ attention to details.
 ==== DistCp API
 
 Similar to the `FsShell`, SHDP provides a lightweight, fully embeddable
-http://hadoop.apache.org/common/docs/stable/distcp.html[`DistCp`]
+https://hadoop.apache.org/common/docs/stable/distcp.html[`DistCp`]
 version that builds on top of the `distcp` from the Hadoop distro. The
 semantics and configuration options are the same however, one can use it
 from within a Java application without having to use the command-line.
