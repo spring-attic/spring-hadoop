@@ -56,7 +56,7 @@ import org.springframework.util.StringUtils;
 
 /**
  * HDFS FileSystem Shell supporting the 'hadoop fs/dfs [x]' commands as methods.
- * See the <a href="http://hadoop.apache.org/common/docs/stable/file_system_shell.html">official guide</a> for more information.
+ * See the <a href="https://hadoop.apache.org/common/docs/stable/file_system_shell.html">official guide</a> for more information.
  * <p>
  * This class mimics as much as possible the shell behavior yet it is meant to be used in a programmatic way,
  * that is rather then printing out information, they return object or collections that one can iterate through. If the message is
