@@ -1,12 +1,12 @@
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:hdp="http://www.springframework.org/schema/hadoop"
-	xmlns:util="http://www.springframework.org/schema/util"
-	xmlns:p="http://www.springframework.org/schema/p"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-      	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
-      	http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd
-      	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+<beans xmlns="https://www.springframework.org/schema/beans"
+	xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
+	xmlns:hdp="https://www.springframework.org/schema/hadoop"
+	xmlns:util="https://www.springframework.org/schema/util"
+	xmlns:p="https://www.springframework.org/schema/p"
+	xsi:schemaLocation="https://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+      	https://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd
+      	https://www.springframework.org/schema/hadoop https://www.springframework.org/schema/hadoop/spring-hadoop.xsd
+      	https://www.springframework.org/schema/util https://www.springframework.org/schema/util/spring-util.xsd">
 
 	<import resource="../hadoop-ctx.xml"/>
 	
@@ -24,7 +24,7 @@
 	<hdp:pig-template />
 	<hdp:pig-template id="foo" pig-factory-ref="pig-raw"/>
 	
-	<pig-factory exec-type="MAPREDUCE" job-name="pig-script" configuration-ref="hadoopConfiguration" xmlns="http://www.springframework.org/schema/hadoop" 
+	<pig-factory exec-type="MAPREDUCE" job-name="pig-script" configuration-ref="hadoopConfiguration" xmlns="https://www.springframework.org/schema/hadoop" 
 		properties-ref="props" properties-location="cfg-1.properties, cfg-2.properties">
 		ivy=blue
 
@@ -45,7 +45,7 @@
 	</hdp:script>
 	
 	
-	<pig-runner id="pig-scripts" xmlns="http://www.springframework.org/schema/hadoop" post-action="nop-script" scope="singleton">
+	<pig-runner id="pig-scripts" xmlns="https://www.springframework.org/schema/hadoop" post-action="nop-script" scope="singleton">
 		<script location="org/springframework/data/hadoop/pig/script.pig"  />
 		<script>
 			<arguments>
