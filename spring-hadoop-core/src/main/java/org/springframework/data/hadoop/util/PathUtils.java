@@ -40,7 +40,7 @@ public abstract class PathUtils {
 	 *
 	 * @param pathFormat Formatted path, the variable in the path will be
 	 * 					 replaced by {@link java.util.Date}.
-	 * 					 http://docs.oracle.com/javase/6/docs/api/java/util/Formatter.html#dt
+	 * 					 https://docs.oracle.com/javase/6/docs/api/java/util/Formatter.html#dt
 	 * @param appendUUID Whether a UUID is appended to the generated path
 	 * @return generated path
 	 */
