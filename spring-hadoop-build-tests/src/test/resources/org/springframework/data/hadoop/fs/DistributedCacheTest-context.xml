@@ -1,8 +1,8 @@
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:hdp="http://www.springframework.org/schema/hadoop"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-      	http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd" default-lazy-init="true">
+<beans xmlns="https://www.springframework.org/schema/beans"
+	xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
+	xmlns:hdp="https://www.springframework.org/schema/hadoop"
+	xsi:schemaLocation="https://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+      	https://www.springframework.org/schema/hadoop https://www.springframework.org/schema/hadoop/spring-hadoop.xsd" default-lazy-init="true">
 
 
 	<import resource="../hadoop-ctx.xml"/>
