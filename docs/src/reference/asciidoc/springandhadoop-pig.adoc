@@ -1,7 +1,7 @@
 [[springandhadoop-pig]]
 == Pig support
 
-For http://pig.apache.org[Pig] users, SHDP provides easy creation and
+For https://pig.apache.org[Pig] users, SHDP provides easy creation and
 configuration of PigServer instances for registering and executing
 scripts either locally or remotely. In its simplest form, the
 declaration looks as follows:
@@ -100,7 +100,7 @@ namespace.
 
 For those that need to programmatically interact directly with Pig ,
 Spring for Apache Hadoop provides a dedicated
-http://en.wikipedia.org/wiki/Template_method_pattern[template], similar
+https://en.wikipedia.org/wiki/Template_method_pattern[template], similar
 to the aforementioned `HiveTemplate`. The template handles the
 redundant, boiler-plate code, required for interacting with Pig such as
 creating a new `PigServer`, executing the scripts, catching any
