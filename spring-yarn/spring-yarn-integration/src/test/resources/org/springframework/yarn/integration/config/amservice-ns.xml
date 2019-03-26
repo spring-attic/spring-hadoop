@@ -6,15 +6,15 @@
 	xmlns:int-ip="http://www.springframework.org/schema/integration/ip"
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/yarn/integration
-		http://www.springframework.org/schema/yarn/integration/spring-yarn-integration.xsd
+		https://www.springframework.org/schema/yarn/integration/spring-yarn-integration.xsd
 		http://www.springframework.org/schema/integration
-		http://www.springframework.org/schema/integration/spring-integration.xsd
+		https://www.springframework.org/schema/integration/spring-integration.xsd
 		http://www.springframework.org/schema/integration/ip
-		http://www.springframework.org/schema/integration/ip/spring-integration-ip.xsd
+		https://www.springframework.org/schema/integration/ip/spring-integration-ip.xsd
 		http://www.springframework.org/schema/beans
-		http://www.springframework.org/schema/beans/spring-beans.xsd
+		https://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/util
-		http://www.springframework.org/schema/util/spring-util.xsd">
+		https://www.springframework.org/schema/util/spring-util.xsd">
 
 	<yarn-int:amservice service-impl="org.springframework.yarn.integration.ip.mind.TestService"/>
 
