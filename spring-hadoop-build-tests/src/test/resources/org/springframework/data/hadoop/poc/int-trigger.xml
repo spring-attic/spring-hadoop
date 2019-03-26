@@ -3,9 +3,9 @@
 	xmlns:int="http://www.springframework.org/schema/integration"
 	xmlns:file="http://www.springframework.org/schema/integration/file"
 	xmlns:p="http://www.springframework.org/schema/p"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-      	http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
-      	http://www.springframework.org/schema/integration/file http://www.springframework.org/schema/integration/file/spring-integration-file.xsd">
+	xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+      	http://www.springframework.org/schema/integration https://www.springframework.org/schema/integration/spring-integration.xsd
+      	http://www.springframework.org/schema/integration/file https://www.springframework.org/schema/integration/file/spring-integration-file.xsd">
 
 	<!--  watch for input files to act as a trigger -->
 	
