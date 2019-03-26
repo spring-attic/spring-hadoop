@@ -3,8 +3,8 @@
 	xmlns:c="http://www.springframework.org/schema/c"
 	xmlns:p="http://www.springframework.org/schema/p"
 	xmlns:hdp="http://www.springframework.org/schema/hadoop"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
+	xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/hadoop https://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
 
 	<!--use the bean definition to go beyond the configuration options provided by the namespace -->
 	<bean name="ppc" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
