@@ -41,12 +41,12 @@ by the callee.
 Securing a Hadoop cluster can be a difficult task - each machine can
 have a different set of users and groups, each with different passwords.
 Hadoop relies on
-http://en.wikipedia.org/wiki/Kerberos_%28protocol%29[Kerberos], a
+https://en.wikipedia.org/wiki/Kerberos_%2528protocol%2529[Kerberos], a
 ticket-based protocol for allowing nodes to communicate over a
 non-secure network to prove their identity to one another in a secure
 manner. Unfortunately there is not a lot of documentation on this topic
 out there. However there are
-http://hortonworks.com/blog/fine-tune-your-apache-hadoop-security-settings/[some]
+https://hortonworks.com/blog/fine-tune-your-apache-hadoop-security-settings/[some]
 https://ccp.cloudera.com/display/CDHDOC/Configuring+Hadoop+Security+in+CDH3[resources]
 to get you started.
 
