@@ -1,0 +1,40 @@
+#Directory creation in HDFS for a specific given path.
+hadoopfs-mkdir<paths>
+
+#Listing of the directory contents.
+hadoopfs-ls<args>
+
+
+#HDFS file Upload/download.
+#Upload:
+hadoopfs -put:
+
+#Copy single src file, or multiple src files from local file system to the Hadoop data file system
+hadoopfs-put<localsrc> … <HDFS-dest-Path>
+
+
+#hadoopfs -get:
+#Copies/Downloads files to the local file system
+hadoopfs-get<hdfs-src><localdst>
+
+
+#File copying from source to destination
+hadoopfs-cp<source><dest>
+
+#Copying of file to HDFS from a local file and vice-versa
+hadoopfs-copyFromLocal<localsrc>URI
+
+#File moving from source to destination.
+hadoopfs-mv<src><dest>
+
+#File or directory removal in HDFS.
+hadoopfs-rm<arg>
+
+#Repetitive version of delete.
+hadoopfs-rmr<arg>
+
+#Showing the file’s final few lines.
+hadoopfs-tail<path[filename]>
+
+#Showing the aggregate length of a file.
+hadoopfs-du<path>
