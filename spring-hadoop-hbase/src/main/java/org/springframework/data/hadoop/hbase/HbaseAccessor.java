@@ -18,7 +18,7 @@ package org.springframework.data.hadoop.hbase;
 import java.nio.charset.Charset;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hbase.client.HTableInterfaceFactory;
+//import org.apache.hadoop.hbase.client.HTableInterfaceFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
@@ -34,7 +34,6 @@ public abstract class HbaseAccessor implements InitializingBean {
 	private String encoding;
 	private Charset charset = HbaseUtils.getCharset(encoding);
 
-	private HTableInterfaceFactory tableFactory;
 	private Configuration configuration;
 
 	@Override
@@ -42,15 +41,6 @@ public abstract class HbaseAccessor implements InitializingBean {
 		Assert.notNull(configuration, " a valid configuration is required");
 		// detect charset
 		charset = HbaseUtils.getCharset(encoding);
-	}
-
-	/**
-	 * Sets the table factory.
-	 *
-	 * @param tableFactory The tableFactory to set.
-	 */
-	public void setTableFactory(HTableInterfaceFactory tableFactory) {
-		this.tableFactory = tableFactory;
 	}
 
 	/**
@@ -73,10 +63,6 @@ public abstract class HbaseAccessor implements InitializingBean {
 
 	public Charset getCharset() {
 		return charset;
-	}
-
-	public HTableInterfaceFactory getTableFactory() {
-		return tableFactory;
 	}
 
 	public Configuration getConfiguration() {

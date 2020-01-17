@@ -3652,7 +3652,7 @@ Resource Manager and HDFS.
 public void doListPushed() {
   YarnInfoApplication app = new YarnInfoApplication();
   Properties appProperties = new Properties();
-  appProperties.setProperty("spring.yarn.internal.YarnInfoApplication.operation", "PUSHED");
+  appProperties.setProperty("spring.yarn.internal.yarn-info-application.operation", "PUSHED");
   app.appProperties(appProperties);
   String info = app.run();
   System.out.println(info);
@@ -3661,9 +3661,9 @@ public void doListPushed() {
 public void doListSubmitted() {
   YarnInfoApplication app = new YarnInfoApplication();
   Properties appProperties = new Properties();
-  appProperties.setProperty("spring.yarn.internal.YarnInfoApplication.operation", "SUBMITTED");
-  appProperties.setProperty("spring.yarn.internal.YarnInfoApplication.verbose", "true");
-  appProperties.setProperty("spring.yarn.internal.YarnInfoApplication.type", "GS");
+  appProperties.setProperty("spring.yarn.internal.yarn-info-application.operation", "SUBMITTED");
+  appProperties.setProperty("spring.yarn.internal.yarn-info-application.verbose", "true");
+  appProperties.setProperty("spring.yarn.internal.yarn-info-application.type", "GS");
   app.appProperties(appProperties);
   String info = app.run();
   System.out.println(info);
@@ -3685,7 +3685,7 @@ YarnKillApplication is used to kill running application instances.
 public void doKill() {
   YarnKillApplication app = new YarnKillApplication();
   Properties appProperties = new Properties();
-  appProperties.setProperty("spring.yarn.internal.YarnKillApplication.applicationId", "application_1395058039949_0052");
+  appProperties.setProperty("spring.yarn.internal.yarn-kill-application.applicationId", "application_1395058039949_0052");
   app.appProperties(appProperties);
   String info = app.run();
   System.out.println(info);
@@ -3705,7 +3705,7 @@ YarnShutdownApplication is used to gracefully shutdown running application insta
 public void doShutdown() {
   YarnShutdownApplication app = new YarnShutdownApplication();
   Properties appProperties = new Properties();
-  appProperties.setProperty("spring.yarn.internal.YarnShutdownApplication.applicationId", "application_1395058039949_0052");
+  appProperties.setProperty("spring.yarn.internal.yarn-shutdown-application.applicationId", "application_1395058039949_0052");
   app.appProperties(appProperties);
   String info = app.run();
   System.out.println(info);

@@ -19,9 +19,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.nio.charset.UnsupportedCharsetException;
+import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
-
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.util.Assert;
@@ -34,15 +33,7 @@ import org.springframework.util.Assert;
  */
 public abstract class ResourceUtils {
 
-	private static final Charset UTF8;
-
-	static {
-		try {
-			UTF8 = Charset.forName("UTF-8");
-		} catch (UnsupportedCharsetException uce) {
-			throw new IllegalArgumentException("UTF-8 charset not found!");
-		}
-	}
+	private static final Charset UTF8 = StandardCharsets.UTF_8;
 
 	/**
 	 * Locates the jar (within the classpath) containing the given class.

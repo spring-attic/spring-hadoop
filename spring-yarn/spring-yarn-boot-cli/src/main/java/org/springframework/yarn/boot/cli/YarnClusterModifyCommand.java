@@ -71,7 +71,7 @@ public class YarnClusterModifyCommand extends AbstractApplicationCommand {
 
 	public static class ClusterModifyOptionHandler extends ApplicationOptionHandler<String> {
 
-		private static final String PREFIX = "spring.yarn.internal.ContainerClusterApplication";
+		private static final String PREFIX = "spring.yarn.internal.container-cluster-application";
 
 		private OptionSpec<String> applicationIdOption;
 
@@ -119,10 +119,10 @@ public class YarnClusterModifyCommand extends AbstractApplicationCommand {
 
 			YarnContainerClusterApplication app = new YarnContainerClusterApplication();
 			Properties appProperties = new Properties();
-			appProperties.setProperty("spring.yarn.internal.ContainerClusterApplication.operation", "CLUSTERMODIFY");
-			appProperties.setProperty("spring.yarn.internal.ContainerClusterApplication.applicationId",
+			appProperties.setProperty("spring.yarn.internal.container-cluster-application.operation", "CLUSTERMODIFY");
+			appProperties.setProperty("spring.yarn.internal.container-cluster-application.applicationId",
 					appId);
-			appProperties.setProperty("spring.yarn.internal.ContainerClusterApplication.clusterId",
+			appProperties.setProperty("spring.yarn.internal.container-cluster-application.clusterId",
 					clusterId);
 
 			if (StringUtils.hasText(projectionAny)) {

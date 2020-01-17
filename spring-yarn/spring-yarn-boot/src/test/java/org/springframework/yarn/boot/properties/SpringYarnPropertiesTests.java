@@ -21,6 +21,7 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Configuration;
@@ -36,7 +37,7 @@ public class SpringYarnPropertiesTests {
 	@Test
 	public void testAllPropertiesSet() {
 		SpringApplication app = new SpringApplication(TestConfiguration.class);
-		app.setWebEnvironment(false);
+		app.setWebApplicationType(WebApplicationType.NONE);
 		ConfigurableApplicationContext context = app
 				.run(new String[] { "--spring.config.name=SpringYarnPropertiesTests" });
 		SpringYarnProperties properties = context.getBean(SpringYarnProperties.class);
@@ -55,7 +56,7 @@ public class SpringYarnPropertiesTests {
 	@Test
 	public void testEnvProperties() {
 		SpringApplication app = new SpringApplication(TestConfiguration.class);
-		app.setWebEnvironment(false);
+		app.setWebApplicationType(WebApplicationType.NONE);
 		ConfigurableApplicationContext context = app.run(new String[] { "--SHDP_HD_FS=myshdphdfs",
 				"--SHDP_HD_RM=myshdphdrm", "--SHDP_HD_SCHEDULER=myshdpscheduler",
 				"--SHDP_AMSERVICE_TRACKURL=myshdpamservicetrackurl", "--SHDP_CONTAINERID=myshdpcontainerid" });

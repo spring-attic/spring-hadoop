@@ -70,7 +70,7 @@ public final class YarnAppmasterBuilder extends AbstractConfiguredAnnotationBuil
 	@Override
 	protected YarnAppmaster performBuild() throws Exception {
 
-		YarnAppmaster appmaster = BeanUtils.instantiate(appmasterClass);
+		YarnAppmaster appmaster = BeanUtils.instantiateClass(appmasterClass);
 
 		if (appmaster instanceof AbstractAppmaster) {
 			AbstractAppmaster abstractAppmaster = (AbstractAppmaster) appmaster;

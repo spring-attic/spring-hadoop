@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.junit.Test;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Configuration;
@@ -42,7 +43,7 @@ public class SpringYarnAppmasterContainerClusterPropertiesTests {
 	@Test
 	public void testAllPropertiesSet() {
 		SpringApplication app = new SpringApplication(TestConfiguration.class);
-		app.setWebEnvironment(false);
+		app.setWebApplicationType(WebApplicationType.NONE);
 		ConfigurableApplicationContext context = app
 				.run(new String[] { "--spring.config.name=SpringYarnAppmasterContainerClusterPropertiesTests1" });
 		SpringYarnAppmasterProperties properties = context.getBean(SpringYarnAppmasterProperties.class);
@@ -130,7 +131,7 @@ public class SpringYarnAppmasterContainerClusterPropertiesTests {
 	@Test
 	public void testAllPropertiesSet2() {
 		SpringApplication app = new SpringApplication(TestConfiguration.class);
-		app.setWebEnvironment(false);
+		app.setWebApplicationType(WebApplicationType.NONE);
 		ConfigurableApplicationContext context = app
 				.run(new String[] { "--spring.config.name=SpringYarnAppmasterContainerClusterPropertiesTests2" });
 		SpringYarnAppmasterProperties properties = context.getBean(SpringYarnAppmasterProperties.class);
@@ -204,10 +205,10 @@ public class SpringYarnAppmasterContainerClusterPropertiesTests {
 	@Test
 	public void testAllMultiYaml() {
 		SpringApplication app = new SpringApplication(TestConfiguration.class);
-		app.setWebEnvironment(false);
+		app.setWebApplicationType(WebApplicationType.NONE);
 		ConfigurableApplicationContext context = app
 				.run(new String[] { "--spring.config.name=SpringYarnAppmasterContainerClusterPropertiesTests2",
-						"--spring.config.location=classpath:/SpringYarnAppmasterContainerClusterPropertiesTests2-2.yml"});
+						"--spring.config.additional-location=classpath:/SpringYarnAppmasterContainerClusterPropertiesTests2-2.yml"});
 		SpringYarnAppmasterProperties properties = context.getBean(SpringYarnAppmasterProperties.class);
 		assertThat(properties, notNullValue());
 
@@ -283,7 +284,7 @@ public class SpringYarnAppmasterContainerClusterPropertiesTests {
 	@Test
 	public void testAllPropertiesSet3() {
 		SpringApplication app = new SpringApplication(TestConfiguration.class);
-		app.setWebEnvironment(false);
+		app.setWebApplicationType(WebApplicationType.NONE);
 		ConfigurableApplicationContext context = app
 				.run(new String[] { "--spring.config.name=SpringYarnAppmasterContainerClusterPropertiesTests3" });
 		SpringYarnAppmasterProperties properties = context.getBean(SpringYarnAppmasterProperties.class);
@@ -357,7 +358,7 @@ public class SpringYarnAppmasterContainerClusterPropertiesTests {
 	@Test
 	public void testMapStylePropertiesSet4() {
 		SpringApplication app = new SpringApplication(TestConfiguration.class);
-		app.setWebEnvironment(false);
+		app.setWebApplicationType(WebApplicationType.NONE);
 		ConfigurableApplicationContext context = app
 				.run(new String[] { "--spring.config.name=SpringYarnAppmasterContainerClusterPropertiesTests4" });
 		SpringYarnAppmasterProperties properties = context.getBean(SpringYarnAppmasterProperties.class);

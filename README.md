@@ -1,3 +1,4 @@
+
 > **NOTICE: The Spring for Apache Hadoop project has reached End-Of-Life status on April 5th, 2019. The final Spring for Apache Hadoop 2.5.0 release was built using Apache Hadoop version 2.7.3 and no new releases are planned.**
 
 The [Spring for Apache Hadoop](https://projects.spring.io/spring-hadoop/) project provides extensions to 

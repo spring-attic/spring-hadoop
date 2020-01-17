@@ -56,18 +56,18 @@ public abstract class MockUtils {
 		return container;
 	}
 
-	public static Resource getMockResource(int mem, int cores) {
+	public static Resource getMockResource(long mem, int cores) {
 		Resource resource = mock(Resource.class);
-		when(resource.getMemory()).thenReturn(mem);
+		when(resource.getMemorySize()).thenReturn(mem);
 		when(resource.getVirtualCores()).thenReturn(cores);
 		return resource;
 	}
 
-	public static ContainerId getMockContainerId(ApplicationAttemptId applicationAttemptId, int id) {
+	public static ContainerId getMockContainerId(ApplicationAttemptId applicationAttemptId, long id) {
 		ContainerId containerId = mock(ContainerId.class);
 		doReturn(applicationAttemptId).when(containerId).getApplicationAttemptId();
-		doReturn(id).when(containerId).getId();
-		doReturn(Integer.toString(id)).when(containerId).toString();
+		doReturn(id).when(containerId).getContainerId();
+		doReturn(Long.toString(id)).when(containerId).toString();
 		return containerId;
 	}
 

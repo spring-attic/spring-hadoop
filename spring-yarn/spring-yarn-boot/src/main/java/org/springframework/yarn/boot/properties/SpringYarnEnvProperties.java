@@ -124,6 +124,17 @@ public class SpringYarnEnvProperties {
 	 * @param containerId container id
 	 */
 	public void setShdpContainerid(String containerId) {
+      setContainerId(containerId);
+    }
+
+	/**
+	 * TODO: Why is it needed ???
+     * Sets the value from an environment variable
+     * <code>CONTAINER_ID</code>.
+     *
+     * @param containerId container id
+     */
+	public void setContainerId(String containerId) {
 		this.containerId = containerId;
 	}
 

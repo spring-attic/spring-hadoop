@@ -93,11 +93,11 @@ public class YarnSubmittedCommand extends AbstractApplicationCommand {
 		protected void runApplication(OptionSet options) throws Exception {
 			YarnInfoApplication app = new YarnInfoApplication();
 			Properties appProperties = new Properties();
-			appProperties.setProperty("spring.yarn.internal.YarnInfoApplication.operation", "SUBMITTED");
+			appProperties.setProperty("spring.yarn.internal.yarn-info-application.operation", "SUBMITTED");
 			if (isFlagOn(options, verboseOption)) {
-				appProperties.setProperty("spring.yarn.internal.YarnInfoApplication.verbose", "true");
+				appProperties.setProperty("spring.yarn.internal.yarn-info-application.verbose", "true");
 			}
-			appProperties.setProperty("spring.yarn.internal.YarnInfoApplication.type", options.valueOf(typeOption));
+			appProperties.setProperty("spring.yarn.internal.yarn-info-application.type", options.valueOf(typeOption));
 			app.appProperties(appProperties);
 			handleApplicationRun(app);
 		}

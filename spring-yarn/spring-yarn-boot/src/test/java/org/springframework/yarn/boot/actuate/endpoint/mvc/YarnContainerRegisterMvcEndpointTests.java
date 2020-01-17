@@ -18,7 +18,7 @@ package org.springframework.yarn.boot.actuate.endpoint.mvc;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.isEmptyString;
+import static org.hamcrest.Matchers.emptyString;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -26,18 +26,17 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.autoconfigure.EndpointWebMvcAutoConfiguration;
-import org.springframework.boot.actuate.autoconfigure.ManagementServerPropertiesAutoConfiguration;
+import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointAutoConfiguration;
+import org.springframework.boot.actuate.endpoint.invoke.ParameterValueMapper;
+import org.springframework.boot.actuate.endpoint.invoke.convert.ConversionServiceParameterValueMapper;
 import org.springframework.boot.autoconfigure.hateoas.HypermediaAutoConfiguration;
-import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -59,7 +58,7 @@ import org.springframework.yarn.event.DefaultYarnEventPublisher;
 import org.springframework.yarn.event.YarnEventPublisher;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = { YarnContainerRegisterMvcEndpointTests.TestConfiguration.class })
+@SpringBootTest(classes = { YarnContainerRegisterMvcEndpointTests.TestConfiguration.class })
 @WebAppConfiguration
 @DirtiesContext(classMode=ClassMode.AFTER_EACH_TEST_METHOD)
 public class YarnContainerRegisterMvcEndpointTests {
@@ -84,7 +83,7 @@ public class YarnContainerRegisterMvcEndpointTests {
 		mvc.
 			perform(get(BASE)).
 			andExpect(status().isOk()).
-			andExpect(content().string(not(isEmptyString()))).
+			andExpect(content().string(not(emptyString()))).
 			andExpect(jsonPath("$.*", hasSize(1))).
 			andExpect(jsonPath("$.message", containsString("Use POST")));
 	}
@@ -99,13 +98,13 @@ public class YarnContainerRegisterMvcEndpointTests {
 		assertThat(appmaster.events.size(), is(1));
 	}
 
-	@Import({ EndpointWebMvcAutoConfiguration.class, ManagementServerPropertiesAutoConfiguration.class,
+	@Import({ WebEndpointAutoConfiguration.class,
 			HypermediaAutoConfiguration.class })
 	@EnableWebMvc
 	@Configuration
 	public static class TestConfiguration {
 
-		@Bean
+  	    @Bean
 		public YarnContainerRegisterEndpoint endpoint() {
 			return new YarnContainerRegisterEndpoint();
 		}
@@ -124,6 +123,11 @@ public class YarnContainerRegisterMvcEndpointTests {
 		@Bean
 		public YarnEventPublisher yarnEventPublisher() {
 			return new DefaultYarnEventPublisher();
+		}
+		
+		@Bean
+		public ParameterValueMapper conversionServiceParameterValueMapper() {
+		  return new ConversionServiceParameterValueMapper();
 		}
 
 	}

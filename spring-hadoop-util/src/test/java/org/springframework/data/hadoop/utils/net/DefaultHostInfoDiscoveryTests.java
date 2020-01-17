@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.yarn.net;
+package org.springframework.data.hadoop.utils.net;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
@@ -25,16 +25,12 @@ import static org.powermock.api.mockito.PowerMockito.when;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.util.Arrays;
-import java.util.List;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-import org.springframework.yarn.net.DefaultHostInfoDiscoveryTests.MockDefaultHostInfoDiscovery;
-import org.springframework.yarn.net.HostInfoDiscovery.HostInfo;
+import org.springframework.data.hadoop.util.net.HostInfoDiscovery.HostInfo;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({NetworkInterface.class, InterfaceAddress.class, MockDefaultHostInfoDiscovery.class})
@@ -419,20 +415,5 @@ public class DefaultHostInfoDiscoveryTests {
 		when(adapter.getAddress()).thenReturn(address);
 		when(adapter.getNetworkPrefixLength()).thenReturn((short) netPrefix);
 		return adapter;
-	}
-
-	public static class MockDefaultHostInfoDiscovery extends DefaultHostInfoDiscovery {
-
-		List<NetworkInterface> interfaces;
-
-		public MockDefaultHostInfoDiscovery(List<NetworkInterface> interfaces) {
-			this.interfaces = interfaces;
-		}
-
-		@Override
-		protected List<NetworkInterface> getAllAvailableInterfaces() throws SocketException {
-			return interfaces;
-		}
-
 	}
 }

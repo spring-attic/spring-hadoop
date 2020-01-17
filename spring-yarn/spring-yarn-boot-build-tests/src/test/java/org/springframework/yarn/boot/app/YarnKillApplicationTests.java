@@ -86,7 +86,7 @@ public class YarnKillApplicationTests extends AbstractApplicationTests {
 		killApp.appProperties(appProperties);
 
 		String[] killArgs = new String[]{
-				"--spring.yarn.internal.YarnKillApplication.applicationId=" + applicationId.toString()
+				"--spring.yarn.internal.yarn-kill-application.applicationId=" + applicationId.toString()
 		};
 
 		String info = killApp.run(killArgs);

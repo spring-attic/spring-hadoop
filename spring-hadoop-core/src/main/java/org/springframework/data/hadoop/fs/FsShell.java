@@ -518,12 +518,10 @@ public class FsShell implements Closeable, DisposableBean {
 			Path[] srcs = FileUtil.stat2Paths(srcFs.globStatus(srcPath), srcPath);
 			for (int i = 0; i < srcs.length; i++) {
 				if (addnl) {
-					FileUtil.copyMerge(srcFs, srcs[i], FileSystem.getLocal(configuration), dst, false, configuration,
-							"\n");
+					FileUtil.copy(srcFs, srcs[i], FileSystem.getLocal(configuration), dst, false, configuration);
 				}
 				else {
-					FileUtil.copyMerge(srcFs, srcs[i], FileSystem.getLocal(configuration), dst, false, configuration,
-							null);
+					FileUtil.copy(srcFs, srcs[i], FileSystem.getLocal(configuration), dst, false, configuration);
 				}
 			}
 		} catch (IOException ex) {

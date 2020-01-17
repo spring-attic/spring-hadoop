@@ -81,7 +81,7 @@ public class YarnShutdownCommand extends AbstractApplicationCommand {
 			Assert.hasText(appId, "Application Id must be defined");
 			YarnShutdownApplication app = new YarnShutdownApplication();
 			Properties appProperties = new Properties();
-			appProperties.setProperty("spring.yarn.internal.YarnShutdownApplication.applicationId", appId);
+			appProperties.setProperty("spring.yarn.internal.yarn-shutdown-application.applicationId", appId);
 			app.appProperties(appProperties);
 			handleApplicationRun(app);
 		}

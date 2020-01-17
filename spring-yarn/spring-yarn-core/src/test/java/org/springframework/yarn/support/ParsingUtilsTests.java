@@ -32,18 +32,18 @@ public class ParsingUtilsTests {
 
 	@Test
 	public void testParseBytesAsMegs() throws ParseException {
-		assertThat(ParsingUtils.parseBytesAsMegs("0"), is(0));
-		assertThat(ParsingUtils.parseBytesAsMegs("1"), is(1));
-		assertThat(ParsingUtils.parseBytesAsMegs("1024K"), is(1));
-		assertThat(ParsingUtils.parseBytesAsMegs("1124K"), is(1));
-		assertThat(ParsingUtils.parseBytesAsMegs("2047K"), is(1));
-		assertThat(ParsingUtils.parseBytesAsMegs("2048K"), is(2));
-		assertThat(ParsingUtils.parseBytesAsMegs("2048k"), is(2));
-		assertThat(ParsingUtils.parseBytesAsMegs("1M"), is(1));
-		assertThat(ParsingUtils.parseBytesAsMegs("2M"), is(2));
-		assertThat(ParsingUtils.parseBytesAsMegs("2m"), is(2));
-		assertThat(ParsingUtils.parseBytesAsMegs("1G"), is(1024));
-		assertThat(ParsingUtils.parseBytesAsMegs("1g"), is(1024));
+		assertThat(ParsingUtils.parseBytesAsMegs("0"), is(0L));
+		assertThat(ParsingUtils.parseBytesAsMegs("1"), is(1L));
+		assertThat(ParsingUtils.parseBytesAsMegs("1024K"), is(1L));
+		assertThat(ParsingUtils.parseBytesAsMegs("1124K"), is(1L));
+		assertThat(ParsingUtils.parseBytesAsMegs("2047K"), is(1L));
+		assertThat(ParsingUtils.parseBytesAsMegs("2048K"), is(2L));
+		assertThat(ParsingUtils.parseBytesAsMegs("2048k"), is(2L));
+		assertThat(ParsingUtils.parseBytesAsMegs("1M"), is(1L));
+		assertThat(ParsingUtils.parseBytesAsMegs("2M"), is(2L));
+		assertThat(ParsingUtils.parseBytesAsMegs("2m"), is(2L));
+		assertThat(ParsingUtils.parseBytesAsMegs("1G"), is(1024L));
+		assertThat(ParsingUtils.parseBytesAsMegs("1g"), is(1024L));
 	}
 
 }

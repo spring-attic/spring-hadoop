@@ -64,9 +64,9 @@ public abstract class AbstractBootYarnClusterTests extends AbstractYarnClusterTe
 	 * @return Application info for submit
 	 * @throws Exception if exception occurred
 	 * @see ApplicationInfo
-	 * @see #submitApplicationAndWaitState(Object, String[], long, TimeUnit, YarnApplicationState...)
+	 * @see #submitApplicationAndWaitState(Class , String[], long, TimeUnit, YarnApplicationState...)
 	 */
-	protected ApplicationInfo submitApplicationAndWait(Object source, String[] args) throws Exception {
+	protected ApplicationInfo submitApplicationAndWait(Class<?> source, String[] args) throws Exception {
 		return submitApplicationAndWait(source, args, 60, TimeUnit.SECONDS);
 	}
 
@@ -80,9 +80,9 @@ public abstract class AbstractBootYarnClusterTests extends AbstractYarnClusterTe
 	 * @return Application info for submit
 	 * @throws Exception if exception occurred
 	 * @see ApplicationInfo
-	 * @see #submitApplicationAndWaitState(Object, String[], long, TimeUnit, YarnApplicationState...)
+	 * @see #submitApplicationAndWaitState(Class, String[], long, TimeUnit, YarnApplicationState...)
 	 */
-	protected ApplicationInfo submitApplicationAndWait(Object source, String[] args, long timeout, final TimeUnit unit) throws Exception {
+	protected ApplicationInfo submitApplicationAndWait(Class<?> source, String[] args, long timeout, final TimeUnit unit) throws Exception {
 		return submitApplicationAndWaitState(source, args, timeout, unit, YarnApplicationState.FINISHED, YarnApplicationState.FAILED);
 	}
 
@@ -101,7 +101,7 @@ public abstract class AbstractBootYarnClusterTests extends AbstractYarnClusterTe
 	 * @throws Exception if exception occurred
 	 * @see ApplicationInfo
 	 */
-	protected ApplicationInfo submitApplicationAndWaitState(Object source, String[] args, final long timeout,
+	protected ApplicationInfo submitApplicationAndWaitState(Class<?> source, String[] args, final long timeout,
 			final TimeUnit unit, final YarnApplicationState... applicationStates) throws Exception {
 
 		SpringApplicationBuilder builder = new SpringApplicationBuilder(source);

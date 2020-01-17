@@ -17,7 +17,7 @@ package org.springframework.yarn.boot.support;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.boot.context.embedded.EmbeddedServletContainerInitializedEvent;
+import org.springframework.boot.web.servlet.context.ServletWebServerInitializedEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.data.hadoop.util.net.HostInfoDiscovery;
 import org.springframework.data.hadoop.util.net.HostInfoDiscovery.HostInfo;
@@ -33,7 +33,7 @@ import org.springframework.yarn.support.LifecycleObjectSupport;
  *
  */
 public class ContainerRegistrar extends LifecycleObjectSupport implements
-		ApplicationListener<EmbeddedServletContainerInitializedEvent> {
+		ApplicationListener<ServletWebServerInitializedEvent> {
 
 	private static final Log log = LogFactory.getLog(ContainerRegistrar.class);
 
@@ -55,13 +55,13 @@ public class ContainerRegistrar extends LifecycleObjectSupport implements
 	}
 
 	@Override
-	public void onApplicationEvent(EmbeddedServletContainerInitializedEvent event) {
+	public void onApplicationEvent(ServletWebServerInitializedEvent event) {
 		String namespace = event.getApplicationContext().getNamespace();
 		if ("management".equals(namespace)) {
 			return;
 		}
 
-		int port = event.getEmbeddedServletContainer().getPort();
+		int port = event.getWebServer().getPort();
 		try {
 			RestTemplate restTemplate = getBeanFactory().getBean(YarnSystemConstants.DEFAULT_ID_RESTTEMPLATE, RestTemplate.class);
 			HostInfo hostInfo = hostInfoDiscovery.getHostInfo();

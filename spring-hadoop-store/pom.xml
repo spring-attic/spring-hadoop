@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>spring-data-hadoop-store</artifactId>
+    <name>Spring for Apache Hadoop Store Features</name>
+    <description>Spring for Apache Hadoop Store Features</description>
+
+    <parent>
+        <groupId>org.springframework.data</groupId>
+        <artifactId>spring-data-hadoop-parent</artifactId>
+        <version>2.5.1-SNAPSHOT</version>
+    </parent>
+
+    <!--
+        compile project(":spring-data-hadoop-config")
+        compile "org.springframework:spring-messaging:$springVersion"
+        compile("org.kitesdk:kite-data-core:$kiteVersion") { dep ->
+            exclude group: "log4j", module: "log4j"
+        }
+        testCompile project(":spring-data-hadoop")
+        testCompile project(path:":spring-data-hadoop-test", configuration:"testArtifacts")
+        testCompile "org.springframework:spring-test:$springVersion"
+        testCompile("org.mockito:mockito-core:$mockitoVersion") { dep ->
+            exclude group: "org.hamcrest"
+        }
+        testCompile "org.hamcrest:hamcrest-core:$hamcrestVersion"
+        testCompile "org.hamcrest:hamcrest-library:$hamcrestVersion"
+        testRuntime "org.xerial.snappy:snappy-java:1.1.0" 
+-->
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-hadoop-config</artifactId>
+            <version>2.5.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-messaging</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-tx</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.kitesdk</groupId>
+            <artifactId>kite-data-core</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-hadoop</artifactId>
+            <version>2.5.1-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-hadoop-test</artifactId>
+            <classifier>tests</classifier>
+            <version>2.5.1-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-hadoop-test</artifactId>
+            <version>2.5.1-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-library</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.xerial.snappy</groupId>
+            <artifactId>snappy-java</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>integration-test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <excludes>
+                                <exclude>none</exclude>
+                            </excludes>
+                            <includes>
+                                <include>**/*Test</include>
+                                <include>**/*Tests</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

@@ -17,14 +17,13 @@ package org.springframework.yarn.boot.app;
 
 import org.apache.hadoop.yarn.api.records.ApplicationId;
 import org.apache.hadoop.yarn.api.records.ApplicationReport;
-import org.apache.hadoop.yarn.util.ConverterUtils;
-import org.springframework.boot.actuate.autoconfigure.EndpointAutoConfiguration;
-import org.springframework.boot.actuate.autoconfigure.EndpointMBeanExportAutoConfiguration;
+import org.springframework.boot.WebApplicationType;
+import org.springframework.boot.actuate.autoconfigure.endpoint.EndpointAutoConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.batch.BatchAutoConfiguration;
 import org.springframework.boot.autoconfigure.jmx.JmxAutoConfiguration;
-import org.springframework.boot.autoconfigure.web.EmbeddedServletContainerAutoConfiguration;
-import org.springframework.boot.autoconfigure.web.WebMvcAutoConfiguration;
+import org.springframework.boot.autoconfigure.web.servlet.ServletWebServerFactoryAutoConfiguration;
+import org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationContext;
@@ -43,9 +42,8 @@ import org.springframework.yarn.client.YarnClient;
  *
  */
 @Configuration
-@EnableAutoConfiguration(exclude = { EmbeddedServletContainerAutoConfiguration.class, WebMvcAutoConfiguration.class,
-		JmxAutoConfiguration.class, BatchAutoConfiguration.class, JmxAutoConfiguration.class,
-		EndpointMBeanExportAutoConfiguration.class, EndpointAutoConfiguration.class })
+@EnableAutoConfiguration(exclude = { ServletWebServerFactoryAutoConfiguration.class, WebMvcAutoConfiguration.class,
+		JmxAutoConfiguration.class, BatchAutoConfiguration.class, JmxAutoConfiguration.class, EndpointAutoConfiguration.class })
 public class YarnShutdownApplication extends AbstractClientApplication<String, YarnShutdownApplication> {
 
 	public String run() {
@@ -55,9 +53,9 @@ public class YarnShutdownApplication extends AbstractClientApplication<String, Y
 	@Override
 	public String run(String... args) {
 		SpringApplicationBuilder builder = new SpringApplicationBuilder();
-		builder.web(false);
+		builder.web(WebApplicationType.NONE);
 		builder.sources(YarnShutdownApplication.class, OperationProperties.class);
-		SpringYarnBootUtils.addSources(builder, sources.toArray(new Object[0]));
+		SpringYarnBootUtils.addSources(builder, sources.toArray(new Class<?>[0]));
 		SpringYarnBootUtils.addProfiles(builder, profiles.toArray(new String[0]));
 		SpringYarnBootUtils.addApplicationListener(builder, appProperties);
 
@@ -67,7 +65,7 @@ public class YarnShutdownApplication extends AbstractClientApplication<String, Y
 			@Override
 			public String runWithSpringApplication(ApplicationContext context) throws Exception {
 				OperationProperties operationProperties = context.getBean(OperationProperties.class);
-				ApplicationId applicationId = ConverterUtils.toApplicationId(operationProperties.getApplicationId());
+				ApplicationId applicationId = ApplicationId.fromString(operationProperties.getApplicationId());
 				YarnClient client = context.getBean(YarnClient.class);
 				ApplicationReport report = client.getApplicationReport(applicationId);
 				String trackingUrl = report.getOriginalTrackingUrl();
@@ -86,7 +84,7 @@ public class YarnShutdownApplication extends AbstractClientApplication<String, Y
 		return this;
 	}
 
-	@ConfigurationProperties(value = "spring.yarn.internal.YarnShutdownApplication")
+	@ConfigurationProperties(value = "spring.yarn.internal.yarn-shutdown-application")
 	public static class OperationProperties {
 		String applicationId;
 		public void setApplicationId(String applicationId) {

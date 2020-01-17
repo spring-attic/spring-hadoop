@@ -16,14 +16,17 @@
 package org.springframework.data.hadoop.hbase;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hbase.TableName;
+import org.apache.hadoop.hbase.client.Admin;
+import org.apache.hadoop.hbase.client.Connection;
+import org.apache.hadoop.hbase.client.ConnectionFactory;
 import org.apache.hadoop.hbase.client.Delete;
 import org.apache.hadoop.hbase.client.Get;
-import org.apache.hadoop.hbase.client.HTable;
-import org.apache.hadoop.hbase.client.HTableInterface;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
+import org.apache.hadoop.hbase.client.Table;
 import org.springframework.dao.DataAccessException;
 import org.springframework.util.Assert;
 
@@ -41,25 +44,30 @@ public class HbaseTemplate extends HbaseAccessor implements HbaseOperations {
 
 	private boolean autoFlush = true;
 
+	private Connection connection;
+
+	private Admin admin;
+
 	public HbaseTemplate() {
 	}
 
-	public HbaseTemplate(Configuration configuration) {
+	public HbaseTemplate(Configuration configuration) throws IOException {
 		setConfiguration(configuration);
 		afterPropertiesSet();
+		this.connection = ConnectionFactory.createConnection(configuration);
+		this.admin = this.connection.getAdmin();
 	}
 
 	@Override
-	public <T> T execute(String tableName, TableCallback<T> action) {
+	public <T> T execute(String tableName, TableCallback<T> action) throws IOException {
 		Assert.notNull(action, "Callback object must not be null");
 		Assert.notNull(tableName, "No table specified");
 
-		HTableInterface table = getTable(tableName);
+		Table table = getTable(tableName);
 
 		try {
-			boolean previousFlushSetting = applyFlushSetting(table);
 			T result = action.doInTable(table);
-			flushIfNecessary(table, previousFlushSetting);
+			this.admin.flush(table.getName());
 			return result;
 		} catch (Throwable th) {
 			if (th instanceof Error) {
@@ -70,40 +78,14 @@ public class HbaseTemplate extends HbaseAccessor implements HbaseOperations {
 			}
 			throw convertHbaseAccessException((Exception) th);
 		} finally {
-			releaseTable(tableName, table);
+			table.close();
 		}
 	}
 
-	private HTableInterface getTable(String tableName) {
-		return HbaseUtils.getHTable(tableName, getConfiguration(), getCharset(), getTableFactory());
-	}
+	private Table getTable(String tableName) throws IOException {
+		TableName tableNameObj = TableName.valueOf(tableName);
 
-	private void releaseTable(String tableName, HTableInterface table) {
-		HbaseUtils.releaseTable(tableName, table, getTableFactory());
-	}
-
-	@SuppressWarnings("deprecation")
-	private boolean applyFlushSetting(HTableInterface table) {
-		boolean autoFlush = table.isAutoFlush();
-		if (table instanceof HTable) {
-			((HTable) table).setAutoFlush(this.autoFlush);
-		}
-		return autoFlush;
-	}
-
-	@SuppressWarnings("deprecation")
-	private void restoreFlushSettings(HTableInterface table, boolean oldFlush) {
-		if (table instanceof HTable) {
-			if (table.isAutoFlush() != oldFlush) {
-				((HTable) table).setAutoFlush(oldFlush);
-			}
-		}
-	}
-
-	private void flushIfNecessary(HTableInterface table, boolean oldFlush) throws IOException {
-		// TODO: check whether we can consider or not a table scope
-		table.flushCommits();
-		restoreFlushSettings(table, oldFlush);
+		return connection.getTable(tableNameObj);
 	}
 
 	public DataAccessException convertHbaseAccessException(Exception ex) {
@@ -111,24 +93,24 @@ public class HbaseTemplate extends HbaseAccessor implements HbaseOperations {
 	}
 
 	@Override
-	public <T> T find(String tableName, String family, final ResultsExtractor<T> action) {
+	public <T> T find(String tableName, String family, final ResultsExtractor<T> action) throws IOException {
 		Scan scan = new Scan();
 		scan.addFamily(family.getBytes(getCharset()));
 		return find(tableName, scan, action);
 	}
 
 	@Override
-	public <T> T find(String tableName, String family, String qualifier, final ResultsExtractor<T> action) {
+	public <T> T find(String tableName, String family, String qualifier, final ResultsExtractor<T> action) throws IOException {
 		Scan scan = new Scan();
 		scan.addColumn(family.getBytes(getCharset()), qualifier.getBytes(getCharset()));
 		return find(tableName, scan, action);
 	}
 
 	@Override
-	public <T> T find(String tableName, final Scan scan, final ResultsExtractor<T> action) {
+	public <T> T find(String tableName, final Scan scan, final ResultsExtractor<T> action) throws IOException {
 		return execute(tableName, new TableCallback<T>() {
 			@Override
-			public T doInTable(HTableInterface htable) throws Throwable {
+			public T doInTable(Table htable) throws Throwable {
 				ResultScanner scanner = htable.getScanner(scan);
 				try {
 					return action.extractData(scanner);
@@ -140,39 +122,39 @@ public class HbaseTemplate extends HbaseAccessor implements HbaseOperations {
 	}
 
 	@Override
-	public <T> List<T> find(String tableName, String family, final RowMapper<T> action) {
+	public <T> List<T> find(String tableName, String family, final RowMapper<T> action) throws IOException {
 		Scan scan = new Scan();
 		scan.addFamily(family.getBytes(getCharset()));
 		return find(tableName, scan, action);
 	}
 
 	@Override
-	public <T> List<T> find(String tableName, String family, String qualifier, final RowMapper<T> action) {
+	public <T> List<T> find(String tableName, String family, String qualifier, final RowMapper<T> action) throws IOException {
 		Scan scan = new Scan();
 		scan.addColumn(family.getBytes(getCharset()), qualifier.getBytes(getCharset()));
 		return find(tableName, scan, action);
 	}
 
 	@Override
-	public <T> List<T> find(String tableName, final Scan scan, final RowMapper<T> action) {
+	public <T> List<T> find(String tableName, final Scan scan, final RowMapper<T> action) throws IOException {
 		return find(tableName, scan, new RowMapperResultsExtractor<T>(action));
 	}
 
 	@Override
-	public <T> T get(String tableName, String rowName, final RowMapper<T> mapper) {
+	public <T> T get(String tableName, String rowName, final RowMapper<T> mapper) throws IOException {
 		return get(tableName, rowName, null, null, mapper);
 	}
 
 	@Override
-	public <T> T get(String tableName, String rowName, String familyName, final RowMapper<T> mapper) {
+	public <T> T get(String tableName, String rowName, String familyName, final RowMapper<T> mapper) throws IOException {
 		return get(tableName, rowName, familyName, null, mapper);
 	}
 
 	@Override
-	public <T> T get(String tableName, final String rowName, final String familyName, final String qualifier, final RowMapper<T> mapper) {
+	public <T> T get(String tableName, final String rowName, final String familyName, final String qualifier, final RowMapper<T> mapper) throws IOException {
 		return execute(tableName, new TableCallback<T>() {
 			@Override
-			public T doInTable(HTableInterface htable) throws Throwable {
+			public T doInTable(Table htable) throws Throwable {
 				Get get = new Get(rowName.getBytes(getCharset()));
 				if (familyName != null) {
 					byte[] family = familyName.getBytes(getCharset());
@@ -191,15 +173,15 @@ public class HbaseTemplate extends HbaseAccessor implements HbaseOperations {
 	}
 
 	@Override
-	public void put(String tableName, final String rowName, final String familyName, final String qualifier, final byte[] value) {
+	public void put(String tableName, final String rowName, final String familyName, final String qualifier, final byte[] value) throws IOException {
 		Assert.hasLength(rowName);
 		Assert.hasLength(familyName);
 		Assert.hasLength(qualifier);
 		Assert.notNull(value);
 		execute(tableName, new TableCallback<Object>() {
 			@Override
-			public Object doInTable(HTableInterface htable) throws Throwable {
-				Put put = new Put(rowName.getBytes(getCharset())).add(familyName.getBytes(getCharset()), qualifier.getBytes(getCharset()), value);
+			public Object doInTable(Table htable) throws Throwable {
+				Put put = new Put(rowName.getBytes(getCharset())).addColumn(familyName.getBytes(getCharset()), qualifier.getBytes(getCharset()), value);
 				htable.put(put);
 				return null;
 			}
@@ -207,25 +189,25 @@ public class HbaseTemplate extends HbaseAccessor implements HbaseOperations {
 	}
 
 	@Override
-	public void delete(String tableName, final String rowName, final String familyName) {
+	public void delete(String tableName, final String rowName, final String familyName) throws IOException {
 		delete(tableName, rowName, familyName, null);
 	}
 	
 	@Override
-	public void delete(String tableName, final String rowName, final String familyName, final String qualifier) {
+	public void delete(String tableName, final String rowName, final String familyName, final String qualifier) throws IOException {
 		Assert.hasLength(rowName);
 		Assert.hasLength(familyName);
 		execute(tableName, new TableCallback<Object>() {
 			@Override
-			public Object doInTable(HTableInterface htable) throws Throwable {
+			public Object doInTable(Table htable) throws Throwable {
 				Delete delete = new Delete(rowName.getBytes(getCharset()));
 				byte[] family = familyName.getBytes(getCharset());
 
 				if (qualifier != null) {
-					delete.deleteColumn(family, qualifier.getBytes(getCharset()));
+					delete.addColumn(family, qualifier.getBytes(getCharset()));
 				}
 				else {
-					delete.deleteFamily(family);
+					delete.addFamily(family);
 				}
 				
 				htable.delete(delete);

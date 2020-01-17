@@ -68,7 +68,7 @@ public class YarnPushedCommand extends AbstractApplicationCommand {
 		protected void runApplication(OptionSet options) throws Exception {
 			YarnInfoApplication app = new YarnInfoApplication();
 			Properties appProperties = new Properties();
-			appProperties.setProperty("spring.yarn.internal.YarnInfoApplication.operation", "PUSHED");
+			appProperties.setProperty("spring.yarn.internal.yarn-info-application.operation", "PUSHED");
 			app.appProperties(appProperties);
 			handleApplicationRun(app);
 		}

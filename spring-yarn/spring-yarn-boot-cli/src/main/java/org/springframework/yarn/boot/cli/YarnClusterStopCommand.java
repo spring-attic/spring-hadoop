@@ -93,10 +93,10 @@ public class YarnClusterStopCommand extends AbstractApplicationCommand {
 			Assert.state(StringUtils.hasText(appId) && StringUtils.hasText(clusterId), "Cluster Id and Application Id must be defined");
 			YarnContainerClusterApplication app = new YarnContainerClusterApplication();
 			Properties appProperties = new Properties();
-			appProperties.setProperty("spring.yarn.internal.ContainerClusterApplication.operation", "CLUSTERSTOP");
-			appProperties.setProperty("spring.yarn.internal.ContainerClusterApplication.applicationId",
+			appProperties.setProperty("spring.yarn.internal.container-cluster-application.operation", "CLUSTERSTOP");
+			appProperties.setProperty("spring.yarn.internal.container-cluster-application.applicationId",
 					appId);
-			appProperties.setProperty("spring.yarn.internal.ContainerClusterApplication.clusterId",
+			appProperties.setProperty("spring.yarn.internal.container-cluster-application.clusterId",
 					clusterId);
 			app.appProperties(appProperties);
 			handleApplicationRun(app);

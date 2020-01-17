@@ -80,7 +80,7 @@ public class YarnKillCommand extends AbstractApplicationCommand {
 			Assert.hasText(appId, "Application Id must be defined");
 			YarnKillApplication app = new YarnKillApplication();
 			Properties appProperties = new Properties();
-			appProperties.setProperty("spring.yarn.internal.YarnKillApplication.applicationId", appId);
+			appProperties.setProperty("spring.yarn.internal.yarn-kill-application.applicationId", appId);
 			app.appProperties(appProperties);
 			handleApplicationRun(app);
 		}

@@ -51,12 +51,12 @@ public class DefaultGridProjectionTests {
 	public void setup() throws Exception {
 		// try to fix some hadoop static init usage
 		// do it again after a test
-		TestUtils.setField("initCalled", new RackResolver(), false);
+		TestUtils.setField("initCalled", RackResolver.class, false);
 	}
 
 	@After
 	public void clean() throws Exception {
-		TestUtils.setField("initCalled", new RackResolver(), false);
+		TestUtils.setField("initCalled", RackResolver.class, false);
 	}
 
 	@Test
@@ -91,7 +91,7 @@ public class DefaultGridProjectionTests {
 		DefaultGridProjection projection = new DefaultGridProjection();
 		projection.setProjectionData(new ProjectionData(1));
 		projection.setPriority(0);
-		projection.setMemory(0);
+		projection.setMemory(0L);
 		projection.setVirtualCores(0);
 
 		ContainerId id = MockUtils.getMockContainerId(MockUtils.getMockApplicationAttemptId(0, 0), 0);
@@ -116,7 +116,7 @@ public class DefaultGridProjectionTests {
 		DefaultGridProjection projection = new DefaultGridProjection();
 		projection.setPriority(0);
 		projection.setProjectionData(new ProjectionData(2));
-		projection.setMemory(0);
+		projection.setMemory(0L);
 		projection.setVirtualCores(0);
 
 		Priority priority = MockUtils.getMockPriority(0);
@@ -177,7 +177,7 @@ public class DefaultGridProjectionTests {
 		projectionData.setHost("host3", 2);
 		projection.setProjectionData(projectionData);
 		projection.setPriority(0);
-		projection.setMemory(0);
+		projection.setMemory(0L);
 		projection.setVirtualCores(0);
 
 		SatisfyStateData satisfyState = projection.getSatisfyState();
@@ -230,7 +230,7 @@ public class DefaultGridProjectionTests {
 		projectionData.setHost("host2", 2);
 		projection.setProjectionData(projectionData);
 		projection.setPriority(0);
-		projection.setMemory(0);
+		projection.setMemory(0L);
 		projection.setVirtualCores(0);
 
 		SatisfyStateData satisfyState = projection.getSatisfyState();
@@ -315,7 +315,7 @@ public class DefaultGridProjectionTests {
 		configuration.set("net.topology.node.switch.mapping.impl", "org.springframework.yarn.am.grid.support.TestDNSToSwitchMapping");
 		DefaultGridProjection projection = new DefaultGridProjection(configuration);
 		projection.setPriority(0);
-		projection.setMemory(0);
+		projection.setMemory(0L);
 		projection.setVirtualCores(0);
 
 		ProjectionData projectionData = new ProjectionData();
@@ -380,7 +380,7 @@ public class DefaultGridProjectionTests {
 		configuration.set("net.topology.node.switch.mapping.impl", "org.springframework.yarn.am.grid.support.TestDNSToSwitchMapping");
 		DefaultGridProjection projection = new DefaultGridProjection(configuration);
 		projection.setPriority(0);
-		projection.setMemory(0);
+		projection.setMemory(0L);
 		projection.setVirtualCores(0);
 
 		ProjectionData projectionData = new ProjectionData();

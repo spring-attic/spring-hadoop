@@ -62,7 +62,7 @@ public class HadoopAutoConfigurationTests {
 	@Test
 	public void testConfigurationViaBootApp() {
 		SpringApplication app = new SpringApplication(HadoopAutoConfiguration.class);
-		app.setWebEnvironment(false);
+//		app.setWebEnvironment(false);
 		ConfigurableApplicationContext ctx = app
 				.run(new String[] { "--spring.config.name=HadoopAutoConfigurationTests1" });
 		this.context = ctx;

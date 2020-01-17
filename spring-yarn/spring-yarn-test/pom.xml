@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>spring-yarn-test</artifactId>
+
+    <name>Spring for Apache Hadoop YARN Test </name>
+    <description>Spring for Apache Hadoop YARN Test</description>
+
+    <parent>
+        <groupId>org.springframework.data</groupId>
+        <artifactId>spring-yarn</artifactId>
+        <version>2.5.1-SNAPSHOT</version>
+    </parent>
+<!-- 
+        compile project(":spring-yarn:spring-yarn-core")
+        compile "org.springframework:spring-test:$springVersion"
+        compile "junit:junit:$junitVersion"
+        compile("org.apache.hadoop:hadoop-yarn-client:$hadoopVersion") { dep ->
+            exclude group: "org.slf4j", module: "slf4j-log4j12"
+        }
+        compile("org.apache.hadoop:hadoop-common:$hadoopVersion") { dep ->
+            exclude group: "junit", module: "junit"
+        }
+        compile("org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion") { dep ->
+            exclude group: "org.slf4j", module: "slf4j-log4j12"
+        }
+        compile("org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion:tests") { dep ->
+            exclude group: "org.slf4j", module: "slf4j-log4j12"
+        }
+        compile "org.apache.hadoop:hadoop-hdfs:$hadoopVersion"
+        compile("org.apache.hadoop:hadoop-hdfs:$hadoopVersion:tests") { dep ->
+            exclude group: "log4j", module: "log4j"
+        }
+        compile("org.apache.hadoop:hadoop-common:$hadoopVersion:tests") { dep ->
+            exclude group: "log4j", module: "log4j"
+            exclude group: "org.slf4j", module: "slf4j-log4j12"
+        }
+        hadoopruntime configurations.runtime
+        hadoopruntimenotest configurations.runtime
+-->
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-yarn-core</artifactId>
+            <version>2.5.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-yarn-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-common</artifactId>
+            <classifier>tests</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-yarn-server-tests</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-yarn-server-tests</artifactId>
+            <classifier>tests</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-hdfs</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-hdfs</artifactId>
+            <classifier>tests</classifier>
+        </dependency>
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+</project>

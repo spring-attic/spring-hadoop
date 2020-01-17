@@ -84,8 +84,8 @@ public class YarnClustersInfoCommand extends AbstractApplicationCommand {
 			String appId = options.valueOf(applicationIdOption);
 			YarnContainerClusterApplication app = new YarnContainerClusterApplication();
 			Properties appProperties = new Properties();
-			appProperties.setProperty("spring.yarn.internal.ContainerClusterApplication.operation", "CLUSTERSINFO");
-			appProperties.setProperty("spring.yarn.internal.ContainerClusterApplication.applicationId",
+			appProperties.setProperty("spring.yarn.internal.container-cluster-application.operation", "CLUSTERSINFO");
+			appProperties.setProperty("spring.yarn.internal.container-cluster-application.applicationId",
 					appId);
 			app.appProperties(appProperties);
 			handleApplicationRun(app);

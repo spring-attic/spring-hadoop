@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>spring-yarn</artifactId>
+    <packaging>pom</packaging>
+
+    <name>Spring for Apache Hadoop YARN </name>
+    <description>Spring for Apache Hadoop YARN</description>
+
+    <parent>
+        <groupId>org.springframework.data</groupId>
+        <artifactId>spring-data-hadoop-parent</artifactId>
+        <version>2.5.1-SNAPSHOT</version>
+    </parent>
+
+    <modules>
+        <module>spring-yarn-core</module>
+        <module>spring-yarn-integration</module>
+        <module>spring-yarn-test</module>
+        <module>spring-yarn-batch</module>
+        <module>spring-yarn-boot</module>
+        <module>spring-yarn-boot-cli</module>
+        <module>spring-yarn-boot-test</module>
+        <module>spring-yarn-boot-build-tests</module>
+        <module>spring-yarn-build-tests</module>
+    </modules>
+</project>

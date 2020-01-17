@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ScheduledFuture;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.io.DataOutputBuffer;
@@ -42,7 +41,6 @@ import org.apache.hadoop.yarn.api.records.ContainerState;
 import org.apache.hadoop.yarn.api.records.ContainerStatus;
 import org.apache.hadoop.yarn.api.records.SerializedException;
 import org.apache.hadoop.yarn.security.AMRMTokenIdentifier;
-import org.apache.hadoop.yarn.util.ConverterUtils;
 import org.apache.hadoop.yarn.util.Records;
 import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.support.PeriodicTrigger;
@@ -118,7 +116,7 @@ public class DefaultContainerLauncher extends AbstractLauncher implements Contai
 		// Yarn doesn't tell container what is its container id
 		// so we do it here
 		Map<String, String> env = getEnvironment();
-		env.put(YarnSystemConstants.SYARN_CONTAINER_ID, ConverterUtils.toString(container.getId()));
+		env.put(YarnSystemConstants.SYARN_CONTAINER_ID, container.getId().toString());
 		ctx.setEnvironment(env);
 		ctx = getInterceptors().preLaunch(container, ctx);
 

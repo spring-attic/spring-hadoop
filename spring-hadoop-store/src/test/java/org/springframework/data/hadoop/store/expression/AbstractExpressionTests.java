@@ -60,7 +60,7 @@ public abstract class AbstractExpressionTests {
 	}
 
 	protected static void assertExpression(MethodResolver resolver, PropertyAccessor accessor, boolean replaceAccessor, Object rootObject, String expression, String result, boolean compilable) throws Exception {
-		SpelParserConfiguration spelParserConfiguration = new SpelParserConfiguration(SpelCompilerMode.IMMEDIATE, null);
+		SpelParserConfiguration spelParserConfiguration = new SpelParserConfiguration(SpelCompilerMode.MIXED, null);
 		ExpressionParser parser = new SpelExpressionParser(spelParserConfiguration);
 		StandardEvaluationContext context = new StandardEvaluationContext();
 

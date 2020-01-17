@@ -28,8 +28,8 @@ import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.springframework.boot.autoconfigure.PropertyPlaceholderAutoConfiguration;
-import org.springframework.boot.test.EnvironmentTestUtils;
+import org.springframework.boot.autoconfigure.context.PropertyPlaceholderAutoConfiguration;
+import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -66,11 +66,10 @@ public class YarnAppmasterAutoConfigurationTests {
 	public void testDefaultContext() throws Exception {
 		System.setProperty("HADOOP_TOKEN_FILE_LOCATION", "xx/xx/xx/00001/container_tokens");
 		context = new AnnotationConfigApplicationContext();
-		EnvironmentTestUtils
-				.addEnvironment(
-						this.context,
-						"spring.yarn.appmaster.appmasterClass:org.springframework.yarn.boot.YarnAppmasterAutoConfigurationTests$TestManagedContainerClusterAppmaster",
-						"spring.yarn.appmaster.containercluster.enabled:true");
+		TestPropertyValues.of("spring.yarn.appmaster.appmasterClass=org.springframework.yarn.boot.YarnAppmasterAutoConfigurationTests$TestManagedContainerClusterAppmaster")
+		.and("spring.yarn.appmaster.containercluster.enabled=true")
+		.applyTo(context);
+		
 		context.register(ContainerClusterStateMachineConfiguration.class,
 				YarnAppmasterAutoConfiguration.class, PropertyPlaceholderAutoConfiguration.class);
 		context.refresh();
@@ -88,11 +87,11 @@ public class YarnAppmasterAutoConfigurationTests {
 	public void testOverrideDefaultGridProjectionFactory() throws Exception {
 		System.setProperty("HADOOP_TOKEN_FILE_LOCATION", "xx/xx/xx/00001/container_tokens");
 		context = new AnnotationConfigApplicationContext();
-		EnvironmentTestUtils
-				.addEnvironment(
-						this.context,
-						"spring.yarn.appmaster.appmasterClass:org.springframework.yarn.boot.YarnAppmasterAutoConfigurationTests$TestManagedContainerClusterAppmaster",
-						"spring.yarn.appmaster.containercluster.enabled:true");
+		
+		TestPropertyValues.of("spring.yarn.appmaster.appmasterClass=org.springframework.yarn.boot.YarnAppmasterAutoConfigurationTests$TestManagedContainerClusterAppmaster")
+        .and("spring.yarn.appmaster.containercluster.enabled=true")
+        .applyTo(context);
+
 		context.register(ContainerClusterStateMachineConfiguration.class, TestConfig1WithClass.class,
 				YarnAppmasterAutoConfiguration.class, PropertyPlaceholderAutoConfiguration.class);
 		context.refresh();
@@ -110,11 +109,10 @@ public class YarnAppmasterAutoConfigurationTests {
 	public void testAddCustomGridProjectionFactory() throws Exception {
 		System.setProperty("HADOOP_TOKEN_FILE_LOCATION", "xx/xx/xx/00001/container_tokens");
 		context = new AnnotationConfigApplicationContext();
-		EnvironmentTestUtils
-				.addEnvironment(
-						this.context,
-						"spring.yarn.appmaster.appmasterClass:org.springframework.yarn.boot.YarnAppmasterAutoConfigurationTests$TestManagedContainerClusterAppmaster",
-						"spring.yarn.appmaster.containercluster.enabled:true");
+		TestPropertyValues.of("spring.yarn.appmaster.appmasterClass=org.springframework.yarn.boot.YarnAppmasterAutoConfigurationTests$TestManagedContainerClusterAppmaster")
+          .and("spring.yarn.appmaster.containercluster.enabled=true")
+          .applyTo(context);
+
 		context.register(ContainerClusterStateMachineConfiguration.class, TestConfig2WithClass.class,
 				YarnAppmasterAutoConfiguration.class, PropertyPlaceholderAutoConfiguration.class);
 		context.refresh();

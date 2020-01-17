@@ -243,11 +243,11 @@ public class DefaultContainerMonitorTests {
 	 * @param id the container id
 	 * @return mocked {@link ContainerId}
 	 */
-	public static ContainerId getMockContainerId(ApplicationAttemptId applicationAttemptId, int id) {
+	public static ContainerId getMockContainerId(ApplicationAttemptId applicationAttemptId, long id) {
 		ContainerId containerId = mock(ContainerId.class);
 		doReturn(applicationAttemptId).when(containerId).getApplicationAttemptId();
-		doReturn(id).when(containerId).getId();
-		doReturn(Integer.toString(id)).when(containerId).toString();
+		doReturn(id).when(containerId).getContainerId();
+		doReturn(Long.toString(id)).when(containerId).toString();
 		return containerId;
 	}
 

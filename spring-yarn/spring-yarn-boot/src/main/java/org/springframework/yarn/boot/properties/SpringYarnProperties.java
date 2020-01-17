@@ -15,7 +15,6 @@
  */
 package org.springframework.yarn.boot.properties;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
@@ -35,9 +34,6 @@ public class SpringYarnProperties {
 	private String appType;
 	private String siteYarnAppClasspath;
 	private String siteMapreduceAppClasspath;
-
-	@Autowired
-	private SpringYarnEnvProperties syep;
 
 	public String getApplicationDir() {
 		return applicationDir;

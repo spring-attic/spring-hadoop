@@ -37,7 +37,7 @@ public class SpringHadoopPropertiesTests {
 	@Test
 	public void testAllPropertiesSet1() {
 		SpringApplication app = new SpringApplication(TestConfiguration.class);
-		app.setWebEnvironment(false);
+//		app.setWebEnvironment(false);
 		ConfigurableApplicationContext context = app
 				.run(new String[] { "--spring.config.name=SpringHadoopPropertiesTests1" });
 		SpringHadoopProperties properties = context.getBean(SpringHadoopProperties.class);
@@ -58,7 +58,7 @@ public class SpringHadoopPropertiesTests {
 	@Test
 	public void testAllPropertiesSet2() {
 		SpringApplication app = new SpringApplication(TestConfiguration.class);
-		app.setWebEnvironment(false);
+//		app.setWebEnvironment(false);
 		ConfigurableApplicationContext context = app
 				.run(new String[] { "--spring.config.name=SpringHadoopPropertiesTests2" });
 		SpringHadoopProperties properties = context.getBean(SpringHadoopProperties.class);
@@ -77,7 +77,7 @@ public class SpringHadoopPropertiesTests {
 	@Test
 	public void testHadoopConfigFromYaml() {
 		SpringApplication app = new SpringApplication(TestConfiguration.class);
-		app.setWebEnvironment(false);
+//		app.setWebEnvironment(false);
 		ConfigurableApplicationContext context = app
 				.run(new String[] { "--spring.config.name=SpringHadoopPropertiesTests3" });
 		SpringHadoopProperties properties = context.getBean(SpringHadoopProperties.class);
@@ -94,7 +94,7 @@ public class SpringHadoopPropertiesTests {
 	@Test
 	public void testHadoopConfigFromProperties() {
 		SpringApplication app = new SpringApplication(TestConfiguration.class);
-		app.setWebEnvironment(false);
+//		app.setWebEnvironment(false);
 		ConfigurableApplicationContext context = app
 				.run(new String[] { "--spring.config.name=SpringHadoopPropertiesTests4" });
 		SpringHadoopProperties properties = context.getBean(SpringHadoopProperties.class);

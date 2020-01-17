@@ -20,7 +20,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -29,7 +28,7 @@ import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.yarn.api.records.LocalResource;
-import org.apache.hadoop.yarn.util.ConverterUtils;
+import org.apache.hadoop.yarn.api.records.URL;
 import org.apache.hadoop.yarn.util.Records;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -170,7 +169,7 @@ public class DefaultResourceLocalizer extends AbstractResourceLocalizer implemen
 						LocalResource res = Records.newRecord(LocalResource.class);
 						res.setType(e.type);
 						res.setVisibility(e.visibility);
-						res.setResource(ConverterUtils.getYarnUrlFromPath(path));
+						res.setResource(URL.fromPath(path));
 						res.setTimestamp(status.getModificationTime());
 						res.setSize(status.getLen());
 						if(log.isDebugEnabled()) {

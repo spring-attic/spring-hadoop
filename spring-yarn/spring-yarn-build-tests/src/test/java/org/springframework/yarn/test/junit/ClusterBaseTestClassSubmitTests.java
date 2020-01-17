@@ -20,7 +20,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.lessThan;
-
+import static org.junit.Assert.assertEquals;
 import java.io.File;
 import java.util.List;
 import java.util.Scanner;
@@ -73,13 +73,13 @@ public class ClusterBaseTestClassSubmitTests extends AbstractYarnClusterTests {
 				info.getApplicationId());
 
 		// appmaster and 4 containers should
-		// make it 10 log files
+		// make it 20 log files
 		assertThat(resources, notNullValue());
-		assertThat("expecting 10 log files", resources.size(), is(10));
+		assertThat("expecting 20 log files", resources.size(), is(20));
 
 		for (Resource res : resources) {
 			File file = res.getFile();
-			if (file.getName().endsWith("stdout")) {
+			if (file.getName().endsWith(".stdout")) {
 				// there has to be some content in stdout file
 				assertThat("there has to be content in stdout file", file.length(), greaterThan(0l));
 				if (file.getName().equals("Container.stdout")) {
@@ -90,7 +90,7 @@ public class ClusterBaseTestClassSubmitTests extends AbstractYarnClusterTests {
 					assertThat("content doesn't look like timestamp", content.length(), greaterThan(10));
 					assertThat("content doesn't look like timestamp", content.length(), lessThan(40));
 				}
-			} else if (file.getName().endsWith("stderr")) {
+			} else if (file.getName().endsWith(".stderr")) {
 				String content = "";
 				if (file.length() > 0) {
 					Scanner scanner = new Scanner(file);
@@ -104,7 +104,14 @@ public class ClusterBaseTestClassSubmitTests extends AbstractYarnClusterTests {
 					// can't have anything in stderr files
 					assertThat("stderr file is not empty: " + content, file.length(), is(0l));
 				}
-			}
+			} else if (file.getName().endsWith(".err")) {
+			    assertEquals("prelaunch.err", file.getName());
+			    assertThat("prelaunch.err file is not empty", file.length(), is(0l));
+			} else if (file.getName().endsWith(".out")) {
+			  assertEquals("prelaunch.out", file.getName());
+            } else {
+              throw new Exception("Unkonwn log file: " + file);
+            }
 		}
 
 	}

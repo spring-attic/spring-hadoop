@@ -15,7 +15,7 @@
  */
 package org.springframework.data.hadoop.hbase;
 
-import org.apache.hadoop.hbase.client.HTableInterface;
+import org.apache.hadoop.hbase.client.Table;
 
 /**
  * Callback interface for Hbase code. To be used with {@link HbaseTemplate}'s execution methods, often as anonymous classes within a method implementation without
@@ -32,5 +32,5 @@ public interface TableCallback<T> {
 	 * @return a result object, or null if none
 	 * @throws Throwable thrown by the Hbase API
 	 */
-	T doInTable(HTableInterface table) throws Throwable;
+	T doInTable(Table table) throws Throwable;
 }

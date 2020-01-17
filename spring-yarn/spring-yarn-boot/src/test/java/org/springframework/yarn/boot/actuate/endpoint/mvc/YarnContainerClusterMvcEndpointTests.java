@@ -17,10 +17,10 @@ package org.springframework.yarn.boot.actuate.endpoint.mvc;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.emptyString;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isEmptyString;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
@@ -32,12 +32,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.hadoop.yarn.api.records.Container;
 import org.apache.hadoop.yarn.api.records.ContainerId;
 import org.apache.hadoop.yarn.api.records.NodeId;
@@ -47,10 +45,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.autoconfigure.EndpointWebMvcAutoConfiguration;
-import org.springframework.boot.actuate.autoconfigure.ManagementServerPropertiesAutoConfiguration;
+import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointAutoConfiguration;
+import org.springframework.boot.actuate.endpoint.invoke.ParameterValueMapper;
+import org.springframework.boot.actuate.endpoint.invoke.convert.ConversionServiceParameterValueMapper;
 import org.springframework.boot.autoconfigure.hateoas.HypermediaAutoConfiguration;
-import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -86,7 +85,7 @@ import org.springframework.yarn.boot.actuate.endpoint.mvc.YarnContainerClusterMv
 import org.springframework.yarn.listener.ContainerAllocatorListener;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = { TestConfiguration.class })
+@SpringBootTest(classes = { TestConfiguration.class })
 @WebAppConfiguration
 @DirtiesContext(classMode=ClassMode.AFTER_EACH_TEST_METHOD)
 public class YarnContainerClusterMvcEndpointTests {
@@ -114,7 +113,7 @@ public class YarnContainerClusterMvcEndpointTests {
 		mvc.
 			perform(get(BASE)).
 			andExpect(status().isOk()).
-			andExpect(content().string(not(isEmptyString()))).
+			andExpect(content().string(not(emptyString()))).
 			andExpect(jsonPath("$.*", hasSize(1))).
 			andExpect(jsonPath("$.clusters", hasSize(0)));
 	}
@@ -192,7 +191,7 @@ public class YarnContainerClusterMvcEndpointTests {
 		mvc.
 			perform(get(BASE)).
 			andExpect(status().isOk()).
-			andExpect(content().string(not(isEmptyString()))).
+			andExpect(content().string(not(emptyString()))).
 			andExpect(jsonPath("$.*", hasSize(1))).
 			andExpect(jsonPath("$.clusters", hasSize(1))).
 			andExpect(jsonPath("$.clusters[0]", is("cluster1")));
@@ -208,7 +207,7 @@ public class YarnContainerClusterMvcEndpointTests {
 		mvc.
 			perform(get(BASE)).
 			andExpect(status().isOk()).
-			andExpect(content().string(not(isEmptyString()))).
+			andExpect(content().string(not(emptyString()))).
 			andExpect(jsonPath("$.*", hasSize(1))).
 			andExpect(jsonPath("$.clusters", hasSize(1))).
 			andExpect(jsonPath("$.clusters[0]", is("cluster1")));
@@ -223,14 +222,14 @@ public class YarnContainerClusterMvcEndpointTests {
 		mvc.
 			perform(put(BASE + "/cluster1").content(content).contentType(MediaType.APPLICATION_JSON)).
 			andExpect(status().isOk()).
-			andExpect(content().string(isEmptyString()));
+			andExpect(content().string(emptyString()));
 
 		allocateContainer(appmaster, 1);
 
 		mvc.
 			perform(get(BASE + "/cluster1")).
 			andExpect(status().isOk()).
-			andExpect(content().string(not(isEmptyString()))).
+			andExpect(content().string(not(emptyString()))).
 			andExpect(jsonPath("$.*", hasSize(3))).
 			andExpect(jsonPath("$.id", is("cluster1"))).
 			andExpect(jsonPath("$.gridProjection.*", hasSize(3))).
@@ -264,7 +263,7 @@ public class YarnContainerClusterMvcEndpointTests {
 		mvc.
 			perform(put(BASE + "/foo").content(content).contentType(MediaType.APPLICATION_JSON)).
 			andExpect(status().isOk()).
-			andExpect(content().string(isEmptyString()));
+			andExpect(content().string(emptyString()));
 
 		Map<String, ContainerCluster> clusters = TestUtils.readField("clusters", appmaster);
 		assertThat(clusters.size(), is(1));
@@ -288,7 +287,7 @@ public class YarnContainerClusterMvcEndpointTests {
 		mvc.
 		perform(put(BASE + "/foo").content(content).contentType(MediaType.APPLICATION_JSON)).
 		andExpect(status().isOk()).
-		andExpect(content().string(isEmptyString()));
+		andExpect(content().string(emptyString()));
 		Map<String, ContainerCluster> clusters = TestUtils.readField("clusters", appmaster);
 		assertThat(clusters.size(), is(1));
 		assertThat(clusters.containsKey("foo"), is(true));
@@ -334,7 +333,7 @@ public class YarnContainerClusterMvcEndpointTests {
 		mvc.
 			perform(get(BASE)).
 			andExpect(status().isOk()).
-			andExpect(content().string(not(isEmptyString()))).
+			andExpect(content().string(not(emptyString()))).
 			andExpect(jsonPath("$.*", hasSize(1))).
 			andExpect(jsonPath("$.clusters", hasSize(1))).
 			andExpect(jsonPath("$.clusters[0]", is("cluster.1.1")));
@@ -343,14 +342,14 @@ public class YarnContainerClusterMvcEndpointTests {
 		mvc.
 			perform(put(BASE + "/cluster.1.1").content(content).contentType(MediaType.APPLICATION_JSON)).
 			andExpect(status().isOk()).
-			andExpect(content().string(isEmptyString()));
+			andExpect(content().string(emptyString()));
 
 		TestUtils.callMethod("doTask", appmaster);
 		allocateContainer(appmaster, 1);
 		mvc.
 			perform(get(BASE + "/cluster.1.1")).
 			andExpect(status().isOk()).
-			andExpect(content().string(not(isEmptyString()))).
+			andExpect(content().string(not(emptyString()))).
 			andExpect(jsonPath("$.*", hasSize(3))).
 			andExpect(jsonPath("$.id", is("cluster.1.1"))).
 			andExpect(jsonPath("$.gridProjection.*", hasSize(3))).
@@ -375,7 +374,7 @@ public class YarnContainerClusterMvcEndpointTests {
 	}
 
 
-	@Import({ ContainerClusterStateMachineConfiguration.class, EndpointWebMvcAutoConfiguration.class, ManagementServerPropertiesAutoConfiguration.class,
+	@Import({ ContainerClusterStateMachineConfiguration.class, WebEndpointAutoConfiguration.class,
 			HypermediaAutoConfiguration.class })
 	@EnableWebMvc
 	@Configuration
@@ -418,10 +417,15 @@ public class YarnContainerClusterMvcEndpointTests {
 			Map<String, ProjectionData> defaults = new HashMap<String, ProjectionData>();
 			ProjectionData projectionData = new ProjectionData(null, null, null, "any", 0);
 			projectionData.setVirtualCores(0);
-			projectionData.setMemory(0);
+			projectionData.setMemory(0L);
 			defaults.put("cluster1", projectionData);
 			return new ProjectionDataRegistry(defaults);
 		}
+		
+		@Bean
+        public ParameterValueMapper conversionServiceParameterValueMapper() {
+          return new ConversionServiceParameterValueMapper();
+        }
 
 	}
 

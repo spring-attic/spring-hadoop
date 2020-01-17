@@ -4,15 +4,17 @@ defaultTasks 'build'
 
 buildscript {
 	repositories {
-		maven { url "https://repo.spring.io/plugins-release" }
-		maven { url "https://repo.spring.io/plugins-snapshot" }
+		mavenCentral()
+		mavenLocal()
+		//maven { url "https://repo.spring.io/plugins-release" }
+		//maven { url "https://repo.spring.io/plugins-snapshot" }
 	}
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:$springBootVersion")
-		classpath("org.springframework.build.gradle:propdeps-plugin:0.0.7")
-		classpath("org.springframework.build.gradle:spring-io-plugin:0.0.3.RELEASE")
-		classpath('org.asciidoctor:asciidoctor-gradle-plugin:1.5.2')
-		classpath("io.spring.gradle:docbook-reference-plugin:0.3.1")
+		classpath("io.spring.gradle:propdeps-plugin:0.0.10.RELEASE")
+		//classpath("io.spring.gradle:spring-io-plugin:0.0.8.RELEASE")
+		//classpath('org.asciidoctor:asciidoctor-gradle-plugin:1.5.7')
+		//classpath("io.spring.gradle:docbook-reference-plugin:0.3.1")
 	}
 }
 
@@ -21,8 +23,8 @@ allprojects {
 
 	repositories {
 		mavenCentral()
-		maven { url 'https://repo.spring.io/libs-release' }
-		maven { url 'https://repo.spring.io/libs-milestone' }
+		maven { url 'https://repo.spring.io/release' }
+		maven { url 'https://repo.spring.io/milestone' }
 	}
 }
 
@@ -91,116 +93,116 @@ def pigQualifier = ''
 // default is Hadoop 2.7.x
 switch (hadoopDistro) {
 
-	// Cloudera CDH5 YARN 2.3.x base
-	case "cdh5":
-		hadoopVersion = cdh5Version
-		println "Using Cloudera CDH5 [$hadoopVersion]"
-		hbaseVersion = cdh5HbaseVersion
-		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion",
-				  "org.apache.hbase:hbase-common:$hbaseVersion",
-				  "org.apache.hbase:hbase-client:$hbaseVersion"]
-		hiveVersion = cdh5HiveVersion
-		pigVersion = cdh5PigVersion
-		sparkVersion = cdh5SparkVersion
-		sqoop2Version = cdh5Sqoop2Version
-		hadoopArtifacts = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-yarn-common:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-streaming:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-distcp:$hadoopVersion"]
-		hadoopTestArtifacts = ["org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion:tests",
-					"org.apache.hadoop:hadoop-hdfs:$hadoopVersion:tests",
-					"org.apache.hadoop:hadoop-common:$hadoopVersion:tests",
-					"org.apache.hadoop:hadoop-mapreduce-client-app:$hadoopVersion",
-					"org.apache.hadoop:hadoop-mapreduce-client-hs:$hadoopVersion",
-					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion",
-					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion:tests"]
-		break;
-
-	// Hortonworks Data Platform 2.6
-	case "hdp26":
-		hadoopVersion = hdp26Version
-		println "Using Hortonworks Data Platform 2.6 [$hadoopVersion]"
-		hadoopArtifacts = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-yarn-common:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-streaming:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-distcp:$hadoopVersion"]
-		hadoopTestArtifacts = ["org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion:tests",
-					"org.apache.hadoop:hadoop-hdfs:$hadoopVersion:tests",
-					"org.apache.hadoop:hadoop-common:$hadoopVersion:tests",
-					"org.apache.hadoop:hadoop-mapreduce-client-app:$hadoopVersion",
-					"org.apache.hadoop:hadoop-mapreduce-client-hs:$hadoopVersion",
-					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion",
-					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion:tests"]
-		hbaseVersion = hdp26HbaseVersion
-		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion",
-				  "org.apache.hbase:hbase-common:$hbaseVersion",
-				  "org.apache.hbase:hbase-client:$hbaseVersion"]
-		hiveVersion = hdp26HiveVersion
-		pigVersion = hdp26PigVersion
-		pigQualifier = ':h2'
-		sparkVersion = hdp26SparkVersion
-		break;
-
-	// Hortonworks Data Platform 2.5
-	case "hdp25":
-		hadoopVersion = hdp25Version
-		println "Using Hortonworks Data Platform 2.5 [$hadoopVersion]"
-		hadoopArtifacts = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-yarn-common:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-streaming:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-distcp:$hadoopVersion"]
-		hadoopTestArtifacts = ["org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion:tests",
-					"org.apache.hadoop:hadoop-hdfs:$hadoopVersion:tests",
-					"org.apache.hadoop:hadoop-common:$hadoopVersion:tests",
-					"org.apache.hadoop:hadoop-mapreduce-client-app:$hadoopVersion",
-					"org.apache.hadoop:hadoop-mapreduce-client-hs:$hadoopVersion",
-					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion",
-					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion:tests"]
-		hbaseVersion = hdp25HbaseVersion
-		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion",
-				  "org.apache.hbase:hbase-common:$hbaseVersion",
-				  "org.apache.hbase:hbase-client:$hbaseVersion"]
-		hiveVersion = hdp25HiveVersion
-		pigVersion = hdp25PigVersion
-		pigQualifier = ':h2'
-		sparkVersion = hdp25SparkVersion
-		break;
-
-	// Hadoop 2.6.x
-	case "hadoop26":
-		hadoopVersion = hd26Version
-		println "Using Apache Hadoop 2.6.x - [$hadoopVersion]"
-		hadoopArtifacts = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-yarn-common:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-streaming:$hadoopVersion",
-				   "org.apache.hadoop:hadoop-distcp:$hadoopVersion"]
-		hadoopTestArtifacts = ["org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion:tests",
-					"org.apache.hadoop:hadoop-hdfs:$hadoopVersion:tests",
-					"org.apache.hadoop:hadoop-common:$hadoopVersion:tests",
-					"org.apache.hadoop:hadoop-mapreduce-client-app:$hadoopVersion",
-					"org.apache.hadoop:hadoop-mapreduce-client-hs:$hadoopVersion",
-					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion",
-					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion:tests"]
-		hbaseVersion = hd26HbaseVersion
-		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion",
-				  "org.apache.hbase:hbase-common:$hbaseVersion",
-				  "org.apache.hbase:hbase-client:$hbaseVersion"]
-		hiveVersion = hd26HiveVersion
-		pigVersion = hd26PigVersion
-		pigQualifier = ':h2'
-		break;
+//	// Cloudera CDH5 YARN 2.3.x base
+//	case "cdh5":
+//		hadoopVersion = cdh5Version
+//		println "Using Cloudera CDH5 [$hadoopVersion]"
+//		hbaseVersion = cdh5HbaseVersion
+//		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion",
+//				  "org.apache.hbase:hbase-common:$hbaseVersion",
+//				  "org.apache.hbase:hbase-client:$hbaseVersion"]
+//		hiveVersion = cdh5HiveVersion
+//		pigVersion = cdh5PigVersion
+//		sparkVersion = cdh5SparkVersion
+//		sqoop2Version = cdh5Sqoop2Version
+//		hadoopArtifacts = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
+//				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
+//				   "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
+//				   "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion",
+//				   "org.apache.hadoop:hadoop-yarn-common:$hadoopVersion",
+//				   "org.apache.hadoop:hadoop-streaming:$hadoopVersion",
+//				   "org.apache.hadoop:hadoop-distcp:$hadoopVersion"]
+//		hadoopTestArtifacts = ["org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion:tests",
+//					"org.apache.hadoop:hadoop-hdfs:$hadoopVersion:tests",
+//					"org.apache.hadoop:hadoop-common:$hadoopVersion:tests",
+//					"org.apache.hadoop:hadoop-mapreduce-client-app:$hadoopVersion",
+//					"org.apache.hadoop:hadoop-mapreduce-client-hs:$hadoopVersion",
+//					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion",
+//					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion:tests"]
+//		break;
+//
+//	// Hortonworks Data Platform 2.6
+//	case "hdp26":
+//		hadoopVersion = hdp26Version
+//		println "Using Hortonworks Data Platform 2.6 [$hadoopVersion]"
+//		hadoopArtifacts = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
+//				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
+//				   "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
+//				   "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion",
+//				   "org.apache.hadoop:hadoop-yarn-common:$hadoopVersion",
+//				   "org.apache.hadoop:hadoop-streaming:$hadoopVersion",
+//				   "org.apache.hadoop:hadoop-distcp:$hadoopVersion"]
+//		hadoopTestArtifacts = ["org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion:tests",
+//					"org.apache.hadoop:hadoop-hdfs:$hadoopVersion:tests",
+//					"org.apache.hadoop:hadoop-common:$hadoopVersion:tests",
+//					"org.apache.hadoop:hadoop-mapreduce-client-app:$hadoopVersion",
+//					"org.apache.hadoop:hadoop-mapreduce-client-hs:$hadoopVersion",
+//					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion",
+//					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion:tests"]
+//		hbaseVersion = hdp26HbaseVersion
+//		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion",
+//				  "org.apache.hbase:hbase-common:$hbaseVersion",
+//				  "org.apache.hbase:hbase-client:$hbaseVersion"]
+//		hiveVersion = hdp26HiveVersion
+//		pigVersion = hdp26PigVersion
+//		pigQualifier = ':h2'
+//		sparkVersion = hdp26SparkVersion
+//		break;
+//
+//	// Hortonworks Data Platform 2.5
+//	case "hdp25":
+//		hadoopVersion = hdp25Version
+//		println "Using Hortonworks Data Platform 2.5 [$hadoopVersion]"
+//		hadoopArtifacts = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
+//				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
+//				   "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
+//				   "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion",
+//				   "org.apache.hadoop:hadoop-yarn-common:$hadoopVersion",
+//				   "org.apache.hadoop:hadoop-streaming:$hadoopVersion",
+//				   "org.apache.hadoop:hadoop-distcp:$hadoopVersion"]
+//		hadoopTestArtifacts = ["org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion:tests",
+//					"org.apache.hadoop:hadoop-hdfs:$hadoopVersion:tests",
+//					"org.apache.hadoop:hadoop-common:$hadoopVersion:tests",
+//					"org.apache.hadoop:hadoop-mapreduce-client-app:$hadoopVersion",
+//					"org.apache.hadoop:hadoop-mapreduce-client-hs:$hadoopVersion",
+//					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion",
+//					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion:tests"]
+//		hbaseVersion = hdp25HbaseVersion
+//		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion",
+//				  "org.apache.hbase:hbase-common:$hbaseVersion",
+//				  "org.apache.hbase:hbase-client:$hbaseVersion"]
+//		hiveVersion = hdp25HiveVersion
+//		pigVersion = hdp25PigVersion
+//		pigQualifier = ':h2'
+//		sparkVersion = hdp25SparkVersion
+//		break;
+//
+//	// Hadoop 2.6.x
+//	case "hadoop26":
+//		hadoopVersion = hd26Version
+//		println "Using Apache Hadoop 2.6.x - [$hadoopVersion]"
+//		hadoopArtifacts = ["org.apache.hadoop:hadoop-common:$hadoopVersion",
+//				   "org.apache.hadoop:hadoop-hdfs:$hadoopVersion",
+//				   "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion",
+//				   "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion",
+//				   "org.apache.hadoop:hadoop-yarn-common:$hadoopVersion",
+//				   "org.apache.hadoop:hadoop-streaming:$hadoopVersion",
+//				   "org.apache.hadoop:hadoop-distcp:$hadoopVersion"]
+//		hadoopTestArtifacts = ["org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion:tests",
+//					"org.apache.hadoop:hadoop-hdfs:$hadoopVersion:tests",
+//					"org.apache.hadoop:hadoop-common:$hadoopVersion:tests",
+//					"org.apache.hadoop:hadoop-mapreduce-client-app:$hadoopVersion",
+//					"org.apache.hadoop:hadoop-mapreduce-client-hs:$hadoopVersion",
+//					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion",
+//					"org.apache.hadoop:hadoop-yarn-server-tests:$hadoopVersion:tests"]
+//		hbaseVersion = hd26HbaseVersion
+//		hbaseArtifacts = ["org.apache.hbase:hbase:$hbaseVersion",
+//				  "org.apache.hbase:hbase-common:$hbaseVersion",
+//				  "org.apache.hbase:hbase-client:$hbaseVersion"]
+//		hiveVersion = hd26HiveVersion
+//		pigVersion = hd26PigVersion
+//		pigQualifier = ':h2'
+//		break;
 
 	// Hadoop 2.7.x
 	default:
@@ -247,14 +249,15 @@ configure(javaProjects()) {
 	apply plugin: 'eclipse'
 	apply plugin: 'idea'
 	apply plugin: 'propdeps'
-	apply plugin: 'propdeps-idea'
-	apply plugin: 'propdeps-eclipse'
+	//apply plugin: 'propdeps-idea'
+	//apply plugin: 'propdeps-eclipse'
 
 	if (project.hasProperty('platformVersion')) {
 		apply plugin: 'spring-io'
 
 		repositories {
-			maven { url "https://repo.spring.io/libs-snapshot" }
+			mavenCentral()
+			maven { url "https://repo.spring.io/snapshot" }
 		}
 
 		dependencies {
@@ -414,46 +417,46 @@ configure(hadoopProjects()) {
 	// default is Hadoop 2.6.x
 	switch (hadoopDistro) {
 
-		// Cloudera CDH5 YARN
-		case "cdh5":
-			dependencies {
-				compile("org.apache.hadoop:hadoop-common:$cdh5Version")
-				compile("org.apache.hadoop:hadoop-mapreduce-client-core:$cdh5Version")
-				compile("org.apache.hadoop:hadoop-distcp:$cdh5Version")
-				compile("org.apache.hadoop:hadoop-hdfs:$cdh5Version")
-				optional("org.apache.hadoop:hadoop-streaming:$cdh5Version")
-				testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
-				testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
-				testRuntime "dk.brics.automaton:automaton:1.11-8"
-			}
-			break;
-
-		// Hortonworks Data Platform 2.6
-		case "hdp26":
-			dependencies {
-				testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
-				testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
-				testRuntime "dk.brics.automaton:automaton:1.11-8"
-			}
-			break;
-
-		// Hortonworks Data Platform 2.5
-		case "hdp25":
-			dependencies {
-				testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
-				testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
-				testRuntime "dk.brics.automaton:automaton:1.11-8"
-			}
-			break;
-
-		// Hadoop 2.6.x
-		case "hadoop26":
-			dependencies {
-				testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
-				testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
-				testRuntime "dk.brics.automaton:automaton:1.11-8"
-			}
-			break;
+//		// Cloudera CDH5 YARN
+//		case "cdh5":
+//			dependencies {
+//				compile("org.apache.hadoop:hadoop-common:$cdh5Version")
+//				compile("org.apache.hadoop:hadoop-mapreduce-client-core:$cdh5Version")
+//				compile("org.apache.hadoop:hadoop-distcp:$cdh5Version")
+//				compile("org.apache.hadoop:hadoop-hdfs:$cdh5Version")
+//				optional("org.apache.hadoop:hadoop-streaming:$cdh5Version")
+//				testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
+//				testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
+//				testRuntime "dk.brics.automaton:automaton:1.11-8"
+//			}
+//			break;
+//
+//		// Hortonworks Data Platform 2.6
+//		case "hdp26":
+//			dependencies {
+//				testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
+//				testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
+//				testRuntime "dk.brics.automaton:automaton:1.11-8"
+//			}
+//			break;
+//
+//		// Hortonworks Data Platform 2.5
+//		case "hdp25":
+//			dependencies {
+//				testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
+//				testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
+//				testRuntime "dk.brics.automaton:automaton:1.11-8"
+//			}
+//			break;
+//
+//		// Hadoop 2.6.x
+//		case "hadoop26":
+//			dependencies {
+//				testCompile "org.apache.hadoop:hadoop-mapreduce-examples:$hadoopVersion"
+//				testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
+//				testRuntime "dk.brics.automaton:automaton:1.11-8"
+//			}
+//			break;
 
 		// Hadoop 2.7.x
 		default:
@@ -532,171 +535,171 @@ configure(rootProject) {
 
 	apply plugin: 'eclipse'
 	apply plugin: 'idea'
-	apply plugin: 'org.asciidoctor.gradle.asciidoctor'
-	apply plugin: "docbook-reference"
-
-	ext.expandPlaceholders = ""
-
-	reference {
-		sourceDir = new File(asciidoctor.outputDir , 'docbook5')
-		pdfFilename = "spring-data-hadoop-reference.pdf"
-		epubFilename = "spring-data-hadoop-reference.epub"
-		expandPlaceholders = ""
-	}
-
-	afterEvaluate {
-		tasks.findAll { it.name.startsWith("reference") }.each{ it.dependsOn.add("asciidoctor") }
-	}
-
-	asciidoctorj {
-		version = '1.5.2'
-	}
-
-	asciidoctor {
-		sourceDir = file("docs/src/reference/asciidoc")
-		backends = ['docbook5']
-		options eruby: 'erubis'
-		attributes docinfo: '',
-			copycss : '',
-			icons : 'font',
-			'source-highlighter': 'prettify',
-			sectanchors : '',
-			toc2: '',
-			idprefix: '',
-			idseparator: '-',
-			doctype: 'book',
-			numbered: '',
-			'spring-hadoop-version' : project.version,
-			'spring-version' : springVersion,
-			'hadoop-version' : hadoopVanillaVersion,
-			revnumber : project.version
-	}
-
-	// don't publish the default jar for the root project
-	configurations.archives.artifacts.clear()
-
-	task api(type: Javadoc) {
-		group = "Documentation"
-		description = "Generates aggregated Javadoc API documentation."
-		title = "${rootProject.description} ${version} API"
-
-		dependsOn {
-			subprojects.collect {
-				it.tasks.getByName("jar")
-			}
-		}
-		options.memberLevel = org.gradle.external.javadoc.JavadocMemberLevel.PROTECTED
-		options.author = true
-		options.header = rootProject.description
-		options.overview = "docs/src/api/overview.html"
-		options.stylesheetFile = file("docs/src/api/stylesheet.css")
-		options.splitIndex = true
-		//options.links(project.ext.javadocLinks)
-
-		source subprojects.collect { project ->
-			project.sourceSets.main.allJava
-		}
-
-		maxMemory = "1024m"
-		destinationDir = new File(buildDir, "api")
-
-		doFirst {
-			classpath = files(subprojects.collect { it.sourceSets.main.compileClasspath })
-		}
-	}
-
-	task docsZip(type: Zip) {
-		group = "Distribution"
-		baseName = "spring-data-hadoop"
-		classifier = "docs"
-		description = "Builds -${classifier} archive containing api and reference " +
-			"for deployment at https://docs.spring.io/spring-hadoop/docs."
-
-		from("docs/src/info") {
-			include "changelog.txt"
-		}
-
-		from (api) {
-			into "api"
-		}
-
-		from (reference) {
-			into "reference"
-		}
-	}
-
-	task schemaZip(type: Zip) {
-		group = "Distribution"
-		baseName = "spring-data-hadoop"
-		classifier = "schema"
-		description = "Builds -${classifier} archive containing all " +
-			"XSDs for deployment at https://springframework.org/schema."
-
-		subprojects.each { subproject ->
-			def Properties schemas = new Properties();
-
-			subproject.sourceSets.main.resources.find {
-				it.path.endsWith("META-INF/spring.schemas")
-			}?.withInputStream { schemas.load(it) }
-
-			for (def key : schemas.keySet()) {
-				def shortName = key.replaceAll(/http.*schema.(.*).spring-.*/, '$1')
-				assert shortName != key
-				File xsdFile = subproject.sourceSets.main.resources.find {
-					it.path.endsWith(schemas.get(key))
-				}
-				assert xsdFile != null
-				into (shortName) {
-					from xsdFile.path
-				}
-			}
-		}
-	}
-
-	task distZip(type: Zip, dependsOn: [docsZip, schemaZip]) {
-		group = "Distribution"
-		baseName = "spring-data-hadoop"
-		classifier = "dist"
-		description = "Builds -${classifier} archive, containing all jars and docs, " +
-					"suitable for community download page."
-
-		ext.baseDir = "${baseName}-${project.version}";
-
-		from("docs/src/info") {
-			include "readme.txt"
-			include "license.txt"
-			include "notice.txt"
-			into "${baseDir}"
-			expand(copyright: new Date().format("yyyy"), version: project.version)
-		}
-
-		from(zipTree(docsZip.archivePath)) {
-			into "${baseDir}/docs"
-		}
-
-		from(zipTree(schemaZip.archivePath)) {
-			into "${baseDir}/schema"
-		}
-
-		subprojects.each { subproject ->
-			into ("${baseDir}/libs") {
-				from subproject.jar
-				if (subproject.tasks.findByPath("sourcesJar")) {
-					from subproject.sourcesJar
-				}
-				if (subproject.tasks.findByPath("javadocJar")) {
-					from subproject.javadocJar
-				}
-			}
-		}
-	}
-
-	artifacts {
-		archives docsZip
-		archives schemaZip
-		archives distZip
-	}
-
+//	apply plugin: 'org.asciidoctor.gradle.asciidoctor'
+//	apply plugin: "docbook-reference"
+//
+//	ext.expandPlaceholders = ""
+//
+//	reference {
+//		sourceDir = new File(asciidoctor.outputDir , 'docbook5')
+//		pdfFilename = "spring-data-hadoop-reference.pdf"
+//		epubFilename = "spring-data-hadoop-reference.epub"
+//		expandPlaceholders = ""
+//	}
+//
+//	afterEvaluate {
+//		tasks.findAll { it.name.startsWith("reference") }.each{ it.dependsOn.add("asciidoctor") }
+//	}
+//
+//	asciidoctorj {
+//		version = '1.5.2'
+//	}
+//
+//	asciidoctor {
+//		sourceDir = file("docs/src/reference/asciidoc")
+//		backends = ['docbook5']
+//		options eruby: 'erubis'
+//		attributes docinfo: '',
+//			copycss : '',
+//			icons : 'font',
+//			'source-highlighter': 'prettify',
+//			sectanchors : '',
+//			toc2: '',
+//			idprefix: '',
+//			idseparator: '-',
+//			doctype: 'book',
+//			numbered: '',
+//			'spring-hadoop-version' : project.version,
+//			'spring-version' : springVersion,
+//			'hadoop-version' : hadoopVanillaVersion,
+//			revnumber : project.version
+//	}
+//
+//	// don't publish the default jar for the root project
+//	configurations.archives.artifacts.clear()
+//
+//	task api(type: Javadoc) {
+//		group = "Documentation"
+//		description = "Generates aggregated Javadoc API documentation."
+//		title = "${rootProject.description} ${version} API"
+//
+//		dependsOn {
+//			subprojects.collect {
+//				it.tasks.getByName("jar")
+//			}
+//		}
+//		options.memberLevel = org.gradle.external.javadoc.JavadocMemberLevel.PROTECTED
+//		options.author = true
+//		options.header = rootProject.description
+//		options.overview = "docs/src/api/overview.html"
+//		options.stylesheetFile = file("docs/src/api/stylesheet.css")
+//		options.splitIndex = true
+//		//options.links(project.ext.javadocLinks)
+//
+//		source subprojects.collect { project ->
+//			project.sourceSets.main.allJava
+//		}
+//
+//		maxMemory = "1024m"
+//		destinationDir = new File(buildDir, "api")
+//
+//		doFirst {
+//			classpath = files(subprojects.collect { it.sourceSets.main.compileClasspath })
+//		}
+//	}
+//
+//	task docsZip(type: Zip) {
+//		group = "Distribution"
+//		baseName = "spring-data-hadoop"
+//		classifier = "docs"
+//		description = "Builds -${classifier} archive containing api and reference " +
+//			"for deployment at https://docs.spring.io/spring-hadoop/docs."
+//
+//		from("docs/src/info") {
+//			include "changelog.txt"
+//		}
+//
+//		from (api) {
+//			into "api"
+//		}
+//
+//		from (reference) {
+//			into "reference"
+//		}
+//	}
+//
+//	task schemaZip(type: Zip) {
+//		group = "Distribution"
+//		baseName = "spring-data-hadoop"
+//		classifier = "schema"
+//		description = "Builds -${classifier} archive containing all " +
+//			"XSDs for deployment at https://springframework.org/schema."
+//
+//		subprojects.each { subproject ->
+//			def Properties schemas = new Properties();
+//
+//			subproject.sourceSets.main.resources.find {
+//				it.path.endsWith("META-INF/spring.schemas")
+//			}?.withInputStream { schemas.load(it) }
+//
+//			for (def key : schemas.keySet()) {
+//				def shortName = key.replaceAll(/http.*schema.(.*).spring-.*/, '$1')
+//				assert shortName != key
+//				File xsdFile = subproject.sourceSets.main.resources.find {
+//					it.path.endsWith(schemas.get(key))
+//				}
+//				assert xsdFile != null
+//				into (shortName) {
+//					from xsdFile.path
+//				}
+//			}
+//		}
+//	}
+//
+//	task distZip(type: Zip, dependsOn: [docsZip, schemaZip]) {
+//		group = "Distribution"
+//		baseName = "spring-data-hadoop"
+//		classifier = "dist"
+//		description = "Builds -${classifier} archive, containing all jars and docs, " +
+//					"suitable for community download page."
+//
+//		ext.baseDir = "${baseName}-${project.version}";
+//
+//		from("docs/src/info") {
+//			include "readme.txt"
+//			include "license.txt"
+//			include "notice.txt"
+//			into "${baseDir}"
+//			expand(copyright: new Date().format("yyyy"), version: project.version)
+//		}
+//
+//		from(zipTree(docsZip.archivePath)) {
+//			into "${baseDir}/docs"
+//		}
+//
+//		from(zipTree(schemaZip.archivePath)) {
+//			into "${baseDir}/schema"
+//		}
+//
+//		subprojects.each { subproject ->
+//			into ("${baseDir}/libs") {
+//				from subproject.jar
+//				if (subproject.tasks.findByPath("sourcesJar")) {
+//					from subproject.sourcesJar
+//				}
+//				if (subproject.tasks.findByPath("javadocJar")) {
+//					from subproject.javadocJar
+//				}
+//			}
+//		}
+//	}
+//
+//	artifacts {
+//		archives docsZip
+//		archives schemaZip
+//		archives distZip
+//	}
+//
 }
 
 project('spring-data-hadoop-core') {

@@ -16,23 +16,24 @@
 package org.springframework.yarn.boot.actuate.endpoint.mvc;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
-
-import org.springframework.boot.actuate.endpoint.mvc.EndpointMvcAdapter;
-import org.springframework.boot.actuate.endpoint.mvc.MvcEndpoint;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 import org.springframework.web.util.UriComponents;
 import org.springframework.yarn.am.cluster.ContainerCluster;
@@ -43,13 +44,15 @@ import org.springframework.yarn.boot.actuate.endpoint.mvc.domain.ContainerCluste
 import org.springframework.yarn.boot.actuate.endpoint.mvc.domain.YarnContainerClusterEndpointResource;
 
 /**
- * A custom {@link MvcEndpoint} adding specific rest API used to
+ * A {@link RestController} adding specific rest API used to
  * control {@link YarnContainerClusterEndpoint}.
  *
  * @author Janne Valkealahti
  *
  */
-public class YarnContainerClusterMvcEndpoint extends EndpointMvcAdapter {
+@RestController
+@RequestMapping(YarnContainerClusterEndpoint.ENDPOINT_ID)
+public class YarnContainerClusterMvcEndpoint{
 
 	private final YarnContainerClusterEndpoint delegate;
 
@@ -59,7 +62,6 @@ public class YarnContainerClusterMvcEndpoint extends EndpointMvcAdapter {
 	 * @param delegate the delegate {@link YarnContainerClusterEndpoint}
 	 */
 	public YarnContainerClusterMvcEndpoint(YarnContainerClusterEndpoint delegate) {
-		super(delegate);
 		this.delegate = delegate;
 	}
 
@@ -67,12 +69,12 @@ public class YarnContainerClusterMvcEndpoint extends EndpointMvcAdapter {
 	 * Main {@link EndpointMvcAdapter#invoke()} which returns information
 	 * about existing container clusters.
 	 */
-	@RequestMapping(method = RequestMethod.GET)
+	@GetMapping
 	@ResponseBody
 	public Object invoke() {
 		Collection<ContainerCluster> clusters = delegate.getClusters().values();
 		YarnContainerClusterEndpointResource response = new YarnContainerClusterEndpointResource();
-		Collection<String> clusterIds = new ArrayList<String>();
+		Collection<String> clusterIds = new ArrayList<>();
 		for (ContainerCluster cluster : clusters) {
 			clusterIds.add(cluster.getId());
 		}
@@ -86,7 +88,7 @@ public class YarnContainerClusterMvcEndpoint extends EndpointMvcAdapter {
 	 * @param request the container cluster create request
 	 * @return the container cluster create response
 	 */
-	@RequestMapping(method = RequestMethod.POST)
+	@PostMapping
 	public HttpEntity<Void> createCluster(@RequestBody ContainerClusterCreateRequest request) {
 		ProjectionData projectionData = new ProjectionData();
 		if (request.getProjectionData().getAny() != null) {
@@ -106,7 +108,7 @@ public class YarnContainerClusterMvcEndpoint extends EndpointMvcAdapter {
 			throw new InvalidInputException("Projection not defined");
 		}
 
-		projectionData.setType(request.getProjection().toString().toLowerCase());
+		projectionData.setType(request.getProjection().toLowerCase());
 
 		Map<String, Object> extraProperties = request.getExtraProperties();
 
@@ -117,7 +119,7 @@ public class YarnContainerClusterMvcEndpoint extends EndpointMvcAdapter {
 			    .fromMethodCall(on(YarnContainerClusterMvcEndpoint.class).clusterInfo(request.getClusterId())).build();
 		responseHeaders.setLocation(uriComponents.toUri());
 
-		return new ResponseEntity<Void>(responseHeaders, HttpStatus.CREATED);
+		return new ResponseEntity<>(responseHeaders, HttpStatus.CREATED);
 	}
 
 	/**
@@ -126,14 +128,14 @@ public class YarnContainerClusterMvcEndpoint extends EndpointMvcAdapter {
 	 * @param clusterId the container cluster identifier
 	 * @return the container cluster status response
 	 */
-	@RequestMapping(value = "/{clusterId:.*}", method = RequestMethod.GET)
+	@GetMapping(value = "/{clusterId:.*}")
 	public HttpEntity<ContainerClusterResource> clusterInfo(@PathVariable("clusterId") String clusterId) {
 		ContainerCluster cluster = delegate.getClusters().get(clusterId);
 		if (cluster == null) {
 			throw new NoSuchClusterException("No such cluster: " + clusterId);
 		}
 		ContainerClusterResource response = new ContainerClusterResource(cluster);
-		return new ResponseEntity<ContainerClusterResource>(response, HttpStatus.OK);
+		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
 	/**
@@ -143,7 +145,7 @@ public class YarnContainerClusterMvcEndpoint extends EndpointMvcAdapter {
 	 * @param request Binding for modify request content
 	 * @return the container cluster status response
 	 */
-	@RequestMapping(value = "/{clusterId:.*}", method = RequestMethod.PUT)
+	@PutMapping(value = "/{clusterId:.*}")
 	public HttpEntity<Void> modifyCluster(@PathVariable("clusterId") String clusterId,
 			@RequestBody ContainerClusterModifyRequest request) {
 		ModifyAction action = ContainerClusterModifyRequest.getModifyAction(request.getAction());
@@ -156,14 +158,14 @@ public class YarnContainerClusterMvcEndpoint extends EndpointMvcAdapter {
 		} else if (ModifyAction.STOP.equals(action)) {
 			delegate.stopCluster(clusterId);
 		}
-		return new ResponseEntity<Void>(HttpStatus.OK);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/{clusterId:.*}", method = RequestMethod.DELETE)
+	@DeleteMapping(value = "/{clusterId:.*}")
 	public ResponseEntity<Void> destroyCluster(@PathVariable("clusterId") String clusterId) {
 		ContainerCluster cluster = getClusterMayThrow(clusterId);
 		delegate.destroyCluster(cluster.getId());
-		return new ResponseEntity<Void>(HttpStatus.OK);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	/**
@@ -173,7 +175,7 @@ public class YarnContainerClusterMvcEndpoint extends EndpointMvcAdapter {
 	 * @param request the request
 	 * @return the container cluster modify response
 	 */
-	@RequestMapping(value = "/{clusterId:.*}", method = RequestMethod.PATCH)
+	@PatchMapping(value = "/{clusterId:.*}")
 	public HttpEntity<Void> updateCluster(@PathVariable("clusterId") String clusterId, @RequestBody ContainerClusterCreateRequest request) {
 		ContainerCluster cluster = delegate.getClusters().get(clusterId);
 		if (cluster == null) {
@@ -191,7 +193,7 @@ public class YarnContainerClusterMvcEndpoint extends EndpointMvcAdapter {
 		}
 		delegate.modifyCluster(clusterId, data);
 
-		return new ResponseEntity<Void>(HttpStatus.OK);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	/**

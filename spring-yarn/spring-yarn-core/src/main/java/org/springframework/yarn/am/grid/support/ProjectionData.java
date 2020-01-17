@@ -28,7 +28,7 @@ public class ProjectionData {
 
 	private String type;
 	private Integer priority;
-	private Integer memory;
+	private Long memory;
 	private Integer virtualCores;
 	private Boolean locality;
 	private Integer any = 0;
@@ -141,7 +141,7 @@ public class ProjectionData {
 		return virtualCores;
 	}
 
-	public void setMemory(Integer memory) {
+	public void setMemory(Long memory) {
 		this.memory = memory;
 	}
 
@@ -153,7 +153,7 @@ public class ProjectionData {
 		return locality;
 	}
 
-	public Integer getMemory() {
+	public Long getMemory() {
 		return memory;
 	}
 

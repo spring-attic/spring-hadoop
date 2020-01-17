@@ -68,7 +68,7 @@ public abstract class AbstractYarnClient implements YarnClient, InitializingBean
 	private int virtualcores = 1;
 
 	/** Resource capability as of memory */
-	private int memory = 64;
+	private long memory = 64;
 
 	/** Yarn queue for the request */
 	private String queue = "default";
@@ -310,7 +310,7 @@ public abstract class AbstractYarnClient implements YarnClient, InitializingBean
 	 *
 	 * @param memory the new memory
 	 */
-	public void setMemory(int memory) {
+	public void setMemory(long memory) {
 		this.memory = memory;
 	}
 
@@ -379,7 +379,7 @@ public abstract class AbstractYarnClient implements YarnClient, InitializingBean
 		context.setAMContainerSpec(getMasterContainerLaunchContext());
 
 		Resource capability = Records.newRecord(Resource.class);
-		capability.setMemory(memory);
+		capability.setMemorySize(memory);
 		ResourceCompat.setVirtualCores(capability, virtualcores);
 		context.setResource(capability);
 

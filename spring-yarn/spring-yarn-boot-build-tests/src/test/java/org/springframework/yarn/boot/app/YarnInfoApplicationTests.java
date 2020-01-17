@@ -43,7 +43,7 @@ public class YarnInfoApplicationTests extends AbstractApplicationTests {
 				"spring.hadoop.resourceManagerSchedulerAddress", appProperties);
 
 		String[] args = new String[]{
-				"--spring.yarn.internal.YarnInfoApplication.operation=SUBMITTED"
+				"--spring.yarn.internal.yarn-info-application.operation=SUBMITTED"
 		};
 
 		YarnInfoApplication app = new YarnInfoApplication();
@@ -71,7 +71,7 @@ public class YarnInfoApplicationTests extends AbstractApplicationTests {
 
 		String[] args = new String[]{
 				"--spring.yarn.applicationBaseDir=" + BASE,
-				"--spring.yarn.internal.YarnInfoApplication.operation=PUSHED"
+				"--spring.yarn.internal.yarn-info-application.operation=PUSHED"
 		};
 
 		YarnInfoApplication app = new YarnInfoApplication();

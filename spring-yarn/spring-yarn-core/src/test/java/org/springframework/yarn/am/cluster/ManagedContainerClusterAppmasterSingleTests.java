@@ -83,7 +83,7 @@ public class ManagedContainerClusterAppmasterSingleTests extends AbstractManaged
 		appmaster.setStateMachineFactory(stateMachineFactory);
 
 		ProjectionData projectionData = new ProjectionData(1, null, null, "default", 0);
-		projectionData.setMemory(0);
+		projectionData.setMemory(0L);
 		projectionData.setVirtualCores(0);
 
 		appmaster.createContainerCluster("foo", projectionData);
@@ -115,7 +115,7 @@ public class ManagedContainerClusterAppmasterSingleTests extends AbstractManaged
 		TestManagedContainerClusterAppmaster appmaster = createTestAppmaster(allocator, launcher);
 		appmaster.setStateMachineFactory(stateMachineFactory);
 		ProjectionData projectionData = new ProjectionData(1, null, null, "default", 0);
-		projectionData.setMemory(0);
+		projectionData.setMemory(0L);
 		projectionData.setVirtualCores(0);
 
 		// create
@@ -144,7 +144,7 @@ public class ManagedContainerClusterAppmasterSingleTests extends AbstractManaged
 		TestManagedContainerClusterAppmaster appmaster = createTestAppmaster(allocator, launcher);
 		appmaster.setStateMachineFactory(stateMachineFactory);
 		ProjectionData projectionData = new ProjectionData(1, null, null, "default", 0);
-		projectionData.setMemory(0);
+		projectionData.setMemory(0L);
 		projectionData.setVirtualCores(0);
 
 		// create
@@ -191,7 +191,7 @@ public class ManagedContainerClusterAppmasterSingleTests extends AbstractManaged
 		TestManagedContainerClusterAppmaster appmaster = createTestAppmaster(allocator, launcher);
 		appmaster.setStateMachineFactory(stateMachineFactory);
 		ProjectionData projectionData = new ProjectionData(1, null, null, "default", 0);
-		projectionData.setMemory(0);
+		projectionData.setMemory(0L);
 		projectionData.setVirtualCores(0);
 
 		// create and start
@@ -270,7 +270,7 @@ public class ManagedContainerClusterAppmasterSingleTests extends AbstractManaged
 		hosts.put("host1", 2);
 		hosts.put("host2", 2);
 		ProjectionData projectionData = new ProjectionData(0, hosts, null, "default", 0);
-		projectionData.setMemory(0);
+		projectionData.setMemory(0L);
 		projectionData.setVirtualCores(0);
 
 		// create
@@ -327,7 +327,7 @@ public class ManagedContainerClusterAppmasterSingleTests extends AbstractManaged
 		Map<String, Integer> hosts = new HashMap<String, Integer>();
 		hosts.put("host1", 1);
 		ProjectionData projectionData = new ProjectionData(0, hosts, null, "default", 0);
-		projectionData.setMemory(0);
+		projectionData.setMemory(0L);
 		projectionData.setVirtualCores(0);
 
 		GridProjection projection = appmaster.createContainerCluster("foo", projectionData).getGridProjection();

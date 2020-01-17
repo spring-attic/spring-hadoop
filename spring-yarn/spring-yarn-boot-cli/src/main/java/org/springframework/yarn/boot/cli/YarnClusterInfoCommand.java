@@ -94,13 +94,13 @@ public class YarnClusterInfoCommand extends AbstractApplicationCommand {
 			String clusterId = options.valueOf(clusterIdOption);
 			YarnContainerClusterApplication app = new YarnContainerClusterApplication();
 			Properties appProperties = new Properties();
-			appProperties.setProperty("spring.yarn.internal.ContainerClusterApplication.operation", "CLUSTERINFO");
-			appProperties.setProperty("spring.yarn.internal.ContainerClusterApplication.applicationId",
+			appProperties.setProperty("spring.yarn.internal.container-cluster-application.operation", "CLUSTERINFO");
+			appProperties.setProperty("spring.yarn.internal.container-cluster-application.applicationId",
 					appId);
-			appProperties.setProperty("spring.yarn.internal.ContainerClusterApplication.clusterId",
+			appProperties.setProperty("spring.yarn.internal.container-cluster-application.clusterId",
 					clusterId);
 			if (isFlagOn(options, verboseOption)) {
-				appProperties.setProperty("spring.yarn.internal.ContainerClusterApplication.verbose", "true");
+				appProperties.setProperty("spring.yarn.internal.container-cluster-application.verbose", "true");
 			}
 			app.appProperties(appProperties);
 			handleApplicationRun(app);

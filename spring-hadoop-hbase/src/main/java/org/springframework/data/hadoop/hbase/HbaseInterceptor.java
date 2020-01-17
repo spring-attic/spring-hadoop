@@ -15,16 +15,21 @@
  */
 package org.springframework.data.hadoop.hbase;
 
-import java.io.IOException;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.hadoop.hbase.client.HTableInterface;
+import org.apache.hadoop.hbase.TableName;
+import org.apache.hadoop.hbase.client.Connection;
+import org.apache.hadoop.hbase.client.ConnectionFactory;
+import org.apache.hadoop.hbase.client.Table;
 import org.springframework.util.Assert;
+
+import java.io.IOException;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+//import org.apache.hadoop.hbase.client.HTableInterface;
 
 /**
  * AOP interceptor that binds a new Hbase table to the thread before a method call, closing and removing it afterwards in case of any method outcome.
@@ -41,18 +46,25 @@ public class HbaseInterceptor extends HbaseAccessor implements MethodInterceptor
 	private String[] tableNames;
 
 
+	@Override
 	public void afterPropertiesSet() {
 		super.afterPropertiesSet();
 		Assert.notEmpty(tableNames, "at least one table needs to be specified");
 	}
 
+	@Override
 	public Object invoke(MethodInvocation methodInvocation) throws Throwable {
 		Set<String> boundTables = new LinkedHashSet<String>();
 
 		for (String tableName : tableNames) {
 			if (!HbaseSynchronizationManager.hasResource(tableName)) {
 				boundTables.add(tableName);
-				HTableInterface table = HbaseUtils.getHTable(tableName, getConfiguration(), getCharset(), getTableFactory());
+
+				TableName tableNameObj = TableName.valueOf(tableName);
+
+				Connection connection = ConnectionFactory.createConnection(getConfiguration());
+				Table table = connection.getTable(tableNameObj);
+
 				HbaseSynchronizationManager.bindResource(tableName, table);
 			}
 		}
@@ -69,9 +81,9 @@ public class HbaseInterceptor extends HbaseAccessor implements MethodInterceptor
 			}
 		} finally {
 			for (String tableName : boundTables) {
-				HTableInterface table = (HTableInterface) HbaseSynchronizationManager.unbindResourceIfPossible(tableName);
+				Table table =  HbaseSynchronizationManager.unbindResourceIfPossible(tableName);
 				if (table != null) {
-					HbaseUtils.releaseTable(tableName, table);
+					table.close();
 				}
 				else {
 					log.warn("Table [" + tableName + "] unbound from the thread by somebody else; cannot guarantee proper clean-up");

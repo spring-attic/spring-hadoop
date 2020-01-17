@@ -21,7 +21,7 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.After;
 import org.junit.Test;
-import org.springframework.boot.test.EnvironmentTestUtils;
+import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.data.hadoop.HadoopSystemConstants;
@@ -55,7 +55,7 @@ public class HadoopFsShellAutoConfigurationTests {
 	@Test
 	public void testEnabled() throws Exception {
 		AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext();
-		EnvironmentTestUtils.addEnvironment(ctx, "spring.hadoop.fsshell.enabled:true");
+		TestPropertyValues.of("spring.hadoop.fsshell.enabled=true").applyTo(ctx);
 		this.context = ctx;
 		ctx.register(HadoopAutoConfiguration.class, HadoopFsShellAutoConfiguration.class);
 		ctx.refresh();
@@ -65,7 +65,7 @@ public class HadoopFsShellAutoConfigurationTests {
 	@Test
 	public void testDisabled() throws Exception {
 		AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext();
-		EnvironmentTestUtils.addEnvironment(ctx, "spring.hadoop.fsshell.enabled:false");
+		TestPropertyValues.of("spring.hadoop.fsshell.enabled=false").applyTo(ctx);
 		this.context = ctx;
 		ctx.register(HadoopAutoConfiguration.class, HadoopFsShellAutoConfiguration.class);
 		ctx.refresh();

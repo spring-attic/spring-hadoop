@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>spring-yarn-boot-cli</artifactId>
+
+    <name>Spring for Apache Hadoop YARN Boot Cli </name>
+    <description>Spring for Apache Hadoop YARN Boot Cli</description>
+
+    <parent>
+        <groupId>org.springframework.data</groupId>
+        <artifactId>spring-yarn</artifactId>
+        <version>2.5.1-SNAPSHOT</version>
+    </parent>
+
+    <!--
+        compile project(":spring-yarn:spring-yarn-boot")
+        compile "org.springframework.boot:spring-boot-cli:$springBootVersion"
+        runtime "org.springframework:spring-web:$springVersion"
+-->
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-yarn-boot</artifactId>
+            <version>2.5.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-cli</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+</project>

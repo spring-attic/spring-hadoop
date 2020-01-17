@@ -17,12 +17,11 @@ package org.springframework.yarn.boot.support;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.boot.context.embedded.AnnotationConfigEmbeddedWebApplicationContext;
-import org.springframework.boot.context.embedded.EmbeddedServletContainer;
-import org.springframework.data.hadoop.util.net.HostInfoDiscovery;
-import org.springframework.data.hadoop.util.net.HostInfoDiscovery.HostInfo;
+import org.springframework.boot.web.servlet.context.ServletWebServerInitializedEvent;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.data.hadoop.util.net.HostInfoDiscovery;
+import org.springframework.data.hadoop.util.net.HostInfoDiscovery.HostInfo;
 import org.springframework.yarn.am.AppmasterTrackService;
 
 /**
@@ -43,7 +42,7 @@ public class EmbeddedAppmasterTrackService implements AppmasterTrackService, App
 
 	private final static long DEFAULT_WAIT_TIME = 60000;
 
-	private EmbeddedServletContainer embeddedServletContainer;
+	private ServletWebServerInitializedEvent embeddedServletContainer;
 
 	private long waitTime;
 
@@ -79,7 +78,7 @@ public class EmbeddedAppmasterTrackService implements AppmasterTrackService, App
 		log.info("Using hostInfoDiscovery " + hostInfoDiscovery);
 		long now = System.currentTimeMillis();
 		while(now + waitTime > System.currentTimeMillis()) {
-			int port = embeddedServletContainer.getPort();
+			int port = embeddedServletContainer.getWebServer().getPort();
 			if (log.isDebugEnabled()) {
 				log.debug("Polling port from EmbeddedServletContainer port=" + port);
 			}
@@ -101,9 +100,8 @@ public class EmbeddedAppmasterTrackService implements AppmasterTrackService, App
 	@Override
 	public void onApplicationEvent(ApplicationEvent event) {
 		Object source = event.getSource();
-		if (source instanceof AnnotationConfigEmbeddedWebApplicationContext) {
-			embeddedServletContainer = ((AnnotationConfigEmbeddedWebApplicationContext) source)
-					.getEmbeddedServletContainer();
+		if (source instanceof ServletWebServerInitializedEvent) {
+			embeddedServletContainer = (ServletWebServerInitializedEvent) source;
 		}
 	}
 

@@ -56,10 +56,10 @@ public class ParsingUtils {
 	 * @return the value as megs
 	 * @throws ParseException the parse exception
 	 */
-	public static int parseBytesAsMegs(final String string) throws ParseException {
+	public static long parseBytesAsMegs(final String string) throws ParseException {
 		try {
 			// expect input as megs if it's a number
-			return Integer.parseInt(string);
+			return Long.parseLong(string);
 		} catch (NumberFormatException e) {
 		}
 		long bytes = parseBytes(string);

@@ -15,8 +15,7 @@
  */
 package org.springframework.yarn.boot;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.autoconfigure.EndpointWebMvcAutoConfiguration;
+import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointAutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -39,7 +38,7 @@ import org.springframework.yarn.config.annotation.EnableYarn;
 @ConditionalOnClass(EnableYarn.class)
 @ConditionalOnMissingBean(YarnAppmaster.class)
 @ConditionalOnExpression("${spring.yarn.appmaster.containercluster.enabled:false}")
-@AutoConfigureBefore({EndpointWebMvcAutoConfiguration.class, YarnAppmasterAutoConfiguration.class})
+@AutoConfigureBefore({WebEndpointAutoConfiguration.class, YarnAppmasterAutoConfiguration.class})
 @Import(ContainerClusterStateMachineConfiguration.class)
 public class ContainerClusterAppmasterAutoConfiguration {
 
@@ -47,9 +46,6 @@ public class ContainerClusterAppmasterAutoConfiguration {
 	@EnableConfigurationProperties({ SpringYarnAppmasterProperties.class })
 	@ConditionalOnExpression("${spring.yarn.endpoints.containercluster.enabled:false}")
 	public static class ContainerClusterEndPointConfig {
-
-		@Autowired
-		private SpringYarnAppmasterProperties syap;
 
 		@Bean
 		@ConditionalOnMissingBean

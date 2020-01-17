@@ -21,6 +21,7 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Configuration;
@@ -31,13 +32,13 @@ public class YarnContainerClusterApplicationOperationPropertiesTests {
 	@Test
 	public void testProjectionDataProperties() {
 		SpringApplication app = new SpringApplication(TestConfiguration.class);
-		app.setWebEnvironment(false);
+		app.setWebApplicationType(WebApplicationType.NONE);
 		ConfigurableApplicationContext context = app.run(new String[] {
-				"--spring.yarn.internal.ContainerClusterApplication.projectionData.any=1",
-				"--spring.yarn.internal.ContainerClusterApplication.projectionData.hosts.host1=1",
-				"--spring.yarn.internal.ContainerClusterApplication.projectionData.racks.rack1=1",
-				"--spring.yarn.internal.ContainerClusterApplication.projectionData.hosts.host2=2",
-				"--spring.yarn.internal.ContainerClusterApplication.projectionData.racks.rack2=2" });
+				"--spring.yarn.internal.container-cluster-application.projectionData.any=1",
+				"--spring.yarn.internal.container-cluster-application.projectionData.hosts.host1=1",
+				"--spring.yarn.internal.container-cluster-application.projectionData.racks.rack1=1",
+				"--spring.yarn.internal.container-cluster-application.projectionData.hosts.host2=2",
+				"--spring.yarn.internal.container-cluster-application.projectionData.racks.rack2=2" });
 		OperationProperties properties = context.getBean(OperationProperties.class);
 		assertThat(properties, notNullValue());
 		assertThat(properties.getProjectionData().getAny(), is(1));

@@ -33,7 +33,7 @@ public class ProjectionDataTests {
 		ProjectionData other = new ProjectionData();
 		other.setType("type");
 		other.setPriority(10);
-		other.setMemory(20);
+		other.setMemory(20L);
 		other.setVirtualCores(5);
 		other.setLocality(true);
 		other.setAny(3);
@@ -42,7 +42,7 @@ public class ProjectionDataTests {
 
 		assertThat(other.getType(), is("type"));
 		assertThat(other.getPriority(), is(10));
-		assertThat(other.getMemory(), is(20));
+		assertThat(other.getMemory(), is(20L));
 		assertThat(other.getVirtualCores(), is(5));
 		assertThat(other.getLocality(), is(true));
 		assertThat(other.getAny(), is(3));
@@ -58,7 +58,7 @@ public class ProjectionDataTests {
 		ProjectionData other = new ProjectionData();
 		other.setType("type");
 		other.setPriority(10);
-		other.setMemory(20);
+		other.setMemory(20L);
 		other.setVirtualCores(5);
 		other.setLocality(true);
 		other.setAny(3);
@@ -68,7 +68,7 @@ public class ProjectionDataTests {
 
 		assertThat(merged.getType(), is("type"));
 		assertThat(merged.getPriority(), is(10));
-		assertThat(merged.getMemory(), is(20));
+		assertThat(merged.getMemory(), is(20L));
 		assertThat(merged.getVirtualCores(), is(5));
 		assertThat(merged.getLocality(), is(true));
 		assertThat(merged.getAny(), is(3));

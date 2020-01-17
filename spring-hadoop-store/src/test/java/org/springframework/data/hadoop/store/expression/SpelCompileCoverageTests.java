@@ -90,7 +90,7 @@ public class SpelCompileCoverageTests {
 	}
 
 	private static void assertExpression(Object rootObject, String expression, String result, boolean compilable) throws Exception {
-		SpelParserConfiguration spelParserConfiguration = new SpelParserConfiguration(SpelCompilerMode.IMMEDIATE, null);
+		SpelParserConfiguration spelParserConfiguration = new SpelParserConfiguration(SpelCompilerMode.MIXED, null);
 		ExpressionParser parser = new SpelExpressionParser(spelParserConfiguration);
 		StandardEvaluationContext context = new StandardEvaluationContext();
 

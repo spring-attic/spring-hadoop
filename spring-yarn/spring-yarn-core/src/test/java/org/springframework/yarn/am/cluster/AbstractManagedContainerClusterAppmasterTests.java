@@ -65,12 +65,12 @@ public abstract class AbstractManagedContainerClusterAppmasterTests {
 
 	protected StateMachineFactory<ClusterState, ClusterEvent> stateMachineFactory;
 
-	protected Container allocateContainer(Object appmaster, int id) throws Exception {
+	protected Container allocateContainer(Object appmaster, long id) throws Exception {
 		// force host as "host"
 		return allocateContainer(appmaster, id, "host");
 	}
 
-	protected Container allocateContainer(Object appmaster, int id, String host) throws Exception {
+	protected Container allocateContainer(Object appmaster, long id, String host) throws Exception {
 		ContainerId containerId = MockUtils.getMockContainerId(MockUtils.getMockApplicationAttemptId(0, 0), 0);
 		NodeId nodeId = MockUtils.getMockNodeId(host, 0);
 		Priority priority = MockUtils.getMockPriority(0);

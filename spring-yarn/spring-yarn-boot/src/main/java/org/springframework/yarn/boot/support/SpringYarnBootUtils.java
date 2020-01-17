@@ -19,10 +19,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
-
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
@@ -39,7 +39,7 @@ public final class SpringYarnBootUtils {
 
 	private SpringYarnBootUtils(){
 		// private no instantiation
-	};
+	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static void mergeBootArgumentsIntoMap(String[] args, Map map) {
@@ -72,7 +72,7 @@ public final class SpringYarnBootUtils {
 	}
 
 	public static String[] propertiesToBootArguments(Properties properties) {
-		ArrayList<String> args = new ArrayList<String>();
+		List<String> args = new ArrayList<>();
 		for (Entry<Object, Object> entry : properties.entrySet()) {
 			args.add("--" + entry.getKey() + "=" + entry.getValue());
 		}
@@ -93,7 +93,7 @@ public final class SpringYarnBootUtils {
 
 	public static void addApplicationListener(SpringApplicationBuilder builder, Properties properties) {
 		if (properties != null && !properties.isEmpty()) {
-			Map<String, Object> map = new HashMap<String, Object>();
+			Map<String, Object> map = new HashMap<>();
 			for (String key : properties.stringPropertyNames()) {
 				map.put(key, properties.getProperty(key));
 			}
@@ -107,7 +107,7 @@ public final class SpringYarnBootUtils {
 		}
 	}
 
-	public static void addSources(SpringApplicationBuilder builder, Object[] sources) {
+	public static void addSources(SpringApplicationBuilder builder, Class<?>[] sources) {
 		if (!ObjectUtils.isEmpty(sources)) {
 			builder.sources(sources);
 		}
@@ -117,7 +117,7 @@ public final class SpringYarnBootUtils {
 		if (configFilesContents == null) {
 			return;
 		}
-		Map<String, Object> defaultProperties = new HashMap<String, Object>();
+		Map<String, Object> defaultProperties = new HashMap<>();
 		for (Entry<String, Properties> entry : configFilesContents.entrySet()) {
 			try {
 				ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -133,11 +133,12 @@ public final class SpringYarnBootUtils {
 	}
 
 	public static String escapeConfigKey(String key) {
-		return StringUtils.replace(key, ".", "%2E");
+		return StringUtils.replace(key, ".", "--2E--");
 	}
 
+	
 	public static String unescapeConfigKey(String key) {
-		return StringUtils.replace(key, "%2E", ".");
+		return StringUtils.replace(key, "--2E--", ".");
 	}
 
 	public static String resolveApplicationdir(SpringYarnProperties syp) {

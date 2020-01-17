@@ -29,6 +29,7 @@ import org.apache.hadoop.hive.metastore.api.ConfigValSecurityException;
 import org.apache.hadoop.hive.metastore.api.IndexAlreadyExistsException;
 import org.apache.hadoop.hive.service.HiveServerException;
 import org.apache.hadoop.io.IOUtils;
+import org.apache.hive.service.ServiceException;
 import org.apache.thrift.TBase;
 import org.apache.thrift.TException;
 import org.springframework.dao.DataAccessException;
@@ -62,8 +63,8 @@ abstract class HiveUtils {
 		}
 
 		// Thrift client exception
-		if (ex instanceof HiveServerException) {
-			return convert((HiveServerException) ex);
+		if (ex instanceof ServiceException) {
+			return convert(ex);
 		}
 		if (ex instanceof TException) {
 			return new DataAccessResourceFailureException(ex.getMessage(), ex);

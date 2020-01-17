@@ -22,7 +22,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -30,7 +29,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.apache.hadoop.yarn.api.records.Container;
 import org.apache.hadoop.yarn.api.records.ContainerId;
 import org.apache.hadoop.yarn.api.records.NodeId;
@@ -39,10 +37,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.autoconfigure.EndpointWebMvcAutoConfiguration;
-import org.springframework.boot.actuate.autoconfigure.ManagementServerPropertiesAutoConfiguration;
+import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointAutoConfiguration;
+import org.springframework.boot.actuate.endpoint.invoke.ParameterValueMapper;
+import org.springframework.boot.actuate.endpoint.invoke.convert.ConversionServiceParameterValueMapper;
 import org.springframework.boot.autoconfigure.hateoas.HypermediaAutoConfiguration;
-import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -79,7 +78,7 @@ import org.springframework.yarn.boot.actuate.endpoint.mvc.YarnContainerClusterWi
 import org.springframework.yarn.listener.ContainerAllocatorListener;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = { TestConfiguration.class })
+@SpringBootTest(classes = { TestConfiguration.class })
 @WebAppConfiguration
 @DirtiesContext(classMode=ClassMode.AFTER_EACH_TEST_METHOD)
 public class YarnContainerClusterWithCustomProjectionsMvcEndpointTests {
@@ -117,7 +116,7 @@ public class YarnContainerClusterWithCustomProjectionsMvcEndpointTests {
 	}
 
 
-	@Import({ ContainerClusterStateMachineConfiguration.class, EndpointWebMvcAutoConfiguration.class, ManagementServerPropertiesAutoConfiguration.class,
+	@Import({ ContainerClusterStateMachineConfiguration.class, WebEndpointAutoConfiguration.class,
 			HypermediaAutoConfiguration.class })
 	@EnableWebMvc
 	@Configuration
@@ -162,6 +161,11 @@ public class YarnContainerClusterWithCustomProjectionsMvcEndpointTests {
 			defaults.put("cluster1", new ProjectionData(null, null, null, "any", 0));
 			return new ProjectionDataRegistry(defaults);
 		}
+		
+		@Bean
+        public ParameterValueMapper conversionServiceParameterValueMapper() {
+          return new ConversionServiceParameterValueMapper();
+        }
 
 	}
 

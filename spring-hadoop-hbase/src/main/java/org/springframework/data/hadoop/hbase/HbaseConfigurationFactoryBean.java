@@ -15,25 +15,22 @@
  */
 package org.springframework.data.hadoop.hbase;
 
-import java.util.Properties;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HConstants;
-import org.apache.hadoop.hbase.client.HConnectionManager;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.data.hadoop.configuration.ConfigurationUtils;
 import org.springframework.util.StringUtils;
 
+import java.util.Properties;
+
 /**
  * Factory for creating HBase specific configuration. By default cleans up any connection associated with the current configuration.
  *
- *
- * @see HConnectionManager
  * @author Costin Leau
  */
 public class HbaseConfigurationFactoryBean implements InitializingBean, DisposableBean, FactoryBean<Configuration> {
@@ -74,13 +71,6 @@ public class HbaseConfigurationFactoryBean implements InitializingBean, Disposab
 		this.hadoopConfig = configuration;
 	}
 
-	@SuppressWarnings("deprecation")
-	public void destroy() {
-		if (deleteConnection) {
-			HConnectionManager.deleteConnection(getObject());
-		}
-	}
-
 	/**
 	 * Sets the configuration properties.
 	 *
@@ -90,6 +80,7 @@ public class HbaseConfigurationFactoryBean implements InitializingBean, Disposab
 		this.properties = properties;
 	}
 
+	@Override
 	public void afterPropertiesSet() {
 		configuration = (hadoopConfig != null ? HBaseConfiguration.create(hadoopConfig) : HBaseConfiguration.create());
 		ConfigurationUtils.addProperties(configuration, properties);
@@ -103,14 +94,17 @@ public class HbaseConfigurationFactoryBean implements InitializingBean, Disposab
 		}
 	}
 
+	@Override
 	public Configuration getObject() {
 		return configuration;
 	}
 
+	@Override
 	public Class<? extends Configuration> getObjectType() {
 		return (configuration != null ? configuration.getClass() : Configuration.class);
 	}
 
+	@Override
 	public boolean isSingleton() {
 		return true;
 	}
@@ -131,5 +125,10 @@ public class HbaseConfigurationFactoryBean implements InitializingBean, Disposab
 	 */
 	public void setZkPort(Integer port) {
 		this.port = port;
+	}
+
+	@Override
+	public void destroy() throws Exception {
+
 	}
 }

@@ -20,18 +20,13 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertNotNull;
-
 import java.util.List;
 import java.util.Map;
-
 import javax.annotation.Resource;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.CommonConfigurationKeysPublic;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.yarn.TestUtils;
@@ -42,9 +37,6 @@ import org.springframework.yarn.fs.ResourceLocalizer;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("client-ns.xml")
 public class ClientNamespaceTest {
-
-	@Autowired
-	private ApplicationContext ctx;
 
 	@Resource(name = "yarnClient")
 	private YarnClient defaultYarnClient;
@@ -122,8 +114,8 @@ public class ClientNamespaceTest {
 		Integer priority = TestUtils.readField("priority", customYarnClientFactoryBean);
 		assertThat(priority, is(1));
 
-		Integer memory = TestUtils.readField("memory", customYarnClientFactoryBean);
-		assertThat(memory, is(11));
+		Long memory = TestUtils.readField("memory", customYarnClientFactoryBean);
+		assertThat(memory, is(11L));
 
 		String queue = TestUtils.readField("queue", customYarnClientFactoryBean);
 		assertThat(queue, is("customqueue"));

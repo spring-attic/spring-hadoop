@@ -21,6 +21,7 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Configuration;
@@ -37,7 +38,7 @@ public class SpringYarnBatchPropertiesTests {
 	@Test
 	public void testAllPropertiesSetYml() {
 		SpringApplication app = new SpringApplication(TestConfiguration.class);
-		app.setWebEnvironment(false);
+		app.setWebApplicationType(WebApplicationType.NONE);
 		ConfigurableApplicationContext context = app
 				.run(new String[] { "--spring.config.name=SpringYarnBatchPropertiesTests" });
 		SpringYarnBatchProperties properties = context.getBean(SpringYarnBatchProperties.class);
@@ -65,7 +66,7 @@ public class SpringYarnBatchPropertiesTests {
 	@Test
 	public void testAllPropertiesSetProperties() {
 		SpringApplication app = new SpringApplication(TestConfiguration.class);
-		app.setWebEnvironment(false);
+		app.setWebApplicationType(WebApplicationType.NONE);
 		ConfigurableApplicationContext context = app
 				.run(new String[] { "--spring.config.name=SpringYarnBatchPropertiesTests2" });
 		SpringYarnBatchProperties properties = context.getBean(SpringYarnBatchProperties.class);

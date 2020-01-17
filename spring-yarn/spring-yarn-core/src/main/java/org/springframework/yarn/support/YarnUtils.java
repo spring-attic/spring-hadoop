@@ -28,7 +28,6 @@ import org.apache.hadoop.yarn.api.records.ContainerId;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.apache.hadoop.yarn.exceptions.YarnException;
 import org.apache.hadoop.yarn.exceptions.YarnRuntimeException;
-import org.apache.hadoop.yarn.util.ConverterUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.util.Assert;
 import org.springframework.yarn.YarnSystemException;
@@ -95,7 +94,7 @@ public class YarnUtils {
 		if (amContainerId == null) {
 			return null;
 		}
-		ContainerId containerId = ConverterUtils.toContainerId(amContainerId);
+		ContainerId containerId = ContainerId.fromString(amContainerId);
 		return containerId.getApplicationAttemptId();
 	}
 

@@ -92,10 +92,10 @@ public class YarnClusterDestroyCommand extends AbstractApplicationCommand {
 			String versionId = options.valueOf(clusterIdOption);
 			YarnContainerClusterApplication app = new YarnContainerClusterApplication();
 			Properties appProperties = new Properties();
-			appProperties.setProperty("spring.yarn.internal.ContainerClusterApplication.operation", "CLUSTERDESTROY");
-			appProperties.setProperty("spring.yarn.internal.ContainerClusterApplication.applicationId",
+			appProperties.setProperty("spring.yarn.internal.container-cluster-application.operation", "CLUSTERDESTROY");
+			appProperties.setProperty("spring.yarn.internal.container-cluster-application.applicationId",
 					appId);
-			appProperties.setProperty("spring.yarn.internal.ContainerClusterApplication.clusterId",
+			appProperties.setProperty("spring.yarn.internal.container-cluster-application.clusterId",
 					versionId);
 			app.appProperties(appProperties);
 			handleApplicationRun(app);

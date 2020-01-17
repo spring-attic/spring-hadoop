@@ -152,8 +152,8 @@ public class DefaultContainerAllocatorTests {
 	public void testMixedHostRequests() throws Exception {
 		DefaultContainerAllocator allocator = new DefaultContainerAllocator();
 		allocator.setConfiguration(new Configuration());
-		allocator.setAllocationValues("cluster1", 1, null, 1, 64, false);
-		allocator.setAllocationValues("cluster2", 2, null, 2, 128, true);
+		allocator.setAllocationValues("cluster1", 1, null, 1, 64L, false);
+		allocator.setAllocationValues("cluster2", 2, null, 2, 128L, true);
 		TestUtils.callMethod("internalInit", allocator);
 
 		ContainerAllocateData data1 = new ContainerAllocateData();
@@ -171,20 +171,20 @@ public class DefaultContainerAllocatorTests {
 		assertThat(createRequests, notNullValue());
 		assertThat(createRequests.size(), is(6));
 
-		assertResourceRequest(createRequests.get(0), "*", 2, 2, false, 128, 2);
-		assertResourceRequest(createRequests.get(1), "/default-rack", 2, 1, false, 128, 2);
-		assertResourceRequest(createRequests.get(2), "host20", 2, 1, true, 128, 2);
-		assertResourceRequest(createRequests.get(3), "*", 1, 2, true, 64, 1);
-		assertResourceRequest(createRequests.get(4), "/default-rack", 1, 1, true, 64, 1);
-		assertResourceRequest(createRequests.get(5), "host10", 1, 1, true, 64, 1);
+		assertResourceRequest(createRequests.get(0), "*", 2, 2, false, 128L, 2);
+		assertResourceRequest(createRequests.get(1), "/default-rack", 2, 1, false, 128L, 2);
+		assertResourceRequest(createRequests.get(2), "host20", 2, 1, true, 128L, 2);
+		assertResourceRequest(createRequests.get(3), "*", 1, 2, true, 64L, 1);
+		assertResourceRequest(createRequests.get(4), "/default-rack", 1, 1, true, 64L, 1);
+		assertResourceRequest(createRequests.get(5), "host10", 1, 1, true, 64L, 1);
 	}
 
 	@Test
 	public void testMixedAnyAndHostRequests() throws Exception {
 		DefaultContainerAllocator allocator = new DefaultContainerAllocator();
 		allocator.setConfiguration(new Configuration());
-		allocator.setAllocationValues("cluster1", 1, null, 1, 64, false);
-		allocator.setAllocationValues("cluster2", 2, null, 2, 128, true);
+		allocator.setAllocationValues("cluster1", 1, null, 1, 64L, false);
+		allocator.setAllocationValues("cluster2", 2, null, 2, 128L, true);
 		TestUtils.callMethod("internalInit", allocator);
 
 		ContainerAllocateData data1 = new ContainerAllocateData();
@@ -202,10 +202,10 @@ public class DefaultContainerAllocatorTests {
 		assertThat(createRequests, notNullValue());
 		assertThat(createRequests.size(), is(4));
 
-		assertResourceRequest(createRequests.get(0), "*", 2, 2, false, 128, 2);
-		assertResourceRequest(createRequests.get(1), "/default-rack", 2, 1, false, 128, 2);
-		assertResourceRequest(createRequests.get(2), "host20", 2, 1, true, 128, 2);
-		assertResourceRequest(createRequests.get(3), "*", 1, 1, true, 64, 1);
+		assertResourceRequest(createRequests.get(0), "*", 2, 2, false, 128L, 2);
+		assertResourceRequest(createRequests.get(1), "/default-rack", 2, 1, false, 128L, 2);
+		assertResourceRequest(createRequests.get(2), "host20", 2, 1, true, 128L, 2);
+		assertResourceRequest(createRequests.get(3), "*", 1, 1, true, 64L, 1);
 	}
 
 	@Test
@@ -225,7 +225,7 @@ public class DefaultContainerAllocatorTests {
 		assertThat(createRequests, notNullValue());
 		assertThat(createRequests.size(), is(1));
 
-		assertResourceRequest(createRequests.get(0), "*", 0, 1, true, 64, 1);
+		assertResourceRequest(createRequests.get(0), "*", 0, 1, true, 64L, 1);
 	}
 
 	@Test
@@ -273,7 +273,7 @@ public class DefaultContainerAllocatorTests {
 		assertThat(matchRequest(createRequests, "*", 0, 1, true), notNullValue());
 	}
 
-	private static void assertResourceRequest(ResourceRequest req, String resourceName, Integer priority, Integer numContainers, Boolean relaxLocality, Integer capMemory, Integer capCores) {
+	private static void assertResourceRequest(ResourceRequest req, String resourceName, Integer priority, Integer numContainers, Boolean relaxLocality, Long capMemory, Integer capCores) {
 		if (resourceName != null) {
 			assertThat(req.getResourceName(), is(resourceName));
 		}
@@ -287,7 +287,7 @@ public class DefaultContainerAllocatorTests {
 			assertThat(req.getRelaxLocality(), is(relaxLocality));
 		}
 		if (capMemory != null) {
-			assertThat(req.getCapability().getMemory(), is(capMemory));
+			assertThat(req.getCapability().getMemorySize(), is(capMemory));
 		}
 		if (capCores != null) {
 			assertThat(req.getCapability().getVirtualCores(), is(capCores));

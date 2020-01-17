@@ -86,7 +86,7 @@ public class PartitionTextFileWriterTests extends AbstractStoreTests {
 		String[] dataArray = new String[] { DATA10 };
 		MessagePartitionStrategy<String> strategy = new MessagePartitionStrategy<String>(expression,
 				new StandardEvaluationContext(), new SpelExpressionParser(new SpelParserConfiguration(
-						SpelCompilerMode.IMMEDIATE, null)));
+						SpelCompilerMode.MIXED, null)));
 
 		Map<String, Object> headers = new HashMap<String, Object>();
 		headers.put("region", "foo");
@@ -111,7 +111,7 @@ public class PartitionTextFileWriterTests extends AbstractStoreTests {
 		String[] dataArray = new String[] { DATA10 };
 		MessagePartitionStrategy<String> strategy = new MessagePartitionStrategy<String>(expression,
 				new StandardEvaluationContext(), new SpelExpressionParser(new SpelParserConfiguration(
-						SpelCompilerMode.IMMEDIATE, null)));
+						SpelCompilerMode.MIXED, null)));
 
 		Map<String, Object> headers = new HashMap<String, Object>();
 		headers.put("region", "foo");
@@ -134,7 +134,7 @@ public class PartitionTextFileWriterTests extends AbstractStoreTests {
 		String expression = "headers[region].toString() + '/' + dateFormat('yyyy/MM', headers[timestamp])";
 		MessagePartitionStrategy<String> strategy = new MessagePartitionStrategy<String>(expression,
 				new StandardEvaluationContext(), new SpelExpressionParser(new SpelParserConfiguration(
-						SpelCompilerMode.IMMEDIATE, null)));
+						SpelCompilerMode.MIXED, null)));
 
 		PartitionTextFileWriter<Message<?>> writer =
 				new PartitionTextFileWriter<Message<?>>(getConfiguration(), testDefaultPath, null, strategy);

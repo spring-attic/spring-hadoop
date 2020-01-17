@@ -166,9 +166,9 @@ class AllocationGroup {
 		int priority = 0;
 		String labelExpression;
 		int virtualcores = 1;
-		int memory = 64;
+		long memory = 64;
 		boolean locality = false;
-		public ContainerAllocationValues(Integer priority, String labelExpression, Integer virtualcores, Integer memory, Boolean locality) {
+		public ContainerAllocationValues(Integer priority, String labelExpression, Integer virtualcores, Long memory, Boolean locality) {
 			if (priority != null) {
 				this.priority = priority;
 			}

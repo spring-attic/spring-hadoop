@@ -17,13 +17,13 @@ package org.springframework.yarn.boot.app;
 
 import org.apache.hadoop.yarn.api.records.ApplicationId;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.actuate.autoconfigure.EndpointAutoConfiguration;
-import org.springframework.boot.actuate.autoconfigure.EndpointMBeanExportAutoConfiguration;
+import org.springframework.boot.WebApplicationType;
+import org.springframework.boot.actuate.autoconfigure.endpoint.EndpointAutoConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.batch.BatchAutoConfiguration;
 import org.springframework.boot.autoconfigure.jmx.JmxAutoConfiguration;
-import org.springframework.boot.autoconfigure.web.EmbeddedServletContainerAutoConfiguration;
-import org.springframework.boot.autoconfigure.web.WebMvcAutoConfiguration;
+import org.springframework.boot.autoconfigure.web.servlet.ServletWebServerFactoryAutoConfiguration;
+import org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
@@ -44,9 +44,8 @@ import org.springframework.yarn.client.YarnClient;
  *
  */
 @Configuration
-@EnableAutoConfiguration(exclude = { EmbeddedServletContainerAutoConfiguration.class, WebMvcAutoConfiguration.class,
-		JmxAutoConfiguration.class, BatchAutoConfiguration.class, JmxAutoConfiguration.class,
-		EndpointMBeanExportAutoConfiguration.class, EndpointAutoConfiguration.class })
+@EnableAutoConfiguration(exclude = { ServletWebServerFactoryAutoConfiguration.class, WebMvcAutoConfiguration.class,
+		JmxAutoConfiguration.class, BatchAutoConfiguration.class, JmxAutoConfiguration.class, EndpointAutoConfiguration.class })
 public class YarnSubmitApplication extends AbstractClientApplication<ApplicationId, YarnSubmitApplication> {
 
 	private String applicationName;
@@ -72,9 +71,9 @@ public class YarnSubmitApplication extends AbstractClientApplication<Application
 	public ApplicationId run(String... args) {
 		Assert.state(StringUtils.hasText(applicationVersion), "Instance id must be set");
 		SpringApplicationBuilder builder = new SpringApplicationBuilder();
-		builder.web(false);
+		builder.web(WebApplicationType.NONE);
 		builder.sources(YarnSubmitApplication.class);
-		SpringYarnBootUtils.addSources(builder, sources.toArray(new Object[0]));
+		SpringYarnBootUtils.addSources(builder, sources.toArray(new Class<?>[0]));
 		SpringYarnBootUtils.addProfiles(builder, profiles.toArray(new String[0]));
 
 		if (StringUtils.hasText(applicationBaseDir)) {

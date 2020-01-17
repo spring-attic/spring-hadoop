@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>spring-yarn-boot</artifactId>
+
+    <name>Spring for Apache Hadoop YARN Boot </name>
+    <description>Spring for Apache Hadoop YARN Boot</description>
+
+    <parent>
+        <groupId>org.springframework.data</groupId>
+        <artifactId>spring-yarn</artifactId>
+        <version>2.5.1-SNAPSHOT</version>
+    </parent>
+
+<!--
+        compile project(":spring-yarn:spring-yarn-core")
+        compile project(":spring-data-hadoop-util")
+        provided project(":spring-yarn:spring-yarn-batch")
+        provided "org.springframework:spring-web:$springVersion"
+        provided "org.springframework:spring-webmvc:$springVersion"
+        compile "org.springframework.boot:spring-boot-autoconfigure:$springBootVersion"
+        compile "org.springframework.boot:spring-boot-actuator:$springBootVersion"
+        optional "org.springframework.boot:spring-boot-configuration-processor:$springBootVersion"
+        compile "org.apache.httpcomponents:httpclient:$httpclientVersion"
+        optional "org.springframework.security:spring-security-config:$springSecurityVersion"
+        optional "org.springframework.security:spring-security-web:$springSecurityVersion"
+        runtime "org.yaml:snakeyaml:$snakeYamlVersion"
+        testCompile "org.springframework.boot:spring-boot-test:$springBootVersion"
+        testRuntime "org.apache.tomcat.embed:tomcat-embed-core:$tomcatEmbedVersion"
+        testRuntime "org.apache.tomcat.embed:tomcat-embed-logging-juli:$tomcatEmbedVersion"
+        testCompile("org.mockito:mockito-core:$mockitoVersion") { dep ->
+            exclude group: "org.hamcrest"
+        }
+        testCompile "com.jayway.jsonpath:json-path:$jsonpathVersion"
+        testCompile "com.jayway.jsonpath:json-path-assert:$jsonpathVersion"
+-->
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-yarn-core</artifactId>
+            <version>2.5.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-hadoop-util</artifactId>
+            <version>2.5.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-yarn-batch</artifactId>
+            <version>2.5.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-actuator-autoconfigure</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-config</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-web</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.jayway.jsonpath</groupId>
+            <artifactId>json-path</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+</project>

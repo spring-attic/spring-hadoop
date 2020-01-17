@@ -22,7 +22,6 @@ import java.util.LinkedList;
 import org.apache.hadoop.conf.Configurable;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.FsShell;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.hadoop.HadoopException;
 import org.springframework.util.ClassUtils;

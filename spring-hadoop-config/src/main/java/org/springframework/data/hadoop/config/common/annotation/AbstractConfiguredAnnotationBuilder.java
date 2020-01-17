@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
+import javax.management.RuntimeErrorException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.util.Assert;
@@ -50,13 +50,13 @@ public abstract class AbstractConfiguredAnnotationBuilder<O,I,B extends Annotati
 
 	/** Configurers which are added to this builder before the configure step */
 	private final LinkedHashMap<Class<? extends AnnotationConfigurer<O, B>>, List<AnnotationConfigurer<O, B>>> mainConfigurers =
-			new LinkedHashMap<Class<? extends AnnotationConfigurer<O, B>>, List<AnnotationConfigurer<O, B>>>();
+			new LinkedHashMap<>();
 
 	/** Configurers which are added to this builder during the configuration phase */
 	private final LinkedHashMap<Class<? extends AnnotationConfigurer<O, B>>, List<AnnotationConfigurer<O, B>>> postConfigurers =
-			new LinkedHashMap<Class<? extends AnnotationConfigurer<O, B>>, List<AnnotationConfigurer<O, B>>>();
+			new LinkedHashMap<>();
 
-	private final Map<Class<Object>, Object> sharedObjects = new HashMap<Class<Object>, Object>();
+	private final Map<Class<Object>, Object> sharedObjects = new HashMap<>();
 
 	private final boolean allowConfigurersOfSameType;
 
@@ -129,7 +129,7 @@ public abstract class AbstractConfiguredAnnotationBuilder<O,I,B extends Annotati
 				return build();
 			} catch (Exception e) {
 				log.error("Failed to perform build. Returning null", e);
-				return null;
+				throw new RuntimeException(e);
 			}
 		} else {
 			return getObject();

@@ -22,7 +22,7 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.hadoop.hbase.client.HTableInterface;
+import org.apache.hadoop.hbase.client.Table;
 import org.springframework.core.NamedThreadLocal;
 import org.springframework.transaction.support.ResourceTransactionManager;
 import org.springframework.util.Assert;
@@ -37,7 +37,7 @@ public abstract class HbaseSynchronizationManager {
 
 	private static final Log logger = LogFactory.getLog(HbaseSynchronizationManager.class);
 
-	private static final ThreadLocal<Map<String, HTableInterface>> resources = new NamedThreadLocal<Map<String, HTableInterface>>("Bound resources");
+	private static final ThreadLocal<Map<String, Table>> resources = new NamedThreadLocal<Map<String, Table>>("Bound resources");
 
 	/**
 	 * Checks whether any resource is bound for the given key.
@@ -56,15 +56,15 @@ public abstract class HbaseSynchronizationManager {
 	 * @param key association key
 	 * @return associated resource (table)
 	 */
-	public static HTableInterface getResource(Object key) {
+	public static Table getResource(Object key) {
 		return doGetResource(key);
 	}
 
 	/**
 	 * Actually checks the value of the resource that is bound for the given key.
 	 */
-	private static HTableInterface doGetResource(Object actualKey) {
-		Map<String, HTableInterface> tables = resources.get();
+	private static Table doGetResource(Object actualKey) {
+		Map<String, Table> tables = resources.get();
 		if (tables == null) {
 			return null;
 		}
@@ -78,15 +78,15 @@ public abstract class HbaseSynchronizationManager {
 	 * @throws IllegalStateException if there is already a value bound to the thread
 	 * @see ResourceTransactionManager#getResourceFactory()
 	 */
-	public static void bindResource(String key, HTableInterface value) throws IllegalStateException {
+	public static void bindResource(String key, Table value) throws IllegalStateException {
 		Assert.notNull(value, "Value must not be null");
-		Map<String, HTableInterface> map = resources.get();
+		Map<String, Table> map = resources.get();
 		// set ThreadLocal Map if none found
 		if (map == null) {
-			map = new LinkedHashMap<String, HTableInterface>();
+			map = new LinkedHashMap<String, Table>();
 			resources.set(map);
 		}
-		HTableInterface oldValue = map.put(key, value);
+		Table oldValue = map.put(key, value);
 		if (oldValue != null) {
 			throw new IllegalStateException("Already value [" + oldValue + "] for key [" + key
 					+ "] bound to thread [" + Thread.currentThread().getName() + "]");
@@ -104,8 +104,8 @@ public abstract class HbaseSynchronizationManager {
 	 * @throws IllegalStateException if there is no value bound to the thread
 	 * @see ResourceTransactionManager#getResourceFactory()
 	 */
-	public static HTableInterface unbindResource(String key) throws IllegalStateException {
-		HTableInterface value = doUnbindResource(key);
+	public static Table unbindResource(String key) throws IllegalStateException {
+		Table value = doUnbindResource(key);
 		if (value == null) {
 			throw new IllegalStateException("No value for key [" + key + "] bound to thread ["
 					+ Thread.currentThread().getName() + "]");
@@ -119,19 +119,19 @@ public abstract class HbaseSynchronizationManager {
 	 * @param key the key to unbind (usually the resource factory)
 	 * @return the previously bound value, or <code>null</code> if none bound
 	 */
-	public static Object unbindResourceIfPossible(Object key) {
+	public static Table unbindResourceIfPossible(Object key) {
 		return doUnbindResource(key);
 	}
 
 	/**
 	 * Actually remove the value of the resource that is bound for the given key.
 	 */
-	private static HTableInterface doUnbindResource(Object actualKey) {
-		Map<String, HTableInterface> map = resources.get();
+	private static Table doUnbindResource(Object actualKey) {
+		Map<String, Table> map = resources.get();
 		if (map == null) {
 			return null;
 		}
-		HTableInterface value = map.remove(actualKey);
+		Table value = map.remove(actualKey);
 		// Remove entire ThreadLocal if empty...
 		if (map.isEmpty()) {
 			resources.remove();
@@ -150,7 +150,7 @@ public abstract class HbaseSynchronizationManager {
 	 * @return names of bound tables
 	 */
 	public static Set<String> getTableNames() {
-		Map<String, HTableInterface> map = resources.get();
+		Map<String, Table> map = resources.get();
 		if (map != null && !map.isEmpty()) {
 			return Collections.unmodifiableSet(map.keySet());
 		}

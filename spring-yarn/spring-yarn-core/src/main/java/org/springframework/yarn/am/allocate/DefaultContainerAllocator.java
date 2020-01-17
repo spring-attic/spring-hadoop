@@ -67,7 +67,7 @@ public class DefaultContainerAllocator extends AbstractPollingAllocator implemen
 	private int virtualcores = 1;
 
 	/** Resource capability as of memory */
-	private int memory = 64;
+	private long memory = 64;
 
 	/** Locality relaxing */
 	private boolean locality = false;
@@ -298,7 +298,7 @@ public class DefaultContainerAllocator extends AbstractPollingAllocator implemen
 	 * @param memory the memory
 	 * @param locality the locality flag
 	 */
-	public void setAllocationValues(String id, Integer priority, String labelExpression, Integer virtualcores, Integer memory, Boolean locality) {
+	public void setAllocationValues(String id, Integer priority, String labelExpression, Integer virtualcores, Long memory, Boolean locality) {
 		if (log.isTraceEnabled()) {
 			log.trace("setAllocationValues 1: id=" + id + " priority=" + priority + " labelExpression=" + labelExpression + " cores="
 					+ virtualcores + " memory=" + memory + " locality=" + locality);
@@ -360,7 +360,7 @@ public class DefaultContainerAllocator extends AbstractPollingAllocator implemen
 	 *
 	 * @return the memory
 	 */
-	public int getMemory() {
+	public long getMemory() {
 		return memory;
 	}
 
@@ -370,7 +370,7 @@ public class DefaultContainerAllocator extends AbstractPollingAllocator implemen
 	 *
 	 * @param memory the new memory
 	 */
-	public void setMemory(int memory) {
+	public void setMemory(long memory) {
 		this.memory = memory;
 	}
 
@@ -478,7 +478,7 @@ public class DefaultContainerAllocator extends AbstractPollingAllocator implemen
 		pri.setPriority(priority);
 		request.setPriority(pri);
 		Resource capability = Records.newRecord(Resource.class);
-		capability.setMemory(allocationValues.memory);
+		capability.setMemorySize(allocationValues.memory);
 		ResourceCompat.setVirtualCores(capability, allocationValues.virtualcores);
 		request.setCapability(capability);
 		return request;

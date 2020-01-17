@@ -42,7 +42,7 @@ public class DefaultProjectedGridTests {
 		DefaultGridProjection projection = new DefaultGridProjection();
 		projection.setProjectionData(new ProjectionData(2));
 		projection.setPriority(0);
-		projection.setMemory(0);
+		projection.setMemory(0L);
 		projection.setVirtualCores(0);
 
 		projectedGrid.addProjection(projection);

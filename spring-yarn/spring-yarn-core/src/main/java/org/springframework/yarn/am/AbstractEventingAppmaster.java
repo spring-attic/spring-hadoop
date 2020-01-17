@@ -17,14 +17,12 @@ package org.springframework.yarn.am;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.yarn.api.records.Container;
 import org.apache.hadoop.yarn.api.records.ContainerId;
 import org.apache.hadoop.yarn.api.records.ContainerLaunchContext;
 import org.apache.hadoop.yarn.api.records.ContainerStatus;
-import org.apache.hadoop.yarn.util.ConverterUtils;
 import org.springframework.context.ApplicationListener;
 import org.springframework.util.StringUtils;
 import org.springframework.yarn.YarnSystemConstants;
@@ -93,7 +91,7 @@ public abstract class AbstractEventingAppmaster extends AbstractServicesAppmaste
 			onContainerCompleted(containerStatus);
 		} else if (event instanceof ContainerRegisterEvent) {
 			ContainerRegisterEvent e = (ContainerRegisterEvent) event;
-			ContainerId containerId = ConverterUtils.toContainerId(e.getContainerId());
+			ContainerId containerId = ContainerId.fromString(e.getContainerId());
 			Container container = runningContainers.get(containerId);
 			if (container != null) {
 				registeredContainers.put(container, new ContainerRegisterInfo(e.getTrackUrl()));

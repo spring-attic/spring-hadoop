@@ -18,14 +18,12 @@ package org.springframework.yarn.am.monitor;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.yarn.api.records.Container;
 import org.apache.hadoop.yarn.api.records.ContainerId;
 import org.apache.hadoop.yarn.api.records.ContainerState;
 import org.apache.hadoop.yarn.api.records.ContainerStatus;
-import org.apache.hadoop.yarn.util.ConverterUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.yarn.listener.ContainerMonitorListener.ContainerMonitorState;
 
@@ -95,7 +93,7 @@ public class DefaultContainerMonitor extends AbstractMonitor implements Containe
 			log.debug("Reporting container=" + container);
 		}
 
-		String cid = ConverterUtils.toString(container.getId());
+		String cid = container.getId().toString();
 		synchronized (lock) {
 			if (allocated.contains(cid)) {
 				running.add(cid);
@@ -120,7 +118,7 @@ public class DefaultContainerMonitor extends AbstractMonitor implements Containe
 			ContainerId containerId = status.getContainerId();
 			int exitStatus = status.getExitStatus();
 			ContainerState state = status.getState();
-			String cid = ConverterUtils.toString(containerId);
+			String cid = containerId.toString();
 
 			synchronized (lock) {
 				if (state.equals(ContainerState.COMPLETE)) {

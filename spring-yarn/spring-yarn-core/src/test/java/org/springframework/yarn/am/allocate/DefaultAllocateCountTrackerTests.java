@@ -49,12 +49,12 @@ public class DefaultAllocateCountTrackerTests {
 	public void setup() throws Exception {
 		// try to fix some hadoop static init usage
 		// do it again after a test
-		TestUtils.setField("initCalled", new RackResolver(), false);
+		TestUtils.setField("initCalled", RackResolver.class, false);
 	}
 
 	@After
 	public void clean() throws Exception {
-		TestUtils.setField("initCalled", new RackResolver(), false);
+		TestUtils.setField("initCalled", RackResolver.class, false);
 	}
 	
 	@Test

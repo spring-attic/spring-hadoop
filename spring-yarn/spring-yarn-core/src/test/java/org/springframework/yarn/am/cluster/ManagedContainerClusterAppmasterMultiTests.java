@@ -58,13 +58,13 @@ public class ManagedContainerClusterAppmasterMultiTests extends AbstractManagedC
 		appmaster.setStateMachineFactory(stateMachineFactory);
 
 		ProjectionData projectionData1 = new ProjectionData(1, null, null, "default", 0);
-		projectionData1.setMemory(0);
+		projectionData1.setMemory(0L);
 		projectionData1.setVirtualCores(0);
 		appmaster.createContainerCluster("cluster1", projectionData1);
 		appmaster.startContainerCluster("cluster1");
 
 		ProjectionData projectionData2 = new ProjectionData(1, null, null, "default", 0);
-		projectionData2.setMemory(0);
+		projectionData2.setMemory(0L);
 		projectionData2.setVirtualCores(0);
 		appmaster.createContainerCluster("cluster2", projectionData2);
 		appmaster.startContainerCluster("cluster2");
@@ -110,14 +110,14 @@ public class ManagedContainerClusterAppmasterMultiTests extends AbstractManagedC
 		Map<String, Object> extraProperties1 = new HashMap<String, Object>();
 		extraProperties1.put("key", "value1");
 		ProjectionData projectionData1 = new ProjectionData(1, null, null, "default", 0);
-		projectionData1.setMemory(0);
+		projectionData1.setMemory(0L);
 		projectionData1.setVirtualCores(0);
 		appmaster.createContainerCluster("cluster1", "cluster", projectionData1, extraProperties1);
 
 		Map<String, Object> extraProperties2 = new HashMap<String, Object>();
 		extraProperties2.put("key", "value2");
 		ProjectionData projectionData2 = new ProjectionData(1, null, null, "default", 0);
-		projectionData2.setMemory(0);
+		projectionData2.setMemory(0L);
 		projectionData2.setVirtualCores(0);
 		appmaster.createContainerCluster("cluster2", "cluster", projectionData2, extraProperties2);
 
@@ -163,13 +163,13 @@ public class ManagedContainerClusterAppmasterMultiTests extends AbstractManagedC
 
 		// cluster1
 		ProjectionData projectionData1 = new ProjectionData(1, null, null, "default", 0);
-		projectionData1.setMemory(0);
+		projectionData1.setMemory(0L);
 		projectionData1.setVirtualCores(0);
 		GridProjection projection1 = appmaster.createContainerCluster("cluster1", projectionData1).getGridProjection();
 
 		// cluster2
 		ProjectionData projectionData2 = new ProjectionData(1, null, null, "default", 0);
-		projectionData2.setMemory(0);
+		projectionData2.setMemory(0L);
 		projectionData2.setVirtualCores(0);
 		GridProjection projection2 = appmaster.createContainerCluster("cluster2", projectionData2).getGridProjection();
 
@@ -211,7 +211,7 @@ public class ManagedContainerClusterAppmasterMultiTests extends AbstractManagedC
 		hosts1.put("host10", 1);
 
 		ProjectionData projectionData1 = new ProjectionData(0, hosts1, null, "default", 0);
-		projectionData1.setMemory(0);
+		projectionData1.setMemory(0L);
 		projectionData1.setVirtualCores(0);
 
 		GridProjection projection1 = appmaster.createContainerCluster("cluster1", projectionData1).getGridProjection();
@@ -220,7 +220,7 @@ public class ManagedContainerClusterAppmasterMultiTests extends AbstractManagedC
 		Map<String, Integer> hosts2 = new HashMap<String, Integer>();
 		hosts2.put("host20", 1);
 		ProjectionData projectionData2 = new ProjectionData(0, hosts2, null, "default", 0);
-		projectionData2.setMemory(0);
+		projectionData2.setMemory(0L);
 		projectionData2.setVirtualCores(0);
 		GridProjection projection2 = appmaster.createContainerCluster("cluster2", projectionData2).getGridProjection();
 

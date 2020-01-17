@@ -19,7 +19,6 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -69,7 +68,7 @@ public class YarnContainerAutoConfiguration {
 
 		@Bean
 		@ConditionalOnMissingBean(ContainerLauncherRunner.class)
-		@ConditionalOnBean(YarnContainer.class)
+		@ConditionalOnClass(YarnContainer.class)
 		public ContainerLauncherRunner containerLauncherRunner() {
 			ContainerLauncherRunner runner = new ContainerLauncherRunner();
 			runner.setWaitLatch(sycp.isKeepContextAlive());
@@ -132,9 +131,6 @@ public class YarnContainerAutoConfiguration {
 			SpringYarnEnvProperties.class, SpringYarnContainerProperties.class })
 	@EnableYarn(enable=Enable.CONTAINER)
 	public static class SpringYarnConfig extends SpringYarnConfigurerAdapter {
-
-		@Autowired
-		private SpringYarnProperties syp;
 
 		@Autowired
 		private SpringHadoopProperties shp;

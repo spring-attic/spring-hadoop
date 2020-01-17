@@ -62,7 +62,7 @@ public abstract class AbstractGridProjection implements GridProjection {
 	private Integer priority;
 
 	/** Resource memory setting */
-	private Integer memory;
+	private Long memory;
 
 	/** Resource cpu setting */
 	private Integer virtualCores;
@@ -156,7 +156,7 @@ public abstract class AbstractGridProjection implements GridProjection {
 	 *
 	 * @param memory the new memory
 	 */
-	public void setMemory(Integer memory) {
+	public void setMemory(Long memory) {
 		this.memory = memory;
 	}
 
@@ -165,7 +165,7 @@ public abstract class AbstractGridProjection implements GridProjection {
 	 *
 	 * @return the memory
 	 */
-	public Integer getMemory() {
+	public Long getMemory() {
 		return memory;
 	}
 
@@ -351,7 +351,7 @@ public abstract class AbstractGridProjection implements GridProjection {
 	 */
 	protected boolean canFit(GridMember member) {
 		int cpu = member.getContainer().getResource().getVirtualCores();
-		int mem = member.getContainer().getResource().getMemory();
+		long mem = member.getContainer().getResource().getMemorySize();
 		return virtualCores != null && memory != null && virtualCores <= cpu && memory <= mem;
 	}
 

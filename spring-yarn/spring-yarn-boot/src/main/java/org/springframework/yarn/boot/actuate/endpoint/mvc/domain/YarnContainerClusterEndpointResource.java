@@ -31,7 +31,7 @@ public class YarnContainerClusterEndpointResource  {
 	private Collection<String> clusterIds;
 
 	public YarnContainerClusterEndpointResource() {
-		this(new ArrayList<String>());
+		this(new ArrayList<>());
 	}
 
 	public YarnContainerClusterEndpointResource(Collection<String> clusters) {

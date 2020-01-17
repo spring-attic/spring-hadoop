@@ -43,14 +43,14 @@ class HadoopNamespaceHandler extends NamespaceHandlerSupport {
 
 		registerBeanDefinitionParser("script", new ScriptParser());
 
-		registerBeanDefinitionParser("pig-factory", new PigServerParser());
-		registerBeanDefinitionParser("pig-template", new PigTemplateParser());
-		registerBeanDefinitionParser("pig-runner", new PigRunnerParser());
-
-		registerBeanDefinitionParser("hive-client-factory", new HiveClientParser());
-		registerBeanDefinitionParser("hive-server", new HiveServerParser());
-		registerBeanDefinitionParser("hive-template", new HiveTemplateParser());
-		registerBeanDefinitionParser("hive-runner", new HiveRunnerParser());
+//		registerBeanDefinitionParser("pig-factory", new PigServerParser());
+//		registerBeanDefinitionParser("pig-template", new PigTemplateParser());
+//		registerBeanDefinitionParser("pig-runner", new PigRunnerParser());
+//
+//		registerBeanDefinitionParser("hive-client-factory", new HiveClientParser());
+//		registerBeanDefinitionParser("hive-server", new HiveServerParser());
+//		registerBeanDefinitionParser("hive-template", new HiveTemplateParser());
+//		registerBeanDefinitionParser("hive-runner", new HiveRunnerParser());
 
 		registerBeanDefinitionParser("hbase-configuration", new HbaseConfigurationParser());
 
@@ -58,8 +58,8 @@ class HadoopNamespaceHandler extends NamespaceHandlerSupport {
 		registerBeanDefinitionParser("tool-tasklet", new ToolTaskletParser());
 		registerBeanDefinitionParser("jar-tasklet", new JarTaskletParser());
 		registerBeanDefinitionParser("script-tasklet", new ScriptTaskletParser());
-		registerBeanDefinitionParser("hive-tasklet", new HiveTaskletParser());
-		registerBeanDefinitionParser("pig-tasklet", new PigTaskletParser());
+//		registerBeanDefinitionParser("hive-tasklet", new HiveTaskletParser());
+//		registerBeanDefinitionParser("pig-tasklet", new PigTaskletParser());
 
 	}
 

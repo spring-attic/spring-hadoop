@@ -71,7 +71,7 @@ public class YarnClusterCreateCommand extends AbstractApplicationCommand {
 
 	public static class ClusterCreateOptionHandler extends ApplicationOptionHandler<String> {
 
-		private static final String PREFIX = "spring.yarn.internal.ContainerClusterApplication";
+		private static final String PREFIX = "spring.yarn.internal.container-cluster-application";
 
 		private OptionSpec<String> applicationIdOption;
 
@@ -129,16 +129,16 @@ public class YarnClusterCreateCommand extends AbstractApplicationCommand {
 
 			YarnContainerClusterApplication app = new YarnContainerClusterApplication();
 			Properties appProperties = new Properties();
-			appProperties.setProperty("spring.yarn.internal.ContainerClusterApplication.operation", "CLUSTERCREATE");
-			appProperties.setProperty("spring.yarn.internal.ContainerClusterApplication.applicationId",
+			appProperties.setProperty("spring.yarn.internal.container-cluster-application.operation", "CLUSTERCREATE");
+			appProperties.setProperty("spring.yarn.internal.container-cluster-application.applicationId",
 					appId);
-			appProperties.setProperty("spring.yarn.internal.ContainerClusterApplication.clusterId",
+			appProperties.setProperty("spring.yarn.internal.container-cluster-application.clusterId",
 					clusterId);
 			if (clusterDef != null) {
-				appProperties.setProperty("spring.yarn.internal.ContainerClusterApplication.clusterDef", clusterDef);
+				appProperties.setProperty("spring.yarn.internal.container-cluster-application.clusterDef", clusterDef);
 			}
 			if (projectionType != null) {
-				appProperties.setProperty("spring.yarn.internal.ContainerClusterApplication.projectionType",
+				appProperties.setProperty("spring.yarn.internal.container-cluster-application.projectionType",
 						projectionType);
 			}
 
@@ -167,7 +167,7 @@ public class YarnClusterCreateCommand extends AbstractApplicationCommand {
 			Properties extraProperties = getExtraProperties(options);
 			if (extraProperties != null) {
 				for (String key : extraProperties.stringPropertyNames()) {
-					appProperties.setProperty("spring.yarn.internal.ContainerClusterApplication.extraProperties."
+					appProperties.setProperty("spring.yarn.internal.container-cluster-application.extraProperties."
 							+ key, extraProperties.getProperty(key));
 				}
 			}

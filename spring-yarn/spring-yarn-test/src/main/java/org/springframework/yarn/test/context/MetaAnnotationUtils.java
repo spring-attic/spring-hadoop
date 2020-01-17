@@ -16,16 +16,17 @@
 
 package org.springframework.yarn.test.context;
 
+import static org.springframework.core.annotation.AnnotationUtils.isAnnotationDeclaredLocally;
 import java.lang.annotation.Annotation;
-
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.style.ToStringCreator;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
-
-import static org.springframework.core.annotation.AnnotationUtils.*;
 
 /**
  * {@code MetaAnnotationUtils} is a collection of utility methods that complements
@@ -266,7 +267,7 @@ abstract class MetaAnnotationUtils {
 					: rootDeclaringClass;
 			this.composedAnnotation = composedAnnotation;
 			this.annotation = annotation;
-			this.annotationAttributes = AnnotatedElementUtils.getAnnotationAttributes(rootDeclaringClass,
+			this.annotationAttributes = AnnotatedElementUtils.getMergedAnnotationAttributes(rootDeclaringClass,
 				annotation.annotationType().getName());
 		}
 
